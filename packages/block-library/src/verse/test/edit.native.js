@@ -6,7 +6,7 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	getBlock,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 } from 'test/helpers';
 
@@ -65,13 +65,13 @@ describe( 'Verse block', () => {
 			'Write verse…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string );
+		typeInRichText( verseTextInput, string );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( verseTextInput, 'Again' );
+		typeInRichText( verseTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `

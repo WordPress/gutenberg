@@ -4,8 +4,7 @@
 import {
 	addBlock,
 	getBlock,
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -79,7 +78,7 @@ describe( 'Editor History', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -124,7 +123,7 @@ describe( 'Editor History', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{ selectionStart: 2, selectionEnd: 7 }

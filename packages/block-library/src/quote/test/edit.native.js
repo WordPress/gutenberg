@@ -10,7 +10,7 @@ import {
 	fireEvent,
 	within,
 	waitFor,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -50,7 +50,7 @@ describe( 'Quote', () => {
 		let quoteTextInput =
 			within( quoteBlock ).getByPlaceholderText( 'Start writing…' );
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( quoteTextInput, string, {
+		typeInRichText( quoteTextInput, string, {
 			selectionStart: string.length,
 			selectionEnd: string.length,
 		} );
@@ -63,10 +63,10 @@ describe( 'Quote', () => {
 			within( quoteBlock ).getAllByPlaceholderText(
 				'Start writing…'
 			)[ 1 ];
-		changeAndSelectTextOfRichText( quoteTextInput, 'Again.' );
+		typeInRichText( quoteTextInput, 'Again.' );
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		changeAndSelectTextOfRichText( citationTextInput, 'A person', {
+		typeInRichText( citationTextInput, 'A person', {
 			selectionStart: 2,
 			selectionEnd: 2,
 		} );

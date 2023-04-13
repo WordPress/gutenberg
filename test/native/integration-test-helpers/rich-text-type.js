@@ -17,18 +17,14 @@ function insertTextAtPosition( text, newText, start, end ) {
  * Changes the text and selection of a RichText component.
  *
  * @param {import('react-test-renderer').ReactTestInstance} richText                        RichText test instance.
- * @param {string}                                          text                            Text to be set.
+ * @param {string}                                          text                            Text to set.
  * @param {Object}                                          options                         Configuration options for selection.
- * @param {number}                                          [options.initialSelectionStart]
- * @param {number}                                          [options.initialSelectionEnd]
- * @param {number}                                          [options.selectionStart]        Selection start position.
- * @param {number}                                          [options.selectionEnd]          Selection end position.
+ * @param {number}                                          [options.initialSelectionStart] Selection start position before the text is inserted.
+ * @param {number}                                          [options.initialSelectionEnd]   Selection end position before the text is inserted.
+ * @param {number}                                          [options.selectionStart]        Selection start position after the text is inserted.
+ * @param {number}                                          [options.selectionEnd]          Selection end position after the text is inserted.
  */
-export const changeAndSelectTextOfRichText = (
-	richText,
-	text,
-	options = {}
-) => {
+export const typeInRichText = ( richText, text, options = {} ) => {
 	const currentValueSansOuterHtmlTags = stripOuterHtmlTags(
 		richText.props.value
 	);
@@ -40,6 +36,7 @@ export const changeAndSelectTextOfRichText = (
 	} = options;
 
 	fireEvent( richText, 'focus' );
+	// `onSelectionChange` invokes `onChange`; we only need to trigger the former.
 	fireEvent(
 		richText,
 		'onSelectionChange',
@@ -48,7 +45,7 @@ export const changeAndSelectTextOfRichText = (
 		text,
 		{
 			nativeEvent: {
-				eventCount: ( eventCount += 101 ),
+				eventCount: ( eventCount += 101 ), // Avoid Aztec dropping the event.
 				target: undefined,
 				text: insertTextAtPosition(
 					currentValueSansOuterHtmlTags,

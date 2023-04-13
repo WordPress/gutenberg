@@ -2,8 +2,7 @@
  * External dependencies
  */
 import {
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -79,7 +78,7 @@ describe( 'List block', () => {
 
 		const listItemField =
 			within( listBlock ).getByPlaceholderText( 'List' );
-		changeTextOfRichText( listItemField, 'First list item' );
+		typeInRichText( listItemField, 'First list item' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -347,7 +346,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
-		changeAndSelectTextOfRichText( listItemField, '', {
+		typeInRichText( listItemField, '', {
 			selectionStart: 0,
 		} );
 		fireEvent( listItemField, 'onKeyDown', {
@@ -397,7 +396,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
-		changeAndSelectTextOfRichText( listItemField, '', {
+		typeInRichText( listItemField, '', {
 			selectionStart: 0,
 		} );
 		fireEvent( listItemField, 'onKeyDown', {

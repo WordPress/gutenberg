@@ -5,8 +5,7 @@ import {
 	act,
 	addBlock,
 	getBlock,
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -55,7 +54,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{ selectionStart: 2, selectionEnd: 7 }
@@ -80,7 +79,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{ selectionStart: 2, selectionEnd: 7 }
@@ -105,7 +104,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{ selectionStart: 2, selectionEnd: 7 }
@@ -130,7 +129,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -155,7 +154,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -180,7 +179,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -208,7 +207,7 @@ describe( 'Paragraph block', () => {
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		const string = 'A quick brown fox jumps over the lazy dog.';
-		changeAndSelectTextOfRichText( paragraphTextInput, string, {
+		typeInRichText( paragraphTextInput, string, {
 			selectionStart: string.length / 2,
 			selectionEnd: string.length / 2,
 		} );
@@ -279,7 +278,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
@@ -325,7 +324,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
@@ -362,14 +361,10 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
-			paragraphTextInput,
-			'     some text      ',
-			{
-				selectionStart: 5,
-				selectionEnd: 14,
-			}
-		);
+		typeInRichText( paragraphTextInput, '     some text      ', {
+			selectionStart: 5,
+			selectionEnd: 14,
+		} );
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
 
 		// Assert

@@ -3,7 +3,7 @@
  */
 import {
 	addBlock,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -68,13 +68,13 @@ describe( 'Preformatted', () => {
 			'Write preformatted text…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( preformattedTextInput, string );
+		typeInRichText( preformattedTextInput, string );
 		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( preformattedTextInput, 'Again' );
+		typeInRichText( preformattedTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `

@@ -10,7 +10,7 @@ import {
 	fireEvent,
 	within,
 	waitFor,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -36,17 +36,17 @@ describe( 'Pullquote', () => {
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( pullquoteTextInput, string );
+		typeInRichText( pullquoteTextInput, string );
 		fireEvent( pullquoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( pullquoteTextInput, 'Again' );
+		typeInRichText( pullquoteTextInput, 'Again' );
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		changeAndSelectTextOfRichText( citationTextInput, 'A person', {
+		typeInRichText( citationTextInput, 'A person', {
 			selectionStart: 2,
 			selectionEnd: 2,
 		} );
