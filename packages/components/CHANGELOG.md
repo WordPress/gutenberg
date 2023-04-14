@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
+
 ## 23.8.0 (2023-04-12)
 
 ### Internal
