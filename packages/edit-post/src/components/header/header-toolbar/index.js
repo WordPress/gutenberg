@@ -8,6 +8,7 @@ import {
 	NavigableToolbar,
 	ToolSelector,
 	store as blockEditorStore,
+	useShouldContextualToolbarShow,
 } from '@wordpress/block-editor';
 import {
 	EditorHistoryRedo,
@@ -18,7 +19,6 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -40,44 +40,27 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		shouldUseKeyboardFocusShortcut,
+		selectedBlockId,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
-			getBlock,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			getSelectedBlockClientId,
 			getFirstMultiSelectedBlockClientId,
 			getSettings,
-			__unstableGetEditorMode,
 		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const editorMode = __unstableGetEditorMode();
-		const isDistractionFree = getSettings().isDistractionFree;
-		const hasFixedToolbar = getSettings().hasFixedToolbar;
-
-		// Check if we have an empty block selected
-		// If the first block in a multi selection is empty, there isn't a toolbar to show
-		const selectedBlockId =
-			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-		const isBlockWithToolbarSelected = selectedBlockId
-			? ! isUnmodifiedDefaultBlock( getBlock( selectedBlockId ) )
-			: false;
-
-		const maybeBlockToolbarShowing =
-			isBlockWithToolbarSelected ||
-			// Anytime there's a fixed toolbar and a selection, a toolbar is showing
-			( hasFixedToolbar && selectedBlockId );
 
 		return {
-			shouldUseKeyboardFocusShortcut:
-				isDistractionFree ||
-				! maybeBlockToolbarShowing ||
-				( ! hasFixedToolbar && editorMode !== 'edit' ),
+			hasFixedToolbar: getSettings().hasFixedToolbar,
+			selectedBlockId:
+				getSelectedBlockClientId() ||
+				getFirstMultiSelectedBlockClientId(),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -94,9 +77,17 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-
+	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
+		useShouldContextualToolbarShow( selectedBlockId );
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		( ( hasFixedToolbar || ! isLargeViewport ) && selectedBlockId );
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -144,7 +135,7 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
-			shouldUseKeyboardFocusShortcut={ shouldUseKeyboardFocusShortcut }
+			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
