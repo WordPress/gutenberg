@@ -40,7 +40,7 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	it( 'renders without crashing', () => {
+	it.only( 'renders without crashing', () => {
 		const screen = getTestComponentWithContent( '' );
 		expect( screen.container ).toBeTruthy();
 	} );
