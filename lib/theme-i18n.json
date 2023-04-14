@@ -69,6 +69,11 @@
 							"name": "Space size name"
 						}
 					]
+				},
+				"variations": {
+					"*": {
+						"label": "Name of style variation"
+					}
 				}
 			}
 		}
