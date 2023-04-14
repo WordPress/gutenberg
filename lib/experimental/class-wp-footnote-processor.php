@@ -24,7 +24,7 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	 *
 	 * @var array[]
 	 */
-	private $notes = array();
+	public $notes = array();
 
 	/**
 	 * Replaces inline footnotes in a given HTML document with
@@ -55,7 +55,8 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 			$count = $this->notes[ $id ]['count'];
 
 			$footnote_content = sprintf(
-				'<sup><a class="note-link" href="#%s" id="%s-link-%d">[%d]</a></sup>',
+				'<sup title="%s"><a class="note-link" href="#%s" id="%s-link-%d">[%d]</a></sup>',
+                esc_attr( $note ),
 				$id,
 				$id,
 				$count,
@@ -185,13 +186,58 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 }
 
 add_filter(
-	'the_content',
-	function ( $html ) {
-		$p = new WP_Footnote_Processor( $html );
-		$p->replace_footnotes();
+    'block_parser_class',
+    /**
+     * Hack to inject a per-render singleton footnote processor.
+     */
+    function ( $parser_class ) {
+        $notes = array();
 
-		return $p->get_updated_html() . $p->get_footer();
-	},
-	1000,
-	1
+        add_filter(
+            'render_block',
+            function ( $html, $block ) use ( &$notes ) {
+                if ( 'core/footnote-list' === $block['blockName'] ) {
+                    if ( 0 === count( $notes ) ) {
+                        return $html;
+                    }
+
+                    $p        = new WP_Footnote_Processor( $html );
+                    $p->notes = $notes;
+                    $list     = $p->get_footer();
+                    $notes    = array();
+
+                    return $html . $list;
+                }
+
+                $p        = new WP_Footnote_Processor( $html );
+                $p->notes = $notes;
+                $p->replace_footnotes();
+                $notes    = $p->notes;
+
+                return $p->get_updated_html();
+            },
+            1000,
+            2
+        );
+
+        add_filter(
+            'the_content',
+            function ( $html ) use ( &$notes ) {
+                if ( 0 === count( $notes ) ) {
+                    return $html;
+                }
+
+                $p        = new WP_Footnote_Processor( $html );
+                $p->notes = $notes;
+                $list     = $p->get_footer();
+                $notes    = array();
+
+                return $html . $list;
+            },
+            1000,
+            1
+        );
+
+        return $parser_class;
+    }
 );
