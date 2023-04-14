@@ -463,3 +463,53 @@ $block-navigation-max-indent: 8;
 .list-view-appender__description {
 	display: none;
 }
+
+.block-editor-list-view-block-draggable-chip-wrapper {
+	position: absolute;
+	// Offset the chip slightly so that it's not directly under the mouse cursor.
+	// This ensures there is clearance so that the drop indicator line is visible.
+	top: $grid-unit-10;
+	left: $grid-unit-20;
+}
+
+.block-editor-list-view-block-draggable-chip {
+	// Width of the sidebar, minus the list view's padding and the block settings icon.
+	width: 350px - $grid-unit-10 - $icon-size;
+	height: 36px;
+	background: $white;
+	border: 1px solid $gray-400;
+	border-radius: $radius-block-ui;
+	opacity: 0.75;
+
+	.block-editor-list-view-block-select-button__label-wrapper {
+		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
+		flex: 1;
+		position: relative;
+
+		.components-truncate {
+			position: absolute;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+	}
+
+	.block-editor-list-view-block-select-button__anchor-wrapper {
+		position: relative;
+		max-width: min(110px, 40%);
+		width: 100%;
+	}
+
+	.block-editor-list-view-block-select-button__anchor {
+		position: absolute;
+		right: 0;
+		transform: translateY(-50%);
+		background: rgba($black, 0.1);
+		border-radius: $radius-block-ui;
+		padding: 2px 6px;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+}

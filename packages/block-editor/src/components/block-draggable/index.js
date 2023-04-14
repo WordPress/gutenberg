@@ -19,6 +19,7 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	__experimentalDragComponent,
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
@@ -102,7 +103,12 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
+				__experimentalDragComponent || (
+					<BlockDraggableChip
+						count={ clientIds.length }
+						icon={ icon }
+					/>
+				)
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
