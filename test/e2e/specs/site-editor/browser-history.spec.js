@@ -54,7 +54,10 @@ test.describe( 'Site editor browser history', () => {
 			'/wp-admin/site-editor.php?path=%2Fwp_template%2Fall'
 		);
 
-		const title = page.getByRole( 'heading', { level: 1 } );
+		const header = page.getByRole( 'region', {
+			name: 'Templates list - Header',
+		} );
+		const title = header.getByRole( 'heading', { level: 2 } );
 		await expect( title ).toHaveText( 'Templates' );
 	} );
 } );
