@@ -16,7 +16,7 @@ The following sections will walk you through the existing block APIs:
 -   [Selectors](/docs/reference-guides/block-api/block-selectors.md)
 -   [Styles](/docs/reference-guides/block-api/block-styles.md)
 -   [Supports](/docs/reference-guides/block-api/block-supports.md)
--   [Templates for Blocks)](/docs/reference-guides/block-api/block-templates.md)
+-   [Templates](/docs/reference-guides/block-api/block-templates.md)
 -   [Transformations](/docs/reference-guides/block-api/block-transforms.md)
 -   [Templates](/docs/reference-guides/block-api/block-templates.md)
 -   [Variations](/docs/reference-guides/block-api/block-variations.md)
