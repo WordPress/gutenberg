@@ -139,8 +139,13 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		<>
 			<InspectorControls group="filter">
 				<StylesFiltersPanel
-					value={ style }
-					onChange={ ( newStyle ) => {
+					value={ { filter: style?.filter } }
+					onChange={ ( newDuotone ) => {
+						const newStyle = {
+							color: {
+								...newDuotone?.filter,
+							},
+						};
 						setAttributes( { style: newStyle } );
 					} }
 					settings={ settings }
