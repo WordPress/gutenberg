@@ -290,7 +290,17 @@ const SpacerEdit = ( {
 				} );
 			}
 		}
-	}, [] );
+	}, [
+		blockStyle,
+		flexSize,
+		height,
+		inheritedOrientation,
+		isFlexLayout,
+		layout,
+		selfStretch,
+		setAttributes,
+		width,
+	] );
 
 	return (
 		<>
