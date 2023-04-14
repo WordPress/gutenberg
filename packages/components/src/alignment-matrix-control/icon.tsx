@@ -17,7 +17,7 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const BASE_SIZE = 24;
 
-function AlignmentMatrixControlIcon( {
+function AlignmentMatrixControlIconTest( {
 	className,
 	disablePointerEvents = true,
 	size = BASE_SIZE,
@@ -59,4 +59,4 @@ function AlignmentMatrixControlIcon( {
 	);
 }
 
-export default AlignmentMatrixControlIcon;
+export default AlignmentMatrixControlIconTest;
