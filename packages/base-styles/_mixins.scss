@@ -535,11 +535,23 @@
 	// Firefox 109+ and Chrome 111+
 	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
 	scrollbar-width: thin;
-	scrollbar-gutter: stable;
+	scrollbar-gutter: auto;
 
+	// Needed to fix a Safari rendering issue.
+	will-change: transform;
+
+	// On-hover/focus visibility.
 	&:hover,
 	&:focus,
 	& > * {
 		visibility: visible;
+	}
+
+	// Scrolling behavior.
+	overflow: hidden;
+
+	&:hover,
+	&:focus {
+		overflow: auto;
 	}
 }
