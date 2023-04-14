@@ -1648,7 +1648,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_sanitize_for_block_with_style_variations() {
 		return array(
-			'1 variation with 1 valid property'   => array(
+			'1 variation with 1 valid property'     => array(
 				'theme_json_variations' => array(
 					'variations' => array(
 						'plain' => array(
