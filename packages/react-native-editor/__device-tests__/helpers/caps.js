@@ -16,9 +16,6 @@ exports.iosLocal = {
 	deviceName: 'iPhone 13',
 	wdaLaunchTimeout: 240000,
 	usePrebuiltWDA: true,
-	wdaConnectionTimeout: 480000,
-	wdaStartupRetries: 4,
-	wdaStartupRetryInterval: 3000,
 };
 
 exports.iosServer = {
