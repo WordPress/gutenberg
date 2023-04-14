@@ -467,7 +467,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	}
 
 	// Checks if fluid font sizes are activated.
-	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
+	$global_settings     = gutenberg_get_global_settings();
+	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
+	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+
 	$should_use_fluid_typography
 		= isset( $typography_settings['fluid'] ) &&
 		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
@@ -481,7 +484,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
 
 	// Defaults.
-	$default_maximum_viewport_width       = '1600px';
+	$default_maximum_viewport_width       = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : '1600px';
 	$default_minimum_viewport_width       = '320px';
 	$default_minimum_font_size_factor_max = 0.75;
 	$default_minimum_font_size_factor_min = 0.25;
