@@ -10,7 +10,7 @@ import {
 	MenuItem,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { Icon, chevronDown, reset } from '@wordpress/icons';
+import { Icon, moreVertical, reset } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -65,12 +65,11 @@ export default function Actions( { template } ) {
 
 	return (
 		<DropdownMenu
-			icon={ chevronDown }
+			icon={ moreVertical }
 			className="edit-site-list-table__actions"
 			text={ __( 'Actions' ) }
 			toggleProps={ {
 				variant: 'tertiary',
-				iconPosition: 'right',
 			} }
 		>
 			{ ( { onClose } ) => (
