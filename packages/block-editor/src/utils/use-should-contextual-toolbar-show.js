@@ -36,6 +36,7 @@ export function useShouldContextualToolbarShow( clientId ) {
 			const isEditMode = __unstableGetEditorMode() === 'edit';
 			const hasFixedToolbar = getSettings().hasFixedToolbar;
 			const isDistractionFree = getSettings().isDistractionFree;
+			const hasClientId = !! clientId;
 			const isEmptyDefaultBlock = isUnmodifiedDefaultBlock(
 				getBlock( clientId ) || {}
 			);
@@ -47,12 +48,13 @@ export function useShouldContextualToolbarShow( clientId ) {
 				isLargeViewport &&
 				! isMultiSelecting() &&
 				! isTyping() &&
-				! isUnmodifiedDefaultBlock( getBlock( clientId ) || {} ) &&
+				hasClientId &&
 				! isEmptyDefaultBlock &&
 				! isBlockInterfaceHidden();
 
 			const _canFocusHiddenToolbar =
 				isEditMode &&
+				hasClientId &&
 				! _shouldShowContextualToolbar &&
 				! hasFixedToolbar &&
 				! isDistractionFree &&
