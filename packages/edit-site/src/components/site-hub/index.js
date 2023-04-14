@@ -11,7 +11,6 @@ import {
 	Button,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
-	__unstableUseAnimation as useAnimation,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
@@ -19,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,18 +57,12 @@ const SiteHub = forwardRef( ( props, ref ) => {
 		[]
 	);
 
-	const controls = useAnimation();
-	useEffect( () => {
-		controls.set( { layout: true } );
-	}, [ controls ] );
-
 	return (
 		<motion.div
 			ref={ ref }
 			{ ...props }
 			className={ classnames( 'edit-site-site-hub', props.className ) }
 			initial={ false }
-			animate={ controls }
 			transition={ {
 				type: 'tween',
 				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
@@ -84,7 +77,6 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				<motion.div
 					className="edit-site-site-hub__view-mode-toggle-container"
 					layout
-					animate={ controls }
 					transition={ {
 						type: 'tween',
 						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
