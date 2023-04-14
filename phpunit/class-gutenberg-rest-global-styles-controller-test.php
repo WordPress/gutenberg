@@ -160,8 +160,8 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 		$this->assertCount( 1, $data, 'Check that only one revision exists' );
 		$this->assertArrayHasKey( 'id', $data[0], 'Check that an id key exists' );
-		$this->assertArrayHasKey( 'raw', $data[0]['title'], 'Check that a raw title key exists' );
-		$this->assertArrayHasKey( 'rendered', $data[0]['title'], 'Check that a rendered title key exists' );
+		$this->assertArrayHasKey( 'raw', $data[0]['date'], 'Check that a raw title key exists' );
+		$this->assertArrayHasKey( 'rendered', $data[0]['date'], 'Check that a rendered title key exists' );
 		$this->assertEquals(
 			$data[0]['settings'],
 			new stdClass(),
