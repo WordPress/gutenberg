@@ -438,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Styles",
 		"slug": "block-styles",
 		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",

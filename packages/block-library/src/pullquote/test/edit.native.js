@@ -45,8 +45,7 @@ describe( 'Pullquote', () => {
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-
-		// TODO: Determine a way to type after pressing ENTER within the block.
+		changeAndSelectTextOfRichText( pullquoteTextInput, 'Again' );
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
@@ -63,7 +62,7 @@ describe( 'Pullquote', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
-		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br></p><cite>A <br>person</cite></blockquote></figure>
+		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
 		<!-- /wp:pullquote -->"
 	` );
 	} );
