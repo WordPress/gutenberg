@@ -3,6 +3,10 @@
 	overflow: hidden;
 }
 
+.wp-block-details summary {
+	cursor: pointer;
+}
+
 // Use block gap for block; falls back to browser default if not supported.
 .wp-block-details > *:not(summary) {
 	margin-block-start: var(--wp--style--block-gap);
