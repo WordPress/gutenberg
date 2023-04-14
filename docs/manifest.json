@@ -456,7 +456,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Templates",
+		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
