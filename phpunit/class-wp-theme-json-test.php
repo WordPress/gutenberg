@@ -1584,7 +1584,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 										'background' => 'hotpink',
 									),
 								),
-								'plain' => array(
+								'plain'                 => array(
 									'color' => array(
 										'background' => 'hotpink',
 									),
@@ -1597,7 +1597,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$sanitized_theme_json = $theme_json->get_raw_data();
-		$expected = array(
+		$expected             = array(
 			'version' => 2,
 			'styles'  => array(
 				'blocks' => array(
@@ -1610,8 +1610,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-				)
-			)
+				),
+			),
 		);
 		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json styles does not match' );
 	}

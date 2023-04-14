@@ -607,14 +607,14 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
 		$valid_variations    = array();
-		foreach( self::get_blocks_metadata() as $block_name => $block_meta ) {
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
 			if ( ! isset( $block_meta['styleVariations'] ) ) {
 				continue;
 			}
 			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
 		}
-		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
+		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -2837,7 +2837,7 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
 		$valid_variations    = array();
-		foreach( self::get_blocks_metadata() as $block_name => $block_meta ) {
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
 			if ( ! isset( $block_meta['styleVariations'] ) ) {
 				continue;
 			}
