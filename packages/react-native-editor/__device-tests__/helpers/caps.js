@@ -15,7 +15,7 @@ exports.iosLocal = {
 	...ios,
 	deviceName: 'iPhone 13',
 	wdaLaunchTimeout: 240000,
-	usePrebuiltWDA: true,
+	usePrebuiltWDA: false,
 };
 
 exports.iosServer = {
