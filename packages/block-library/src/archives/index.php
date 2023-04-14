@@ -63,8 +63,8 @@ function render_block_core_archives( $attributes ) {
 
 		$show_label = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 
-		$block_content = '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . esc_html( $title ) . '</label>
-		<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
+		$block_content = '<label for="' . esc_attr( $dropdown_id ) . '" class="wp-block-archives__label' . esc_attr( $show_label ) . '">' . esc_html( $title ) . '</label>
+		<select id="' . esc_attr( $dropdown_id ) . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
 		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
 
 		return sprintf(
