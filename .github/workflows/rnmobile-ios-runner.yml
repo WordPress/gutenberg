@@ -62,7 +62,7 @@ jobs:
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
             - name: Launch simulator
-              run: open -a Simulator && xcrun simctl boot 'iPhone 13'
+              run: open -a Simulator && xcrun simctl boot '${{ matrix.device }}'
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
