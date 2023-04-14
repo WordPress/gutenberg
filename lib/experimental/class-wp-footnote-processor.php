@@ -56,7 +56,7 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 
 			$footnote_content = sprintf(
 				'<sup title="%s"><a class="note-link" href="#%s" id="%s-link-%d">[%d]</a></sup>',
-                esc_attr( $note ),
+				esc_attr( $note ),
 				$id,
 				$id,
 				$count,
@@ -191,53 +191,53 @@ add_filter(
      * Hack to inject a per-render singleton footnote processor.
      */
     function ( $parser_class ) {
-        $notes = array();
+		$notes = array();
 
-        add_filter(
-            'render_block',
-            function ( $html, $block ) use ( &$notes ) {
-                if ( 'core/footnote-list' === $block['blockName'] ) {
-                    if ( 0 === count( $notes ) ) {
-                        return $html;
-                    }
+		add_filter(
+			'render_block',
+			function ( $html, $block ) use ( &$notes ) {
+				if ( 'core/footnote-list' === $block['blockName'] ) {
+					if ( 0 === count( $notes ) ) {
+						return $html;
+					}
 
-                    $p        = new WP_Footnote_Processor( $html );
-                    $p->notes = $notes;
-                    $list     = $p->get_footer();
-                    $notes    = array();
+					$p        = new WP_Footnote_Processor( $html );
+					$p->notes = $notes;
+					$list     = $p->get_footer();
+					$notes    = array();
 
-                    return $html . $list;
-                }
+					return $html . $list;
+				}
 
-                $p        = new WP_Footnote_Processor( $html );
-                $p->notes = $notes;
-                $p->replace_footnotes();
-                $notes    = $p->notes;
+				$p        = new WP_Footnote_Processor( $html );
+				$p->notes = $notes;
+				$p->replace_footnotes();
+				$notes    = $p->notes;
 
-                return $p->get_updated_html();
-            },
-            1000,
-            2
-        );
+				return $p->get_updated_html();
+			},
+			1000,
+			2
+		);
 
-        add_filter(
-            'the_content',
-            function ( $html ) use ( &$notes ) {
-                if ( 0 === count( $notes ) ) {
-                    return $html;
-                }
+		add_filter(
+			'the_content',
+			function ( $html ) use ( &$notes ) {
+				if ( 0 === count( $notes ) ) {
+					return $html;
+				}
 
-                $p        = new WP_Footnote_Processor( $html );
-                $p->notes = $notes;
-                $list     = $p->get_footer();
-                $notes    = array();
+				$p        = new WP_Footnote_Processor( $html );
+				$p->notes = $notes;
+				$list     = $p->get_footer();
+				$notes    = array();
 
-                return $html . $list;
-            },
-            1000,
-            1
-        );
+				return $html . $list;
+			},
+			1000,
+			1
+		);
 
-        return $parser_class;
-    }
+		return $parser_class;
+	}
 );
