@@ -32,7 +32,19 @@ export default function PostTitleEdit( {
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	/**
+	 * Hack: useCanEditEntity may trigger an OPTIONS request. When the post title
+	 * is a descendant of a query loop, we know for sure that user cannot edit
+	 * the title. To avoid unnecessary OPTIONS requests we should avoid using
+	 * useCanEditEntity. However, it's a hook and cannot be fired conditionally,
+	 * hence instead we call it without proper data. In this case hook automatically
+	 * returns false without calling a backend.
+	 */
+	 const userCanEdit = useCanEditEntity(
+		'postType',
+		isDescendentOfQueryLoop ? '' : postType,
+		isDescendentOfQueryLoop ? '' : postId
+	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,
@@ -55,7 +67,7 @@ export default function PostTitleEdit( {
 
 	if ( postType && postId ) {
 		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
+			userCanEdit ? (
 				<PlainText
 					tagName={ TagName }
 					placeholder={ __( 'No Title' ) }
@@ -75,7 +87,7 @@ export default function PostTitleEdit( {
 
 	if ( isLink && postType && postId ) {
 		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
+			userCanEdit ? (
 				<TagName { ...blockProps }>
 					<PlainText
 						tagName="a"
