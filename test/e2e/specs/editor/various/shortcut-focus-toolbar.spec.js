@@ -143,6 +143,82 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			).not.toBeVisible();
 		} );
 	} );
+
+	test.describe( 'Smaller than large viewports', () => {
+		test.use( {
+			// Make the viewport small enough to trigger the fixed toolbar
+			viewport: {
+				width: 700,
+				height: 700,
+			},
+		} );
+
+		test.beforeEach( async ( { editor } ) => {
+			// Ensure the fixed toolbar option is off
+			await editor.setIsFixedToolbar( false );
+		} );
+
+		test( 'Focuses the correct toolbar in edit mode', async ( {
+			editor,
+			page,
+			toolbarUtils,
+		} ) => {
+			// Test: Focus the document toolbar from title
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.documentToolbarButton ).toBeFocused();
+
+			// Test: Focus the block toolbar from empty block
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.documentToolbarTooltip
+			).not.toBeVisible();
+
+			// Test: Focus the block toolbar from paragraph block with content
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type(
+				'Focus the block toolbar from paragraph block with content'
+			);
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.documentToolbarTooltip
+			).not.toBeVisible();
+		} );
+
+		test( 'Focuses the correct toolbar in select mode', async ( {
+			editor,
+			page,
+			toolbarUtils,
+		} ) => {
+			// Test: Focus the document toolbar from title
+			await toolbarUtils.useSelectMode();
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.documentToolbarButton ).toBeFocused();
+
+			// Test: Focus the block toolbar from empty block
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await toolbarUtils.useSelectMode();
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.documentToolbarTooltip
+			).not.toBeVisible();
+
+			// Test: Focus the block toolbar from paragraph in select mode
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type(
+				'Focus the block toolbar from paragraph in select mode'
+			);
+			await toolbarUtils.useSelectMode();
+			await toolbarUtils.moveToToolbarShortcut();
+			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.documentToolbarTooltip
+			).not.toBeVisible();
+		} );
+	} );
 } );
 
 class ToolbarUtils {
