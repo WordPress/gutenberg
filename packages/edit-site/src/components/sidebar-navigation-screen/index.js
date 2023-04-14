@@ -48,9 +48,8 @@ export default function SidebarNavigationScreen( {
 				) : (
 					<SidebarButton
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Navigate to the Dashboard' ) }
+						label={ __( 'Go back to the Dashboard' ) }
 						href={ dashboardLink || 'index.php' }
-						label={ __( 'Dashboard' ) }
 					/>
 				) }
 				<Heading

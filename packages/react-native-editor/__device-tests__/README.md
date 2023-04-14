@@ -14,7 +14,7 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 >
 > Visual regression tests that rely upon screenshots require specific devices and OS versions for Android and iOS, respectively, otherwise the tests will fail due to subtle OS differences. To run or update visual regression tests, install the emulators/simulators listed in the test suite [configuration files](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30-L31).
 
-**iOS:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have XCode installed and the simulators set up.
+**iOS:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Xcode installed and the simulators set up.
 
 **Android:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Android Studio installed and the Android SDK installed. You'll also need to have the [Android Emulator](https://developer.android.com/studio/run/emulator) installed and set up. The emulator needs to be running prior to running the tests.
 

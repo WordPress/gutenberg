@@ -2,8 +2,24 @@
 
 ## Unreleased
 
--   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
+### Enhancements
+
 -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
+
+## 23.8.0 (2023-04-12)
+
+### Internal
+
+-   `Mobile` Refactor of the KeyboardAwareFlatList component.
+
+### Enhancements
+
+-   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
+-   `Navigator`: Add `skipFocus` property in `NavigateOptions`. ([#49350](https://github.com/WordPress/gutenberg/pull/49350)).
+
+### Bug Fix
+
+-   `Snackbar`: Fix insufficient color contrast on hover ([#49682](https://github.com/WordPress/gutenberg/pull/49682)).
 
 ## 23.7.0 (2023-03-29)
 

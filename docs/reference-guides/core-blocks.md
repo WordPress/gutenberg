@@ -233,13 +233,40 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 -	**Supports:** align, anchor, color (text, ~~background~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
+## Details
+
+A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+
+-	**Name:** core/details
+-	**Category:** text
+-	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** showContent
+
+## Details Content
+
+Add content that may be shown or hidden via a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
+
+-	**Name:** core/details-content
+-	**Category:** text
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
+## Details Summary
+
+Provide summary text used to toggle the display of content inside a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
+
+-	**Name:** core/details-summary
+-	**Category:** text
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** summary
+
 ## Embed
 
 Add a block that displays content pulled from other sites, like Twitter or YouTube. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/embed))
 
 -	**Name:** core/embed
 -	**Category:** embed
--	**Supports:** align
+-	**Supports:** align, spacing (margin)
 -	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
 ## File
@@ -739,7 +766,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 ## Site Logo
 
-Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
+Display an image to represent this site. Update this block and the changes apply everywhere. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
 
 -	**Name:** core/site-logo
 -	**Category:** theme

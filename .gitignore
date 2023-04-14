@@ -8,6 +8,8 @@ gutenberg.zip
 coverage
 *-performance-results.json
 .phpunit.result.cache
+.reassure
+
 
 # Directories/files that may appear in your environment
 *.log
@@ -36,6 +38,7 @@ test/native/junit.xml
 
 # Local overrides
 .wp-env.override.json
+playwright.config.override.ts
 phpcs.xml
 phpunit.xml
 phpunit-watcher.yml

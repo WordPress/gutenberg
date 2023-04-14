@@ -35,7 +35,7 @@ extension SourceFile {
     
     public func jsScript(with argument: String? = nil) throws -> WKUserScript {
         let content = try getContent()
-        let formatted = String(format: content, argument ?? [])
+        let formatted = String(format: content, argument ?? "")
         
         switch self.type {
         case .css:
@@ -48,14 +48,14 @@ extension SourceFile {
 }
 
 extension SourceFile {
-    static let editorStyle = SourceFile(name: "editor-style-overrides", type: .css)
-    static let wpBarsStyle = SourceFile(name: "wp-bar-override", type: .css)
-    static let injectCss = SourceFile(name: "inject-css", type: .js)
     static let retrieveHtml = SourceFile(name: "content-functions", type: .js)
+    static let editorBehavior = SourceFile(name: "editor-behavior-overrides", type: .js)
+    static let editorStyle = SourceFile(name: "editor-style-overrides", type: .css)
+    static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
+    static let injectCss = SourceFile(name: "inject-css", type: .js)
     static let insertBlock = SourceFile(name: "insert-block", type: .js)
     static let localStorage  = SourceFile(name: "local-storage-overrides", type: .json)
     static let preventAutosaves = SourceFile(name: "prevent-autosaves", type: .js)
-    static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
     static let supportedBlocks = SourceFile(name: "supported-blocks", type: .json)
-    static let editorBehavior = SourceFile(name: "editor-behavior-overrides", type: .js)
+    static let wpBarsStyle = SourceFile(name: "wp-bar-override", type: .css)
 }

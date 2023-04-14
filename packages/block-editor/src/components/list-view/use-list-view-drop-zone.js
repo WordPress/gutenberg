@@ -36,6 +36,7 @@ import { store as blockEditorStore } from '../../store';
  * @property {Element} element                         The DOM element representing the block.
  * @property {number}  innerBlockCount                 The number of inner blocks the block has.
  * @property {boolean} isDraggedBlock                  Whether the block is currently being dragged.
+ * @property {boolean} isExpanded                      Whether the block is expanded in the UI.
  * @property {boolean} canInsertDraggedBlocksAsSibling Whether the dragged block can be a sibling of this block.
  * @property {boolean} canInsertDraggedBlocksAsChild   Whether the dragged block can be a child of this block.
  */
@@ -78,7 +79,7 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  *
  * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
-function getListViewDropTarget( blocksData, position ) {
+export function getListViewDropTarget( blocksData, position ) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;

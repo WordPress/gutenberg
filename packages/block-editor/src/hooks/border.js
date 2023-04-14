@@ -84,7 +84,7 @@ function styleToAttributes( style ) {
 
 	const borderColorValue = style?.border?.color;
 	const borderColorSlug = borderColorValue?.startsWith( 'var:preset|color|' )
-		? borderColorSlug.substring( 'var:preset|color|'.length )
+		? borderColorValue.substring( 'var:preset|color|'.length )
 		: undefined;
 	const updatedStyle = { ...style };
 	updatedStyle.border = {

@@ -74,13 +74,12 @@ describe( 'Verse block', () => {
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-
-		// TODO: Determine a way to type after pressing ENTER within the block.
+		changeAndSelectTextOfRichText( verseTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:verse -->
-		<pre class="wp-block-verse">A great statement.<br></pre>
+		<pre class="wp-block-verse">A great statement.<br>Again</pre>
 		<!-- /wp:verse -->"
 	` );
 	} );

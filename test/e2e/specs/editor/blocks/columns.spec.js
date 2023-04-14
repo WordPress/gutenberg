@@ -68,6 +68,7 @@ test.describe( 'Columns', () => {
 		await editor.selectBlocks(
 			page.locator( 'role=document[name="Block: Columns"i]' )
 		);
+		await editor.openDocumentSettingsSidebar();
 
 		const columnsChangeInput = page.locator(
 			'role=spinbutton[name="Columns"i]'
