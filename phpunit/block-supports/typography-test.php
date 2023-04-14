@@ -379,7 +379,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '1.75rem',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.05rem, 1.05rem + ((1vw - 0.2rem) * 0.875), 1.75rem)',
+				'expected_output'             => 'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 0.789), 1.75rem)',
 			),
 
 			'returns clamp value with em min and max units' => array(
@@ -387,7 +387,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '1.75em',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.05em, 1.05rem + ((1vw - 0.2em) * 0.875), 1.75em)',
+				'expected_output'             => 'clamp(1.119em, 1.119rem + ((1vw - 0.2em) * 0.789), 1.75em)',
 			),
 
 			'returns clamp value for floats'             => array(
@@ -395,7 +395,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '70.175px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(34.377px, 2.149rem + ((1vw - 3.2px) * 2.797), 70.175px)',
+				'expected_output'             => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			),
 
 			'coerces integer to `px` and returns clamp value' => array(
@@ -403,7 +403,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => 33,
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(19.154px, 1.197rem + ((1vw - 3.2px) * 1.082), 33px)',
+				'expected_output'             => 'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
 			),
 
 			'coerces float to `px` and returns clamp value' => array(
@@ -411,7 +411,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => 70.175,
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(34.377px, 2.149rem + ((1vw - 3.2px) * 2.797), 70.175px)',
+				'expected_output'             => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			),
 
 			'returns clamp value when `fluid` is empty array' => array(
@@ -420,7 +420,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'fluid' => array(),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 0.875), 28px)',
+				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
 			'returns clamp value when `fluid` is `null`' => array(
@@ -429,7 +429,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'fluid' => null,
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 0.875), 28px)',
+				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
 			'returns clamp value if min font size is greater than max' => array(
@@ -503,7 +503,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 4.937), 80px)',
+				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 4.851), 80px)',
 			),
 
 			'should not apply lower bound test when fluid values are set' => array(
@@ -557,7 +557,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '12rem',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(4.429rem, 4.429rem + ((1vw - 0.2rem) * 9.464), 12rem)',
+				'expected_output'             => 'clamp(5.174rem, 5.174rem + ((1vw - 0.2rem) * 8.533), 12rem)',
 			),
 
 			'should apply scaled min font size for px values when custom min font size is not set' => array(
@@ -565,7 +565,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '200px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(72.84px, 4.553rem + ((1vw - 3.2px) * 9.934), 200px)',
+				'expected_output'             => 'clamp(85.342px, 5.334rem + ((1vw - 3.2px) * 8.958), 200px)',
 			),
 
 			'should not apply scaled min font size for minimum font size when custom min font size is set' => array(
@@ -718,7 +718,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:4rem;font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 				'font_size_value'             => '4rem',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(2.004rem, 2.004rem + ((1vw - 0.2rem) * 2.495), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
+				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(2.2rem, 2.2rem + ((1vw - 0.2rem) * 2.25), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 			),
 			'return_content_if_no_inline_font_size_found'  => array(
 				'block_content'               => '<p class="has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
@@ -742,7 +742,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 				'font_size_value'             => '1.5em',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(0.928em, 0.928rem + ((1vw - 0.2em) * 0.715), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
+				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(0.984em, 0.984rem + ((1vw - 0.2em) * 0.645), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 			),
 		);
 	}

@@ -33,7 +33,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 			fontSize: '30px',
 		} );
 		expect( fluidTypographyValues ).toBe(
-			'clamp(17.756px, 1.11rem + ((1vw - 3.2px) * 0.957), 30px)'
+			'clamp(18.959px, 1.185rem + ((1vw - 3.2px) * 0.863), 30px)'
 		);
 	} );
 
@@ -42,7 +42,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 			fontSize: '30px',
 		} );
 		expect( fluidTypographyValues ).toBe(
-			'clamp(17.756px, 1.11rem + ((1vw - 3.2px) * 0.957), 30px)'
+			'clamp(18.959px, 1.185rem + ((1vw - 3.2px) * 0.863), 30px)'
 		);
 	} );
 
@@ -53,7 +53,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 			maximumViewPortWidth: '1000px',
 		} );
 		expect( fluidTypographyValues ).toBe(
-			'clamp(17.756px, 1.11rem + ((1vw - 5px) * 2.449), 30px)'
+			'clamp(18.959px, 1.185rem + ((1vw - 5px) * 2.208), 30px)'
 		);
 	} );
 
@@ -63,7 +63,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 			scaleFactor: '2',
 		} );
 		expect( fluidTypographyValues ).toBe(
-			'clamp(17.756px, 1.11rem + ((1vw - 3.2px) * 1.913), 30px)'
+			'clamp(18.959px, 1.185rem + ((1vw - 3.2px) * 1.725), 30px)'
 		);
 	} );
 

@@ -540,10 +540,14 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	 */
 	if ( ! $minimum_font_size_raw ) {
 		$preferred_font_size_in_px = 'px' === $preferred_size['unit'] ? $preferred_size['value'] : $preferred_size['value'] * 16;
-		// Logarithmic scale factor: Min font scale that tapers out as the font size increases.
-		$minimum_font_size_factor = 1 - 0.12 * log( $preferred_font_size_in_px );
-		// Constrains the minimum font size factor between min and max values.
-		$minimum_font_size_factor     = min( max( $minimum_font_size_factor, $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
+
+		/*
+		 * The scale factor is a multiplier that affects how quickly the curve will move towards the minimum,
+		 * that is, how quickly the size factor reaches 0 given increasing font size values.
+		 * For a - b * log2(), lower values of b will make the curve move towards the minimum faster.
+		 * The scale factor is constrained between min and max values.
+		 */
+		$minimum_font_size_factor     = min( max( 1 - 0.075 * log( $preferred_font_size_in_px, 2 ), $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
 		$calculated_minimum_font_size = round( $preferred_size['value'] * $minimum_font_size_factor, 3 );
 
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.

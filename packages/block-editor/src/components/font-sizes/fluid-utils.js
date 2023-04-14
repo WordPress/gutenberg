@@ -108,11 +108,15 @@ export function getComputedFluidTypographyValue( {
 					? fontSizeParsed.value
 					: fontSizeParsed.value * 16;
 
-			// Logarithmic scale factor: Min font scale that tapers out as the font size increases.
-			// And constrains the minimum font size factor between min and max values.
+			/*
+			 * The scale factor is a multiplier that affects how quickly the curve will move towards the minimum,
+			 * that is, how quickly the size factor reaches 0 given increasing font size values.
+			 * For a - b * log2(), lower values of b will make the curve move towards the minimum faster.
+			 * The scale factor is constrained between min and max values.
+			 */
 			const minimumFontSizeFactor = Math.min(
 				Math.max(
-					1 - 0.12 * Math.log( fontSizeValueInPx ),
+					1 - 0.075 * Math.log2( fontSizeValueInPx ),
 					DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MIN
 				),
 				DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MAX

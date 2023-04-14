@@ -89,7 +89,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(1.05rem, 1.05rem + ((1vw - 0.2rem) * 0.875), 1.75rem)',
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 0.789), 1.75rem)',
 			},
 
 			{
@@ -101,7 +101,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(1.05em, 1.05rem + ((1vw - 0.2em) * 0.875), 1.75em)',
+					'clamp(1.119em, 1.119rem + ((1vw - 0.2em) * 0.789), 1.75em)',
 			},
 
 			{
@@ -113,7 +113,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(34.377px, 2.149rem + ((1vw - 3.2px) * 2.797), 70.175px)',
+					'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			},
 
 			{
@@ -127,7 +127,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(19.154px, 1.197rem + ((1vw - 3.2px) * 1.082), 33px)',
+					'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
 			},
 
 			{
@@ -140,7 +140,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(34.377px, 2.149rem + ((1vw - 3.2px) * 2.797), 70.175px)',
+					'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			},
 
 			{
@@ -154,7 +154,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 0.875), 28px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			},
 
 			{
@@ -167,7 +167,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 0.875), 28px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			},
 
 			{
@@ -271,7 +271,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(16.804px, 1.05rem + ((1vw - 3.2px) * 4.937), 80px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 4.851), 80px)',
 			},
 
 			{
@@ -392,7 +392,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(4.429rem, 4.429rem + ((1vw - 0.2rem) * 9.464), 12rem)',
+					'clamp(5.174rem, 5.174rem + ((1vw - 0.2rem) * 8.533), 12rem)',
 			},
 
 			{
@@ -405,7 +405,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(72.84px, 4.553rem + ((1vw - 3.2px) * 9.934), 200px)',
+					'clamp(85.342px, 5.334rem + ((1vw - 3.2px) * 8.958), 200px)',
 			},
 
 			{
