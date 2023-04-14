@@ -6,7 +6,6 @@ Block registration API reference.
 You can use the functions documented on this page to register a block with JavaScript only on the client, but the recommended method is to register new block types also with PHP on the server using the `block.json` metadata file. See [metadata documentation for complete information](/docs/reference-guides/block-api/block-metadata.md).
 
 [Learn how to create your first block](/docs/getting-started/create-block/README.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all you need to know to get started with creating blocks.
-
 </div>
 
 ## `registerBlockType`
