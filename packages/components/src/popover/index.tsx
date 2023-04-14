@@ -161,7 +161,7 @@ const UnforwardedPopover = (
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
 		// props (except for `animate`, which is re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' >
+		keyof Omit< MotionProps, 'animate' | 'children' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
