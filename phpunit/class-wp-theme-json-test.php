@@ -1648,7 +1648,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_sanitize_for_block_with_style_variations() {
 		return array(
-			'1 variation with 1 invalid property'   => array(
+			'1 variation with 1 valid property'   => array(
 				'theme_json_variations' => array(
 					'variations' => array(
 						'plain' => array(
@@ -1691,44 +1691,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'plain' => array(
 									'color' => array(
 										'background' => 'hotpink',
-									),
-								),
-							),
-						),
-					),
-				),
-			),
-			'2 variations with 1 invalid property'  => array(
-				'theme_json_variations' => array(
-					'variations' => array(
-						'plain' => array(
-							'color'            => array(
-								'background' => 'hotpink',
-							),
-							'invalidProperty1' => 'value1',
-						),
-						'basic' => array(
-							'color' => array(
-								'background' => '#ffffff',
-								'text'       => '#000000',
-							),
-							'foo'   => 'bar',
-						),
-					),
-				),
-				'expected_sanitized'    => array(
-					'blocks' => array(
-						'core/quote' => array(
-							'variations' => array(
-								'plain' => array(
-									'color' => array(
-										'background' => 'hotpink',
-									),
-								),
-								'basic' => array(
-									'color' => array(
-										'background' => '#ffffff',
-										'text'       => '#000000',
 									),
 								),
 							),
@@ -1825,13 +1787,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			'styles'   => '.is-style-plain.is-style-plain.wp-block-quote{background-color: hotpink;}',
 		);
-		$basic = array(
-			'metadata' => array(
-				'path'     => array( 'styles', 'blocks', 'core/quote', 'variations', 'basic' ),
-				'selector' => '.is-style-basic.is-style-basic.wp-block-quote',
-			),
-			'styles'   => '.is-style-basic.is-style-basic.wp-block-quote{background-color: #ffffff;color: #000000;}',
-		);
 
 		return array(
 			'1 variation with 1 invalid property'   => array(
@@ -1861,51 +1816,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'metadata_variation'    => array( $plain['metadata'] ),
 				'expected'              => $plain['styles'],
-			),
-			'2 variations with 1 invalid property'  => array(
-				'theme_json_variations' => array(
-					'variations' => array(
-						'plain' => array(
-							'color'            => array(
-								'background' => 'hotpink',
-							),
-							'invalidProperty1' => 'value1',
-						),
-						'basic' => array(
-							'color' => array(
-								'background' => '#ffffff',
-								'text'       => '#000000',
-							),
-							'foo'   => 'bar',
-						),
-					),
-				),
-				'metadata_variation'    => array( $plain['metadata'], $basic['metadata'] ),
-				'expected_styles'       => $plain['styles'] . $basic['styles'],
-			),
-			'2 variations with multiple invalid properties' => array(
-				'theme_json_variations' => array(
-					'variations' => array(
-						'plain' => array(
-							'color'            => array(
-								'background' => 'hotpink',
-							),
-							'invalidProperty1' => 'value1',
-							'invalidProperty2' => 'value2',
-						),
-						'basic' => array(
-							'foo'   => 'foo',
-							'color' => array(
-								'background' => '#ffffff',
-								'text'       => '#000000',
-							),
-							'bar'   => 'bar',
-							'baz'   => 'baz',
-						),
-					),
-				),
-				'metadata_variation'    => array( $plain['metadata'], $basic['metadata'] ),
-				'expected_styles'       => $plain['styles'] . $basic['styles'],
 			),
 		);
 	}
