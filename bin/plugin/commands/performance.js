@@ -272,11 +272,9 @@ async function runPerformanceTests( refs, options ) {
 
 	logTitle( '💃 Performance Tests 🕺' );
 	logInfo(
-		[
-			'Welcome! This tool runs the performance tests on multiple refs and displays a comparison table.',
-			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
-			'Make sure these ports are not used before continuing.',
-		].join( '\n' )
+		'Welcome! This tool runs the performance tests on multiple refs and displays a comparison table.',
+		'\nIn order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
+		'\nMake sure these ports are not used before continuing.'
 	);
 
 	logTitle( '🏠 Setting up the environment' );
