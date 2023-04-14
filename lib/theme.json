@@ -450,6 +450,18 @@
 					"style": true,
 					"width": true
 				}
+			},
+			"core/quote": {
+				"variations": {
+					"plain": false,
+					"large": {
+						"name": "large",
+						"label": "Large",
+						"inlineStyle": "",
+						"styleHandle": "",
+						"isDefault": true
+					}
+				}
 			}
 		}
 	},
