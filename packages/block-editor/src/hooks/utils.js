@@ -150,9 +150,14 @@ export function useBlockSettings( name, parentLayout ) {
 	const borderWidth = useSetting( 'border.width' );
 	const customColorsEnabled = useSetting( 'color.custom' );
 	const customColors = useSetting( 'color.palette.custom' );
+	const customDuotone = useSetting( 'color.customDuotone' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.default' );
 	const defaultPalette = useSetting( 'color.defaultPalette' );
+	const defaultDuotone = useSetting( 'color.defaultDuotone' );
+	const userDuotonePalette = useSetting( 'color.duotone.custom' );
+	const themeDuotonePalette = useSetting( 'color.duotone.theme' );
+	const defaultDuotonePalette = useSetting( 'color.duotone.default' );
 	const userGradientPalette = useSetting( 'color.gradients.custom' );
 	const themeGradientPalette = useSetting( 'color.gradients.theme' );
 	const defaultGradientPalette = useSetting( 'color.gradients.default' );
@@ -175,10 +180,17 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeGradientPalette,
 					default: defaultGradientPalette,
 				},
+				duotone: {
+					custom: userDuotonePalette,
+					theme: themeDuotonePalette,
+					default: defaultDuotonePalette,
+				},
 				defaultGradients,
 				defaultPalette,
+				defaultDuotone,
 				custom: customColorsEnabled,
 				customGradient: areCustomGradientsEnabled,
+				customDuotone,
 				background: isBackgroundEnabled,
 				link: isLinkEnabled,
 				text: isTextEnabled,
@@ -245,9 +257,14 @@ export function useBlockSettings( name, parentLayout ) {
 		borderWidth,
 		customColorsEnabled,
 		customColors,
+		customDuotone,
 		themeColors,
 		defaultColors,
 		defaultPalette,
+		defaultDuotone,
+		userDuotonePalette,
+		themeDuotonePalette,
+		defaultDuotonePalette,
 		userGradientPalette,
 		themeGradientPalette,
 		defaultGradientPalette,
