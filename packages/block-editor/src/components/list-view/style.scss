@@ -474,12 +474,17 @@ $block-navigation-max-indent: 8;
 
 .block-editor-list-view-block-draggable-chip {
 	// Width of the sidebar, minus the list view's padding and the block settings icon.
-	width: 350px - $grid-unit-10 - $icon-size;
+	width: 350px - $grid-unit-10 - $icon-size * 2;
 	height: 36px;
 	background: $white;
 	border: 1px solid $gray-400;
 	border-radius: $radius-block-ui;
 	opacity: 0.75;
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+		flex: 0 0 $icon-size;
+	}
 
 	.block-editor-list-view-block-select-button__label-wrapper {
 		min-width: 120px;
