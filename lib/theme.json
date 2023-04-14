@@ -452,15 +452,25 @@
 				}
 			},
 			"core/quote": {
-				"variations": {
-					"plain": false,
-					"large": {
+				"variations": [
+					{
 						"name": "large",
-						"label": "Large",
+						"label": "Large using array",
 						"inlineStyle": "",
 						"styleHandle": "",
 						"isDefault": true
 					}
+				]
+			},
+			"core/paragraph": {
+				"variations": {
+					"large": {
+						"label": "Large using object",
+						"inlineStyle": "",
+						"styleHandle": "",
+						"isDefault": true
+					},
+					"toUnregister": false
 				}
 			}
 		}

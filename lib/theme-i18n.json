@@ -72,7 +72,7 @@
 				},
 				"variations": {
 					"*": {
-						"label": "Name of style variation"
+						"label": "Style variation name"
 					}
 				}
 			}
