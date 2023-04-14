@@ -140,6 +140,7 @@ function RichTextWrapper(
 		if ( originalIsSelected === undefined ) {
 			isSelected =
 				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
 				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
@@ -581,7 +582,7 @@ function RichTextWrapper(
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
-			ref={ mergedRef }
+			// ref={ mergedRef }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }

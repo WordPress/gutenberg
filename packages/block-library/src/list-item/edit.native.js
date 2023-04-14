@@ -115,6 +115,7 @@ export default function ListItemEdit( {
 		...( style?.color && {
 			placeholderColor: style.color + OPACITY,
 		} ),
+		paddingTop: 0,
 	};
 
 	const preventDefault = useRef( false );
