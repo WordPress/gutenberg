@@ -75,7 +75,11 @@ export default function ListViewDropIndicator( {
 			// the scroll container, minus the distance from the left
 			// edge of the scroll container to the left edge of the
 			// target element.
-			const scrollContainer = getScrollContainer( targetElement );
+			const scrollContainer = getScrollContainer(
+				targetElement,
+				'horizontal'
+			);
+
 			if ( scrollContainer ) {
 				const scrollContainerRect =
 					scrollContainer.getBoundingClientRect();
