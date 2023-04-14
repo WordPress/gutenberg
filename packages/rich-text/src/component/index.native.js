@@ -35,7 +35,7 @@ import { remove } from '../remove';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import { isCollapsed } from '../is-collapsed';
-import styles from './style';
+import styles from './style.scss';
 
 const EMPTY_ACTIVE_FORMATS = [];
 const noop = () => {};
