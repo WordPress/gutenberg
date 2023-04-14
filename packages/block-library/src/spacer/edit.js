@@ -105,6 +105,8 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
+	const hasFlexSize = !! flexSize;
+
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
 	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
@@ -115,7 +117,7 @@ const SpacerEdit = ( {
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
 
-		if ( isFlexLayout ) {
+		if ( isFlexLayout || hasFlexSize ) {
 			setAttributes( {
 				style: {
 					...blockStyle,
@@ -135,7 +137,7 @@ const SpacerEdit = ( {
 	const handleOnHorizontalResizeStop = ( newWidth ) => {
 		onResizeStop();
 
-		if ( isFlexLayout ) {
+		if ( isFlexLayout || hasFlexSize ) {
 			setAttributes( {
 				style: {
 					...blockStyle,
@@ -288,17 +290,7 @@ const SpacerEdit = ( {
 				} );
 			}
 		}
-	}, [
-		blockStyle,
-		flexSize,
-		height,
-		inheritedOrientation,
-		isFlexLayout,
-		layout,
-		selfStretch,
-		setAttributes,
-		width,
-	] );
+	}, [] );
 
 	return (
 		<>
