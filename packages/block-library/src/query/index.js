@@ -13,7 +13,7 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
-import queryInspectorControls from './hooks';
+import queryBlockInfo from './hooks';
 
 const { name } = metadata;
 export { metadata, name };
@@ -27,7 +27,7 @@ export const settings = {
 };
 
 export const init = () => {
-	addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
+	addFilter( 'editor.BlockEdit', 'core/query', queryBlockInfo );
 
 	return initBlock( { name, metadata, settings } );
 };
