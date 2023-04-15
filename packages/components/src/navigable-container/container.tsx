@@ -116,9 +116,9 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			// from scrolling. The preventDefault also prevents Voiceover from
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
-			const targetRole = ( event.target as HTMLDivElement ).getAttribute(
-				'role'
-			);
+			const targetRole = (
+				event.target as HTMLDivElement | null
+			 )?.getAttribute( 'role' );
 			const targetHasMenuItemRole =
 				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
