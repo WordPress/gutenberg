@@ -131,7 +131,10 @@ export default function BlockTools( {
 				) }
 				{ ! isZoomOutMode &&
 					( hasFixedToolbar || ! isLargeViewport ) && (
-						<BlockContextualToolbar isFixed />
+						<BlockContextualToolbar
+							isFixed
+							isBottom={ ! isLargeViewport }
+						/>
 					) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }
