@@ -128,12 +128,17 @@ describe( 'TabbableContainer', () => {
 			/>
 		);
 
-		// With the `cycle` prop set to `false`, cycling is not allowed.
 		// By default, cycling from first to last and from last to first is allowed.
+		// With the `cycle` prop set to `false`, cycling is not allowed.
+		// Therefore, focus will escape the `TabbableContainer` and continue its
+		// natural path in the page.
 		await user.tab( { shift: true } );
-		expect( firstTabbable ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Before container' } )
+		).toHaveFocus();
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
 
+		await user.tab();
 		await user.tab();
 		await user.tab();
 		expect( lastTabbable ).toHaveFocus();
@@ -143,8 +148,12 @@ describe( 'TabbableContainer', () => {
 			lastTabbable
 		);
 
+		// Focus will move to the next natively focusable elements after
+		// `TabbableContainer`
 		await user.tab();
-		expect( lastTabbable ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'After container' } )
+		).toHaveFocus();
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
 	} );
 
