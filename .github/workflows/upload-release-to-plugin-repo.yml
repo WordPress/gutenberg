@@ -13,12 +13,18 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                      const fetchData = require('node-fetch');
+                      const https = require('https');
                       const repo = process.env.GITHUB_REPOSITORY;
+                      const githubRef = context.ref;
 
-                      async function fetchJson(url) {
-                        const response = await fetchData(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
-                        return response.json();
+                      function fetchJson(url) {
+                        return new Promise((resolve, reject) => {
+                          https.get(url, { headers: { Accept: 'application/json' } }, res => {
+                            let data = '';
+                            res.on('data', chunk => data += chunk);
+                            res.on('end', () => resolve(JSON.parse(data)));
+                          }).on('error', reject);
+                        });
                       }
 
                       /**
