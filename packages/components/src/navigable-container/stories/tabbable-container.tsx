@@ -12,11 +12,14 @@ const meta: ComponentMeta< typeof TabbableContainer > = {
 	title: 'Components/TabbableContainer',
 	component: TabbableContainer,
 	argTypes: {
-		children: { type: undefined },
-		cycle: {
-			type: 'boolean',
+		children: { control: { type: null } },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
 		},
-		onNavigate: { action: 'onNavigate' },
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;

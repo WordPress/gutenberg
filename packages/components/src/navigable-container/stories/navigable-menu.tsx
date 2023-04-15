@@ -13,11 +13,13 @@ const meta: ComponentMeta< typeof NavigableMenu > = {
 	component: NavigableMenu,
 	argTypes: {
 		children: { control: { type: null } },
-		onNavigate: { action: 'onNavigate' },
-		orientation: {
-			options: [ 'horizontal', 'vertical' ],
-			control: { type: 'radio' },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
 		},
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
