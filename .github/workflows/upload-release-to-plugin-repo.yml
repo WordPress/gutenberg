@@ -5,22 +5,50 @@ on:
         types: [published]
 
 jobs:
-    compute-latest-stable:
-        name: Get latest stable version
+    compute_should_update_trunk:
         runs-on: ubuntu-latest
-        outputs:
-            latest_stable_tag: ${{ steps.get_latest_stable_tag.outputs.latest_stable_tag }}
-
         steps:
-            - name: Get latest stable tag
-              id: get_latest_stable_tag
-              run: |
-                  curl \
-                    -H "Accept: application/vnd.github.v3+json" \
-                    -o latest.json \
-                    "https://api.github.com/repos/${{ github.repository }}/releases/latest"
-                  LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
-                  echo "latest_stable_tag=${LATEST_STABLE_TAG}" >> $GITHUB_OUTPUT
+            - name: Compare version numbers
+              id: compute-should-update-trunk
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const fetch = require('node-fetch');
+                      const repo = process.env.GITHUB_REPOSITORY;
+
+                      async function fetchJson(url) {
+                        const response = await fetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
+                        return response.json();
+                      }
+
+                      /**
+                       * Compares two version strings.
+                       *
+                       * @param {string} v1 - The first version string to compare, which may have an optional leading "v".
+                       * @param {string} v2 - The second version string to compare, which may have an optional leading "v".
+                       * @returns {number} - Returns 1 if v1 is greater than v2, -1 if v1 is less than v2, and 0 if v1 and v2 are equal.
+                       */
+                      function compareVersions(v1, v2) {
+                        const p1 = v1.replace(/^v/, '').split('.').map(Number), p2 = v2.replace(/^v/, '').split('.').map(Number);
+                        return p1.reduce((acc, part, i) => acc === 0 ? (part > p2[i] ? 1 : (part < p2[i] ? -1 : 0)) : acc, 0);
+                      }
+
+                      (async () => {
+                        const [githubData, wpData] = await Promise.all([
+                          fetchJson(`https://api.github.com/repos/${repo}/releases/latest`),
+                          fetchJson('https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=gutenberg'),
+                        ]);
+
+                        const latestVersionInGithub = githubData.tag_name
+                        const latestVersionInCoreRepo = wpData.version;
+                        const isLatestVersionInGithubMoreRecent = compareVersions(latestVersionInGithub, latestVersionInCoreRepo) === 1;
+
+                        // Only update trunk *if* the ref from the published plugin matches the latest
+                        // version in GH (releases) *and* if this version is actually GREATER than the
+                        // version published in the WP plugins repo. If not, then it will update the tag.
+                        const shouldUpdateTrunk = githubRef === `refs/tags/${latestVersionInGithub}` && isLatestVersionInGithubMoreRecent;
+                        core.setOutput('should_update_trunk', shouldUpdateTrunk);
+                      })();
 
     get-release-branch:
         name: Get release branch name
@@ -115,9 +143,9 @@ jobs:
         name: Publish as trunk (and tag)
         runs-on: ubuntu-latest
         environment: wp.org plugin
-        needs: [compute-latest-stable, update-changelog]
+        needs: [compute_should_update_trunk, update-changelog]
         if: |
-            endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
+            needs.compute_should_update_trunk.outputs.should_update_trunk == 'true' &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
@@ -179,9 +207,9 @@ jobs:
         name: Publish as tag
         runs-on: ubuntu-latest
         environment: wp.org plugin
-        needs: [compute-latest-stable, update-changelog]
+        needs: [compute_should_update_trunk, update-changelog]
         if: |
-            !endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
+            needs.compute_should_update_trunk.outputs.should_update_trunk == 'false' &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
