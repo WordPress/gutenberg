@@ -135,7 +135,8 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			return;
 		}
 
-		const { activeElement } = ( event.target as HTMLElement ).ownerDocument;
+		const activeElement = ( event.target as HTMLElement | null )
+			?.ownerDocument?.activeElement;
 		if ( ! activeElement ) {
 			return;
 		}
