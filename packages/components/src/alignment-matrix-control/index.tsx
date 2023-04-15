@@ -37,7 +37,7 @@ function useBaseId( id?: string ) {
 
 /**
  *
- * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI. This is test.
  *
  * ```jsx
  * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
