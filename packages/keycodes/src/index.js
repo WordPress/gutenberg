@@ -260,6 +260,10 @@ export const displayShortcutList = mapValues(
 				/** @type {string[]} */ ( [] )
 			);
 
+			if ( ! character ) {
+				return modifierKeys;
+			}
+
 			// Symbols (~`,.) are removed by the default regular expression,
 			// so override the rule to allow symbols used for shortcuts.
 			// see: https://github.com/blakeembrey/change-case#options
@@ -333,7 +337,11 @@ export const shortcutAriaLabel = mapValues(
 				'~': __( 'Tilde' ),
 			};
 
-			return [ ...modifier( _isApple ), character ]
+			const shortcutChars = character
+				? [ ...modifier( _isApple ), character ]
+				: modifier( _isApple );
+
+			return shortcutChars
 				.map( ( key ) =>
 					capitalCase( replacementKeyMap[ key ] ?? key )
 				)

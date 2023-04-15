@@ -74,6 +74,17 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/edit-site/peek',
+			category: 'global',
+			description: __(
+				'Hold to hide the block toolbar and see blocks more clearly.'
+			),
+			keyCombination: {
+				modifier: 'alt',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/edit-site/keyboard-shortcuts',
 			category: 'main',
 			description: __( 'Display these keyboard shortcuts.' ),

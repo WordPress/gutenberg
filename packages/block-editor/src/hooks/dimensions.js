@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
+import { usePrevious } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -28,16 +29,18 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizer() {
 	const [ property, setProperty ] = useState( false );
+	const previousProperty = usePrevious( property );
 	const { hideBlockInterface, showBlockInterface } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	useEffect( () => {
-		if ( ! property ) {
+		if ( ! property && previousProperty ) {
 			showBlockInterface();
-		} else {
+		}
+		if ( property && ! previousProperty ) {
 			hideBlockInterface();
 		}
-	}, [ property, showBlockInterface, hideBlockInterface ] );
+	}, [ property, previousProperty, showBlockInterface, hideBlockInterface ] );
 
 	return [ property, setProperty ];
 }
