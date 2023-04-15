@@ -24,12 +24,13 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
             - name: 'Fetch relevant history from origin'
               run: git fetch origin ${{ github.event.pull_request.base.ref }}
             - name: Run git diff
               run: |
                   changelog_path="packages/components/CHANGELOG.md"
-                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
+                  if git diff --quiet ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- "$changelog_path"; then
                     echo "Please add a CHANGELOG entry to $changelog_path"
                     exit 1
                   fi
