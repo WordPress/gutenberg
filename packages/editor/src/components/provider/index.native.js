@@ -12,6 +12,7 @@ import RNReactNativeGutenbergBridge, {
 	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
+	subscribeParentRemoveAllBlocks,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
@@ -114,6 +115,12 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode(
 			() => {
 				this.toggleMode();
+			}
+		);
+
+		this.subscriptionRemoveAllBlocks = subscribeParentRemoveAllBlocks(
+			() => {
+				this.removeAllBlocks();
 			}
 		);
 
@@ -324,6 +331,13 @@ class NativeEditorProvider extends Component {
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
+	removeAllBlocks() {
+		const allClientIds = this.props.blocks.map(
+			( block ) => block.clientId
+		);
+		this.props.removeBlocks( allClientIds );
+	}
+
 	updateCapabilitiesAction( capabilities ) {
 		this.props.updateEditorSettings( { capabilities } );
 	}
@@ -392,6 +406,7 @@ const ComposedNativeProvider = compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
+			removeBlocks,
 		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
@@ -417,6 +432,7 @@ const ComposedNativeProvider = compose( [
 				switchEditorMode( mode );
 			},
 			replaceBlock,
+			removeBlocks,
 		};
 	} ),
 ] )( NativeEditorProvider );

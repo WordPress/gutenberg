@@ -391,6 +391,7 @@ extension GutenbergViewController {
         }
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
+        alert.addAction(removeAllBlocksAction)
         alert.addAction(updateHtmlAction)
         alert.addAction(unsupportedBlockUIAction)
         alert.addAction(showEditorHelpAction)
@@ -405,6 +406,15 @@ extension GutenbergViewController {
             style: .default,
             handler: { [unowned self] action in
                 self.toggleHTMLMode(action)
+        })
+    }
+
+    var removeAllBlocksAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Remove All Blocks",
+            style: .default,
+            handler: { [unowned self] action in
+                self.removeAllBlocks()
         })
     }
     
@@ -461,6 +471,10 @@ extension GutenbergViewController {
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+
+    func removeAllBlocks() {
+        gutenberg.removeAllBlocks()
     }
     
     func showEditorHelp() {

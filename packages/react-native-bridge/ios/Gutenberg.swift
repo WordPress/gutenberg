@@ -111,6 +111,10 @@ public class Gutenberg: UIResponder {
         sendEvent(.toggleHTMLMode)
     }
 
+    public func removeAllBlocks() {
+        sendEvent(.removeAllBlocks)
+    }
+
     public func setTitle(_ title: String) {
         sendEvent(.setTitle, body: ["title": title])
     }

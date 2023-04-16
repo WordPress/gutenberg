@@ -435,6 +435,7 @@ extension RNReactNativeGutenbergBridge {
         case showNotice
         case mediaSave
         case showEditorHelp
+        case removeAllBlocks
     }
 
     public override func supportedEvents() -> [String]! {
