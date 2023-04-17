@@ -167,9 +167,12 @@
 		width: auto;
 	}
 
-	.block-editor-block-mover.is-horizontal .block-editor-block-mover__move-button-container {
-		padding-left: 6px;
-		padding-right: 6px;
+	.block-editor-block-mover.is-horizontal {
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-mover-button {
+			padding-left: 6px;
+			padding-right: 6px;
+		}
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
@@ -189,9 +192,9 @@
 		border-left-color: $gray-200;
 	}
 
-	.block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 12px !important;
-		padding-right: 12px !important;
+	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
+		padding-left: 12px;
+		padding-right: 12px;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
