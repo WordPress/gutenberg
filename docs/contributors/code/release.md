@@ -80,7 +80,7 @@ If you decide that the fixes deserve another release candidate before the stable
 
 #### Publishing the release
 
-Only once you’re happy with the shape of the release notes, press the green “Publish release” button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
+Only once you're happy with the shape of the release notes, press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
 1. Use the release notes that you just edited to update `changelog.txt`, and
 2. Upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
