@@ -54,6 +54,19 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'] );
 	}
 
+	public function test_should_return_post_id_of_navigation_menu() {
+
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertIsInt( $data );
+
+		$this->assertEquals( 'wp_navigation', get_post_type( $data ) );
+	}
+
 	private function get_navigations_in_database() {
 		$navs_in_db = new WP_Query(
 			array(
