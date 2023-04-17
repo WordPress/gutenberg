@@ -2,18 +2,14 @@
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
 	@include break-small() {
-		width: calc(100% - #{ $grid-unit-20 * 2 });
-		height: calc(100% - #{ $grid-unit-20 * 2 });
+		width: 95vw;
+		height: 95vh;
 		max-height: none;
 	}
 	@include break-medium() {
-		width: calc(100% - #{ $grid-unit-50 * 2 });
-		height: calc(100% - #{ $grid-unit-50 * 2 });
+		width: 90vw;
+		height: 90vh;
 		max-width: none;
-	}
-	@include break-large() {
-		width: calc(100% - #{ $grid-unit-50 * 2 });
-		height: calc(100% - #{ $grid-unit-50 * 2 });
 	}
 }
 
