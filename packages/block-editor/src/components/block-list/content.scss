@@ -35,11 +35,14 @@
 	}
 
 	// Block multi selection
-	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
-		// Apply a rounded radius to the entire block.
+	// Apply a rounded radius to the entire block when multi selected, but with low specificity
+	// so explicit radii set by tools are preserved.
+	&:where(.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected)) {
 		border-radius: $radius-block-ui;
 		overflow: hidden;
+	}
 
+	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
 		// Hide the native selection indicator, for the selection, and children.
 		&::selection,
 		& ::selection {
@@ -68,24 +71,22 @@
 			// Show outline in high contrast mode.
 			outline: 2px solid transparent;
 		}
+
+		// Don't show the highlight focus style when multi selected.
+		&.is-highlighted::after {
+			box-shadow: none;
+		}
 	}
 
-	// Block highlight, and navigation mode, not focus.
-	// By not using a pseudo element, we can limit ourselves to only
-	// using ::after, leaving ::before free. Otherwise, highlight + multi-select
-	// would require the opacity-changing overlay to be on ::before.
+	// Block highlight, and navigation mode, and focus.
+	// This piece of code has gone back and forth between using a pseudo element
+	// vs. styling the block directly. Ultimately we likely need a pseudo element
+	// (unless styles like focus and selection overlay can be rendered as separate elements),
+	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
-		border-radius: $radius-block-ui;
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Show outline in high contrast mode.
-		outline: 2px solid transparent;
-	}
-
-	// Block focus.
+	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected,
 	.block-editor-block-list__block:not([contenteditable]):focus {
 		outline: none;
 
