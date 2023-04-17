@@ -70,9 +70,10 @@ export function subscribeFeaturedImageIdNativeUpdated( callback ) {
 }
 
 export function subscribePostSaveEvent( callback ) {
-	return isIOS
-		? gutenbergBridgeEvents.addListener( 'postHasBeenJustSaved', callback )
-		: undefined;
+	return gutenbergBridgeEvents.addListener(
+		'postHasBeenJustSaved',
+		callback
+	);
 }
 
 /**
