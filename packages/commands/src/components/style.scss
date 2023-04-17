@@ -45,7 +45,7 @@
 		margin: 0;
 		font-size: 20px;
 		line-height: 28px;
-		border-bottom: 1px solid $gray-300;
+		border-bottom: 1px solid $gray-200;
 		border-radius: 0;
 
 		&::placeholder {
@@ -53,35 +53,44 @@
 		}
 
 		&:focus {
-			border: none;
 			box-shadow: none;
 			outline: none;
+			border-bottom: 1px solid $gray-200;
 		}
 	}
 
 	[cmdk-item] {
-		border-radius: $radius-block-ui;
+		border-radius: $grid-unit-05;
 		cursor: pointer;
-		height: $grid-unit-50;
 		display: flex;
 		align-items: center;
-		padding: 0 $grid-unit-20;
+		padding: $grid-unit;
 		color: $gray-900;
 
 		&[aria-selected="true"],
 		&:active {
-			background: $gray-100;
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: var(--wp-admin-theme-color);
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
 		}
 
 		&[aria-disabled="true"] {
 			color: $gray-600;
 			cursor: not-allowed;
 		}
+
+		svg {
+			fill: $gray-600;
+		}
 	}
 
 	[cmdk-root] > [cmdk-list] {
 		max-height: 400px;
 		overflow: auto;
+		padding: $grid-unit;
 	}
 
 	[cmdk-empty] {
