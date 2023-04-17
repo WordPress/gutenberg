@@ -12,7 +12,7 @@ The elements highlighted in the figure are:
 
 1. **Inserter**: A panel for inserting blocks into the content canvas
 2. **Content canvas**: The content editor, which holds content created with blocks
-3. **Settings sidebar.**: A sidebar panel for configuring a block’s settings (among other things)
+3. **Settings sidebar**: A sidebar panel for configuring a block’s settings (among other things)
 
 Through the Block editor, you create content modularly using Blocks. There are a number of [core blocks](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/) ready to be used, and you can also [create your own custom block](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
