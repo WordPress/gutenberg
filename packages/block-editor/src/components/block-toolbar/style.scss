@@ -150,7 +150,9 @@
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
 		.block-editor-block-icon {
-			display: none !important;
+			width: 0 !important;
+			height: 0 !important;
+			min-width: 0 !important;
 		}
 	}
 
