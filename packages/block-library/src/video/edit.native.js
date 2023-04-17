@@ -235,7 +235,7 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		if ( ! id && ! src ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
