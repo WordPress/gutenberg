@@ -59,4 +59,11 @@ export function createSlotFill( key ) {
 	};
 }
 
+export const createPrivateSlotFill = ( name ) => {
+	const privateKey = Symbol( name );
+	const privateSlotFill = createSlotFill( privateKey );
+
+	return { privateKey, ...privateSlotFill };
+};
+
 export { useSlot };

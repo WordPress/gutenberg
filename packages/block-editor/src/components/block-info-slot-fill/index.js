@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
-export const createPrivateSlotFill = ( name ) => {
-	const privateKey = Symbol( name );
-	const privateSlotFill = createSlotFill( privateKey );
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
 
-	return { privateKey, ...privateSlotFill };
-};
-
+const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const { Fill, Slot } = createPrivateSlotFill( 'BlockInformation' );
+
 const BlockInfo = ( props ) => <Fill { ...props } />;
 BlockInfo.Slot = ( props ) => <Slot { ...props } />;
 
