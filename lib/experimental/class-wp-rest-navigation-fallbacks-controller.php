@@ -12,7 +12,25 @@ require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
 /**
  * Base Templates REST API Controller.
  */
-class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
+class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
+
+	/**
+	 * The Post Type for the Controller
+	 *
+	 * @var string
+	 */
+	private $post_type;
+
+	/**
+	 * Constructs the controller.
+	 *
+	 * @since 5.9.0
+	 */
+	public function __construct() {
+		$this->namespace = 'wp-block-editor/v1';
+		$this->rest_base = 'navigation-fallbacks';
+		$this->post_type = 'wp_navigation';
+	}
 
 	/**
 	 * Registers the controllers routes.
@@ -21,12 +39,11 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function register_routes() {
 
-		parent::register_routes();
 
 		// Lists a single nav item based on the given id or slug.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/fallback',
+			'/' . $this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -34,7 +51,6 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 					'permission_callback' => array( $this, 'get_fallbacks_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE ),
 				),
-				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);

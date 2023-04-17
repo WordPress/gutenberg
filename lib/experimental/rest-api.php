@@ -30,6 +30,16 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 
 /**
+ * Registers the Navigation Fallbacks REST API routes.
+ */
+function gutenberg_register_rest_navigation_fallbacks() {
+	$editor_settings = new WP_REST_Navigation_Fallbacks_Controller();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_fallbacks' );
+
+
+/**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *
  * This function filters the return from get_sample_permalink() and essentially
@@ -101,21 +111,3 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
-
-/**
- * Updates the REST API controller for the navigation post type.
- * This is a temporary fix until we can patch the registration of this in Core.
- *
- * @param array  $args Array of arguments for registering a post type.
- * @param string $post_type Post type key.
- * @return array Array of arguments for registering a post type.
- */
-function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
-	if ( in_array( $post_type, array( 'wp_navigation' ), true ) ) {
-		// Original set in
-		// https://github.com/WordPress/wordpress-develop/blob/6cbed78c94b9d8c6a9b4c8b472b88ee0cd56528c/src/wp-includes/post.php#L528.
-		$args['rest_controller_class'] = 'WP_REST_Navigation_Controller';
-	}
-	return $args;
-}
-add_filter( 'register_post_type_args', 'gutenberg_update_navigation_rest_controller', 10, 2 );

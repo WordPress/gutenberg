@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests covering WP_REST_Navigation_Controller functionality.
+ * Unit tests covering WP_REST_Navigation_Fallbacks_Controller functionality.
  *
  * @package WordPress
  * @subpackage REST API
@@ -10,7 +10,7 @@
  * @group restapi
  * @group navigation
  */
-class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	protected static $admin_user;
 	protected static $editor_user;
@@ -28,7 +28,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	/**
-	 * @covers WP_REST_Navigation_Controller::register_routes
+	 * @covers WP_REST_Navigation_Fallbacks_Controller::register_routes
 	 *
 	 * @since 5.8.0
 	 * @since 6.2.0 Added pattern directory categories endpoint.
@@ -36,14 +36,14 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 
-		$this->assertArrayHasKey( '/wp/v2/navigation/fallback', $routes );
+		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallbacks', $routes );
 	}
 
 	public function test_should_not_return_menus_for_users_without_permissions() {
 
 		wp_set_current_user( self::$editor_user );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -55,7 +55,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -82,7 +82,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		unregister_block_type( 'core/page-list' );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -98,9 +98,9 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	public function test_should_manage_concurrent_requests() {
-		$request_one   = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
-		$request_two   = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
-		$request_three = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request_one   = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request_two   = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request_three = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 
 		// Fire off multiple requests.
 		rest_get_server()->dispatch( $request_one );
@@ -140,7 +140,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -173,7 +173,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -228,7 +228,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$locations['header']  = $another_menu_id;
 		set_theme_mod( 'nav_menu_locations', $locations );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -266,7 +266,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -304,7 +304,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -336,7 +336,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$request = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 
 		$response = rest_get_server()->dispatch( $request );
 
