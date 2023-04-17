@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 15.6.0-rc.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Fonts API
+- Revert PR 49646: "[Font API] Use registered fonts for Block Editor iframe." ([49863](https://github.com/WordPress/gutenberg/pull/49863))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@hellofromtonya
+
+
 = 15.6.0-rc.1 =
 
 
