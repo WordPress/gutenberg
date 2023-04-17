@@ -47,7 +47,7 @@
 	}
 
 	// Active.
-	&.is-active::after {
+	&[data-state="active"]::after {
 		height: calc(1 * var(--wp-admin-border-width-focus));
 
 		// Windows high contrast mode.

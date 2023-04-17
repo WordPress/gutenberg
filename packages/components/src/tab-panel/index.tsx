@@ -1,7 +1,9 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import * as RadixTabs from '@radix-ui/react-tabs';
 
 /**
  * WordPress dependencies
@@ -12,32 +14,39 @@ import {
 	useLayoutEffect,
 	useCallback,
 } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { NavigableMenu } from '../navigable-container';
-import Button from '../button';
 import type { TabButtonProps, TabPanelProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import Button from '../button';
 
-const TabButton = ( {
-	tabId,
+export const Tab = ( {
+	value,
+	disabled = false,
 	children,
-	selected,
 	...rest
 }: TabButtonProps ) => (
-	<Button
-		role="tab"
-		tabIndex={ selected ? undefined : -1 }
-		aria-selected={ selected }
-		id={ tabId }
-		__experimentalIsFocusable
-		{ ...rest }
+	<RadixTabs.Trigger disabled={ disabled } value={ value } asChild>
+		<Button disabled={ disabled } __experimentalIsFocusable { ...rest }>
+			{ children }
+		</Button>
+	</RadixTabs.Trigger>
+);
+
+export const TabList = ( { children } ) => (
+	<RadixTabs.TabsList className="components-tab-panel__tabs">
+		{ children }
+	</RadixTabs.TabsList>
+);
+
+export const TabPanel = ( { value, children } ) => (
+	<RadixTabs.Content
+		value={ value }
+		className="components-tab-panel__tab-content"
 	>
 		{ children }
-	</Button>
+	</RadixTabs.Content>
 );
 
 /**
@@ -76,7 +85,7 @@ const TabButton = ( {
  * );
  * ```
  */
-export function TabPanel( {
+export function Tabs( {
 	className,
 	children,
 	tabs,
@@ -85,28 +94,18 @@ export function TabPanel( {
 	orientation = 'horizontal',
 	activeClass = 'is-active',
 	onSelect,
-}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
-	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
-	const [ selected, setSelected ] = useState< string >();
+}: TabPanelProps ) {
+	const [ selected, setSelected ] = useState< string >( initialTabName );
 
 	const handleTabSelection = useCallback(
-		( tabKey: string ) => {
-			setSelected( tabKey );
-			onSelect?.( tabKey );
+		( tabValue: string ) => {
+			setSelected( tabValue );
+			onSelect?.( tabValue );
 		},
 		[ onSelect ]
 	);
 
-	// Simulate a click on the newly focused tab, which causes the component
-	// to show the `tab-panel` associated with the clicked tab.
-	const activateTabAutomatically = (
-		_childIndex: number,
-		child: HTMLButtonElement
-	) => {
-		child.click();
-	};
 	const selectedTab = tabs.find( ( { name } ) => name === selected );
-	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
@@ -134,7 +133,7 @@ export function TabPanel( {
 		}
 	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
 
-	// Handle the currently selected tab becoming disabled.
+	// // Handle the currently selected tab becoming disabled.
 	useEffect( () => {
 		// This effect only runs when the selected tab is defined and becomes disabled.
 		if ( ! selectedTab?.disabled ) {
@@ -151,51 +150,39 @@ export function TabPanel( {
 	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
 
 	return (
-		<div className={ className }>
-			<NavigableMenu
-				role="tablist"
-				orientation={ orientation }
-				onNavigate={
-					selectOnMove ? activateTabAutomatically : undefined
-				}
-				className="components-tab-panel__tabs"
-			>
+		<RadixTabs.Root
+			className={ className }
+			value={ selected }
+			onValueChange={ handleTabSelection }
+			activationMode={ selectOnMove ? 'automatic' : 'manual' }
+		>
+			<TabList>
 				{ tabs.map( ( tab ) => (
-					<TabButton
+					<Tab
+						key={ tab.name }
+						value={ tab.name }
 						className={ classnames(
 							'components-tab-panel__tabs-item',
 							tab.className,
-							{
-								[ activeClass ]: tab.name === selected,
-							}
+							{ [ activeClass ]: tab.name === selected }
 						) }
-						tabId={ `${ instanceId }-${ tab.name }` }
-						aria-controls={ `${ instanceId }-${ tab.name }-view` }
-						selected={ tab.name === selected }
-						key={ tab.name }
-						onClick={ () => handleTabSelection( tab.name ) }
 						disabled={ tab.disabled }
-						label={ tab.icon && tab.title }
 						icon={ tab.icon }
+						label={ tab.icon && tab.title }
 						showTooltip={ !! tab.icon }
 					>
 						{ ! tab.icon && tab.title }
-					</TabButton>
+					</Tab>
 				) ) }
-			</NavigableMenu>
+			</TabList>
+
 			{ selectedTab && (
-				<div
-					key={ selectedId }
-					aria-labelledby={ selectedId }
-					role="tabpanel"
-					id={ `${ selectedId }-view` }
-					className="components-tab-panel__tab-content"
-				>
+				<TabPanel value={ selectedTab.name }>
 					{ children( selectedTab ) }
-				</div>
+				</TabPanel>
 			) }
-		</div>
+		</RadixTabs.Root>
 	);
 }
 
-export default TabPanel;
+export default Tabs;

@@ -38,6 +38,7 @@
 		"@emotion/styled": "^11.6.0",
 		"@emotion/utils": "^1.0.0",
 		"@floating-ui/react-dom": "1.0.0",
+		"@radix-ui/react-tabs": "^1.0.3",
 		"@use-gesture/react": "^10.2.24",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",

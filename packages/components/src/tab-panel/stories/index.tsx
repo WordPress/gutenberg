@@ -37,6 +37,7 @@ Default.args = {
 		{
 			name: 'tab1',
 			title: 'Tab 1',
+			disabled: false,
 		},
 		{
 			name: 'tab2',
