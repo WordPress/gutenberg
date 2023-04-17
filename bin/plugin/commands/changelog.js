@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { groupBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -711,9 +710,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy(
-		skipCreatedByBots( pullRequests ),
-		getIssueType
+	const groupedPullRequests = skipCreatedByBots( pullRequests ).reduce(
+		(
+			/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+			pr
+		) => {
+			const issueType = getIssueType( pr );
+			if ( ! acc[ issueType ] ) {
+				acc[ issueType ] = [];
+			}
+			acc[ issueType ].push( pr );
+			return acc;
+		},
+		{}
 	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
@@ -732,7 +741,20 @@ function getChangelog( pullRequests ) {
 		changelog += '### ' + group + '\n\n';
 
 		// Group PRs within this section into "Features".
-		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+		const featureGroups = groupPullRequests.reduce(
+			(
+				/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+				pr
+			) => {
+				const issueFeature = getIssueFeature( pr );
+				if ( ! acc[ issueFeature ] ) {
+					acc[ issueFeature ] = [];
+				}
+				acc[ issueFeature ].push( pr );
+				return acc;
+			},
+			{}
+		);
 
 		const featuredGroupNames = sortFeatureGroups( featureGroups );
 

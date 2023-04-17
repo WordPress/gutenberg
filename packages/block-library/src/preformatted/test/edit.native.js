@@ -64,24 +64,25 @@ describe( 'Preformatted', () => {
 
 		// Act
 		await addBlock( screen, 'Preformatted' );
-		const verseTextInput = await screen.findByPlaceholderText(
+		const preformattedTextInput = await screen.findByPlaceholderText(
 			'Write preformatted text…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string, {
+		changeAndSelectTextOfRichText( preformattedTextInput, string, {
 			selectionStart: string.length,
 			selectionEnd: string.length,
 		} );
-		fireEvent( verseTextInput, 'onKeyDown', {
+		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
+		changeAndSelectTextOfRichText( preformattedTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:preformatted -->
-		<pre class="wp-block-preformatted">A great statement.<br></pre>
+		<pre class="wp-block-preformatted">A great statement.<br>Again</pre>
 		<!-- /wp:preformatted -->"
 	` );
 	} );
