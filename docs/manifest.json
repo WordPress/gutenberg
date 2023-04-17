@@ -2262,7 +2262,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"
