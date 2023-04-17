@@ -2,7 +2,7 @@
  * External dependencies
  */
 import {
-	selectTextInRichText,
+	selectRangeInRichText,
 	typeInRichText,
 	fireEvent,
 	getEditorHtml,
@@ -347,7 +347,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
-		selectTextInRichText( listItemField );
+		selectRangeInRichText( listItemField, 0 );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -395,7 +395,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
-		selectTextInRichText( listItemField );
+		selectRangeInRichText( listItemField, 0 );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
