@@ -45,7 +45,7 @@ export function Provider( { children, ...props } ) {
 }
 
 export function createSlotFill( key ) {
-	const baseName = typeof key === 'string' ? key : key.description;
+	const baseName = typeof key === 'symbol' ? key.description : key;
 	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
 	FillComponent.displayName = `${ baseName }Fill`;
 
