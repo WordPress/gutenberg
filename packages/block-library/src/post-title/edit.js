@@ -40,7 +40,7 @@ export default function PostTitleEdit( {
 	 * hence instead we call it without proper data. In this case hook automatically
 	 * returns false without calling a backend.
 	 */
-	 const userCanEdit = useCanEditEntity(
+	const userCanEdit = useCanEditEntity(
 		'postType',
 		isDescendentOfQueryLoop ? '' : postType,
 		isDescendentOfQueryLoop ? '' : postId
@@ -66,56 +66,52 @@ export default function PostTitleEdit( {
 	);
 
 	if ( postType && postId ) {
-		titleElement =
-			userCanEdit ? (
+		titleElement = userCanEdit ? (
+			<PlainText
+				tagName={ TagName }
+				placeholder={ __( 'No Title' ) }
+				value={ rawTitle }
+				onChange={ setTitle }
+				__experimentalVersion={ 2 }
+				__unstableOnSplitAtEnd={ onSplitAtEnd }
+				{ ...blockProps }
+			/>
+		) : (
+			<TagName
+				{ ...blockProps }
+				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+			/>
+		);
+	}
+
+	if ( isLink && postType && postId ) {
+		titleElement = userCanEdit ? (
+			<TagName { ...blockProps }>
 				<PlainText
-					tagName={ TagName }
-					placeholder={ __( 'No Title' ) }
+					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					placeholder={ ! rawTitle.length ? __( 'No Title' ) : null }
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
 					__unstableOnSplitAtEnd={ onSplitAtEnd }
-					{ ...blockProps }
 				/>
-			) : (
-				<TagName
-					{ ...blockProps }
-					dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+			</TagName>
+		) : (
+			<TagName { ...blockProps }>
+				<a
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					onClick={ ( event ) => event.preventDefault() }
+					dangerouslySetInnerHTML={ {
+						__html: fullTitle?.rendered,
+					} }
 				/>
-			);
-	}
-
-	if ( isLink && postType && postId ) {
-		titleElement =
-			userCanEdit ? (
-				<TagName { ...blockProps }>
-					<PlainText
-						tagName="a"
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						placeholder={
-							! rawTitle.length ? __( 'No Title' ) : null
-						}
-						value={ rawTitle }
-						onChange={ setTitle }
-						__experimentalVersion={ 2 }
-						__unstableOnSplitAtEnd={ onSplitAtEnd }
-					/>
-				</TagName>
-			) : (
-				<TagName { ...blockProps }>
-					<a
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						onClick={ ( event ) => event.preventDefault() }
-						dangerouslySetInnerHTML={ {
-							__html: fullTitle?.rendered,
-						} }
-					/>
-				</TagName>
-			);
+			</TagName>
+		);
 	}
 
 	return (
