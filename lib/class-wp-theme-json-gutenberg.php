@@ -1114,7 +1114,18 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( $this->theme_json['styles']['blocks'][ $name ]['variations'] as $variation_name => $node ) {
 						$custom_variation_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'variations', $variation_name, 'css' ) );
 						if ( $custom_variation_css ) {
-							$selector    = static::$blocks_metadata[ $name ]['styleVariations'][ $variation_name ];
+							if ( 'default' === $variation_name ) {
+								// The default variation is the one that doesn't have a class.
+								// If the default variation is selected, the class .is-style-default is missing.
+								// We need to add a ':not' selector to the selector to target the default variation.
+								$not_selector = '';
+								foreach ( static::$blocks_metadata[ $name ]['styleVariations'] as $not_style_variation_name => $node ) {
+									$not_selector .= ':not(.is-style-' . $not_style_variation_name . ')';
+								}
+								$selector = static::$blocks_metadata[ $name ]['selector'] . $not_selector . ',' . static::$blocks_metadata[ $name ]['styleVariations'][ $variation_name ];
+							} else {
+								$selector = static::$blocks_metadata[ $name ]['styleVariations'][ $variation_name ];
+							}
 							$stylesheet .= $this->process_blocks_custom_css( $custom_variation_css, $selector );
 						}
 					}
