@@ -8,8 +8,7 @@ Namespace: `core/notices`.
 
 ### getNotices
 
-Returns all notices as an array, optionally for a given context. Defaults to
-the global context.
+Returns all notices as an array, optionally for a given context. Defaults to the global context.
 
 _Usage_
 
@@ -48,8 +47,7 @@ _Returns_
 
 ### createErrorNotice
 
-Returns an action object used in signalling that an error notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an error notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -93,8 +91,7 @@ _Returns_
 
 ### createInfoNotice
 
-Returns an action object used in signalling that an info notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an info notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -178,8 +175,7 @@ _Returns_
 
 ### createSuccessNotice
 
-Returns an action object used in signalling that a success notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a success notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -221,8 +217,7 @@ _Returns_
 
 ### createWarningNotice
 
-Returns an action object used in signalling that a warning notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a warning notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 

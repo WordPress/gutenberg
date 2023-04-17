@@ -57,21 +57,25 @@ function useSortedBlockTypes() {
 	return [ ...coreItems, ...nonCoreItems ];
 }
 
-function BlockMenuItem( { block } ) {
-	const [ rawSettings ] = useGlobalSetting( '', block.name );
-	const settings = useSettingsForBlockElement( rawSettings, block.name );
+export function useBlockHasGlobalStyles( blockName ) {
+	const [ rawSettings ] = useGlobalSetting( '', blockName );
+	const settings = useSettingsForBlockElement( rawSettings, blockName );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
-	const hasVariationsPanel = useHasVariationsPanel( block.name );
-	const hasBlockMenuItem =
+	const hasVariationsPanel = useHasVariationsPanel( blockName );
+	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||
 		hasLayoutPanel ||
 		hasVariationsPanel;
+	return hasGlobalStyles;
+}
 
+function BlockMenuItem( { block } ) {
+	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
 	}
