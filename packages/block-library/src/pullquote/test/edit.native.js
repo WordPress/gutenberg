@@ -46,8 +46,8 @@ describe( 'Pullquote', () => {
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
 		typeInRichText( citationTextInput, 'A person', {
-			selectionStart: 2,
-			selectionEnd: 2,
+			finalSelectionStart: 2,
+			finalSelectionEnd: 2,
 		} );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},

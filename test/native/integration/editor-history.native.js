@@ -126,7 +126,7 @@ describe( 'Editor History', () => {
 		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		// Artifical delay to create two history entries for typing and bolding.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );

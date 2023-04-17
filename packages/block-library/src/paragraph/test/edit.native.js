@@ -57,7 +57,7 @@ describe( 'Paragraph block', () => {
 		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Bold' ) );
 
@@ -82,7 +82,7 @@ describe( 'Paragraph block', () => {
 		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
 
@@ -107,7 +107,7 @@ describe( 'Paragraph block', () => {
 		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Strikethrough' ) );
 
@@ -208,8 +208,8 @@ describe( 'Paragraph block', () => {
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		const string = 'A quick brown fox jumps over the lazy dog.';
 		typeInRichText( paragraphTextInput, string, {
-			selectionStart: string.length / 2,
-			selectionEnd: string.length / 2,
+			finalSelectionStart: string.length / 2,
+			finalSelectionEnd: string.length / 2,
 		} );
 		fireEvent( paragraphTextInput, 'onKeyDown', {
 			nativeEvent: {},
@@ -282,8 +282,8 @@ describe( 'Paragraph block', () => {
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
-				selectionStart: 2,
-				selectionEnd: 7,
+				finalSelectionStart: 2,
+				finalSelectionEnd: 7,
 			}
 		);
 		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
@@ -328,8 +328,8 @@ describe( 'Paragraph block', () => {
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
-				selectionStart: 2,
-				selectionEnd: 7,
+				finalSelectionStart: 2,
+				finalSelectionEnd: 7,
 			}
 		);
 		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
@@ -362,8 +362,8 @@ describe( 'Paragraph block', () => {
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		typeInRichText( paragraphTextInput, '     some text      ', {
-			selectionStart: 5,
-			selectionEnd: 14,
+			finalSelectionStart: 5,
+			finalSelectionEnd: 14,
 		} );
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
 

@@ -17,7 +17,7 @@ export const selectRangeInRichText = ( richText, start, end = start ) => {
 	}
 
 	typeInRichText( richText, '', {
-		selectionStart: start,
-		selectionEnd: end,
+		finalSelectionStart: start,
+		finalSelectionEnd: end,
 	} );
 };

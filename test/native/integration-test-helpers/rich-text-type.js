@@ -21,8 +21,8 @@ function insertTextAtPosition( text, newText, start, end ) {
  * @param {Object}                                          options                         Configuration options for selection.
  * @param {number}                                          [options.initialSelectionStart] Selection start position before the text is inserted.
  * @param {number}                                          [options.initialSelectionEnd]   Selection end position before the text is inserted.
- * @param {number}                                          [options.selectionStart]        Selection start position after the text is inserted.
- * @param {number}                                          [options.selectionEnd]          Selection end position after the text is inserted.
+ * @param {number}                                          [options.finalSelectionStart]   Selection start position after the text is inserted.
+ * @param {number}                                          [options.finalSelectionEnd]     Selection end position after the text is inserted.
  */
 export const typeInRichText = ( richText, text, options = {} ) => {
 	const currentValueSansOuterHtmlTags = stripOuterHtmlTags(
@@ -31,8 +31,9 @@ export const typeInRichText = ( richText, text, options = {} ) => {
 	const {
 		initialSelectionStart = currentValueSansOuterHtmlTags.length,
 		initialSelectionEnd = initialSelectionStart,
-		selectionStart = currentValueSansOuterHtmlTags.length + text.length,
-		selectionEnd = selectionStart,
+		finalSelectionStart = currentValueSansOuterHtmlTags.length +
+			text.length,
+		finalSelectionEnd = finalSelectionStart,
 	} = options;
 
 	fireEvent( richText, 'focus' );
@@ -40,8 +41,8 @@ export const typeInRichText = ( richText, text, options = {} ) => {
 	fireEvent(
 		richText,
 		'onSelectionChange',
-		selectionStart,
-		selectionEnd,
+		finalSelectionStart,
+		finalSelectionEnd,
 		text,
 		{
 			nativeEvent: {
