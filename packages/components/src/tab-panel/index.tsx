@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -21,7 +20,7 @@ import {
 import type { TabButtonProps, TabPanelProps } from './types';
 import Button from '../button';
 
-export const Tab = ( {
+const Tab = ( {
 	value,
 	disabled = false,
 	children,
@@ -34,13 +33,13 @@ export const Tab = ( {
 	</RadixTabs.Trigger>
 );
 
-export const TabList = ( { children } ) => (
-	<RadixTabs.TabsList className="components-tab-panel__tabs">
-		{ children }
-	</RadixTabs.TabsList>
-);
-
-export const TabPanel = ( { value, children } ) => (
+const TabPanel = ( {
+	value,
+	children,
+}: {
+	value: string;
+	children: React.ReactNode;
+} ) => (
 	<RadixTabs.Content
 		value={ value }
 		className="components-tab-panel__tab-content"
@@ -95,7 +94,7 @@ export function Tabs( {
 	activeClass = 'is-active',
 	onSelect,
 }: TabPanelProps ) {
-	const [ selected, setSelected ] = useState< string >( initialTabName );
+	const [ selected, setSelected ] = useState< string >();
 
 	const handleTabSelection = useCallback(
 		( tabValue: string ) => {
@@ -151,16 +150,15 @@ export function Tabs( {
 
 	return (
 		<RadixTabs.Root
-			className={ className }
-			value={ selected }
-			onValueChange={ handleTabSelection }
 			activationMode={ selectOnMove ? 'automatic' : 'manual' }
+			className={ className }
+			onValueChange={ handleTabSelection }
+			orientation={ orientation }
+			value={ selected }
 		>
-			<TabList>
+			<RadixTabs.TabsList className="components-tab-panel__tabs">
 				{ tabs.map( ( tab ) => (
 					<Tab
-						key={ tab.name }
-						value={ tab.name }
 						className={ classnames(
 							'components-tab-panel__tabs-item',
 							tab.className,
@@ -168,13 +166,15 @@ export function Tabs( {
 						) }
 						disabled={ tab.disabled }
 						icon={ tab.icon }
+						key={ tab.name }
 						label={ tab.icon && tab.title }
 						showTooltip={ !! tab.icon }
+						value={ tab.name }
 					>
 						{ ! tab.icon && tab.title }
 					</Tab>
 				) ) }
-			</TabList>
+			</RadixTabs.TabsList>
 
 			{ selectedTab && (
 				<TabPanel value={ selectedTab.name }>
