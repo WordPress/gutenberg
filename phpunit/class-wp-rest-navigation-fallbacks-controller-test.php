@@ -65,6 +65,12 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$this->assertIsInt( $data );
 
 		$this->assertEquals( 'wp_navigation', get_post_type( $data ) );
+
+		// Check that only a single Navigation fallback was created.
+		$navs_in_db = $this->get_navigations_in_database();
+
+		$this->assertCount( 1, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
+
 	}
 
 	private function get_navigations_in_database() {
