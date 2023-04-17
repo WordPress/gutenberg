@@ -1087,7 +1087,7 @@ Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link`
 
 #### Variations
 
-A block can have a "style variation", as defined per the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the `theme.json`. Styles for unregistered style variations will be ignored.
+A block can have a "style variation", as defined per the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the theme.json file. Styles for unregistered style variations will be ignored.
 
 Note that variations are a "block concept", they only exist bound to blocks. The `theme.json` specification respects that distinction by only allowing `variations` at the block-level but not at the top-level.
 
