@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancement
+### Breaking Changes
 
 -   `run` command now has a `--cwd` option to set the working directory for the command to execute from.
 
