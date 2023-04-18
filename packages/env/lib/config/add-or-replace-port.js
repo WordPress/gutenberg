@@ -6,8 +6,8 @@ const { ValidationError } = require( './validate-config' );
 /**
  * Adds or replaces the port to the given domain or URI.
  *
- * @param {string} input The domain or URI to operate on.
- * @param {string} port The port to append.
+ * @param {string}  input     The domain or URI to operate on.
+ * @param {string}  port      The port to append.
  * @param {boolean} [replace] Indicates whether or not the port should be replaced if one is already present. Defaults to true.
  * @return {string} The string with the port added or replaced.
  */
