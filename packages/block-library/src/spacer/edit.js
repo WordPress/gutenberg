@@ -157,27 +157,23 @@ const SpacerEdit = ( {
 	};
 
 	const getHeightForVerticalBlocks = () => {
-		if ( isFlexLayout && selfStretch === 'fit' ) {
+		if ( isFlexLayout ) {
 			return undefined;
-		} else if ( isFlexLayout && flexSize ) {
-			return temporaryHeight || flexSize;
 		}
 		return temporaryHeight || getSpacingPresetCssVar( height ) || undefined;
 	};
 
 	const getWidthForHorizontalBlocks = () => {
-		if ( isFlexLayout && selfStretch === 'fit' ) {
+		if ( isFlexLayout ) {
 			return undefined;
-		} else if ( isFlexLayout && flexSize ) {
-			return temporaryWidth || flexSize;
 		}
 		return temporaryWidth || getSpacingPresetCssVar( width ) || undefined;
 	};
 
 	const sizeConditionalOnOrientation =
 		inheritedOrientation === 'horizontal'
-			? getWidthForHorizontalBlocks()
-			: getHeightForVerticalBlocks();
+			? temporaryWidth || flexSize
+			: temporaryHeight || flexSize;
 
 	const style = {
 		height:
@@ -266,7 +262,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					'100px';
 				setAttributes( {
-					width: undefined,
+					width: '0px',
 					style: {
 						...blockStyle,
 						layout: {
@@ -282,7 +278,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( width, spacingSizes ) ||
 					'100px';
 				setAttributes( {
-					height: undefined,
+					height: '0px',
 					style: {
 						...blockStyle,
 						layout: {
