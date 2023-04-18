@@ -14,6 +14,21 @@
 		},
 	} );
 
+	registerBlockType( 'e2e-tests/auto-inserted', {
+		title: 'Auto Inserted',
+		description: 'Auto-inserted test block.',
+		category: 'widgets',
+		edit() {
+			return 'I got auto-inserted!';
+		},
+		save() {
+			return 'I got auto-inserted';
+		},
+		autoInsert: {
+			after: [ 'core/quote' ],
+		},
+	} );
+
 	addFilter(
 		'blocks.registerBlockType',
 		'e2e-tests/hello-world/filter-added-after-registration',
