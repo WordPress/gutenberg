@@ -145,10 +145,11 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 
 		$schema = $this->get_item_schema();
 
-		// We are also renaming the fields to more understandable names.
 		if ( isset( $schema['properties']['id'] ) ) {
-			$data = (int) $item->ID;
+			$data['id'] = (int) $item->ID;
 		}
+
+		$data = $this->add_additional_fields_to_object( $data, $request );
 
 		return rest_ensure_response( $data );
 	}
