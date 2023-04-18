@@ -430,6 +430,19 @@ _Returns_
 
 -   `string|null`: A font-size value using clamp().
 
+### getCustomValueFromPreset
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert
+-   _spacingSizes_ `Array`: Array of the current spacing preset objects
+
+_Returns_
+
+-   `string`: Mapping of the spacing preset to its equivalent custom value.
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.

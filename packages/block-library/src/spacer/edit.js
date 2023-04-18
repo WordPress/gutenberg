@@ -8,6 +8,8 @@ import classnames from 'classnames';
  */
 import {
 	useBlockProps,
+	useSetting,
+	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -105,7 +107,7 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const hasFlexSize = !! flexSize;
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
@@ -117,7 +119,7 @@ const SpacerEdit = ( {
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
 
-		if ( isFlexLayout || hasFlexSize ) {
+		if ( isFlexLayout ) {
 			setAttributes( {
 				style: {
 					...blockStyle,
@@ -137,7 +139,7 @@ const SpacerEdit = ( {
 	const handleOnHorizontalResizeStop = ( newWidth ) => {
 		onResizeStop();
 
-		if ( isFlexLayout || hasFlexSize ) {
+		if ( isFlexLayout ) {
 			setAttributes( {
 				style: {
 					...blockStyle,
@@ -250,45 +252,80 @@ const SpacerEdit = ( {
 	};
 
 	useEffect( () => {
-		if ( inheritedOrientation === 'horizontal' && ! width ) {
-			setAttributes( {
-				height: '0px',
-				width: '72px',
-			} );
-		}
 		if (
 			isFlexLayout &&
 			selfStretch !== 'fill' &&
 			selfStretch !== 'fit' &&
 			! flexSize
 		) {
-			const newSize =
-				inheritedOrientation === 'horizontal'
-					? getSpacingPresetCssVar( width ) || '72px'
-					: getSpacingPresetCssVar( height ) || '100px';
-			setAttributes( {
-				style: {
-					...blockStyle,
-					layout: {
-						...layout,
-						flexSize: newSize,
-						selfStretch: 'fixed',
+			if ( inheritedOrientation === 'horizontal' ) {
+				// If spacer is moving from a vertical container to a horizontal container,
+				// it might not have width but have height instead.
+				const newSize =
+					getCustomValueFromPreset( width, spacingSizes ) ||
+					getCustomValueFromPreset( height, spacingSizes ) ||
+					'100px';
+				setAttributes( {
+					width: null,
+					style: {
+						...blockStyle,
+						layout: {
+							...layout,
+							flexSize: newSize,
+							selfStretch: 'fixed',
+						},
 					},
-				},
-			} );
+				} );
+			} else {
+				const newSize =
+					getCustomValueFromPreset( height, spacingSizes ) ||
+					getCustomValueFromPreset( width, spacingSizes ) ||
+					'100px';
+				setAttributes( {
+					height: null,
+					style: {
+						...blockStyle,
+						layout: {
+							...layout,
+							flexSize: newSize,
+							selfStretch: 'fixed',
+						},
+					},
+				} );
+			}
 		} else if (
 			isFlexLayout &&
 			( selfStretch === 'fill' || selfStretch === 'fit' )
 		) {
 			if ( inheritedOrientation === 'horizontal' ) {
 				setAttributes( {
-					width: '0px',
+					width: null,
 				} );
 			} else {
 				setAttributes( {
-					height: '0px',
+					height: null,
 				} );
 			}
+		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
+			if ( inheritedOrientation === 'horizontal' ) {
+				setAttributes( {
+					width: flexSize,
+				} );
+			} else {
+				setAttributes( {
+					height: flexSize,
+				} );
+			}
+			setAttributes( {
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: null,
+						selfStretch: null,
+					},
+				},
+			} );
 		}
 	}, [
 		blockStyle,
@@ -299,6 +336,7 @@ const SpacerEdit = ( {
 		layout,
 		selfStretch,
 		setAttributes,
+		spacingSizes,
 		width,
 	] );
 
