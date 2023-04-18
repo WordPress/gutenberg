@@ -82,12 +82,16 @@ export const isPathSupported = ( path, method ) => {
 };
 
 export const shouldEnableCaching = ( path ) => {
-	const disabledCachingEnpoints = applyFilters(
+	const disabledCachingEndpoints = applyFilters(
 		'native.disabled_caching_endpoints',
 		DISABLED_CACHING_ENDPOINTS
 	);
 
-	! disabledCachingEnpoints.some( ( pattern ) => pattern.test( path ) );
+	const isDisabled = disabledCachingEndpoints.some( ( pattern ) =>
+		pattern.test( path )
+	);
+
+	return ! isDisabled;
 };
 
 export default () => {
