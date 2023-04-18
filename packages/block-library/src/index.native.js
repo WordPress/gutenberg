@@ -261,8 +261,9 @@ export const registerCoreBlocks = () => {
  * than 0, a "new" badge is displayed on the block type within the block
  * inserter.
  *
- * With the below example, the Audio block will be displayed as "new" until it
- * reaches 40 impressions.
+ * With the below example, the Audio block will be displayed as "new" until its
+ * impression count reaches 0, which occurs by various actions decrementing
+ * the impression count.
  *
  * {
  * 	[ audio.name ]: 40
