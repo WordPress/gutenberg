@@ -68,6 +68,7 @@ export const setTemplate =
 					.resolveSelect( coreStore )
 					.getEntityRecord( 'postType', 'wp_template', templateId );
 				templateSlug = template?.slug;
+				console.log( 'setTemplate', template );
 			} catch ( error ) {}
 		}
 
@@ -242,6 +243,7 @@ export const setPage =
 			type: 'SET_EDITED_POST',
 			postType: 'wp_template',
 			id: template.id,
+			content: template.content,
 			context: {
 				...page.context,
 				templateSlug: template.slug,

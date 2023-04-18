@@ -195,6 +195,18 @@ export function getEditedPostContext( state ) {
 }
 
 /**
+ * Returns the edited post's content.
+ *
+ * @deprecated
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Post content.
+ */
+export function getEditedPostContent( state ) {
+	return state.editedPost.content;
+}
+
+/**
  * Returns the current page object.
  *
  * @deprecated

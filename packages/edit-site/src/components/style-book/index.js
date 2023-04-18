@@ -372,4 +372,4 @@ function useHasStyleBook() {
 
 StyleBook.Slot = StyleBookSlot;
 export default StyleBook;
-export { useHasStyleBook };
+export { useHasStyleBook, StyleBookFill };

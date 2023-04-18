@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { set } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -36,6 +36,7 @@ import Subtitle from './subtitle';
 import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
+import Revisions from '../revisions';
 
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -170,7 +171,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 }
 
 function ScreenRevisions() {
-	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
+	const { useGlobalStylesReset, GlobalStylesContext } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
@@ -183,6 +184,7 @@ function ScreenRevisions() {
 		} ),
 		[]
 	);
+	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
 	const [ currentRevisionId, setCurrentRevisionId ] = useState();
 	const [ cachedUserConfig ] = useState( userConfig );
 	const [ canRestoreCachedConfig, setCanRestoreCachedConfig ] =
@@ -201,6 +203,16 @@ function ScreenRevisions() {
 
 	const restoreRevision = useCallback(
 		( revision ) => {
+			// setUserConfig( ( currentConfig ) => {
+			// 	// Deep clone `currentConfig` to avoid mutating it later.
+			// 	const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
+			// 	set( newUserConfig, contextualPath, newValue );
+			// 	return  {
+			// 		styles: revision?.styles,
+			// 			settings: revision?.settings,
+			// 	};
+			//
+			// } );
 			setUserConfig( () => ( {
 				styles: revision?.styles,
 				settings: revision?.settings,
@@ -212,6 +224,11 @@ function ScreenRevisions() {
 		},
 		[ userConfig, cachedUserConfig ]
 	);
+
+	const selectRevision = ( revision ) => {
+		console.log( 'selectRevision', revision?.styles );
+		setGlobalStylesRevision( revision?.styles )
+	};
 
 	const RevisionsComponent =
 		userRevisions.length >= SELECTOR_MINIMUM_REVISION_COUNT
@@ -237,34 +254,42 @@ function ScreenRevisions() {
 				<VStack spacing={ 3 }>
 					<Subtitle>{ __( 'Revisions' ) }</Subtitle>
 					<RevisionsComponent
-						onChange={ restoreRevision }
+						onChange={ selectRevision }
 						currentRevisionId={ currentRevisionId }
 						userRevisions={ userRevisions }
 					/>
 					<VStack spacing={ 1 }>
+						{/*<Button*/}
+						{/*	onClick={ () => {*/}
+						{/*		if ( hasUnsavedChanges ) {*/}
+						{/*			selectRevision( cachedUserConfig );*/}
+						{/*		}*/}
+						{/*	} }*/}
+						{/*	className="edit-site-global-styles-screen-revisions__button"*/}
+						{/*	icon={ backupIcon }*/}
+						{/*	aria-disabled={ ! hasUnsavedChanges }*/}
+						{/*>*/}
+						{/*	{ __( 'Restore unsaved changes' ) }*/}
+						{/*</Button>*/}
+						{/*<Button*/}
+						{/*	onClick={ canReset ? onReset : undefined }*/}
+						{/*	icon={ isRTL ? redoIcon : undoIcon }*/}
+						{/*	className="edit-site-global-styles-screen-revisions__button"*/}
+						{/*	aria-disabled={ ! canReset }*/}
+						{/*>*/}
+						{/*	{ __( 'Reset styles to theme default' ) }*/}
+						{/*</Button>*/}
 						<Button
-							onClick={ () => {
-								if ( hasUnsavedChanges ) {
-									restoreRevision( cachedUserConfig );
-								}
-							} }
-							className="edit-site-global-styles-screen-revisions__button"
-							icon={ backupIcon }
-							aria-disabled={ ! hasUnsavedChanges }
+							variant="primary"
+							onClick={ () => restoreRevision( globalStylesRevision ) }
 						>
-							{ __( 'Restore unsaved changes' ) }
-						</Button>
-						<Button
-							onClick={ canReset ? onReset : undefined }
-							icon={ isRTL ? redoIcon : undoIcon }
-							className="edit-site-global-styles-screen-revisions__button"
-							aria-disabled={ ! canReset }
-						>
-							{ __( 'Reset styles to theme default' ) }
+							{ __( 'Restore and save revision' ) }
+
 						</Button>
 					</VStack>
 				</VStack>
 			</div>
+			<Revisions styles={ globalStylesRevision } />
 		</>
 	);
 }

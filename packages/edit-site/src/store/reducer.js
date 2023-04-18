@@ -56,6 +56,7 @@ export function editedPost( state = {}, action ) {
 				postType: action.postType,
 				id: action.id,
 				context: action.context,
+				content: action.content,
 			};
 		case 'SET_EDITED_POST_CONTEXT':
 			return {
