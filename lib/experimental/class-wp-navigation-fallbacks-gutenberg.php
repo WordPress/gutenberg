@@ -81,7 +81,6 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		$classic_nav_menu = static::get_fallback_classic_menu();
 
 		if ( ! $classic_nav_menu ) {
-			// return a WP_error object with a message and error code
 			return new WP_Error( 'no_classic_menus', __( 'No Classic Menus found.', 'gutenberg' ) );
 		}
 
