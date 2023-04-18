@@ -128,11 +128,13 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
-	 * @return int|null The ID of the fallback Navigation Menu, or null if none exists.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
 		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		return ! empty( $post ) ? $post->ID : null;
+		$response = ! empty( $post ) ? $post->ID : null;
+
+		return rest_ensure_response( $response );
 	}
 }
