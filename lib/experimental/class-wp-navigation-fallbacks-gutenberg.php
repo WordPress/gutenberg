@@ -112,7 +112,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	/**
 	 * Determine the most appropriate classic navigation menu to use as a fallback.
 	 *
-	 * @return object WP_Term The classic navigation.
+	 * @return WP_Term|null The most appropriate classic navigation menu to use as a fallback.
 	 */
 	public static function get_fallback_classic_menu() {
 		$classic_nav_menus = wp_get_nav_menus();
