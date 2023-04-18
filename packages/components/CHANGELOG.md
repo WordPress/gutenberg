@@ -7,7 +7,6 @@
 -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
 -   `Modal`: Equalize internal spacing ([#49890](https://github.com/WordPress/gutenberg/pull/49890)).
 -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
--   `TEST`: test ([#999999](https://github.com/WordPress/gutenberg/pull/999999)).
 
 
 ### Documentation
@@ -32,6 +31,7 @@
 
 ## 23.7.0 (2023-03-29)
 
+-   `TEST`: test ([#999999](https://github.com/WordPress/gutenberg/pull/999999)).
 ### Internal
 
 -   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).
