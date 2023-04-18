@@ -141,7 +141,7 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response $response The response data.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$data = null;
+		$data = array();
 
 		$schema = $this->get_item_schema();
 
