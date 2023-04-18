@@ -13,7 +13,6 @@ import { closeSmall } from '@wordpress/icons';
  */
 import { Tabs, TabsList, Tab, TabPanel } from '..';
 import Button from '../../button';
-import './style.css';
 
 const meta: ComponentMeta< typeof Tabs > = {
 	title: 'Components/Tabs',
@@ -35,7 +34,7 @@ Default.args = {
 	defaultValue: 'tab-1',
 	children: (
 		<>
-			<TabsList className="tabs-story-default__tabs-list">
+			<TabsList>
 				<Tab value="tab-1">Tab 1</Tab>
 				<Tab value="tab-2">Tab 2</Tab>
 			</TabsList>
@@ -66,16 +65,30 @@ DisabledTab.args = {
 
 export const ToBeNamedStory = Template.bind( {} );
 ToBeNamedStory.args = {
-	defaultValue: 'tab-1',
+	defaultValue: 'post',
 	children: (
 		<>
-			<TabsList className="tabs-story-tbn__tabs-list">
-				<Tab value="tab-1">Tab 1</Tab>
-				<Tab value="tab-2">Tab 2</Tab>
-				<Button icon={ closeSmall } label="Some Action" />
-			</TabsList>
-			<TabPanel value="tab-1">You see the content of tab 1</TabPanel>
-			<TabPanel value="tab-2">You see the content of tab 2</TabPanel>
+			<div style={ { display: 'flex', alignItems: 'center' } }>
+				<TabsList>
+					<Tab value="post">Post</Tab>
+					<Tab value="block">Block</Tab>
+				</TabsList>
+				<Button
+					icon={ closeSmall }
+					label="Some Action"
+					style={ { marginLeft: 'auto' } }
+				/>
+			</div>
+			<TabPanel value="post">Show post settings</TabPanel>
+			<TabPanel value="block">Show block settings</TabPanel>
 		</>
 	),
 };
+
+ToBeNamedStory.decorators = [
+	( Story ) => (
+		<div style={ { width: '280px' } }>
+			<Story />
+		</div>
+	),
+];
