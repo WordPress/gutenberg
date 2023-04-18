@@ -9,11 +9,16 @@ import { Command } from 'cmdk';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal, TextHighlight } from '@wordpress/components';
+import {
+	Modal,
+	TextHighlight,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
+import { Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,12 +44,18 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 						value={ command.name }
 						onSelect={ () => command.callback( { close } ) }
 					>
-						<span className="commands-command-menu__item">
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
+						<HStack
+							alignment="left"
+							className="commands-command-menu__item"
+						>
+							<Icon icon={ command.icon } />
+							<span>
+								<TextHighlight
+									text={ command.label }
+									highlight={ search }
+								/>
+							</span>
+						</HStack>
 					</Command.Item>
 				) ) }
 			</Command.List>
@@ -91,19 +102,25 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 	);
 
 	return (
-		<Command.Group heading={ group }>
+		<Command.Group>
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
 					value={ command.name }
 					onSelect={ () => command.callback( { close } ) }
 				>
-					<span className="commands-command-menu__item">
-						<TextHighlight
-							text={ command.label }
-							highlight={ search }
-						/>
-					</span>
+					<HStack
+						alignment="left"
+						className="commands-command-menu__item"
+					>
+						<Icon icon={ command.icon } />
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
 				</Command.Item>
 			) ) }
 			{ loaders.map( ( loader ) => (
@@ -188,27 +205,27 @@ export function CommandMenu() {
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ __(
-								'Search for content and templates, or try commands like "Add…"'
-							) }
+							placeholder={ __( 'Type a command or search' ) }
 						/>
 					</div>
-					<Command.List>
-						{ ! isLoading && (
-							<Command.Empty>
-								{ __( 'No results found.' ) }
-							</Command.Empty>
-						) }
-						{ groups.map( ( group ) => (
-							<CommandMenuGroup
-								key={ group }
-								group={ group }
-								search={ search }
-								setLoader={ setLoader }
-								close={ close }
-							/>
-						) ) }
-					</Command.List>
+					{ search && (
+						<Command.List>
+							{ ! isLoading && (
+								<Command.Empty>
+									{ __( 'No results found.' ) }
+								</Command.Empty>
+							) }
+							{ groups.map( ( group ) => (
+								<CommandMenuGroup
+									key={ group }
+									group={ group }
+									search={ search }
+									setLoader={ setLoader }
+									close={ close }
+								/>
+							) ) }
+						</Command.List>
+					) }
 				</Command>
 			</div>
 		</Modal>
