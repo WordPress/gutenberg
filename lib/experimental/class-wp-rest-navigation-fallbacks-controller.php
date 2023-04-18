@@ -149,7 +149,9 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 			$data['id'] = (int) $item->ID;
 		}
 
-		$data = $this->add_additional_fields_to_object( $data, $request );
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		return rest_ensure_response( $data );
 	}
