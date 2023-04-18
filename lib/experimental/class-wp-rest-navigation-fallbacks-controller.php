@@ -9,6 +9,9 @@
  * @since 6.3.0
  */
 
+/**
+ * Import dependencies.
+ */
 require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
 
 /**
