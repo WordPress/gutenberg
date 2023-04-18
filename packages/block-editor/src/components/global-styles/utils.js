@@ -376,3 +376,15 @@ export function scopeSelector( scope, selector ) {
 
 	return selectorsScoped.join( ', ' );
 }
+
+/**
+ * Ideally, falsy values should be retained but the current implementation of
+ * global styles merging (theme with user) relies on the fact that emptying inputs
+ * (empty strings) should fallback to the parent value.
+ * Ideally, there should be a dedicated UI element to "revert to theme" for each input instead.
+ *
+ * @param {*} value Value to normalize.
+ *
+ * @return {undefined|*} normalized value.
+ */
+export const normalizeFalsyValue = ( value ) => ( ! value ? undefined : value );
