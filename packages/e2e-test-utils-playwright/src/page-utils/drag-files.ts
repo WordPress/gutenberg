@@ -24,8 +24,8 @@ type Options = {
 /**
  * Simulate dragging files from outside the current page.
  *
- * @param  this
- * @param  files The files to be dragged.
+ * @param this
+ * @param files The files to be dragged.
  * @return The methods of the drag operation.
  */
 async function dragFiles(
@@ -100,9 +100,9 @@ async function dragFiles(
 		/**
 		 * Drag the files over an element (fires `dragenter` and `dragover` events).
 		 *
-		 * @param  selectorOrLocator A selector or a locator to search for an element.
-		 * @param  options           The optional options.
-		 * @param  options.position  A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+		 * @param selectorOrLocator A selector or a locator to search for an element.
+		 * @param options           The optional options.
+		 * @param options.position  A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
 		 */
 		dragOver: async (
 			selectorOrLocator: string | Locator,

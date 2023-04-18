@@ -12,8 +12,8 @@ interface BlockRepresentation {
 /**
  * Insert a block.
  *
- * @param {Editor}              this
- * @param {BlockRepresentation} blockRepresentation Inserted block representation.
+ * @param this
+ * @param blockRepresentation Inserted block representation.
  */
 async function insertBlock(
 	this: Editor,

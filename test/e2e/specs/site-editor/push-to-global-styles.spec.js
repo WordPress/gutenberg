@@ -16,9 +16,9 @@ test.describe( 'Push to Global Styles button', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should apply Heading block styles to all Heading blocks', async ( {
@@ -42,9 +42,8 @@ test.describe( 'Push to Global Styles button', () => {
 			page.getByRole( 'button', { name: 'Uppercase' } )
 		).toHaveAttribute( 'aria-pressed', 'false' );
 
-		// Go to block settings, select inner tab, and open the Advanced panel
+		// Go to block settings and open the Advanced panel
 		await page.getByRole( 'button', { name: 'Settings' } ).click();
-		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 
 		// Push button should be disabled
@@ -54,15 +53,8 @@ test.describe( 'Push to Global Styles button', () => {
 			} )
 		).toBeDisabled();
 
-		// Switch back to the Styles inspector tab to check typography style
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-
 		// Make the Heading block uppercase
 		await page.getByRole( 'button', { name: 'Uppercase' } ).click();
-
-		// Switch back to the Settings inspector tab to check for enabled button
-		await page.getByRole( 'tab', { name: 'Settings' } ).click();
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 
 		// Push button should now be enabled
 		await expect(

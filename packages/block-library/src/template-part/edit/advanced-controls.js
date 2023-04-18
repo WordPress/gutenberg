@@ -71,7 +71,7 @@ export function TemplatePartAdvancedControls( {
 	};
 
 	return (
-		<InspectorControls __experimentalGroup="advanced">
+		<InspectorControls group="advanced">
 			{ isEntityAvailable && (
 				<>
 					<TextControl

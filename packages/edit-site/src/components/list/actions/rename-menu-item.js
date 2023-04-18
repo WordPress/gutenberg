@@ -24,7 +24,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( ! template.is_custom ) {
+	if ( template.type === 'wp_template' && ! template.is_custom ) {
 		return null;
 	}
 
@@ -75,7 +75,6 @@ export default function RenameMenuItem( { template, onClose } ) {
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Rename' ) }
-					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }

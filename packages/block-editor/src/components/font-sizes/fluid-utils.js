@@ -12,7 +12,7 @@ const DEFAULT_MINIMUM_FONT_SIZE_FACTOR = 0.75;
 const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
 
 /**
- * Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+ * Computes a fluid font-size value that uses clamp(). A minimum and maximum
  * font size OR a single font size can be specified.
  *
  * If a single font size is specified, it is scaled up and down by

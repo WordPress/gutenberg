@@ -76,7 +76,7 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
  * @param {WPPoint}                  position   The point representing the cursor position when dragging.
  *
- * @return {WPListViewDropZoneTarget} An object containing data about the drop target.
+ * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
 function getListViewDropTarget( blocksData, position ) {
 	let candidateEdge;

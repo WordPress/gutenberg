@@ -29,7 +29,7 @@ const AdvancedControls = () => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorControls.Slot __experimentalGroup="advanced" />
+			<InspectorControls.Slot group="advanced" />
 		</PanelBody>
 	);
 };

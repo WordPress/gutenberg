@@ -78,18 +78,15 @@ const SiteLogo = ( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
 			'__unstableBase'
 		);
 		return {
 			title: siteEntities?.name,
-			...Object.fromEntries(
-				Object.entries( getSettings() ).filter( ( [ key ] ) =>
-					[ 'imageEditing', 'maxWidth' ].includes( key )
-				)
-			),
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
 		};
 	}, [] );
 
@@ -303,6 +300,7 @@ const SiteLogo = ( {
 						disabled={ ! isResizable }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link image to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -310,6 +308,7 @@ const SiteLogo = ( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -323,6 +322,7 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Use as site icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );

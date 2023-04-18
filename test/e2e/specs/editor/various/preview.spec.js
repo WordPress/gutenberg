@@ -343,6 +343,8 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click( 'role=button[name="Close dialog"i]' );
+		await this.page.click(
+			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
+		);
 	}
 }

@@ -107,12 +107,6 @@ function InserterListItem( {
 								onHover( null );
 							}
 						} }
-						onFocus={ () => {
-							if ( isDragging.current ) {
-								return;
-							}
-							onHover( item );
-						} }
 						onMouseEnter={ () => {
 							if ( isDragging.current ) {
 								return;
@@ -120,7 +114,6 @@ function InserterListItem( {
 							onHover( item );
 						} }
 						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
 						{ ...props }
 					>
 						<span

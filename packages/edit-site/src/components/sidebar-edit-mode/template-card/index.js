@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { Icon } from '@wordpress/components';
+import { PanelRow, Icon } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -13,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
+import LastRevision from './last-revision';
 
 export default function TemplateCard() {
 	const {
@@ -38,20 +40,28 @@ export default function TemplateCard() {
 	}
 
 	return (
-		<div className="edit-site-template-card">
-			<Icon className="edit-site-template-card__icon" icon={ icon } />
-			<div className="edit-site-template-card__content">
-				<div className="edit-site-template-card__header">
-					<h2 className="edit-site-template-card__title">
-						{ decodeEntities( title ) }
-					</h2>
-					<TemplateActions template={ template } />
+		<>
+			<div className="edit-site-template-card">
+				<Icon className="edit-site-template-card__icon" icon={ icon } />
+				<div className="edit-site-template-card__content">
+					<div className="edit-site-template-card__header">
+						<h2 className="edit-site-template-card__title">
+							{ decodeEntities( title ) }
+						</h2>
+						<TemplateActions template={ template } />
+					</div>
+					<div className="edit-site-template-card__description">
+						{ decodeEntities( description ) }
+					</div>
+					<TemplateAreas />
 				</div>
-				<div className="edit-site-template-card__description">
-					{ decodeEntities( description ) }
-				</div>
-				<TemplateAreas />
 			</div>
-		</div>
+			<PanelRow
+				header={ __( 'Editing history' ) }
+				className="edit-site-template-revisions"
+			>
+				<LastRevision />
+			</PanelRow>
+		</>
 	);
 }

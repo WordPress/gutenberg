@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { IconType } from '../icon';
 
-type Tab< IconProps = unknown > = {
+type Tab = {
 	/**
 	 * The key of the tab.
 	 */
@@ -24,21 +24,21 @@ type Tab< IconProps = unknown > = {
 	/**
 	 * The icon used for the tab button.
 	 */
-	icon?: IconType< IconProps >;
+	icon?: IconType;
 	/**
 	 * Determines if the tab button should be disabled.
 	 */
 	disabled?: boolean;
 } & Record< any, any >;
 
-export type TabButtonProps< IconProps = unknown > = {
+export type TabButtonProps = {
 	children: ReactNode;
 	label?: string;
 	onClick: ( event: MouseEvent ) => void;
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;
-} & Pick< Tab< IconProps >, 'className' | 'icon' | 'disabled' >;
+} & Pick< Tab, 'className' | 'icon' | 'disabled' >;
 
 export type TabPanelProps = {
 	/**

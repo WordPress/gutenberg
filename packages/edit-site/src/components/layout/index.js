@@ -19,9 +19,10 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -38,6 +39,11 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import SiteHub from '../site-hub';
 import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
+import { unlock } from '../../private-apis';
+import SavePanel from '../save-panel';
+import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
+import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useCommands } from '../../hooks/commands';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -52,10 +58,11 @@ const emptyResizeHandleStyles = {
 	left: undefined,
 };
 
-export default function Layout( { onError } ) {
+export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
@@ -66,9 +73,9 @@ export default function Layout( { onError } ) {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
-			const { __unstableGetCanvasMode } = select( editSiteStore );
+			const { getCanvasMode } = unlock( select( editSiteStore ) );
 			return {
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 				previousShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/previous-region'
 				),
@@ -85,21 +92,20 @@ export default function Layout( { onError } ) {
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ isMobileCanvasVisible, setIsMobileCanvasVisible ] =
-		useState( false );
 	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
-		( isMobileViewport && ! isMobileCanvasVisible ) ||
+		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
-		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
+		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
+		! isMobileViewport ||
+		! isEditorPage;
 	const showFrame =
-		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
-
+		( ! isEditorPage && ! isMobileViewport ) ||
+		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
-		( isEditorPage && canvasMode === 'edit' && ! isMobileViewport ) ||
-		isMobileCanvasVisible;
-	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
+		( isMobileViewport && isListPage ) ||
+		( isEditorPage && canvasMode === 'edit' );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
 	const [ forcedWidth, setForcedWidth ] = useState( null );
@@ -110,15 +116,6 @@ export default function Layout( { onError } ) {
 	if ( showFrame && ! isResizing ) {
 		canvasWidth = canvasSize.width - canvasPadding;
 	}
-	useEffect( () => {
-		if ( canvasMode === 'view' && isMobileViewport ) {
-			setIsMobileCanvasVisible( false );
-		}
-
-		if ( canvasMode === 'edit' && isMobileViewport ) {
-			setIsMobileCanvasVisible( true );
-		}
-	}, [ canvasMode, isMobileViewport ] );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -129,6 +126,9 @@ export default function Layout( { onError } ) {
 
 	return (
 		<>
+			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
+			<KeyboardShortcutsRegister />
+			<KeyboardShortcutsGlobal />
 			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
@@ -151,37 +151,34 @@ export default function Layout( { onError } ) {
 								? forcedWidth - 48
 								: undefined,
 					} }
-					isMobileCanvasVisible={ isMobileCanvasVisible }
-					setIsMobileCanvasVisible={ setIsMobileCanvasVisible }
 				/>
 
 				<AnimatePresence initial={ false }>
-					{ isEditorPage &&
-						( canvasMode === 'edit' || isMobileCanvasVisible ) && (
-							<NavigableRegion
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								animate={ {
-									y: 0,
-								} }
-								initial={ {
-									y: '-100%',
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
-								{ canvasMode === 'edit' && <Header /> }
-							</NavigableRegion>
-						) }
+					{ isEditorPage && canvasMode === 'edit' && (
+						<NavigableRegion
+							className="edit-site-layout__header"
+							ariaLabel={ __( 'Editor top bar' ) }
+							as={ motion.div }
+							animate={ {
+								y: 0,
+							} }
+							initial={ {
+								y: '-100%',
+							} }
+							exit={ {
+								y: '-100%',
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion
+									? 0
+									: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+						>
+							{ canvasMode === 'edit' && <Header /> }
+						</NavigableRegion>
+					) }
 				</AnimatePresence>
 
 				<div className="edit-site-layout__content">
@@ -266,6 +263,8 @@ export default function Layout( { onError } ) {
 						) }
 					</AnimatePresence>
 
+					<SavePanel />
+
 					{ showCanvas && (
 						<div
 							className={ classnames(
@@ -282,6 +281,21 @@ export default function Layout( { onError } ) {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										isEditorPage && canvasMode === 'view'
+											? {
+													scale: 1.005,
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: 0.5,
+														ease: 'easeOut',
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"
@@ -314,7 +328,7 @@ export default function Layout( { onError } ) {
 											ease: 'easeOut',
 										} }
 									>
-										<ErrorBoundary onError={ onError }>
+										<ErrorBoundary>
 											{ isEditorPage && <Editor /> }
 											{ isListPage && <ListPage /> }
 										</ErrorBoundary>

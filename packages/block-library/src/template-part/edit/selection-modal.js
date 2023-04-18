@@ -22,7 +22,7 @@ import {
 	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 import { createTemplatePartId } from './utils/create-template-part-id';
-import { searchPatterns } from './utils/search';
+import { searchPatterns } from '../../utils/search-patterns';
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,

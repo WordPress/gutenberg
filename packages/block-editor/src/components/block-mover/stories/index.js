@@ -11,7 +11,7 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockMover from '../';
-import BlockEditorProvider from '../../provider';
+import { ExperimentalBlockEditorProvider } from '../../provider';
 import { store as blockEditorStore } from '../../../store';
 
 registerCoreBlocks();
@@ -35,9 +35,9 @@ function Provider( { children } ) {
 
 	return (
 		<div style={ wrapperStyle }>
-			<BlockEditorProvider value={ blocks }>
+			<ExperimentalBlockEditorProvider value={ blocks }>
 				{ children }
-			</BlockEditorProvider>
+			</ExperimentalBlockEditorProvider>
 		</div>
 	);
 }

@@ -13,7 +13,6 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useHistory } from '../routes';
-import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import {
 	useExistingTemplateParts,
@@ -30,7 +29,6 @@ export default function NewTemplatePart( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const existingTemplateParts = useExistingTemplateParts();
 
 	async function createTemplatePart( { title, area } ) {
@@ -62,13 +60,11 @@ export default function NewTemplatePart( {
 
 			setIsModalOpen( false );
 
-			// Switch to edit mode.
-			__unstableSetCanvasMode( 'edit' );
-
 			// Navigate to the created template part editor.
 			history.push( {
 				postId: templatePart.id,
-				postType: templatePart.type,
+				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
 
 			// TODO: Add a success notice?
@@ -85,11 +81,12 @@ export default function NewTemplatePart( {
 			setIsModalOpen( false );
 		}
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
 
 	return (
 		<>
-			<Button
-				{ ...toggleProps }
+			<Toggle
+				{ ...restToggleProps }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
@@ -97,7 +94,7 @@ export default function NewTemplatePart( {
 				label={ postType.labels.add_new }
 			>
 				{ showIcon ? null : postType.labels.add_new }
-			</Button>
+			</Toggle>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => setIsModalOpen( false ) }

@@ -785,7 +785,7 @@ export function isPreviewingPost( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Preview Link.
+ * @return {string | undefined} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
 	if ( state.saving.pending || isSavingPost( state ) ) {

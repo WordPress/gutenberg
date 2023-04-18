@@ -12,6 +12,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 	ignore: [
 		'**/src/mobile/**/README.md',
 		'**/src/ui/**/README.md',
+		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
 	],
 } );

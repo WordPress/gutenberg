@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../provider';
+import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
@@ -66,13 +66,16 @@ export function BlockPreview( {
 	}
 
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }
 
@@ -126,12 +129,15 @@ export function useBlockPreview( {
 	);
 
 	const children = (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
 			<BlockListItems
 				renderAppender={ false }
 				__experimentalLayout={ __experimentalLayout }
 			/>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 
 	return {

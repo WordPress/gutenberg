@@ -68,6 +68,12 @@ const Layout = () => (
 );
 ```
 
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.scope_ `string|undefined`:
+-   _props.onError_ `Function|undefined`:
+
 _Returns_
 
 -   `WPComponent`: The component to be rendered.
@@ -174,12 +180,11 @@ _Parameters_
 
 _Returns_
 
--   `?WPPlugin`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPPlugin | undefined`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
 
 #### withPluginContext
 
-A Higher Order Component used to inject Plugin context to the
-wrapped component.
+A Higher Order Component used to inject Plugin context to the wrapped component.
 
 _Parameters_
 

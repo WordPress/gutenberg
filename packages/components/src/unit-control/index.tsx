@@ -203,8 +203,8 @@ function UnforwardedUnitControl(
 	 * This allows us to tap into actions to transform the (next) state for
 	 * InputControl.
 	 *
-	 * @param  state  State from InputControl
-	 * @param  action Action triggering state change
+	 * @param state  State from InputControl
+	 * @param action Action triggering state change
 	 * @return The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer: StateReducer = ( state, action ) => {

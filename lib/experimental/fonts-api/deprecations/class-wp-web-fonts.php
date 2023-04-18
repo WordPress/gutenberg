@@ -690,7 +690,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 			}
 
 			$variation_obj        = $this->registered[ $variation_handle ];
-			$variation_properties = array( 'origin' => 'gutenberg_wp_webfonts_api' );
+			$variation_properties = array( 'origin' => 'gutenberg_wp_fonts_api' );
 			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
 				$property_in_camelcase                          = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
 				$variation_properties[ $property_in_camelcase ] = $property_value;

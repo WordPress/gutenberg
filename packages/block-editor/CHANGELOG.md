@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+## 11.8.0 (2023-04-12)
+
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
+## 11.6.0 (2023-03-15)
+
+## 11.5.0 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
+## 11.3.0 (2023-02-01)
+
 ## 11.2.0 (2023-01-11)
 
 ### Bug Fix

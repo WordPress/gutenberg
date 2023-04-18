@@ -16,9 +16,9 @@ test.describe( 'Site Editor Inserter', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'inserter toggle button should toggle global inserter', async ( {
@@ -39,5 +39,32 @@ test.describe( 'Site Editor Inserter', () => {
 				'role=searchbox[name="Search for blocks and patterns"i]'
 			)
 		).toBeHidden();
+	} );
+
+	// A test for https://github.com/WordPress/gutenberg/issues/43090.
+	test( 'should close the inserter when clicking on the toggle button', async ( {
+		page,
+		editor,
+	} ) => {
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		const beforeBlocks = await editor.getBlocks();
+
+		await inserterButton.click();
+		await blockLibrary.getByRole( 'tab', { name: 'Blocks' } ).click();
+		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ ...beforeBlocks, { name: 'core/buttons' } ] );
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
 	} );
 } );

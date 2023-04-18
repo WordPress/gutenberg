@@ -52,7 +52,6 @@ function AddCustomGenericTemplateModal( {
 	return (
 		<Modal
 			title={ __( 'Create custom template' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ () => {
 				onClose();
 			} }

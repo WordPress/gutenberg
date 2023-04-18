@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-devtools-core/dist/backend.js b/node_modules/react-devtools-core/dist/backend.js
+index b9ada48..135ee39 100644
+--- a/node_modules/react-devtools-core/dist/backend.js
++++ b/node_modules/react-devtools-core/dist/backend.js
+@@ -14106,7 +14106,7 @@ function hideOverlay() {
+ }
+ function showOverlay(elements, componentName, hideAfterTimeout) {
+   // TODO (npm-packages) Detect RN and support it somehow
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     return;
+   }
+ 

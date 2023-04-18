@@ -34,6 +34,7 @@ function EditTemplatePartMenuItem( { attributes } ) {
 		{
 			postId: templatePart?.id,
 			postType: templatePart?.type,
+			canvas: 'edit',
 		},
 		{
 			fromTemplateId: params.postId,

@@ -468,7 +468,7 @@ class URLInput extends Component {
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
-			'aria-controls': suggestionsListboxId,
+			'aria-owns': suggestionsListboxId,
 			'aria-activedescendant':
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
@@ -531,7 +531,8 @@ class URLInput extends Component {
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
 				ref: this.bindSuggestionNode( index ),
-				'aria-selected': index === selectedSuggestion,
+				'aria-selected':
+					index === selectedSuggestion ? true : undefined,
 			};
 		};
 

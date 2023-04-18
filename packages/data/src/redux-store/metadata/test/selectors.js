@@ -3,7 +3,6 @@
  */
 import { createRegistry } from '@wordpress/data';
 
-jest.useRealTimers();
 const testStore = {
 	reducer: ( state = null, action ) => {
 		if ( action.type === 'RECEIVE' ) {

@@ -28,22 +28,20 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				</div>
 			) }
 			<InspectorControls.Slot
-				__experimentalGroup="color"
+				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="typography"
+				group="typography"
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="dimensions"
+				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
-			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
+			<InspectorControls.Slot group="border" label={ __( 'Border' ) } />
+			<InspectorControls.Slot group="styles" />
 		</>
 	);
 };

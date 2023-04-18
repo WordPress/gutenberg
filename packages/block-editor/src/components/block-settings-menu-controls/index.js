@@ -28,16 +28,14 @@ const BlockSettingsMenuControlsSlot = ( {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: getBlocksByClientId( ids )
-					.filter( Boolean )
-					.map( ( block ) => block.name ),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				canRemove: canRemoveBlocks( ids ),
 			};
@@ -50,7 +48,8 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const convertToGroupButtonProps =
+		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;

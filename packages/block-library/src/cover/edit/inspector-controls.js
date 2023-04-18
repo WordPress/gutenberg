@@ -171,12 +171,14 @@ export default function CoverInspectorControls( {
 						{ isImageBackground && (
 							<>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Repeated background' ) }
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
@@ -204,9 +206,7 @@ export default function CoverInspectorControls( {
 							isImgElement && (
 								<TextareaControl
 									__nextHasNoMarginBottom
-									label={ __(
-										'Alt text (alternative text)'
-									) }
+									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
 										setAttributes( { alt: newAlt } )
@@ -215,11 +215,12 @@ export default function CoverInspectorControls( {
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 												{ __(
-													'Describe the purpose of the image'
+													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
+											<br />
 											{ __(
-												'Leave empty if the image is purely decorative.'
+												'Leave empty if decorative.'
 											) }
 										</>
 									}
@@ -248,7 +249,7 @@ export default function CoverInspectorControls( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
 					__experimentalIsRenderedInSidebar
 					settings={ [
@@ -304,7 +305,7 @@ export default function CoverInspectorControls( {
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="dimensions">
+			<InspectorControls group="dimensions">
 				<ToolsPanelItem
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
@@ -335,7 +336,7 @@ export default function CoverInspectorControls( {
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
 					label={ __( 'HTML element' ) }

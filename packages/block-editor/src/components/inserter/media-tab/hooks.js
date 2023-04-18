@@ -71,20 +71,18 @@ export function useMediaResults( category, query = {} ) {
 }
 
 function useInserterMediaCategories() {
-	const { inserterMediaCategories, allowedMimeTypes } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const {
-				__unstableInserterMediaCategories,
-				allowedMimeTypes: _allowedMimeTypes,
-			} = getSettings();
-			return {
-				inserterMediaCategories: __unstableInserterMediaCategories,
-				allowedMimeTypes: _allowedMimeTypes,
-			};
-		},
-		[]
-	);
+	const {
+		inserterMediaCategories,
+		allowedMimeTypes,
+		enableOpenverseMediaCategory,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			inserterMediaCategories: settings.inserterMediaCategories,
+			allowedMimeTypes: settings.allowedMimeTypes,
+			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
+		};
+	}, [] );
 	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
 	// some of them. In this case we shouldn't add the category to the available media
 	// categories list in the inserter.
@@ -93,18 +91,22 @@ function useInserterMediaCategories() {
 			return;
 		}
 		return inserterMediaCategories.filter( ( category ) => {
-			// When a category has set `isExternalResource` to `true`, we
-			// don't need to check for allowed mime types, as they are used
-			// for restricting uploads for this media type and not for
-			// inserting media from external sources.
-			if ( category.isExternalResource ) {
-				return true;
+			// Check if Openverse category is enabled.
+			if (
+				! enableOpenverseMediaCategory &&
+				category.name === 'openverse'
+			) {
+				return false;
 			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
 				mimeType.startsWith( `${ category.mediaType }/` )
 			);
 		} );
-	}, [ inserterMediaCategories, allowedMimeTypes ] );
+	}, [
+		inserterMediaCategories,
+		allowedMimeTypes,
+		enableOpenverseMediaCategory,
+	] );
 	return allowedCategories;
 }
 
@@ -134,7 +136,7 @@ export function useMediaCategories( rootClientId ) {
 	useEffect( () => {
 		( async () => {
 			const _categories = [];
-			// If `__unstableInserterMediaCategories` is not defined in
+			// If `inserterMediaCategories` is not defined in
 			// block editor settings, do not show any media categories.
 			if ( ! inserterMediaCategories ) {
 				return;
@@ -147,7 +149,15 @@ export function useMediaCategories( rootClientId ) {
 						if ( category.isExternalResource ) {
 							return [ category.name, true ];
 						}
-						const results = await category.fetch( { per_page: 1 } );
+						let results = [];
+						try {
+							results = await category.fetch( {
+								per_page: 1,
+							} );
+						} catch ( e ) {
+							// If the request fails, we shallow the error and just don't show
+							// the category, in order to not break the media tab.
+						}
 						return [ category.name, !! results.length ];
 					} )
 				)

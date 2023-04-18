@@ -43,6 +43,7 @@ export default function FileBlockInspector( {
 				{ href.endsWith( '.pdf' ) && (
 					<PanelBody title={ __( 'PDF settings' ) }>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show inline embed' ) }
 							help={
 								displayPreview
@@ -78,11 +79,13 @@ export default function FileBlockInspector( {
 						onChange={ changeLinkDestinationOption }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open in new tab' ) }
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }
 						onChange={ changeShowDownloadButton }

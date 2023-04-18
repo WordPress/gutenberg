@@ -296,6 +296,82 @@ const v3 = {
 	},
 };
 
-const deprecated = [ v3, v2, v1 ];
+const v4 = {
+	attributes: {
+		queryId: {
+			type: 'number',
+		},
+		query: {
+			type: 'object',
+			default: {
+				perPage: null,
+				pages: 0,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				exclude: [],
+				sticky: '',
+				inherit: true,
+				taxQuery: null,
+				parents: [],
+			},
+		},
+		tagName: {
+			type: 'string',
+			default: 'div',
+		},
+		displayLayout: {
+			type: 'object',
+			default: {
+				type: 'list',
+			},
+		},
+		namespace: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		__experimentalLayout: true,
+	},
+	save( { attributes: { tagName: Tag = 'div' } } ) {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+		return <Tag { ...innerBlocksProps } />;
+	},
+	isEligible: ( { layout } ) =>
+		! layout ||
+		layout.inherit ||
+		( layout.contentSize && layout.type !== 'constrained' ),
+	migrate: ( attributes ) => {
+		const { layout = null } = attributes;
+		if ( ! layout ) {
+			return attributes;
+		}
+		if ( layout.inherit || layout.contentSize ) {
+			return {
+				...attributes,
+				layout: {
+					...layout,
+					type: 'constrained',
+				},
+			};
+		}
+	},
+};
+
+const deprecated = [ v4, v3, v2, v1 ];
 
 export default deprecated;

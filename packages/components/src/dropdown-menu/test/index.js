@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -63,10 +63,6 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
-		// See also: https://floating-ui.com/docs/react-dom#testing
-		await act( () => Promise.resolve() );
-
 		const menu = screen.getByRole( 'menu' );
 
 		// we need to wait because showing the dropdown is animated
@@ -86,14 +82,10 @@ describe( 'DropdownMenu', () => {
 			/>
 		);
 
-		const button = screen.getByRole( 'button' );
-		act( () => button.focus() );
+		// Move focus on the toggle button
+		await user.tab();
 
 		await user.keyboard( '[ArrowDown]' );
-
-		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
-		// See also: https://floating-ui.com/docs/react-dom#testing
-		await act( () => Promise.resolve() );
 
 		const menu = screen.getByRole( 'menu' );
 

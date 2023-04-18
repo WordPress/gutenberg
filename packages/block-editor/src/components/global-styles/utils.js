@@ -16,7 +16,9 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -57,8 +59,15 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'color', 'duotone' ],
+		valueKey: 'colors',
 		cssVarInfix: 'duotone',
 		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
+		classes: [],
+	},
+	{
+		path: [ 'shadow', 'presets' ],
+		valueKey: 'shadow',
+		cssVarInfix: 'shadow',
 		classes: [],
 	},
 	{
@@ -89,12 +98,14 @@ export const PRESET_METADATA = [
 export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
+	'filter.duotone': 'duotone',
 	'elements.link.color.text': 'color',
 	'elements.link.:hover.color.text': 'color',
 	'elements.link.typography.fontFamily': 'font-family',
 	'elements.link.typography.fontSize': 'font-size',
 	'elements.button.color.text': 'color',
 	'elements.button.color.background': 'color',
+	'elements.caption.color.text': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
 	'elements.heading.color': 'color',
@@ -127,6 +138,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.h6.typography.fontFamily': 'font-family',
 	'elements.h6.color.gradient': 'gradient',
 	'color.gradient': 'gradient',
+	shadow: 'shadow',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
 };
