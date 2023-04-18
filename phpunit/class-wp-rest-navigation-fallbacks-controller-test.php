@@ -41,7 +41,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 
-		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallbacks', $routes );
+		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallbacks', $routes, 'Fallback route should be registered.' );
 	}
 
 	/**
@@ -57,11 +57,11 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 403, $response->get_status() );
+		$this->assertEquals( 403, $response->get_status(), 'Response should indicate user does not have permission.' );
 
-		$this->assertEquals( 'rest_cannot_create', $data['code'] );
+		$this->assertEquals( 'rest_cannot_create', $data['code'], 'Response should indicate user cannot create.' );
 
-		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'] );
+		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'], 'Response should indicate failed request status.' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 200, $response->get_status(), 'Status should indicate successful request.' );
 
 		$this->assertIsInt( $data );
 
@@ -98,7 +98,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 200, $response->get_status(), 'Status should indicate successful request.' );
 
 		$this->assertArrayHasKey( 'schema', $data, '"schema" key should exist in response.' );
 
