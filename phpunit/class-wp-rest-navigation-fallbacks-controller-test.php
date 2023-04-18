@@ -36,8 +36,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	/**
 	 * @covers WP_REST_Navigation_Fallbacks_Controller::register_routes
 	 *
-	 * @since 5.8.0
-	 * @since 6.2.0 Added pattern directory categories endpoint.
+	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -45,6 +44,11 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallbacks', $routes );
 	}
 
+	/**
+	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 *
+	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
+	 */
 	public function test_should_not_return_menus_for_users_without_permissions() {
 
 		wp_set_current_user( self::$editor_user );
@@ -60,6 +64,11 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'] );
 	}
 
+	/**
+	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 *
+	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
+	 */
 	public function test_should_return_post_id_of_navigation_menu() {
 
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
@@ -79,6 +88,11 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 
 	}
 
+	/**
+	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 *
+	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
+	 */
 	public function test_get_fallbacks_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
