@@ -100,6 +100,11 @@ class WP_Duotone_Gutenberg {
 	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
 
 	/**
+	 * Prefix used for generating and referencing duotone filter IDs.
+	 */
+	const FILTER_ID_PREFIX = 'wp-duotone-';
+
+	/**
 	 * Direct port of colord's clamp function. Using min/max instead of
 	 * nested ternaries.
 	 *
@@ -502,6 +507,16 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Get the ID of the duotone filter.
+	 *
+	 * @param string $slug The slug of the duotone preset.
+	 * @return string The ID of the duotone filter.
+	 */
+	private static function get_filter_id( $slug ) {
+		return self::FILTER_ID_PREFIX . $slug;
+	}
+
+	/**
 	 * Gets the SVG for the duotone filter definition.
 	 *
 	 * @param string $filter_id The ID of the filter.
@@ -593,7 +608,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS declaration.
 	 */
 	private static function get_css_custom_property_declaration( $filter_data ) {
-		$declaration_value                = gutenberg_get_duotone_filter_property( $filter_data );
+		$declaration_value                = self::get_filter_css_property_value_from_preset( $filter_data );
 		$duotone_preset_css_property_name = self::get_css_custom_property_name( $filter_data['slug'] );
 		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
 	}
@@ -716,6 +731,32 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Registers the style and colors block attributes for block types that support it.
+	 *
+	 * @param WP_Block_Type $block_type Block Type.
+	 */
+	public static function register_duotone_support( $block_type ) {
+		$has_duotone_support = false;
+		if ( property_exists( $block_type, 'supports' ) ) {
+			// Previous `color.__experimentalDuotone` support flag is migrated
+			// to `filter.duotone` via `block_type_metadata_settings` filter.
+			$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
+		}
+
+		if ( $has_duotone_support ) {
+			if ( ! $block_type->attributes ) {
+				$block_type->attributes = array();
+			}
+
+			if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
+				$block_type->attributes['style'] = array(
+					'type' => 'object',
+				);
+			}
+		}
+	}
+
+	/**
 	 * Render out the duotone CSS styles and SVG.
 	 *
 	 * @param  string $block_content Rendered block content.
@@ -775,7 +816,7 @@ class WP_Duotone_Gutenberg {
 					'colors' => $duotone_attr,
 				);
 				// Build a customized CSS filter property for unique slug.
-				$declaration_value = gutenberg_get_duotone_filter_property( $filter_data );
+				$declaration_value = self::get_filter_css_property_value_from_preset( $filter_data );
 
 				self::$output[ $slug ] = $filter_data;
 			}
@@ -790,7 +831,7 @@ class WP_Duotone_Gutenberg {
 
 		// - Applied as a class attribute to the block wrapper.
 		// - Used as a selector to apply the filter to the block.
-		$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
+		$filter_id = self::get_filter_id_from_preset( array( 'slug' => $slug ) );
 
 		// Build the CSS selectors to which the filter will be applied.
 		$selectors = explode( ',', $duotone_selector );
@@ -861,14 +902,43 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Returns the prefixed id for the duotone filter for use as a CSS id.
+	 *
+	 * @param  array $preset Duotone preset value as seen in theme.json.
+	 * @return string        Duotone filter CSS id.
+	 */
+	public static function get_filter_id_from_preset( $preset ) {
+		$filter_id = '';
+		if ( isset( $preset['slug'] ) ) {
+			$filter_id = self::get_filter_id( $preset['slug'] );
+		}
+		return $filter_id;
+	}
+
+	/**
 	 * Gets the SVG for the duotone filter definition from a preset.
 	 *
 	 * @param array $preset The duotone preset.
 	 * @return string The SVG for the filter definition.
 	 */
 	public static function get_filter_svg_from_preset( $preset ) {
-		// TODO: This function will be refactored out in a follow-up PR where it will be deprecated.
-		$filter_id = gutenberg_get_duotone_filter_id( $preset );
+		$filter_id = self::get_filter_id_from_preset( $preset );
 		return self::get_filter_svg( $filter_id, $preset['colors'] );
+	}
+
+	/**
+	 * Gets the CSS filter property value from a preset.
+	 *
+	 * @param array $preset The duotone preset.
+	 * @return string The CSS filter property value.
+	 */
+	public static function get_filter_css_property_value_from_preset( $preset ) {
+		if ( isset( $preset['colors'] ) && is_string( $preset['colors'] ) ) {
+			return $preset['colors'];
+		}
+
+		$filter_id = self::get_filter_id_from_preset( $preset );
+
+		return 'url(#' . $filter_id . ')';
 	}
 }
