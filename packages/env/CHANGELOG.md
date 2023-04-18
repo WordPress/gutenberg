@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+- Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
+
 ## 5.11.0 (2023-02-01)
 
 ### Bug fix
