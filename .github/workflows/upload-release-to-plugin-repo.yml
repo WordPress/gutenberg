@@ -47,12 +47,13 @@ jobs:
 
                         const latestVersionInGithub = githubData.tag_name
                         const latestVersionInCoreRepo = wpData.version;
-                        const isLatestVersionInGithubMoreRecent = compareVersions(latestVersionInGithub, latestVersionInCoreRepo) === 1;
+                        const isLatestVersionInGithubMoreRecentThanInCoreRepo = compareVersions(latestVersionInGithub, latestVersionInCoreRepo) === 1;
 
                         // Only update trunk *if* the ref from the published plugin matches the latest
-                        // version in GH (releases) *and* if this version is actually GREATER than the
-                        // version published in the WP plugins repo. If not, then it will update the tag.
-                        const shouldUpdateTrunk = githubRef === `refs/tags/${latestVersionInGithub}` && isLatestVersionInGithubMoreRecent;
+                        // version in GH (releases) *and*, most importantly, if this version is actually
+                        // GREATER than the version published in the WP plugins repo. If not, then it
+                        // will upload it as a new tag.
+                        const shouldUpdateTrunk = githubRef === `refs/tags/${latestVersionInGithub}` && isLatestVersionInGithubMoreRecentThanInCoreRepo;
                         core.setOutput('should_update_trunk', shouldUpdateTrunk);
                       })();
 
