@@ -69,7 +69,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
-	public function test_should_return_post_id_of_navigation_menu() {
+	public function test_should_return_fallback_navigation_menu() {
 
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
@@ -77,9 +77,11 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 
 		$this->assertEquals( 200, $response->get_status(), 'Status should indicate successful request.' );
 
-		$this->assertIsInt( $data );
+		$this->assertIsArray( $data );
 
-		$this->assertEquals( 'wp_navigation', get_post_type( $data ) );
+		$this->assertArrayHasKey( 'id', $data );
+
+		$this->assertEquals( 'wp_navigation', get_post_type( $data['id'] ) );
 
 		// Check that only a single Navigation fallback was created.
 		$navs_in_db = $this->get_navigations_in_database();
