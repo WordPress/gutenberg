@@ -892,17 +892,17 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:1000/',
+							WP_TESTS_DOMAIN: 'localhost:1000',
+							WP_SITEURL: 'http://localhost:1000',
+							WP_HOME: 'http://localhost:1000',
 						},
 					},
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:2000/',
+							WP_TESTS_DOMAIN: 'localhost:2000',
+							WP_SITEURL: 'http://localhost:2000',
+							WP_HOME: 'http://localhost:2000',
 						},
 					},
 				},
@@ -916,7 +916,7 @@ describe( 'readConfig', () => {
 						port: 1000,
 						testsPort: 2000,
 						config: {
-							WP_HOME: 'http://localhost:3000/',
+							WP_HOME: 'http://localhost:3000',
 						},
 					} )
 				)
@@ -928,17 +928,17 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:3000/',
+							WP_TESTS_DOMAIN: 'localhost:1000',
+							WP_SITEURL: 'http://localhost:1000',
+							WP_HOME: 'http://localhost:3000',
 						},
 					},
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:3000/',
+							WP_TESTS_DOMAIN: 'localhost:2000',
+							WP_SITEURL: 'http://localhost:2000',
+							WP_HOME: 'http://localhost:3000',
 						},
 					},
 				},
@@ -1191,9 +1191,9 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8889/',
-				WP_HOME: 'http://localhost:8889/',
+				WP_TESTS_DOMAIN: 'localhost:8889',
+				WP_SITEURL: 'http://localhost:8889',
+				WP_HOME: 'http://localhost:8889',
 			} );
 
 			expect( config.env.development.config ).toEqual( {
@@ -1205,9 +1205,9 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8888/',
-				WP_HOME: 'http://localhost:8888/',
+				WP_TESTS_DOMAIN: 'localhost:8888',
+				WP_SITEURL: 'http://localhost:8888',
+				WP_HOME: 'http://localhost:8888',
 			} );
 		} );
 	} );
