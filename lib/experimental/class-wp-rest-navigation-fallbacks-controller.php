@@ -39,7 +39,6 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 */
 	public function register_routes() {
 
-
 		// Lists a single nav item based on the given id or slug.
 		register_rest_route(
 			$this->namespace,
@@ -51,9 +50,36 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_fallbacks_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE ),
 				),
-				'schema'      => array( $this, 'get_public_item_schema' ),
+				'schema' => array( $this, 'get_fallbacks_schema' ),
 			)
 		);
+	}
+
+	/**
+	 * Retrieves the fallbacks' schema, conforming to JSON Schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_fallbacks_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$this->schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'navigation-fallbacks',
+			'type'       => 'object',
+			'properties' => array(
+				'id' => array(
+					'description' => __( 'The unique identifier for the Navigation Menu.' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+			),
+		);
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**
@@ -85,8 +111,9 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 * @return WP_Post|null the fallback Navigation Post or null.
 	 */
 	public function get_fallbacks() {
-		// Todo - see if we can inject this dependency.
-		return WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+
+		return $post->ID;
 	}
 
 	/**

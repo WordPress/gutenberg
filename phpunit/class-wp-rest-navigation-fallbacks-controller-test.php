@@ -73,6 +73,24 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 
 	}
 
+	public function test_get_fallbacks_schema() {
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertArrayHasKey( 'schema', $data, '"schema" key should exist in response.' );
+
+		$schema = $data['schema'];
+
+		$this->assertEquals( 'object', $schema['type'] );
+
+		$this->assertArrayHasKey( 'id', $schema['properties'], 'Schema should have an "id" property.' );
+		$this->assertEquals( 'integer', $schema['properties']['id']['type'], 'Schema "id" property should be an integer.' );
+		$this->assertTrue( $schema['properties']['id']['readonly'], 'Schema "id" property should be readonly.' );
+	}
+
 	private function get_navigations_in_database() {
 		$navs_in_db = new WP_Query(
 			array(
