@@ -327,6 +327,14 @@
 					left: $grid-unit * 36;
 				}
 			}
+
+			.auto-fold.is-fullscreen-mode .show-icon-labels & {
+				left: $grid-unit-80 * 2;
+				&.is-collapsed {
+					left: $grid-unit * 48;
+				}
+			}
+
 		}
 	}
 
