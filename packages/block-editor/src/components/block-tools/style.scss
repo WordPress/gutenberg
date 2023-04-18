@@ -270,6 +270,8 @@
 	// for the block inserter the publish button
 	@include break-large() {
 		&.is-fixed {
+			// leave room for block inserter and the dashboard navigation
+			left: $grid-unit-80 + $grid-unit-40 + ( $grid-unit-80 * 2 );
 			// Don't fill the whole header, minimize area
 			width: initial;
 			.is-fullscreen-mode & {
