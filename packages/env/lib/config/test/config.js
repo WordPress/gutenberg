@@ -70,6 +70,44 @@ describe( 'readConfig', () => {
 			}
 		} );
 
+		it( 'should throw a validation error if WP_SITEURL is not a valid URL', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						config: {
+							WP_SITEURL: 'test',
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain( 'must be a valid URL' );
+			}
+		} );
+
+		it( 'should throw a validation error if WP_HOME is not a valid URL', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						config: {
+							WP_SITEURL: 'test',
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain( 'must be a valid URL' );
+			}
+		} );
+
 		it( 'should infer a core config when ran from a core directory', async () => {
 			readFile.mockImplementation( () =>
 				Promise.reject( { code: 'ENOENT' } )
