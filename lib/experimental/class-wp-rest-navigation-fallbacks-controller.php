@@ -58,33 +58,6 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves the fallbacks' schema, conforming to JSON Schema.
-	 *
-	 * @return array Item schema data.
-	 */
-	public function get_item_schema() {
-		if ( $this->schema ) {
-			return $this->add_additional_fields_schema( $this->schema );
-		}
-
-		$this->schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'navigation-fallbacks',
-			'type'       => 'object',
-			'properties' => array(
-				'id' => array(
-					'description' => __( 'The unique identifier for the Navigation Menu.', 'gutenberg' ),
-					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-			),
-		);
-
-		return $this->add_additional_fields_schema( $this->schema );
-	}
-
-	/**
 	 * Checks if a given request has access to read fallbacks.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -124,8 +97,59 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$response = ! empty( $post ) ? $post->ID : new WP_Error( 'no_fallback_menu', __( 'No fallback menu found.', 'gutenberg' ), array( 'status' => 404 ) );
+		if ( empty( $post ) ) {
+			return rest_ensure_response( new WP_Error( 'no_fallback_menu', __( 'No fallback menu found.', 'gutenberg' ), array( 'status' => 404 ) ) );
+		}
 
-		return rest_ensure_response( $response );
+		$response = $this->prepare_item_for_response( $post, $request );
+
+		return $response;
+	}
+
+	/**
+	 * Retrieves the fallbacks' schema, conforming to JSON Schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$this->schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'navigation-fallbacks',
+			'type'       => 'object',
+			'properties' => array(
+				'id' => array(
+					'description' => __( 'The unique identifier for the Navigation Menu.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+			),
+		);
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Matches the post data to the schema we want.
+	 *
+	 * @param WP_Post         $item The wp_navigation Post object whose response is being prepared.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response $response The response data.
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$data = null;
+
+		$schema = $this->get_item_schema();
+
+		// We are also renaming the fields to more understandable names.
+		if ( isset( $schema['properties']['id'] ) ) {
+			$data = (int) $item->ID;
+		}
+
+		return rest_ensure_response( $data );
 	}
 }
