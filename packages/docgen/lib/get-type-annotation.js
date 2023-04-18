@@ -516,22 +516,6 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	// Otherwise find the corresponding parameter token for the documented parameter.
 	let paramToken = functionToken.params[ paramIndex ];
 
-	// If the parameter is a destructured object then we sometimes need to do
-	// extra work to find the correct token inside that object. The object would
-	// be the only parameter, which means we can't index on the function params
-	// to find a property of the object.
-	if (
-		! paramToken &&
-		functionToken.params.length === 1 &&
-		tag.name.split( '.' ).length === 2 &&
-		functionToken.params[ 0 ].type === 'ObjectPattern'
-	) {
-		const propName = tag.name.split( '.' )[ 1 ];
-		paramToken = functionToken.params[ 0 ].properties.find(
-			( property ) => property.key.name === propName
-		);
-	}
-
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.
 	if ( ! paramToken ) {
