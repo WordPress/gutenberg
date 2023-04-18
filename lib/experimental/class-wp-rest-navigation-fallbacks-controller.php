@@ -48,11 +48,11 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_fallbacks' ),
-					'permission_callback' => array( $this, 'get_fallbacks_permissions_check' ),
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE ),
 				),
-				'schema' => array( $this, 'get_fallbacks_schema' ),
+				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
 	}
@@ -62,7 +62,7 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 *
 	 * @return array Item schema data.
 	 */
-	public function get_fallbacks_schema() {
+	public function get_item_schema() {
 		if ( $this->schema ) {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
@@ -90,7 +90,7 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_fallbacks_permissions_check( $request ) {
+	public function get_item_permissions_check( $request ) {
 
 		$post_type = get_post_type_object( $this->post_type );
 
@@ -112,7 +112,7 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	 *
 	 * @return int|null The ID of the fallback Navigation Menu, or null if none exists.
 	 */
-	public function get_fallbacks() {
+	public function get_item( $request ) {
 		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
 		return ! empty( $post ) ? $post->ID : null;
