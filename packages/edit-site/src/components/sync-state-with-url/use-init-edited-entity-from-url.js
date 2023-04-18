@@ -14,16 +14,17 @@ import { store as editSiteStore } from '../../store';
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, postType } = {} } = useLocation();
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
-		const { getSite } = select( coreDataStore );
+		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
+		const base = getUnstableBase();
 
 		return {
-			isRequestingSite: ! siteData,
+			isRequestingSite: ! base,
 			homepageId:
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
-			url: siteData?.url,
+			url: base?.home,
 		};
 	}, [] );
 
