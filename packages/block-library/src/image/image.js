@@ -15,7 +15,7 @@ import {
 	TextControl,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useViewportMatch, usePrevious } from '@wordpress/compose';
+import { usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
@@ -154,8 +154,6 @@ export default function Image( {
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -163,10 +161,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable =
-		allowResize &&
-		! isContentLocked &&
-		! ( isWideAligned && isLargeViewport );
+	const isResizable = allowResize && ! isContentLocked;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
