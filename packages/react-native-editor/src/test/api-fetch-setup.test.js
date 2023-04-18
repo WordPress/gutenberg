@@ -93,4 +93,16 @@ describe( 'shouldEnableCaching', () => {
 			expect( shouldEnableCaching( path ) ).toBe( false );
 		} );
 	} );
+
+	it( 'checks disabled cache endpoints provided by WP hook', () => {
+		addFilter(
+			'native.disabled_cache_endpoints',
+			'gutenberg-mobile',
+			( endpoints ) => {
+				return [ ...endpoints, /test\/no-cache-endpoint/i ];
+			}
+		);
+
+		expect( shouldEnableCaching( 'test/no-cache-endpoint' ) ).toBe( false );
+	} );
 } );
