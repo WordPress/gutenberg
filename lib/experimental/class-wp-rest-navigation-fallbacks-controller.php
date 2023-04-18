@@ -108,12 +108,12 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the most appropriate fallback Navigation Menu.
 	 *
-	 * @return WP_Post|null the fallback Navigation Post or null.
+	 * @return int|null The ID of the fallback Navigation Menu, or null if none exists.
 	 */
 	public function get_fallbacks() {
 		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		return $post->ID;
+		return ! empty( $post ) ? $post->ID : null;
 	}
 
 	/**
