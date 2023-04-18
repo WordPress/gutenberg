@@ -6,6 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { useMemo } from '@wordpress/element';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -45,6 +46,7 @@ const getWPAdminAddCommandLoader = ( postType ) =>
 				{
 					name: 'core/wp-admin/add-' + postType,
 					label,
+					icon: plus,
 					callback: () => {
 						document.location.href = addQueryArgs( newPostLink, {
 							post_type: postType,
