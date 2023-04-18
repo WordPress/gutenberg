@@ -266,7 +266,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					'100px';
 				setAttributes( {
-					width: null,
+					width: undefined,
 					style: {
 						...blockStyle,
 						layout: {
@@ -282,7 +282,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( width, spacingSizes ) ||
 					'100px';
 				setAttributes( {
-					height: null,
+					height: undefined,
 					style: {
 						...blockStyle,
 						layout: {
@@ -299,11 +299,11 @@ const SpacerEdit = ( {
 		) {
 			if ( inheritedOrientation === 'horizontal' ) {
 				setAttributes( {
-					width: null,
+					width: undefined,
 				} );
 			} else {
 				setAttributes( {
-					height: null,
+					height: undefined,
 				} );
 			}
 		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
@@ -321,8 +321,8 @@ const SpacerEdit = ( {
 					...blockStyle,
 					layout: {
 						...layout,
-						flexSize: null,
-						selfStretch: null,
+						flexSize: undefined,
+						selfStretch: undefined,
 					},
 				},
 			} );
