@@ -26,14 +26,14 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_it_exists() {
-		$this->assertTrue( class_exists( 'WP_Navigation_Fallbacks_Gutenberg' ) );
+		$this->assertTrue( class_exists( 'WP_Navigation_Fallbacks_Gutenberg' ), 'WP_Navigation_Fallbacks_Gutenberg class should exist.' );
 	}
 
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'wp_navigation', $data->post_type, 'Fallback menu type should be `wp_navigation`' );
 
@@ -56,11 +56,11 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
-		$this->assertNotEquals( '<!-- wp:page-list /-->', $data->post_content );
+		$this->assertNotEquals( '<!-- wp:page-list /-->', $data->post_content, 'Navigation Menu should not contain a Page List block.' );
 
-		$this->assertEmpty( $data->post_content );
+		$this->assertEmpty( $data->post_content, 'Menu should be empty.' );
 
 		register_block_type( 'core/page-list', $original_page_list_block );
 	}
@@ -73,7 +73,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 		// Assert on the final invocation.
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'Navigation', $data->post_title, 'Fallback menu title should be the default title' );
 
@@ -102,7 +102,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( $most_recently_published_nav->post_title, $data->post_title, 'Fallback menu title should be the same as the most recently created menu.' );
 
@@ -131,7 +131,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'Existing Classic Menu', $data->post_title, 'Fallback menu title should be the same as the classic menu.' );
 
@@ -182,7 +182,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'Classic Menu in Primary Location', $data->post_title, 'Fallback menu title should match the menu in the "primary" location.' );
 	}
@@ -216,7 +216,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'Primary', $data->post_title, 'Fallback menu title should match the menu with the slug "primary".' );
 	}
@@ -250,7 +250,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( 'Most Recent Classic Menu', $data->post_title, 'Fallback menu title should match the menu that was created most recently.' );
 	}
@@ -278,7 +278,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
-		$this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
 		$this->assertEquals( $existing_navigation_menu->post_title, $data->post_title, 'Fallback menu title should be the same as the existing Navigation menu.' );
 
