@@ -2,15 +2,17 @@
 /**
  * WP_Navigation_Fallbacks_Gutenberg class
  *
- * @package gutenberg
+ * Manages fallback behavior for Navigation menus.
+ *
+ * @package Gutenberg
+ * @subpackage Navigation
  * @since 6.3.0
  */
-
 
 require __DIR__ . '/class-wp-nav-menu-conversion-gutenberg.php';
 
 /**
- * Manages Fallback behavior for Navigation menus.
+ * Manages fallback behavior for Navigation menus.
  *
  * @access public
  */
