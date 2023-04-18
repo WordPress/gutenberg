@@ -1,16 +1,18 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Navigation_Controller class
+ * WP_REST_Navigation_Fallbacks_Controller class
  *
- * @package    Gutenberg
+ * REST Controller to create/fetch a fallback Navigation Menu.
+ *
+ * @package Gutenberg
  * @subpackage REST_API
+ * @since 6.3.0
  */
 
 require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
 
-
 /**
- * Base Templates REST API Controller.
+ * REST Controller to create/fetch a fallback Navigation Menu.
  */
 class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 
