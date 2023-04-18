@@ -214,7 +214,7 @@ class PrivateInserter extends Component {
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }
 				) }
-				popoverProps={ { position } }
+				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
