@@ -557,10 +557,10 @@ export default function Image( {
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
 		const hasWideOrFullAlign = [ 'wide', 'full' ].includes( align );
-		const maxWidthBuffer = hasWideOrFullAlign
-			? maxWidth * 5
-			: maxWidth * 2.5;
-		const maxHeightBuffer = maxWidthBuffer / ratio;
+		const maxWidthBuffer = hasWideOrFullAlign ? undefined : maxWidth * 2.5;
+		const maxHeightBuffer = hasWideOrFullAlign
+			? undefined
+			: maxWidthBuffer / ratio;
 
 		img = (
 			<ResizableAlignmentControls
