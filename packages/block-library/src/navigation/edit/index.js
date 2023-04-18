@@ -230,8 +230,8 @@ function Navigation( {
 		}
 
 		apiFetch( { path: '/wp-block-editor/v1/navigation-fallbacks' } )
-			.then( ( fallbackNavigationMenu ) => {
-				if ( ! fallbackNavigationMenu?.ID ) {
+			.then( ( fallbackNavigationMenuId ) => {
+				if ( ! fallbackNavigationMenuId ) {
 					showNavigationMenuStatusNotice(
 						__( 'Unable to fetch a fallback Navigation Menu.' )
 					);
@@ -246,7 +246,7 @@ function Navigation( {
 				 *  nor to be undoable, hence why it is marked as non persistent
 				 */
 				__unstableMarkNextChangeAsNotPersistent();
-				setRef( fallbackNavigationMenu.ID );
+				setRef( fallbackNavigationMenuId );
 			} )
 			.catch( () => {
 				showNavigationMenuStatusNotice(
