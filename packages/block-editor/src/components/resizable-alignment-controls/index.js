@@ -81,7 +81,6 @@ function ResizableAlignmentControls( {
 	size,
 } ) {
 	const resizableRef = useRef();
-	const aspect = useRef( size.height / size.width );
 	const detectSnapping = useDetectSnapping();
 	const [ isAlignmentVisualizerVisible, setIsAlignmentVisualizerVisible ] =
 		useState( false );
@@ -125,12 +124,13 @@ function ResizableAlignmentControls( {
 		}
 
 		const alignmentRect = snappedAlignment.rect;
+		const aspect = size.height / size.width;
 
 		return {
 			float: 'left',
-			height: alignmentRect.width * aspect.current,
+			height: alignmentRect.width * aspect,
 		};
-	}, [ snappedAlignment ] );
+	}, [ snappedAlignment, size.width, size.height ] );
 
 	return (
 		<>
