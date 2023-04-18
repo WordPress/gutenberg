@@ -4,8 +4,8 @@
 
 ### Breaking Change
 
-- Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
-- Automatically add the environment's port to `WP_TESTS_DOMAIN`.
+-   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
+-   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 
 ## 5.16.0 (2023-04-12)
 
