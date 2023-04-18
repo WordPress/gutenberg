@@ -29,6 +29,7 @@ import { pasteHandler } from '@wordpress/blocks';
  * Internal dependencies
  */
 import Image from './image';
+import { name } from './block.json';
 
 // Much of this description is duplicated from MediaPlaceholder.
 const placeholder = ( content ) => {
@@ -169,13 +170,12 @@ export function ImageEdit( {
 		setTemporaryURL( undefined );
 	}
 
-	// TODO: If this would be the way to go, we need to handle similarly audio and video.
 	function onHTMLDrop( HTML ) {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 		if (
 			Array.isArray( blocks ) &&
 			blocks.length === 1 &&
-			blocks[ 0 ].name === 'core/image'
+			blocks[ 0 ].name === name
 		) {
 			setAttributes( {
 				url: undefined,

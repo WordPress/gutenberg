@@ -30,7 +30,11 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { audio as icon, caption as captionIcon } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	pasteHandler,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import { usePrevious } from '@wordpress/compose';
 
@@ -38,6 +42,7 @@ import { usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { name } from './block.json';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -124,6 +129,22 @@ function AudioEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+		if (
+			Array.isArray( blocks ) &&
+			blocks.length === 1 &&
+			blocks[ 0 ].name === name
+		) {
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				caption: undefined,
+				...blocks[ 0 ].attributes,
+			} );
+		}
+	}
+
 	function getAutoplayHelp( checked ) {
 		return checked
 			? __( 'Autoplay may cause usability issues for some users.' )
@@ -169,6 +190,7 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
+					onHTMLDrop={ onHTMLDrop }
 				/>
 			</div>
 		);

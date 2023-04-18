@@ -34,7 +34,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { video as icon, caption as captionIcon } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	pasteHandler,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -44,6 +48,7 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
+import { name } from './block.json';
 
 // Much of this description is duplicated from MediaPlaceholder.
 const placeholder = ( content ) => {
@@ -174,6 +179,24 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+		if (
+			Array.isArray( blocks ) &&
+			blocks.length === 1 &&
+			blocks[ 0 ].name === name
+		) {
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				caption: undefined,
+				poster: undefined,
+				tracks: undefined,
+				...blocks[ 0 ].attributes,
+			} );
+		}
+	}
+
 	const classes = classnames( className, {
 		'is-transient': isTemporaryVideo,
 	} );
@@ -193,6 +216,7 @@ function VideoEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
+					onHTMLDrop={ onHTMLDrop }
 					placeholder={ placeholder }
 				/>
 			</div>
