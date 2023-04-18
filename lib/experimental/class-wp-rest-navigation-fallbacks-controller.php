@@ -104,28 +104,6 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 		}
 
 		// Getting fallbacks requires reading `wp_navigation` posts.
-		return $this->check_has_read_only_access( $request, $post_type );
-	}
-
-	/**
-	 * Gets the most appropriate fallback Navigation Menu.
-	 *
-	 * @return int|null The ID of the fallback Navigation Menu, or null if none exists.
-	 */
-	public function get_item( $request ) {
-		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
-
-		return ! empty( $post ) ? $post->ID : null;
-	}
-
-	/**
-	 * Checks whether the current user has read only access to the post type.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @param WP_Post_Type    $post_type Post type object.
-	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
-	 */
-	protected function check_has_read_only_access( $request, $post_type ) {
 		if ( current_user_can( 'edit_theme_options' ) ) {
 			return true;
 		}
@@ -143,5 +121,18 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Gets the most appropriate fallback Navigation Menu.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return int|null The ID of the fallback Navigation Menu, or null if none exists.
+	 */
+	public function get_item( $request ) {
+		$post = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+
+		return ! empty( $post ) ? $post->ID : null;
 	}
 }
