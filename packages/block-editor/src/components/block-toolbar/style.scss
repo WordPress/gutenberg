@@ -193,8 +193,8 @@
 	}
 
 	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 12px;
-		padding-right: 12px;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
