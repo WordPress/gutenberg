@@ -10,7 +10,6 @@ export default function PreferencesModal( { closeModal, children } ) {
 			className="interface-preferences-modal"
 			title={ __( 'Preferences' ) }
 			onRequestClose={ closeModal }
-			isFullScreen={ true }
 		>
 			{ children }
 		</Modal>
