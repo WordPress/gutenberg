@@ -126,8 +126,7 @@ _Returns_
 
 ### getScreenRect
 
-Gets an element's true screen space rect, offsetting any intervening iFrames
-in the element's ancestry.
+Gets an element's true screen space rect, offsetting any intervening iFrames in the element's ancestry.
 
 _Parameters_
 
