@@ -556,7 +556,11 @@ export default function Image( {
 		// main column, though not infinitely.
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
+		const hasWideOrFullAlign = [ 'wide', 'full' ].includes( align );
+		const maxWidthBuffer = hasWideOrFullAlign
+			? maxWidth * 5
+			: maxWidth * 2.5;
+		const maxHeightBuffer = maxWidthBuffer / ratio;
 
 		img = (
 			<ResizableAlignmentControls
@@ -564,9 +568,9 @@ export default function Image( {
 				clientId={ clientId }
 				currentAlignment={ align }
 				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
+				maxWidth={ maxWidthBuffer }
+				maxHeight={ maxHeightBuffer }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -583,8 +587,11 @@ export default function Image( {
 				} }
 				showHandle={ isSelected }
 				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
+					width: hasWideOrFullAlign ? '100%' : width ?? 'auto',
+					height:
+						height && ! hasCustomBorder && ! hasWideOrFullAlign
+							? height
+							: 'auto',
 				} }
 			>
 				{ img }
