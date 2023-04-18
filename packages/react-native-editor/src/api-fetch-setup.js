@@ -81,8 +81,14 @@ export const isPathSupported = ( path, method ) => {
 	);
 };
 
-export const shouldEnableCaching = ( path ) =>
-	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
+export const shouldEnableCaching = ( path ) => {
+	const disabledCachingEnpoints = applyFilters(
+		'native.disabled_caching_endpoints',
+		DISABLED_CACHING_ENDPOINTS
+	);
+
+	! disabledCachingEnpoints.some( ( pattern ) => pattern.test( path ) );
+};
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
