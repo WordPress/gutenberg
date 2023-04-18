@@ -10,6 +10,10 @@
 
 -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
 
+### Internal
+
+-   `Draggable` Do not stringify `dataTransfer` data if are already a string ([#49297](https://github.com/WordPress/gutenberg/pull/49297)).
+
 ## 23.8.0 (2023-04-12)
 
 ### Internal
