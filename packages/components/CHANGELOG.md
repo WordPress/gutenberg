@@ -31,7 +31,7 @@
 
 ## 23.7.0 (2023-03-29)
 
--   `TEST`: test ([#999999](https://github.com/WordPress/gutenberg/pull/999999)).
+-   `TEST`: test ([#49780](https://github.com/WordPress/gutenberg/pull/49780)).
 ### Internal
 
 -   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).
