@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as RadixTabs from '@radix-ui/react-tabs';
+import cx from 'classnames';
 
 /**
  * WordPress dependencies
@@ -19,7 +20,9 @@ import type {
 } from './types';
 
 export const TabsList = ( { className, children }: TabsListProps ) => (
-	<RadixTabs.TabsList className={ className }>
+	<RadixTabs.TabsList
+		className={ cx( 'components-tabs__tabs-list', className ) }
+	>
 		{ children }
 	</RadixTabs.TabsList>
 );
@@ -33,7 +36,7 @@ export const Tab = ( {
 	<RadixTabs.Trigger
 		value={ value }
 		disabled={ disabled }
-		className={ className }
+		className={ cx( 'components-tabs__tab', className ) }
 		asChild
 	>
 		<Button disabled={ disabled } __experimentalIsFocusable>
