@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `run` command now has a `--cwd` option to set the working directory for the command to execute from.
+
 ## 5.16.0 (2023-04-12)
 
 ## 5.15.0 (2023-03-29)

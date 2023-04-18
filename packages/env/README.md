@@ -316,7 +316,7 @@ The run command can be used to open shell sessions or invoke WP-CLI commands.
 <div class="callout callout-alert">
 In some cases, `wp-env` may consume options that you are attempting to pass to
 the container. This happens with options that `wp-env` has already declared,
-such as `--debug`, `--help`, and `--version`. When this happens, you should fall
+such as `--env-cwd`, `--debug`, `--help`, and `--version`. When this happens, you should fall
 back to using quotation marks; `wp-env` considers everything inside the
 quotation marks to be command argument.
 
@@ -349,6 +349,8 @@ Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
+  --env-cwd  The working directory the command is ran from.
+                                             [string] [default: "/var/www/html"]
 ```
 
 For example:
