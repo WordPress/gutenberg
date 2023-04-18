@@ -2,6 +2,12 @@
 /**
  * Unit tests covering WP_REST_Navigation_Fallbacks_Controller functionality.
  *
+ * Note: that these tests are designed to provide high level coverage only. The majority of the tests
+ * are made directly against the WP_Navigation_Fallbacks_Gutenberg class as this:
+ *
+ * - is where the bulk of the logic is.
+ * - is also consumed by the Navigation block's server side rendering.
+ *
  * @package WordPress
  * @subpackage REST API
  */
