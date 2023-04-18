@@ -18,10 +18,17 @@ const initConfig = require( '../init-config' );
  * @param {Object}   options
  * @param {string}   options.container The Docker container to run the command on.
  * @param {string[]} options.command   The command to run.
+ * @param {string}   options.cwd       The working directory for the command to be executed from.
  * @param {Object}   options.spinner   A CLI spinner which indicates progress.
  * @param {boolean}  options.debug     True if debug mode is enabled.
  */
-module.exports = async function run( { container, command, spinner, debug } ) {
+module.exports = async function run( {
+	container,
+	command,
+	cwd,
+	spinner,
+	debug,
+} ) {
 	const config = await initConfig( { spinner, debug } );
 
 	command = command.join( ' ' );
@@ -29,12 +36,7 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 	// Shows a contextual tip for the given command.
 	showCommandTips( command, container, spinner );
 
-	await spawnCommandDirectly( {
-		container,
-		command,
-		spinner,
-		config,
-	} );
+	await spawnCommandDirectly( config, container, command, cwd, spinner );
 
 	spinner.text = `Ran \`${ command }\` in '${ container }'.`;
 };
@@ -42,21 +44,25 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 /**
  * Runs an arbitrary command on the given Docker container.
  *
- * @param {Object}   options
- * @param {string}   options.container The Docker container to run the command on.
- * @param {string}   options.command   The command to run.
- * @param {WPConfig} options.config    The wp-env configuration.
- * @param {Object}   options.spinner   A CLI spinner which indicates progress.
+ * @param {WPConfig} config    The wp-env configuration.
+ * @param {string}   container The Docker container to run the command on.
+ * @param {string}   command   The command to run.
+ * @param {string}   cwd       The working directory for the command to be executed from.
+ * @param {Object}   spinner   A CLI spinner which indicates progress.
  */
-function spawnCommandDirectly( { container, command, config, spinner } ) {
+function spawnCommandDirectly( config, container, command, cwd, spinner ) {
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
 		'run',
+		'-w',
+		cwd,
 		'--rm',
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
 	];
+
+	console.log( composeCommand );
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
