@@ -98,10 +98,10 @@ describe( 'ColorPicker', () => {
 	} );
 
 	describe.each( [
-		[ 'red', 0, '#7dffff' ],
-		[ 'green', 1, '#ff7dff' ],
-		[ 'blue', 2, '#ffff7d' ],
-	] )( 'RGB inputs', ( colorInput, inputIndex, expected ) => {
+		[ 'red', 'Red', '#7dffff' ],
+		[ 'green', 'Green', '#ff7dff' ],
+		[ 'blue', 'Blue', '#ffff7d' ],
+	] )( 'RGB inputs', ( colorInput, inputLabel, expected ) => {
 		it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -120,8 +120,9 @@ describe( 'ColorPicker', () => {
 
 			await user.selectOptions( formatSelector, 'rgb' );
 
-			const inputElement =
-				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
+			const inputElement = screen.getByRole( 'spinbutton', {
+				name: inputLabel,
+			} );
 			expect( inputElement ).toBeVisible();
 
 			await user.clear( inputElement );
@@ -133,10 +134,10 @@ describe( 'ColorPicker', () => {
 	} );
 
 	describe.each( [
-		[ 'hue', 0, '#aad52a' ],
-		[ 'saturation', 1, '#20dfdf' ],
-		[ 'lightness', 2, '#95eaea' ],
-	] )( 'HSL inputs', ( colorInput, inputIndex, expected ) => {
+		[ 'hue', 'Hue', '#aad52a' ],
+		[ 'saturation', 'Saturation', '#20dfdf' ],
+		[ 'lightness', 'Lightness', '#95eaea' ],
+	] )( 'HSL inputs', ( colorInput, inputLabel, expected ) => {
 		it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -155,8 +156,9 @@ describe( 'ColorPicker', () => {
 
 			await user.selectOptions( formatSelector, 'hsl' );
 
-			const inputElement =
-				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
+			const inputElement = screen.getByRole( 'spinbutton', {
+				name: inputLabel,
+			} );
 			expect( inputElement ).toBeVisible();
 
 			await user.clear( inputElement );
