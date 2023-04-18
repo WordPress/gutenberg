@@ -152,7 +152,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	private static function get_most_recently_created_nav_menu( $classic_nav_menus ) {
 		usort(
 			$classic_nav_menus,
-			function( $a, $b ) {
+			static function( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);
