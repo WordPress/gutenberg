@@ -81,7 +81,8 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		$classic_nav_menu = static::get_fallback_classic_menu();
 
 		if ( ! $classic_nav_menu ) {
-			return new WP_Error( 'no_classic_menus', 'No Classic Menus found.' );
+			// return a WP_error object with a message and error code
+			return new WP_Error( 'no_classic_menus', __( 'No Classic Menus found.', 'gutenberg' ) );
 		}
 
 		// Todo: inject as dependency.
@@ -91,7 +92,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		$classic_nav_menu_blocks = $menu_converter->convert();
 
 		if ( empty( $classic_nav_menu_blocks ) ) {
-			return new WP_Error( 'cannot_convert_classic_menu', 'Unable to convert Classic Menu to blocks.' );
+			return new WP_Error( 'cannot_convert_classic_menu', __( 'Unable to convert Classic Menu to blocks.', 'gutenberg' ) );
 		}
 
 		// Create a new navigation menu from the classic menu.
