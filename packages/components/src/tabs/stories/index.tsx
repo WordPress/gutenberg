@@ -13,6 +13,7 @@ import { closeSmall } from '@wordpress/icons';
  */
 import { Tabs, TabsList, Tab, TabPanel } from '..';
 import Button from '../../button';
+import './style.css';
 
 const meta: ComponentMeta< typeof Tabs > = {
 	title: 'Components/Tabs',
@@ -68,7 +69,7 @@ ToBeNamedStory.args = {
 	defaultValue: 'tab-1',
 	children: (
 		<>
-			<TabsList>
+			<TabsList className="tabs-story-tbn__tabs-list">
 				<Tab value="tab-1">Tab 1</Tab>
 				<Tab value="tab-2">Tab 2</Tab>
 				<Button icon={ closeSmall } label="Some Action" />
