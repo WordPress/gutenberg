@@ -250,14 +250,31 @@
 	// except for the inserter on the left
 	@include break-medium() {
 		&.is-fixed {
-			width: calc(100% - #{$grid-unit-80 + $grid-unit-40});
+
+			left: 28 * $grid-unit;
+			width: calc(100% - #{28 * $grid-unit});
+
 			&.is-collapsed {
 				// when collapsed minimize area
 				width: initial;
+				left: $grid-unit * 48;
 			}
+
+			// collapsed wp admin sidebar when not in full screen mode
+			.auto-fold & {
+				left: $grid-unit-80 + $grid-unit-40;
+				width: calc(100% - #{$grid-unit-80 + $grid-unit-40});
+
+				&.is-collapsed {
+					left: $grid-unit * 32;
+				}
+			}
+
 			.is-fullscreen-mode & {
 				width: calc(100% - #{$grid-unit-80 + $grid-unit-70});
+				left: $grid-unit-80 + $grid-unit-70;
 				&.is-collapsed {
+					left: $grid-unit * 36;
 					// when collapsed minimize area
 					width: initial;
 				}
@@ -270,13 +287,45 @@
 	// for the block inserter the publish button
 	@include break-large() {
 		&.is-fixed {
-			// leave room for block inserter and the dashboard navigation
-			left: $grid-unit-80 + $grid-unit-40 + ( $grid-unit-80 * 2 );
-			// Don't fill the whole header, minimize area
-			width: initial;
-			.is-fullscreen-mode & {
+
+			.auto-fold & {
 				// Don't fill the whole header, minimize area
 				width: initial;
+
+				// leave room for block inserter and the dashboard navigation
+				left: $grid-unit-80 + $grid-unit-40 + ( $grid-unit-80 * 2 );
+
+				&.is-collapsed {
+					// when collapsed minimize area
+					width: initial;
+					left: $grid-unit * 48;
+				}
+
+			}
+
+			// collapsed wp admin sidebar when not in full screen mode
+			.auto-fold.folded & {
+				width: initial;
+				left: $grid-unit-80 + $grid-unit-40;
+
+				&.is-collapsed {
+					// when collapsed minimize area
+					width: initial;
+					left: $grid-unit * 32;
+				}
+
+			}
+
+			.auto-fold.is-fullscreen-mode & {
+				// Don't fill the whole header, minimize area
+				width: initial;
+				left: $grid-unit-80 + $grid-unit-70;
+
+				&.is-collapsed {
+					// when collapsed minimize area
+					width: initial;
+					left: $grid-unit * 36;
+				}
 			}
 		}
 	}
