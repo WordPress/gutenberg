@@ -17,6 +17,7 @@ const BlockDraggable = ( {
 	children,
 	clientIds,
 	cloneClassname,
+	elementId,
 	onDragStart,
 	onDragEnd,
 	__experimentalDragComponent,
@@ -103,13 +104,18 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				__experimentalDragComponent || (
+				// Check against `undefined` so that `null` can be used to disable
+				// the default drag component.
+				__experimentalDragComponent !== undefined ? (
+					__experimentalDragComponent
+				) : (
 					<BlockDraggableChip
 						count={ clientIds.length }
 						icon={ icon }
 					/>
 				)
 			}
+			elementId={ elementId }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {

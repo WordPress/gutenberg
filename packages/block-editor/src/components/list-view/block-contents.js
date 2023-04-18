@@ -13,7 +13,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import ListViewBlockSelectButton from './block-select-button';
-import ListViewBlockDraggableChip from './block-draggable-chip';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 import { useListViewContext } from './context';
@@ -77,12 +76,8 @@ const ListViewBlockContents = forwardRef(
 				) }
 				<BlockDraggable
 					clientIds={ draggableClientIds }
-					__experimentalDragComponent={
-						<ListViewBlockDraggableChip
-							className={ className }
-							clientId={ draggableClientIds[ 0 ] }
-						/>
-					}
+					__experimentalDragComponent={ null }
+					elementId={ `list-view-block-${ clientId }` }
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
