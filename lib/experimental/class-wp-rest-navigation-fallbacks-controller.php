@@ -73,7 +73,7 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'id' => array(
-					'description' => __( 'The unique identifier for the Navigation Menu.', 'default' ),
+					'description' => __( 'The unique identifier for the Navigation Menu.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
