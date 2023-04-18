@@ -54,23 +54,6 @@ class WP_Nav_Menu_Conversion_Gutenberg {
 	}
 
 	/**
-	 * Keys menu items keyed by the order in which they appear in the menu.
-	 *
-	 * @param array $menu_items the menu items to key.
-	 * @return array
-	 */
-	private function key_by_order_id( $menu_items ) {
-		return (array) $menu_items;
-		$sorted_menu_items = array();
-
-		foreach ( (array) $menu_items as $menu_item ) {
-			$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
-		}
-
-		return $sorted_menu_items;
-	}
-
-	/**
 	 * Returns an array of menu items grouped by the id of the parent menu item.
 	 *
 	 * @param array $menu_items An array of menu items.
