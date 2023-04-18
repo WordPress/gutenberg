@@ -96,7 +96,7 @@ describe( 'shouldEnableCaching', () => {
 
 	it( 'checks disabled cache endpoints provided by WP hook', () => {
 		addFilter(
-			'native.disabled_cache_endpoints',
+			'native.disabled_caching_endpoints',
 			'gutenberg-mobile',
 			( endpoints ) => {
 				return [ ...endpoints, /test\/no-cache-endpoint/i ];
