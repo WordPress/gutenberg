@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import URLPopover from '../';
 
-jest.useRealTimers();
-
 /**
  * Returns the first found popover element up the DOM tree.
  *

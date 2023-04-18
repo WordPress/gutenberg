@@ -39,17 +39,35 @@ export class Editor {
 		return this.page.frame( 'editor-canvas' ) || this.page;
 	}
 
-	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem.bind( this );
-	clickBlockToolbarButton = clickBlockToolbarButton.bind( this );
-	getBlocks = getBlocks.bind( this );
-	getEditedPostContent = getEditedPostContent.bind( this );
-	insertBlock = insertBlock.bind( this );
-	openDocumentSettingsSidebar = openDocumentSettingsSidebar.bind( this );
-	openPreviewPage = openPreviewPage.bind( this );
-	publishPost = publishPost.bind( this );
-	saveSiteEditorEntities = saveSiteEditorEntities.bind( this );
-	selectBlocks = selectBlocks.bind( this );
-	setContent = setContent.bind( this );
-	showBlockToolbar = showBlockToolbar.bind( this );
-	transformBlockTo = transformBlockTo.bind( this );
+	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
+	clickBlockOptionsMenuItem: typeof clickBlockOptionsMenuItem =
+		clickBlockOptionsMenuItem.bind( this );
+	/** @borrows clickBlockToolbarButton as this.clickBlockToolbarButton */
+	clickBlockToolbarButton: typeof clickBlockToolbarButton =
+		clickBlockToolbarButton.bind( this );
+	/** @borrows getBlocks as this.getBlocks */
+	getBlocks: typeof getBlocks = getBlocks.bind( this );
+	/** @borrows getEditedPostContent as this.getEditedPostContent */
+	getEditedPostContent: typeof getEditedPostContent =
+		getEditedPostContent.bind( this );
+	/** @borrows insertBlock as this.insertBlock */
+	insertBlock: typeof insertBlock = insertBlock.bind( this );
+	/** @borrows openDocumentSettingsSidebar as this.openDocumentSettingsSidebar */
+	openDocumentSettingsSidebar: typeof openDocumentSettingsSidebar =
+		openDocumentSettingsSidebar.bind( this );
+	/** @borrows openPreviewPage as this.openPreviewPage */
+	openPreviewPage: typeof openPreviewPage = openPreviewPage.bind( this );
+	/** @borrows publishPost as this.publishPost */
+	publishPost: typeof publishPost = publishPost.bind( this );
+	/** @borrows saveSiteEditorEntities as this.saveSiteEditorEntities */
+	saveSiteEditorEntities: typeof saveSiteEditorEntities =
+		saveSiteEditorEntities.bind( this );
+	/** @borrows selectBlocks as this.selectBlocks */
+	selectBlocks: typeof selectBlocks = selectBlocks.bind( this );
+	/** @borrows setContent as this.setContent */
+	setContent: typeof setContent = setContent.bind( this );
+	/** @borrows showBlockToolbar as this.showBlockToolbar */
+	showBlockToolbar: typeof showBlockToolbar = showBlockToolbar.bind( this );
+	/** @borrows transformBlockTo as this.transformBlockTo */
+	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
 }

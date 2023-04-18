@@ -35,6 +35,7 @@ export {
 
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
+export { hasSplitBorders as __experimentalHasSplitBorders } from './border-box-control/utils';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';

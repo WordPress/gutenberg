@@ -3,20 +3,7 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { unlock } from '../experiments';
-
-/**
- * WordPress dependencies
- */
-
-beforeEach( () => {
-	jest.useFakeTimers( 'legacy' );
-} );
-
-afterEach( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
+import { unlock } from '../private-apis';
 
 describe( 'Private data APIs', () => {
 	let registry;

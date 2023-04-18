@@ -5,6 +5,7 @@ import androidx.core.util.Consumer;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
@@ -29,7 +30,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     interface MediaUploadEventEmitter {
         void onUploadMediaFileClear(int mediaId);
         void onMediaFileUploadProgress(int mediaId, float progress);
-        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
+        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId, WritableNativeMap metadata);
         void onMediaFileUploadFailed(int mediaId);
     }
 

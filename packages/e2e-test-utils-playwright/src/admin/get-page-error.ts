@@ -7,8 +7,6 @@ import type { Admin } from './';
  * Regular expression matching a displayed PHP error within a markup string.
  *
  * @see https://github.com/php/php-src/blob/598175e/main/main.c#L1257-L1297
- *
- * @type {RegExp}
  */
 const REGEXP_PHP_ERROR =
 	/(<b>)?(Fatal error|Recoverable fatal error|Warning|Parse error|Notice|Strict Standards|Deprecated|Unknown error)(<\/b>)?: (.*?) in (.*?) on line (<b>)?\d+(<\/b>)?/;
@@ -21,10 +19,8 @@ const REGEXP_PHP_ERROR =
  *
  * @see http://php.net/manual/en/function.error-reporting.php
  *
- * @param {Admin} this
- *
- * @return {Promise<?string>} Promise resolving to a string or null, depending
- *                            whether a page error is present.
+ * @param this
+ * @return Promise resolving to a string or null, depending whether a page error is present.
  */
 export async function getPageError( this: Admin ) {
 	const content = await this.page.content();

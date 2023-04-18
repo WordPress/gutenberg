@@ -1,15 +1,20 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { wordpress, category, media } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import TabPanel from '..';
-
-const setupUser = () => userEvent.setup();
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const TABS = [
 	{
@@ -33,7 +38,14 @@ const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
 
-describe( 'TabPanel', () => {
+describe.each( [
+	[ 'uncontrolled', TabPanel ],
+	// The controlled component tests will be added once we certify the
+	// uncontrolled component's behaviour on trunk.
+	// [ 'controlled', TabPanel ],
+] )( 'TabPanel %s', ( ...modeAndComponent ) => {
+	const [ , Component ] = modeAndComponent;
+
 	beforeAll( () => {
 		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
 		// Mocking `getClientRects()` is necessary to pass a check performed by
@@ -49,295 +61,589 @@ describe( 'TabPanel', () => {
 		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
 	} );
 
-	it( 'should render a tabpanel, and clicking should change tabs', async () => {
-		const user = setupUser();
-		const panelRenderFunction = jest.fn();
-		const mockOnSelect = jest.fn();
+	describe( 'Accessibility and semantics', () => {
+		test( 'should use the correct aria attributes', () => {
+			const panelRenderFunction = jest.fn();
 
-		render(
-			<TabPanel
-				tabs={ TABS }
-				children={ panelRenderFunction }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
-		expect(
-			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
-		).toBeInTheDocument();
-		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
-		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
-
-		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-		expect(
-			screen.getByRole( 'tabpanel', { name: 'Beta' } )
-		).toBeInTheDocument();
-		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
-		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-
-		await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
-		expect(
-			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
-		).toBeInTheDocument();
-		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
-		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
-	} );
-
-	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
-		render(
-			<TabPanel
-				initialTabName="beta"
-				tabs={ TABS }
-				children={ () => undefined }
-			/>
-		);
-		const selectedTab = screen.getByRole( 'tab', { selected: true } );
-		expect( selectedTab ).toHaveTextContent( 'Beta' );
-	} );
-
-	it( 'should apply the `activeClass` to the selected tab', async () => {
-		const user = setupUser();
-		const activeClass = 'my-active-tab';
-
-		render(
-			<TabPanel
-				activeClass={ activeClass }
-				tabs={ TABS }
-				children={ () => undefined }
-			/>
-		);
-		expect( getSelectedTab() ).toHaveClass( activeClass );
-		screen
-			.getAllByRole( 'tab', { selected: false } )
-			.forEach( ( unselectedTab ) => {
-				expect( unselectedTab ).not.toHaveClass( activeClass );
-			} );
-
-		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
-
-		expect( getSelectedTab() ).toHaveClass( activeClass );
-		screen
-			.getAllByRole( 'tab', { selected: false } )
-			.forEach( ( unselectedTab ) => {
-				expect( unselectedTab ).not.toHaveClass( activeClass );
-			} );
-	} );
-
-	it( "should apply the tab's `className` to the tab button", () => {
-		render( <TabPanel tabs={ TABS } children={ () => undefined } /> );
-
-		expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
-			'alpha-class'
-		);
-		expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
-			'beta-class'
-		);
-		expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
-			'gamma-class'
-		);
-	} );
-
-	it( 'should select `initialTabName` if defined', () => {
-		const mockOnSelect = jest.fn();
-
-		render(
-			<TabPanel
-				tabs={ TABS }
-				initialTabName="beta"
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-	} );
-
-	it( 'waits for the tab with the `initialTabName` to become present in the `tabs` array before selecting it', () => {
-		const mockOnSelect = jest.fn();
-
-		const { rerender } = render(
-			<TabPanel
-				tabs={ TABS }
-				initialTabName="delta"
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		// There should be no selected tab.
-		expect(
-			screen.queryByRole( 'tab', { selected: true } )
-		).not.toBeInTheDocument();
-
-		rerender(
-			<TabPanel
-				tabs={ [
-					{ name: 'delta', title: 'Delta', className: 'delta-class' },
-					...TABS,
-				] }
-				initialTabName="delta"
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
-		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
-	} );
-
-	it( 'should disable the tab when `disabled` is true', async () => {
-		const user = setupUser();
-		const mockOnSelect = jest.fn();
-
-		render(
-			<TabPanel
-				tabs={ [
-					...TABS,
-					{
-						name: 'delta',
-						title: 'Delta',
-						className: 'delta-class',
-						disabled: true,
-					},
-				] }
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toHaveAttribute(
-			'aria-disabled',
-			'true'
-		);
-
-		// onSelect gets called on the initial render.
-		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-
-		// onSelect should not be called since the disabled tab is highlighted, but not selected.
-		await user.keyboard( '[ArrowLeft]' );
-		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'should select the first enabled tab when the inital tab is disabled', () => {
-		const mockOnSelect = jest.fn();
-
-		render(
-			<TabPanel
-				tabs={ [
-					{
-						name: 'alpha',
-						title: 'Alpha',
-						className: 'alpha-class',
-						disabled: true,
-					},
-					{
-						name: 'beta',
-						title: 'Beta',
-						className: 'beta-class',
-					},
-				] }
-				initialTabName="alpha"
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-	} );
-
-	it( 'should select the first enabled tab when the currently selected becomes disabled', () => {
-		const mockOnSelect = jest.fn();
-
-		const { rerender } = render(
-			<TabPanel
-				tabs={ TABS }
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
-
-		rerender(
-			<TabPanel
-				tabs={ TABS.map( ( tab ) => {
-					if ( tab.name === 'alpha' ) {
-						return { ...tab, disabled: true };
-					}
-					return tab;
-				} ) }
-				children={ () => undefined }
-				onSelect={ mockOnSelect }
-			/>
-		);
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-	} );
-
-	describe( 'fallbacks when new tab list invalidates current selection', () => {
-		it( 'should select `initialTabName` if defined', async () => {
-			const user = setupUser();
-			const mockOnSelect = jest.fn();
-
-			const { rerender } = render(
-				<TabPanel
-					tabs={ TABS }
-					initialTabName="gamma"
-					children={ () => undefined }
-					onSelect={ mockOnSelect }
-				/>
+			render(
+				<Component tabs={ TABS } children={ panelRenderFunction } />
 			);
-			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 
-			rerender(
-				<TabPanel
-					tabs={ TABS.slice( 1 ) /* remove alpha */ }
-					initialTabName="gamma"
-					children={ () => undefined }
-					onSelect={ mockOnSelect }
-				/>
+			const tabList = screen.getByRole( 'tablist' );
+			const allTabs = screen.getAllByRole( 'tab' );
+			const selectedTabPanel = screen.getByRole( 'tabpanel' );
+
+			expect( tabList ).toBeVisible();
+			expect( tabList ).toHaveAttribute(
+				'aria-orientation',
+				'horizontal'
 			);
-			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			expect( allTabs ).toHaveLength( TABS.length );
+
+			// The selected `tab` aria-controls the active `tabpanel`,
+			// which is `aria-labelledby` the selected `tab`.
+			expect( selectedTabPanel ).toBeVisible();
+			expect( allTabs[ 0 ] ).toHaveAttribute(
+				'aria-controls',
+				selectedTabPanel.getAttribute( 'id' )
+			);
+			expect( selectedTabPanel ).toHaveAttribute(
+				'aria-labelledby',
+				allTabs[ 0 ].getAttribute( 'id' )
+			);
 		} );
 
-		it( 'should select first tab if `initialTabName` not defined', async () => {
-			const user = setupUser();
-			const mockOnSelect = jest.fn();
+		test( 'should display a tooltip when hovering tabs provided with an icon', async () => {
+			const user = userEvent.setup();
 
+			const panelRenderFunction = jest.fn();
+
+			const TABS_WITH_ICON = [
+				{ ...TABS[ 0 ], icon: wordpress },
+				{ ...TABS[ 1 ], icon: category },
+				{ ...TABS[ 2 ], icon: media },
+			];
+
+			render(
+				// In order for the tooltip to display properly, there needs to be
+				// `Popover.Slot` in which the `Popover` renders outside of the
+				// `TabPanel` component, otherwise the tooltip renders inline.
+				<SlotFillProvider>
+					<Component
+						tabs={ TABS_WITH_ICON }
+						children={ panelRenderFunction }
+					/>
+					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
+					<Popover.Slot />
+				</SlotFillProvider>
+			);
+
+			const allTabs = screen.getAllByRole( 'tab' );
+
+			for ( let i = 0; i < allTabs.length; i++ ) {
+				expect(
+					screen.queryByText( TABS_WITH_ICON[ i ].title )
+				).not.toBeInTheDocument();
+
+				await user.hover( allTabs[ i ] );
+
+				await waitFor( () =>
+					expect(
+						screen.getByText( TABS_WITH_ICON[ i ].title )
+					).toBeVisible()
+				);
+
+				await user.unhover( allTabs[ i ] );
+			}
+		} );
+
+		test( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
+			const user = userEvent.setup();
+
+			const mockOnSelect = jest.fn();
+			const panelRenderFunction = jest.fn();
+
+			const TABS_WITH_ICON = [
+				{ ...TABS[ 0 ], icon: wordpress },
+				{ ...TABS[ 1 ], icon: category },
+				{ ...TABS[ 2 ], icon: media },
+			];
+
+			render(
+				// In order for the tooltip to display properly, there needs to be
+				// `Popover.Slot` in which the `Popover` renders outside of the
+				// `TabPanel` component, otherwise the tooltip renders inline.
+				<SlotFillProvider>
+					<Component
+						tabs={ TABS_WITH_ICON }
+						children={ panelRenderFunction }
+						onSelect={ mockOnSelect }
+					/>
+					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
+					<Popover.Slot />
+				</SlotFillProvider>
+			);
+
+			expect( getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+
+			// Tab to focus the tablist. Make sure alpha is focused, and that the
+			// corresponding tooltip is shown.
+			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[Tab]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure beta is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure gamma is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure beta is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowLeft]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+		} );
+	} );
+
+	describe( 'Without `initialTabName`', () => {
+		it( 'should render first tab', async () => {
+			const panelRenderFunction = jest.fn();
+
+			render(
+				<Component tabs={ TABS } children={ panelRenderFunction } />
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect(
+				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+			).toBeInTheDocument();
+			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
+		} );
+
+		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
+			const mockOnSelect = jest.fn();
 			const { rerender } = render(
-				<TabPanel
+				<Component
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
 				/>
 			);
-			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 
 			rerender(
-				<TabPanel
+				<Component
 					tabs={ TABS.slice( 1 ) /* remove alpha */ }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
 				/>
 			);
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 		} );
 	} );
 
-	describe( 'tab activation', () => {
-		it( 'defaults to automatic tab activation', async () => {
-			const user = setupUser();
+	describe( 'With `initialTabName`', () => {
+		it( 'should render the tab set by initialTabName prop', () => {
+			render(
+				<Component
+					initialTabName="beta"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+		} );
+
+		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
+			render(
+				<Component
+					initialTabName="does-not-exist"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			// No tab should be selected i.e. it doesn't fall back to first tab.
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
+
+			// No tabpanel should be rendered either
+			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not change tabs when initialTabName is changed', () => {
+			const { rerender } = render(
+				<Component
+					initialTabName="beta"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			rerender(
+				<Component
+					initialTabName="alpha"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+		} );
+
+		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS.slice( 1 ) } // Remove alpha
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+		} );
+
+		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS.slice( 0, 2 ) } // Remove gamma
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
+			const mockOnSelect = jest.fn();
+			const { rerender } = render(
+				<Component
+					initialTabName="delta"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// There should be no selected tab yet.
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<Component
+					initialTabName="delta"
+					tabs={ [
+						{
+							name: 'delta',
+							title: 'Delta',
+							className: 'delta-class',
+						},
+						...TABS,
+					] }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
+		} );
+	} );
+
+	describe( 'Disabled Tab', () => {
+		it( 'should disable the tab when `disabled` is `true`', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
 			render(
-				<TabPanel
+				<Component
+					tabs={ [
+						...TABS,
+						{
+							name: 'delta',
+							title: 'Delta',
+							className: 'delta-class',
+							disabled: true,
+						},
+					] }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'tab', { name: 'Delta' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// onSelect should not be called since the disabled tab is
+			// highlighted, but not selected.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should select first enabled tab when the initial tab is disabled', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					// Disable alpha
+					tabs={ TABS.map( ( tab ) => {
+						if ( tab.name !== 'alpha' ) {
+							return tab;
+						}
+						return { ...tab, disabled: true };
+					} ) }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// As alpha (first tab) is disabled,
+			// the first enabled tab should be gamma.
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+
+			// Re-enable all tabs
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// Even if the initial tab becomes enabled again, the selected tab doesn't
+			// change.
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+		} );
+
+		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					tabs={ TABS.map( ( tab ) => {
+						if ( tab.name === 'gamma' ) {
+							return tab;
+						}
+						return { ...tab, disabled: true };
+					} ) }
+					initialTabName="beta"
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// As alpha (first tab), and beta (the initial tab), are both
+			// disabled the first enabled tab should be gamma.
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+
+			// Re-enable all tabs
+			rerender(
+				<Component
+					tabs={ TABS }
+					initialTabName="beta"
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// Even if the initial tab becomes enabled again, the selected tab doesn't
+			// change.
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+		} );
+
+		it( 'should select the first enabled tab when the selected tab becomes disabled', () => {
+			const mockOnSelect = jest.fn();
+			const { rerender } = render(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			rerender(
+				<Component
+					tabs={ TABS.map( ( tab ) => {
+						if ( tab.name === 'alpha' ) {
+							return { ...tab, disabled: true };
+						}
+						return tab;
+					} ) }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+		} );
+
+		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ [
+						TABS[ 0 ],
+						TABS[ 1 ],
+						{ ...TABS[ 2 ], disabled: true },
+					] } // Disable gamma
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+		} );
+	} );
+
+	describe( 'Tab Activation', () => {
+		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
+			const user = userEvent.setup();
+			const panelRenderFunction = jest.fn();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
+					tabs={ TABS }
+					children={ panelRenderFunction }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// Alpha is the initially selected tab
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect(
+				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+			).toBeInTheDocument();
+			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Click on Beta, make sure beta is the selected tab
+			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect(
+				screen.getByRole( 'tabpanel', { name: 'Beta' } )
+			).toBeInTheDocument();
+			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			// Click on Alpha, make sure beta is the selected tab
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect(
+				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+			).toBeInTheDocument();
+			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
+
+		it( 'defaults to automatic tab activation (arrow keys)', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
@@ -347,42 +653,219 @@ describe( 'TabPanel', () => {
 			// onSelect gets called on the initial render.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
-			// Click on Alpha, make sure Alpha is selected
-			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+			// Tab to focus the tablist. Make sure alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
 
-			// Navigate forward with arrow keys,
-			// make sure Beta is selected automatically.
+			// Navigate forward with arrow keys and make sure the Beta tab is
+			// selected automatically.
 			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
-			// Navigate forward with arrow keys,
-			// make sure Gamma (last tab) is selected automatically.
-			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-
-			// Navigate forward with arrow keys,
-			// make sure Alpha (first tab) is selected automatically.
-			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
-
-			// Navigate backwards with arrow keys,
-			// make sure Gamma (last tab) is selected automatically
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
 			await user.keyboard( '[ArrowLeft]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 6 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
-			const user = setupUser();
+		it( 'wraps around the last/first tab when using arrow keys', async () => {
+			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
 			render(
-				<TabPanel
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure Alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Navigate backwards with arrow keys and make sure that the Gamma tab
+			// (the last tab) is selected automatically.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate forward with arrow keys. Make sure alpha (the first tab) is
+			// selected automatically.
+			await user.keyboard( '[ArrowRight]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
+
+		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Press the arrow up key, nothing happens.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Press the arrow down key, nothing happens
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Change orientation to `vertical`. When the orientation is vertical,
+			// left/right arrow keys are replaced by up/down arrow keys.
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+					orientation="vertical"
+				/>
+			);
+
+			expect( screen.getByRole( 'tablist' ) ).toHaveAttribute(
+				'aria-orientation',
+				'vertical'
+			);
+
+			// Make sure alpha is still focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Navigate forward with arrow keys and make sure the Beta tab is
+			// selected automatically.
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
+
+		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
+					tabs={ [
+						...TABS,
+						{
+							name: 'delta',
+							title: 'Delta',
+							className: 'delta-class',
+							disabled: true,
+						},
+					] }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure Alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Press the right arrow key three times. Since the delta tab is disabled:
+			// - it won't be selected. The gamma tab will be selected instead, since
+			//   it was the tab that was last selected before delta. Therefore, the
+			//   `mockOnSelect` function gets called only twice (and not three times)
+			// - it will receive focus, when using arrow keys
+			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect(
+				screen.getByRole( 'tab', { name: 'Delta' } )
+			).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate backwards with arrow keys. The gamma tab receives focus.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+
+			// Click on on the disabled tab. Compared to using arrow keys to move the
+			// focus, disabled tabs ignore pointer clicks — and therefore, they don't
+			// receive focus, nor they cause the `mockOnSelect` function to fire.
+			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+		} );
+
+		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
@@ -393,35 +876,84 @@ describe( 'TabPanel', () => {
 			// onSelect gets called on the initial render.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
-			// Click on Alpha, make sure Alpha is selected
+			// Click on Alpha and make sure it is selected.
 			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			// Navigate forward with arrow keys.
-			// Make sure Beta is focused, but that the tab selection happens only when
-			// pressing the spacebar or the enter key.
+			// Navigate forward with arrow keys. Make sure Beta is focused, but
+			// that the tab selection happens only when pressing the spacebar
+			// or enter key.
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveFocus();
+
 			await user.keyboard( '[Enter]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
-			// Navigate forward with arrow keys.
-			// Make sure Gamma (last tab) is focused, but that the tab selection
-			// happens only when pressing the spacebar or the enter key.
+			// Navigate forward with arrow keys. Make sure Gamma (last tab) is
+			// focused, but that tab selection happens only when pressing the
+			// spacebar or enter key.
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect(
 				screen.getByRole( 'tab', { name: 'Gamma' } )
 			).toHaveFocus();
+
 			await user.keyboard( '[Space]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+		} );
+	} );
 
-			// No need to test the "wrap-around" behavior, as it's being tested in the
-			// "automatic tab activation" test above.
+	describe( 'Tab Attributes', () => {
+		it( "should apply the tab's `className` to the tab button", () => {
+			render( <Component tabs={ TABS } children={ () => undefined } /> );
+
+			expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
+				'alpha-class'
+			);
+			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
+				'beta-class'
+			);
+			expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
+				'gamma-class'
+			);
+		} );
+
+		it( 'should apply the `activeClass` to the selected tab', async () => {
+			const user = userEvent.setup();
+			const activeClass = 'my-active-tab';
+
+			render(
+				<Component
+					activeClass={ activeClass }
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			// Make sure that only the selected tab has the active class
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( getSelectedTab() ).toHaveClass( activeClass );
+			screen
+				.getAllByRole( 'tab', { selected: false } )
+				.forEach( ( unselectedTab ) => {
+					expect( unselectedTab ).not.toHaveClass( activeClass );
+				} );
+
+			// Click the 'Beta' tab
+			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+
+			// Make sure that only the selected tab has the active class
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect( getSelectedTab() ).toHaveClass( activeClass );
+			screen
+				.getAllByRole( 'tab', { selected: false } )
+				.forEach( ( unselectedTab ) => {
+					expect( unselectedTab ).not.toHaveClass( activeClass );
+				} );
 		} );
 	} );
 } );

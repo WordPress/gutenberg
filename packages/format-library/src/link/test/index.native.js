@@ -27,7 +27,7 @@ const LinkEditSlot = ( props ) => (
 jest.spyOn( Keyboard, 'dismiss' );
 
 beforeAll( () => {
-	jest.useFakeTimers( 'legacy' );
+	jest.useFakeTimers( { legacyFakeTimers: true } );
 } );
 
 afterAll( () => {

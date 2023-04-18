@@ -6,10 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	getSpacingPresetCssVar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -78,8 +83,21 @@ const SpacerEdit = ( {
 	setAttributes,
 	toggleSelection,
 	context,
+	__unstableParentLayout: parentLayout,
+	className,
 } ) => {
+	const disableCustomSpacingSizes = useSelect( ( select ) => {
+		const editorSettings = select( blockEditorStore ).getSettings();
+		return editorSettings?.disableCustomSpacingSizes;
+	} );
 	const { orientation } = context;
+	const { orientation: parentOrientation, type } = parentLayout || {};
+	// If the spacer is inside a flex container, it should either inherit the orientation
+	// of the parent or use the flex default orientation.
+	const inheritedOrientation =
+		! parentOrientation && type === 'flex'
+			? 'horizontal'
+			: parentOrientation || orientation;
 	const { height, width } = attributes;
 
 	const [ isResizing, setIsResizing ] = useState( false );
@@ -104,12 +122,19 @@ const SpacerEdit = ( {
 
 	const style = {
 		height:
-			orientation === 'horizontal'
+			inheritedOrientation === 'horizontal'
 				? 24
-				: temporaryHeight || height || undefined,
+				: temporaryHeight ||
+				  getSpacingPresetCssVar( height ) ||
+				  undefined,
 		width:
-			orientation === 'horizontal'
-				? temporaryWidth || width || undefined
+			inheritedOrientation === 'horizontal'
+				? temporaryWidth || getSpacingPresetCssVar( width ) || undefined
+				: undefined,
+		// In vertical flex containers, the spacer shrinks to nothing without a minimum width.
+		minWidth:
+			inheritedOrientation === 'vertical' && type === 'flex'
+				? 48
 				: undefined,
 	};
 
@@ -166,7 +191,7 @@ const SpacerEdit = ( {
 	};
 
 	useEffect( () => {
-		if ( orientation === 'horizontal' && ! width ) {
+		if ( inheritedOrientation === 'horizontal' && ! width ) {
 			setAttributes( {
 				height: '0px',
 				width: '72px',
@@ -176,14 +201,21 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<View { ...useBlockProps( { style } ) }>
-				{ resizableBoxWithOrientation( orientation ) }
+			<View
+				{ ...useBlockProps( {
+					style,
+					className: classnames( className, {
+						'custom-sizes-disabled': disableCustomSpacingSizes,
+					} ),
+				} ) }
+			>
+				{ resizableBoxWithOrientation( inheritedOrientation ) }
 			</View>
 			<SpacerControls
 				setAttributes={ setAttributes }
 				height={ temporaryHeight || height }
 				width={ temporaryWidth || width }
-				orientation={ orientation }
+				orientation={ inheritedOrientation }
 				isResizing={ isResizing }
 			/>
 		</>

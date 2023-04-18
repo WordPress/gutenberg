@@ -92,7 +92,10 @@ export { default as URLPopover } from './url-popover';
 export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
 export { default as __experimentalSpacingSizesControl } from './spacing-sizes-control';
-
+export {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+} from './spacing-sizes-control/utils';
 /*
  * Content Related Components
  */

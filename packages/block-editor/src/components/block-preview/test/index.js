@@ -17,8 +17,6 @@ import {
  */
 import { useBlockPreview } from '../';
 
-jest.useRealTimers();
-
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {

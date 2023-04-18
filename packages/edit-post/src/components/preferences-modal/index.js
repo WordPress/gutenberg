@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 
@@ -213,10 +208,7 @@ export default function EditPostPreferencesModal() {
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
-										label={ get( taxonomy, [
-											'labels',
-											'menu_name',
-										] ) }
+										label={ taxonomy.labels.menu_name }
 										panelName={ `taxonomy-panel-${ taxonomy.slug }` }
 									/>
 								) }

@@ -143,27 +143,32 @@ export default function CategoriesEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show only top level categories' ) }
 						checked={ showOnlyTopLevel }
 						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show empty categories' ) }
 						checked={ showEmpty }
 						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
 					{ ! showOnlyTopLevel && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show hierarchy' ) }
 							checked={ showHierarchy }
 							onChange={ toggleAttribute( 'showHierarchy' ) }

@@ -32,8 +32,10 @@ export default {
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
+		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
+		const { allowJustification = true } = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -117,23 +119,27 @@ export default {
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
-				<ToggleGroupControl
-					__nextHasNoMarginBottom
-					label={ __( 'Justification' ) }
-					value={ justifyContent }
-					onChange={ onJustificationChange }
-				>
-					{ justificationOptions.map( ( { value, icon, label } ) => {
-						return (
-							<ToggleGroupControlOptionIcon
-								key={ value }
-								value={ value }
-								icon={ icon }
-								label={ label }
-							/>
-						);
-					} ) }
-				</ToggleGroupControl>
+				{ allowJustification && (
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						label={ __( 'Justification' ) }
+						value={ justifyContent }
+						onChange={ onJustificationChange }
+					>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => {
+								return (
+									<ToggleGroupControlOptionIcon
+										key={ value }
+										value={ value }
+										icon={ icon }
+										label={ label }
+									/>
+								);
+							}
+						) }
+					</ToggleGroupControl>
+				) }
 			</>
 		);
 	},

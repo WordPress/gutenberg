@@ -7,6 +7,16 @@
 - Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
 - Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 
+## 5.16.0 (2023-04-12)
+
+## 5.15.0 (2023-03-29)
+
+## 5.14.0 (2023-03-15)
+
+## 5.13.0 (2023-03-01)
+
+## 5.12.0 (2023-02-15)
+
 ## 5.11.0 (2023-02-01)
 
 ### Bug fix
