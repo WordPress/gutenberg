@@ -24,6 +24,7 @@ import {
 	post,
 	postAuthor,
 	postDate,
+	postList,
 	search,
 	tag,
 	layout as customGenericTemplateIcon,
@@ -51,6 +52,7 @@ import { unlock } from '../../private-apis';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
+	'home',
 	'single',
 	'page',
 	'index',
@@ -66,6 +68,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
+	home: postList,
 	single: post,
 	page,
 	archive,

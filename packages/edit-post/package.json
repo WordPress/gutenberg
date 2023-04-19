@@ -57,7 +57,7 @@
 		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.3.1",
 		"memize": "^1.1.0",
-		"rememo": "^4.0.0"
+		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

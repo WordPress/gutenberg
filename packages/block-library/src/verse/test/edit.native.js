@@ -6,7 +6,7 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	getBlock,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 } from 'test/helpers';
 
@@ -64,17 +64,13 @@ describe( 'Verse block', () => {
 		const verseTextInput = await screen.findByPlaceholderText(
 			'Write verse…'
 		);
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( verseTextInput, 'A great statement.' );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( verseTextInput, 'Again' );
+		typeInRichText( verseTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
