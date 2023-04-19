@@ -50,7 +50,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 	/**
-	 * Finds the most recently published `wp_navigation` Post.
+	 * Finds the most recently published `wp_navigation` post type.
 	 *
 	 * @return WP_Post|null the first non-empty Navigation or null.
 	 */
