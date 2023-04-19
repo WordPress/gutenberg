@@ -96,6 +96,7 @@
 		// The inner drag handle will still have `pointer-events: all` allowing
 		// it to continue to be interacted with.
 		pointer-events: none;
+		overflow: visible;
 	}
 }
 
