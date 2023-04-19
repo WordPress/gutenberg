@@ -1,9 +1,9 @@
 <?php
 /**
- * Unit tests covering WP_REST_Navigation_Fallbacks_Controller functionality.
+ * Unit tests covering WP_REST_Navigation_Fallback_Controller functionality.
  *
  * Note: that these tests are designed to provide high level coverage only. The majority of the tests
- * are made directly against the WP_Navigation_Fallbacks_Gutenberg class as this:
+ * are made directly against the WP_Navigation_Fallback_Gutenberg class as this:
  *
  * - is where the bulk of the logic is.
  * - is also consumed by the Navigation block's server side rendering.
@@ -16,7 +16,7 @@
  * @group restapi
  * @group navigation
  */
-class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	protected static $admin_user;
 	protected static $editor_user;
@@ -34,7 +34,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	/**
-	 * @covers WP_REST_Navigation_Fallbacks_Controller::register_routes
+	 * @covers WP_REST_Navigation_Fallback_Controller::register_routes
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
@@ -45,7 +45,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	/**
-	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 * @covers WP_REST_Navigation_Fallback_Controller
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
@@ -65,7 +65,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	/**
-	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 * @covers WP_REST_Navigation_Fallback_Controller
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
@@ -91,7 +91,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	/**
-	 * @covers WP_REST_Navigation_Fallbacks_Controller
+	 * @covers WP_REST_Navigation_Fallback_Controller
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */

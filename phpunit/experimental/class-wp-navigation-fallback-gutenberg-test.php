@@ -1,14 +1,14 @@
 <?php
 /**
- * Tests WP_Navigation_Fallbacks_Gutenberg
+ * Tests WP_Navigation_Fallback_Gutenberg
  *
  * @package WordPress
  */
 
 /**
- * Tests for the WP_Navigation_Fallbacks_Gutenberg class.
+ * Tests for the WP_Navigation_Fallback_Gutenberg class.
  */
-class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
+class WP_Navigation_Fallback_Gutenberg_Test extends WP_UnitTestCase {
 
 	protected static $admin_user;
 	protected static $editor_user;
@@ -26,12 +26,12 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_it_exists() {
-		$this->assertTrue( class_exists( 'WP_Navigation_Fallbacks_Gutenberg' ), 'WP_Navigation_Fallbacks_Gutenberg class should exist.' );
+		$this->assertTrue( class_exists( 'WP_Navigation_Fallback_Gutenberg' ), 'WP_Navigation_Fallback_Gutenberg class should exist.' );
 	}
 
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -54,7 +54,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		unregister_block_type( 'core/page-list' );
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -67,11 +67,11 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function test_should_handle_consecutive_invocations() {
 		// Invoke the method multiple times to ensure that it doesn't create a new fallback menu on each invocation.
-		WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
-		WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
+		WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		// Assert on the final invocation.
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -100,7 +100,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -129,7 +129,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -180,7 +180,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 		$locations['header']  = $another_menu_id;
 		set_theme_mod( 'nav_menu_locations', $locations );
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -214,7 +214,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -248,7 +248,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 
@@ -276,7 +276,7 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data, 'Response should be of the correct type.' );
 

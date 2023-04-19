@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Navigation_Fallbacks_Gutenberg class
+ * WP_Navigation_Fallback_Gutenberg class
  *
  * Manages fallback behavior for Navigation menus.
  *
@@ -19,7 +19,7 @@ require __DIR__ . '/class-wp-nav-menu-conversion-gutenberg.php';
  *
  * @access public
  */
-class WP_Navigation_Fallbacks_Gutenberg {
+class WP_Navigation_Fallback_Gutenberg {
 
 	/**
 	 * Gets (and/or creates) an appropriate fallback Navigation Menu.
@@ -56,7 +56,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	private static function get_most_recently_published_navigation() {
 
-		
+
 		$parsed_args = array(
 			'post_type'              => 'wp_navigation',
 			'no_found_rows'          => true,
