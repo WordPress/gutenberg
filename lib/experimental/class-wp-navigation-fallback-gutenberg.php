@@ -12,7 +12,7 @@
 /**
  * Import dependencies.
  */
-require __DIR__ . '/class-wp-nav-menu-conversion-gutenberg.php';
+require __DIR__ . '/class-wp-classic-to-block-menu-converter.php';
 
 /**
  * Manages fallback behavior for Navigation menus.
@@ -91,7 +91,7 @@ class WP_Navigation_Fallback_Gutenberg {
 		}
 
 		// Todo: inject as dependency.
-		$menu_converter = new WP_Nav_Menu_Conversion_Gutenberg( $classic_nav_menu );
+		$menu_converter = new WP_Classic_To_Block_Menu_Converter( $classic_nav_menu );
 
 		// If we have a classic menu then convert it to blocks.
 		$classic_nav_menu_blocks = $menu_converter->convert();
