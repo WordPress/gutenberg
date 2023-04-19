@@ -37,12 +37,14 @@ class WP_Navigation_Fallback_Gutenberg {
 		$fallback = static::create_classic_menu_fallback();
 
 		if ( $fallback && ! is_wp_error( $fallback ) ) {
+			// Return the newly created fallback post object which will now be the most recently created navigation menu.
 			return $fallback instanceof WP_Post ? $fallback : static::get_most_recently_published_navigation();
 		}
 
 		$fallback = static::create_default_fallback();
 
 		if ( $fallback && ! is_wp_error( $fallback ) ) {
+			// Return the newly created fallback post object which will now be the most recently created navigation menu.
 			return $fallback instanceof WP_Post ? $fallback : static::get_most_recently_published_navigation();
 		}
 
