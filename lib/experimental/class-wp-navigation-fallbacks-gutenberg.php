@@ -28,19 +28,22 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	public static function get_fallback_menu() {
 
-		$fallback_sequence = array(
-			'get_most_recently_published_navigation',
-			'create_classic_menu_fallback',
-			'create_default_fallback',
-		);
+		$fallback = static::get_most_recently_published_navigation();
 
-		// go through each of the fallbacks and return the first one that works.
-		foreach ( $fallback_sequence as $fallback ) {
-			$navigation_post = static::$fallback();
+		if ( $fallback && ! is_wp_error( $fallback ) ) {
+			return $fallback;
+		}
 
-			if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
-				return $navigation_post instanceof WP_Post ? $navigation_post : static::get_most_recently_published_navigation();
-			}
+		$fallback = static::create_classic_menu_fallback();
+
+		if ( $fallback && ! is_wp_error( $fallback ) ) {
+			return $fallback instanceof WP_Post ? $fallback : static::get_most_recently_published_navigation();
+		}
+
+		$fallback = static::create_default_fallback();
+
+		if ( $fallback && ! is_wp_error( $fallback ) ) {
+			return $fallback instanceof WP_Post ? $fallback : static::get_most_recently_published_navigation();
 		}
 
 		return null;
