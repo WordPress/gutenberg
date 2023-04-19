@@ -111,13 +111,20 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockAriaLabel = isLocked
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the locked block.
-				__( '%s (locked)' ),
-				blockTitle
-		  )
-		: blockTitle;
+	let blockAriaLabel = __( 'Link' );
+	if ( blockInformation ) {
+		blockAriaLabel = isLocked
+			? sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the locked block.
+					__( '%s link (locked)' ),
+					blockInformation.title
+			  )
+			: sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the block.
+					__( '%s link' ),
+					blockInformation.title
+			  );
+	}
 
 	const settingsAriaLabel = sprintf(
 		// translators: %s: The title of the block.
@@ -246,7 +253,10 @@ function ListViewBlock( {
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
+				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected || forceSelectionContentLock }
+				aria-expanded={ isContentLocked ? undefined : isExpanded }
+				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
