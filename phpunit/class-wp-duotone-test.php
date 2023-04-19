@@ -7,14 +7,6 @@
  */
 
 class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
-	/**
-	 * Cleans up CSS added to block-supports from duotone styles. We need to do this
-	 * in order to avoid impacting other tests.
-	 */
-	public static function wpTearDownAfterClass() {
-		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
-	}
-
 	public function test_gutenberg_render_duotone_support_preset() {
 		$block         = array(
 			'blockName' => 'core/image',
@@ -22,7 +14,8 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '<figure class="wp-block-image size-full wp-duotone-blue-orange"><img src="/my-image.jpg" /></figure>';
-		$this->assertSame( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$instance      = new WP_Duotone_Gutenberg();
+		$this->assertSame( $expected, $instance->render_duotone_support( $block_content, $block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_css() {
@@ -32,7 +25,8 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-block-image size-full wp-duotone-unset-\d+"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$instance      = new WP_Duotone_Gutenberg();
+		$this->assertMatchesRegularExpression( $expected, $instance->render_duotone_support( $block_content, $block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_custom() {
@@ -42,7 +36,8 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-block-image size-full wp-duotone-ffffff-000000-\d+"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
+		$instance      = new WP_Duotone_Gutenberg();
+		$this->assertMatchesRegularExpression( $expected, $instance->render_duotone_support( $block_content, $block ) );
 	}
 
 	public function data_get_slug_from_attribute() {
@@ -65,26 +60,6 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_get_slug_from_attribute( $data_attr, $expected ) {
 
 		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'get_slug_from_attribute' );
-		$reflection->setAccessible( true );
-
-		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
-	}
-
-	public function data_is_preset() {
-		return array(
-			'pipe-slug'                       => array( 'var:preset|duotone|blue-orange', true ),
-			'css-var'                         => array( 'var(--wp--preset--duotone--blue-orange)', true ),
-			'css-var-invalid-slug-chars'      => array( 'var(--wp--preset--duotone--.)', false ),
-			'css-var-missing-end-parenthesis' => array( 'var(--wp--preset--duotone--blue-orange', false ),
-			'invalid'                         => array( 'not a valid attribute', false ),
-		);
-	}
-
-	/**
-	 * @dataProvider data_is_preset
-	 */
-	public function test_is_preset( $data_attr, $expected ) {
-		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'is_preset' );
 		$reflection->setAccessible( true );
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
