@@ -34,7 +34,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			"Focus to block toolbar when block toolbar isn't visible"
 		);
 		await toolbarUtils.moveToToolbarShortcut();
-		await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+		await expect( toolbarUtils.blockToolbarParagraphButton ).toBeFocused();
 		await expect( toolbarUtils.documentToolbarTooltip ).not.toBeVisible();
 
 		// Test: Focus block toolbar from block content when block toolbar is visible
@@ -46,7 +46,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		// https://github.com/WordPress/gutenberg/pull/49644 won't surface in the e2e tests.
 		await editor.showBlockToolbar();
 		await toolbarUtils.moveToToolbarShortcut();
-		await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+		await expect( toolbarUtils.blockToolbarParagraphButton ).toBeFocused();
 		await expect( toolbarUtils.documentToolbarTooltip ).not.toBeVisible();
 	} );
 
@@ -94,7 +94,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			// Test: Focus the block toolbar from empty block
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarShowDocumentButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -105,7 +107,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				'Focus the block toolbar from paragraph block with content'
 			);
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarShowDocumentButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -125,7 +129,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarShowDocumentButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -137,7 +143,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			);
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarShowDocumentButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -170,7 +178,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			// Test: Focus the block toolbar from empty block
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -181,7 +191,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				'Focus the block toolbar from paragraph block with content'
 			);
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -201,7 +213,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -213,7 +227,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			);
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
-			await expect( toolbarUtils.blockToolbarButton ).toBeFocused();
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeFocused();
 			await expect(
 				toolbarUtils.documentToolbarTooltip
 			).not.toBeVisible();
@@ -233,8 +249,12 @@ class ToolbarUtils {
 		this.documentToolbarTooltip = this.page.locator(
 			'text=Toggle block inserter'
 		);
-		this.blockToolbarButton = this.page.getByRole( 'button', {
+		this.blockToolbarParagraphButton = this.page.getByRole( 'button', {
 			name: 'Paragraph',
+			exact: true,
+		} );
+		this.blockToolbarShowDocumentButton = this.page.getByRole( 'button', {
+			name: 'Show document tools',
 			exact: true,
 		} );
 	}
