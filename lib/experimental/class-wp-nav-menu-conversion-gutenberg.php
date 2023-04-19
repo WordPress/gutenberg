@@ -43,10 +43,12 @@ class WP_Nav_Menu_Conversion_Gutenberg {
 
 		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items );
 
-		$inner_blocks = $this->to_blocks(
-			isset( $menu_items_by_parent_id[0] )
+		$first_menu_item = isset( $menu_items_by_parent_id[0] )
 			? $menu_items_by_parent_id[0]
-			: array(),
+			: array();
+
+		$inner_blocks = $this->to_blocks(
+			$first_menu_item,
 			$menu_items_by_parent_id
 		);
 
