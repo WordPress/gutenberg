@@ -63,6 +63,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {?boolean}       props.showAppender      Flag to show or hide the block appender. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param {string}         props.rootClientId      The client id of the root block from which we determine the blocks to show in the list.
+ * @param {string}         props.description       Optional accessible description for the tree grid component.
  * @param {Ref}            ref                     Forwarded ref
  */
 function ListViewComponent(
@@ -74,6 +75,7 @@ function ListViewComponent(
 		showAppender = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
+		description,
 	},
 	ref
 ) {
@@ -229,6 +231,8 @@ function ListViewComponent(
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
+				// eslint-disable-next-line jsx-a11y/aria-props
+				aria-description={ description }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
