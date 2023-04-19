@@ -39,6 +39,13 @@
  */
 class WP_Duotone_Gutenberg {
 	/**
+	 * Container for the main instance of the class.
+	 *
+	 * @var WP_Duotone_Gutenberg|null
+	 */
+	private static $instance = null;
+
+	/**
 	 * Block names from global, theme, and custom styles that use duotone presets and the slug of
 	 * the preset they are using.
 	 *
@@ -50,7 +57,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static $global_styles_block_names = array();
+	private $global_styles_block_names = array();
 
 	/**
 	 * An array of duotone filter data from global, theme, and custom presets.
@@ -70,7 +77,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static $global_styles_presets = array();
+	private $global_styles_presets = array();
 
 	/**
 	 * All of the duotone filter data from presets for CSS custom properties on
@@ -87,7 +94,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static $used_global_styles_presets = array();
+	private $used_global_styles_presets = array();
 
 	/**
 	 * All of the duotone filter data for SVGs on the page. Includes both
@@ -108,7 +115,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static $used_svg_filter_data = array();
+	private $used_svg_filter_data = array();
 
 	/**
 	 * All of the block CSS declarations for styles on the page.
@@ -126,7 +133,22 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static $block_css_declarations = array();
+	private $block_css_declarations = array();
+
+	/**
+	 * Returns an instance of the WP_Duotone_Gutenberg class, or create one if none exist yet.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return WP_Duotone_Gutenberg The main instance.
+	 */
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
 
 	/**
 	 * Direct port of colord's clamp function. Using min/max instead of
@@ -459,19 +481,6 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
-	 * Check if we have a valid duotone preset.
-	 *
-	 * @param string $duotone_attr The duotone attribute from a block.
-	 * @return bool True if the duotone preset present and valid.
-	 */
-	private static function is_preset( $duotone_attr ) {
-		$slug      = self::get_slug_from_attribute( $duotone_attr );
-		$filter_id = self::get_filter_id( $slug );
-
-		return array_key_exists( $filter_id, self::$global_styles_presets );
-	}
-
-	/**
 	 * Get the CSS variable name for a duotone preset.
 	 *
 	 * @param string $slug The slug of the duotone preset.
@@ -669,7 +678,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $duotone_selector The block's duotone selector. e.g. '.wp-block-image img'.
 	 * @param string $filter_value     The filter CSS value. e.g. 'url(#wp-duotone-000000-ffffff-2)' or 'unset'.
 	 */
-	private static function enqueue_block_css( $filter_id, $duotone_selector, $filter_value ) {
+	private function enqueue_block_css( $filter_id, $duotone_selector, $filter_value ) {
 		// Build the CSS selectors to which the filter will be applied.
 		$selectors = explode( ',', $duotone_selector );
 
@@ -683,7 +692,7 @@ class WP_Duotone_Gutenberg {
 
 		$selector = implode( ', ', $selectors_scoped );
 
-		self::$block_css_declarations[] = array(
+		$this->block_css_declarations[] = array(
 			'selector'     => $selector,
 			'declarations' => array(
 				'filter' => $filter_value,
@@ -699,9 +708,9 @@ class WP_Duotone_Gutenberg {
 	 * @param string $filter_value     The filter CSS value. e.g. 'url(#wp-duotone-000000-ffffff-2)' or 'unset'.
 	 * @param array  $filter_data      Duotone filter data with 'slug' and 'colors' keys.
 	 */
-	private static function enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data ) {
-		self::$used_svg_filter_data[ $filter_id ] = $filter_data;
-		self::enqueue_block_css( $filter_id, $duotone_selector, $filter_value );
+	private function enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data ) {
+		$this->used_svg_filter_data[ $filter_id ] = $filter_data;
+		$this->enqueue_block_css( $filter_id, $duotone_selector, $filter_value );
 	}
 
 	/**
@@ -711,9 +720,9 @@ class WP_Duotone_Gutenberg {
 	 * @param string $duotone_selector The block's duotone selector. e.g. '.wp-block-image img'.
 	 * @param string $filter_value     The filter CSS value. e.g. 'url(#wp-duotone-blue-orange)' or 'unset'.
 	 */
-	private static function enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value ) {
-		self::$used_global_styles_presets[ $filter_id ] = self::$global_styles_presets[ $filter_id ];
-		self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, self::$global_styles_presets[ $filter_id ] );
+	private function enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value ) {
+		$this->used_global_styles_presets[ $filter_id ] = $this->global_styles_presets[ $filter_id ];
+		$this->enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $this->global_styles_presets[ $filter_id ] );
 	}
 
 	/**
@@ -723,7 +732,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @param WP_Block_Type $block_type Block Type.
 	 */
-	public static function register_duotone_support( $block_type ) {
+	public function register_duotone_support( $block_type ) {
 		$has_duotone_support = false;
 		if ( property_exists( $block_type, 'supports' ) ) {
 			// Previous `color.__experimentalDuotone` support flag is migrated
@@ -750,7 +759,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 */
-	public static function set_global_styles_presets() {
+	public function set_global_styles_presets() {
 		// Get the per block settings from the theme.json.
 		$tree              = gutenberg_get_global_settings();
 		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
@@ -759,17 +768,17 @@ class WP_Duotone_Gutenberg {
 			foreach ( $presets as $preset ) {
 				$filter_id = self::get_filter_id( _wp_to_kebab_case( $preset['slug'] ) );
 
-				self::$global_styles_presets[ $filter_id ] = $preset;
+				$this->global_styles_presets[ $filter_id ] = $preset;
 			}
 		}
 	}
 
 	/**
-	 * Scrape all block names from global styles and store in self::$global_styles_block_names
+	 * Scrape all block names from global styles and store in $this->global_styles_block_names
 	 *
 	 * @since 6.3.0
 	 */
-	public static function set_global_style_block_names() {
+	public function set_global_style_block_names() {
 		// Get the per block settings from the theme.json.
 		$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
@@ -792,13 +801,13 @@ class WP_Duotone_Gutenberg {
 			$slug = self::get_slug_from_attribute( $duotone_attr );
 
 			if ( $slug && $slug !== $duotone_attr ) {
-				self::$global_styles_block_names[ $block_node['name'] ] = $slug;
+				$this->global_styles_block_names[ $block_node['name'] ] = $slug;
 			}
 		}
 	}
 
 	/**
-	 * Render out the duotone CSS styles and SVG.
+	 * Scrape all block names from global styles and store in $this->global_styles_block_names
 	 *
 	 * @since 6.3.0
 	 *
@@ -806,12 +815,12 @@ class WP_Duotone_Gutenberg {
 	 * @param  array  $block         Block object.
 	 * @return string                Filtered block content.
 	 */
-	public static function render_duotone_support( $block_content, $block ) {
+	public function render_duotone_support( $block_content, $block ) {
 		$duotone_selector = self::get_selector( $block['blockName'] );
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
 		$has_duotone_attribute     = isset( $block['attrs']['style']['color']['duotone'] );
-		$has_global_styles_duotone = array_key_exists( $block['blockName'], self::$global_styles_block_names );
+		$has_global_styles_duotone = array_key_exists( $block['blockName'], $this->global_styles_block_names );
 
 		if (
 			empty( $block_content ) ||
@@ -830,7 +839,7 @@ class WP_Duotone_Gutenberg {
 			// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 
 			$duotone_attr = $block['attrs']['style']['color']['duotone'];
-			$is_preset    = is_string( $duotone_attr ) && self::is_preset( $duotone_attr );
+			$is_preset    = is_string( $duotone_attr ) && array_key_exists( self::get_filter_id( self::get_slug_from_attribute( $duotone_attr ) ), $this->global_styles_presets );
 			$is_css       = is_string( $duotone_attr ) && ! $is_preset;
 			$is_custom    = is_array( $duotone_attr );
 
@@ -840,7 +849,7 @@ class WP_Duotone_Gutenberg {
 				$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
 
 				// CSS custom property, SVG filter, and block CSS.
-				self::enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
+				$this->enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
 
 			} elseif ( $is_css ) {
 				$slug         = wp_unique_id( sanitize_key( $duotone_attr . '-' ) ); // e.g. 'unset-1'.
@@ -848,7 +857,7 @@ class WP_Duotone_Gutenberg {
 				$filter_value = $duotone_attr; // e.g. 'unset'.
 
 				// Just block CSS.
-				self::enqueue_block_css( $filter_id, $duotone_selector, $filter_value );
+				$this->enqueue_block_css( $filter_id, $duotone_selector, $filter_value );
 			} elseif ( $is_custom ) {
 				$slug         = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) ); // e.g. '000000-ffffff-2'.
 				$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-000000-ffffff-2'.
@@ -859,15 +868,15 @@ class WP_Duotone_Gutenberg {
 				);
 
 				// SVG filter and block CSS.
-				self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
+				$this->enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 			}
 		} elseif ( $has_global_styles_duotone ) {
-			$slug         = self::$global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
+			$slug         = $this->global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
 			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.
 			$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
 
 			// CSS custom property, SVG filter, and block CSS.
-			self::enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
+			$this->enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
 		}
 
 		// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
@@ -884,10 +893,10 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 */
-	public static function output_block_styles() {
-		if ( ! empty( self::$block_css_declarations ) ) {
+	public function output_block_styles() {
+		if ( ! empty( $this->block_css_declarations ) ) {
 			gutenberg_style_engine_get_stylesheet_from_css_rules(
-				self::$block_css_declarations,
+				$this->block_css_declarations,
 				array(
 					'context' => 'block-supports',
 				)
@@ -901,9 +910,9 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 */
-	public static function output_global_styles() {
-		if ( ! empty( self::$used_global_styles_presets ) ) {
-			wp_add_inline_style( 'global-styles', self::get_global_styles_presets( self::$used_global_styles_presets ) );
+	public function output_global_styles() {
+		if ( ! empty( $this->used_global_styles_presets ) ) {
+			wp_add_inline_style( 'global-styles', self::get_global_styles_presets( $this->used_global_styles_presets ) );
 		}
 	}
 
@@ -912,14 +921,14 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 */
-	public static function output_footer_assets() {
-		if ( ! empty( self::$used_svg_filter_data ) ) {
-			echo self::get_svg_definitions( self::$used_svg_filter_data );
+	public function output_footer_assets() {
+		if ( ! empty( $this->used_svg_filter_data ) ) {
+			echo self::get_svg_definitions( $this->used_svg_filter_data );
 		}
 
 		// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
-		if ( ! wp_is_block_theme() && ! empty( self::$used_global_styles_presets ) ) {
-			wp_add_inline_style( 'core-block-supports', self::get_global_styles_presets( self::$used_global_styles_presets ) );
+		if ( ! wp_is_block_theme() && ! empty( $this->used_global_styles_presets ) ) {
+			wp_add_inline_style( 'core-block-supports', self::get_global_styles_presets( $this->used_global_styles_presets ) );
 		}
 	}
 
@@ -933,15 +942,15 @@ class WP_Duotone_Gutenberg {
 	 * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
 	 * @return array The editor settings with duotone SVGs and CSS custom properties.
 	 */
-	public static function add_editor_settings( $settings ) {
-		if ( ! empty( self::$global_styles_presets ) ) {
+	public function add_editor_settings( $settings ) {
+		if ( ! empty( $this->global_styles_presets ) ) {
 			if ( ! isset( $settings['styles'] ) ) {
 				$settings['styles'] = array();
 			}
 
 			$settings['styles'][] = array(
 				// For the editor we can add all of the presets by default.
-				'assets'         => self::get_svg_definitions( self::$global_styles_presets ),
+				'assets'         => self::get_svg_definitions( $this->global_styles_presets ),
 				// The 'svgs' type is new in 6.3 and requires the corresponding JS changes in the EditorStyles component to work.
 				'__unstableType' => 'svgs',
 				// These styles not generated by global styles, so this must be false or they will be stripped out in gutenberg_get_block_editor_settings.
@@ -950,7 +959,7 @@ class WP_Duotone_Gutenberg {
 
 			$settings['styles'][] = array(
 				// For the editor we can add all of the presets by default.
-				'css'            => self::get_global_styles_presets( self::$global_styles_presets ),
+				'css'            => self::get_global_styles_presets( $this->global_styles_presets ),
 				// This must be set and must be something other than 'theme' or they will be stripped out in the post editor <Editor> component.
 				'__unstableType' => 'presets',
 				// These styles are no longer generated by global styles, so this must be false or they will be stripped out in gutenberg_get_block_editor_settings.
@@ -972,7 +981,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @return array Filtered block type settings.
 	 */
-	public static function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
+	public function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
 		$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
 
 		if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
