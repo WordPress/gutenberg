@@ -45,7 +45,10 @@
 			}
 		},
 		"spacing": {
-			"blockGap": true
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		}
 	},
 	"style": "wp-block-post-template",
