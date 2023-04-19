@@ -26,24 +26,24 @@ async function setupPage() {
 	] );
 }
 
-// Before every test suite run, delete all content created by the test. This ensures
-// other posts/comments/etc. aren't dirtying tests and tests don't depend on
-// each other's side-effects.
+// Before every test suite run, delete all content created by the test. This
+// ensures other posts/comments/etc. aren't dirtying tests and tests don't
+// depend on each other's side-effects.
 beforeAll( async () => {
 	enablePageDialogAccept();
 
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
+	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 	await clearLocalStorage();
 	await setupPage();
-	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );
 
 afterEach( async () => {
 	// Clear localStorage between tests so that the next test starts clean.
 	await clearLocalStorage();
-	// Close the previous page entirely and create a new page, so that the next test
-	// isn't affected by page unload work.
+	// Close the previous page entirely and create a new page, so that the next
+	// test isn't affected by page unload work.
 	await page.close();
 	page = await browser.newPage();
 	// Set up testing config on new page.

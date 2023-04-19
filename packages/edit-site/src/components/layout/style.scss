@@ -49,6 +49,7 @@
 }
 
 .edit-site-layout__content {
+	height: 100%;
 	flex-grow: 1;
 	display: flex;
 }
@@ -134,6 +135,7 @@
 
 		& > div {
 			border-radius: 0;
+			box-shadow: none;
 		}
 	}
 }

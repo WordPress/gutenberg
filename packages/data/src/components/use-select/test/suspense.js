@@ -14,8 +14,6 @@ import {
 } from '@wordpress/data';
 import { Component, Suspense } from '@wordpress/element';
 
-jest.useRealTimers();
-
 function createRegistryWithStore() {
 	const initialState = {
 		prefix: 'pre-',

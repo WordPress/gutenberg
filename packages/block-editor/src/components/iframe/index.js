@@ -71,7 +71,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'dragover' ];
+	const eventTypes = [ 'dragover', 'mousemove' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );

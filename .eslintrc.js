@@ -81,6 +81,7 @@ const restrictedImports = [
 			'flowRight',
 			'forEach',
 			'fromPairs',
+			'groupBy',
 			'has',
 			'identity',
 			'includes',
@@ -350,7 +351,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'error',

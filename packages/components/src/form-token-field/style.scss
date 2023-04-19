@@ -1,7 +1,6 @@
 .components-form-token-field__input-container {
 	@include input-control();
 	width: 100%;
-	margin: 0 0 $grid-unit-10 0;
 	padding: 0;
 	cursor: text;
 
@@ -46,12 +45,6 @@
 	.components-form-token-field__token + input[type="text"].components-form-token-field__input {
 		width: auto;
 	}
-}
-
-.components-form-token-field__help {
-	font-size: $helptext-font-size;
-	font-style: normal;
-	color: $gray-700;
 }
 
 // Tokens

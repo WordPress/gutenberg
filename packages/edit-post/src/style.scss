@@ -99,6 +99,15 @@ body.block-editor-page {
 
 @include wordpress-admin-schemes();
 
+.interface-interface-skeleton__header .edit-post-header {
+	@supports (scrollbar-gutter: stable) {
+		// The scrollbar-gutter property ensures space is reserved for the scrollbar to appear,
+		// when scrollbars are set to be always visible. This ensure icons stay visually aligned.
+		scrollbar-gutter: stable;
+		overflow: hidden;
+	}
+}
+
 // The edit-site package adds or removes the sidebar when it's opened or closed.
 // The edit-post package, however, always has the sidebar in the canvas.
 // These edit-post specific rules ensures there isn't a border on the right of
@@ -109,6 +118,7 @@ body.block-editor-page {
 	.is-sidebar-opened & {
 		@include break-medium() {
 			border-left: $border-width solid $gray-200;
+			overflow: hidden scroll;
 		}
 	}
 }

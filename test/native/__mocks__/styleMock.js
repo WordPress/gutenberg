@@ -175,4 +175,7 @@ module.exports = {
 	innerAppender: {
 		marginLeft: 8,
 	},
+	mediaAreaPadding: {
+		width: 12,
+	},
 };

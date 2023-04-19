@@ -138,7 +138,6 @@ export function TypographyPanel( {
 		<StylesTypographyPanel
 			as={ TypographyInspectorControl }
 			panelId={ clientId }
-			name={ name }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
