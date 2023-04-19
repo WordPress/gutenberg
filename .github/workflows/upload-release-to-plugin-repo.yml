@@ -23,7 +23,7 @@ jobs:
                   GITHUB_REF: ${{ github.ref }}
               run: |
                   latestPublishedVersion=$(echo "$GITHUB_REF" | sed -E 's/refs\/tags\/(v?)([0-9.]+)/\2/')
-                  latestVersionInCoreRepo="${{ stepss.compute_latest_version_in_core_repo.outputs.version }}"
+                  latestVersionInCoreRepo="${{ steps.compute_latest_version_in_core_repo.outputs.version }}"
 
                   # Determines if the first version string is greater than the second version string.
                   #
