@@ -240,8 +240,8 @@ function Navigation( {
 
 				/**
 				 *  This fallback displays (both in editor and on front)
-				 *  a list of pages only if no menu (user assigned or
-				 *  automatically picked) is available.
+				 
+				
 				 *  The fallback should not request a save (entity dirty state)
 				 *  nor to be undoable, hence why it is marked as non persistent
 				 */
