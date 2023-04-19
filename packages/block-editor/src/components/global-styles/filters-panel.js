@@ -96,7 +96,6 @@ const popoverProps = {
 	shift: true,
 	className: 'block-editor-duotone-control__popover',
 	headerTitle: __( 'Duotone' ),
-	variant: 'toolbar',
 };
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
