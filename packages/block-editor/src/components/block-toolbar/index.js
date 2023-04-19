@@ -99,7 +99,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
