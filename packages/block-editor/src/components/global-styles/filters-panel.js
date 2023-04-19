@@ -98,18 +98,16 @@ const popoverProps = {
 	headerTitle: __( 'Duotone' ),
 };
 
-const LabeledColorIndicators = ( { indicators, label } ) => (
+const LabeledColorIndicator = ( { indicator, label } ) => (
 	<HStack justify="flex-start">
 		<ZStack isLayered={ false } offset={ -8 }>
-			{ indicators.map( ( indicator, index ) => (
-				<Flex key={ index } expanded={ false }>
-					{ indicator === 'unset' || ! indicator ? (
-						<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
-					) : (
-						<DuotoneSwatch values={ indicator } />
-					) }
-				</Flex>
-			) ) }
+			<Flex expanded={ false }>
+				{ indicator === 'unset' || ! indicator ? (
+					<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+				) : (
+					<DuotoneSwatch values={ indicator } />
+				) }
+			</Flex>
 		</ZStack>
 		<FlexItem title={ label }>{ label }</FlexItem>
 	</HStack>
@@ -193,8 +191,8 @@ export default function FiltersPanel( {
 							return (
 								<ItemGroup isBordered isSeparated>
 									<Button { ...toggleProps }>
-										<LabeledColorIndicators
-											indicators={ [ duotone ] }
+										<LabeledColorIndicator
+											indicator={ duotone }
 											label={ __( 'Duotone' ) }
 										/>
 									</Button>
