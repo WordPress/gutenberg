@@ -69,7 +69,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
-	public function test_should_return_fallback_navigation_menu() {
+	public function test_get_item() {
 
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
@@ -95,7 +95,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
-	public function test_should_provide_schema() {
+	public function test_get_item_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -151,13 +151,6 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	/**
 	 * @doesNotPerformAssertions
 	 */
-	public function test_get_item() {
-		// Controller does not implement get_item().
-	}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
 	public function test_create_item() {
 		// Controller does not implement create_item().
 	}
@@ -176,11 +169,6 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 		// Controller does not implement delete_item().
 	}
 
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_get_item_schema() {
-		// The controller's schema is hardcoded, so tests would not be meaningful.
-	}
+
 
 }
