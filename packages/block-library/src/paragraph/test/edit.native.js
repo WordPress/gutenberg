@@ -575,4 +575,68 @@ describe( 'Paragraph block', () => {
 		const gradientButton = screen.queryByLabelText( 'Gradient' );
 		expect( gradientButton ).toBeNull();
 	} );
+
+	it( 'should set a theme text color', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Text color settings
+		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( '#2411a4' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"textColor":"tertiary"} -->
+		<p class="has-tertiary-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should show the contrast check warning', async () => {
+		// Arrange
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:paragraph {"backgroundColor":"white","textColor":"white"} -->
+			<p class="has-white-color has-white-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
+			<!-- /wp:paragraph -->`,
+		} );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Assert
+		const contrastCheckElement = screen.getByText(
+			/This color combination/
+		);
+		expect( contrastCheckElement ).toBeDefined();
+	} );
 } );
