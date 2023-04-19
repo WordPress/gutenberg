@@ -5,7 +5,9 @@ store( {
 	actions: {
 		core: {
 			imageZoom: ( { context } ) => {
+				context.core.initialized = true;
 				context.core.isZoomed = ! context.core.isZoomed;
+
 				context.core.handleScroll = () => {
 					context.core.isZoomed = false;
 					window.removeEventListener(
@@ -33,7 +35,6 @@ store( {
 				// Function to handle the ESC key press
 				function handleEscKey( event ) {
 					if ( event.key === 'Escape' || event.keyCode === 27 ) {
-						console.log( 'ESC key pressed' );
 						// Add any custom logic you want to execute when the ESC key is pressed
 						context.core.isZoomed = false;
 					}
