@@ -7,26 +7,17 @@ on:
 jobs:
     compute_should_update_trunk:
         runs-on: ubuntu-latest
+        outputs:
+            should_update_trunk: ${{ steps.compute-should-update-trunk.outputs.should_update_trunk }}
         steps:
             - name: Decide if trunk or tag
               id: compute-should-update-trunk
               uses: actions/github-script@v6
               with:
                   script: |
-                      const os = require("os");
-                      const fs = require("fs");
                       const https = require('https');
                       const repo = process.env.GITHUB_REPOSITORY;
                       const githubRef = context.ref;
-
-                      // Define a function to output the result of this action
-                      // We don't use the one from "actions/core" because we
-                      // don't want to install the npm package which would add
-                      // to the workflow runtime.
-                      function setOutput(key, val) {
-                        const out = process.env["GITHUB_OUTPUT"];
-                        fs.appendFileSync(out, `${key}=${val}${os.EOL}`);
-                      }
 
                       function fetchJson(url) {
                         return new Promise((resolve, reject) => {
@@ -65,7 +56,7 @@ jobs:
                         // GREATER than the version published in the WP plugins repo. If not, then it
                         // will upload it as a new tag.
                         const shouldUpdateTrunk = githubRef === `refs/tags/${latestVersionInGithub}` && isLatestVersionInGithubMoreRecentThanInCoreRepo;
-                        setOutput('should_update_trunk', shouldUpdateTrunk)
+                        core.setOutput('should_update_trunk', shouldUpdateTrunk)
                       })();
 
     get-release-branch:
