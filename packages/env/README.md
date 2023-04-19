@@ -350,7 +350,8 @@ Options:
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --env-cwd  The command's working directory inside of the container. Paths
-             without a leading slash are relative to the WordPress root.[string]
+             without a leading slash are relative to the WordPress root.
+                                                         [string] [default: "."]
 ```
 
 For example:
