@@ -6,7 +6,9 @@ This guide takes you through creating a basic block to display a message in a po
 
 There are two main types of blocks: static and dynamic, this guide focuses on static blocks. A static block is used to insert HTML content into the post and save it with the post. A dynamic block builds the content on the fly when rendered on the front end, see the [dynamic blocks guide](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md).
 
+<div class="callout callout-alert">
 This guide focuses on just the block, see the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for a complete setup.
+</div>
 
 ## Before you start
 
@@ -141,6 +143,7 @@ In order to register the block, an asset php file is required in the same direct
 {% JSX %}
 
 Build the scripts and asset file which is used to keep track of dependencies and the build version.
+
 ```bash
 npm run build
 ```

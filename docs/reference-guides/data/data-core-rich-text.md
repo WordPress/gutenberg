@@ -21,8 +21,7 @@ _Returns_
 
 ### getFormatTypeForBareElement
 
-Gets the format type, if any, that can handle a bare element (without a
-data-format-type attribute), given the tag name of this element.
+Gets the format type, if any, that can handle a bare element (without a data-format-type attribute), given the tag name of this element.
 
 _Parameters_
 
@@ -66,8 +65,7 @@ _Returns_
 
 ### addFormatTypes
 
-Returns an action object used in signalling that format types have been
-added.
+Returns an action object used in signalling that format types have been added.
 
 _Parameters_
 

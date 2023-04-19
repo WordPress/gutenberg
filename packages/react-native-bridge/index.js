@@ -297,6 +297,10 @@ export function fetchRequest( path, enableCaching = true ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
+export function postRequest( path, data = {} ) {
+	return RNReactNativeGutenbergBridge.postRequest( path, data );
+}
+
 export function showUserSuggestions() {
 	return RNReactNativeGutenbergBridge.showUserSuggestions();
 }

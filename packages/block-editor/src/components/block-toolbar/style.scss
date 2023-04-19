@@ -152,19 +152,36 @@
 		.block-editor-block-icon {
 			width: 0 !important;
 			height: 0 !important;
+			min-width: 0 !important;
 		}
 	}
 
 	// Parent selector overrides
 
 	.block-editor-block-parent-selector__button {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+
 		.block-editor-block-icon {
 			width: 0;
 		}
 	}
 
-	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+	.block-editor-block-mover .block-editor-block-mover__move-button-container {
 		width: auto;
+	}
+
+	.block-editor-block-mover.is-horizontal {
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-mover-button {
+			padding-left: 6px;
+			padding-right: 6px;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
 	}
 
 	// Mover overrides.
@@ -179,15 +196,9 @@
 		border-left-color: $gray-200;
 	}
 
-	.block-editor-block-mover-button {
-		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
-		padding-left: $grid-unit !important;
-		padding-right: $grid-unit !important;
-	}
-
-	.block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 12px !important;
-		padding-right: 12px !important;
+	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
@@ -204,18 +215,10 @@
 
 		.block-editor-block-mover__move-button-container {
 			border-left: 1px solid $gray-900;
-
-			&::before {
-				content: "";
-				display: block;
-				height: 1px;
-				background: $gray-900;
-				order: 2;
-			}
 		}
 
 		.is-down-button.is-down-button.is-down-button {
-			order: 3;
+			order: 2;
 		}
 
 		.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container::before {

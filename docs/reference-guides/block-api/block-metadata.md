@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
@@ -28,9 +28,6 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 		"my-plugin/message": "message"
 	},
 	"usesContext": [ "groupId" ],
-	"editorSelectors": {
-		"root": ".editor-styles-wrapper .wp-block-my-plugin-notice"
-	},
 	"selectors": {
 		"root": ".wp-block-my-plugin-notice"
 	},
@@ -243,7 +240,7 @@ Setting `parent` lets a block require that it is only available when nested with
 { "ancestor": [ "my-block/product" ] }
 ```
 
-The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparrison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
 ### Icon
 
@@ -385,38 +382,6 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 }
 ```
 
-### Editor Selectors
-
--   Type: `object`
--   Optional
--   Localized: No
--   Property: `editorSelectors`
--   Default: `{}`
--   Since: `WordPress 6.3.0`
-
-Any editor specific custom CSS selectors, keyed by `root`, feature, or
-sub-feature, to be used when generating block styles for theme.json
-(global styles) stylesheets in the editor.
-
-Editor only selectors override those defined within the `selectors` property.
-
-See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
-
-```json
-{
-	"editorSelectors": {
-		"root": ".my-custom-block-selector",
-		"color": {
-			"text": ".my-custom-block-selector p"
-		},
-		"typography": {
-			"root": ".my-custom-block-selector > h2",
-			"text-decoration": ".my-custom-block-selector > h2 span"
-		}
-	}
-}
-```
-
 ### Selectors
 
 -   Type: `object`
@@ -431,7 +396,6 @@ when generating block styles for theme.json (global styles) stylesheets.
 Providing custom selectors allows more fine grained control over which styles
 apply to what block elements, e.g. applying typography styles only to an inner
 heading while colors are still applied on the outer block wrapper etc.
-
 
 See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 

@@ -96,7 +96,6 @@ export default function ListViewSidebar() {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			aria-label={ __( 'Document Overview' ) }
 			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
@@ -107,7 +106,7 @@ export default function ListViewSidebar() {
 			>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close Document Overview Sidebar' ) }
+					label={ __( 'Close' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 				<ul>

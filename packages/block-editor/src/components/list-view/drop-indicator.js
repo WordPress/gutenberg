@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
+import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
 
 export default function ListViewDropIndicator( {
@@ -40,33 +41,74 @@ export default function ListViewDropIndicator( {
 	// is undefined, so the indicator will appear after the rootBlockElement.
 	const targetElement = blockElement || rootBlockElement;
 
-	const getDropIndicatorIndent = useCallback( () => {
-		if ( ! rootBlockElement ) {
-			return 0;
-		}
+	const getDropIndicatorIndent = useCallback(
+		( targetElementRect ) => {
+			if ( ! rootBlockElement ) {
+				return 0;
+			}
 
-		// Calculate the indent using the block icon of the root block.
-		// Using a classname selector here might be flaky and could be
-		// improved.
-		const targetElementRect = targetElement.getBoundingClientRect();
-		const rootBlockIconElement = rootBlockElement.querySelector(
-			'.block-editor-block-icon'
-		);
-		const rootBlockIconRect = rootBlockIconElement.getBoundingClientRect();
-		return rootBlockIconRect.right - targetElementRect.left;
-	}, [ rootBlockElement, targetElement ] );
+			// Calculate the indent using the block icon of the root block.
+			// Using a classname selector here might be flaky and could be
+			// improved.
+			const rootBlockIconElement = rootBlockElement.querySelector(
+				'.block-editor-block-icon'
+			);
+			const rootBlockIconRect =
+				rootBlockIconElement.getBoundingClientRect();
+			return rootBlockIconRect.right - targetElementRect.left;
+		},
+		[ rootBlockElement ]
+	);
+
+	const getDropIndicatorWidth = useCallback(
+		( targetElementRect, indent ) => {
+			if ( ! targetElement ) {
+				return 0;
+			}
+
+			// Default to assuming that the width of the drop indicator
+			// should be the same as the target element.
+			let width = targetElement.offsetWidth;
+
+			// In deeply nested lists, where a scrollbar is present,
+			// the width of the drop indicator should be the width of
+			// the scroll container, minus the distance from the left
+			// edge of the scroll container to the left edge of the
+			// target element.
+			const scrollContainer = getScrollContainer(
+				targetElement,
+				'horizontal'
+			);
+
+			if ( scrollContainer ) {
+				const scrollContainerRect =
+					scrollContainer.getBoundingClientRect();
+
+				if ( scrollContainer.clientWidth < width ) {
+					width =
+						scrollContainer.clientWidth -
+						( targetElementRect.left - scrollContainerRect.left );
+				}
+			}
+
+			// Subtract the indent from the final width of the indicator.
+			return width - indent;
+		},
+		[ targetElement ]
+	);
 
 	const style = useMemo( () => {
 		if ( ! targetElement ) {
 			return {};
 		}
 
-		const indent = getDropIndicatorIndent();
+		const targetElementRect = targetElement.getBoundingClientRect();
+		const indent = getDropIndicatorIndent( targetElementRect );
 
 		return {
-			width: targetElement.offsetWidth - indent,
+			width: getDropIndicatorWidth( targetElementRect, indent ),
 		};
-	}, [ getDropIndicatorIndent, targetElement ] );
+	}, [ getDropIndicatorIndent, getDropIndicatorWidth, targetElement ] );
 
 	const popoverAnchor = useMemo( () => {
 		const isValidDropPosition =
@@ -81,10 +123,8 @@ export default function ListViewDropIndicator( {
 			ownerDocument: targetElement.ownerDocument,
 			getBoundingClientRect() {
 				const rect = targetElement.getBoundingClientRect();
-				const indent = getDropIndicatorIndent();
-
+				const indent = getDropIndicatorIndent( rect );
 				const left = rect.left + indent;
-				const right = rect.right;
 				let top = 0;
 				let bottom = 0;
 
@@ -97,13 +137,18 @@ export default function ListViewDropIndicator( {
 					bottom = rect.bottom;
 				}
 
-				const width = right - left;
+				const width = getDropIndicatorWidth( rect, indent );
 				const height = bottom - top;
 
 				return new window.DOMRect( left, top, width, height );
 			},
 		};
-	}, [ targetElement, dropPosition, getDropIndicatorIndent ] );
+	}, [
+		targetElement,
+		dropPosition,
+		getDropIndicatorIndent,
+		getDropIndicatorWidth,
+	] );
 
 	if ( ! targetElement ) {
 		return null;

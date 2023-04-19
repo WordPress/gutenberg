@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
 /**
@@ -82,33 +77,45 @@ export function updateSelectedCell( state, selection, updateCell ) {
 	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } =
 		selection;
 
-	return mapValues( tableSections, ( section, sectionName ) => {
-		if ( selectionSectionName && selectionSectionName !== sectionName ) {
-			return section;
-		}
-
-		return section.map( ( row, rowIndex ) => {
-			if ( selectionRowIndex && selectionRowIndex !== rowIndex ) {
-				return row;
+	return Object.fromEntries(
+		Object.entries( tableSections ).map( ( [ sectionName, section ] ) => {
+			if (
+				selectionSectionName &&
+				selectionSectionName !== sectionName
+			) {
+				return [ sectionName, section ];
 			}
 
-			return {
-				cells: row.cells.map( ( cellAttributes, columnIndex ) => {
-					const cellLocation = {
-						sectionName,
-						columnIndex,
-						rowIndex,
-					};
-
-					if ( ! isCellSelected( cellLocation, selection ) ) {
-						return cellAttributes;
+			return [
+				sectionName,
+				section.map( ( row, rowIndex ) => {
+					if ( selectionRowIndex && selectionRowIndex !== rowIndex ) {
+						return row;
 					}
 
-					return updateCell( cellAttributes );
+					return {
+						cells: row.cells.map(
+							( cellAttributes, columnIndex ) => {
+								const cellLocation = {
+									sectionName,
+									columnIndex,
+									rowIndex,
+								};
+
+								if (
+									! isCellSelected( cellLocation, selection )
+								) {
+									return cellAttributes;
+								}
+
+								return updateCell( cellAttributes );
+							}
+						),
+					};
 				} ),
-			};
-		} );
-	} );
+			];
+		} )
+	);
 }
 
 /**
@@ -224,31 +231,36 @@ export function insertColumn( state, { columnIndex } ) {
 		)
 	);
 
-	return mapValues( tableSections, ( section, sectionName ) => {
-		// Bail early if the table section is empty.
-		if ( isEmptyTableSection( section ) ) {
-			return section;
-		}
-
-		return section.map( ( row ) => {
-			// Bail early if the row is empty or it's an attempt to insert past
-			// the last possible index of the array.
-			if ( isEmptyRow( row ) || row.cells.length < columnIndex ) {
-				return row;
+	return Object.fromEntries(
+		Object.entries( tableSections ).map( ( [ sectionName, section ] ) => {
+			// Bail early if the table section is empty.
+			if ( isEmptyTableSection( section ) ) {
+				return [ sectionName, section ];
 			}
 
-			return {
-				cells: [
-					...row.cells.slice( 0, columnIndex ),
-					{
-						content: '',
-						tag: sectionName === 'head' ? 'th' : 'td',
-					},
-					...row.cells.slice( columnIndex ),
-				],
-			};
-		} );
-	} );
+			return [
+				sectionName,
+				section.map( ( row ) => {
+					// Bail early if the row is empty or it's an attempt to insert past
+					// the last possible index of the array.
+					if ( isEmptyRow( row ) || row.cells.length < columnIndex ) {
+						return row;
+					}
+
+					return {
+						cells: [
+							...row.cells.slice( 0, columnIndex ),
+							{
+								content: '',
+								tag: sectionName === 'head' ? 'th' : 'td',
+							},
+							...row.cells.slice( columnIndex ),
+						],
+					};
+				} ),
+			];
+		} )
+	);
 }
 
 /**
@@ -267,23 +279,28 @@ export function deleteColumn( state, { columnIndex } ) {
 		)
 	);
 
-	return mapValues( tableSections, ( section ) => {
-		// Bail early if the table section is empty.
-		if ( isEmptyTableSection( section ) ) {
-			return section;
-		}
+	return Object.fromEntries(
+		Object.entries( tableSections ).map( ( [ sectionName, section ] ) => {
+			// Bail early if the table section is empty.
+			if ( isEmptyTableSection( section ) ) {
+				return [ sectionName, section ];
+			}
 
-		return section
-			.map( ( row ) => ( {
-				cells:
-					row.cells.length >= columnIndex
-						? row.cells.filter(
-								( cell, index ) => index !== columnIndex
-						  )
-						: row.cells,
-			} ) )
-			.filter( ( row ) => row.cells.length );
-	} );
+			return [
+				sectionName,
+				section
+					.map( ( row ) => ( {
+						cells:
+							row.cells.length >= columnIndex
+								? row.cells.filter(
+										( cell, index ) => index !== columnIndex
+								  )
+								: row.cells,
+					} ) )
+					.filter( ( row ) => row.cells.length ),
+			];
+		} )
+	);
 }
 
 /**
