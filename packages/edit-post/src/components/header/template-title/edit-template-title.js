@@ -67,7 +67,6 @@ export default function EditTemplateTitle() {
 						)
 					);
 					updateEditorSettings( {
-						...settings,
 						availableTemplates: newAvailableTemplates,
 					} );
 					editEntityRecord( 'postType', 'wp_template', template.id, {
