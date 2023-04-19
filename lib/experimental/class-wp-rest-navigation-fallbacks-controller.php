@@ -15,7 +15,7 @@
 require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
 
 /**
- * REST Controller to create/fetch a fallback Navigation Menu.
+ * REST Controller to fetch a fallback Navigation Block Menu. If needed it creates one.
  */
 class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 
