@@ -7,7 +7,7 @@
  */
 
 /**
- * Manages Fallback behavior for Navigation menus.
+ * Manages Fallback behavior for Navigation block menus.
  *
  * @access public
  */
