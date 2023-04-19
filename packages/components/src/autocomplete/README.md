@@ -20,10 +20,12 @@ A function to be called when an option is selected to insert into the existing t
 -   Required: Yes
 -   Type: `( value: string ) => void`
 
+### onReplace
+
 A function to be called when an option is selected to replace the existing text.
 
 -   Required: Yes
--   Type: `( arg: [ OptionCompletion[ 'value' ] ] ) => void;`
+-   Type: `( values: RichTextValue[] ) => void`
 
 ### completers
 
@@ -31,7 +33,7 @@ An array of all of the completers to apply to the current element.
 
 -   Required: Yes
 -   Type: `Array< WPCompleter >`
- 
+
 ### contentRef
 
 A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
