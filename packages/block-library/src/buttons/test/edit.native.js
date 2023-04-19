@@ -7,7 +7,7 @@ import {
 	within,
 	getBlock,
 	initializeEditor,
-	changeTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -196,7 +196,7 @@ describe( 'Buttons block', () => {
 				within( secondButtonBlock ).getByLabelText(
 					'Text input. Empty'
 				);
-			changeTextOfRichText( secondButtonInput, 'Hello!' );
+			typeInRichText( secondButtonInput, 'Hello!' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
