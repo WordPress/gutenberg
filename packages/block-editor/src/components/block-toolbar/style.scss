@@ -2,8 +2,6 @@
  * Block Toolbar
  */
 
-$grid-unit-075: 0.75 * $grid-unit;	// 6px
-
 .block-editor-block-toolbar {
 	display: flex;
 	flex-grow: 1;
@@ -145,8 +143,8 @@ $grid-unit-075: 0.75 * $grid-unit;	// 6px
 	// Padding overrides.
 
 	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
-		padding-left: $grid-unit-075;
-		padding-right: $grid-unit-075;
+		padding-left: 6px;
+		padding-right: 6px;
 	}
 
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
@@ -172,8 +170,8 @@ $grid-unit-075: 0.75 * $grid-unit;	// 6px
 	.block-editor-block-mover.is-horizontal {
 		.block-editor-block-mover__move-button-container,
 		.block-editor-block-mover-button {
-			padding-left: $grid-unit-075;
-			padding-right: $grid-unit-075;
+			padding-left: 6px;
+			padding-right: 6px;
 		}
 	}
 
@@ -185,8 +183,8 @@ $grid-unit-075: 0.75 * $grid-unit;	// 6px
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
 		border-left: 1px solid $gray-900;
-		margin-left: $grid-unit-075;
-		margin-right: -$grid-unit-075;
+		margin-left: 6px;
+		margin-right: -6px;
 		white-space: nowrap;
 	}
 
@@ -244,7 +242,7 @@ $grid-unit-075: 0.75 * $grid-unit;	// 6px
 
 	.block-editor-rich-text__inline-format-toolbar-group {
 		.components-button + .components-button {
-			margin-left: $grid-unit-075;
+			margin-left: 6px;
 		}
 	}
 }
