@@ -167,8 +167,21 @@
 		}
 	}
 
-	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+	.block-editor-block-mover .block-editor-block-mover__move-button-container {
 		width: auto;
+	}
+
+	.block-editor-block-mover.is-horizontal {
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-mover-button {
+			padding-left: 6px;
+			padding-right: 6px;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
 	}
 
 	// Mover overrides.
@@ -183,15 +196,9 @@
 		border-left-color: $gray-200;
 	}
 
-	.block-editor-block-mover-button {
-		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
-		padding-left: $grid-unit !important;
-		padding-right: $grid-unit !important;
-	}
-
-	.block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 12px !important;
-		padding-right: 12px !important;
+	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
