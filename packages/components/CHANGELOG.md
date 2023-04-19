@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- foo
+- Foo ([#49924](https://github.com/WordPress/gutenberg/pull/49924)).
 
 ### Enhancements
 
