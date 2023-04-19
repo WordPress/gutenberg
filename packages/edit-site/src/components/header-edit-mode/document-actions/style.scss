@@ -44,7 +44,7 @@
 		color: currentColor;
 		align-items: center;
 		display: inline-flex;
-		gap: 4px;
+		gap: $grid-unit-05;
 	}
 
 	.edit-site-document-actions__secondary-item {
@@ -71,8 +71,8 @@
 			opacity: 1;
 			padding: 0 4px;
 			max-width: 180px;
-			margin-left: 12px;
-			gap: 4px;
+			margin-left: $grid-unit-15;
+			gap: $grid-unit-05;
 		}
 	}
 }
