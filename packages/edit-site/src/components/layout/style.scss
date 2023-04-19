@@ -105,7 +105,9 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	& > div {
 		color: $gray-900;
 		background: $white;
