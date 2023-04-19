@@ -54,7 +54,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 *
 	 * @return WP_Post|null the first non-empty Navigation or null.
 	 */
-	public static function get_most_recently_published_navigation() {
+	private static function get_most_recently_published_navigation() {
 
 		// Default to the most recently created menu.
 		$parsed_args = array(
@@ -82,7 +82,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 *
 	 * @return int|WP_Error The post ID of the default fallback menu or a WP_Error object.
 	 */
-	public static function create_classic_menu_fallback() {
+	private static function create_classic_menu_fallback() {
 		// See if we have a classic menu.
 		$classic_nav_menu = static::get_fallback_classic_menu();
 
@@ -120,7 +120,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 *
 	 * @return WP_Term|null The most appropriate classic navigation menu to use as a fallback.
 	 */
-	public static function get_fallback_classic_menu() {
+	private static function get_fallback_classic_menu() {
 		$classic_nav_menus = wp_get_nav_menus();
 
 		if ( ! $classic_nav_menus || is_wp_error( $classic_nav_menus ) ) {
