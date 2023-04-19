@@ -1106,8 +1106,11 @@ const processCSSNesting = ( css, blockSelector ) => {
 	return processedCSS;
 };
 
-export function useGlobalStylesOutput() {
+export function useGlobalStylesOutput( customMergedConfig = null ) {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
+	if ( !! customMergedConfig ) {
+		mergedConfig = customMergedConfig;
+	}
 
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;

@@ -2,17 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { set } from 'lodash';
+
 /**
  * WordPress dependencies
  */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	Button,
 	SelectControl,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -21,11 +22,6 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import {
-	undo as undoIcon,
-	redo as redoIcon,
-	backup as backupIcon,
-} from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -37,6 +33,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
 import Revisions from '../revisions';
+import { store as editSiteStore } from '../../store';
 
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -88,6 +85,8 @@ function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	return (
 		<>
+			<Subtitle>{ __( 'Styles revisions' ) }</Subtitle>
+
 			<ol
 				className="edit-site-global-styles-screen-revisions__revisions-list"
 				aria-label={ __( 'Global styles revisions' ) }
@@ -170,26 +169,29 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	);
 }
 
-function ScreenRevisions() {
-	const { useGlobalStylesReset, GlobalStylesContext } = unlock( blockEditorPrivateApis );
-	const [ canReset, onReset ] = useGlobalStylesReset();
+function ScreenRevisions( { onClose } ) {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { userRevisions } = useSelect(
-		( select ) => ( {
+	const { userRevisions, isDirty } = useSelect( ( select ) => {
+		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+			select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		return {
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving: dirtyEntityRecords.some( ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
+			),
 			userRevisions:
 				select(
 					coreStore
 				).__experimentalGetCurrentThemeGlobalStylesRevisions() || [],
-		} ),
-		[]
-	);
+		};
+	}, [] );
 	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
 	const [ currentRevisionId, setCurrentRevisionId ] = useState();
-	const [ cachedUserConfig ] = useState( userConfig );
-	const [ canRestoreCachedConfig, setCanRestoreCachedConfig ] =
-		useState( false );
-
+	const [ shouldSaveUnsavedChanges, setShouldSaveUnsavedChanges ] =
+		useState( true );
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	useEffect( () => {
 		let currentRevision = null;
 		for ( let i = 0; i < userRevisions.length; i++ ) {
@@ -203,31 +205,18 @@ function ScreenRevisions() {
 
 	const restoreRevision = useCallback(
 		( revision ) => {
-			// setUserConfig( ( currentConfig ) => {
-			// 	// Deep clone `currentConfig` to avoid mutating it later.
-			// 	const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			// 	set( newUserConfig, contextualPath, newValue );
-			// 	return  {
-			// 		styles: revision?.styles,
-			// 			settings: revision?.settings,
-			// 	};
-			//
-			// } );
 			setUserConfig( () => ( {
 				styles: revision?.styles,
 				settings: revision?.settings,
 			} ) );
-			setCurrentRevisionId( revision?.id );
-			setCanRestoreCachedConfig(
-				! isGlobalStyleConfigEqual( cachedUserConfig, revision )
-			);
+			setIsSaveViewOpened( true );
 		},
-		[ userConfig, cachedUserConfig ]
+		[ userConfig ]
 	);
 
 	const selectRevision = ( revision ) => {
-		console.log( 'selectRevision', revision?.styles );
-		setGlobalStylesRevision( revision?.styles )
+		setGlobalStylesRevision( revision );
+		setCurrentRevisionId( revision?.id );
 	};
 
 	const RevisionsComponent =
@@ -235,61 +224,72 @@ function ScreenRevisions() {
 			? RevisionsSelect
 			: RevisionsButtons;
 
-	const hasUnsavedChanges =
-		canRestoreCachedConfig &&
-		! isGlobalStyleConfigEqual(
-			cachedUserConfig,
-			userRevisions.find( ( revision ) => revision.is_latest === true )
-		);
+	const hasUnsavedContent = isDirty && shouldSaveUnsavedChanges;
 
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
-				description={ __(
-					"Select one of your global styles revisions to preview it in the editor. Changes won't take effect until you've saved the template."
-				) }
+				description={
+					hasUnsavedContent
+						? __(
+								"Select one of your global styles revisions to preview it in the editor. Changes won't take effect until you've saved the template."
+						  )
+						: __(
+								'You have unsaved changes. Restoring a revision will discard this changes.'
+						  )
+				}
 			/>
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
-					<Subtitle>{ __( 'Revisions' ) }</Subtitle>
-					<RevisionsComponent
-						onChange={ selectRevision }
-						currentRevisionId={ currentRevisionId }
-						userRevisions={ userRevisions }
-					/>
-					<VStack spacing={ 1 }>
-						{/*<Button*/}
-						{/*	onClick={ () => {*/}
-						{/*		if ( hasUnsavedChanges ) {*/}
-						{/*			selectRevision( cachedUserConfig );*/}
-						{/*		}*/}
-						{/*	} }*/}
-						{/*	className="edit-site-global-styles-screen-revisions__button"*/}
-						{/*	icon={ backupIcon }*/}
-						{/*	aria-disabled={ ! hasUnsavedChanges }*/}
-						{/*>*/}
-						{/*	{ __( 'Restore unsaved changes' ) }*/}
-						{/*</Button>*/}
-						{/*<Button*/}
-						{/*	onClick={ canReset ? onReset : undefined }*/}
-						{/*	icon={ isRTL ? redoIcon : undoIcon }*/}
-						{/*	className="edit-site-global-styles-screen-revisions__button"*/}
-						{/*	aria-disabled={ ! canReset }*/}
-						{/*>*/}
-						{/*	{ __( 'Reset styles to theme default' ) }*/}
-						{/*</Button>*/}
-						<Button
-							variant="primary"
-							onClick={ () => restoreRevision( globalStylesRevision ) }
-						>
-							{ __( 'Restore and save revision' ) }
-
-						</Button>
-					</VStack>
+					{ hasUnsavedContent ? (
+						<>
+							<Button
+								variant="primary"
+								className="edit-site-global-styles-screen-revisions__button"
+								aria-label={ __(
+									'Save my unsaved changes now'
+								) }
+								onClick={ () => setIsSaveViewOpened( true ) }
+							>
+								{ __( 'Save my unsaved changes' ) }
+							</Button>
+							<Button
+								variant="primary"
+								className="edit-site-global-styles-screen-revisions__button"
+								aria-label={ __( "Don't save" ) }
+								onClick={ () =>
+									setShouldSaveUnsavedChanges( false )
+								}
+							>
+								{ __( "Don't save" ) }
+							</Button>
+						</>
+					) : (
+						<>
+							<RevisionsComponent
+								onChange={ selectRevision }
+								currentRevisionId={ currentRevisionId }
+								userRevisions={ userRevisions }
+							/>
+							<Button
+								variant="primary"
+								className="edit-site-global-styles-screen-revisions__button"
+								aria-label={ __(
+									'Restore and save selected revision'
+								) }
+								disabled={ ! globalStylesRevision?.id }
+								onClick={ () =>
+									restoreRevision( globalStylesRevision )
+								}
+							>
+								{ __( 'Restore and save selected revision' ) }
+							</Button>
+						</>
+					) }
 				</VStack>
 			</div>
-			<Revisions styles={ globalStylesRevision } />
+			<Revisions revision={ globalStylesRevision } onClose={ () => {} } />
 		</>
 	);
 }

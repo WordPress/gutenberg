@@ -214,15 +214,13 @@
 .edit-site-global-styles-screen-revisions__revision-item {
 	width: 100%;
 	height: auto;
-	&.is-current:disabled {
-		background: $gray-400;
+	&.is-current {
+		border: 1px solid $black;
 	}
 }
 
 .edit-site-global-styles-screen-revisions__button {
-	padding-bottom: 0;
-	padding-top: 0;
-	height: auto;
+	justify-content: center;
 }
 
 .edit-site-global-styles-screen-revisions__description {

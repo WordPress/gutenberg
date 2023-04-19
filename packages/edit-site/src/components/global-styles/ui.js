@@ -174,7 +174,11 @@ function BlockStylesNavigationScreens( {
 	) );
 }
 
-function ContextScreens( { name, parentMenu = '', variation = '' } ) {
+function ContextScreens( {
+	name,
+	parentMenu = '',
+	variation = '',
+} ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -321,9 +325,11 @@ function GlobalStylesBlockLink() {
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
-function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+function GlobalStylesUI( {
+	isStyleBookOpened,
+	onCloseStyleBook,
+} ) {
 	const blocks = getBlockTypes();
-
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"

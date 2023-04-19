@@ -117,6 +117,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	// @TODO We should genericize the style book slot.
 	const hasStyleBook = useHasStyleBook();
 
 	const isFocusMode = templateType === 'wp_template_part';

@@ -2,31 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
-	Disabled,
-	TabPanel,
-	createSlotFill,
-	__experimentalUseSlotFills as useSlotFills,
-	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
-	__experimentalVStack as VStack,
-	FlexItem,
-} from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	getCategories,
-	getBlockTypes,
-	getBlockFromExample,
-	createBlock,
-} from '@wordpress/blocks';
+import { Button, Disabled } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockList,
 	privateApis as blockEditorPrivateApis,
@@ -42,9 +23,9 @@ import {
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useMemo, memo, useContext } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
-
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -52,12 +33,13 @@ import { ESCAPE } from '@wordpress/keycodes';
 
 import { unlock } from '../../private-apis';
 import { StyleBookFill } from '../style-book';
+import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 
-
-
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	ExperimentalBlockEditorProvider,
+	useGlobalStyle,
+	useGlobalStylesOutput,
+} = unlock( blockEditorPrivateApis );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -128,8 +110,12 @@ const STYLE_BOOK_IFRAME_STYLES = `
 		margin-bottom: 0;
 	}
 `;
-function Revisions( { isSelected, onSelect, onClose, styles } ) {
-
+function Revisions( {
+	isSelected,
+	onSelect,
+	onClose,
+	revision: globalStylesRevision,
+} ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
@@ -137,12 +123,22 @@ function Revisions( { isSelected, onSelect, onClose, styles } ) {
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 
-console.log( 'styles', styles );
-
-	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
+	const { baseConfig } = useSelect(
+		( select ) => ( {
+			baseConfig:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		} ),
 		[]
 	);
+
+	const mergedConfig = useMemo( () => {
+		if ( ! isEmpty( globalStylesRevision ) && ! isEmpty( baseConfig ) ) {
+			return mergeBaseAndUserConfigs( baseConfig, globalStylesRevision );
+		}
+		return null;
+	}, [ baseConfig, globalStylesRevision ] );
 
 	const renderedBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks(),
@@ -154,9 +150,13 @@ console.log( 'styles', styles );
 			Array.isArray( renderedBlocks )
 				? renderedBlocks
 				: [ renderedBlocks ],
-		[ renderedBlocks ] );
+		[ renderedBlocks ]
+	);
 
-
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
 
 	const settings = useMemo(
 		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
@@ -169,7 +169,13 @@ console.log( 'styles', styles );
 			onClose();
 		}
 	}
-console.log( 'settings.styles', settings.styles );
+
+	const [ globalStyles ] = useGlobalStylesOutput( mergedConfig );
+	const editorStyles =
+		! isEmpty( globalStyles ) && ! isEmpty( globalStylesRevision )
+			? globalStyles
+			: settings.styles;
+
 	return (
 		<StyleBookFill>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
@@ -202,16 +208,14 @@ console.log( 'settings.styles', settings.styles );
 					name="style-revisions"
 					tabIndex={ 0 }
 				>
-					<EditorStyles
-						styles={ settings.styles }
-					/>
+					<EditorStyles styles={ editorStyles } />
 					<style>
 						{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 							`.is-root-container { display: flow-root; }
 											body { position: relative; padding: 32px !important; }` +
-							STYLE_BOOK_IFRAME_STYLES
+								STYLE_BOOK_IFRAME_STYLES
 						}
 					</style>
 					<Disabled className="edit-site-style-book__example-preview__content">
@@ -222,14 +226,10 @@ console.log( 'settings.styles', settings.styles );
 							<BlockList renderAppender={ false } />
 						</ExperimentalBlockEditorProvider>
 					</Disabled>
-
-
 				</Iframe>
 			</section>
 		</StyleBookFill>
 	);
 }
 
-
 export default Revisions;
-
