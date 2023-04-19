@@ -48,7 +48,7 @@ jobs:
 
                   # Confirm that the CHANGELOG has an entry for the current PR
                   if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
-                      echo "Please make sure your CHANGELOG entry has a link to the current PR."
+                      echo "Please add a CHANGELOG entry to $changelog_path, and make sure your CHANGELOG entry has a link to the current PR."
                       echo
                         echo "${optional_check_notice}"
                       exit 1
