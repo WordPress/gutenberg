@@ -223,7 +223,7 @@ function Navigation( {
 	useEffect( () => {
 		// If:
 		// - there is an existing menu, OR
-		// - there are existing inner blocks
+		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
 		if ( ref || hasUnsavedBlocks ) {
 			return;
@@ -240,8 +240,6 @@ function Navigation( {
 
 				/**
 				 *  This fallback displays (both in editor and on front)
-				 
-				
 				 *  The fallback should not request a save (entity dirty state)
 				 *  nor to be undoable, hence why it is marked as non persistent
 				 */
