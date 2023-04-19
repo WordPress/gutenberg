@@ -23,7 +23,8 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Heading"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
 
-		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph {"textColor":"luminous-vivid-orange"} -->
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:paragraph {"textColor":"luminous-vivid-orange"} -->
 <p class="has-luminous-vivid-orange-color has-text-color">Heading</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -45,7 +46,8 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click( 'role=menuitem[name="Group"i]' );
-		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:group -->
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Line 1 to be made large</p>
 <!-- /wp:paragraph -->
@@ -58,7 +60,6 @@ test.describe( 'Keep styles on block transforms', () => {
 <p class="has-large-font-size">Line 3 to be made large</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
-		
 	} );
 
 	test( 'Should not include styles in the group block when grouping a block', async ( {
@@ -75,7 +76,8 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click( 'role=menuitem[name="Group"i]' );
 
-		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:group -->
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Line 1 to be made large</p>
 <!-- /wp:paragraph --></div>
