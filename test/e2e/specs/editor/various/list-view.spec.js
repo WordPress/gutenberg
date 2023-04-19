@@ -27,7 +27,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -44,11 +44,11 @@ test.describe( 'List View', () => {
 
 		// Drag the paragraph above the heading.
 		const paragraphBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Paragraph',
+			name: 'Paragraph link',
 			exact: true,
 		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Heading',
+			name: 'Heading link',
 			exact: true,
 		} );
 		await paragraphBlockItem.dragTo( headingBlockItem, { x: 0, y: 0 } );
@@ -83,7 +83,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -135,7 +135,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -175,7 +175,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -227,7 +227,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Heading',
+				name: 'Heading link',
 				exact: true,
 				selected: true,
 			} )
@@ -237,7 +237,7 @@ test.describe( 'List View', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Image',
+				name: 'Image link',
 				exact: true,
 				selected: true,
 			} )
@@ -287,7 +287,7 @@ test.describe( 'List View', () => {
 		// The child paragraph block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -295,7 +295,7 @@ test.describe( 'List View', () => {
 
 		// Collapse the Cover block.
 		await listView
-			.getByRole( 'gridcell', { name: 'Cover', exact: true } )
+			.getByRole( 'gridcell', { name: 'Cover link', exact: true } )
 			.getByTestId( 'list-view-expander', { includeHidden: true } )
 			// Force the click to bypass the visibility check. The expander is
 			// intentionally aria-hidden. See the implementation for details.
@@ -321,7 +321,7 @@ test.describe( 'List View', () => {
 		// The child paragraph block in List View should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -349,7 +349,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Group',
+				name: 'Group link',
 				exact: true,
 				selected: true,
 			} )
@@ -368,7 +368,7 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			listView.getByRole( 'link', {
-				name: 'Columns',
+				name: 'Columns link',
 				exact: true,
 			} )
 		).toBeFocused();
@@ -415,7 +415,7 @@ test.describe( 'List View', () => {
 		// The paragraph item should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
@@ -526,7 +526,7 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
+				name: 'Paragraph link',
 				exact: true,
 				selected: true,
 			} )
