@@ -39,13 +39,6 @@
  */
 class WP_Duotone_Gutenberg {
 	/**
-	 * Container for the main instance of the class.
-	 *
-	 * @var WP_Duotone_Gutenberg|null
-	 */
-	private static $instance = null;
-
-	/**
 	 * Block names from global, theme, and custom styles that use duotone presets and the slug of
 	 * the preset they are using.
 	 *
@@ -134,21 +127,6 @@ class WP_Duotone_Gutenberg {
 	 * @var array
 	 */
 	private $block_css_declarations = array();
-
-	/**
-	 * Returns an instance of the WP_Duotone_Gutenberg class, or create one if none exist yet.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @return WP_Duotone_Gutenberg The main instance.
-	 */
-	public static function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
 
 	/**
 	 * Direct port of colord's clamp function. Using min/max instead of

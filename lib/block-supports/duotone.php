@@ -6,26 +6,43 @@
  */
 
 /**
+ * Initializes $wp_duotone_support if it has not been set.
+ *
+ * @global WP_Duotone_Gutenberg $wp_duotone_support
+ *
+ * @return WP_Duotone_Gutenberg WP_Duotone_Gutenberg instance.
+ */
+function gutenberg_duotone_support() {
+	global $wp_duotone_support;
+
+	if ( ! ( $wp_duotone_support instanceof WP_Duotone_Gutenberg ) ) {
+		$wp_duotone_support = new WP_Duotone_Gutenberg();
+	}
+
+	return $wp_duotone_support;
+}
+
+/**
  * Registers the style and colors block attributes for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_duotone_support( $block_type ) {
-	return WP_Duotone_Gutenberg::get_instance()->register_duotone_support( $block_type );
+	return gutenberg_duotone_support()->register_duotone_support( $block_type );
 }
 
 /**
  * Pre-computes and saves all possible duotone presets from global and theme styles for later use.
  */
 function gutenberg_set_duotone_global_styles_presets() {
-	return WP_Duotone_Gutenberg::get_instance()->set_global_styles_presets();
+	return gutenberg_duotone_support()->set_global_styles_presets();
 }
 
 /**
  * Pre-computes and saves all block names from global styles for later use.
  */
 function gutenberg_set_duotone_global_style_block_names() {
-	return WP_Duotone_Gutenberg::get_instance()->set_global_style_block_names();
+	return gutenberg_duotone_support()->set_global_style_block_names();
 }
 
 /**
@@ -37,28 +54,28 @@ function gutenberg_set_duotone_global_style_block_names() {
  * @return string Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
-	return WP_Duotone_Gutenberg::get_instance()->render_duotone_support( $block_content, $block );
+	return gutenberg_duotone_support()->render_duotone_support( $block_content, $block );
 }
 
 /**
  * Enqueues duotone block styles in core-block-supports-inline-css BEFORE (priority 9) the style engine outputs them in gutenberg_enqueue_stored_styles.
  */
 function gutenberg_output_duotone_block_styles() {
-	return WP_Duotone_Gutenberg::get_instance()->output_block_styles();
+	return gutenberg_duotone_support()->output_block_styles();
 }
 
 /**
  * Enqueues duotone global styles in global-styles-inline-css AFTER (priority 11) the other global styles are enqueued in gutenberg_enqueue_global_styles.
  */
 function gutenberg_output_duotone_global_styles() {
-	return WP_Duotone_Gutenberg::get_instance()->output_global_styles();
+	return gutenberg_duotone_support()->output_global_styles();
 }
 
 /**
  * Add SVG filters to the footer. Also, for classic themes, output block styles in core-block-supports-inline-css.
  */
 function gutenberg_output_duotone_footer_assets() {
-	return WP_Duotone_Gutenberg::get_instance()->output_footer_assets();
+	return gutenberg_duotone_support()->output_footer_assets();
 }
 
 /**
@@ -69,7 +86,7 @@ function gutenberg_output_duotone_footer_assets() {
  * @return array Editor settings with duotone SVGs and CSS custom properties.
  */
 function gutenberg_add_duotone_editor_settings( $settings ) {
-	return WP_Duotone_Gutenberg::get_instance()->add_editor_settings( $settings );
+	return gutenberg_duotone_support()->add_editor_settings( $settings );
 }
 
 /**
@@ -81,7 +98,7 @@ function gutenberg_add_duotone_editor_settings( $settings ) {
  * @return array Filtered block type settings.
  */
 function gutenberg_migrate_experimental_duotone_support_flag( $settings, $metadata ) {
-	return WP_Duotone_Gutenberg::get_instance()->migrate_experimental_duotone_support_flag( $settings, $metadata );
+	return gutenberg_duotone_support()->migrate_experimental_duotone_support_flag( $settings, $metadata );
 }
 
 /**
