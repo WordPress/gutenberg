@@ -387,4 +387,4 @@ export function scopeSelector( scope, selector ) {
  *
  * @return {undefined|*} normalized value.
  */
-export const normalizeFalsyValue = ( value ) => ( ! value ? undefined : value );
+export const normalizeFalsyValue = ( value ) => value || undefined;
