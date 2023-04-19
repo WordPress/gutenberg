@@ -260,6 +260,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
+								accessibilityLabel={ color }
 								testID={ color }
 							>
 								<Animated.View
