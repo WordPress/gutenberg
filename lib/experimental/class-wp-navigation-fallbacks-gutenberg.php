@@ -56,7 +56,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	private static function get_most_recently_published_navigation() {
 
-		// Default to the most recently created menu.
+		
 		$parsed_args = array(
 			'post_type'              => 'wp_navigation',
 			'no_found_rows'          => true,
@@ -65,7 +65,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 			'order'                  => 'DESC',
 			'orderby'                => 'date',
 			'post_status'            => 'publish',
-			'posts_per_page'         => 1, // get only the most recent.
+			'posts_per_page'         => 1,
 		);
 
 		$navigation_post = new WP_Query( $parsed_args );
