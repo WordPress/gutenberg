@@ -209,7 +209,7 @@ class WP_Navigation_Fallback_Gutenberg {
 		$default_blocks = static::get_default_fallback_blocks();
 
 		// Create a new navigation menu from the fallback blocks.
-		$wp_insert_post_result = wp_insert_post(
+		$default_fallback = wp_insert_post(
 			array(
 				'post_content' => $default_blocks,
 				'post_title'   => _x( 'Navigation', 'Title of a Navigation menu', 'gutenberg' ),
@@ -220,7 +220,7 @@ class WP_Navigation_Fallback_Gutenberg {
 			true // So that we can check whether the result is an error.
 		);
 
-		return $wp_insert_post_result;
+		return $default_fallback;
 	}
 
 	/**
