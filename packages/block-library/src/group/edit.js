@@ -153,7 +153,7 @@ function GroupEdit( {
 				}
 			/>
 			{ showPlaceholder && (
-				<View { ...innerBlocksProps }>
+				<View>
 					{ innerBlocksProps.children }
 					<GroupPlaceHolder
 						clientId={ clientId }

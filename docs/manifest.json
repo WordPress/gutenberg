@@ -438,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Styles",
 		"slug": "block-styles",
 		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
@@ -450,7 +456,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Templates",
+		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -2256,7 +2262,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"

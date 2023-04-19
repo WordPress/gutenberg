@@ -430,6 +430,19 @@ _Returns_
 
 -   `string|null`: A font-size value using clamp().
 
+### getCustomValueFromPreset
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert
+-   _spacingSizes_ `Array`: Array of the current spacing preset objects
+
+_Returns_
+
+-   `string`: Mapping of the spacing preset to its equivalent custom value.
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
@@ -735,7 +748,7 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Array`: CSS rules.
+-   _styles_ `Object|Array`: CSS rules.
 -   _wrapperClassName_ `string`: Wrapper Class Name.
 
 _Returns_

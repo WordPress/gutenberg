@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.5.1",
+	"version": "15.6.0-rc.3",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -251,7 +251,7 @@
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
 		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
-		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
+		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build && node ./bin/packages/check-build-type-declaration-files.js",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
