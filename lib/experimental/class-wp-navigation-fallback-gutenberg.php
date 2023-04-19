@@ -129,24 +129,18 @@ class WP_Navigation_Fallback_Gutenberg {
 			return null;
 		}
 
-		// 1.
-		// Attempt to use the menu assigned to location `primary`.
 		$nav_menu = static::get_nav_menu_at_primary_location();
 
 		if ( $nav_menu ) {
 			return $nav_menu;
 		}
 
-		// 2.
-		// Use the menu with `primary` as its slug.
 		$nav_menu = static::get_nav_menu_with_primary_slug( $classic_nav_menus );
 
 		if ( $nav_menu ) {
 			return $nav_menu;
 		}
 
-		// 3.
-		// Otherwise use the most recently created classic menu.
 		return static::get_most_recently_created_nav_menu( $classic_nav_menus );
 	}
 
