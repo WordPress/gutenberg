@@ -61,7 +61,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 						templatePart.area === area )
 			) || []
 		);
-	}, [ templateParts, area ] );
+	}, [ templateParts, area, excludedId ] );
 
 	return {
 		templateParts: filteredTemplateParts,
