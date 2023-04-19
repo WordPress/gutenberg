@@ -21,7 +21,7 @@ import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
 import { unlock } from '../../lock-unlock';
-import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
+import { privateApis } from '../../private-apis';
 
 function selector( select ) {
 	const {
@@ -53,6 +53,8 @@ function SelectedBlockPopover( {
 		selector,
 		[]
 	);
+
+	const { useShouldContextualToolbarShow } = unlock( privateApis );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
 			const {

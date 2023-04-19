@@ -8,7 +8,7 @@ import {
 	NavigableToolbar,
 	ToolSelector,
 	store as blockEditorStore,
-	useShouldContextualToolbarShow,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	EditorHistoryRedo,
@@ -24,6 +24,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
+import { unlock } from '../../../private-apis';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -77,6 +78,8 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
+
+	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );

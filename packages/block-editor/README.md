@@ -858,18 +858,6 @@ _Returns_
 
 -   `any`: Returns the value defined for the setting.
 
-### useShouldContextualToolbarShow
-
-Returns true if the contextual block toolbar should show, or false if it should be hidden.
-
-_Parameters_
-
--   _clientId_ `string`: The client ID of the block.
-
-_Returns_
-
--   `boolean`: Whether the block toolbar is hidden.
-
 ### Warning
 
 _Related_
