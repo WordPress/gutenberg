@@ -13,8 +13,8 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
  * @covers ::gutenberg_register_fonts_from_theme_json
  */
 class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase {
-	const FONTS_THEME    = 'fonts-block-theme';
-	const FONT_FAMILIIES = array(
+	const FONTS_THEME   = 'fonts-block-theme';
+	const FONT_FAMILIES = array(
 		'fonts-block-theme' => array(
 			// From theme.json.
 			'dm-sans',
@@ -123,7 +123,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 		gutenberg_register_fonts_from_theme_json();
 		$wp_fonts = wp_fonts();
 
-		$expected = static::FONT_FAMILIIES[ static::FONTS_THEME ];
+		$expected = static::FONT_FAMILIES[ static::FONTS_THEME ];
 		$this->assertSameSetsWithIndex( $expected, $wp_fonts->get_registered_font_families(), 'Font families should be registered' );
 		$this->assertSameSetsWithIndex( $expected, $wp_fonts->get_enqueued(), 'Font families should be enqueued' );
 	}
@@ -142,7 +142,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 
 		// Font families are not duplicated.
 		$this->assertSameSetsWithIndex(
-			static::FONT_FAMILIIES[ static::FONTS_THEME ],
+			static::FONT_FAMILIES[ static::FONTS_THEME ],
 			$wp_fonts->get_registered_font_families(),
 			'Font families should not be duplicated'
 		);
@@ -308,7 +308,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 		$actual_enqueued_fonts = wp_fonts()->get_enqueued();
 
 		$this->assertNotContains( 'lato', $actual_enqueued_fonts, 'Lato font-family should not be enqueued' );
-		$this->assertSameSets( static::FONT_FAMILIIES[ static::FONTS_THEME ], $actual_enqueued_fonts, 'Only the theme font families should be enqueued' );
+		$this->assertSameSets( static::FONT_FAMILIES[ static::FONTS_THEME ], $actual_enqueued_fonts, 'Only the theme font families should be enqueued' );
 	}
 
 	public function test_should_skip_when_font_face_not_defined() {
@@ -340,7 +340,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 					continue;
 				}
 
-				// Remove the 'fontFace' element, which removes the font's varations.
+				// Remove the 'fontFace' element, which removes the font's variations.
 				unset( $data['settings']['typography']['fontFamilies']['theme'][ $index ]['fontFace'] );
 				break;
 			}
