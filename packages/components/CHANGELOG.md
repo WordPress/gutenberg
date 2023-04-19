@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Draggable`: Add `attachToElementWrapper` prop to allow elementId based elements to be attached to the ownerDocument body ([#49911](https://github.com/WordPress/gutenberg/pull/49911))
+-   `Draggable`: Add `attachToElementWrapper` prop to allow elementId based elements to be attached to the ownerDocument body ([#49911](https://github.com/WordPress/gutenberg/pull/49911)).
 -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
 -   `Modal`: Equalize internal spacing ([#49890](https://github.com/WordPress/gutenberg/pull/49890)).
 -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
