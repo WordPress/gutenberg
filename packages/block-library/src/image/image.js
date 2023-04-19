@@ -10,7 +10,6 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	PanelBody,
-	ResizableBox,
 	Spinner,
 	TextareaControl,
 	TextControl,
@@ -30,6 +29,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -38,7 +38,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -60,6 +60,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
+import { unlock } from '../private-apis';
 
 /**
  * Module constants
@@ -81,6 +82,7 @@ export default function Image( {
 	clientId,
 	isContentLocked,
 } ) {
+	const { ResizableAlignmentControls } = unlock( blockEditorPrivateApis );
 	const {
 		url = '',
 		alt,
@@ -300,10 +302,11 @@ export default function Image( {
 		} );
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
+	function updateAlignment( nextAlign, { resetDimensions } = {} ) {
+		const extraUpdatedAttributes =
+			resetDimensions || [ 'wide', 'full' ].includes( nextAlign )
+				? { width: undefined, height: undefined }
+				: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
 			align: nextAlign,
@@ -560,53 +563,15 @@ export default function Image( {
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
 
-		let showRightHandle = false;
-		let showLeftHandle = false;
-
-		/* eslint-disable no-lonely-if */
-		// See https://github.com/WordPress/gutenberg/issues/7584.
-		if ( align === 'center' ) {
-			// When the image is centered, show both handles.
-			showRightHandle = true;
-			showLeftHandle = true;
-		} else if ( isRTL() ) {
-			// In RTL mode the image is on the right by default.
-			// Show the right handle and hide the left handle only when it is
-			// aligned left. Otherwise always show the left handle.
-			if ( align === 'left' ) {
-				showRightHandle = true;
-			} else {
-				showLeftHandle = true;
-			}
-		} else {
-			// Show the left handle and hide the right handle only when the
-			// image is aligned right. Otherwise always show the right handle.
-			if ( align === 'right' ) {
-				showLeftHandle = true;
-			} else {
-				showRightHandle = true;
-			}
-		}
-		/* eslint-enable no-lonely-if */
-
 		img = (
-			<ResizableBox
-				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
-				} }
-				showHandle={ isSelected }
+			<ResizableAlignmentControls
+				allowedAlignments={ [ 'none', 'wide', 'full' ] }
+				clientId={ clientId }
+				currentAlignment={ align }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
 				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: showRightHandle,
-					bottom: true,
-					left: showLeftHandle,
-				} }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -615,10 +580,20 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
-				resizeRatio={ align === 'center' ? 2 : 1 }
+				onSnap={ ( newAlignment ) => {
+					// When snapping, reset the image dimensions. This ensures
+					// when the image is set to align 'none', any custom dimensions
+					// are removed, and the image appears as content width.
+					updateAlignment( newAlignment, { resetDimensions: true } );
+				} }
+				showHandle={ isSelected }
+				size={ {
+					width: width ?? 'auto',
+					height: height && ! hasCustomBorder ? height : 'auto',
+				} }
 			>
 				{ img }
-			</ResizableBox>
+			</ResizableAlignmentControls>
 		);
 	}
 
