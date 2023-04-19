@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { spawn } = require( 'child_process' );
+const path = require( 'path' );
 
 /**
  * Internal dependencies
@@ -51,6 +52,9 @@ module.exports = async function run( {
  * @param {Object}   spinner   A CLI spinner which indicates progress.
  */
 function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
+	// We need to pass absolute paths to the container.
+	envCwd = path.resolve( '/var/www/html', envCwd );
+
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,

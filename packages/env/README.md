@@ -349,8 +349,8 @@ Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
-  --env-cwd  The directory inside of the container that the command is ran from.
-                                             [string] [default: "/var/www/html"]
+  --env-cwd  The command's working directory inside of the container. Paths
+             without a leading slash are relative to the WordPress root.[string]
 ```
 
 For example:

@@ -177,9 +177,8 @@ module.exports = function cli() {
 			args.option( 'env-cwd', {
 				type: 'string',
 				requiresArg: true,
-				default: '/var/www/html',
 				describe:
-					'The directory inside of the container that the command is ran from.',
+					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
 			} );
 			args.positional( 'container', {
 				type: 'string',
