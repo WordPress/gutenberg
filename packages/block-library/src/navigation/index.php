@@ -466,7 +466,7 @@ function block_core_navigation_get_fallback_blocks() {
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	$navigation_post = WP_Navigation_Fallback_Gutenberg::get_fallback_menu();
+	$navigation_post = WP_Navigation_Fallback_Gutenberg::get_fallback();
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {

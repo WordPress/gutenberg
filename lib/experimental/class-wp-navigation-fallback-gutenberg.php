@@ -26,7 +26,7 @@ class WP_Navigation_Fallback_Gutenberg {
 	 *
 	 * @return WP_Post|null the fallback Navigation Post or null.
 	 */
-	public static function get_fallback_menu() {
+	public static function get_fallback() {
 
 		$fallback = static::get_most_recently_published_navigation();
 
