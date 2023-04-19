@@ -95,7 +95,7 @@ class WP_REST_Navigation_Fallbacks_Controller_Test extends WP_Test_REST_Controll
 	 *
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
-	public function test_get_fallbacks_schema() {
+	public function test_should_provide_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
