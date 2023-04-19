@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-- Foo ([#49924](https://github.com/WordPress/gutenberg/pull/49924)).
-
 ### Enhancements
 
 -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
@@ -19,6 +17,7 @@
 
 ### Internal
 
+-   Foo ([#49924](https://github.com/WordPress/gutenberg/pull/49924)).
 -   `Mobile` Refactor of the KeyboardAwareFlatList component.
 
 ### Enhancements
