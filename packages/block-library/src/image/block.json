@@ -85,9 +85,11 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": true,
 			"text": false,
 			"background": false
+		},
+		"filter": {
+			"duotone": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -102,9 +104,9 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area",
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
 		"filter": {
-			"duotone": "img, .components-placeholder"
+			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}
 	},
 	"styles": [

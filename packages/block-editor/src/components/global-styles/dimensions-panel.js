@@ -184,12 +184,13 @@ function DimensionsToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	contentSize: true,
-	wideSize: true,
-	padding: true,
-	margin: true,
-	blockGap: true,
-	minHeight: true,
+	contentSize: false,
+	wideSize: false,
+	padding: false,
+	margin: false,
+	blockGap: false,
+	minHeight: false,
+	childLayout: true,
 };
 
 export default function DimensionsPanel( {
@@ -391,7 +392,10 @@ export default function DimensionsPanel( {
 					label={ __( 'Content size' ) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
-					isShownByDefault={ defaultControls.contentSize }
+					isShownByDefault={
+						defaultControls.contentSize ??
+						DEFAULT_CONTROLS.contentSize
+					}
 					panelId={ panelId }
 				>
 					<HStack alignment="flex-end" justify="flex-start">
@@ -417,7 +421,9 @@ export default function DimensionsPanel( {
 					label={ __( 'Wide size' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
-					isShownByDefault={ defaultControls.wideSize }
+					isShownByDefault={
+						defaultControls.wideSize ?? DEFAULT_CONTROLS.wideSize
+					}
 					panelId={ panelId }
 				>
 					<HStack alignment="flex-end" justify="flex-start">
@@ -442,7 +448,9 @@ export default function DimensionsPanel( {
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
-					isShownByDefault={ defaultControls.padding }
+					isShownByDefault={
+						defaultControls.padding ?? DEFAULT_CONTROLS.padding
+					}
 					className={ classnames( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
@@ -481,7 +489,9 @@ export default function DimensionsPanel( {
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
 					onDeselect={ resetMarginValue }
-					isShownByDefault={ defaultControls.margin }
+					isShownByDefault={
+						defaultControls.margin ?? DEFAULT_CONTROLS.margin
+					}
 					className={ classnames( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
@@ -520,7 +530,9 @@ export default function DimensionsPanel( {
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
 					onDeselect={ resetGapValue }
-					isShownByDefault={ defaultControls.blockGap }
+					isShownByDefault={
+						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
+					}
 					className={ classnames( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
@@ -566,7 +578,9 @@ export default function DimensionsPanel( {
 					hasValue={ hasMinHeightValue }
 					label={ __( 'Min. height' ) }
 					onDeselect={ resetMinHeightValue }
-					isShownByDefault={ defaultControls.minHeight }
+					isShownByDefault={
+						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
+					}
 					panelId={ panelId }
 				>
 					<HeightControl
@@ -583,7 +597,10 @@ export default function DimensionsPanel( {
 					hasValue={ hasChildLayoutValue }
 					label={ childLayoutOrientationLabel }
 					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={ defaultControls.childLayout }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
 					panelId={ panelId }
 				>
 					<ChildLayoutControl

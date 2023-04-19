@@ -9,6 +9,7 @@ import { get, isEmpty, kebabCase, set } from 'lodash';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -324,7 +325,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 
-			if ( !! properties && typeof styleValue !== 'string' ) {
+			if ( properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
 
@@ -381,7 +382,7 @@ export function getStylesDeclarations(
 			ruleValue = get( tree, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || !! ruleValue?.ref ) {
+			if ( ! ruleValue || ruleValue?.ref ) {
 				return;
 			}
 		}
@@ -483,10 +484,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `${ selector } .${ className }${
+										? `:where(${ selector } .${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${ selector }-${ className }${
+										: `${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -550,6 +551,33 @@ export function getLayoutStyles( {
 	return ruleset;
 }
 
+const STYLE_KEYS = [
+	'border',
+	'color',
+	'dimensions',
+	'spacing',
+	'typography',
+	'filter',
+	'outline',
+	'shadow',
+];
+
+function pickStyleKeys( treeToPickFrom ) {
+	if ( ! treeToPickFrom ) {
+		return {};
+	}
+	const entries = Object.entries( treeToPickFrom );
+	const pickedEntries = entries.filter( ( [ key ] ) =>
+		STYLE_KEYS.includes( key )
+	);
+	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
+	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
+		key,
+		JSON.parse( JSON.stringify( style ) ),
+	] );
+	return Object.fromEntries( clonedEntries );
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
@@ -557,25 +585,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		return nodes;
 	}
 
-	const pickStyleKeys = ( treeToPickFrom ) =>
-		Object.fromEntries(
-			Object.entries( treeToPickFrom ?? {} ).filter( ( [ key ] ) =>
-				[
-					'border',
-					'color',
-					'dimensions',
-					'spacing',
-					'typography',
-					'filter',
-					'outline',
-					'shadow',
-				].includes( key )
-			)
-		);
-
 	// Top-level.
 	const styles = pickStyleKeys( tree.styles );
-	if ( !! styles ) {
+	if ( styles ) {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
@@ -583,7 +595,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( !! tree.styles?.elements?.[ name ] ) {
+		if ( tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
@@ -605,10 +617,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				} );
 				blockStyles.variations = variations;
 			}
-			if (
-				!! blockStyles &&
-				!! blockSelectors?.[ blockName ]?.selector
-			) {
+			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
@@ -616,7 +625,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ]?.selector,
+					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
@@ -628,9 +637,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			Object.entries( node?.elements ?? {} ).forEach(
 				( [ elementName, value ] ) => {
 					if (
-						!! value &&
-						!! blockSelectors?.[ blockName ] &&
-						!! ELEMENTS?.[ elementName ]
+						value &&
+						blockSelectors?.[ blockName ] &&
+						ELEMENTS[ elementName ]
 					) {
 						nodes.push( {
 							styles: value,
@@ -676,7 +685,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || !! custom ) {
+	if ( ! isEmpty( presets ) || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -689,7 +698,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+			if ( ! isEmpty( blockPresets ) || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -713,7 +722,7 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 		}
 
 		if ( declarations.length > 0 ) {
-			ruleset = ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 		}
 	} );
 
@@ -786,9 +795,9 @@ export const toStyles = (
 
 				Object.entries( featureDeclarations ).forEach(
 					( [ cssSelector, declarations ] ) => {
-						if ( !! declarations.length ) {
+						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset = ruleset + `${ cssSelector }{${ rules }}`;
+							ruleset += `${ cssSelector }{${ rules };}`;
 						}
 					}
 				);
@@ -797,20 +806,20 @@ export const toStyles = (
 			if ( styleVariationSelectors ) {
 				Object.entries( styleVariationSelectors ).forEach(
 					( [ styleVariationName, styleVariationSelector ] ) => {
-						if ( styles?.variations?.[ styleVariationName ] ) {
+						const styleVariations =
+							styles?.variations?.[ styleVariationName ];
+						if ( styleVariations ) {
 							// If the block uses any custom selectors for block support, add those first.
 							if ( featureSelectors ) {
 								const featureDeclarations =
 									getFeatureDeclarations(
 										featureSelectors,
-										styles?.variations?.[
-											styleVariationName
-										]
+										styleVariations
 									);
 
 								Object.entries( featureDeclarations ).forEach(
 									( [ baseSelector, declarations ] ) => {
-										if ( !! declarations.length ) {
+										if ( declarations.length ) {
 											const cssSelector =
 												concatFeatureVariationSelectorString(
 													baseSelector,
@@ -818,9 +827,7 @@ export const toStyles = (
 												);
 											const rules =
 												declarations.join( ';' );
-											ruleset =
-												ruleset +
-												`${ cssSelector }{${ rules }}`;
+											ruleset += `${ cssSelector }{${ rules };}`;
 										}
 									}
 								);
@@ -829,40 +836,34 @@ export const toStyles = (
 							// Otherwise add regular selectors.
 							const styleVariationDeclarations =
 								getStylesDeclarations(
-									styles?.variations?.[ styleVariationName ],
+									styleVariations,
 									styleVariationSelector,
 									useRootPaddingAlign,
 									tree
 								);
-							if ( !! styleVariationDeclarations.length ) {
-								ruleset =
-									ruleset +
-									`${ styleVariationSelector }{${ styleVariationDeclarations.join(
-										';'
-									) }}`;
+							if ( styleVariationDeclarations.length ) {
+								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
+									';'
+								) };}`;
 							}
 						}
 					}
 				);
 			}
 
-			const duotoneStyles = {};
-			if ( styles?.filter ) {
-				duotoneStyles.filter = styles.filter;
-				delete styles.filter;
-			}
-
-			// Process duotone styles (they use color.__experimentalDuotone selector).
+			// Process duotone styles.
 			if ( duotoneSelector ) {
+				const duotoneStyles = {};
+				if ( styles?.filter ) {
+					duotoneStyles.filter = styles.filter;
+					delete styles.filter;
+				}
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length > 0 ) {
-					ruleset =
-						ruleset +
-						`${ scopeSelector(
-							selector,
-							duotoneSelector
-						) }{${ duotoneDeclarations.join( ';' ) };}`;
+				if ( duotoneDeclarations.length ) {
+					ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+						';'
+					) };}`;
 				}
 			}
 
@@ -889,8 +890,7 @@ export const toStyles = (
 				tree
 			);
 			if ( declarations?.length ) {
-				ruleset =
-					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
@@ -924,7 +924,7 @@ export const toStyles = (
 							';'
 						) };}`;
 
-						ruleset = ruleset + pseudoRule;
+						ruleset += pseudoRule;
 					}
 				);
 			}
@@ -948,10 +948,13 @@ export const toStyles = (
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
-			'.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			`.wp-site-blocks > * + * { margin-block-start: ${ gapValue }; }`;
+			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+		ruleset =
+			ruleset +
+			':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
 	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {
@@ -962,7 +965,7 @@ export const toStyles = (
 
 		const classes = getPresetsClasses( selector, presets );
 		if ( ! isEmpty( classes ) ) {
-			ruleset = ruleset + classes;
+			ruleset += classes;
 		}
 	} );
 
@@ -1002,11 +1005,24 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockCSSSelector( blockType, 'root' );
-		const duotoneSelector = getBlockCSSSelector(
+		const selector = getBlockCSSSelector( blockType );
+		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
 		);
+
+		// Keep backwards compatibility for support.color.__experimentalDuotone.
+		if ( ! duotoneSelector ) {
+			const rootSelector = getBlockCSSSelector( blockType );
+			const duotoneSupport = getBlockSupport(
+				blockType,
+				'color.__experimentalDuotone',
+				false
+			);
+			duotoneSelector =
+				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
+		}
+
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;

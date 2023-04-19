@@ -25,11 +25,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	* wp_trim_words is used instead.
 	*/
 	$excerpt_length = $attributes['excerptLength'];
+	$excerpt        = get_the_excerpt( $block->context['postId'] );
 	if ( isset( $excerpt_length ) ) {
-		$excerpt = wp_trim_words( get_the_excerpt(), $excerpt_length );
-	} else {
-		$excerpt = get_the_excerpt();
+		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
 	}
+
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';

@@ -606,8 +606,15 @@ class WP_Theme_JSON_Gutenberg {
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
-		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
+		$valid_variations    = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
+		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -685,9 +692,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
 	 * @param array $valid_element_names List of valid element names.
+	 * @param array $valid_variations    List of valid variations per block.
 	 * @return array The sanitized output.
 	 */
-	protected static function sanitize( $input, $valid_block_names, $valid_element_names ) {
+	protected static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
 
 		$output = array();
 
@@ -745,9 +753,13 @@ class WP_Theme_JSON_Gutenberg {
 			$style_variation_names = array();
 			if (
 				! empty( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				is_array( $input['styles']['blocks'][ $block ]['variations'] )
+				is_array( $input['styles']['blocks'][ $block ]['variations'] ) &&
+				isset( $valid_variations[ $block ] )
 			) {
-				$style_variation_names = array_keys( $input['styles']['blocks'][ $block ]['variations'] );
+				$style_variation_names = array_intersect(
+					array_keys( $input['styles']['blocks'][ $block ]['variations'] ),
+					$valid_variations[ $block ]
+				);
 			}
 
 			$schema_styles_variations = array();
@@ -871,6 +883,17 @@ class WP_Theme_JSON_Gutenberg {
 
 			// The block may or may not have a duotone selector.
 			$duotone_selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
+
+			// Keep backwards compatibility for support.color.__experimentalDuotone.
+			if ( null === $duotone_selector ) {
+				$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
+
+				if ( $duotone_support ) {
+					$root_selector    = wp_get_block_css_selector( $block_type );
+					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+				}
+			}
+
 			if ( null !== $duotone_selector ) {
 				static::$blocks_metadata[ $block_name ]['duotone'] = $duotone_selector;
 			}
@@ -1287,7 +1310,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%1$s .%2$s%3$s' : '%1$s-%2$s%1$s-%2$s%3$s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : '%s-%s%s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -2389,8 +2412,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
+			$block_rules .= static::to_ruleset( $block_metadata['duotone'], $declarations_duotone );
 		}
 
 		// 4. Generate Layout block gap styles.
@@ -2478,8 +2500,9 @@ class WP_Theme_JSON_Gutenberg {
 		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		if ( $has_block_gap_support ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-			$css            .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-			$css            .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
+			$css            .= ':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+			$css            .= ':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
@@ -2813,8 +2836,15 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
+		$valid_variations    = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
 
-		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );

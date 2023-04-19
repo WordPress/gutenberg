@@ -14,6 +14,13 @@
 		}
 	},
 	"supports": {
+		"color": {
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,

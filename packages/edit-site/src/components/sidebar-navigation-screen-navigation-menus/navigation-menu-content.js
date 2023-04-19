@@ -10,9 +10,10 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useState } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { useCallback, useEffect, useState } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -47,18 +48,53 @@ function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 		</Popover>
 	);
 }
+// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
+const MAX_PAGE_COUNT = 100;
+const PAGES_QUERY = [
+	'postType',
+	'page',
+	{
+		per_page: MAX_PAGE_COUNT,
+		_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+		// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+		// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+		// sort.
+		orderby: 'menu_order',
+		order: 'asc',
+	},
+];
 
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
-	const { clientIdsTree, isLoading } = useSelect(
+	const [ isLoading, setIsLoading ] = useState( true );
+	const { clientIdsTree, shouldKeepLoading, isSinglePageList } = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree, areInnerBlocksControlled } =
-				select( blockEditorStore );
-			return {
-				clientIdsTree: __unstableGetClientIdsTree( rootClientId ),
+			const {
+				__unstableGetClientIdsTree,
+				areInnerBlocksControlled,
+				getBlockName,
+			} = select( blockEditorStore );
+			const { isResolving } = select( coreStore );
 
+			const _clientIdsTree = __unstableGetClientIdsTree( rootClientId );
+			const hasOnlyPageListBlock =
+				_clientIdsTree.length === 1 &&
+				getBlockName( _clientIdsTree[ 0 ].clientId ) ===
+					'core/page-list';
+			const isLoadingPages = isResolving(
+				'getEntityRecords',
+				PAGES_QUERY
+			);
+			return {
+				clientIdsTree: _clientIdsTree,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
-				isLoading: ! areInnerBlocksControlled( rootClientId ),
+				shouldKeepLoading:
+					! areInnerBlocksControlled( rootClientId ) ||
+					isLoadingPages,
+				isSinglePageList:
+					hasOnlyPageListBlock &&
+					! isLoadingPages &&
+					_clientIdsTree[ 0 ].innerBlocks.length > 0,
 			};
 		},
 		[ rootClientId ]
@@ -88,6 +124,25 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		},
 		[ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ]
 	);
+
+	// Delay loading stop by 50ms to avoid flickering.
+	useEffect( () => {
+		let timeoutId;
+		if ( shouldKeepLoading && ! isLoading ) {
+			setIsLoading( true );
+		}
+		if ( ! shouldKeepLoading && isLoading ) {
+			timeoutId = setTimeout( () => {
+				setIsLoading( false );
+				timeoutId = undefined;
+			}, 50 );
+		}
+		return () => {
+			if ( timeoutId ) {
+				clearTimeout( timeoutId );
+			}
+		};
+	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
 
 	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
@@ -127,7 +182,11 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 			{ isLoading && <NavigationMenuLoader /> }
 			{ ! isLoading && (
 				<OffCanvasEditor
-					blocks={ clientIdsTree }
+					blocks={
+						isSinglePageList
+							? clientIdsTree[ 0 ].innerBlocks
+							: clientIdsTree
+					}
 					onSelect={ offCanvasOnselect }
 					LeafMoreMenu={ LeafMoreMenu }
 					showAppender={ false }
