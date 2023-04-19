@@ -146,9 +146,9 @@ class WP_REST_Navigation_Fallbacks_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $item, $request ) {
 		$data = array();
 
-		$schema = $this->get_item_schema();
+		$fields = $this->get_fields_for_response( $request );
 
-		if ( isset( $schema['properties']['id'] ) ) {
+		if ( rest_is_field_included( 'id', $fields ) ) {
 			$data['id'] = (int) $item->ID;
 		}
 
