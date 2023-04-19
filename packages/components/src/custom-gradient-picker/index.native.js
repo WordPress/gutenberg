@@ -25,7 +25,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ currentColor, setCurrentColor ] = useState( currentValue );
 
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
-	const gradientAST = getGradientAstWithDefault( currentColor );
+	const gradientWithDefault = getGradientAstWithDefault( currentColor );
 	const gradientType = getGradientType( currentColor );
 
 	function isLinearGradient( type ) {
@@ -33,6 +33,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	}
 
 	function getGradientColor( type ) {
+		const { gradientAST } = gradientWithDefault;
 		const { orientation, ...restGradientAST } = gradientAST;
 
 		if ( orientation ) {
@@ -64,6 +65,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	}
 
 	function setGradientAngle( value ) {
+		const { gradientAST } = gradientWithDefault;
 		const gradientColor = serializeGradient( {
 			...gradientAST,
 			orientation: {
@@ -79,6 +81,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	}
 
 	function getGradientAngle() {
+		const { gradientAST } = gradientWithDefault;
 		return gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
 	}
 	return (
