@@ -10,7 +10,7 @@ jobs:
 
         steps:
             - name: Fetch latest version in the WP core repo
-              id: latest_version_in_core_repo
+              id: compute_latest_version_in_core_repo
               run: |
                   CORE_API_URL="https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=gutenberg"
                   latest_version_in_core_repo=$(curl -s "$CORE_API_URL" | jq -r '.version')
@@ -18,12 +18,12 @@ jobs:
                   echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
 
             - name: Decide if it is a trunk or tag update
-              id: comparison
+              id: compute_should_update_trunk
               env:
                   GITHUB_REF: ${{ github.ref }}
               run: |
                   latestPublishedVersion=$(echo "$GITHUB_REF" | sed -E 's/refs\/tags\/(v?)([0-9.]+)/\2/')
-                  latestVersionInCoreRepo="${{ stepss.latest_version_in_core_repo_.outputs.version }}"
+                  latestVersionInCoreRepo="${{ stepss.compute_latest_version_in_core_repo.outputs.version }}"
 
                   # Determines if the first version string is greater than the second version string.
                   #
