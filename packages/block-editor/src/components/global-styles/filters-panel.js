@@ -111,12 +111,7 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 				</Flex>
 			) ) }
 		</ZStack>
-		<FlexItem
-			className="block-editor-panel-color-gradient-settings__color-name"
-			title={ label }
-		>
-			{ label }
-		</FlexItem>
+		<FlexItem title={ label }>{ label }</FlexItem>
 	</HStack>
 );
 
@@ -187,14 +182,11 @@ export default function FiltersPanel( {
 				>
 					<Dropdown
 						popoverProps={ popoverProps }
-						className="block-editor-tools-panel-color-gradient-settings__dropdown"
+						className="block-editor-global-styles-filters-panel__dropdown"
 						renderToggle={ ( { onToggle, isOpen } ) => {
 							const toggleProps = {
 								onClick: onToggle,
-								className: classnames(
-									'block-editor-panel-color-gradient-settings__dropdown',
-									{ 'is-open': isOpen }
-								),
+								className: classnames( { 'is-open': isOpen } ),
 								'aria-expanded': isOpen,
 							};
 

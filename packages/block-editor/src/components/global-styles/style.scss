@@ -6,11 +6,12 @@
 	width: 230px;
 }
 
+.block-editor-global-styles-filters-panel__dropdown,
 .block-editor-global-styles-effects-panel__shadow-dropdown {
 	display: block;
 	padding: 0;
 
-	> button {
+	button {
 		width: 100%;
 		padding: $grid-unit-10;
 
