@@ -311,6 +311,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					autoInsertedBlocks: {},
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -411,6 +412,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					autoInsertedBlocks: {},
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -576,6 +578,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					autoInsertedBlocks: {},
 				} );
 
 				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
@@ -703,6 +706,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: {},
+					autoInsertedBlocks: {},
 				} );
 
 				// The block object of the parent should be updated.
@@ -724,6 +728,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: new Map(),
 				controlledInnerBlocks: {},
+				autoInsertedBlocks: {},
 			} );
 		} );
 
@@ -2373,7 +2378,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		describe.only( 'automatically inserted blocks', () => {
+		describe( 'automatically inserted blocks', () => {
 			beforeAll( () => {
 				registerBlockType( 'core/auto-inserted-block', {
 					save: noop,
@@ -2404,7 +2409,46 @@ describe( 'state', () => {
 				} );
 
 				expect( state.byClientId.size ).toBe( 2 );
-				console.log( state.order );
+				expect( Array.from( state.byClientId.values() ) ).toEqual( [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+					},
+					expect.objectContaining( {
+						name: 'core/auto-inserted-block',
+					} ),
+				] );
+				expect( state.autoInsertedBlocks ).toEqual( {
+					'': [ 'core/auto-inserted-block' ],
+				} );
+			} );
+
+			it( 'should not automatically insert a previously inserted block', () => {
+				const state = blocks( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{
+							clientId: 'chicken',
+							name: 'core/test-block',
+							attributes: {},
+							innerBlocks: [],
+						},
+					],
+					autoInsertedBlocks: {
+						'': [ 'core/auto-inserted-block' ],
+					},
+				} );
+
+				expect( state.byClientId.size ).toBe( 1 );
+				expect( Array.from( state.byClientId.values() ) ).toEqual( [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+					},
+				] );
+				expect( state.autoInsertedBlocks ).toEqual( {
+					'': [ 'core/auto-inserted-block' ],
+				} );
 			} );
 		} );
 	} );

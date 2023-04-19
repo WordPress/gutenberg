@@ -597,6 +597,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: new Map( mapBlockParents( action.blocks ) ),
 			controlledInnerBlocks: {},
+			autoInsertedBlocks: action?.autoInsertedBlocks || {},
 		};
 
 		newState.tree = new Map( state?.tree );
@@ -751,14 +752,20 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  * @return {Function} Enhanced reducer function.
  */
 const withAutoInsertBlocks = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'RESET_BLOCKS' ) {
+	const {
+		autoInsertedBlocks,
+		blocks: originalBlocks,
+		rootClientId = '',
+		type,
+	} = action;
+	if (
+		originalBlocks?.length &&
+		( 'RESET_BLOCKS' === type || 'REPLACE_INNER_BLOCKS' === type )
+	) {
 		const autoInsertBlockTypes = select( blocksStore )
 			.getBlockTypes()
 			.filter( ( { autoInsert } ) => {
-				return (
-					autoInsert?.after?.length > 0 ||
-					autoInsert?.before?.length > 0
-				);
+				return autoInsert?.after?.length > 0;
 			} )
 			.reduce( ( autoInsertAccumulator, { name, autoInsert } ) => {
 				return autoInsert.after.reduce(
@@ -776,19 +783,48 @@ const withAutoInsertBlocks = ( reducer ) => ( state, action ) => {
 				);
 			}, {} );
 
-		const result = [];
-		action.blocks.forEach( ( block ) => {
-			result.push( block );
+		const previouslyAutoInsertedBlockNames = new Set(
+			autoInsertedBlocks
+				? autoInsertedBlocks?.[ rootClientId ]
+				: state?.autoInsertedBlocks?.[ rootClientId ]
+		);
+		const newAutoInsertedBlockNames = new Set();
+		const updatedBlocks = [];
+		originalBlocks.forEach( ( block ) => {
+			updatedBlocks.push( block );
 			if ( block.name in autoInsertBlockTypes ) {
 				autoInsertBlockTypes[ block.name ].after.forEach(
 					( autoInsertBlockName ) => {
-						result.push( createBlock( autoInsertBlockName ) );
+						if (
+							! previouslyAutoInsertedBlockNames.has(
+								autoInsertBlockName
+							)
+						) {
+							updatedBlocks.push(
+								createBlock( autoInsertBlockName )
+							);
+							newAutoInsertedBlockNames.add(
+								autoInsertBlockName
+							);
+						}
 					}
 				);
 			}
 		} );
 
-		return reducer( state, { ...action, blocks: result } );
+		const newState = reducer( state, {
+			...action,
+			blocks: updatedBlocks,
+		} );
+		if ( newAutoInsertedBlockNames.size === 0 ) {
+			return newState;
+		}
+
+		return reducer( newState, {
+			type: 'UPDATE_AUTO_INSERTED_BLOCKS',
+			rootClientId,
+			newAutoInsertedBlockNames,
+		} );
 	}
 
 	return reducer( state, action );
@@ -1233,6 +1269,22 @@ export const blocks = pipe(
 			return {
 				...state,
 				[ clientId ]: hasControlledInnerBlocks,
+			};
+		}
+		return state;
+	},
+
+	autoInsertedBlocks(
+		state = {},
+		{ type, rootClientId = '', newAutoInsertedBlockNames }
+	) {
+		if ( 'UPDATE_AUTO_INSERTED_BLOCKS' === type ) {
+			return {
+				...state,
+				[ rootClientId ]: [
+					...( state[ rootClientId ] || [] ),
+					...newAutoInsertedBlockNames,
+				],
 			};
 		}
 		return state;
