@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "13.7.0",
+	"version": "13.8.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -65,7 +65,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"rememo": "^4.0.0",
+		"rememo": "^4.0.2",
 		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {

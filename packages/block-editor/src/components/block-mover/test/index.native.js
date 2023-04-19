@@ -9,7 +9,7 @@ import {
 	within,
 	getEditorHtml,
 	render,
-	changeTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -89,7 +89,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -138,7 +138,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -176,7 +176,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );

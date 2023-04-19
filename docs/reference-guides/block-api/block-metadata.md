@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
@@ -396,7 +396,6 @@ when generating block styles for theme.json (global styles) stylesheets.
 Providing custom selectors allows more fine grained control over which styles
 apply to what block elements, e.g. applying typography styles only to an inner
 heading while colors are still applied on the outer block wrapper etc.
-
 
 See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 

@@ -53,7 +53,6 @@ function ListViewBlock( {
 	path,
 	isExpanded,
 	selectedClientIds,
-	preventAnnouncement,
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
@@ -90,6 +89,7 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = blockInformation?.title || __( 'Untitled' );
 	const blockName = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
@@ -111,28 +111,19 @@ function ListViewBlock( {
 		level
 	);
 
-	let blockAriaLabel = __( 'Link' );
-	if ( blockInformation ) {
-		blockAriaLabel = isLocked
-			? sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the locked block.
-					__( '%s link (locked)' ),
-					blockInformation.title
-			  )
-			: sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the block.
-					__( '%s link' ),
-					blockInformation.title
-			  );
-	}
-
-	const settingsAriaLabel = blockInformation
+	const blockAriaLabel = isLocked
 		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Options for %s block' ),
-				blockInformation.title
+				// translators: %s: The title of the block. This string indicates a link to select the locked block.
+				__( '%s (locked)' ),
+				blockTitle
 		  )
-		: __( 'Options' );
+		: blockTitle;
+
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s' ),
+		blockTitle
+	);
 
 	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
 		useListViewContext();
@@ -249,18 +240,13 @@ function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			data-expanded={ canExpand ? isExpanded : undefined }
-			isExpanded={ canExpand ? isExpanded : undefined }
-			aria-selected={ !! isSelected || forceSelectionContentLock }
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected || forceSelectionContentLock }
-				aria-expanded={ canExpand ? isExpanded : undefined }
-				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -277,9 +263,10 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ isExpanded }
+							isExpanded={ canExpand ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
-							preventAnnouncement={ preventAnnouncement }
+							ariaLabel={ blockAriaLabel }
+							ariaDescribedBy={ descriptionId }
 						/>
 						<div
 							className="block-editor-list-view-block-select-button__description"

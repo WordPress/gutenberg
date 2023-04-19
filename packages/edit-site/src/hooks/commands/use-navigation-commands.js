@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { post, page, layout, symbolFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,6 +16,13 @@ import { unlock } from '../../private-apis';
 import { useHistory } from '../../components/routes';
 
 const { useCommandLoader } = unlock( privateApis );
+
+const icons = {
+	post,
+	page,
+	wp_template: layout,
+	wp_template_part: symbolFilled,
+};
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
@@ -51,6 +59,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),
+					icon: icons[ postType ],
 					callback: ( { close } ) => {
 						history.push( {
 							postType,
