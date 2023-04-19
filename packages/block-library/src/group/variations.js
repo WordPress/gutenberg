@@ -42,7 +42,10 @@ const variations = [
 			blockAttributes.layout?.orientation === 'vertical',
 		icon: stack,
 	},
-	{
+];
+
+if ( window?.__experimentalEnableGroupGridVariation ) {
+	variations.push( {
 		name: 'group-grid',
 		title: __( 'Grid' ),
 		description: __( 'Arrange blocks in a grid.' ),
@@ -51,7 +54,7 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'grid',
 		icon: grid,
-	},
-];
+	} );
+}
 
 export default variations;
