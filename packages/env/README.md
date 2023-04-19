@@ -349,7 +349,7 @@ Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
-  --env-cwd  The working directory the command is ran from.
+  --env-cwd  The directory inside of the container that the command is ran from.
                                              [string] [default: "/var/www/html"]
 ```
 

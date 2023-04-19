@@ -178,7 +178,8 @@ module.exports = function cli() {
 				type: 'string',
 				requiresArg: true,
 				default: '/var/www/html',
-				describe: 'The working directory the command is ran from.',
+				describe:
+					'The directory inside of the container that the command is ran from.',
 			} );
 			args.positional( 'container', {
 				type: 'string',
