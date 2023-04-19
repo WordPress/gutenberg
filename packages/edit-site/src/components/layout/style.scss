@@ -105,8 +105,9 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	overflow: hidden;
-
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	& > div {
 		color: $gray-900;
 	}
