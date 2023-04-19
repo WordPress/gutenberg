@@ -204,7 +204,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 	/**
-	 * Creates a default Navigation Menu fallback.
+	 * Creates a default Navigation Block Menu fallback.
 	 *
 	 * @return int|WP_Error The post ID of the default fallback menu or a WP_Error object.
 	 */
