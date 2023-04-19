@@ -33,7 +33,11 @@ export function PostTemplate() {
 
 	const { editPost } = useDispatch( editorStore );
 
-	if ( ! isViewable || ! Object.entries( availableTemplates ?? {} ).length ) {
+	if (
+		! isViewable ||
+		! availableTemplates ||
+		! Object.keys( availableTemplates ).length
+	) {
 		return null;
 	}
 
