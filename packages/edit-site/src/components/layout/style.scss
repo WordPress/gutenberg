@@ -221,3 +221,18 @@
 		border-left: $border-width solid $gray-300;
 	}
 }
+
+.edit-site-layout.has-fixed-toolbar {
+	// making the header be lower than the content
+	// so the fixed toolbar can be positioned on top of it
+	// but only on desktop
+	@include break-medium() {
+		.edit-site-site-hub {
+			z-index: 4;
+		}
+		.edit-site-layout__header:focus-within {
+			z-index: 3;
+		}
+	}
+
+}

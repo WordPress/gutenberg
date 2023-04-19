@@ -56,26 +56,46 @@
 	}
 }
 
+// on desktop browsers the fixed toolbar has tweaked borders
+@include break-medium() {
+	.block-editor-block-contextual-toolbar.is-fixed {
+		.block-editor-block-toolbar {
+			.components-toolbar-group,
+			.components-toolbar {
+				border-right: none;
+
+				&::after {
+					content: "";
+					width: $border-width;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-bottom: $grid-unit + $grid-unit-05;
+					background-color: $gray-300;
+					margin-left: $grid-unit;
+				}
+
+				& .components-toolbar-group.components-toolbar-group {
+					&::after {
+						display: none;
+					}
+				}
+			}
+
+			> :last-child,
+			> :last-child .components-toolbar-group,
+			> :last-child .components-toolbar {
+				&::after {
+					display: none;
+				}
+			}
+		}
+	}
+}
+
 .block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
 
 	.show-icon-labels & {
 		margin-left: 0;
-	}
-}
-
-.block-editor-block-parent-selector {
-	position: absolute;
-	top: -$border-width;
-	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-	.show-icon-labels & {
-		position: relative;
-		left: auto;
-		top: auto;
-		margin-top: -$border-width;
-		margin-left: -$border-width;
-		margin-bottom: -$border-width;
 	}
 }
 
