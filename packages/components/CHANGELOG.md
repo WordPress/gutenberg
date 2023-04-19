@@ -18,6 +18,7 @@
 ### Internal
 
 -   `Mobile` Refactor of the KeyboardAwareFlatList component.
+-   Update `reakit` dependency to 1.3.11 ([#49763](https://github.com/WordPress/gutenberg/pull/49763)).
 
 ### Enhancements
 
