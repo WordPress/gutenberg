@@ -30,7 +30,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 
 		$fallback = static::get_most_recently_published_navigation();
 
-		if ( $fallback && ! is_wp_error( $fallback ) ) {
+		if ( $fallback ) {
 			return $fallback;
 		}
 
