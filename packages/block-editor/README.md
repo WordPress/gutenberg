@@ -748,7 +748,7 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Array`: CSS rules.
+-   _styles_ `Object|Array`: CSS rules.
 -   _wrapperClassName_ `string`: Wrapper Class Name.
 
 _Returns_
