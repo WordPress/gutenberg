@@ -70,9 +70,9 @@ const Layout = () => (
 
 _Parameters_
 
--   _props_ `PluginAreaProps`:
--   _props.scope_ `string|undefined`:
--   _props.onError_ `( name: WPPlugin[ 'name' ], error: Error ) => void|undefined`:
+-   _props_ `{ scope?: string; onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void; }`:
+-   _props.scope_ `string`:
+-   _props.onError_ `( name: WPPlugin[ 'name' ], error: Error ) => void`:
 
 _Returns_
 

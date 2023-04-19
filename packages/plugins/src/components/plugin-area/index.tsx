@@ -26,17 +26,12 @@ const getPluginContext = memoize(
 	} )
 );
 
-type PluginAreaProps = {
-	scope?: string;
-	onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void;
-};
-
 /**
  * A component that renders all plugin fills in a hidden div.
  *
- * @param                                                                props
- * @param {string|undefined}                                             props.scope
- * @param {( name: WPPlugin[ 'name' ], error: Error ) => void|undefined} props.onError
+ * @param  props
+ * @param  props.scope
+ * @param  props.onError
  * @example
  * ```js
  * // Using ES5 syntax
@@ -68,7 +63,13 @@ type PluginAreaProps = {
  *
  * @return {WPComponent} The component to be rendered.
  */
-function PluginArea( { scope, onError }: PluginAreaProps ) {
+function PluginArea( {
+	scope,
+	onError,
+}: {
+	scope?: string;
+	onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void;
+} ) {
 	const store = useMemo( () => {
 		let lastValue: WPPlugin[] = [];
 
