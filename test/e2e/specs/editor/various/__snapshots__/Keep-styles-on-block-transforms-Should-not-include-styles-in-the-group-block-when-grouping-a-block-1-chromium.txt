@@ -1,5 +1,0 @@
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Line 1 to be made large</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->

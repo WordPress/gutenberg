@@ -1,3 +1,0 @@
-<!-- wp:paragraph {"textColor":"luminous-vivid-orange"} -->
-<p class="has-luminous-vivid-orange-color has-text-color">Heading</p>
-<!-- /wp:paragraph -->

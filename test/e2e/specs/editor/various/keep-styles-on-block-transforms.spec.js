@@ -15,19 +15,17 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 
+		await editor.openDocumentSettingsSidebar();
 		await page.click( 'role=button[name="Text"i]' );
 
 		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
 
-		await page.mouse.move( 50, 50 );
-		await page.mouse.move( 75, 75 );
-		await page.mouse.move( 100, 100 );
 		await page.click( 'role=button[name="Heading"i]' );
-		await page.click(
-			"button[class='components-button components-menu-item__button editor-block-list-item-paragraph'] span[class='components-menu-item__item']"
-		);
+		await page.click( 'role=menuitem[name="Paragraph"i]' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph {"textColor":"luminous-vivid-orange"} -->
+<p class="has-luminous-vivid-orange-color has-text-color">Heading</p>
+<!-- /wp:paragraph -->` );
 	} );
 
 	test( 'Should keep the font size during a transform from multiple blocks into multiple blocks', async ( {
@@ -46,10 +44,21 @@ test.describe( 'Keep styles on block transforms', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Paragraph"i]' );
-		await page.click(
-			"button[class='components-button components-menu-item__button editor-block-list-item-heading']"
-		);
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await page.click( 'role=menuitem[name="Group"i]' );
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Line 1 to be made large</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Line 2 to be made large</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Line 3 to be made large</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+		
 	} );
 
 	test( 'Should not include styles in the group block when grouping a block', async ( {
@@ -64,10 +73,12 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.mouse.move( 75, 75 );
 		await page.mouse.move( 100, 100 );
 		await page.click( 'role=button[name="Paragraph"i]' );
-		await page.click(
-			"button[class='components-button components-menu-item__button editor-block-list-item-group']"
-		);
+		await page.click( 'role=menuitem[name="Group"i]' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Line 1 to be made large</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
 	} );
 } );
