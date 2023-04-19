@@ -5,8 +5,7 @@ import {
 	act,
 	addBlock,
 	getBlock,
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -55,10 +54,10 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Bold' ) );
 
@@ -80,10 +79,10 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
 
@@ -105,10 +104,10 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		fireEvent.press( screen.getByLabelText( 'Strikethrough' ) );
 
@@ -130,7 +129,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -155,7 +154,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -180,7 +179,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -208,9 +207,9 @@ describe( 'Paragraph block', () => {
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		const string = 'A quick brown fox jumps over the lazy dog.';
-		changeAndSelectTextOfRichText( paragraphTextInput, string, {
-			selectionStart: string.length / 2,
-			selectionEnd: string.length / 2,
+		typeInRichText( paragraphTextInput, string, {
+			finalSelectionStart: string.length / 2,
+			finalSelectionEnd: string.length / 2,
 		} );
 		fireEvent( paragraphTextInput, 'onKeyDown', {
 			nativeEvent: {},
@@ -279,12 +278,12 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
-				selectionStart: 2,
-				selectionEnd: 7,
+				finalSelectionStart: 2,
+				finalSelectionEnd: 7,
 			}
 		);
 		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
@@ -325,12 +324,12 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
 			{
-				selectionStart: 2,
-				selectionEnd: 7,
+				finalSelectionStart: 2,
+				finalSelectionEnd: 7,
 			}
 		);
 		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
@@ -362,14 +361,10 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
-			paragraphTextInput,
-			'     some text      ',
-			{
-				selectionStart: 5,
-				selectionEnd: 14,
-			}
-		);
+		typeInRichText( paragraphTextInput, '     some text      ', {
+			finalSelectionStart: 5,
+			finalSelectionEnd: 14,
+		} );
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
 
 		// Assert

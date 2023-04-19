@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 15.6.0-rc.3 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Site Editor
+- Fix the site editor loading in multi-site installs. ([49861](https://github.com/WordPress/gutenberg/pull/49861))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad
+
+
 = 15.6.0-rc.2 =
 
 

@@ -44,7 +44,7 @@ const getWPAdminAddCommandLoader = ( postType ) =>
 		const commands = useMemo(
 			() => [
 				{
-					name: 'core/wp-admin/add-' + postType,
+					name: 'core/wp-admin/add-' + postType + '-' + search,
 					label,
 					icon: plus,
 					callback: () => {

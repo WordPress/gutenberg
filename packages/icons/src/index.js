@@ -120,6 +120,7 @@ export { default as key } from './library/key';
 export { default as keyboardClose } from './library/keyboard-close';
 export { default as keyboardReturn } from './library/keyboard-return';
 export { default as layout } from './library/layout';
+export { default as levelUp } from './library/level-up';
 export { default as lifesaver } from './library/lifesaver';
 export { default as lineDashed } from './library/line-dashed';
 export { default as lineDotted } from './library/line-dotted';

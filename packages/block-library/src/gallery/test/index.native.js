@@ -3,7 +3,7 @@
  */
 import {
 	act,
-	changeTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getBlock,
 	getEditorHtml,
@@ -173,7 +173,7 @@ describe( 'Gallery block', () => {
 		const captionField = within(
 			getByLabelText( /Gallery caption. Empty/ )
 		).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption'
 		);
@@ -197,7 +197,7 @@ describe( 'Gallery block', () => {
 		// Set gallery item caption
 		const captionField =
 			within( galleryItem ).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption'
 		);
@@ -537,7 +537,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>

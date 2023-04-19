@@ -5,8 +5,14 @@ import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { InspectorControls } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../private-apis';
+
+const { BlockInfo } = unlock( blockEditorPrivateApis );
 const CreateNewPostLink = ( {
 	attributes: { query: { postType } = {} } = {},
 } ) => {
@@ -17,7 +23,7 @@ const CreateNewPostLink = ( {
 	return (
 		<div className="wp-block-query__create-new-link">
 			{ createInterpolateElement(
-				__( '<a>Create a new post</a> for this feed.' ),
+				__( '<a>Add new post</a>' ),
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				{ a: <a href={ newPostUrl } /> }
 			) }
@@ -31,7 +37,7 @@ const CreateNewPostLink = ( {
  * @param {Function} BlockEdit Original component
  * @return {Function}           Wrapped component
  */
-const queryTopInspectorControls = createHigherOrderComponent(
+const queryTopBlockInfo = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name, isSelected } = props;
 		if ( name !== 'core/query' || ! isSelected ) {
@@ -40,14 +46,14 @@ const queryTopInspectorControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<InspectorControls>
+				<BlockInfo>
 					<CreateNewPostLink { ...props } />
-				</InspectorControls>
+				</BlockInfo>
 				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
-	'withInspectorControls'
+	'withBlockInfo'
 );
 
-export default queryTopInspectorControls;
+export default queryTopBlockInfo;
