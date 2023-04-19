@@ -248,7 +248,8 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * For more in-depth information on registering a custom block see the [Create a block tutorial](/docs/getting-started/create-block/README.md)
+ * For more in-depth information on registering a custom block see the
+ * [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
  *
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
@@ -675,7 +676,8 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 /**
  * Registers a new block style for the given block.
  *
- * For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
+ * For more information on connecting the styles with CSS
+ * [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
  *
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
@@ -754,7 +756,8 @@ export const getBlockVariations = ( blockName, scope ) => {
 /**
  * Registers a new block variation for the given block type.
  *
- * For more information on block variations see [the official documentation ](/docs/reference-guides/block-api/block-variations.md)
+ * For more information on block variations see
+ * [the official documentation ](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/).
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.

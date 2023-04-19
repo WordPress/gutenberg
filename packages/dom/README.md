@@ -131,6 +131,7 @@ Given a DOM node, finds the closest scrollable container node or the node itself
 _Parameters_
 
 -   _node_ `Element | null`: Node from which to start.
+-   _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
 
 _Returns_
 

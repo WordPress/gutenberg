@@ -20,7 +20,7 @@
 	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	border-radius: $radius-block-ui;
+	border-radius: $grid-unit-10;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
@@ -64,12 +64,12 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-20;
+	height: $header-height + $grid-unit-15;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -121,7 +121,7 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-20;
+	margin-top: $header-height + $grid-unit-15;
 	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 

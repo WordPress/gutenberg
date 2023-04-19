@@ -5,17 +5,56 @@
  * @package gutenberg
  */
 
+// Register duotone block supports.
+WP_Block_Supports::get_instance()->register(
+	'duotone',
+	array(
+		'register_attribute' => array( 'WP_Duotone_Gutenberg', 'register_duotone_support' ),
+	)
+);
+
+// Set up metadata prior to rendering any blocks.
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
+
+// Remove WordPress core filter to avoid rendering duplicate support elements.
+remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
+
+// Enqueue styles.
+// Block styles (core-block-supports-inline-css) before the style engine (gutenberg_enqueue_stored_styles).
+// Global styles (global-styles-inline-css) after the other global styles (gutenberg_enqueue_global_styles).
+add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_block_styles' ), 9 );
+add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_global_styles' ), 11 );
+
+// Add SVG filters to the footer. Also, for classic themes, output block styles (core-block-supports-inline-css).
+add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
+
+// Add styles and SVGs for use in the editor via the EditorStyles component.
+add_filter( 'block_editor_settings_all', array( 'WP_Duotone_Gutenberg', 'add_editor_settings' ), 10 );
+
+// Migrate the old experimental duotone support flag.
+add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migrate_experimental_duotone_support_flag' ), 10, 2 );
+
+/*
+ * Deprecated functions below. All new functions should be added in class-wp-duotone-gutenberg.php.
+ */
+
 /**
  * Direct port of tinycolor's bound01 function, lightly simplified to maintain
  * consistency with tinycolor.
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  mixed $n   Number of unknown type.
  * @param  int   $max Upper value of the range to bound to.
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
@@ -42,10 +81,14 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  mixed $n   Number of unknown type.
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound_alpha( $n ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( is_numeric( $n ) ) {
 		$n = (float) $n;
 		if ( $n >= 0 && $n <= 1 ) {
@@ -60,10 +103,14 @@ function gutenberg_tinycolor_bound_alpha( $n ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $rgb_color RGB object.
  * @return array            Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	return array(
 		'r' => gutenberg_tinycolor_bound01( $rgb_color['r'], 255 ) * 255,
 		'g' => gutenberg_tinycolor_bound01( $rgb_color['g'], 255 ) * 255,
@@ -76,12 +123,16 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  float $p first component.
  * @param  float $q second component.
  * @param  float $t third component.
  * @return float    R, G, or B component.
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( $t < 0 ) {
 		++$t;
 	}
@@ -105,10 +156,14 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $hsl_color HSL object.
  * @return array            Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	$h = gutenberg_tinycolor_bound01( $hsl_color['h'], 360 );
 	$s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
 	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
@@ -140,10 +195,14 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  * @see https://github.com/bgrins/TinyColor
  * @see https://github.com/casesandberg/react-color/
  *
+ * @deprecated 6.3.0
+ *
  * @param  string $color_str CSS color string.
  * @return array             RGB object.
  */
 function gutenberg_tinycolor_string_to_rgb( $color_str ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	$color_str = strtolower( trim( $color_str ) );
 
 	$css_integer = '[-\\+]?\\d+%?';
@@ -293,163 +352,64 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 /**
  * Returns the prefixed id for the duotone filter for use as a CSS id.
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $preset Duotone preset value as seen in theme.json.
  * @return string        Duotone filter CSS id.
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
-	if ( ! isset( $preset['slug'] ) ) {
-		return '';
-	}
-
-	return 'wp-duotone-' . $preset['slug'];
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+	return WP_Duotone_Gutenberg::get_filter_id_from_preset( $preset );
 }
 
 /**
  * Returns the CSS filter property url to reference the rendered SVG.
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $preset Duotone preset value as seen in theme.json.
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
-	if ( isset( $preset['colors'] ) && is_string( $preset['colors'] ) ) {
-		return $preset['colors'];
-	}
-	$filter_id = gutenberg_get_duotone_filter_id( $preset );
-	return "url('#" . $filter_id . "')";
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+	return WP_Duotone_Gutenberg::get_filter_css_property_value_from_preset( $preset );
 }
 
 /**
  * Returns the duotone filter SVG string for the preset.
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $preset Duotone preset value as seen in theme.json.
  * @return string        Duotone SVG filter.
  */
 function gutenberg_get_duotone_filter_svg( $preset ) {
-	$filter_id = gutenberg_get_duotone_filter_id( $preset );
-
-	$duotone_values = array(
-		'r' => array(),
-		'g' => array(),
-		'b' => array(),
-		'a' => array(),
-	);
-
-	if ( ! isset( $preset['colors'] ) || ! is_array( $preset['colors'] ) ) {
-		$preset['colors'] = array();
-	}
-
-	foreach ( $preset['colors'] as $color_str ) {
-		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
-
-		$duotone_values['r'][] = $color['r'] / 255;
-		$duotone_values['g'][] = $color['g'] / 255;
-		$duotone_values['b'][] = $color['b'] / 255;
-		$duotone_values['a'][] = $color['a'];
-	}
-
-	ob_start();
-
-	?>
-
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 0 0"
-		width="0"
-		height="0"
-		focusable="false"
-		role="none"
-		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
-	>
-		<defs>
-			<filter id="<?php echo esc_attr( $filter_id ); ?>">
-				<feColorMatrix
-					color-interpolation-filters="sRGB"
-					type="matrix"
-					values="
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-					"
-				/>
-				<feComponentTransfer color-interpolation-filters="sRGB" >
-					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
-					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
-					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
-					<feFuncA type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['a'] ) ); ?>" />
-				</feComponentTransfer>
-				<feComposite in2="SourceGraphic" operator="in" />
-			</filter>
-		</defs>
-	</svg>
-
-	<?php
-
-	$svg = ob_get_clean();
-
-	if ( ! SCRIPT_DEBUG ) {
-		// Clean up the whitespace.
-		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
-		$svg = str_replace( '> <', '><', $svg );
-		$svg = trim( $svg );
-	}
-
-	return $svg;
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+	return WP_Duotone_Gutenberg::get_filter_svg_from_preset( $preset );
 }
 
 /**
  * Registers the style and colors block attributes for block types that support it.
  *
+ * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::register_duotone_support() instead.
+ *
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_duotone_support( $block_type ) {
-	$has_duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		// Previous `color.__experimentalDuotone` support flag is migrated
-		// to `filter.duotone` via `block_type_metadata_settings` filter.
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
-	}
-
-	if ( $has_duotone_support ) {
-		if ( ! $block_type->attributes ) {
-			$block_type->attributes = array();
-		}
-
-		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
-			$block_type->attributes['style'] = array(
-				'type' => 'object',
-			);
-		}
-	}
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::register_duotone_support' );
+	return WP_Duotone_Gutenberg::register_duotone_support( $block_type );
 }
 
 /**
  * Render out the duotone stylesheet and SVG.
  *
+ * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::render_duotone_support() instead.
+ *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
- * @deprecated    6.3.0          Use WP_Duotone_Gutenberg::render_duotone_support() instead.
  * @return string                Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );
 	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block );
 }
-
-// Register the block support.
-WP_Block_Supports::get_instance()->register(
-	'duotone',
-	array(
-		'register_attribute' => 'gutenberg_register_duotone_support',
-	)
-);
-
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
-// Remove WordPress core filter to avoid rendering duplicate support elements.
-remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
-add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
-add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_global_styles' ), 11 );
-add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
-add_filter( 'block_editor_settings_all', array( 'WP_Duotone_Gutenberg', 'add_editor_settings' ), 10 );
-add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migrate_experimental_duotone_support_flag' ), 10, 2 );

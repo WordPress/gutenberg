@@ -18,6 +18,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
         - Top-level
         - Block-level
         - Elements
+        - Variations
     - customTemplates
     - templateParts
     - patterns
@@ -1082,6 +1083,41 @@ Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link`
 			}
 		}
 	}
+```
+
+#### Variations
+
+A block can have a "style variation", as defined per the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the theme.json file. Styles for unregistered style variations will be ignored.
+
+Note that variations are a "block concept", they only exist bound to blocks. The `theme.json` specification respects that distinction by only allowing `variations` at the block-level but not at the top-level. It's also worth highlighting that only variations defined in the `block.json` file of the block are considered "registered": so far, the style variations added via `register_block_style` or in the client are ignored, see [this issue](https://github.com/WordPress/gutenberg/issues/49602) for more information.
+
+For example, this is how to provide styles for the existing `plain` variation for the `core/quote` block:
+
+```json
+{
+	"version": 2,
+	"styles":{
+		"blocks": {
+			"core/quote": {
+				"variations": {
+					"plain": {
+						"color": {
+							"background": "red"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+The resulting CSS output is this:
+
+```css
+.wp-block-quote.is-style-plain {
+	background-color: red;
+}
 ```
 
 ### customTemplates

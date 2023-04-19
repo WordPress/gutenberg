@@ -6,6 +6,10 @@
 
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
+
+## 11.8.0 (2023-04-12)
+
+
 ## 11.7.0 (2023-03-29)
 
 -   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).

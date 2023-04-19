@@ -96,6 +96,7 @@ export { default as __experimentalSpacingSizesControl } from './spacing-sizes-co
 export {
 	getSpacingPresetCssVar,
 	isValueSpacingPreset,
+	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
 /*
  * Content Related Components

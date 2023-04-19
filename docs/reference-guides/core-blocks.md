@@ -766,7 +766,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 ## Site Logo
 
-Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
+Display an image to represent this site. Update this block and the changes apply everywhere. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
 
 -	**Name:** core/site-logo
 -	**Category:** theme
