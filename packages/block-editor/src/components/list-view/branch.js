@@ -99,6 +99,7 @@ function ListViewBranch( props ) {
 		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		prioritizedInserterBlocks,
 	} = props;
 
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
@@ -232,6 +233,9 @@ function ListViewBranch( props ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
+								prioritizedInserterBlocks={
+									prioritizedInserterBlocks
+								}
 								{ ...treeGridCellProps }
 							/>
 						) }
