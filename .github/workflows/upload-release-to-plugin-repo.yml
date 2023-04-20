@@ -5,8 +5,12 @@ on:
         types: [published]
 
 jobs:
-    compute_should_update_trunk:
+    compute-should-update-trunk:
+        name: Decide if trunk or tag
         runs-on: ubuntu-latest
+        outputs:
+            should_update_trunk: ${{ steps.compute_should_update_trunk.outputs.should_update_trunk }}
+            latest_version_in_core_repo: ${{ steps.compute_latest_version_in_core_repo.outputs.version }}
 
         steps:
             - name: Fetch latest version in the WP core repo
@@ -145,7 +149,7 @@ jobs:
         name: Publish as trunk (and tag)
         runs-on: ubuntu-latest
         environment: wp.org plugin
-        needs: [compute_should_update_trunk, update-changelog]
+        needs: [compute-should-update-trunk, update-changelog]
         if: |
             needs.compute_should_update_trunk.outputs.should_update_trunk == 'true' &&
             !github.event.release.prerelease && github.event.release.assets[0]
@@ -209,7 +213,7 @@ jobs:
         name: Publish as tag
         runs-on: ubuntu-latest
         environment: wp.org plugin
-        needs: [compute_should_update_trunk, update-changelog]
+        needs: [compute-should-update-trunk, update-changelog]
         if: |
             needs.compute_should_update_trunk.outputs.should_update_trunk == 'false' &&
             !github.event.release.prerelease && github.event.release.assets[0]
