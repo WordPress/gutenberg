@@ -439,7 +439,7 @@ _Parameters_
 
 _Returns_
 
--   `RichTextFormatType|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
@@ -464,7 +464,7 @@ _Parameters_
 -   _$1_ `Object`: Named parameters.
 -   _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
 -   _$1.value_ `RichTextValue`: Value to check for selection.
--   _$1.settings_ `RichTextFormatType`: The format type's settings.
+-   _$1.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
