@@ -83,7 +83,31 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	checkValidURL( envPrefix, config.config, 'WP_SITEURL' );
+	checkValidURL( envPrefix, config.config, 'WP_HOME' );
+
 	return config;
+}
+
+/**
+ * Validates the input and throws if it isn't a valid URL.
+ *
+ * @param {string} envPrefix The environment we're validating.
+ * @param {Object} config    The configuration object we're looking at.
+ * @param {string} configKey The configuration key we're validating.
+ */
+function checkValidURL( envPrefix, config, configKey ) {
+	if ( config[ configKey ] === undefined ) {
+		return;
+	}
+
+	try {
+		new URL( config[ configKey ] );
+	} catch {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }config.${ configKey }" must be a valid URL.`
+		);
+	}
 }
 
 module.exports = {
