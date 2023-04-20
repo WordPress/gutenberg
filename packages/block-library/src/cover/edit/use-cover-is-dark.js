@@ -16,7 +16,7 @@ import { applyFilters } from '@wordpress/hooks';
  * @see https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover
  *
  * @param {import('colord').RgbaColor} source Source color.
- * @param {import('colord').RgbaColor} dest Destination color.
+ * @param {import('colord').RgbaColor} dest   Destination color.
  * @return {import('colord').RgbaColor} Composite color.
  */
 function compositeSourceOver( source, dest ) {
