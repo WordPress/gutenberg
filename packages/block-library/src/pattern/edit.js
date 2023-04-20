@@ -6,18 +6,25 @@ import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId } ) => {
-	const selectedPattern = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__experimentalGetParsedPattern(
-				attributes.slug
-			),
-		[ attributes.slug ]
+	const { selectedPattern, innerBlocks } = useSelect(
+		( select ) => {
+			return {
+				selectedPattern: select(
+					blockEditorStore
+				).__experimentalGetParsedPattern( attributes.slug ),
+				innerBlocks:
+					select( blockEditorStore ).getBlock( clientId )
+						?.innerBlocks,
+			};
+		},
+		[ attributes.slug, clientId ]
 	);
 
-	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	// Run this effect when the component loads.
@@ -25,7 +32,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	// This change won't be saved.
 	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
-		if ( selectedPattern?.blocks ) {
+		if ( selectedPattern?.blocks && ! innerBlocks?.length ) {
 			// We batch updates to block list settings to avoid triggering cascading renders
 			// for each container block included in a tree and optimize initial render.
 			// Since the above uses microtasks, we need to use a microtask here as well,
@@ -33,14 +40,20 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlocks( clientId, selectedPattern.blocks );
+				replaceInnerBlocks( clientId, selectedPattern.blocks );
 			} );
 		}
-	}, [ clientId, selectedPattern?.blocks ] );
+	}, [
+		clientId,
+		selectedPattern?.blocks,
+		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		innerBlocks,
+	] );
 
-	const props = useBlockProps();
-
-	return <div { ...props } />;
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
+	return <> { innerBlocksProps.children } </>;
 };
 
 export default PatternEdit;
