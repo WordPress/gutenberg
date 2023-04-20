@@ -77,16 +77,16 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 
 		$this->assertEquals( 200, $response->get_status(), 'Status should indicate successful request.' );
 
-		$this->assertIsArray( $data );
+		$this->assertIsArray( $data, 'Response should be of correct type.' );
 
-		$this->assertArrayHasKey( 'id', $data );
+		$this->assertArrayHasKey( 'id', $data, 'Response should contain expected fields.' );
 
-		$this->assertEquals( 'wp_navigation', get_post_type( $data['id'] ) );
+		$this->assertEquals( 'wp_navigation', get_post_type( $data['id'] ), '"id" field should represent a post of type "wp_navigation"' );
 
 		// Check that only a single Navigation fallback was created.
 		$navs_in_db = $this->get_navigations_in_database();
 
-		$this->assertCount( 1, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
+		$this->assertCount( 1, $navs_in_db, 'Only a single Navigation menu should be present in the database.' );
 
 	}
 
@@ -106,7 +106,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 
 		$schema = $data['schema'];
 
-		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertEquals( 'object', $schema['type'], 'The schema type should match the expected type.' );
 
 		$this->assertArrayHasKey( 'id', $schema['properties'], 'Schema should have an "id" property.' );
 		$this->assertEquals( 'integer', $schema['properties']['id']['type'], 'Schema "id" property should be an integer.' );
@@ -168,7 +168,4 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 	public function test_delete_item() {
 		// Controller does not implement delete_item().
 	}
-
-
-
 }
