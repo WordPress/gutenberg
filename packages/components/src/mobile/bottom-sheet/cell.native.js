@@ -10,7 +10,6 @@ import {
 	AccessibilityInfo,
 	Platform,
 } from 'react-native';
-import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -273,8 +272,8 @@ class BottomSheetCell extends Component {
 				return accessibilityLabel || label;
 			}
 
-			if ( isEmpty( value ) ) {
-				return isEmpty( help )
+			if ( ! value ) {
+				return ! help
 					? sprintf(
 							/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
 							_x( '%s. Empty', 'inline textinput cell' ),
@@ -288,7 +287,7 @@ class BottomSheetCell extends Component {
 							help
 					  );
 			}
-			return isEmpty( help )
+			return ! help
 				? sprintf(
 						/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
 						_x( '%1$s, %2$s', 'inline textinput cell' ),
@@ -323,7 +322,7 @@ class BottomSheetCell extends Component {
 		const opacity =
 			activeOpacity !== undefined
 				? activeOpacity
-				: get( platformStyles, 'activeOpacity.opacity' );
+				: platformStyles.activeOpacity?.opacity;
 
 		return (
 			<TouchableRipple
