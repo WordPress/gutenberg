@@ -44,20 +44,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const url = ( () => {
-		const port = config.env[ environment ].port;
-		const domain =
-			environment === 'tests'
-				? config.env.tests.config.WP_TESTS_DOMAIN
-				: config.env.development.config.WP_SITEURL;
-		if ( port === 80 ) {
-			return domain;
-		}
-
-		return `${ domain }:${ port }`;
-	} )();
-
-	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];

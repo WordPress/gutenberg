@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Breaking Change
 
+-   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
+-   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
 between the host, web container, and cli container.
