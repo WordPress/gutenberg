@@ -6,6 +6,12 @@
 
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 
+### Bug fix
+
+-   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
+between the host, web container, and cli container.
+
+
 ## 5.16.0 (2023-04-12)
 
 ## 5.15.0 (2023-03-29)
