@@ -18,12 +18,12 @@ export type DraggableProps = {
 		onDraggableEnd: ( event: DragEvent ) => void;
 	} ) => JSX.Element | null;
 	/**
-	 * Whether to attach the cloned element to the element's wrapper when using `elementId`.
-	 * Setting to false will attach the cloned element to the `ownerDocument` body.
+	 * Whether to append the cloned element to the `ownerDocument` body.
+	 * By default, elements sourced by id are appended to the element's wrapper.
 	 *
-	 *@default true
+	 *@default false
 	 */
-	attachElementToWrapper?: boolean;
+	appendToOwnerDocument?: boolean;
 	/**
 	 * Classname for the cloned element.
 	 */

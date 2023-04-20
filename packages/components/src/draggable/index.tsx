@@ -63,7 +63,7 @@ export function Draggable( {
 	onDragStart,
 	onDragOver,
 	onDragEnd,
-	attachElementToWrapper = true,
+	appendToOwnerDocument = false,
 	cloneClassname,
 	elementId,
 	transferData,
@@ -174,10 +174,10 @@ export function Draggable( {
 			cloneWrapper.appendChild( clone );
 
 			// Inject the cloneWrapper into the DOM.
-			if ( attachElementToWrapper ) {
-				elementWrapper?.appendChild( cloneWrapper );
-			} else {
+			if ( appendToOwnerDocument ) {
 				ownerDocument.body.appendChild( cloneWrapper );
+			} else {
+				elementWrapper?.appendChild( cloneWrapper );
 			}
 		}
 
