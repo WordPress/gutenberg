@@ -175,6 +175,17 @@ function ColorPalette( {
 		}
 	}
 
+	function getColorGradientName( value ) {
+		const foundColorName = isGradientSegment
+			? defaultSettings.gradients.find(
+					( gradient ) => gradient.gradient === value
+			  )
+			: defaultSettings.allColors.find(
+					( color ) => color.color === value
+			  );
+		return foundColorName ? foundColorName?.name : '';
+	}
+
 	function onColorPress( color ) {
 		deselectCustomGradient();
 		performAnimation( color );
@@ -251,6 +262,8 @@ function ColorPalette( {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
+					const colorName = getColorGradientName( color );
+
 					return (
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
@@ -260,7 +273,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
-								accessibilityLabel={ color }
+								accessibilityLabel={ colorName }
 								testID={ color }
 							>
 								<Animated.View

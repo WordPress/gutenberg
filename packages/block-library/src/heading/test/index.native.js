@@ -70,7 +70,7 @@ describe( 'Heading block', () => {
 		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#f78da7' ) );
+		fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -104,7 +104,7 @@ describe( 'Heading block', () => {
 		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#ff6900' ) );
+		fireEvent.press( screen.getByLabelText( 'Luminous vivid orange' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );

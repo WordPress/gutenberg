@@ -304,7 +304,7 @@ describe( 'Buttons block', () => {
 			fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
 
 			// Tap one color
-			fireEvent.press( screen.getByLabelText( '#f78da7' ) );
+			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
 
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );
@@ -341,7 +341,7 @@ describe( 'Buttons block', () => {
 			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
 
 			// Tap one color
-			fireEvent.press( screen.getByLabelText( '#fcb900' ) );
+			fireEvent.press( screen.getByLabelText( 'Luminous vivid amber' ) );
 
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );
@@ -382,9 +382,7 @@ describe( 'Buttons block', () => {
 
 			// Tap one gradient color
 			fireEvent.press(
-				screen.getByLabelText(
-					'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
-				)
+				screen.getByLabelText( 'Light green cyan to vivid green cyan' )
 			);
 
 			// Dismiss the Block Settings modal.

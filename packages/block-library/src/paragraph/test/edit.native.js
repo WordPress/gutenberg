@@ -401,7 +401,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#f78da7' ) );
+		fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -439,7 +439,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#ff6900' ) );
+		fireEvent.press( screen.getByLabelText( 'Luminous vivid orange' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -477,7 +477,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#ffffff' ) );
+		fireEvent.press( screen.getByLabelText( 'White' ) );
 
 		// Go back to the settings menu
 		fireEvent.press( screen.getByLabelText( 'Go back' ) );
@@ -486,7 +486,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#ff6900' ) );
+		fireEvent.press( screen.getByLabelText( 'Luminous vivid orange' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -569,7 +569,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
 
 		// Assert
-		const colorButton = screen.getByLabelText( '#ff6900' );
+		const colorButton = screen.getByLabelText( 'Luminous vivid orange' );
 		expect( colorButton ).toBeDefined();
 
 		const gradientButton = screen.queryByLabelText( 'Gradient' );
@@ -601,7 +601,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
 
 		// Tap one color
-		fireEvent.press( screen.getByLabelText( '#2411a4' ) );
+		fireEvent.press( screen.getByLabelText( 'Tertiary' ) );
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
