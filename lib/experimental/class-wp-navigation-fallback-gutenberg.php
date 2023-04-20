@@ -58,7 +58,6 @@ class WP_Navigation_Fallback_Gutenberg {
 	 */
 	private static function get_most_recently_published_navigation() {
 
-
 		$parsed_args = array(
 			'post_type'              => 'wp_navigation',
 			'no_found_rows'          => true,
