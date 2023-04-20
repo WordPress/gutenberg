@@ -1,11 +1,26 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalHStack as HStack,
+	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	Button,
+	ColorIndicator,
 	DuotonePicker,
+	DuotoneSwatch,
+	Dropdown,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -75,6 +90,29 @@ const DEFAULT_CONTROLS = {
 	duotone: true,
 };
 
+const popoverProps = {
+	placement: 'left-start',
+	offset: 36,
+	shift: true,
+	className: 'block-editor-duotone-control__popover',
+	headerTitle: __( 'Duotone' ),
+};
+
+const LabeledColorIndicator = ( { indicator, label } ) => (
+	<HStack justify="flex-start">
+		<ZStack isLayered={ false } offset={ -8 }>
+			<Flex expanded={ false }>
+				{ indicator === 'unset' || ! indicator ? (
+					<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+				) : (
+					<DuotoneSwatch values={ indicator } />
+				) }
+			</Flex>
+		</ZStack>
+		<FlexItem title={ label }>{ label }</FlexItem>
+	</HStack>
+);
+
 export default function FiltersPanel( {
 	as: Wrapper = FiltersToolsPanel,
 	value,
@@ -110,6 +148,11 @@ export default function FiltersPanel( {
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
 
+	const disableCustomColors = ! settings?.color?.custom;
+	const disableCustomDuotone =
+		! settings?.color?.customDuotone ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -135,21 +178,51 @@ export default function FiltersPanel( {
 					isShownByDefault={ defaultControls.duotone }
 					panelId={ panelId }
 				>
-					<VStack>
-						<p>
-							{ __(
-								'Create a two-tone color effect without losing your original image.'
-							) }
-						</p>
-						<DuotonePicker
-							colorPalette={ colorPalette }
-							duotonePalette={ duotonePalette }
-							disableCustomColors={ true }
-							disableCustomDuotone={ true }
-							value={ duotone }
-							onChange={ setDuotone }
-						/>
-					</VStack>
+					<Dropdown
+						popoverProps={ popoverProps }
+						className="block-editor-global-styles-filters-panel__dropdown"
+						renderToggle={ ( { onToggle, isOpen } ) => {
+							const toggleProps = {
+								onClick: onToggle,
+								className: classnames( { 'is-open': isOpen } ),
+								'aria-expanded': isOpen,
+							};
+
+							return (
+								<ItemGroup isBordered isSeparated>
+									<Button { ...toggleProps }>
+										<LabeledColorIndicator
+											indicator={ duotone }
+											label={ __( 'Duotone' ) }
+										/>
+									</Button>
+								</ItemGroup>
+							);
+						} }
+						renderContent={ () => (
+							<DropdownContentWrapper paddingSize="medium">
+								<VStack>
+									<p>
+										{ __(
+											'Create a two-tone color effect without losing your original image.'
+										) }
+									</p>
+									<DuotonePicker
+										colorPalette={ colorPalette }
+										duotonePalette={ duotonePalette }
+										disableCustomColors={
+											disableCustomColors
+										}
+										disableCustomDuotone={
+											disableCustomDuotone
+										}
+										value={ duotone }
+										onChange={ setDuotone }
+									/>
+								</VStack>
+							</DropdownContentWrapper>
+						) }
+					/>
 				</ToolsPanelItem>
 			) }
 		</Wrapper>
