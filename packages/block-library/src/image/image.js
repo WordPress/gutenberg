@@ -572,7 +572,10 @@ export default function Image( {
 				minHeight={ minHeight }
 				maxWidth={ maxWidthBuffer }
 				maxHeight={ maxHeightBuffer }
-				onResizeStart={ onResizeStart }
+				onResizeStart={ () => {
+					updateAlignment( 'none' );
+					onResizeStart();
+				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
 					setAttributes( {
