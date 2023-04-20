@@ -140,8 +140,8 @@ const SegmentedControls = ( {
 		styles.selectedDark
 	);
 
-	const width = segmentsDimensions[ activeSegmentIndex ].width;
-	const height = segmentsDimensions[ activeSegmentIndex ].height;
+	const width = segmentsDimensions[ activeSegmentIndex ]?.width;
+	const height = segmentsDimensions[ activeSegmentIndex ]?.height;
 
 	const outlineStyle = [ styles.outline, isIOS && styles.outlineIOS ];
 
