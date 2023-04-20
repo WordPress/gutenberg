@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 15.6.1 =
+
+## Changelog
+
+### Bug Fixes
+
+#### CSS & Styling
+- Cover: Reduce z-index for inner blocks container. ([49943](https://github.com/WordPress/gutenberg/pull/49943))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw
+
+
 = 15.6.0 =
 
 ## Changelog
