@@ -378,10 +378,11 @@ export function scopeSelector( scope, selector ) {
 }
 
 /**
- * Ideally, falsy values should be retained but the current implementation of
- * global styles merging (theme with user) relies on the fact that emptying inputs
- * (empty strings) should fallback to the parent value.
+ * Some Global Styles UI components (font size for instance) relies on the fact that emptying inputs
+ * (empty strings) should fallback to the parent value (theme.json value).
  * Ideally, there should be a dedicated UI element to "revert to theme" for each input instead.
+ * But until we do, this function is used to transform falsy values to undefined values for these components
+ * which allows the global styles merge algorithm to revert to the theme.json value.
  *
  * @param {*} value Value to normalize.
  *
