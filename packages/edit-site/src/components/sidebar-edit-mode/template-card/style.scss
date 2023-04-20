@@ -59,6 +59,10 @@
 	}
 }
 
+.edit-site-template-revisions {
+	margin-left: math.div(-$grid-unit-10, 2);
+}
+
 h3.edit-site-template-card__template-areas-title {
 	font-weight: 500;
 	margin: 0 0 $grid-unit-10;

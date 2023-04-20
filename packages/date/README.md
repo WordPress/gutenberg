@@ -39,8 +39,7 @@ _Returns_
 
 Formats a date (like `wp_date()` in PHP), translating it into site's locale.
 
-Backward Compatibility Notice: if `timezone` is set to `true`, the function
-behaves like `gmdateI18n`.
+Backward Compatibility Notice: if `timezone` is set to `true`, the function behaves like `gmdateI18n`.
 
 _Related_
 
@@ -105,8 +104,7 @@ _Returns_
 
 ### gmdateI18n
 
-Formats a date (like `wp_date()` in PHP), translating it into site's locale
-and using the UTC timezone.
+Formats a date (like `wp_date()` in PHP), translating it into site's locale and using the UTC timezone.
 
 _Parameters_
 

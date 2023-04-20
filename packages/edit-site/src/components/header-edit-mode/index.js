@@ -100,10 +100,13 @@ export default function HeaderEditMode() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const openInserter = useCallback( () => {
+	const toggleInserter = useCallback( () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover.
+			// Focusing the inserter button should close the inserter popover.
+			// However, there are some cases it won't close when the focus is lost.
+			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
 			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			setIsInserterOpened( true );
 		}
@@ -148,7 +151,7 @@ export default function HeaderEditMode() {
 							variant="primary"
 							isPressed={ isInserterOpen }
 							onMouseDown={ preventDefault }
-							onClick={ openInserter }
+							onClick={ toggleInserter }
 							disabled={ ! isVisualMode }
 							icon={ plus }
 							label={ showIconLabels ? shortLabel : longLabel }

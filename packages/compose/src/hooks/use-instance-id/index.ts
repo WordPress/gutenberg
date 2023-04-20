@@ -8,7 +8,7 @@ const instanceMap = new WeakMap< object, number >();
 /**
  * Creates a new id for a given object.
  *
- * @param  object Object reference to create an id for.
+ * @param object Object reference to create an id for.
  * @return The instance id (index).
  */
 function createId( object: object ): number {
@@ -40,9 +40,9 @@ function useInstanceId< T extends string | number >(
 /**
  * Provides a unique instance ID.
  *
- * @param  object        Object reference to create an id for.
- * @param  [prefix]      Prefix for the unique id.
- * @param  [preferredId] Default ID to use.
+ * @param object        Object reference to create an id for.
+ * @param [prefix]      Prefix for the unique id.
+ * @param [preferredId] Default ID to use.
  * @return The unique instance id.
  */
 function useInstanceId(

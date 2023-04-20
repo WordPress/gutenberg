@@ -51,7 +51,10 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
-jest.useRealTimers();
+jest.mock( '@wordpress/compose', () => ( {
+	...jest.requireActual( '@wordpress/compose' ),
+	useReducedMotion: jest.fn( () => true ),
+} ) );
 
 beforeEach( () => {
 	// Setup a DOM element as a render target.
@@ -789,6 +792,8 @@ describe( 'Manual link entry', () => {
 
 			await user.click( editButton );
 
+			await toggleSettingsDrawer( user );
+
 			let searchInput = screen.getByRole( 'combobox', {
 				name: 'URL',
 			} );
@@ -820,6 +825,8 @@ describe( 'Manual link entry', () => {
 			} );
 
 			await user.click( editButton );
+
+			await toggleSettingsDrawer( user );
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
@@ -1649,9 +1656,8 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+	it( 'should not show a means to toggle the link settings when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
-		const expectedSettingText = 'Open in new tab';
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -1660,6 +1666,67 @@ describe( 'Addition Settings UI', () => {
 		};
 
 		render( <LinkControlConsumer /> );
+
+		const settingsToggle = screen.queryByRole( 'button', {
+			name: 'Link Settings',
+			ariaControls: 'link-settings-1',
+		} );
+
+		expect( settingsToggle ).not.toBeInTheDocument();
+	} );
+	it( 'should provides a means to toggle the link settings', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return <LinkControl value={ link } forceIsEditingLink />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		const settingsToggle = screen.queryByRole( 'button', {
+			name: 'Link Settings',
+			ariaControls: 'link-settings-1',
+		} );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		expect( settingsToggle ).toBeVisible();
+
+		await user.click( settingsToggle );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		const newTabSettingInput = screen.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		expect( newTabSettingInput ).toBeVisible();
+
+		await user.click( settingsToggle );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( newTabSettingInput ).not.toBeVisible();
+	} );
+
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+		const expectedSettingText = 'Open in new tab';
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return <LinkControl value={ link } forceIsEditingLink />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
 
 		const newTabSettingLabel = screen.getByText( expectedSettingText );
 		expect( newTabSettingLabel ).toBeVisible();
@@ -1693,11 +1760,16 @@ describe( 'Addition Settings UI', () => {
 				<LinkControl
 					value={ { ...link, newTab: false, noFollow: true } }
 					settings={ customSettings }
+					forceIsEditingLink
 				/>
 			);
 		};
 
 		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
 
 		expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
 
@@ -2047,6 +2119,10 @@ describe( 'Controlling link title text', () => {
 			/>
 		);
 
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
 		expect(
 			screen.queryByRole( 'textbox', { name: 'Text' } )
 		).toBeVisible();
@@ -2073,6 +2149,10 @@ describe( 'Controlling link title text', () => {
 				/>
 			);
 
+			const user = userEvent.setup();
+
+			await toggleSettingsDrawer( user );
+
 			const textInput = screen.queryByRole( 'textbox', {
 				name: 'Text',
 			} );
@@ -2094,6 +2174,8 @@ describe( 'Controlling link title text', () => {
 				onChange={ mockOnChange }
 			/>
 		);
+
+		await toggleSettingsDrawer( user );
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
@@ -2129,6 +2211,8 @@ describe( 'Controlling link title text', () => {
 			/>
 		);
 
+		await toggleSettingsDrawer( user );
+
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
 		expect( textInput ).toBeVisible();
@@ -2152,3 +2236,11 @@ describe( 'Controlling link title text', () => {
 		).not.toBeInTheDocument();
 	} );
 } );
+
+async function toggleSettingsDrawer( user ) {
+	const settingsToggle = screen.queryByRole( 'button', {
+		name: 'Link Settings',
+	} );
+
+	await user.click( settingsToggle );
+}

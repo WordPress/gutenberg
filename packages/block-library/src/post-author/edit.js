@@ -120,6 +120,7 @@ function PostAuthorEdit( {
 							/>
 						) ) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
 						onChange={ () =>
@@ -140,6 +141,7 @@ function PostAuthorEdit( {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show bio' ) }
 						checked={ showBio }
 						onChange={ () =>
@@ -147,12 +149,14 @@ function PostAuthorEdit( {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link author name to author page' ) }
 						checked={ isLink }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 					/>
 					{ isLink && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {

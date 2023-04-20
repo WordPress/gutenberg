@@ -11,6 +11,9 @@
 			"type": "boolean",
 			"default": false
 		},
+		"aspectRatio": {
+			"type": "string"
+		},
 		"width": {
 			"type": "string"
 		},

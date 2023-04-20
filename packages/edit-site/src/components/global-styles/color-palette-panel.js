@@ -6,14 +6,14 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 export default function ColorPalettePanel( { name } ) {
 	const [ themeColors, setThemeColors ] = useGlobalSetting(
@@ -55,6 +55,7 @@ export default function ColorPalettePanel( { name } ) {
 					colors={ themeColors }
 					onChange={ setThemeColors }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultColors &&
@@ -66,12 +67,14 @@ export default function ColorPalettePanel( { name } ) {
 						colors={ defaultColors }
 						onChange={ setDefaultColors }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelHeadingLevel={ 3 }
 					/>
 				) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelHeadingLevel={ 3 }
 				emptyMessage={ __(
 					'Custom colors are empty! Add some colors to create your own color palette.'
 				) }

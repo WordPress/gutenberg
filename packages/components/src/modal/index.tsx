@@ -14,6 +14,7 @@ import {
 	useRef,
 	useState,
 	forwardRef,
+	useLayoutEffect,
 } from '@wordpress/element';
 import {
 	useInstanceId,
@@ -25,6 +26,7 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -76,8 +78,26 @@ function UnforwardedModal(
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
+	const contentRef = useRef< HTMLDivElement >( null );
+	const childrenContainerRef = useRef< HTMLDivElement >( null );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+
+	// Determines whether the Modal content is scrollable and updates the state.
+	const isContentScrollable = useCallback( () => {
+		if ( ! contentRef.current ) {
+			return;
+		}
+
+		const closestScrollContainer = getScrollContainer( contentRef.current );
+
+		if ( contentRef.current === closestScrollContainer ) {
+			setHasScrollableContent( true );
+		} else {
+			setHasScrollableContent( false );
+		}
+	}, [ contentRef ] );
 
 	useEffect( () => {
 		openModalCount++;
@@ -96,6 +116,22 @@ function UnforwardedModal(
 			}
 		};
 	}, [ bodyOpenClassName ] );
+
+	// Calls the isContentScrollable callback when the Modal children container resizes.
+	useLayoutEffect( () => {
+		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
+			return;
+		}
+
+		const resizeObserver = new ResizeObserver( isContentScrollable );
+		resizeObserver.observe( childrenContainerRef.current );
+
+		isContentScrollable();
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [ isContentScrollable, childrenContainerRef ] );
 
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
@@ -172,10 +208,18 @@ function UnforwardedModal(
 					<div
 						className={ classnames( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
+							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
 						} ) }
 						role="document"
 						onScroll={ onContentContainerScroll }
+						ref={ contentRef }
+						aria-label={
+							hasScrollableContent
+								? __( 'Scrollable section' )
+								: undefined
+						}
+						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">
@@ -208,7 +252,7 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						{ children }
+						<div ref={ childrenContainerRef }>{ children }</div>
 					</div>
 				</div>
 			</StyleProvider>

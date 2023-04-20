@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button, Modal } from '@wordpress/components';
@@ -11,7 +16,7 @@ import { NavigableRegion } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 export default function SavePanel() {
 	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {
@@ -35,6 +40,9 @@ export default function SavePanel() {
 				className="edit-site-save-panel__modal"
 				onRequestClose={ onClose }
 				__experimentalHideHeader
+				contentLabel={ __(
+					'Save site, content, and template changes'
+				) }
 			>
 				<EntitiesSavedStates close={ onClose } />
 			</Modal>
@@ -43,7 +51,9 @@ export default function SavePanel() {
 
 	return (
 		<NavigableRegion
-			className="edit-site-layout__actions"
+			className={ classnames( 'edit-site-layout__actions', {
+				'is-entity-save-view-open': isSaveViewOpen,
+			} ) }
 			ariaLabel={ __( 'Save sidebar' ) }
 		>
 			{ isSaveViewOpen ? (

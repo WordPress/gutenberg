@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function useListViewClientIds( blocks ) {
+export default function useListViewClientIds( { blocks, rootClientId } ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -21,9 +21,11 @@ export default function useListViewClientIds( blocks ) {
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
-				clientIdsTree: blocks ? blocks : __unstableGetClientIdsTree(),
+				clientIdsTree: blocks
+					? blocks
+					: __unstableGetClientIdsTree( rootClientId ),
 			};
 		},
-		[ blocks ]
+		[ blocks, rootClientId ]
 	);
 }

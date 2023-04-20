@@ -53,7 +53,7 @@ describe( 'formatTestResults', () => {
 		} );
 
 		expect( formatted ).toMatchInlineSnapshot(
-			`"<!-- __TEST_RESULT__ --><time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2282393879\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->"`
+			`"<!-- __TEST_RESULT__ --><time datetime="2020-05-10T00:00:00.000Z"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href="https://github.com/WordPress/gutenberg/actions/runs/2282393879"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->"`
 		);
 
 		expect( renderToDisplayText( formatted ) ).toMatchInlineSnapshot(
@@ -73,7 +73,7 @@ describe( 'formatTestResults', () => {
 		expect( formatted ).toMatchInlineSnapshot( `
 		"<!-- __TEST_RESULT__ --><details>
 		<summary>
-			<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2282393879\\"><code>trunk</code></a>.
+			<time datetime="2020-05-10T00:00:00.000Z"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href="https://github.com/WordPress/gutenberg/actions/runs/2282393879"><code>trunk</code></a>.
 		</summary>
 
 		\`\`\`
@@ -101,7 +101,7 @@ describe( 'renderIssueBody', () => {
 		} );
 
 		expect( body ).toMatchInlineSnapshot( `
-		"<!-- __META_DATA__:{\\"failedTimes\\":5,\\"totalCommits\\":100} -->
+		"<!-- __META_DATA__:{"failedTimes":5,"totalCommits":100} -->
 		**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
 		## Test title

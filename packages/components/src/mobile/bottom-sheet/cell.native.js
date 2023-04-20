@@ -234,7 +234,7 @@ class BottomSheetCell extends Component {
 			// we show the TextInput just when the user wants to edit the value,
 			// and the Text component to display it.
 			// We also show the TextInput to display placeholder.
-			const shouldShowPlaceholder = isValueEditable && value === '';
+			const shouldShowPlaceholder = isInteractive && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
 				<TextInput
 					ref={ ( c ) => ( this._valueTextInput = c ) }
