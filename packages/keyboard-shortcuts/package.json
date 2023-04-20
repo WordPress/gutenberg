@@ -29,7 +29,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes",
-		"rememo": "^4.0.0"
+		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

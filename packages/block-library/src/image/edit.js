@@ -29,23 +29,6 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import Image from './image';
 
-// Much of this description is duplicated from MediaPlaceholder.
-const placeholder = ( content ) => {
-	return (
-		<Placeholder
-			className="block-editor-media-placeholder"
-			withIllustration={ true }
-			icon={ icon }
-			label={ __( 'Image' ) }
-			instructions={ __(
-				'Upload an image file, pick one from your media library, or add one with a URL.'
-			) }
-		>
-			{ content }
-		</Placeholder>
-	);
-};
-
 /**
  * Module constants
  */
@@ -344,6 +327,27 @@ export function ImageEdit( {
 		ref,
 		className: classes,
 	} );
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className={ classnames( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSelected,
+				} ) }
+				withIllustration={ true }
+				icon={ icon }
+				label={ __( 'Image' ) }
+				instructions={ __(
+					'Upload an image file, pick one from your media library, or add one with a URL.'
+				) }
+				style={ isSelected ? undefined : borderProps.style }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	return (
 		<figure { ...blockProps }>

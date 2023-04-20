@@ -45,35 +45,6 @@ function useHasBorderWidthControl( settings ) {
 	return settings?.border?.width;
 }
 
-function applyFallbackStyle( border ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	if ( ! border.style && ( border.color || border.width ) ) {
-		return { ...border, style: 'solid' };
-	}
-
-	return border;
-}
-
-function applyAllFallbackStyles( border ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	if ( hasSplitBorders( border ) ) {
-		return {
-			top: applyFallbackStyle( border.top ),
-			right: applyFallbackStyle( border.right ),
-			bottom: applyFallbackStyle( border.bottom ),
-			left: applyFallbackStyle( border.left ),
-		};
-	}
-
-	return applyFallbackStyle( border );
-}
-
 function BorderToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -186,7 +157,7 @@ export default function BorderPanel( {
 	const onBorderChange = ( newBorder ) => {
 		// Ensure we have a visible border style when a border width or
 		// color is being selected.
-		const updatedBorder = applyAllFallbackStyles( newBorder );
+		const updatedBorder = { ...newBorder };
 
 		if ( hasSplitBorders( updatedBorder ) ) {
 			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {

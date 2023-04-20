@@ -39,8 +39,16 @@
 		@include reduce-motion("animation");
 
 		&.is-full-screen {
-			width: 90vw;
-			min-height: 90vh;
+			@include break-small() {
+				width: calc(100% - #{ $grid-unit-20 * 2 });
+				height: calc(100% - #{ $grid-unit-20 * 2 });
+				max-height: none;
+			}
+			@include break-medium() {
+				width: calc(100% - #{ $grid-unit-50 * 2 });
+				height: calc(100% - #{ $grid-unit-50 * 2 });
+				max-width: none;
+			}
 		}
 	}
 
@@ -64,12 +72,12 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-20;
+	height: $header-height + $grid-unit-15;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -121,7 +129,7 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-20;
+	margin-top: $header-height + $grid-unit-15;
 	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 

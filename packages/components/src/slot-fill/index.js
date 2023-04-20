@@ -44,18 +44,26 @@ export function Provider( { children, ...props } ) {
 	);
 }
 
-export function createSlotFill( name ) {
-	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
-	FillComponent.displayName = name + 'Fill';
+export function createSlotFill( key ) {
+	const baseName = typeof key === 'symbol' ? key.description : key;
+	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
+	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
-	SlotComponent.displayName = name + 'Slot';
-	SlotComponent.__unstableName = name;
+	const SlotComponent = ( props ) => <Slot name={ key } { ...props } />;
+	SlotComponent.displayName = `${ baseName }Slot`;
+	SlotComponent.__unstableName = key;
 
 	return {
 		Fill: FillComponent,
 		Slot: SlotComponent,
 	};
 }
+
+export const createPrivateSlotFill = ( name ) => {
+	const privateKey = Symbol( name );
+	const privateSlotFill = createSlotFill( privateKey );
+
+	return { privateKey, ...privateSlotFill };
+};
 
 export { useSlot };

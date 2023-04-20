@@ -37,7 +37,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 				'wp_template_part',
 				query
 			),
-			isLoading: _isResolving( 'getEntityRecords', [
+			isResolving: _isResolving( 'getEntityRecords', [
 				'postType',
 				'wp_template_part',
 				query,
@@ -61,7 +61,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 						templatePart.area === area )
 			) || []
 		);
-	}, [ templateParts, area ] );
+	}, [ templateParts, area, excludedId ] );
 
 	return {
 		templateParts: filteredTemplateParts,
