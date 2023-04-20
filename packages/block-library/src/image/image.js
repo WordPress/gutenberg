@@ -564,6 +564,7 @@ export default function Image( {
 
 		img = (
 			<ResizableAlignmentControls
+				aspectRatio={ loadedNaturalWidth / loadedNaturalHeight }
 				allowedAlignments={ [ 'none', 'wide', 'full' ] }
 				clientId={ clientId }
 				currentAlignment={ align }

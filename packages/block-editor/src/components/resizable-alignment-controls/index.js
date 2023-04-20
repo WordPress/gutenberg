@@ -51,6 +51,7 @@ function getVisibleHandles( alignment ) {
  * and configures snapping to block alignments.
  *
  * @param {Object}                       props
+ * @param {?number}                      props.aspectRatio       An optional aspect ratio to maintain when resizing.
  * @param {?string[]}                    props.allowedAlignments An optional array of allowed alignments. If not provided this will be inferred from the block supports.
  * @param {import('react').ReactElement} props.children          Children of the ResizableBox.
  * @param {string}                       props.clientId          The clientId of the block
@@ -66,6 +67,7 @@ function getVisibleHandles( alignment ) {
  * @param {Object}                       props.size              The current dimensions.
  */
 function ResizableAlignmentControls( {
+	aspectRatio,
 	allowedAlignments,
 	children,
 	clientId,
@@ -124,13 +126,13 @@ function ResizableAlignmentControls( {
 		}
 
 		const alignmentRect = snappedAlignment.rect;
-		const aspect = size.height / size.width;
+		const height = alignmentRect.width / aspectRatio;
 
 		return {
 			float: 'left',
-			height: alignmentRect.width * aspect,
+			height,
 		};
-	}, [ snappedAlignment, size.width, size.height ] );
+	}, [ snappedAlignment, aspectRatio ] );
 
 	return (
 		<>
@@ -157,7 +159,7 @@ function ResizableAlignmentControls( {
 				maxWidth={ maxWidth }
 				minHeight={ minHeight }
 				maxHeight={ maxHeight }
-				lockAspectRatio
+				lockAspectRatio={ !! aspectRatio }
 				enable={ getVisibleHandles( currentAlignment ) }
 				onResizeStart={ ( ...resizeArgs ) => {
 					onResizeStart( ...resizeArgs );
