@@ -10,14 +10,12 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             should_update_trunk: ${{ steps.compute_should_update_trunk.outputs.should_update_trunk }}
-            latest_version_in_core_repo: ${{ steps.compute_latest_version_in_core_repo.outputs.version }}
 
         steps:
             - name: Fetch latest version in the WP core repo
               id: compute_latest_version_in_core_repo
               run: |
-                  CORE_API_URL="https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=gutenberg"
-                  latest_version_in_core_repo=$(curl -s "$CORE_API_URL" | jq -r '.version')
+                  latest_version_in_core_repo=$(curl -s 'https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request\[slug\]=gutenberg' | jq -r '.version')
                   echo "Latest Core Repo version: $latest_version_in_core_repo"
                   echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
 
@@ -151,7 +149,7 @@ jobs:
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
         if: |
-            needs.compute_should_update_trunk.outputs.should_update_trunk == 'true' &&
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
@@ -215,7 +213,7 @@ jobs:
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
         if: |
-            needs.compute_should_update_trunk.outputs.should_update_trunk == 'false' &&
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
