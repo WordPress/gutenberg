@@ -971,6 +971,7 @@ class WP_HTML_Tag_Processor {
 	 * closing `>`; these are left for other methods.
 	 *
 	 * @since 6.2.0
+	 * @since 6.2.1 Support abruptly-closed comments, invalid-tag-closer-comments, and empty elements.
 	 *
 	 * @return bool Whether a tag was found before the end of the document.
 	 */
@@ -1039,13 +1040,42 @@ class WP_HTML_Tag_Processor {
 					'-' === $html[ $at + 2 ] &&
 					'-' === $html[ $at + 3 ]
 				) {
-					$closer_at = strpos( $html, '-->', $at + 4 );
-					if ( false === $closer_at ) {
+					$closer_at = $at + 4;
+					// If it's not possible to close the comment then there is nothing more to scan.
+					if ( strlen( $html ) <= $closer_at ) {
 						return false;
 					}
 
-					$at = $closer_at + 3;
-					continue;
+					// Abruptly-closed empty comments are a sequence of dashes followed by `>`.
+					$span_of_dashes = strspn( $html, '-', $closer_at );
+					if ( '>' === $html[ $closer_at + $span_of_dashes ] ) {
+						$at = $closer_at + $span_of_dashes + 1;
+						continue;
+					}
+
+					/*
+					 * Comments may be closed by either a --> or an invalid --!>.
+					 * The first occurrence closes the comment.
+					 *
+					 * See https://html.spec.whatwg.org/#parse-error-incorrectly-closed-comment
+					 */
+					$closer_at--; // Pre-increment inside condition below reduces risk of accidental infinite looping.
+					while ( ++$closer_at < strlen( $html ) ) {
+						$closer_at = strpos( $html, '--', $closer_at );
+						if ( false === $closer_at ) {
+							return false;
+						}
+
+						if ( $closer_at + 2 < strlen( $html ) && '>' === $html[ $closer_at + 2 ] ) {
+							$at = $closer_at + 3;
+							continue 2;
+						}
+
+						if ( $closer_at + 3 < strlen( $html ) && '!' === $html[ $closer_at + 2 ] && '>' === $html[ $closer_at + 3 ] ) {
+							$at = $closer_at + 4;
+							continue 2;
+						}
+					}
 				}
 
 				/*
@@ -1105,11 +1135,37 @@ class WP_HTML_Tag_Processor {
 			}
 
 			/*
+			 * </> is a missing end tag name, which is ignored.
+			 *
+			 * See https://html.spec.whatwg.org/#parse-error-missing-end-tag-name
+			 */
+			if ( '>' === $html[ $at + 1 ] ) {
+				$at++;
+				continue;
+			}
+
+			/*
 			 * <? transitions to a bogus comment state – skip to the nearest >
-			 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
+			 * See https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			 */
 			if ( '?' === $html[ $at + 1 ] ) {
 				$closer_at = strpos( $html, '>', $at + 2 );
+				if ( false === $closer_at ) {
+					return false;
+				}
+
+				$at = $closer_at + 1;
+				continue;
+			}
+
+			/*
+			 * If a non-alpha starts the tag name in a tag closer it's a comment.
+			 * Find the first `>`, which closes the comment.
+			 *
+			 * See https://html.spec.whatwg.org/#parse-error-invalid-first-character-of-tag-name
+			 */
+			if ( $this->is_closing_tag ) {
+				$closer_at = strpos( $html, '>', $at + 3 );
 				if ( false === $closer_at ) {
 					return false;
 				}
@@ -1404,6 +1460,7 @@ class WP_HTML_Tag_Processor {
 	 * Applies attribute updates to HTML document.
 	 *
 	 * @since 6.2.0
+	 * @since 6.3.0 Invalidate any bookmarks whose targets are overwritten.
 	 *
 	 * @return void
 	 */
@@ -1434,7 +1491,7 @@ class WP_HTML_Tag_Processor {
 		 * Adjust bookmark locations to account for how the text
 		 * replacements adjust offsets in the input document.
 		 */
-		foreach ( $this->bookmarks as $bookmark ) {
+		foreach ( $this->bookmarks as $bookmark_name => $bookmark ) {
 			/*
 			 * Each lexical update which appears before the bookmark's endpoints
 			 * might shift the offsets for those endpoints. Loop through each change
@@ -1445,20 +1502,22 @@ class WP_HTML_Tag_Processor {
 			$tail_delta = 0;
 
 			foreach ( $this->lexical_updates as $diff ) {
-				$update_head = $bookmark->start >= $diff->start;
-				$update_tail = $bookmark->end >= $diff->start;
-
-				if ( ! $update_head && ! $update_tail ) {
+				if ( $bookmark->start < $diff->start && $bookmark->end < $diff->start ) {
 					break;
+				}
+
+				if ( $bookmark->start >= $diff->start && $bookmark->end < $diff->end ) {
+					$this->release_bookmark( $bookmark_name );
+					continue 2;
 				}
 
 				$delta = strlen( $diff->text ) - ( $diff->end - $diff->start );
 
-				if ( $update_head ) {
+				if ( $bookmark->start >= $diff->start ) {
 					$head_delta += $delta;
 				}
 
-				if ( $update_tail ) {
+				if ( $bookmark->end >= $diff->end ) {
 					$tail_delta += $delta;
 				}
 			}
@@ -1468,6 +1527,18 @@ class WP_HTML_Tag_Processor {
 		}
 
 		$this->lexical_updates = array();
+	}
+
+	/**
+	 * Checks whether a bookmark with the given name exists.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $bookmark_name Name to identify a bookmark that potentially exists.
+	 * @return bool Whether that bookmark exists.
+	 */
+	public function has_bookmark( $bookmark_name ) {
+		return array_key_exists( $bookmark_name, $this->bookmarks );
 	}
 
 	/**
@@ -1745,6 +1816,31 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Indicates if the currently matched tag contains the self-closing flag.
+	 *
+	 * No HTML elements ought to have the self-closing flag and for those, the self-closing
+	 * flag will be ignored. For void elements this is benign because they "self close"
+	 * automatically. For non-void HTML elements though problems will appear if someone
+	 * intends to use a self-closing element in place of that element with an empty body.
+	 * For HTML foreign elements and custom elements the self-closing flag determines if
+	 * they self-close or not.
+	 *
+	 * This function does not determine if a tag is self-closing,
+	 * but only if the self-closing flag is present in the syntax.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return bool Whether the currently matched tag contains the self-closing flag.
+	 */
+	public function has_self_closing_flag() {
+		if ( ! $this->tag_name_starts_at ) {
+			return false;
+		}
+
+		return '/' === $this->html[ $this->tag_ends_at - 1 ];
+	}
+
+	/**
 	 * Indicates if the current tag token is a tag closer.
 	 *
 	 * Example:
@@ -1775,6 +1871,7 @@ class WP_HTML_Tag_Processor {
 	 * For string attributes, the value is escaped using the `esc_attr` function.
 	 *
 	 * @since 6.2.0
+	 * @since 6.2.1 Fix: Only create a single update for multiple calls with case-variant attribute names.
 	 *
 	 * @param string      $name  The attribute name to target.
 	 * @param string|bool $value The new attribute value.
@@ -1867,8 +1964,8 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute             = $this->attributes[ $comparable_name ];
-			$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$existing_attribute                        = $this->attributes[ $comparable_name ];
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
 				$updated_attribute
@@ -2045,6 +2142,8 @@ class WP_HTML_Tag_Processor {
 		 * to the end of the updated document and return.
 		 */
 		if ( $requires_no_updating && $this->bytes_already_copied > 0 ) {
+			$this->html                 = $this->output_buffer . substr( $this->html, $this->bytes_already_copied );
+			$this->bytes_already_copied = strlen( $this->output_buffer );
 			return $this->output_buffer . substr( $this->html, $this->bytes_already_copied );
 		}
 
