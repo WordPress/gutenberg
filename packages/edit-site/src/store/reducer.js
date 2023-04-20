@@ -141,6 +141,23 @@ function canvasMode( state = 'init', action ) {
 	return state;
 }
 
+/**
+ * Reducer used to track the site editor 'editor' role.
+ * This is used to differentiate between the editor canvas and other display types,
+ * such as the style book.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+function editorRole( state = 'init', action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_ROLE':
+			return action.mode;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -149,4 +166,5 @@ export default combineReducers( {
 	listViewPanel,
 	saveViewPanel,
 	canvasMode,
+	editorRole,
 } );

@@ -16,7 +16,6 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
 import {
 	useFocusOnMount,
 	useFocusReturn,

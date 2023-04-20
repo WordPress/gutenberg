@@ -4,8 +4,7 @@
 import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
-
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 
 /**
@@ -15,17 +14,19 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
+import { unlock } from '../../private-apis';
 
 export default function GlobalStylesSidebar() {
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
-	const editorMode = useSelect(
-		( select ) => select( editSiteStore ).getEditorMode(),
-		[]
-	);
-
+	const { editorMode, editorRole } = useSelect( ( select ) => {
+		return {
+			editorMode: select( editSiteStore ).getEditorMode(),
+			editorRole: unlock( select( editSiteStore ) ).getEditorRole(),
+		};
+	}, [] );
+	const { setEditorRole } = unlock( useDispatch( editSiteStore ) );
 	useEffect( () => {
 		if ( editorMode !== 'visual' ) {
-			setIsStyleBookOpened( false );
+			setEditorRole( 'init' );
 		}
 	}, [ editorMode ] );
 	return (
@@ -45,10 +46,14 @@ export default function GlobalStylesSidebar() {
 						<Button
 							icon={ seen }
 							label={ __( 'Style Book' ) }
-							isPressed={ isStyleBookOpened }
+							isPressed={ editorRole === 'style-book' }
 							disabled={ editorMode !== 'visual' }
 							onClick={ () => {
-								setIsStyleBookOpened( ! isStyleBookOpened );
+								setEditorRole(
+									editorRole !== 'style-book'
+										? 'style-book'
+										: 'init'
+								);
 							} }
 						/>
 					</FlexItem>
@@ -59,8 +64,7 @@ export default function GlobalStylesSidebar() {
 			}
 		>
 			<GlobalStylesUI
-				isStyleBookOpened={ isStyleBookOpened }
-				onCloseStyleBook={ () => setIsStyleBookOpened( false ) }
+				onCloseStyleBook={ () => setEditorRole( 'init' ) }
 			/>
 		</DefaultSidebar>
 	);

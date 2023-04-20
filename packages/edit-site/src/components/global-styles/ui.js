@@ -43,6 +43,7 @@ import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
 import ScreenEffects from './screen-effects';
 import ScreenRevisions from './screen-revisions';
+import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -66,11 +67,16 @@ function GlobalStylesActionMenu() {
 					0 ) + 1,
 		};
 	}, [] );
+
+	const { setEditorRole } = unlock( useDispatch( editSiteStore ) );
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
-	const loadRevisions = () => goTo( '/revisions' );
+	const loadRevisions = () => {
+		goTo( '/revisions' );
+		setEditorRole( 'global-styles-revisions' );
+	};
 	const hasRevisions = revisionsCount >= 2;
 	return (
 		<GlobalStylesMenuFill>
@@ -140,6 +146,7 @@ function BlockStyleVariationsScreens( { name } ) {
 		},
 		[ name ]
 	);
+
 	if ( ! blockStyleVariations?.length ) {
 		return null;
 	}
@@ -186,7 +193,7 @@ function ContextScreens( {
 		},
 		[ name ]
 	);
-
+	const { setEditorRole } = unlock( useDispatch( editSiteStore ) );
 	return (
 		<>
 			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
@@ -254,7 +261,10 @@ function ContextScreens( {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/revisions' }>
-				<ScreenRevisions name={ name } />
+				<ScreenRevisions
+					name={ name }
+					onClose={ () => setEditorRole( 'init' ) }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (
@@ -330,6 +340,11 @@ function GlobalStylesUI( {
 	onCloseStyleBook,
 } ) {
 	const blocks = getBlockTypes();
+	const { editorRole } = useSelect( ( select ) => {
+		return {
+			editorRole: unlock( select( editSiteStore ) ).getEditorRole(),
+		};
+	}, [] );
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -374,7 +389,8 @@ function GlobalStylesUI( {
 					/>
 				);
 			} ) }
-			{ isStyleBookOpened && (
+
+			{ 'style-book' === editorRole && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
 

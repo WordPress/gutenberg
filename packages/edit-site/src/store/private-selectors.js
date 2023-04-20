@@ -8,3 +8,7 @@
 export function getCanvasMode( state ) {
 	return state.canvasMode;
 }
+
+export function getEditorRole( state ) {
+	return state.editorRole;
+}

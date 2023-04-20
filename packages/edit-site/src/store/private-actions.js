@@ -27,3 +27,17 @@ export const setCanvasMode =
 			dispatch.setIsListViewOpened( true );
 		}
 	};
+
+/**
+ * Action that switches the canvas mode.
+ *
+ * @param {?string} mode Canvas mode.
+ */
+export const setEditorRole =
+	( mode ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'SET_EDITOR_ROLE',
+			mode,
+		} );
+	};

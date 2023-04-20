@@ -38,7 +38,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasEditorCanvasFill } from '../editor-canvas';
+import { unlock } from '../../private-apis';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +56,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		editorRole,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -88,6 +89,7 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editorRole: unlock( select( editSiteStore ) ).getEditorRole(),
 		};
 	}, [] );
 
@@ -117,8 +119,14 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	// @TODO We should genericize the style book slot.
-	const hasEditorCanvasFill = useHasEditorCanvasFill();
+
+	const defaultRole = 'init' === editorRole;
+
+	// @TODO Abstract this.
+	const headerTitle =
+		'style-book' === editorRole
+			? __( 'Style Book' )
+			: __( 'Global styles revisions' );
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -139,7 +147,7 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasEditorCanvasFill && (
+			{ defaultRole && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
@@ -224,16 +232,12 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasEditorCanvasFill ? (
-					__( 'Style Book' )
-				) : (
-					<DocumentActions />
-				) }
+				{ ! defaultRole ? headerTitle : <DocumentActions /> }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasEditorCanvasFill && (
+					{ ! isFocusMode && defaultRole && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

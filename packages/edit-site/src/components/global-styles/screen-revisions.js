@@ -13,7 +13,7 @@ import {
 	SelectControl,
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -33,6 +33,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
 import Revisions from '../revisions';
+import { store as editSiteStore } from '../../store';
+
+
 
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -170,10 +173,9 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 
 function ScreenRevisions( { onClose } ) {
 	const { goBack } = useNavigator();
-
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { userRevisions, isDirty } = useSelect( ( select ) => {
+	const { userRevisions, isDirty, editorRole } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 			select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
@@ -186,6 +188,7 @@ function ScreenRevisions( { onClose } ) {
 				select(
 					coreStore
 				).__experimentalGetCurrentThemeGlobalStylesRevisions() || [],
+			editorRole: unlock( select( editSiteStore ) ).getEditorRole(),
 		};
 	}, [] );
 	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
@@ -203,6 +206,14 @@ function ScreenRevisions( { onClose } ) {
 		}
 		setCurrentRevisionId( currentRevision?.id );
 	}, [ userRevisions, userConfig ] );
+	const { setEditorRole } = unlock( useDispatch( editSiteStore ) );
+	console.log( 'editorRole', editorRole );
+	useEffect( () => {
+		if ( editorRole !== 'global-styles-revisions' ) {
+			goBack();
+			setEditorRole( editorRole );
+		}
+	}, [ editorRole ] );
 
 	const restoreRevision = useCallback(
 		( revision ) => {
@@ -217,6 +228,7 @@ function ScreenRevisions( { onClose } ) {
 
 	const onCloseRevisions = () => {
 		goBack();
+		onClose();
 	};
 
 	const selectRevision = ( revision ) => {

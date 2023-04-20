@@ -21,13 +21,14 @@ import {
 } from '@wordpress/compose';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
+import { closeSmall } from '@wordpress/icons';
+
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
 import { EditorCanvasFillContext } from './context';
-import { closeSmall } from '@wordpress/icons';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const SLOT_FILL_NAME = 'EditSiteEditorCanvas';
@@ -97,10 +98,5 @@ function EditorCanvas( { onClose, title, children } ) {
 	);
 }
 
-function useHasEditorCanvasFill() {
-	const fills = useSlotFills( SLOT_FILL_NAME );
-	return !! fills?.length;
-}
-
 export default EditorCanvas;
-export { useHasEditorCanvasFill, EditorCanvasSlot };
+export { EditorCanvasSlot };

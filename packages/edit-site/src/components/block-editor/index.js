@@ -178,7 +178,8 @@ export default function BlockEditor() {
 					) : (
 						<BlockTools
 							className={ classnames( 'edit-site-visual-editor', {
-								'is-focus-mode': isTemplatePart || !! editorCanvasFill,
+								'is-focus-mode':
+									isTemplatePart || !! editorCanvasFill,
 								'is-view-mode': isViewMode,
 							} ) }
 							__unstableContentRef={ contentRef }
