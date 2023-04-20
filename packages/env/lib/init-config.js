@@ -162,6 +162,7 @@ ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
 ARG HOST_USERNAME
 ARG HOST_UID
 ARG HOST_GID
+RUN groupadd -o -g $HOST_GID $HOST_USERNAME
 RUN useradd -M -u $HOST_UID -g $HOST_GID $HOST_USERNAME
 
 # Set up sudo so they can have root access when using 'run' commands.
