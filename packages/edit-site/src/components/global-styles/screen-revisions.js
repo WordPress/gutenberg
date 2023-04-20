@@ -12,6 +12,7 @@ import {
 	__experimentalHStack as HStack,
 	Button,
 	SelectControl,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -170,6 +171,8 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 }
 
 function ScreenRevisions( { onClose } ) {
+	const { goBack } = useNavigator();
+
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { userRevisions, isDirty } = useSelect( ( select ) => {
@@ -213,6 +216,10 @@ function ScreenRevisions( { onClose } ) {
 		},
 		[ userConfig ]
 	);
+
+	const onCloseRevisions = () => {
+		goBack();
+	};
 
 	const selectRevision = ( revision ) => {
 		setGlobalStylesRevision( revision );
@@ -289,7 +296,7 @@ function ScreenRevisions( { onClose } ) {
 					) }
 				</VStack>
 			</div>
-			<Revisions revision={ globalStylesRevision } onClose={ () => {} } />
+			<Revisions revision={ globalStylesRevision } onClose={ onCloseRevisions } />
 		</>
 	);
 }

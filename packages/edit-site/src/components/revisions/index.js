@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { isEmpty } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -18,13 +18,10 @@ import {
 import { useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import {
-	useResizeObserver,
 	useFocusOnMount,
 	useFocusReturn,
-	useMergeRefs,
 } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -32,8 +29,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 import { unlock } from '../../private-apis';
-import { StyleBookFill } from '../style-book';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
+import EditorCanvas from '../editor-canvas';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -116,10 +113,8 @@ function Revisions( {
 	onClose,
 	revision: globalStylesRevision,
 } ) {
-	const [ resizeObserver, sizes ] = useResizeObserver();
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
-
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 
@@ -163,13 +158,6 @@ function Revisions( {
 		[ originalSettings ]
 	);
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			onClose();
-		}
-	}
-
 	const [ globalStyles ] = useGlobalStylesOutput( mergedConfig );
 	const editorStyles =
 		! isEmpty( globalStyles ) && ! isEmpty( globalStylesRevision )
@@ -177,58 +165,31 @@ function Revisions( {
 			: settings.styles;
 
 	return (
-		<StyleBookFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className={ classnames( 'edit-site-revisions', {
-					'is-wide': sizes.width > 600,
-				} ) }
-				style={ {
-					color: textColor,
-					background: backgroundColor,
-					height: '100%',
-				} }
-				aria-label={ __( 'Revisions' ) }
-				onKeyDown={ closeOnEscape }
-				ref={ useMergeRefs( [
-					sectionFocusReturnRef,
-					focusOnMountRef,
-				] ) }
+		<EditorCanvas title={ __( 'Revisions' ) } onClose={ onClose }>
+			<Iframe
+				className="edit-site-style-book__iframe"
+				name="style-revisions"
+				tabIndex={ 0 }
 			>
-				{ resizeObserver }
-				<Button
-					className="edit-site-style-book__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close Style Book' ) }
-					onClick={ onClose }
-					showTooltip={ false }
-				/>
-				<Iframe
-					className="edit-site-style-book__iframe"
-					name="style-revisions"
-					tabIndex={ 0 }
-				>
-					<EditorStyles styles={ editorStyles } />
-					<style>
-						{
-							// Forming a "block formatting context" to prevent margin collapsing.
-							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.is-root-container { display: flow-root; }
-											body { position: relative; padding: 32px !important; }` +
-								STYLE_BOOK_IFRAME_STYLES
-						}
-					</style>
-					<Disabled className="edit-site-style-book__example-preview__content">
-						<ExperimentalBlockEditorProvider
-							value={ renderedBlocksArray }
-							settings={ settings }
-						>
-							<BlockList renderAppender={ false } />
-						</ExperimentalBlockEditorProvider>
-					</Disabled>
-				</Iframe>
-			</section>
-		</StyleBookFill>
+				<EditorStyles styles={ editorStyles } />
+				<style>
+					{
+						// Forming a "block formatting context" to prevent margin collapsing.
+						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+						`.is-root-container { display: flow-root; }
+											body { position: relative; padding: 32px !important; }`
+					}
+				</style>
+				<Disabled className="edit-site-style-book__example-preview__content">
+					<ExperimentalBlockEditorProvider
+						value={ renderedBlocksArray }
+						settings={ settings }
+					>
+						<BlockList renderAppender={ false } />
+					</ExperimentalBlockEditorProvider>
+				</Disabled>
+			</Iframe>
+		</EditorCanvas>
 	);
 }
 

@@ -38,6 +38,7 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
 import { unlock } from '../../private-apis';
+import { EditorCanvasSlot } from '../editor-canvas';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -166,18 +167,18 @@ export default function BlockEditor() {
 				<BlockInspector />
 			</SidebarInspectorFill>
 			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
-			<StyleBook.Slot>
-				{ ( [ styleBook ] ) =>
-					styleBook ? (
+			<EditorCanvasSlot>
+				{ ( [ editorCanvasFill ] ) =>
+					editorCanvasFill ? (
 						<div className="edit-site-visual-editor is-focus-mode">
 							<ResizableEditor enableResizing>
-								{ styleBook }
+								{ editorCanvasFill }
 							</ResizableEditor>
 						</div>
 					) : (
 						<BlockTools
 							className={ classnames( 'edit-site-visual-editor', {
-								'is-focus-mode': isTemplatePart || !! styleBook,
+								'is-focus-mode': isTemplatePart || !! editorCanvasFill,
 								'is-view-mode': isViewMode,
 							} ) }
 							__unstableContentRef={ contentRef }
@@ -211,7 +212,7 @@ export default function BlockEditor() {
 						</BlockTools>
 					)
 				}
-			</StyleBook.Slot>
+			</EditorCanvasSlot>
 			<ReusableBlocksMenuItems />
 		</ExperimentalBlockEditorProvider>
 	);

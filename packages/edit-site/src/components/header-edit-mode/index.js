@@ -38,7 +38,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import { useHasEditorCanvasFill } from '../editor-canvas';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -118,7 +118,7 @@ export default function HeaderEditMode() {
 	);
 
 	// @TODO We should genericize the style book slot.
-	const hasStyleBook = useHasStyleBook();
+	const hasEditorCanvasFill = useHasEditorCanvasFill();
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -139,7 +139,7 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
+			{ ! hasEditorCanvasFill && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
@@ -224,12 +224,16 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ hasEditorCanvasFill ? (
+					__( 'Style Book' )
+				) : (
+					<DocumentActions />
+				) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+					{ ! isFocusMode && ! hasEditorCanvasFill && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

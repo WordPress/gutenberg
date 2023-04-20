@@ -13,8 +13,6 @@ import {
 	__unstableCompositeItem as CompositeItem,
 	Disabled,
 	TabPanel,
-	createSlotFill,
-	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -31,28 +29,18 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
-import {
-	useResizeObserver,
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
-import { useMemo, memo } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
+import { useMemo, memo, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import EditorCanvas from '../editor-canvas';
+import { EditorCanvasFillContext } from '../editor-canvas/context';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+const { ExperimentalBlockEditorProvider } = unlock(
 	blockEditorPrivateApis
 );
-
-const SLOT_FILL_NAME = 'EditSiteStyleBook';
-const { Slot: StyleBookSlot, Fill: StyleBookFill } =
-	createSlotFill( SLOT_FILL_NAME );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -175,12 +163,6 @@ function getExamples() {
 }
 
 function StyleBook( { isSelected, onSelect, onClose } ) {
-	const [ resizeObserver, sizes ] = useResizeObserver();
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const sectionFocusReturnRef = useFocusReturn();
-
-	const [ textColor ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const examples = useMemo( getExamples, [] );
 	const tabs = useMemo(
 		() =>
@@ -207,83 +189,48 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 		[ originalSettings ]
 	);
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			onClose();
-		}
-	}
+	const { sizes } = useContext( EditorCanvasFillContext );
 
 	return (
-		<StyleBookFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className={ classnames( 'edit-site-style-book', {
-					'is-wide': sizes.width > 600,
-				} ) }
-				style={ {
-					color: textColor,
-					background: backgroundColor,
-				} }
-				aria-label={ __( 'Style Book' ) }
-				onKeyDown={ closeOnEscape }
-				ref={ useMergeRefs( [
-					sectionFocusReturnRef,
-					focusOnMountRef,
-				] ) }
-			>
-				{ resizeObserver }
-				<Button
-					className="edit-site-style-book__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close Style Book' ) }
-					onClick={ onClose }
-					showTooltip={ false }
-				/>
-				<TabPanel
-					className="edit-site-style-book__tab-panel"
-					tabs={ tabs }
-				>
-					{ ( tab ) => (
-						<Iframe
-							className="edit-site-style-book__iframe"
-							name="style-book-canvas"
-							tabIndex={ 0 }
-						>
-							<EditorStyles styles={ settings.styles } />
-							<style>
-								{
-									// Forming a "block formatting context" to prevent margin collapsing.
-									// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-									`.is-root-container { display: flow-root; }
+		<EditorCanvas title={ __( 'Style Book' ) } onClose={ onClose }>
+			<TabPanel className="edit-site-style-book__tab-panel" tabs={ tabs }>
+				{ ( tab ) => (
+					<Iframe
+						className="edit-site-style-book__iframe"
+						name="style-book-canvas"
+						tabIndex={ 0 }
+					>
+						<EditorStyles styles={ settings.styles } />
+						<style>
+							{
+								// Forming a "block formatting context" to prevent margin collapsing.
+								// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+								`.is-root-container { display: flow-root; }
 											body { position: relative; padding: 32px !important; }` +
-										STYLE_BOOK_IFRAME_STYLES
+									STYLE_BOOK_IFRAME_STYLES
+							}
+						</style>
+						<Examples
+							className={ classnames(
+								'edit-site-style-book__examples',
+								{
+									'is-wide': sizes.width > 600,
 								}
-							</style>
-							<Examples
-								className={ classnames(
-									'edit-site-style-book__examples',
-									{
-										'is-wide': sizes.width > 600,
-									}
-								) }
-								examples={ examples }
-								category={ tab.name }
-								label={ sprintf(
-									// translators: %s: Category of blocks, e.g. Text.
-									__(
-										'Examples of blocks in the %s category'
-									),
-									tab.title
-								) }
-								isSelected={ isSelected }
-								onSelect={ onSelect }
-							/>
-						</Iframe>
-					) }
-				</TabPanel>
-			</section>
-		</StyleBookFill>
+							) }
+							examples={ examples }
+							category={ tab.name }
+							label={ sprintf(
+								// translators: %s: Category of blocks, e.g. Text.
+								__( 'Examples of blocks in the %s category' ),
+								tab.title
+							) }
+							isSelected={ isSelected }
+							onSelect={ onSelect }
+						/>
+					</Iframe>
+				) }
+			</TabPanel>
+		</EditorCanvas>
 	);
 }
 
@@ -365,11 +312,4 @@ const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
 	);
 };
 
-function useHasStyleBook() {
-	const fills = useSlotFills( SLOT_FILL_NAME );
-	return !! fills?.length;
-}
-
-StyleBook.Slot = StyleBookSlot;
 export default StyleBook;
-export { useHasStyleBook, StyleBookFill };
