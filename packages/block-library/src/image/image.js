@@ -15,7 +15,7 @@ import {
 	TextControl,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useViewportMatch, usePrevious } from '@wordpress/compose';
+import { usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
@@ -154,8 +154,6 @@ export default function Image( {
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -163,10 +161,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable =
-		allowResize &&
-		! isContentLocked &&
-		! ( isWideAligned && isLargeViewport );
+	const isResizable = allowResize && ! isContentLocked;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -561,18 +556,26 @@ export default function Image( {
 		// main column, though not infinitely.
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
+		const hasWideOrFullAlign = [ 'wide', 'full' ].includes( align );
+		const maxWidthBuffer = hasWideOrFullAlign ? undefined : maxWidth * 2.5;
+		const maxHeightBuffer = hasWideOrFullAlign
+			? undefined
+			: maxWidthBuffer / ratio;
 
 		img = (
 			<ResizableAlignmentControls
+				aspectRatio={ loadedNaturalWidth / loadedNaturalHeight }
 				allowedAlignments={ [ 'none', 'wide', 'full' ] }
 				clientId={ clientId }
 				currentAlignment={ align }
 				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
-				onResizeStart={ onResizeStart }
+				maxWidth={ maxWidthBuffer }
+				maxHeight={ maxHeightBuffer }
+				onResizeStart={ () => {
+					updateAlignment( 'none' );
+					onResizeStart();
+				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
 					setAttributes( {
@@ -588,8 +591,11 @@ export default function Image( {
 				} }
 				showHandle={ isSelected }
 				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
+					width: hasWideOrFullAlign ? '100%' : width ?? 'auto',
+					height:
+						height && ! hasCustomBorder && ! hasWideOrFullAlign
+							? height
+							: 'auto',
 				} }
 			>
 				{ img }
