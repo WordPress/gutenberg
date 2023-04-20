@@ -153,22 +153,22 @@ export default function StartTemplateOptions() {
 				select( editSiteStore );
 			const _postType = getEditedPostType();
 			const postId = getEditedPostId();
-			const {
-				__experimentalGetDirtyEntityRecords,
-				getEditedEntityRecord,
-			} = select( coreStore );
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
 				_postType,
 				postId
 			);
-
-			const hasDirtyEntityRecords =
-				__experimentalGetDirtyEntityRecords().length > 0;
+			const hasEdits = hasEditsForEntityRecord(
+				'postType',
+				_postType,
+				postId
+			);
 
 			return {
 				shouldOpenModel:
-					! hasDirtyEntityRecords &&
+					! hasEdits &&
 					'' === templateRecord.content &&
 					'wp_template' === _postType &&
 					! select( preferencesStore ).get(
