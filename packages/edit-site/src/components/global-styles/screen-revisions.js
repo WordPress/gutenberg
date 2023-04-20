@@ -9,12 +9,11 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	Button,
 	SelectControl,
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -34,7 +33,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
 import Revisions from '../revisions';
-import { store as editSiteStore } from '../../store';
 
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -194,7 +192,7 @@ function ScreenRevisions( { onClose } ) {
 	const [ currentRevisionId, setCurrentRevisionId ] = useState();
 	const [ shouldSaveUnsavedChanges, setShouldSaveUnsavedChanges ] =
 		useState( true );
-	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const [ isRestoringRevision, setIsRestoringRevision ] = useState( false );
 	useEffect( () => {
 		let currentRevision = null;
 		for ( let i = 0; i < userRevisions.length; i++ ) {
@@ -212,7 +210,7 @@ function ScreenRevisions( { onClose } ) {
 				styles: revision?.styles,
 				settings: revision?.settings,
 			} ) );
-			setIsSaveViewOpened( true );
+			onCloseRevisions();
 		},
 		[ userConfig ]
 	);
@@ -238,38 +236,41 @@ function ScreenRevisions( { onClose } ) {
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
 				description={
-					hasUnsavedContent
+					! isRestoringRevision
 						? __(
 								"Select one of your global styles revisions to preview it in the editor. Changes won't take effect until you've saved the template."
 						  )
 						: __(
-								'You have unsaved changes. Restoring a revision will discard this changes.'
+								'You have unsaved changes in the editor. Restoring a revision will discard these changes. You can either return to the editor to save your unsaved changes, or overwrite them with the selected revision.'
 						  )
 				}
 			/>
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
-					{ hasUnsavedContent ? (
+					{ isRestoringRevision ? (
 						<>
 							<Button
 								variant="primary"
 								className="edit-site-global-styles-screen-revisions__button"
 								aria-label={ __(
-									'Save my unsaved changes now'
+									'Save my changes in the editor'
 								) }
-								onClick={ () => setIsSaveViewOpened( true ) }
+								onClick={ () => {
+									onCloseRevisions();
+								} }
 							>
-								{ __( 'Save my unsaved changes' ) }
+								{ __( 'Save my changes in the editor' ) }
 							</Button>
 							<Button
 								variant="primary"
 								className="edit-site-global-styles-screen-revisions__button"
-								aria-label={ __( "Don't save" ) }
-								onClick={ () =>
-									setShouldSaveUnsavedChanges( false )
-								}
+								aria-label={ __( 'Overwrite my changes' ) }
+								onClick={ () => {
+									restoreRevision( globalStylesRevision );
+									setIsRestoringRevision( false );
+								} }
 							>
-								{ __( "Don't save" ) }
+								{ __( 'Overwrite my changes' ) }
 							</Button>
 						</>
 					) : (
@@ -286,17 +287,27 @@ function ScreenRevisions( { onClose } ) {
 									'Restore and save selected revision'
 								) }
 								disabled={ ! globalStylesRevision?.id }
-								onClick={ () =>
-									restoreRevision( globalStylesRevision )
-								}
+								onClick={ () => {
+									// TODO:
+									// Check if editor is dirty and ask for confirmation
+									// isRestoringRevision and isDirty are true, then show a confirmation dialog
+									if ( hasUnsavedContent ) {
+										setIsRestoringRevision( true );
+									} else {
+										restoreRevision( globalStylesRevision );
+									}
+								} }
 							>
-								{ __( 'Restore and save selected revision' ) }
+								{ __( 'Use this revision' ) }
 							</Button>
 						</>
 					) }
 				</VStack>
 			</div>
-			<Revisions revision={ globalStylesRevision } onClose={ onCloseRevisions } />
+			<Revisions
+				revision={ globalStylesRevision }
+				onClose={ onCloseRevisions }
+			/>
 		</>
 	);
 }
