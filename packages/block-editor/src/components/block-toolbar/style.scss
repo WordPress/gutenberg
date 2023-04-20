@@ -56,26 +56,46 @@
 	}
 }
 
+// on desktop browsers the fixed toolbar has tweaked borders
+@include break-medium() {
+	.block-editor-block-contextual-toolbar.is-fixed {
+		.block-editor-block-toolbar {
+			.components-toolbar-group,
+			.components-toolbar {
+				border-right: none;
+
+				&::after {
+					content: "";
+					width: $border-width;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-bottom: $grid-unit + $grid-unit-05;
+					background-color: $gray-300;
+					margin-left: $grid-unit;
+				}
+
+				& .components-toolbar-group.components-toolbar-group {
+					&::after {
+						display: none;
+					}
+				}
+			}
+
+			> :last-child,
+			> :last-child .components-toolbar-group,
+			> :last-child .components-toolbar {
+				&::after {
+					display: none;
+				}
+			}
+		}
+	}
+}
+
 .block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
 
 	.show-icon-labels & {
 		margin-left: 0;
-	}
-}
-
-.block-editor-block-parent-selector {
-	position: absolute;
-	top: -$border-width;
-	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-	.show-icon-labels & {
-		position: relative;
-		left: auto;
-		top: auto;
-		margin-top: -$border-width;
-		margin-left: -$border-width;
-		margin-bottom: -$border-width;
 	}
 }
 
@@ -167,8 +187,21 @@
 		}
 	}
 
-	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+	.block-editor-block-mover .block-editor-block-mover__move-button-container {
 		width: auto;
+	}
+
+	.block-editor-block-mover.is-horizontal {
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-mover-button {
+			padding-left: 6px;
+			padding-right: 6px;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
 	}
 
 	// Mover overrides.
@@ -183,15 +216,9 @@
 		border-left-color: $gray-200;
 	}
 
-	.block-editor-block-mover-button {
-		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
-		padding-left: $grid-unit !important;
-		padding-right: $grid-unit !important;
-	}
-
-	.block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 12px !important;
-		padding-right: 12px !important;
+	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {

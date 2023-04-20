@@ -1,33 +1,25 @@
 == Changelog ==
 
-= 15.6.0-rc.2 =
-
-
+= 15.6.1 =
 
 ## Changelog
 
 ### Bug Fixes
 
-#### Fonts API
-- Revert PR 49646: "[Font API] Use registered fonts for Block Editor iframe." ([49863](https://github.com/WordPress/gutenberg/pull/49863))
+#### CSS & Styling
+- Cover: Reduce z-index for inner blocks container. ([49943](https://github.com/WordPress/gutenberg/pull/49943))
+
 
 ## Contributors
 
 The following contributors merged PRs in this release:
 
-@hellofromtonya
+@aaronrobertshaw
 
 
-= 15.6.0-rc.1 =
-
-
+= 15.6.0 =
 
 ## Changelog
-
-### Features
-
-- Add a command center to the site editor. ([49330](https://github.com/WordPress/gutenberg/pull/49330))
-- Add Details/summary block. ([45055](https://github.com/WordPress/gutenberg/pull/45055))
 
 ### Enhancements
 
@@ -58,6 +50,11 @@ The following contributors merged PRs in this release:
 - Add missing focus style to start template options previews. ([49334](https://github.com/WordPress/gutenberg/pull/49334))
 - Consistent labels for the WP logo and back links. ([49659](https://github.com/WordPress/gutenberg/pull/49659))
 
+### Experiments
+
+- Add a command center to the site editor. ([49330](https://github.com/WordPress/gutenberg/pull/49330))
+- Add Details/summary block. ([45055](https://github.com/WordPress/gutenberg/pull/45055))
+
 ### Bug Fixes
 
 #### Block Library
@@ -81,6 +78,7 @@ The following contributors merged PRs in this release:
 - Navigate to `editor` when clicking `Edit` in a template part. ([49604](https://github.com/WordPress/gutenberg/pull/49604))
 - Update the template title in the details panel. ([49487](https://github.com/WordPress/gutenberg/pull/49487))
 - Use the keyboard shortcuts package for the command center. ([49680](https://github.com/WordPress/gutenberg/pull/49680))
+- Fix the site editor loading in multi-site installs. ([49861](https://github.com/WordPress/gutenberg/pull/49861))
 
 #### Global Styles
 - Block Level Settings: Remove WP filters in Gutenberg. ([49598](https://github.com/WordPress/gutenberg/pull/49598))
@@ -96,7 +94,6 @@ The following contributors merged PRs in this release:
 - Fix redirected links to user documents. ([49537](https://github.com/WordPress/gutenberg/pull/49537))
 - Make InspectorControls tab labels translatable. ([49665](https://github.com/WordPress/gutenberg/pull/49665))
 - Update redirected support link. ([49533](https://github.com/WordPress/gutenberg/pull/49533))
-- Use registered fonts for Block Editor iframe. ([49646](https://github.com/WordPress/gutenberg/pull/49646))
 - Reusable Block: RTL styles don't get added to the `wp-reusable-blocks` stylesheet. ([49632](https://github.com/WordPress/gutenberg/pull/49632))
 - Fix padding and margin visualizer accuracy. ([49422](https://github.com/WordPress/gutenberg/pull/49422))
 
@@ -187,6 +184,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @andrewserong @aristath @aurooba @brookewp @carolinan @cawa-93 @chad1008 @ciampo @dcalhoun @derekblank @draganescu @DustyReagan @eduwass @fluiddot @geriux @getdave @glendaviesnz @hellofromtonya @HILAYTRIVEDI @imanish003 @jameskoster @jasmussen @jhnstn @jorgefilipecosta @Mamaduka @mirka @mokagio @nefeline @noahtallen @ntsekouras @ockham @ramonjd @richtabor @ryanwelcher @SavPhill @scruffian @Soean @t-hamano @talldan @tellthemachines @thealexandrelara @tyxla @youknowriad
+
+
 
 
 = 15.5.1 =

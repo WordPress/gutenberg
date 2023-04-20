@@ -17,7 +17,10 @@ const SUPPORTED_ENDPOINTS = {
 };
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
-const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
+const DISABLED_CACHING_ENDPOINTS = [
+	/wp\/v2\/(blocks)\/?\d*?.*/i,
+	/oembed\/1\.0\/proxy\?.*/i,
+];
 
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
