@@ -161,7 +161,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// Disallow transformation if not allowed via block support attribute transformations.
 	let hasNotTransformableBlock;
 	blocks.forEach( function( block ) {        
-    		if ( ! hasBlockSupport(block.name, 'transforms', true) ) {
+    		if ( ! hasBlockSupport( block.name, 'transforms', true ) ) {
         		hasNotTransformableBlock = true;
     		}
 	});
