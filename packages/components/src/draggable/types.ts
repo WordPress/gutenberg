@@ -21,7 +21,7 @@ export type DraggableProps = {
 	 * Whether to append the cloned element to the `ownerDocument` body.
 	 * By default, elements sourced by id are appended to the element's wrapper.
 	 *
-	 *@default false
+	 * @default false
 	 */
 	appendToOwnerDocument?: boolean;
 	/**
