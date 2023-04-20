@@ -15,6 +15,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getGroupingBlockName,
+	hasBlockSupport,
 } from './registration';
 import {
 	normalizeBlockType,
