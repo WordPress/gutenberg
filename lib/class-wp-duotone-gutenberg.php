@@ -335,6 +335,10 @@ class WP_Duotone_Gutenberg {
 
 				self::$output[ $slug ] = $filter_data;
 			}
+
+			// !important is only needed for individual blocks, not for global styles.
+			$declaration_value .= ' !important';
+
 		} elseif ( $has_global_styles_duotone ) {
 			$slug = self::$global_styles_block_names[ $block['blockName'] ];
 
@@ -365,10 +369,6 @@ class WP_Duotone_Gutenberg {
 				array(
 					'selector'     => $selector,
 					'declarations' => array(
-						// !important is needed because these styles
-						// render before global styles,
-						// and they should be overriding the duotone
-						// filters set by global styles.
 						'filter' => $declaration_value,
 					),
 				),
