@@ -14,7 +14,6 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import BlockEditorProvider from '../../components/provider';
 import { withColorPaletteStyles } from '../color';
 
-
 describe( 'withColorPaletteStyles', () => {
 	const settings = {
 		__experimentalFeatures: {
