@@ -7,47 +7,32 @@
  */
 
 /**
- * Manages Fallback behavior for Navigation block menus.
+ * Converts a Classic Menu to Block Menu blocks.
  *
  * @access public
  */
 class WP_Classic_To_Block_Menu_Converter {
 
 	/**
-	 * The Menu term object of the menu to convert.
-	 *
-	 * @var WP_Term
-	 */
-	private $menu;
-
-	/**
-	 * Constructor
-	 *
-	 * @param WP_Term $menu The Menu term object of the menu to convert.
-	 */
-	public function __construct( $menu ) {
-		$this->menu = $menu;
-	}
-
-	/**
 	 * Converts a Classic Menu to blocks.
 	 *
+	 * @param WP_Term $menu The Menu term object of the menu to convert.
 	 * @return string the serialized and normalized parsed blocks.
 	 */
-	public function convert() {
-		$menu_items = wp_get_nav_menu_items( $this->menu->term_id, array( 'update_post_term_cache' => false ) );
+	public static function convert( $menu ) {
+		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
 
 		// Set up the $menu_item variables.
 		// Adds the class property classes for the current context, if applicable.
 		_wp_menu_item_classes_by_context( $menu_items );
 
-		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items );
+		$menu_items_by_parent_id = static::group_by_parent_id( $menu_items );
 
 		$first_menu_item = isset( $menu_items_by_parent_id[0] )
 			? $menu_items_by_parent_id[0]
 			: array();
 
-		$inner_blocks = $this->to_blocks(
+		$inner_blocks = static::to_blocks(
 			$first_menu_item,
 			$menu_items_by_parent_id
 		);
@@ -61,7 +46,7 @@ class WP_Classic_To_Block_Menu_Converter {
 	 * @param array $menu_items An array of menu items.
 	 * @return array
 	 */
-	private function group_by_parent_id( $menu_items ) {
+	private static function group_by_parent_id( $menu_items ) {
 		$menu_items_by_parent_id = array();
 
 		foreach ( $menu_items as $menu_item ) {
@@ -82,7 +67,7 @@ class WP_Classic_To_Block_Menu_Converter {
 	 *                                        that parent.
 	 * @return array An array of parsed block data.
 	 */
-	private function to_blocks( $menu_items, $menu_items_by_parent_id ) {
+	private static function to_blocks( $menu_items, $menu_items_by_parent_id ) {
 
 		if ( empty( $menu_items ) ) {
 			return array();
@@ -114,7 +99,7 @@ class WP_Classic_To_Block_Menu_Converter {
 			);
 
 			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-			? $this->to_blocks( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			? static::to_blocks( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
 			: array();
 			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
 
@@ -123,8 +108,4 @@ class WP_Classic_To_Block_Menu_Converter {
 
 		return $blocks;
 	}
-
-
-
-
 }
