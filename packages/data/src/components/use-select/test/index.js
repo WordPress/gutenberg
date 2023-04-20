@@ -19,10 +19,10 @@ import {
 } from '../../..';
 import useSelect from '..';
 
-function counterStore( initialCount = 0, step = 1 ) {
+function counterStore( initialCount = 0 ) {
 	return {
 		reducer: ( state = initialCount, action ) =>
-			action.type === 'INC' ? state + step : state,
+			action.type === 'INC' ? state + 1 : state,
 		actions: {
 			inc: () => ( { type: 'INC' } ),
 		},
@@ -122,7 +122,7 @@ describe( 'useSelect', () => {
 		);
 
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
-		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
 		// Ensure expected state was rendered.
@@ -191,81 +191,6 @@ describe( 'useSelect', () => {
 		expect( mapSelectChild ).toHaveBeenCalledTimes( 3 );
 		expect( Parent ).toHaveBeenCalledTimes( 3 );
 		expect( Child ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'incrementally subscribes to newly selected stores', () => {
-		registry.registerStore( 'store-main', counterStore() );
-		registry.registerStore( 'store-even', counterStore( 0, 2 ) );
-		registry.registerStore( 'store-odd', counterStore( 1, 2 ) );
-
-		const mapSelect = jest.fn( ( select ) => {
-			const first = select( 'store-main' ).get();
-			// select from other stores depending on whether main value is even or odd
-			const secondStore = first % 2 === 1 ? 'store-odd' : 'store-even';
-			const second = select( secondStore ).get();
-			return first + ':' + second;
-		} );
-
-		const TestComponent = jest.fn( () => {
-			const data = useSelect( mapSelect, [] );
-			return <div role="status">{ data }</div>;
-		} );
-
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 2 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:0' );
-
-		// check that increment in store-even triggers a render
-		act( () => {
-			registry.dispatch( 'store-even' ).inc();
-		} );
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
-
-		// check that increment in store-odd doesn't trigger a render (not listening yet)
-		act( () => {
-			registry.dispatch( 'store-odd' ).inc();
-		} );
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
-
-		// check that increment in main store switches to store-odd
-		act( () => {
-			registry.dispatch( 'store-main' ).inc();
-		} );
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 4 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:3' );
-
-		// check that increment in store-odd triggers a render
-		act( () => {
-			registry.dispatch( 'store-odd' ).inc();
-		} );
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 5 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
-
-		// check that increment in store-even triggers a mapSelect call (still listening)
-		// but not a render (not used for selected value which doesn't change)
-		act( () => {
-			registry.dispatch( 'store-even' ).inc();
-		} );
-
-		expect( mapSelect ).toHaveBeenCalledTimes( 6 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
@@ -484,7 +409,7 @@ describe( 'useSelect', () => {
 				setDep( 1 );
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:0,dep:1'
 			);
@@ -493,7 +418,7 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'store-1' ).inc();
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 5 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:1,dep:1'
 			);
@@ -698,21 +623,10 @@ describe( 'useSelect', () => {
 
 			act( () => screen.getByText( 'Toggle' ).click() );
 
-			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				'count1:0'
-			);
-
-			// Verify that the component subscribed to store-1 after selected from
-			act( () => {
-				registry.dispatch( 'store-1' ).inc();
-			} );
-
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				'count1:1'
+				'count1:0'
 			);
 		} );
 
@@ -1223,11 +1137,11 @@ describe( 'useSelect', () => {
 			rerender( <App store="counter-2" /> );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 
-			// update from counter-2 is processed because component has subscribed to counter-2
+			// update from counter-2 is ignored because component is subcribed only to counter-1
 			act( () => {
 				registry.dispatch( 'counter-2' ).inc();
 			} );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '11' );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 		} );
 	} );
 

@@ -42,85 +42,48 @@ function Store( registry, suspense ) {
 	let lastMapResult;
 	let lastMapResultValid = false;
 	let lastIsAsync;
-	let subscriber;
+	let subscribe;
 
-	const createSubscriber = ( stores ) => {
-		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
-		// initialized, and then the `updateStores` function can add new stores to it.
-		const activeStores = [ ...stores ];
+	const createSubscriber = ( stores ) => ( listener ) => {
+		// Invalidate the value right after subscription was created. React will
+		// call `getValue` after subscribing, to detect store updates that happened
+		// in the interval between the `getValue` call during render and creating
+		// the subscription, which is slightly delayed. We need to ensure that this
+		// second `getValue` call will compute a fresh value.
+		lastMapResultValid = false;
 
-		// The `subscribe` function, which is passed to the `useSyncExternalStore` hook, could
-		// be called multiple times to establish multiple subscriptions. That's why we need to
-		// keep a set of active subscriptions;
-		const activeSubscriptions = new Set();
-
-		function subscribe( listener ) {
-			// Invalidate the value right after subscription was created. React will
-			// call `getValue` after subscribing, to detect store updates that happened
-			// in the interval between the `getValue` call during render and creating
-			// the subscription, which is slightly delayed. We need to ensure that this
-			// second `getValue` call will compute a fresh value.
+		const onStoreChange = () => {
+			// Invalidate the value on store update, so that a fresh value is computed.
 			lastMapResultValid = false;
+			listener();
+		};
 
-			const onStoreChange = () => {
-				// Invalidate the value on store update, so that a fresh value is computed.
-				lastMapResultValid = false;
-				listener();
-			};
-
-			const onChange = () => {
-				if ( lastIsAsync ) {
-					renderQueue.add( queueContext, onStoreChange );
-				} else {
-					onStoreChange();
-				}
-			};
-
-			const unsubs = [];
-			function subscribeStore( storeName ) {
-				unsubs.push( registry.subscribe( onChange, storeName ) );
+		const onChange = () => {
+			if ( lastIsAsync ) {
+				renderQueue.add( queueContext, onStoreChange );
+			} else {
+				onStoreChange();
 			}
+		};
 
-			for ( const storeName of activeStores ) {
-				subscribeStore( storeName );
+		const unsubs = stores.map( ( storeName ) => {
+			return registry.subscribe( onChange, storeName );
+		} );
+
+		return () => {
+			// The return value of the subscribe function could be undefined if the store is a custom generic store.
+			for ( const unsub of unsubs ) {
+				unsub?.();
 			}
-
-			activeSubscriptions.add( subscribeStore );
-
-			return () => {
-				activeSubscriptions.delete( subscribeStore );
-
-				for ( const unsub of unsubs.values() ) {
-					// The return value of the subscribe function could be undefined if the store is a custom generic store.
-					unsub?.();
-				}
-				// Cancel existing store updates that were already scheduled.
-				renderQueue.cancel( queueContext );
-			};
-		}
-
-		// Check if `newStores` contains some stores we're not subscribed to yet, and add them.
-		function updateStores( newStores ) {
-			for ( const newStore of newStores ) {
-				if ( activeStores.includes( newStore ) ) {
-					continue;
-				}
-
-				// New `subscribe` calls will subscribe to `newStore`, too.
-				activeStores.push( newStore );
-
-				// Add `newStore` to existing subscriptions.
-				for ( const subscription of activeSubscriptions ) {
-					subscription( newStore );
-				}
-			}
-		}
-
-		return { subscribe, updateStores };
+			// Cancel existing store updates that were already scheduled.
+			renderQueue.cancel( queueContext );
+		};
 	};
 
-	return ( mapSelect, isAsync ) => {
-		function updateValue() {
+	return ( mapSelect, resubscribe, isAsync ) => {
+		const selectValue = () => mapSelect( select, registry );
+
+		function updateValue( selectFromStore ) {
 			// If the last value is valid, and the `mapSelect` callback hasn't changed,
 			// then we can safely return the cached value. The value can change only on
 			// store update, and in that case value will be invalidated by the listener.
@@ -128,17 +91,7 @@ function Store( registry, suspense ) {
 				return lastMapResult;
 			}
 
-			const listeningStores = { current: null };
-			const mapResult = registry.__unstableMarkListeningStores(
-				() => mapSelect( select, registry ),
-				listeningStores
-			);
-
-			if ( ! subscriber ) {
-				subscriber = createSubscriber( listeningStores.current );
-			} else {
-				subscriber.updateStores( listeningStores.current );
-			}
+			const mapResult = selectFromStore();
 
 			// If the new value is shallow-equal to the old one, keep the old one so
 			// that we don't trigger unwanted updates that do a `===` check.
@@ -151,7 +104,7 @@ function Store( registry, suspense ) {
 
 		function getValue() {
 			// Update the value in case it's been invalidated or `mapSelect` has changed.
-			updateValue();
+			updateValue( selectValue );
 			return lastMapResult;
 		}
 
@@ -163,12 +116,29 @@ function Store( registry, suspense ) {
 			renderQueue.cancel( queueContext );
 		}
 
-		updateValue();
+		// Either initialize the `subscribe` function, or create a new one if `mapSelect`
+		// changed and has dependencies.
+		// Usage without dependencies, `useSelect( ( s ) => { ... } )`, will subscribe
+		// only once, at mount, and won't resubscibe even if `mapSelect` changes.
+		if ( ! subscribe || ( resubscribe && mapSelect !== lastMapSelect ) ) {
+			// Find out what stores the `mapSelect` callback is selecting from and
+			// use that list to create subscriptions to specific stores.
+			const listeningStores = { current: null };
+			updateValue( () =>
+				registry.__unstableMarkListeningStores(
+					selectValue,
+					listeningStores
+				)
+			);
+			subscribe = createSubscriber( listeningStores.current );
+		} else {
+			updateValue( selectValue );
+		}
 
 		lastIsAsync = isAsync;
 
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe: subscriber.subscribe, getValue };
+		return { subscribe, getValue };
 	};
 }
 
@@ -181,7 +151,7 @@ function useMappingSelect( suspense, mapSelect, deps ) {
 	const isAsync = useAsyncMode();
 	const store = useMemo( () => Store( registry, suspense ), [ registry ] );
 	const selector = useCallback( mapSelect, deps );
-	const { subscribe, getValue } = store( selector, isAsync );
+	const { subscribe, getValue } = store( selector, !! deps, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );
 	useDebugValue( result );
 	return result;
