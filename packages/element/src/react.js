@@ -53,6 +53,12 @@ import {
  */
 
 /**
+ * Object containing a React synthetic event.
+ *
+ * @typedef {import('react').RefObject} RefObject
+ */
+
+/**
  * Object that provides utilities for dealing with React children.
  */
 export { Children };
