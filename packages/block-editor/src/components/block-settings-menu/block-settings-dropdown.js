@@ -233,6 +233,7 @@ export function BlockSettingsDropdown( {
 													}
 												/>
 											}
+											className={ 'block-action-select-parent' }
 											onClick={ () =>
 												selectBlock(
 													firstParentClientId
@@ -259,6 +260,7 @@ export function BlockSettingsDropdown( {
 								/>
 								{ canDuplicate && (
 									<MenuItem
+								 		className={ 'block-action-duplicate' }
 										onClick={ pipe(
 											onClose,
 											onDuplicate,
@@ -272,6 +274,7 @@ export function BlockSettingsDropdown( {
 								{ canInsertDefaultBlock && (
 									<>
 										<MenuItem
+											className={ 'block-action-insert-before' }
 											onClick={ pipe(
 												onClose,
 												onInsertBefore
@@ -281,6 +284,7 @@ export function BlockSettingsDropdown( {
 											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
+											className={ 'block-action-insert-after' }
 											onClick={ pipe(
 												onClose,
 												onInsertAfter
@@ -293,6 +297,7 @@ export function BlockSettingsDropdown( {
 								) }
 								{ canMove && ! onlyBlock && (
 									<MenuItem
+										className={ 'block-action-move-to' }
 										onClick={ pipe( onClose, onMoveTo ) }
 									>
 										{ __( 'Move to' ) }
@@ -313,6 +318,7 @@ export function BlockSettingsDropdown( {
 								/>
 								<MenuItem onClick={ onPasteStyles }>
 									{ __( 'Paste styles' ) }
+									className={ 'block-action-paste-styles' }
 								</MenuItem>
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
@@ -330,6 +336,7 @@ export function BlockSettingsDropdown( {
 							{ canRemove && (
 								<MenuGroup>
 									<MenuItem
+										className={ 'block-action-delete' }
 										onClick={ pipe(
 											onClose,
 											onRemove,
