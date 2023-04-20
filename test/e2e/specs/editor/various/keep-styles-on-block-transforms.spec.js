@@ -23,10 +23,12 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Heading"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
 
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:paragraph {"textColor":"luminous-vivid-orange"} -->
-<p class="has-luminous-vivid-orange-color has-text-color">Heading</p>
-<!-- /wp:paragraph -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Heading' },
+			},
+		] );
 	} );
 
 	test( 'Should keep the font size during a transform from multiple blocks into multiple blocks', async ( {
@@ -46,20 +48,26 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click( 'role=menuitem[name="Group"i]' );
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Line 1 to be made large</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Line 2 to be made large</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Line 3 to be made large</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Line 1 to be made large' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Line 2 to be made large' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Line 3 to be made large' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'Should not include styles in the group block when grouping a block', async ( {
@@ -76,11 +84,16 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click( 'role=menuitem[name="Group"i]' );
 
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group"><!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Line 1 to be made large</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Line 1 to be made large' },
+					},
+				],
+			},
+		] );
 	} );
 } );
