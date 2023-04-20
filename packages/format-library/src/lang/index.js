@@ -10,7 +10,16 @@ const title = __( 'Language selection' );
 
 function Edit( { isActive, value, onChange, onFocus } ) {
 	function onToggle() {
-		onChange( toggleFormat( value, { type: name, title } ) );
+		onChange(
+			toggleFormat( value, {
+				type: name,
+				attributes: {
+					lang: 'it',
+					dir: 'ltr',
+				},
+				title,
+			} )
+		);
 	}
 
 	function onClick() {
@@ -36,7 +45,7 @@ export const lang = {
 	className: 'wp-lang',
 	edit: Edit,
 	attributes: {
-		lang: 'it',
-		dir: 'ltr',
+		lang: 'lang',
+		dir: 'dir',
 	},
 };
