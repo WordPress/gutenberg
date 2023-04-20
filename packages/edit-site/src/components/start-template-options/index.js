@@ -147,7 +147,7 @@ export default function StartTemplateOptions() {
 	const [ modalState, setModalState ] = useState(
 		START_TEMPLATE_MODAL_STATES.INITIAL
 	);
-	const { shouldOpenModel, slug, isCustom, postType } = useSelect(
+	const { shouldOpenModal, slug, isCustom, postType } = useSelect(
 		( select ) => {
 			const { getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
@@ -167,7 +167,7 @@ export default function StartTemplateOptions() {
 			);
 
 			return {
-				shouldOpenModel:
+				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
 					'wp_template' === _postType &&
@@ -185,7 +185,7 @@ export default function StartTemplateOptions() {
 
 	if (
 		( modalState === START_TEMPLATE_MODAL_STATES.INITIAL &&
-			! shouldOpenModel ) ||
+			! shouldOpenModal ) ||
 		modalState === START_TEMPLATE_MODAL_STATES.CLOSED
 	) {
 		return null;
