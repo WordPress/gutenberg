@@ -8,6 +8,7 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
+const { getHostUser } = require( '../build-docker-compose-config' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -52,6 +53,12 @@ module.exports = async function run( {
  * @param {Object}   spinner   A CLI spinner which indicates progress.
  */
 function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
+	// Both the `wordpress` and `tests-wordpress` containers have the host's
+	// user so that they can maintain ownership parity with the host OS.
+	// We should run any commands as that user so that they are able
+	// to interact with the files mounted from the host.
+	const hostUser = getHostUser();
+
 	// We need to pass absolute paths to the container.
 	envCwd = path.resolve( '/var/www/html', envCwd );
 
@@ -61,6 +68,8 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		'run',
 		'-w',
 		envCwd,
+		'--user',
+		hostUser.fullUser,
 		'--rm',
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.

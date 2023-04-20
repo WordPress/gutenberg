@@ -11,7 +11,7 @@ const os = require( 'os' );
  * Internal dependencies
  */
 const { readConfig } = require( './config' );
-const buildDockerComposeConfig = require( './build-docker-compose-config' );
+const { buildDockerComposeConfig } = require( './build-docker-compose-config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -157,6 +157,17 @@ function dockerFileContents( image, config ) {
 
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+RUN useradd -M -u $HOST_UID -g $HOST_GID $HOST_USERNAME
+
+# Set up sudo so they can have root access when using 'run' commands.
+RUN apt-get update
+RUN apt-get -qy install sudo
+RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 `;
 }
 

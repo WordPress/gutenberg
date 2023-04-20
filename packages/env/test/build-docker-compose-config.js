@@ -1,7 +1,9 @@
 /**
  * Internal dependencies
  */
-const buildDockerComposeConfig = require( '../lib/build-docker-compose-config' );
+const {
+	buildDockerComposeConfig,
+} = require( '../lib/build-docker-compose-config' );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {

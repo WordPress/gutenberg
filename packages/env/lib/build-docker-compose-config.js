@@ -4,6 +4,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
+const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -71,6 +72,24 @@ function getMounts(
 }
 
 /**
+ * Gets information about the host user so we can implement ownership parity.
+ *
+ * @return {Object} The host user's name, uid, and gid.
+ */
+function getHostUser() {
+	const hostUser = os.userInfo();
+	const uid = ( hostUser.uid === -1 ? 0 : hostUser.uid ).toString();
+	const gid = ( hostUser.gid === -1 ? 0 : hostUser.gid ).toString();
+
+	return {
+		name: hostUser.username,
+		uid,
+		gid,
+		fullUser: uid + ':' + gid,
+	};
+}
+
+/**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
@@ -78,7 +97,13 @@ function getMounts(
  *
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
-module.exports = function buildDockerComposeConfig( config ) {
+function buildDockerComposeConfig( config ) {
+	// Since we are mounting files from the host operating system
+	// we want to create the host user in some of our containers.
+	// This ensures ownership parity and lets us access files
+	// and folders between the containers and the host.
+	const hostUser = getHostUser();
+
 	const developmentMounts = getMounts(
 		config.workDirectoryPath,
 		config.env.development
@@ -190,12 +215,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
 
-	// The www-data user in wordpress:cli has a different UID (82) to the
-	// www-data user in wordpress (33). Ensure we use the wordpress www-data
-	// user for CLI commands.
-	// https://github.com/docker-library/wordpress/issues/256
-	const cliUser = '33:33';
-
 	// If the user mounted their own uploads folder, we should not override it in the phpunit service.
 	const isMappingTestUploads = testsMounts.some( ( mount ) =>
 		mount.endsWith( ':/var/www/html/wp-content/uploads' )
@@ -227,11 +246,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
-				build: '.',
+				build: {
+					context: '.',
+					args: {
+						HOST_USERNAME: hostUser.name,
+						HOST_UID: hostUser.uid,
+						HOST_GID: hostUser.gid,
+					},
+				},
 				depends_on: [ 'mysql' ],
 				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
 					...dbEnv.credentials,
 					...dbEnv.development,
 					WP_TESTS_DIR: '/wordpress-phpunit',
@@ -243,6 +271,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
 					...dbEnv.credentials,
 					...dbEnv.tests,
 					WP_TESTS_DIR: '/wordpress-phpunit',
@@ -253,7 +283,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'wordpress' ],
 				image: developmentWpCliImage,
 				volumes: developmentMounts,
-				user: cliUser,
+				user: hostUser.fullUser,
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
@@ -264,7 +294,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'tests-wordpress' ],
 				image: testsWpCliImage,
 				volumes: testsMounts,
-				user: cliUser,
+				user: hostUser.fullUser,
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
@@ -300,4 +330,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'phpunit-uploads': {},
 		},
 	};
-};
+}
+
+module.exports = { getHostUser, buildDockerComposeConfig };
