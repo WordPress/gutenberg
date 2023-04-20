@@ -32,7 +32,7 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 				ignore_empty: true,
 			} ),
 		} ).then( ( { content } ) => setTemplateContent( content.raw ) );
-	}, [ slug ] );
+	}, [ isCustom, slug ] );
 	return templateContent;
 }
 
