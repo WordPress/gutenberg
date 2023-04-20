@@ -156,6 +156,18 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	if ( ! blocks.length ) {
 		return false;
 	}
+	
+	// Disallow transformation if not allowed via block support attribute transformations.
+	let hasNotTransformableBlock;
+	blocks.forEach( function( block ) {        
+    		if ( ! hasBlockSupport(block.name, 'transforms', true) ) {
+        		hasNotTransformableBlock = true;
+    		}
+	});
+
+	if( hasNotTransformableBlock ) {
+    		return false;
+	}
 
 	// If multiple blocks are selected, only multi block transforms
 	// or wildcard transforms are allowed.
