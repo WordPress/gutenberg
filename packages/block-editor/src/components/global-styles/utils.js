@@ -18,7 +18,6 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'linkColor',
 	'buttonColor',
 	'headingColor',
-	'headingBackgroundColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
