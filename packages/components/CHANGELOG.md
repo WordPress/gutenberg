@@ -15,7 +15,7 @@
 -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
 -   `Modal`: Updated spacing / dimensions of `isFullScreen` ([#49894](https://github.com/WordPress/gutenberg/pull/49894)).
 -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
-
+-   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
 
 ### Documentation
 
