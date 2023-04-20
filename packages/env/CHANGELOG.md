@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `run` command now has a `--cwd` option to set the working directory for the command to execute from.
+-   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 
 ## 5.16.0 (2023-04-12)
 
