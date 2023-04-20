@@ -4,13 +4,13 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
  */
 const { hasSameCoreSource } = require( './wordpress' );
 const { dbEnv } = require( './config' );
+const getHostUser = require( './get-host-user' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -72,24 +72,6 @@ function getMounts(
 }
 
 /**
- * Gets information about the host user so we can implement ownership parity.
- *
- * @return {Object} The host user's name, uid, and gid.
- */
-function getHostUser() {
-	const hostUser = os.userInfo();
-	const uid = ( hostUser.uid === -1 ? 0 : hostUser.uid ).toString();
-	const gid = ( hostUser.gid === -1 ? 0 : hostUser.gid ).toString();
-
-	return {
-		name: hostUser.username,
-		uid,
-		gid,
-		fullUser: uid + ':' + gid,
-	};
-}
-
-/**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
@@ -97,7 +79,7 @@ function getHostUser() {
  *
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
-function buildDockerComposeConfig( config ) {
+module.exports = function buildDockerComposeConfig( config ) {
 	// Since we are mounting files from the host operating system
 	// we want to create the host user in some of our containers.
 	// This ensures ownership parity and lets us access files
@@ -330,6 +312,4 @@ function buildDockerComposeConfig( config ) {
 			'phpunit-uploads': {},
 		},
 	};
-}
-
-module.exports = { getHostUser, buildDockerComposeConfig };
+};

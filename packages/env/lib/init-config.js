@@ -11,7 +11,7 @@ const os = require( 'os' );
  * Internal dependencies
  */
 const { readConfig } = require( './config' );
-const { buildDockerComposeConfig } = require( './build-docker-compose-config' );
+const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig

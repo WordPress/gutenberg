@@ -8,7 +8,7 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
-const { getHostUser } = require( '../build-docker-compose-config' );
+const getHostUser = require( '../get-host-user' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
