@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -74,7 +75,6 @@ export function MediaPlaceholder( {
 	onToggleFeaturedImage,
 	onDoubleClick,
 	onFilesPreUpload = noop,
-	onHTMLDrop = noop,
 	children,
 	mediaLibraryButton,
 	placeholder,
@@ -176,6 +176,64 @@ export function MediaPlaceholder( {
 			onError,
 		} );
 	};
+
+	async function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML } );
+
+		if ( ! blocks || ! Array.isArray( blocks ) ) {
+			return;
+		}
+
+		function recursivelyFindImagesFromBlocks( _blocks ) {
+			return _blocks.flatMap( ( block ) =>
+				block.name === 'core/image'
+					? [ block ]
+					: recursivelyFindImagesFromBlocks( block.innerBlocks )
+			);
+		}
+
+		const imageBlocks = recursivelyFindImagesFromBlocks( blocks );
+
+		if ( ! imageBlocks.length ) {
+			return;
+		}
+
+		const uploadedMediaList = await Promise.all(
+			imageBlocks.map( ( block ) =>
+				block.attributes.id
+					? block.attributes
+					: new Promise( ( resolve, reject ) => {
+							window
+								.fetch( block.attributes.url )
+								.then( ( response ) => response.blob() )
+								.then( ( blob ) =>
+									mediaUpload( {
+										filesList: [ blob ],
+										additionalData: {
+											title: block.attributes.title,
+											alt_text: block.attributes.alt,
+											caption: block.attributes.caption,
+										},
+										onFileChange: ( [ media ] ) => {
+											if ( media.id ) {
+												resolve( media );
+											}
+										},
+										allowedTypes,
+										onError: reject,
+									} )
+								)
+								.catch( () => resolve( block.attributes.url ) );
+					  } )
+			)
+		).catch( ( err ) => onError( err ) );
+
+		if ( multiple ) {
+			onSelect( uploadedMediaList );
+		} else {
+			onSelect( uploadedMediaList[ 0 ] );
+		}
+	}
 
 	const onUpload = ( event ) => {
 		onFilesUpload( event.target.files );
