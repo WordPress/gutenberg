@@ -13,7 +13,7 @@ import { subscript } from './subscript';
 import { superscript } from './superscript';
 import { keyboard } from './keyboard';
 import { unknown } from './unknown';
-import { lang } from './lang';
+import { langattribute } from './lang';
 
 export default [
 	bold,
@@ -28,5 +28,5 @@ export default [
 	superscript,
 	keyboard,
 	unknown,
-	lang,
+	langattribute,
 ];
