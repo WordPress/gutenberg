@@ -99,7 +99,7 @@ class WP_Navigation_Fallback_Gutenberg {
 		}
 
 		// Create a new navigation menu from the classic menu.
-		$wp_insert_post_result = wp_insert_post(
+		$classic_menu_fallback = wp_insert_post(
 			array(
 				'post_content' => $classic_nav_menu_blocks,
 				'post_title'   => $classic_nav_menu->name,
@@ -110,7 +110,7 @@ class WP_Navigation_Fallback_Gutenberg {
 			true // So that we can check whether the result is an error.
 		);
 
-		return $wp_insert_post_result;
+		return $classic_menu_fallback;
 	}
 
 	/**
