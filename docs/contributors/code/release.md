@@ -194,7 +194,15 @@ _If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will ne
 
 To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
 
-Please note you **cannot create minor releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo). Always check the latest release version before you proceed (see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457) for more information).
+##### Creating a minor release for previous stable releases
+
+It is possible to create a minor release for previous stable releases, following the same workflow as documented for regular minor releases. This can be done for _any_ previous release branch, allowing more flexibility in delivering updates to users.
+
+The old release will be published as a release in the GitHub releases page for Gutenberg, and it will also be published to the WordPress core repository SVN as a tag under http://plugins.svn.wordpress.org/gutenberg/tags/. The `trunk` directory will not be touched.
+
+When publishing the draft created by the ["Build Plugin Zip" workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml), make sure to leave the "Set as last release" checkbox unchecked. If it is left checked by accident, the ["Upload Gutenberg plugin to WordPress.org plugin" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) will still correctly upload it **as a tag (and will not replace the `trunk` version)** to the WordPress plugin repository SVN, as it performs version arithmetic to determine how the release should be shipped. However, if the checkbox is left checked, you will need to re-set the `latest` release in the releases page again, to point it to the correct last release!
+
+One typical scenario for releasing a minor update to an older Gutenberg version is when the previous version is still fairly recent, and a new Release Candidate (RC) has just been introduced. In the past, users had to wait for the stable version to obtain fixes. However, with the ability to create minor releases for earlier stable releases, we can now incorporate the fix (which will also be included in the next release branch) into the prior release branch or any older release branch, as needed. This approach enables recently-released older versions to receive updates more efficiently, ensuring that users obtain crucial fixes and updates without waiting for the next major stable release.
 
 #### Troubleshooting
 
