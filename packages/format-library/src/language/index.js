@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchorRef } from '@wordpress/rich-text';
 import { translation } from '@wordpress/icons';
 
-const name = 'core/lang';
+const name = 'core/language';
 const title = __( 'Language' );
 
 const LangAttributeButton = ( props ) => {
@@ -106,7 +106,7 @@ const LangAttributeButton = ( props ) => {
 	);
 };
 
-export const langattribute = {
+export const language = {
 	name,
 	tagName: 'span',
 	className: 'lang-attribute',
