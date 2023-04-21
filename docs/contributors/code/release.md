@@ -196,15 +196,11 @@ To do this, when running the Workflow, select the appropriate `release/` branch 
 
 ##### Creating a minor release for previous stable releases
 
-It is possible to create a minor release for any release branch even after a more recent stable release has been published. This can be done for _any_ previous release branches, allowing more flexibility in delivering updates to users.
+It is possible to create a minor release for any release branch even after a more recent stable release has been published. This can be done for _any_ previous release branches, allowing more flexibility in delivering updates to users. In the past, users had to wait for the next stable release, potentially taking days. Now, fixes can be swiftly shipped to any previous release branches as required.
 
-The process is identical to the one documented above when an RC is already out: choose a previous release branch, type `stable`, and click "Run workflow".
-
-The release will be published on the GitHub releases page for Gutenberg and to the WordPress core repository SVN as a `tag` under http://plugins.svn.wordpress.org/gutenberg/tags/. The SVN `trunk` directory will not be touched.
+The process is identical to the one documented above when an RC is already out: choose a previous release branch, type `stable`, and click "Run workflow". The release will be published on the GitHub releases page for Gutenberg and to the WordPress core repository SVN as a `tag` under http://plugins.svn.wordpress.org/gutenberg/tags/. The SVN `trunk` directory will not be touched.
 
 **IMPORTANT:** When publishing the draft created by the ["Build Plugin Zip" workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml), make sure to leave the "Set as last release" checkbox unchecked. If it is left checked by accident, the ["Upload Gutenberg plugin to WordPress.org plugin" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) will still correctly upload it **as a tag (and will not replace the `trunk` version)** to the WordPress plugin repository SVN, as it performs version arithmetic to determine how the release should be shipped. However, if the checkbox is left checked, you must reset the `latest` release on the releases page to point it to the correct last release!
-
-One typical scenario for releasing a minor update to an older Gutenberg version is when the previous version is still relatively recent, and a new *stable* release (non-RC) has just been shipped. In the past, users had to wait for the stable version to obtain fixes. However, with the ability to create minor releases for earlier stable releases, we can now incorporate the fixes into the prior release branch or any older release branch, as needed. This approach enables recently released older versions to receive updates more efficiently, ensuring users obtain crucial fixes and updates without waiting for the next major stable release
 
 #### Troubleshooting
 
