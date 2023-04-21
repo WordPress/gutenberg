@@ -695,7 +695,7 @@ The `WP_ENV_POST_INSTALL` environment variable can be used to override the confi
 Additional environment variables are given to the command to provide context about the execution:
 
 - `WP_ENV_POST_INSTALL_CONTEXT` contains the command that triggered the execution, either `start` or `clean`.
-- `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the environment that the command is being executed for, such as `development` or `tests`.
+- `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the WordPress environment that the command is being executed for, such as `development` or `tests`.
 - `WP_ENV_POST_INSTALL_DEBUG` contains a boolean indicating whether or not `wp-env` is in debug mode.
 
 > **Warning:** This command will not always be executed on a fresh environment. It should be resilient and not fail if a step has already been completed.
