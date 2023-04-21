@@ -86,6 +86,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--rm' ],
 			log: config.debug,
 		}
 	);
