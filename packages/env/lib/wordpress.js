@@ -22,8 +22,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  */
 
 /**
- * Error subtype which indicates that an expected validation erorr occurred
- * while reading wp-env configuration.
+ * Error subtype which indicates that the post install command failed.
  */
 class PostInstallError extends Error {}
 
