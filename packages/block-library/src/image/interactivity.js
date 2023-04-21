@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { store, init } from '../utils/interactivity';
+import { store } from '../utils/interactivity';
 
 store( {
 	effects: {
@@ -11,5 +11,3 @@ store( {
 		},
 	},
 } );
-
-init();
