@@ -6,6 +6,7 @@ const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const { execSync } = require( 'child_process' );
 
 /**
  * Promisified dependencies
@@ -39,11 +40,17 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * activating all plugins, and activating the first theme. These steps are
  * performed sequentially so as to not overload the WordPress instance.
  *
- * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
- * @param {WPConfig}      config      The wp-env config object.
- * @param {Object}        spinner     A CLI spinner which indicates progress.
+ * @param {WPEnvironment} environment        The environment to configure. Either 'development' or 'tests'.
+ * @param {WPConfig}      config             The wp-env config object.
+ * @param {string|null}   postInstallContext The context that will be set when executing postInstall command(s). When null, postInstall won't run.
+ * @param {Object}        spinner            A CLI spinner which indicates progress.
  */
-async function configureWordPress( environment, config, spinner ) {
+async function configureWordPress(
+	environment,
+	config,
+	postInstallContext,
+	spinner
+) {
 	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
@@ -105,6 +112,26 @@ async function configureWordPress( environment, config, spinner ) {
 			log: config.debug,
 		}
 	);
+
+	// At this point, WordPress has been configured and the environment should be ready.
+	// We're going to support a "postInstall" configuration option so that users can
+	// have the environment arbitrarily execute command(s) for additional setup.
+	if ( postInstallContext && config.env[ environment ].postInstall ) {
+		try {
+			execSync( config.env[ environment ].postInstall, {
+				encoding: 'utf-8',
+				// We're going to let the script decide what it wants to output.
+				stdio: [ 'ignore', 'inherit', 'pipe' ],
+				env: {
+					...process.env,
+					WP_ENV_POST_INSTALL_CONTEXT: postInstallContext,
+					WP_ENV_POST_INSTALL_ENVIRONMENT: environment,
+				},
+			} );
+		} catch ( e ) {
+			throw new Error( `${ environment } postInstall: ${ e.stderr }` );
+		}
+	}
 }
 
 /**

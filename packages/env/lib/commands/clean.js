@@ -42,7 +42,7 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	if ( environment === 'all' || environment === 'development' ) {
 		tasks.push(
 			resetDatabase( 'development', config )
-				.then( () => configureWordPress( 'development', config ) )
+				.then( () => configureWordPress( 'development', config, null ) )
 				.catch( () => {} )
 		);
 	}
@@ -50,7 +50,7 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	if ( environment === 'all' || environment === 'tests' ) {
 		tasks.push(
 			resetDatabase( 'tests', config )
-				.then( () => configureWordPress( 'tests', config ) )
+				.then( () => configureWordPress( 'tests', config, null ) )
 				.catch( () => {} )
 		);
 	}

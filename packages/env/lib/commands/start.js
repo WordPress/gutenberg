@@ -178,12 +178,24 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 		// Retry WordPress installation in case MySQL *still* wasn't ready.
 		await Promise.all( [
-			retry( () => configureWordPress( 'development', config, spinner ), {
-				times: 2,
-			} ),
-			retry( () => configureWordPress( 'tests', config, spinner ), {
-				times: 2,
-			} ),
+			retry(
+				() =>
+					configureWordPress(
+						'development',
+						config,
+						'start',
+						spinner
+					),
+				{
+					times: 2,
+				}
+			),
+			retry(
+				() => configureWordPress( 'tests', config, 'start', spinner ),
+				{
+					times: 2,
+				}
+			),
 		] );
 
 		// Set the cache key once everything has been configured.
