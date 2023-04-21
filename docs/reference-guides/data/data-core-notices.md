@@ -156,7 +156,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _status_ `[string]`: Notice status.
+-   _status_ `string|undefined`: Notice status ("info" if undefined is passed).
 -   _content_ `string`: Notice message.
 -   _options_ `[Object]`: Notice options.
 -   _options.context_ `[string]`: Context under which to group notice.

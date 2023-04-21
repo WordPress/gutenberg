@@ -82,6 +82,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
+		subscribePostSaveEvent: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateEditorSettings: jest.fn(),

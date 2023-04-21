@@ -22,7 +22,7 @@ Examples of rich formats include:
 
 -   bold, italic, superscript (etc)
 -   links
--   underordered/ordered lists
+-   unordered/ordered lists
 
 ### The RichTextValue object
 
