@@ -113,6 +113,29 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 		$this->assertTrue( $schema['properties']['id']['readonly'], 'Schema "id" property should be readonly.' );
 	}
 
+	/**
+	 * @covers WP_REST_Navigation_Fallback_Controller
+	 *
+	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
+	 */
+	public function test_adds_links() {
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$navigation_post_id = $data['id'];
+
+		$links = $response->get_links();
+
+		$this->assertNotEmpty( $links, 'Response should contain links.' );
+
+		$this->assertArrayHasKey( 'self', $links, 'Response should contain a "self" link.' );
+
+		$this->assertStringContainsString( 'wp/v2/navigation/' . $data['id'], $links['self'][0]['href'], 'Self link should reference the correct Navigation Menu post resource url.' );
+
+		$this->assertTrue( $links['self'][0]['attributes']['embeddable'], 'Self link should be embeddable.' );
+	}
+
 	private function get_navigations_in_database() {
 		$navs_in_db = new WP_Query(
 			array(
