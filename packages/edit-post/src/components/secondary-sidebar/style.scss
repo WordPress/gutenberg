@@ -71,7 +71,7 @@
 	height: 100%;
 
 	// Include custom scrollbars, invisible until hovered.
-	@include custom-scrollbars-on-hover(transparent, $gray-600, $white);
+	@include custom-scrollbars-on-hover(transparent, $gray-600);
 	overflow: auto;
 
 	// Only reserve space for scrollbars when there is content to scroll.

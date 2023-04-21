@@ -514,7 +514,7 @@
 	/* stylelint-enable function-comma-space-after */
 }
 
-@mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover, $track-color ) {
+@mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover) {
 
 	// WebKit
 	&::-webkit-scrollbar {
@@ -522,7 +522,7 @@
 		height: 12px;
 	}
 	&::-webkit-scrollbar-track {
-		background-color: $track-color;
+		background-color: transparent;
 	}
 	&::-webkit-scrollbar-thumb {
 		background-color: $handle-color;
@@ -537,10 +537,10 @@
 	// Firefox 109+ and Chrome 111+
 	scrollbar-width: thin;
 	scrollbar-gutter: stable;
-	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
+	scrollbar-color: $handle-color transparent; // Syntax, "dark", "light", or "#handle-color #track-color"
 
 	&:hover {
-		scrollbar-color: $handle-color-hover $track-color;
+		scrollbar-color: $handle-color-hover transparent;
 	}
 	&:hover::-webkit-scrollbar-thumb {
 		background-color: $handle-color-hover;
