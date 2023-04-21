@@ -156,6 +156,28 @@ class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
 
-		return rest_ensure_response( $data );
+		$response = rest_ensure_response( $data );
+
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			$links = $this->prepare_links( $item );
+			$response->add_links( $links );
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Prepares the links for the request.
+	 *
+	 * @param WP_Post $post the Navigation Menu post object.
+	 * @return array Links for the given request.
+	 */
+	private function prepare_links( $post ) {
+		return array(
+			'self' => array(
+				'href'       => rest_url( rest_get_route_for_post( $post->ID ) ),
+				'embeddable' => true,
+			),
+		);
 	}
 }
