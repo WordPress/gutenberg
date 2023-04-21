@@ -41,6 +41,10 @@ $z-layers: (
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
+	// Sticky position visualizer:
+	// Note that the sticky position block support has a default z-index value of 10.
+	".block-editor__sticky-position-visualizer-popover": 10, // Ensure visualizer sits beneath the block toolbar.
+
 	// Fixed position appender:
 	".block-editor-block-list__block .block-list-appender": 2,
 

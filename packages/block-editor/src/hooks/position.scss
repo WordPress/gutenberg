@@ -17,6 +17,18 @@
 	}
 }
 
+// Prevent position visualizer popover from preventing inner block selection.
+.components-popover.block-editor-block-popover.block-editor__sticky-position-visualizer-popover {
+	z-index: z-index(".block-editor__sticky-position-visualizer-popover");
+	// Additional specificity is required to overcome default block popover
+	// pointer events only for the intended wrappers. This ensures that the
+	// visualizer popover never interferes with inner block selection.
+	.components-popover__content > div,
+	.block-editor__sticky-position-visualizer {
+		pointer-events: none;
+	}
+}
+
 .block-editor__sticky-position-visualizer {
 	position: absolute;
 	top: 0;

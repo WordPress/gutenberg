@@ -263,6 +263,7 @@ export function PositionVisualizer( { clientId, attributes, forceShow } ) {
 
 	return (
 		<BlockPopover
+			className="block-editor__sticky-position-visualizer-popover"
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ positionType }
