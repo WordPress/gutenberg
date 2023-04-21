@@ -2,15 +2,20 @@
  * Internal dependencies
  */
 import registerDirectives from './directives';
-import { init } from './hydration';
+import { init as hydrate } from './hydration';
 export { store } from './store';
 
 /**
  * Initialize the Interactivity API.
  */
-window.addEventListener( 'DOMContentLoaded', () => {
-	registerDirectives();
-	init();
-	// eslint-disable-next-line no-console
-	console.log( 'Interactivity API started' );
-} );
+let started = false;
+export const init = () => {
+	if ( ! started )
+		window.addEventListener( 'DOMContentLoaded', () => {
+			registerDirectives();
+			hydrate();
+			// eslint-disable-next-line no-console
+			console.log( 'Interactivity API started' );
+		} );
+	started = true;
+};

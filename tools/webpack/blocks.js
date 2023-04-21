@@ -221,9 +221,8 @@ module.exports = [
 	},
 	{
 		entry: {
-			interactivity:
-				'./packages/block-library/src/utils/interactivity/index.js',
 			image: './packages/block-library/src/image/interactivity.js',
+			image2: './packages/block-library/src/image/interactivity2.js',
 		},
 		output: {
 			devtoolNamespace: 'wp',
@@ -237,10 +236,17 @@ module.exports = [
 			splitChunks: {
 				cacheGroups: {
 					vendors: {
-						test: /[\\/]node_modules[\\/]/,
 						name: 'vendors',
+						test: /[\\/]node_modules[\\/]/,
 						minSize: 0,
 						chunks: 'all',
+					},
+					interactivity: {
+						name: 'interactivity',
+						test: /[\\/]utils\/interactivity[\\/]/,
+						chunks: 'all',
+						minSize: 0,
+						priority: -10,
 					},
 				},
 			},
