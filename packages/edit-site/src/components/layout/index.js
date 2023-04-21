@@ -22,6 +22,8 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -42,6 +44,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useCommands } from '../../hooks/commands';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -60,13 +63,14 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
+	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
@@ -79,10 +83,10 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				hasFixedToolbar:
+					select( preferencesStore ).get( 'fixedToolbar' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -123,6 +127,7 @@ export default function Layout() {
 
 	return (
 		<>
+			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }
@@ -135,6 +140,7 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>

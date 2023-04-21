@@ -16,6 +16,8 @@
 function gutenberg_safe_style_attrs_6_1( $attrs ) {
 	$attrs[] = 'flex-wrap';
 	$attrs[] = 'gap';
+	$attrs[] = 'column-gap';
+	$attrs[] = 'row-gap';
 	$attrs[] = 'margin-block-start';
 	$attrs[] = 'margin-block-end';
 	$attrs[] = 'margin-inline-start';

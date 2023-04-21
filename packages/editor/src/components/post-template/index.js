@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -38,7 +33,11 @@ export function PostTemplate() {
 
 	const { editPost } = useDispatch( editorStore );
 
-	if ( ! isViewable || isEmpty( availableTemplates ) ) {
+	if (
+		! isViewable ||
+		! availableTemplates ||
+		! Object.keys( availableTemplates ).length
+	) {
 		return null;
 	}
 

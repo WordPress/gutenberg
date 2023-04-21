@@ -28,9 +28,11 @@ jobs:
         name: Run performance tests
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
+        env:
+            WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -38,13 +40,6 @@ jobs:
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
               run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
-
-            - name: Store performance measurements
-              if: github.event_name == 'pull_request'
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
-              with:
-                  name: perf-test-results
-                  path: ./__test-results/*.json
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -80,6 +75,13 @@ jobs:
               run: |
                   ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
 
+            - name: Archive performance results
+              if: success()
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              with:
+                  name: performance-results
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results.json
+
             - name: Publish performance results
               if: github.event_name == 'push'
               env:
@@ -90,8 +92,8 @@ jobs:
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
+              if: failure()
               with:
                   name: failures-artifacts
-                  path: ./__test-results/artifacts
+                  path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore

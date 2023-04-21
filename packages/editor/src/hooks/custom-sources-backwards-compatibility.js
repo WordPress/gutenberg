@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues, isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -57,9 +52,13 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 				const mergedAttributes = useMemo(
 					() => ( {
 						...attributes,
-						...mapValues(
-							metaAttributes,
-							( metaKey ) => meta[ metaKey ]
+						...Object.fromEntries(
+							Object.entries( metaAttributes ).map(
+								( [ attributeKey, metaKey ] ) => [
+									attributeKey,
+									meta[ metaKey ],
+								]
+							)
 						),
 					} ),
 					[ attributes, meta ]
@@ -83,7 +82,7 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 									] )
 							);
 
-							if ( ! isEmpty( nextMeta ) ) {
+							if ( Object.entries( nextMeta ).length ) {
 								setMeta( nextMeta );
 							}
 
@@ -106,15 +105,12 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
  */
 function shimAttributeSource( settings ) {
 	/** @type {WPMetaAttributeMapping} */
-	const metaAttributes = mapValues(
-		Object.fromEntries(
-			Object.entries( settings.attributes ?? {} ).filter(
-				( [ , { source } ] ) => source === 'meta'
-			)
-		),
-		'meta'
+	const metaAttributes = Object.fromEntries(
+		Object.entries( settings.attributes ?? {} )
+			.filter( ( [ , { source } ] ) => source === 'meta' )
+			.map( ( [ attributeKey, { meta } ] ) => [ attributeKey, meta ] )
 	);
-	if ( ! isEmpty( metaAttributes ) ) {
+	if ( Object.entries( metaAttributes ).length ) {
 		settings.edit = createWithMetaAttributeSource( metaAttributes )(
 			settings.edit
 		);

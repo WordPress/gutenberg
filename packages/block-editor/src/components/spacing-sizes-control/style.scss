@@ -2,7 +2,7 @@
 	display: grid;
 	grid-template-columns: auto 1fr auto;
 	align-items: center;
-	grid-template-rows: 16px auto;
+	grid-template-rows: $grid-unit-30 auto;
 }
 
 .component-spacing-sizes-control {
@@ -19,7 +19,7 @@
 	}
 
 	.components-base-control__label {
-		margin-bottom: 0;
+		margin-bottom: $grid-unit-10;
 		height: $grid-unit-20;
 	}
 
@@ -55,6 +55,7 @@
 		grid-row: 1 / 1;
 		align-self: center;
 		margin-left: $grid-unit-05;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.components-spacing-sizes-control__custom-toggle-all {
@@ -85,20 +86,20 @@
 	.components-spacing-sizes-control__custom-value-range {
 		grid-column: span 2;
 		margin-left: $grid-unit-20;
-		margin-top: 8px;
 	}
 
-	.components-spacing-sizes-control__custom-value-input {
+	.components-base-control.components-spacing-sizes-control__custom-value-input {
 		width: 124px;
-		margin-top: 8px;
 		grid-column: 1;
+		margin-bottom: 0;
 	}
 
-	.components-range-control {
+	.components-base-control.components-range-control {
 		height: 40px;
 		/* Vertically center the RangeControl until it has true 40px height. */
 		display: flex;
 		align-items: center;
+		margin-bottom: 0;
 
 		> .components-base-control__field {
 			/* Fixes RangeControl contents when the outer wrapper is flex */
@@ -108,7 +109,6 @@
 
 	.components-spacing-sizes-control__range-control {
 		grid-column: span 3;
-		margin-top: 8px;
 	}
 
 	.components-range-control__mark {

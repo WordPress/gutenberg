@@ -36,6 +36,7 @@ import { store as blockEditorStore } from '../../store';
  * @property {Element} element                         The DOM element representing the block.
  * @property {number}  innerBlockCount                 The number of inner blocks the block has.
  * @property {boolean} isDraggedBlock                  Whether the block is currently being dragged.
+ * @property {boolean} isExpanded                      Whether the block is expanded in the UI.
  * @property {boolean} canInsertDraggedBlocksAsSibling Whether the dragged block can be a sibling of this block.
  * @property {boolean} canInsertDraggedBlocksAsChild   Whether the dragged block can be a child of this block.
  */
@@ -78,7 +79,7 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  *
  * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
-function getListViewDropTarget( blocksData, position ) {
+export function getListViewDropTarget( blocksData, position ) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
@@ -146,12 +147,15 @@ function getListViewDropTarget( blocksData, position ) {
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, this should always be treated
+	// If the block already has inner blocks, and is expanded, this should be treated
 	// as nesting since the next block in the tree will be the first child.
+	// However, if the block is collapsed, dragging beneath the block should
+	// still be allowed, as the next visible block in the tree will be a sibling.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( candidateBlockData.innerBlockCount > 0 ||
+		( ( candidateBlockData.innerBlockCount > 0 &&
+			candidateBlockData.isExpanded ) ||
 			isNestingGesture( position, candidateRect ) )
 	) {
 		return {
@@ -208,10 +212,12 @@ export default function useListViewDropZone() {
 
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
+					const isExpanded = blockElement.dataset.expanded === 'true';
 					const rootClientId = getBlockRootClientId( clientId );
 
 					return {
 						clientId,
+						isExpanded,
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,

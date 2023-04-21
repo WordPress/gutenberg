@@ -8,7 +8,7 @@ import { Layout } from './styles/box-control-styles';
 import type { BoxControlInputControlProps } from './types';
 
 const groupedSides = [ 'vertical', 'horizontal' ] as const;
-type GroupedSide = typeof groupedSides[ number ];
+type GroupedSide = ( typeof groupedSides )[ number ];
 
 export default function AxialInputControls( {
 	onChange,

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -362,7 +361,15 @@ export const entities = ( state = {}, action ) => {
 	// Generates a dynamic reducer for the entities.
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
+		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+			const { kind } = record;
+			if ( ! acc[ kind ] ) {
+				acc[ kind ] = [];
+			}
+			acc[ kind ].push( record );
+			return acc;
+		}, {} );
+
 		entitiesDataReducer = combineReducers(
 			Object.entries( entitiesByKind ).reduce(
 				( memo, [ kind, subEntities ] ) => {

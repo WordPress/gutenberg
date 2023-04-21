@@ -393,7 +393,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Testing removing the block.
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name=/Remove Legacy Widget/]' );
+		await page.click( 'role=menuitem[name=/Delete/]' );
 
 		// Add it back again using the variant.
 		const testWidgetBlock = await widgetsCustomizerPage.addBlock(

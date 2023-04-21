@@ -130,11 +130,15 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
-		support: [ 'color', '__experimentalDuotone' ],
+		support: [ 'filter', 'duotone' ],
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
+	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
 	},
 	buttonColor: {
 		value: [ 'elements', 'button', 'color', 'text' ],

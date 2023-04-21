@@ -13,7 +13,28 @@ describe( 'Formatter', () => {
 			[
 				{
 					path: docPath + '-code.js',
-					description: 'My declaration example.',
+					description: `My declaration example.
+Client-side hyphen-
+ation.
+
+Code:
+
+\`\`\`js
+const myCode = 'code';
+\`\`\`
+
+Unordered Lists:
+
+-   List Item.
+-   List Item.
+    List Item.
+
+Ordered Lists:
+
+1.  List Item.
+2.  List Item.
+    List Item.
+`,
 					tags: [
 						{
 							tag: 'param',
@@ -36,7 +57,37 @@ describe( 'Formatter', () => {
 			'API docs'
 		);
 		expect( docs ).toBe(
-			'# API docs\n\n## myDeclaration\n\nMy declaration example.\n\n*Parameters*\n\n- *firstParam* `number`: First declaration parameter.\n\n*Returns*\n\n- `number`: The result of the declaration.\n'
+			`# API docs
+
+## myDeclaration
+
+My declaration example. Client-side hyphenation.
+
+Code:
+
+\`\`\`js
+const myCode = 'code';
+\`\`\`
+
+Unordered Lists:
+
+-   List Item.
+-   List Item. List Item.
+
+Ordered Lists:
+
+1.  List Item.
+2.  List Item. List Item.
+
+
+*Parameters*
+
+- *firstParam* \`number\`: First declaration parameter.
+
+*Returns*
+
+- \`number\`: The result of the declaration.
+`
 		);
 	} );
 } );
