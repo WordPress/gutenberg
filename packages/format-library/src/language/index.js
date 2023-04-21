@@ -41,8 +41,8 @@ const LangAttributeButton = ( props ) => {
 		<>
 			<RichTextToolbarButton
 				icon={ translation }
-				label={ __( 'Lang attribute' ) }
-				title={ __( 'Lang attribute' ) }
+				label={ title }
+				title={ title }
 				onClick={ () => {
 					if ( isActive ) {
 						onChange( removeFormat( value, name ) );
