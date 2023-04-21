@@ -34,13 +34,15 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
+ * @property {number}                    port          The port to use.
+ * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ *
  * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {string|null}               postInstall   The command(s) to run after configuring WordPress.
  */
 
 /**
@@ -104,6 +106,7 @@ module.exports = async function readConfig( configPath ) {
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
+		postInstall: null,
 		env: {
 			development: {}, // No overrides needed, but it should exist.
 			tests: {
@@ -292,6 +295,11 @@ function withOverrides( config ) {
 	addConfigPort( 'WP_TESTS_DOMAIN' );
 	addConfigPort( 'WP_SITEURL' );
 	addConfigPort( 'WP_HOME' );
+
+	if ( process.env.WP_ENV_POST_INSTALL ) {
+		config.env.development.postInstall = process.env.WP_ENV_POST_INSTALL;
+		config.env.tests.postInstall = process.env.WP_ENV_POST_INSTALL;
+	}
 
 	return config;
 }

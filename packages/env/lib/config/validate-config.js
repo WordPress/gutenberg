@@ -86,6 +86,15 @@ function validateConfig( config, envLocation ) {
 	checkValidURL( envPrefix, config.config, 'WP_SITEURL' );
 	checkValidURL( envPrefix, config.config, 'WP_HOME' );
 
+	if (
+		config.postInstall !== null &&
+		typeof config.postInstall !== 'string'
+	) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }postInstall" must be null or a string.`
+		);
+	}
+
 	return config;
 }
 

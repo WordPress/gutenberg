@@ -25,6 +25,7 @@ exports[`readConfig config file should match snapshot 1`] = `
       "phpVersion": null,
       "pluginSources": [],
       "port": 2000,
+      "postInstall": null,
       "themeSources": [],
     },
     "tests": {
@@ -47,6 +48,7 @@ exports[`readConfig config file should match snapshot 1`] = `
       "phpVersion": null,
       "pluginSources": [],
       "port": 1000,
+      "postInstall": null,
       "themeSources": [],
     },
   },

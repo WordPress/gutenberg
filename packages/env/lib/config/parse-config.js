@@ -56,6 +56,7 @@ module.exports = async function parseConfig( config, options ) {
 			},
 			{}
 		),
+		postInstall: config.postInstall,
 	};
 };
 

@@ -8,6 +8,11 @@
 -   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 
+### New feature
+
+-   Create a `postInstall` property in `.wp-env.json` files for setting arbitrary commands to run after configuring WordPress.
+-   Add a `WP_ENV_POST_INSTALL` environment variable to override the current `postInstall` configuration.
+
 ## 5.16.0 (2023-04-12)
 
 ## 5.15.0 (2023-03-29)
