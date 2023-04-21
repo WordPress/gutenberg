@@ -18,6 +18,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import { pasteHandler } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -75,11 +76,19 @@ export function MediaPlaceholder( {
 	onToggleFeaturedImage,
 	onDoubleClick,
 	onFilesPreUpload = noop,
+	onHTMLDrop: deprecatedOnHTMLDrop,
 	children,
 	mediaLibraryButton,
 	placeholder,
 	style,
 } ) {
+	if ( deprecatedOnHTMLDrop ) {
+		deprecated( 'wp.blockEditor.MediaPlaceholder onHTMLDrop prop', {
+			since: '6.2',
+			version: '6.3',
+		} );
+	}
+
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
