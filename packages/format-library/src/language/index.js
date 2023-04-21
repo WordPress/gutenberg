@@ -14,7 +14,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { applyFormat, removeFormat, useAnchorRef } from '@wordpress/rich-text';
+import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { translation } from '@wordpress/icons';
 
 const name = 'core/language';
@@ -22,7 +22,10 @@ const title = __( 'Language' );
 
 const LangAttributeButton = ( props ) => {
 	const { contentRef, isActive, onChange, value } = props;
-	const anchorRef = useAnchorRef( { ref: contentRef, value } );
+	const anchorRef = useAnchor( {
+		editableContentElement: contentRef.current,
+		language,
+	} );
 
 	const [ lang, setLang ] = useState( '' );
 	const [ dir, setDir ] = useState( 'ltr' );
