@@ -40,12 +40,19 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * Starts the development server.
  *
  * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
- * @param {boolean} options.update  If true, update sources.
- * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {boolean} options.postInstall Indicates whether or not we should skip the post-install command(s).
+ * @param {Object}  options.spinner     A CLI spinner which indicates progress.
+ * @param {boolean} options.debug       True if debug mode is enabled.
+ * @param {boolean} options.update      If true, update sources.
+ * @param {string}  options.xdebug      The Xdebug mode to set.
  */
-module.exports = async function start( { spinner, debug, update, xdebug } ) {
+module.exports = async function start( {
+	spinner,
+	postInstall,
+	debug,
+	update,
+	xdebug,
+} ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -183,7 +190,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 					configureWordPress(
 						'development',
 						config,
-						'start',
+						postInstall ? 'start' : null,
 						spinner
 					),
 				{
@@ -191,7 +198,13 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 				}
 			),
 			retry(
-				() => configureWordPress( 'tests', config, 'start', spinner ),
+				() =>
+					configureWordPress(
+						'tests',
+						config,
+						postInstall ? 'start' : null,
+						spinner
+					),
 				{
 					times: 2,
 				}

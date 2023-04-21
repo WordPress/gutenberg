@@ -112,6 +112,12 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
 		( args ) => {
+			args.option( 'post-install', {
+				type: 'boolean',
+				describe:
+					'Execute any configured post-install command(s) when configuring WordPress.',
+				default: true,
+			} );
 			args.option( 'update', {
 				type: 'boolean',
 				describe:
@@ -144,6 +150,12 @@ module.exports = function cli() {
 				describe: "Which environments' databases to clean.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
+			} );
+			args.option( 'post-install', {
+				type: 'boolean',
+				describe:
+					"Execute the environment's configured post-install command(s) if configured.",
+				default: false,
 			} );
 		},
 		withSpinner( env.clean )
