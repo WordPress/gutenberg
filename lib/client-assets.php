@@ -604,5 +604,23 @@ function gutenberg_register_interactivity_scripts() {
 		);
  	}
 }
-// Register interactivity scripts
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_interactivity_scripts' );
+
+/**
+  * Adds the "defer" attribute to all the interactivity script tags.
+  *
+  * @param string $tag The generated script tag.
+  * @param string $handle The script's registered handle.
+	*
+  * @return string The modified script tag.
+	*/
+function add_defer_attribute( $tag, $handle ) {
+		if ( 0 === strpos( $handle, 'interactivity-' ) ) {
+			$p = new WP_HTML_Tag_Processor( $tag );
+			$p->next_tag( array( 'tag' => 'script' ) );
+			$p->set_attribute( 'defer', true );
+			return $p->get_updated_html();
+		}
+		return $tag;
+}
+add_filter( 'script_loader_tag', 'add_defer_attribute', 10, 2 );
