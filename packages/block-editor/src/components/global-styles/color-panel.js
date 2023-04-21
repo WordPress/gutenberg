@@ -35,7 +35,7 @@ export function useHasColorPanel( settings ) {
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
-	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
