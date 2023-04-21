@@ -22,6 +22,12 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  */
 
 /**
+ * Error subtype which indicates that an expected validation erorr occurred
+ * while reading wp-env configuration.
+ */
+class PostInstallError extends Error {}
+
+/**
  * Checks a WordPress database connection. An error is thrown if the test is
  * unsuccessful.
  *
@@ -118,10 +124,9 @@ async function configureWordPress(
 	// have the environment arbitrarily execute command for additional setup.
 	if ( postInstallContext && config.env[ environment ].postInstall ) {
 		try {
-			execSync( config.env[ environment ].postInstall, {
+			let output = execSync( config.env[ environment ].postInstall, {
 				encoding: 'utf-8',
-				// We're going to let the script decide what it wants to output.
-				stdio: [ 'ignore', 'inherit', 'pipe' ],
+				stdio: 'pipe',
 				env: {
 					...process.env,
 					WP_ENV_POST_INSTALL_CONTEXT: postInstallContext,
@@ -129,8 +134,18 @@ async function configureWordPress(
 					WP_ENV_POST_INSTALL_DEBUG: config.debug,
 				},
 			} );
+
+			// Remove any trailing whitespace for nicer output.
+			output = output.trimRight();
+
+			// We don't need to bother with any output if there isn't any!
+			if ( output ) {
+				spinner.info( `${ environment } Post-Install:\n${ output }` );
+			}
 		} catch ( e ) {
-			throw new Error( `${ environment } postInstall: ${ e.stderr }` );
+			throw new PostInstallError(
+				`${ environment } Post-Install:\n${ e.stderr }`
+			);
 		}
 	}
 }
@@ -312,6 +327,7 @@ async function getLatestWordPressVersion() {
 }
 
 module.exports = {
+	PostInstallError,
 	hasSameCoreSource,
 	checkDatabaseConnection,
 	configureWordPress,

@@ -698,6 +698,8 @@ Additional environment variables are given to the command to provide context abo
 - `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the environment that the command is being executed for, such as `development` or `tests`.
 - `WP_ENV_POST_INSTALL_DEBUG` contains a boolean indicating whether or not `wp-env` is in debug mode.
 
+> **Warning:** This command will not always be executed on a fresh environment. It should be resilient and not fail if a step has already been completed.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

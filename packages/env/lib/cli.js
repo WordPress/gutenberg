@@ -43,6 +43,10 @@ const withSpinner =
 					// Error is a validation error. That means the user did something wrong.
 					spinner.fail( error.message );
 					process.exit( 1 );
+				} else if ( error instanceof env.PostInstallError ) {
+					// Error is a post-install command error. This means their command failed and they should be notified.
+					spinner.fail( error.message );
+					process.exit( 1 );
 				} else if (
 					error &&
 					typeof error === 'object' &&
