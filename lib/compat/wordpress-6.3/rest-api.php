@@ -28,3 +28,12 @@ function gutenberg_update_templates_template_parts_rest_controller( $args, $post
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );
+
+/**
+ * Registers the Global Styles REST API routes.
+ */
+function gutenberg_register_global_styles_endpoints() {
+	$editor_settings = new Gutenberg_REST_Global_Styles_Controller_6_3();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
