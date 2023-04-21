@@ -14,10 +14,11 @@
  * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content ) {
-	wp_enqueue_script( 'interactivity', plugins_url( '../interactive-blocks/interactivity.min.js', __FILE__ ) );
-	wp_enqueue_script( 'interactivity-vendors', plugins_url( '../interactive-blocks/vendors.min.js', __FILE__ ) );
-	wp_enqueue_script( 'interactivity-image', plugins_url( '../interactive-blocks/image.min.js', __FILE__ ) );
-	wp_enqueue_script( 'interactivity-image-2', plugins_url( '../interactive-blocks/image2.min.js', __FILE__ ) );
+	wp_enqueue_script(
+		'interactivity-image',
+		plugins_url('../interactive-blocks/image.min.js', __FILE__ ),
+		array( 'interactivity-runtime' )
+	);
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
