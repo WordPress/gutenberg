@@ -193,16 +193,22 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 			'post_content' => wp_json_encode( $config ),
 		);
 
-		wp_update_post( $new_styles_post, true, false );
-
+		$post_id  = wp_update_post( $new_styles_post, true, false );
+		$post     = get_post( $post_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertCount( 1, $data, 'Check that only one revision exists' );
 		$this->assertArrayHasKey( 'id', $data[0], 'Check that an id key exists' );
-		$this->assertArrayHasKey( 'raw', $data[0]['date'], 'Check that a raw title key exists' );
+		$this->assertEquals( $post->post_modified, $data[0]['date']['raw'], 'Check that a raw date returns expected value' );
 		$this->assertArrayHasKey( 'rendered', $data[0]['date'], 'Check that a rendered title key exists' );
+		$this->assertEquals( get_the_author_meta( 'display_name', $post->post_author ), $data[0]['author']['display_name'], 'Check that author display_name returns expected value' );
+		$this->assertIsString(
+			$data[0]['author']['avatar_url'],
+			'Check that author avatar_url returns expected value type'
+		);
+		$this->assertIsBool( $data[0]['is_latest'], 'Check that is_latest exists, and is a boolean' );
 		$this->assertEquals(
 			$data[0]['settings'],
 			new stdClass(),
