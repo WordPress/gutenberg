@@ -243,6 +243,7 @@ export { default as tablet } from './library/tablet';
 export { default as title } from './library/title';
 export { default as tip } from './library/tip';
 export { default as tool } from './library/tool';
+export { default as translation } from './library/translation';
 export { default as trash } from './library/trash';
 export { default as trendingDown } from './library/trending-down';
 export { default as trendingUp } from './library/trending-up';
