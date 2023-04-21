@@ -14,6 +14,7 @@ const { validateConfig, ValidationError } = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
+const addOrReplacePort = require( './add-or-replace-port' );
 const md5 = require( '../md5' );
 
 /**
@@ -272,30 +273,25 @@ function withOverrides( config ) {
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
 
-	const updateEnvUrl = ( configKey ) => {
-		[ 'development', 'tests' ].forEach( ( envKey ) => {
-			try {
-				const baseUrl = new URL(
-					config.env[ envKey ].config[ configKey ]
-				);
+	// Some of our configuration options need to have the port added to them.
+	const addConfigPort = ( configKey ) => {
+		// Don't replace the port if one is set in WP_HOME.
+		const replace = configKey !== 'WP_HOME';
 
-				// Don't overwrite the port of WP_HOME when set.
-				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
-					baseUrl.port = config.env[ envKey ].port;
-				}
-
-				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
-			} catch ( error ) {
-				throw new ValidationError(
-					`Invalid .wp-env.json: config.${ configKey } must be a valid URL.`
-				);
-			}
-		} );
+		config.env.development.config[ configKey ] = addOrReplacePort(
+			config.env.development.config[ configKey ],
+			config.env.development.port,
+			replace
+		);
+		config.env.tests.config[ configKey ] = addOrReplacePort(
+			config.env.tests.config[ configKey ],
+			config.env.tests.port,
+			replace
+		);
 	};
-
-	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_SITEURL' );
-	updateEnvUrl( 'WP_HOME' );
+	addConfigPort( 'WP_TESTS_DOMAIN' );
+	addConfigPort( 'WP_SITEURL' );
+	addConfigPort( 'WP_HOME' );
 
 	return config;
 }

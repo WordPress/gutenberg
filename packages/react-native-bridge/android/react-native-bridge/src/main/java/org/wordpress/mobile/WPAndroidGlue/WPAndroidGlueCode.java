@@ -992,6 +992,10 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
+    public void sendToJSPostSaveEvent() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().sendToJSPostSaveEvent();
+    }
+
     public void appendMediaFiles(ArrayList<Media> mediaList) {
         if (isMediaSelectedCallbackRegistered() && mMediaPickedByUserOnBlock) {
             mMediaPickedByUserOnBlock = false;
