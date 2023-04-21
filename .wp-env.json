@@ -1,5 +1,6 @@
 {
 	"core": "WordPress/WordPress",
+	"port": 8890,
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {

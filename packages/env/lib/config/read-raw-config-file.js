@@ -48,18 +48,29 @@ module.exports = async function readRawConfigFile( name, configPath ) {
  *                  shape of the currently expected format.
  */
 function withBackCompat( rawConfig ) {
-	// Convert testsPort into new env.tests format.
+	// Convert ports into new format.
 	if ( rawConfig.testsPort !== undefined ) {
 		rawConfig.env = {
 			...( rawConfig.env || {} ),
 			tests: {
 				port: rawConfig.testsPort,
-				...( rawConfig.env && rawConfig.env.tests
-					? rawConfig.env.tests
-					: {} ),
+				...( rawConfig.env?.tests ?? {} ),
 			},
 		};
 	}
+
+	if ( rawConfig.port !== undefined ) {
+		rawConfig.env = {
+			...( rawConfig.env || {} ),
+			development: {
+				port: rawConfig.port,
+				...( rawConfig.env?.development ?? {} ),
+			},
+		};
+	}
+
 	delete rawConfig.testsPort;
+	delete rawConfig.port;
+
 	return rawConfig;
 }
