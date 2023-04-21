@@ -2259,7 +2259,7 @@ describe( 'Controlling link title text', () => {
 		await user.clear( textInput );
 		await user.keyboard( textValue );
 
-		// Was originall title: 'Hello Page', but we've changed it.
+		// Was originally title: 'Hello Page', but we've changed it.
 		rerender(
 			<LinkControl
 				value={ {
