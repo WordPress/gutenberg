@@ -12,8 +12,8 @@
 			"snapshot-diff",
 			"@wordpress/jest-console"
 		],
-		// Some errors in Reakit types with TypeScript 4.3
-		// Remove the following line when they've been addressed.
+		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
+		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.
 		"skipLibCheck": true,
 		"strictNullChecks": true
 	},

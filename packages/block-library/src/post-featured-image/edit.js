@@ -97,7 +97,7 @@ export default function PostFeaturedImageEdit( {
 		} ) );
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio },
+		style: { width, height, aspectRatio, maxWidth: '100%' },
 	} );
 	const borderProps = useBorderProps( attributes );
 
@@ -110,7 +110,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration={ true }
 				style={ {
-					...blockProps.style,
+					height: !! aspectRatio && '100%',
+					width: !! aspectRatio && '100%',
 					...borderProps.style,
 				} }
 			>
@@ -210,7 +211,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height: ( !! aspectRatio && '100%' ) || height,
+		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};

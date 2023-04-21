@@ -193,7 +193,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
-	const e2eSiteUrl = `http://${ config.env.tests.config.WP_TESTS_DOMAIN }:${ config.env.tests.port }/`;
+	const testsSiteUrl = config.env.tests.config.WP_SITEURL;
 
 	const { out: mySQLAddress } = await dockerCompose.port(
 		'mysql',
@@ -213,7 +213,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( 'WordPress test site started' )
-		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
+		.concat( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( `MySQL is listening on port ${ mySQLPort }` )
 		.concat(

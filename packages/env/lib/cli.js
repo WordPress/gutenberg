@@ -174,6 +174,13 @@ module.exports = function cli() {
 		'run <container> [command..]',
 		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
 		( args ) => {
+			args.option( 'env-cwd', {
+				type: 'string',
+				requiresArg: true,
+				default: '.',
+				describe:
+					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
+			} );
 			args.positional( 'container', {
 				type: 'string',
 				describe: 'The container to run the command on.',
