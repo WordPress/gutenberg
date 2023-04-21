@@ -514,8 +514,7 @@
 	/* stylelint-enable function-comma-space-after */
 }
 
-@mixin custom-scrollbars-on-hover($handle-color, $track-color) {
-	visibility: hidden;
+@mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover, $track-color ) {
 
 	// WebKit
 	&::-webkit-scrollbar {
@@ -531,27 +530,22 @@
 		border: 3px solid transparent;
 		background-clip: padding-box;
 	}
+	&:hover:hover::-webkit-scrollbar-thumb { // This needs specificity.
+		background-color: $handle-color-hover;
+	}
 
 	// Firefox 109+ and Chrome 111+
-	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
 	scrollbar-width: thin;
-	scrollbar-gutter: auto;
+	scrollbar-gutter: stable;
+	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
+
+	&:hover {
+		scrollbar-color: $handle-color-hover $track-color;
+	}
+	&:hover::-webkit-scrollbar-thumb {
+		background-color: $handle-color-hover;
+	}
 
 	// Needed to fix a Safari rendering issue.
 	will-change: transform;
-
-	// On-hover/focus visibility.
-	&:hover,
-	&:focus,
-	& > * {
-		visibility: visible;
-	}
-
-	// Scrolling behavior.
-	overflow: hidden;
-
-	&:hover,
-	&:focus {
-		overflow: auto;
-	}
 }

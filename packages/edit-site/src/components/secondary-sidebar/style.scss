@@ -51,8 +51,14 @@
 .edit-site-editor__list-view-panel-content {
 	height: 100%;
 
-	// Include custom scrollbars.
-	@include custom-scrollbars-on-hover($gray-600, $white);
+	// Include custom scrollbars, invisible until hovered.
+	@include custom-scrollbars-on-hover(transparent, $gray-600, $white);
+	overflow: auto;
+
+	// Only reserve space for scrollbars when there is content to scroll.
+	// This allows items in the list view to have equidistant padding left and right
+	// right up until a scrollbar is present.
+	scrollbar-gutter: auto;
 
 	// The table cells use an extra pixels of space left and right. We compensate for that here.
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
