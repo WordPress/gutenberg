@@ -177,9 +177,7 @@ export function MediaPlaceholder( {
 		} );
 	};
 
-	async function onHTMLDrop( HTML ) {
-		const blocks = pasteHandler( { HTML } );
-
+	async function handleBlocksDrop( blocks ) {
 		if ( ! blocks || ! Array.isArray( blocks ) ) {
 			return;
 		}
@@ -233,6 +231,19 @@ export function MediaPlaceholder( {
 		} else {
 			onSelect( uploadedMediaList[ 0 ] );
 		}
+	}
+
+	async function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML } );
+		return await handleBlocksDrop( blocks );
+	}
+
+	async function onDrop( event ) {
+		if ( event.dataTransfer.getData( 'wp-blocks' ) );
+		const blocks = JSON.parse(
+			event.dataTransfer.getData( 'wp-blocks' )
+		).blocks;
+		return await handleBlocksDrop( blocks );
 	}
 
 	const onUpload = ( event ) => {
@@ -322,7 +333,11 @@ export function MediaPlaceholder( {
 		}
 
 		return (
-			<DropZone onFilesDrop={ onFilesUpload } onHTMLDrop={ onHTMLDrop } />
+			<DropZone
+				onFilesDrop={ onFilesUpload }
+				onHTMLDrop={ onHTMLDrop }
+				onDrop={ onDrop }
+			/>
 		);
 	};
 
