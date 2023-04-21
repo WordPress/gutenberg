@@ -226,7 +226,7 @@ jobs:
             - name: Check out Gutenberg tags from WP.org plugin repo
               run: svn checkout "$PLUGIN_REPO_URL/tags" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-            - name: Download and unzip Gutenberg plugin asset into trunk folder
+            - name: Download and unzip Gutenberg plugin asset into tags folder
               env:
                   PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
               run: |
@@ -244,7 +244,7 @@ jobs:
             - name: Download Changelog Artifact
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
-                  name: changelog trunk
+                  name: changelog for tags
                   path: tags/${{ github.event.release.name }}
 
             - name: Commit the content changes
