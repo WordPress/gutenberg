@@ -7,11 +7,7 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -50,7 +46,6 @@ function EditorCanvasContainer( {
 	);
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
-	const refs = useMergeRefs( [ sectionFocusReturnRef, focusOnMountRef ] );
 
 	function onCloseContainer() {
 		onClose();
@@ -69,21 +64,26 @@ function EditorCanvasContainer( {
 		? Children.map( children, ( child, index ) =>
 				index === 0
 					? cloneElement( child, {
-							ref: refs,
-							onKeyDown: closeOnEscape,
+							ref: sectionFocusReturnRef,
 					  } )
 					: child
 		  )
-		: cloneElement( children, { ref: refs, onKeyDown: closeOnEscape } );
+		: cloneElement( children, {
+				ref: sectionFocusReturnRef,
+		  } );
 
 	if ( isClosed ) {
 		return null;
 	}
 
 	return (
-		/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
-		<section className="edit-site-editor-canvas-container">
-			<EditorCanvasContainerFill>
+		<EditorCanvasContainerFill>
+			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			<section
+				className="edit-site-editor-canvas-container"
+				ref={ focusOnMountRef }
+				onKeyDown={ closeOnEscape }
+			>
 				<Button
 					className="edit-site-editor-canvas-container__close-button"
 					icon={ closeSmall }
@@ -92,8 +92,8 @@ function EditorCanvasContainer( {
 					showTooltip={ false }
 				/>
 				{ childrenWithProps }
-			</EditorCanvasContainerFill>
-		</section>
+			</section>
+		</EditorCanvasContainerFill>
 	);
 }
 
