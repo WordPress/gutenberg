@@ -450,6 +450,11 @@
 					"style": true,
 					"width": true
 				}
+			},
+			"core/image": {
+				"behaviors": {
+					"lightbox": true
+				}
 			}
 		}
 	},
