@@ -41,7 +41,7 @@ function gutenberg_register_persisted_preferences_meta() {
 	);
 }
 
-add_action( 'init', 'gutenberg_register_persisted_preferences_meta' );
+add_action( 'rest_api_switched_to_blog', 'gutenberg_register_persisted_preferences_meta' );
 
 /**
  * Configures the preferences package to use user meta persistence.
