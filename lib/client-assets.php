@@ -577,3 +577,32 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+/**
+ * Registers interactivity scripts for Gutenberg.
+ *
+ * This function registers interactivity scripts for Gutenberg when not in the
+ * admin panel.
+ */
+function gutenberg_register_interactivity_scripts() {
+ 	if ( ! is_admin() )	 {
+		wp_register_script(
+			'interactivity-runtime',
+			plugins_url(
+				'../build/block-library/interactive-blocks/interactivity.min.js',
+				__FILE__
+			),
+			array( 'interactivity-vendors')
+		);
+
+		wp_register_script(
+			'interactivity-vendors',
+			plugins_url(
+				'../build/block-library/interactive-blocks/vendors.min.js',
+				__FILE__
+			)
+		);
+ 	}
+}
+// Register interactivity scripts
+add_action( 'wp_enqueue_scripts', 'gutenberg_register_interactivity_scripts' );
