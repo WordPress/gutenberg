@@ -129,6 +129,7 @@ export default () => {
 				.forEach( ( name ) => {
 					const result = evaluate( className[ name ], {
 						className: name,
+						ref: element.ref.current,
 						context: contextValue,
 					} );
 					const currentClass = element.props.class || '';

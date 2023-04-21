@@ -1,22 +1,28 @@
 import './runtime/init.js';
 import { store } from './runtime';
 
+const raf = window.requestAnimationFrame;
+// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
+const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
+
 store( {
 	actions: {
 		core: {
-			imageZoom: ( { context } ) => {
+			showLightbox: ( { context, event } ) => {
 				context.core.initialized = true;
-				context.core.isZoomed = ! context.core.isZoomed;
+				context.core.lightboxEnabled = ! context.core.lightboxEnabled;
+				context.core.lastFocusedElement =
+					event.target.ownerDocument.activeElement;
 
 				context.core.handleScroll = () => {
-					context.core.isZoomed = false;
+					context.core.lightboxEnabled = false;
 					window.removeEventListener(
 						'scroll',
 						context.core.handleScroll
 					);
 				};
 
-				if ( context.core.isZoomed ) {
+				if ( context.core.lightboxEnabled ) {
 					window.addEventListener(
 						'scroll',
 						context.core.handleScroll
@@ -28,15 +34,20 @@ store( {
 					);
 				}
 			},
-			closeZoom: ( { context } ) => {
-				context.core.isZoomed = false;
+			hideLightbox: ( { context, event } ) => {
+				context.core.lightboxEnabled = false;
+				if ( event.pointerType === '' ) {
+					context.core.lastFocusedElement.focus();
+				}
 			},
-			closeZoomOnEsc: ( { context } ) => {
-				// Function to handle the ESC key press
+			hideLightboxOnEsc: ( { context } ) => {
 				function handleEscKey( event ) {
-					if ( event.key === 'Escape' || event.keyCode === 27 ) {
-						// Add any custom logic you want to execute when the ESC key is pressed
-						context.core.isZoomed = false;
+					if (
+						context.core.lightboxEnabled &&
+						( event.key === 'Escape' || event.keyCode === 27 )
+					) {
+						context.core.lightboxEnabled = false;
+						context.core.lastFocusedElement.focus();
 					}
 				}
 				// Add the event listener for the 'keydown' event on the document
@@ -44,6 +55,38 @@ store( {
 				return () => {
 					document.removeEventListener( 'keydown', handleEscKey );
 				};
+			},
+			hideLightboxOnTab: ( { context } ) => {
+				async function handleTab( event ) {
+					if (
+						context.core.lightboxEnabled &&
+						( event.key === 'Tab' || event.keyCode === 9 )
+					) {
+						event.preventDefault();
+						context.core.lightboxEnabled = false;
+						context.core.lastFocusedElement.focus();
+					}
+				}
+				// Add the event listener for the 'keydown' event on the document
+				document.addEventListener( 'keydown', handleTab );
+				return () => {
+					document.removeEventListener( 'keydown', handleTab );
+				};
+			},
+			toggleAriaHidden: ( { context, ref } ) => {
+				ref.setAttribute(
+					'aria-hidden',
+					! context.core.lightboxEnabled
+				);
+			},
+			focusOnClose: async ( { context, ref } ) => {
+				if ( context.core.lightboxEnabled ) {
+					// We need to wait until the DOM is updated and able
+					// to receive focus updates for accessibility
+					await tick();
+					await tick();
+					ref.focus();
+				}
 			},
 		},
 	},

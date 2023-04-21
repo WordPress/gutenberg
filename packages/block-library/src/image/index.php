@@ -23,6 +23,15 @@ function process_img_data_id( $processor, $attributes ) {
 	return $processor;
 }
 
+function has_link_destination( $attributes ) {
+	if ( isset($attributes['linkDestination']) && $attributes['linkDestination'] !== 'none') {
+		return true;
+	} else if ( ! isset($attributes['linkDestination']) ) {
+		return false;
+	}
+	return false;
+}
+
 /**
  * Renders the `core/image` block on the server,
  * adding a data-id attribute to the element if core/gallery has added on pre-render.
@@ -32,12 +41,9 @@ function process_img_data_id( $processor, $attributes ) {
  * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content ) {
-	if( isset( $attributes['enableLightbox'] ) && $attributes['enableLightbox'] === true ) {
-		$body_content = new WP_HTML_Tag_Processor( $content );
 
-		$body_content->next_tag( 'figure' );
-		$body_content->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
-		$body_content->set_attribute( 'data-wp-init.closeZoomOnEsc', 'actions.core.closeZoomOnEsc');
+	if( ! has_link_destination( $attributes ) && isset( $attributes['enableLightbox'] ) && $attributes['enableLightbox'] === true ) {
+		$body_content = new WP_HTML_Tag_Processor( $content );
 
 		$body_content->next_tag( 'img' );
 
@@ -46,7 +52,6 @@ function render_block_core_image( $attributes, $content ) {
 		}
 
 		$body_content = process_img_data_id($body_content, $attributes);
-		$body_content->set_attribute( 'data-wp-on.click', 'actions.core.imageZoom');
 		$body_content = $body_content->get_updated_html();
 
 		$modal_content = new WP_HTML_Tag_Processor( $content );
@@ -54,13 +59,29 @@ function render_block_core_image( $attributes, $content ) {
 		$modal_content = process_img_data_id($modal_content, $attributes);
 		$modal_content = $modal_content->get_updated_html();
 
+		$toggle_close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+
 		return <<<HTML
-			<div class="lightbox-container" data-wp-context='{ "core": { "initialized": false, "isZoomed": false } }'>
-				$body_content
-				<div data-wp-portal="body" class="overlay" data-wp-class.initialized="context.core.initialized" data-wp-class.active="context.core.isZoomed">
-					$modal_content
-					<div class="hide" data-wp-on.click="actions.core.closeZoom"></div>
-				</div>
+			<div class="wp-lightbox-container"
+				 data-wp-context='{ "core": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } }'>
+					<button aria-haspopup='dialog' aria-description='opens lightbox' data-wp-on.click='actions.core.showLightbox'>
+						$body_content
+					</button>
+					<div data-wp-portal="body" class="wp-lightbox-overlay"
+						 aria-hidden="true"
+						 data-wp-attribute.aria-hidden="context.core.lightboxEnabled"
+						 data-wp-class.initialized="context.core.initialized"
+						 data-wp-class.active="context.core.lightboxEnabled"
+						 data-wp-init.hideLightboxOnEsc='actions.core.hideLightboxOnEsc'
+						 data-wp-init.hideLightboxOnTab='actions.core.hideLightboxOnTab'
+						 data-wp-effect="actions.core.toggleAriaHidden"
+						 >
+							$modal_content
+							<button aria-label="Close lightbox" class="close-button" data-wp-on.click="actions.core.hideLightbox" data-wp-effect="actions.core.focusOnClose">
+								$toggle_close_button_icon
+							</button>
+							<div class="hide" data-wp-on.click="actions.core.hideLightbox"></div>
+					</div>
 			</div>
 		HTML;
 	}

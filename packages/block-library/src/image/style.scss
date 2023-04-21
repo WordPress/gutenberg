@@ -152,19 +152,15 @@
 	margin: 0;
 }
 
-.lightbox-container {
-	figure.wp-block-image {
-		position: relative;
-		width: 100%;
-		height: 100%;
-
-		img {
-			cursor: zoom-in;
-		}
+.wp-lightbox-container {
+	button {
+		border: none;
+    	background: none;
+		cursor: zoom-in;
 	}
 }
 
-.overlay {
+.wp-lightbox-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -175,6 +171,15 @@
 	background: rgba(255, 255, 255, .9);
 	visibility: hidden;
 
+	.close-button {
+		font-size: 40px;
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		cursor: pointer;
+		z-index: 4000000;
+	}
+
 	.hide {
 		width: 100%;
 		height: 100%;
@@ -184,7 +189,7 @@
 		left: 0;
 	}
 
-	figure {
+	.wp-block-image {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -192,6 +197,11 @@
 		height: 100%;
 		z-index: 2000000;
 		position: absolute;
+	}
+
+	button {
+		border: none;
+		background: none;
 	}
 
 	img {
