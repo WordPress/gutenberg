@@ -12,7 +12,7 @@
 
 -   Create a `postInstall` property in `.wp-env.json` files for setting arbitrary commands to run after configuring WordPress.
 -   Add a `WP_ENV_POST_INSTALL` environment variable to override the current `postInstall` configuration.
--   Run the `postInstall` command on `wp-env start` when WordPress is being configures due to cache invalidation or the `--update` option.
+-   Run the `postInstall` command on `wp-env start` when WordPress is being configured. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
 -   Run the `postInstall` command on `wp-env clean` when given the `--post-install` option.
 
 ## 5.16.0 (2023-04-12)
