@@ -103,6 +103,8 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
  */
 export const getSettings = createSelector(
 	( state, setIsInserterOpen ) => {
+		const isLocked = hasPageContentLock( state );
+
 		const settings = {
 			...state.settings,
 			outlineMode: true,
@@ -123,8 +125,8 @@ export const getSettings = createSelector(
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
 				'wp_template' === getEditedPostType( state ),
-			contentBlockTypes: CONTENT_BLOCK_TYPES,
-			templateLock: hasPageContentLock( state ) ? 'contentOnly' : false,
+			contentBlockTypes: isLocked ? CONTENT_BLOCK_TYPES : null,
+			templateLock: isLocked ? 'contentOnly' : false,
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -139,6 +141,7 @@ export const getSettings = createSelector(
 				...rest,
 			} );
 		};
+
 		return settings;
 	},
 	( state ) => [

@@ -2857,13 +2857,23 @@ export const __experimentalGetRootContentLockingBlock = createSelector(
 export const __experimentalIsContentBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
 		const blockName = getBlockName( state, clientId );
-		return (
-			state.settings.contentBlockTypes.includes( blockName ) ||
-			select( blocksStore ).__experimentalHasContentRoleAttribute(
-				blockName
-			)
-		);
+		return state.settings.contentBlockTypes
+			? state.settings.contentBlockTypes.includes( blockName )
+			: select( blocksStore ).__experimentalHasContentRoleAttribute(
+					blockName
+			  );
 	}
+);
+
+export const __experimentalGetContentClientIdsTree = createSelector(
+	( state, rootClientId = null ) => {
+		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) =>
+			__experimentalIsContentBlock( state, clientId )
+				? [ __unstableGetClientIdWithClientIdsTree( state, clientId ) ]
+				: __experimentalGetContentClientIdsTree( state, clientId )
+		);
+	},
+	( state ) => [ state.blocks.order ]
 );
 
 /**
