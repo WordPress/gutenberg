@@ -407,3 +407,4 @@ return el( TextControl, {
     document.querySelector( {the-value-textarea} ).innerHTML = content;
   },
 } );
+```
