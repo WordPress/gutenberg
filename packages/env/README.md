@@ -696,6 +696,7 @@ Additional environment variables are given to the command to provide context abo
 
 - `WP_ENV_POST_INSTALL_CONTEXT` contains the command that triggered the execution, either `start` or `clean`.
 - `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the environment that the command is being executed for, such as `development` or `tests`.
+- `WP_ENV_POST_INSTALL_DEBUG` contains a boolean indicating whether or not `wp-env` is in debug mode.
 
 ## Contributing to this package
 

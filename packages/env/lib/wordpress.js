@@ -126,6 +126,7 @@ async function configureWordPress(
 					...process.env,
 					WP_ENV_POST_INSTALL_CONTEXT: postInstallContext,
 					WP_ENV_POST_INSTALL_ENVIRONMENT: environment,
+					WP_ENV_POST_INSTALL_DEBUG: config.debug,
 				},
 			} );
 		} catch ( e ) {
