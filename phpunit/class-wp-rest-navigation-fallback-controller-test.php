@@ -131,7 +131,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 
 		$this->assertArrayHasKey( 'self', $links, 'Response should contain a "self" link.' );
 
-		$this->assertStringContainsString( 'wp/v2/navigation/' . $data['id'], $links['self'][0]['href'], 'Self link should reference the correct Navigation Menu post resource url.' );
+		$this->assertStringContainsString( 'wp/v2/navigation/' . $navigation_post_id, $links['self'][0]['href'], 'Self link should reference the correct Navigation Menu post resource url.' );
 
 		$this->assertTrue( $links['self'][0]['attributes']['embeddable'], 'Self link should be embeddable.' );
 	}
