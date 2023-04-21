@@ -6,7 +6,13 @@ import { paramCase as kebabCase } from 'change-case';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import {
@@ -106,13 +112,20 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	isGradient,
 	element,
 	onChange,
+	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] = {
+		shift: true,
+		offset: 20,
+		placement: 'left-start',
+		...receivedPopoverProps,
+	};
+
 	return (
 		<Popover
-			placement="left-start"
-			offset={ 20 }
 			className="components-palette-edit__popover"
+			{ ...popoverProps }
 			onClose={ onClose }
 		>
 			{ ! isGradient && (
@@ -154,17 +167,31 @@ function Option< T extends Color | Gradient >( {
 	onStartEditing,
 	onRemove,
 	onStopEditing,
+	popoverProps: receivedPopoverProps,
 	slugPrefix,
 	isGradient,
 }: OptionProps< T > ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const popoverProps = useMemo(
+		() => ( {
+			...receivedPopoverProps,
+			// Use the custom palette color item as the popover anchor.
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor, receivedPopoverProps ]
+	);
+
 	return (
 		<PaletteItem
 			className={ isEditing ? 'is-selected' : undefined }
 			as="div"
 			onClick={ onStartEditing }
+			ref={ setPopoverAnchor }
 			{ ...( isEditing
 				? { ...focusOutsideProps }
 				: {
@@ -218,6 +245,7 @@ function Option< T extends Color | Gradient >( {
 					isGradient={ isGradient }
 					onChange={ onChange }
 					element={ element }
+					popoverProps={ popoverProps }
 				/>
 			) }
 		</PaletteItem>
@@ -244,6 +272,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
+	popoverProps,
 }: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReference = useRef< typeof elements >();
@@ -317,6 +346,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							}
 						} }
 						slugPrefix={ slugPrefix }
+						popoverProps={ popoverProps }
 					/>
 				) ) }
 			</ItemGroup>
@@ -356,6 +386,7 @@ export function PaletteEdit( {
 	canOnlyChangeValues,
 	canReset,
 	slugPrefix = '',
+	popoverProps,
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
@@ -541,6 +572,7 @@ export function PaletteEdit( {
 							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }
 							isGradient={ isGradient }
+							popoverProps={ popoverProps }
 						/>
 					) }
 					{ ! isEditing && editingElement !== null && (
@@ -568,6 +600,7 @@ export function PaletteEdit( {
 								);
 							} }
 							element={ elements[ editingElement ?? -1 ] }
+							popoverProps={ popoverProps }
 						/>
 					) }
 					{ ! isEditing &&

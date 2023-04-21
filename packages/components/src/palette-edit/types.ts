@@ -7,6 +7,7 @@ import type { Key, MouseEventHandler } from 'react';
  * Internal dependencies
  */
 import type { HeadingSize } from '../heading/types';
+import type { PopoverProps } from '../popover/types';
 
 export type Color = {
 	color: string;
@@ -85,7 +86,9 @@ type PaletteEditGradients = {
 };
 
 export type PaletteEditProps = BasePaletteEdit &
-	( PaletteEditColors | PaletteEditGradients );
+	( PaletteEditColors | PaletteEditGradients ) & {
+		popoverProps?: Omit< PopoverProps, 'children' >;
+	};
 
 type EditingElement = number | null;
 
@@ -94,6 +97,7 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	onChange: ( newElement: T ) => void;
 	isGradient?: T extends Gradient ? true : false;
 	onClose?: () => void;
+	popoverProps?: Omit< PopoverProps, 'children' >;
 };
 
 export type NameInputProps = {
@@ -112,6 +116,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
 	onStopEditing: () => void;
+	popoverProps?: Omit< PopoverProps, 'children' >;
 	slugPrefix: string;
 };
 
@@ -121,6 +126,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
+	popoverProps?: Omit< PopoverProps, 'children' >;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: string;
 };
