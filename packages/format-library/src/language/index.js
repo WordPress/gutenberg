@@ -64,17 +64,10 @@ const Edit = ( props ) => {
 						value={ lang }
 						onChange={ ( val ) => setLang( val ) }
 						aria-describedby={ `language-selector-describe-${ contentRef.current.id }` }
+						help={ __(
+							'A valid language attribute, like "en" or "fr".'
+						) }
 					/>
-					<p
-						id={ `language-selector-describe-${ contentRef.current.id }` }
-					>
-						<em>
-							{ __(
-								'A valid language attribute, like "en" or "fr".'
-							) }
-						</em>
-					</p>
-
 					<SelectControl
 						label={ __( 'Text direction' ) }
 						value={ dir }
