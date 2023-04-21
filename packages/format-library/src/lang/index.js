@@ -58,7 +58,7 @@ const LangAttributeButton = ( props ) => {
 					<TextControl
 						label={ __( 'Lang attribute' ) }
 						value={ lang }
-						onChange={ ( lang ) => setLang( lang ) }
+						onChange={ ( val ) => setLang( val ) }
 					/>
 					<p className="lang-attribute-info">
 						<em>
@@ -81,7 +81,7 @@ const LangAttributeButton = ( props ) => {
 								value: 'rtl',
 							},
 						] }
-						onChange={ ( dir ) => setDir( dir ) }
+						onChange={ ( val ) => setDir( val ) }
 					/>
 					<Button
 						isPrimary
