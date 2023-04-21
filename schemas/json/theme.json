@@ -675,7 +675,8 @@
 						"shadow": {},
 						"spacing": {},
 						"typography": {},
-						"custom": {}
+						"custom": {},
+						"behaviors": {}
 					},
 					"additionalProperties": false
 				}
@@ -796,7 +797,28 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "#/definitions/settingsPropertiesComplete"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"behaviors": {
+									"description": "Allows users to set named behaviors for a block.\nGutenberg plugin required.",
+									"type": "object",
+									"properties": {
+										"lightbox": {
+											"description": "Show a lightbox for the image.\nGutenberg plugin required.",
+											"type": "boolean",
+											"default": true
+										}
+									}
+								}
+							}
+						}
+					]
 				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
