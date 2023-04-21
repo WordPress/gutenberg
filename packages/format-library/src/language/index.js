@@ -20,7 +20,7 @@ import { translation } from '@wordpress/icons';
 const name = 'core/language';
 const title = __( 'Language' );
 
-const LangAttributeButton = ( props ) => {
+const Edit = ( props ) => {
 	const { contentRef, isActive, onChange, value } = props;
 	const anchorRef = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -113,7 +113,7 @@ export const language = {
 	name,
 	tagName: 'span',
 	className: 'lang-attribute',
-	edit: LangAttributeButton,
+	edit: Edit,
 	icon: 'translation',
 	title,
 };
