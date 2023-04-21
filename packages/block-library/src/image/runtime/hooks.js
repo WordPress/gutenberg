@@ -31,11 +31,13 @@ const getEvaluate =
 	(path, extraArgs = {}) => {
 		const value = resolve(path, extraArgs.context);
 		return typeof value === 'function'
-			? value({
+			? value( {
 					state: store.state,
-					...(ref !== undefined ? { ref } : {}),
+					...( ref.current !== undefined
+						? { ref: ref.current }
+						: {} ),
 					...extraArgs,
-			  })
+			  } )
 			: value;
 	};
 
@@ -44,7 +46,7 @@ const Directive = ({ type, directives, props: originalProps }) => {
 	const ref = useRef(null);
 	const element = h(type, { ...originalProps, ref, _wrapped: true });
 	const props = { ...originalProps, children: element };
-	const evaluate = getEvaluate({ ref: ref.current });
+	const evaluate = getEvaluate({ ref });
 	const directiveArgs = { directives, props, element, context, evaluate };
 
 	for (const d in directives) {
