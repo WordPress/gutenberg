@@ -34,13 +34,13 @@ function ScreenRoot() {
 	const { variations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
-			__experimentalGetCurrentGlobalStylesId,
+			__experimentalGetCurrentGlobalStyles,
 			__experimentalGetCurrentThemeGlobalStylesVariations,
 		} = select( coreStore );
 
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+		const currentGlobalStyles = __experimentalGetCurrentGlobalStyles();
+		const globalStyles = currentGlobalStyles?.id
+			? getEntityRecord( 'root', 'globalStyles', currentGlobalStyles?.id )
 			: undefined;
 
 		return {

@@ -53,33 +53,30 @@ function useGlobalStylesUserConfig() {
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const _globalStylesId =
-				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
+			const _globalStyles =
+				select( coreStore ).__experimentalGetCurrentGlobalStyles();
+			const record = _globalStyles?.id
 				? getEditedEntityRecord(
 						'root',
 						'globalStyles',
-						_globalStylesId
+						_globalStyles.id
 				  )
 				: undefined;
-
 			let hasResolved = false;
 			if (
-				hasFinishedResolution(
-					'__experimentalGetCurrentGlobalStylesId'
-				)
+				hasFinishedResolution( '__experimentalGetCurrentGlobalStyles' )
 			) {
-				hasResolved = _globalStylesId
+				hasResolved = _globalStyles?.id
 					? hasFinishedResolution( 'getEditedEntityRecord', [
 							'root',
 							'globalStyles',
-							_globalStylesId,
+							_globalStyles?.id,
 					  ] )
 					: true;
 			}
 
 			return {
-				globalStylesId: _globalStylesId,
+				globalStylesId: _globalStyles?.id,
 				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
