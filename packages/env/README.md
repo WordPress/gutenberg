@@ -698,7 +698,7 @@ Additional environment variables are given to the command to provide context abo
 - `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the WordPress environment that the command is being executed for, such as `development` or `tests`.
 - `WP_ENV_POST_INSTALL_DEBUG` contains a boolean indicating whether or not `wp-env` is in debug mode.
 
-> **Warning:** This command will not always be executed on a fresh environment. It should be resilient and not fail if a step has already been completed.
+> **Warning:** This command can be executed frequently. It should be resilient and not fail if a step has already been completed. For example, you should take care not to add data to the database if it was already done.
 
 ## Contributing to this package
 
