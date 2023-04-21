@@ -165,7 +165,6 @@ export default function BlockEditor() {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
 			<EditorCanvasContainer.Slot>
 				{ ( [ editorCanvasView ] ) =>
 					editorCanvasView ? (
