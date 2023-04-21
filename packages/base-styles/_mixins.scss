@@ -530,22 +530,30 @@
 		border: 3px solid transparent;
 		background-clip: padding-box;
 	}
-	&:hover:hover::-webkit-scrollbar-thumb { // This needs specificity.
+	&:hover::-webkit-scrollbar-thumb, // This needs specificity.
+	&:focus::-webkit-scrollbar-thumb,
+	&:focus-within::-webkit-scrollbar-thumb {
 		background-color: $handle-color-hover;
 	}
 
 	// Firefox 109+ and Chrome 111+
 	scrollbar-width: thin;
-	scrollbar-gutter: stable;
+	scrollbar-gutter: stable both-edges;
 	scrollbar-color: $handle-color transparent; // Syntax, "dark", "light", or "#handle-color #track-color"
 
-	&:hover {
+	&:hover,
+	&:focus,
+	&:focus-within {
 		scrollbar-color: $handle-color-hover transparent;
-	}
-	&:hover::-webkit-scrollbar-thumb {
-		background-color: $handle-color-hover;
 	}
 
 	// Needed to fix a Safari rendering issue.
 	will-change: transform;
+
+	// Always show scrollbar on Mobile devices.
+	@media (hover: none) {
+		& {
+			scrollbar-color: $handle-color-hover transparent;
+		}
+	}
 }
