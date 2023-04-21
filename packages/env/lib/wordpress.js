@@ -147,24 +147,7 @@ async function setupWordPressDirectories( config ) {
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
 	}
-
-	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
-		}
-	}
-}
-
-async function createUploadsDir( corePath ) {
-	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
 }
 
 /**
