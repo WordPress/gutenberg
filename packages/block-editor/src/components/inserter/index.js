@@ -22,6 +22,10 @@ import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const defaultRenderToggle = ( {
 	onToggle,
 	disabled,

@@ -13,8 +13,6 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 
-/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
-
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
 		const { children, settings, stripExperimentalSettings = false } = props;

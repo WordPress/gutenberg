@@ -13,6 +13,10 @@ import { __ } from '@wordpress/i18n';
 import useSetting from '../../components/use-setting';
 
 /**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
+/**
  * Control for letter-spacing.
  *
  * @param {Object}                  props                      Component props.

@@ -11,6 +11,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  */
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPComponent} WPComponent
+ */
+
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;

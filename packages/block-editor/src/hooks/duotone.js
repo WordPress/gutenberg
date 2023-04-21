@@ -39,6 +39,10 @@ import { useBlockSettings } from './utils';
 import { store as blockEditorStore } from '../store';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const EMPTY_ARRAY = [];
 
 extend( [ namesPlugin ] );

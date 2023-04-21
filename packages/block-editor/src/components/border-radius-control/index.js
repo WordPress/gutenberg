@@ -24,6 +24,10 @@ import {
 	hasMixedValues,
 } from './utils';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const DEFAULT_VALUES = {
 	topLeft: undefined,
 	topRight: undefined,

@@ -32,6 +32,10 @@ import { cleanEmptyObject } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const { CustomSelectControl } = unlock( componentsPrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';

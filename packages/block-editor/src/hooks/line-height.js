@@ -13,6 +13,10 @@ import useSetting from '../components/use-setting';
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
 /**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
+/**
  * Inspector control panel containing the line height related configuration
  *
  * @param {Object} props

@@ -9,6 +9,10 @@ import { SVG } from '@wordpress/components';
 import { __unstableGetValuesFromColors as getValuesFromColors } from './index';
 
 /**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
+/**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
  * @param {Object} props          Duotone props.
