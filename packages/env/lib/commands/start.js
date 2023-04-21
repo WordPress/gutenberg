@@ -40,7 +40,7 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * Starts the development server.
  *
  * @param {Object}  options
- * @param {boolean} options.postInstall Indicates whether or not we should skip the post-install command(s).
+ * @param {boolean} options.postInstall Indicates whether or not we should skip the post-install command.
  * @param {Object}  options.spinner     A CLI spinner which indicates progress.
  * @param {boolean} options.debug       True if debug mode is enabled.
  * @param {boolean} options.update      If true, update sources.

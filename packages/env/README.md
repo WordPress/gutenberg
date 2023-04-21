@@ -270,23 +270,27 @@ The start command installs and initializes the WordPress environment, which incl
 ```sh
 wp-env start
 
-Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
-tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
-directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first install, use the '--update' flag to download
-updates to mapped sources and to re-apply WordPress configuration options.
+Starts WordPress for development on port 8888 (​http://localhost:8888​)
+(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
+(override with WP_ENV_TESTS_PORT). The current working directory must be a
+WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After
+first install, use the '--update' flag to download updates to mapped sources and
+to re-apply WordPress configuration options.
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
-  --debug    Enable debug output.                     [boolean] [default: false]
-  --update   Download source updates and apply WordPress configuration.
+  --help          Show help                                            [boolean]
+  --version       Show version number                                  [boolean]
+  --debug         Enable debug output.                [boolean] [default: false]
+  --post-install  Execute any configured post-install command when configuring
+                  WordPress.                           [boolean] [default: true]
+  --update        Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
-  --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
-             are set, uses "debug". You may set multiple Xdebug modes by passing
-             them in a comma-separated list: `--xdebug=develop,coverage`. See
-             https://xdebug.org/docs/all_settings#mode for information about
-             Xdebug modes.                                              [string]
+  --xdebug        Enables Xdebug. If not passed, Xdebug is turned off. If no
+                  modes are set, uses "debug". You may set multiple Xdebug modes
+                  by passing them in a comma-separated list:
+                  `--xdebug=develop,coverage`. See
+                  https://xdebug.org/docs/all_settings#mode for information
+                  about Xdebug modes.                                   [string]
 ```
 
 ### `wp-env stop`
@@ -307,6 +311,13 @@ Cleans the WordPress databases.
 Positionals:
   environment  Which environments' databases to clean.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
+
+Options:
+  --help          Show help                                            [boolean]
+  --version       Show version number                                  [boolean]
+  --debug         Enable debug output.                [boolean] [default: false]
+  --post-install  Execute the environments' configured post-install command if
+                  configured.                         [boolean] [default: false]
 ```
 
 ### `wp-env run [container] [command]`
@@ -471,7 +482,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"testsPort"`   | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
 | `"config"`      | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`    | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
-| `"postInstall"` | `string\|null` | `null`                                 | The command(s) that should be executed after configuring WordPress.                                                              |
+| `"postInstall"` | `string\|null` | `null`                                 | The command that should be executed after configuring WordPress.                                                                 |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -668,6 +679,23 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
   "plugins": ["."]
 }
 ```
+
+#### Post-Install Command
+
+You can define a command for `wp-env` to run after configuring WordPress. This will happen the first time you run `wp-env start`, whenever you change the configuration,
+and when you use the `--update` option. You can also instruct `wp-env` to run the command on `wp-env clean` with the `--post-install` option. 
+The `WP_ENV_POST_INSTALL` environment variable can be used to override the configured command.
+
+```json
+{
+  "postInstall": "echo 'Running Post-Install'"
+}
+```
+
+Additional environment variables are given to the command to provide context about the execution:
+
+- `WP_ENV_POST_INSTALL_CONTEXT` contains the command that triggered the execution, either `start` or `clean`.
+- `WP_ENV_POST_INSTALL_ENVIRONMENT` contains the environment that the command is being executed for, such as `development` or `tests`.
 
 ## Contributing to this package
 

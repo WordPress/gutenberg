@@ -19,7 +19,7 @@ const { configureWordPress, resetDatabase } = require( '../wordpress' );
  *
  * @param {Object}                 options
  * @param {WPEnvironmentSelection} options.environment The environment to clean. Either 'development', 'tests', or 'all'.
- * @param {boolean}                options.postInstall Indicates whether or not we should run post-install command(s).
+ * @param {boolean}                options.postInstall Indicates whether or not we should run the post-install command.
  * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
  * @param {boolean}                options.debug       True if debug mode is enabled.
  */

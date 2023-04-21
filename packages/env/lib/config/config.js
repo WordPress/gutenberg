@@ -42,7 +42,7 @@ const md5 = require( '../md5' );
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string|null}               postInstall   The command(s) to run after configuring WordPress.
+ * @property {string|null}               postInstall   The command to run after configuring WordPress.
  */
 
 /**

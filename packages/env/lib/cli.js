@@ -115,7 +115,7 @@ module.exports = function cli() {
 			args.option( 'post-install', {
 				type: 'boolean',
 				describe:
-					'Execute any configured post-install command(s) when configuring WordPress.',
+					'Execute any configured post-install command when configuring WordPress.',
 				default: true,
 			} );
 			args.option( 'update', {
@@ -154,7 +154,7 @@ module.exports = function cli() {
 			args.option( 'post-install', {
 				type: 'boolean',
 				describe:
-					"Execute the environment's configured post-install command(s) if configured.",
+					"Execute the environments' configured post-install command if configured.",
 				default: false,
 			} );
 		},

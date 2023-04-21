@@ -42,7 +42,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment        The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config             The wp-env config object.
- * @param {string|null}   postInstallContext The context that will be set when executing postInstall command(s). When null, postInstall won't run.
+ * @param {string|null}   postInstallContext The context that will be set when executing postInstall command. When null, postInstall won't run.
  * @param {Object}        spinner            A CLI spinner which indicates progress.
  */
 async function configureWordPress(
@@ -115,7 +115,7 @@ async function configureWordPress(
 
 	// At this point, WordPress has been configured and the environment should be ready.
 	// We're going to support a "postInstall" configuration option so that users can
-	// have the environment arbitrarily execute command(s) for additional setup.
+	// have the environment arbitrarily execute command for additional setup.
 	if ( postInstallContext && config.env[ environment ].postInstall ) {
 		try {
 			execSync( config.env[ environment ].postInstall, {
