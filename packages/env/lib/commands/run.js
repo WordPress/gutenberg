@@ -58,10 +58,9 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
-		'run',
+		'exec',
 		'-w',
 		envCwd,
-		'--rm',
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
 	];
