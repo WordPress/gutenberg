@@ -57,7 +57,7 @@ const Edit = ( props ) => {
 				<Popover
 					className="components-lang-attribute-popover"
 					anchor={ anchorRef }
-					position="bottom center"
+					placement="bottom"
 				>
 					<TextControl
 						label={ title }
