@@ -1,18 +1,3 @@
-.edit-post-start-page-options__modal {
-	// To keep modal dimensions consistent as subsections are navigated, width
-	// and height are used instead of max-(width/height).
-	@include break-small() {
-		width: 95vw;
-		height: 95vh;
-		max-height: none;
-	}
-	@include break-medium() {
-		width: 90vw;
-		height: 90vh;
-		max-width: none;
-	}
-}
-
 // 2 column masonry layout.
 .edit-post-start-page-options__modal-content .block-editor-block-patterns-list {
 	column-count: 2;

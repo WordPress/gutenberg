@@ -19,7 +19,7 @@ let uniqueId = 0;
 /**
  * Returns an action object used in signalling that a notice is to be created.
  *
- * @param {string}                [status='info']              Notice status.
+ * @param {string|undefined}      status                       Notice status ("info" if undefined is passed).
  * @param {string}                content                      Notice message.
  * @param {Object}                [options]                    Notice options.
  * @param {string}                [options.context='global']   Context under which to

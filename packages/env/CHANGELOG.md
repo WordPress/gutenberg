@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
+-   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
+-   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
+
 ## 5.16.0 (2023-04-12)
 
 ## 5.15.0 (2023-03-29)
