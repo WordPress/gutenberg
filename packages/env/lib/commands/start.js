@@ -159,6 +159,11 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 			: [],
 	} );
 
+	// Make sure we've consumed the custom CLI dockerfile.
+	if ( shouldConfigureWp ) {
+		await dockerCompose.buildOne( [ 'cli' ], { ...dockerComposeConfig } );
+	}
+
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {
 		spinner.text = 'Configuring WordPress.';

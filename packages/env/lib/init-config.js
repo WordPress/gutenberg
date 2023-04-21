@@ -82,11 +82,16 @@ module.exports = async function initConfig( {
 		);
 
 		await writeFile(
-			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
-			dockerFileContents(
+			path.resolve( config.workDirectoryPath, 'WordPress.Dockerfile' ),
+			wordpressDockerFileContents(
 				dockerComposeConfig.services.wordpress.image,
 				config
 			)
+		);
+
+		await writeFile(
+			path.resolve( config.workDirectoryPath, 'CLI.Dockerfile' ),
+			cliDockerFileContents( dockerComposeConfig.services.cli.image )
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
@@ -134,14 +139,14 @@ function checkXdebugPhpCompatibility( config ) {
 }
 
 /**
- * Generates the Dockerfile used by wp-env's development instance.
+ * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
  *
  * @param {string}   image  The base docker image to use.
  * @param {WPConfig} config The configuration object.
  *
  * @return {string} The dockerfile contents.
  */
-function dockerFileContents( image, config ) {
+function wordpressDockerFileContents( image, config ) {
 	// Don't install XDebug unless it is explicitly required.
 	let shouldInstallXdebug = false;
 
@@ -162,8 +167,9 @@ ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
 ARG HOST_USERNAME
 ARG HOST_UID
 ARG HOST_GID
-RUN groupadd -o -g $HOST_GID $HOST_USERNAME
-RUN useradd -M -u $HOST_UID -g $HOST_GID $HOST_USERNAME
+# When the IDs are already in use we can still safely move on.
+RUN groupadd -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Set up sudo so they can have root access when using 'run' commands.
 RUN apt-get update
@@ -187,4 +193,30 @@ RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
 	`;
+}
+
+/**
+ * Generates the Dockerfile used by wp-env's `cli` and `tests-cli` instances.
+ *
+ * @param {string} image The base docker image to use.
+ *
+ * @return {string} The dockerfile contents.
+ */
+function cliDockerFileContents( image ) {
+	return `FROM ${ image }
+
+# Switch to root so we can create users.
+USER root
+	
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN addgroup -g $HOST_GID $HOST_USERNAME || true
+RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
+
+# Switch back now that we're done.
+USER www-data
+`;
 }

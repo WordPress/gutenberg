@@ -22,6 +22,7 @@ const getHostUser = require( './get-host-user' );
  *
  * @param {string}          workDirectoryPath The working directory for wp-env.
  * @param {WPServiceConfig} config            The service config to get the mounts from.
+ * @param {string}          hostUsername      The username of the host running wp-env.
  * @param {string}          wordpressDefault  The default internal path for the WordPress
  *                                            source code (such as tests-wordpress).
  *
@@ -30,6 +31,7 @@ const getHostUser = require( './get-host-user' );
 function getMounts(
 	workDirectoryPath,
 	config,
+	hostUsername,
 	wordpressDefault = 'wordpress'
 ) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
@@ -47,9 +49,10 @@ function getMounts(
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
-	const coreMount = `${
-		config.coreSource ? config.coreSource.path : wordpressDefault
-	}:/var/www/html`;
+	const userHomeMount =
+		wordpressDefault === 'wordpress'
+			? `user-home:/home/${ hostUsername }`
+			: `tests-user-home:/home/${ hostUsername }`;
 
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
@@ -60,10 +63,15 @@ function getMounts(
 		'phpunit'
 	) }:/wordpress-phpunit`;
 
+	const coreMount = `${
+		config.coreSource ? config.coreSource.path : wordpressDefault
+	}:/var/www/html`;
+
 	return [
 		...new Set( [
-			coreMount,
+			coreMount, // Must be first because of some operations later that expect it to be!
 			corePHPUnitMount,
+			userHomeMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
@@ -88,11 +96,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 	const developmentMounts = getMounts(
 		config.workDirectoryPath,
-		config.env.development
+		config.env.development,
+		hostUser.name
 	);
 	const testsMounts = getMounts(
 		config.workDirectoryPath,
 		config.env.tests,
+		hostUser.name,
 		'tests-wordpress'
 	);
 
@@ -230,6 +240,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			wordpress: {
 				build: {
 					context: '.',
+					dockerfile: 'WordPress.Dockerfile',
 					args: {
 						HOST_USERNAME: hostUser.name,
 						HOST_UID: hostUser.uid,
@@ -262,6 +273,15 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: testsMounts,
 			},
 			cli: {
+				build: {
+					context: '.',
+					dockerfile: 'CLI.Dockerfile',
+					args: {
+						HOST_USERNAME: hostUser.name,
+						HOST_UID: hostUser.uid,
+						HOST_GID: hostUser.gid,
+					},
+				},
 				depends_on: [ 'wordpress' ],
 				image: developmentWpCliImage,
 				volumes: developmentMounts,
@@ -310,6 +330,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 			mysql: {},
 			'mysql-test': {},
 			'phpunit-uploads': {},
+			'user-home': {},
+			'tests-user-home': {},
 		},
 	};
 };

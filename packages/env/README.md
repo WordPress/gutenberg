@@ -173,17 +173,17 @@ $ wp-env destroy
 $ wp-env start
 ```
 
-### 7. Debug mode and inspecting the generated dockerfile.
+### 7. Debug mode and inspecting the generated docker files.
 
 `wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
 
-Start `wp-env` in debug mode
+Start `wp-env` in debug mode:
 
 ```sh
 wp-env start --debug
 ```
 
-`wp-env` will output its config which includes `dockerComposeConfigPath`.
+`wp-env` will output its config which includes `dockerComposeConfigPath`:
 
 ```sh
 ℹ Config:
