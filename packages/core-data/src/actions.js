@@ -194,28 +194,6 @@ export function __experimentalReceiveThemeGlobalStyleVariations(
 }
 
 /**
- * Returns an action object used in signalling that the theme global styles custom post type (CPT) revisions have been received.
- * Ignored from documentation as it's internal to the data store.
- *
- * @ignore
- *
- * @param {number} currentId The post id.
- * @param {Array}  revisions The global styles revisions.
- *
- * @return {Object} Action object.
- */
-export function __experimentalReceiveThemeGlobalStyleRevisions(
-	currentId,
-	revisions
-) {
-	return {
-		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
-		currentId,
-		revisions,
-	};
-}
-
-/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.

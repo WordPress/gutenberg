@@ -500,35 +500,6 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		);
 	};
 
-export const __experimentalGetCurrentThemeGlobalStylesRevisions =
-	() =>
-	async ( { resolveSelect, dispatch } ) => {
-		const currentGlobalStyles =
-			await resolveSelect.__experimentalGetCurrentGlobalStyles();
-		const revisionsURL =
-			currentGlobalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.href;
-		if ( revisionsURL ) {
-			const revisions = await apiFetch( {
-				url: revisionsURL,
-			} );
-			dispatch.__experimentalReceiveThemeGlobalStyleRevisions(
-				currentGlobalStyles?.id,
-				revisions
-			);
-		}
-	};
-
-__experimentalGetCurrentThemeGlobalStylesRevisions.shouldInvalidate = (
-	action
-) => {
-	return (
-		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
-		action.kind === 'root' &&
-		! action.error &&
-		action.name === 'globalStyles'
-	);
-};
-
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
