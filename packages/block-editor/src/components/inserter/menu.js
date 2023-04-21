@@ -67,25 +67,19 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, inserterItems, enableOpenverseMediaCategory } =
-		useSelect(
-			( select ) => {
-				const {
-					__experimentalGetAllowedPatterns,
-					getInserterItems,
-					getSettings,
-				} = select( blockEditorStore );
-				return {
-					showPatterns: !! __experimentalGetAllowedPatterns(
-						destinationRootClientId
-					).length,
-					inserterItems: getInserterItems( destinationRootClientId ),
-					enableOpenverseMediaCategory:
-						getSettings().enableOpenverseMediaCategory,
-				};
-			},
-			[ destinationRootClientId ]
-		);
+	const { showPatterns, inserterItems } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getInserterItems } =
+				select( blockEditorStore );
+			return {
+				showPatterns: !! __experimentalGetAllowedPatterns(
+					destinationRootClientId
+				).length,
+				inserterItems: getInserterItems( destinationRootClientId ),
+			};
+		},
+		[ destinationRootClientId ]
+	);
 	const hasReusableBlocks = useMemo( () => {
 		return inserterItems.some(
 			( { category } ) => category === 'reusable'
@@ -93,7 +87,7 @@ function InserterMenu(
 	}, [ inserterItems ] );
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = !! mediaCategories.length || enableOpenverseMediaCategory;
+	const showMedia = !! mediaCategories.length;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -158,7 +152,6 @@ function InserterMenu(
 			destinationRootClientId,
 			onInsert,
 			onHover,
-			delayedFilterValue,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
 		]

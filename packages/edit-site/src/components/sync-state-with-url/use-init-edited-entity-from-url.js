@@ -13,16 +13,18 @@ import { store as editSiteStore } from '../../store';
 
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, postType } = {} } = useLocation();
-	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
-		const { getSite } = select( coreDataStore );
+	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
+		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
+		const base = getUnstableBase();
 
 		return {
-			isRequestingSite: ! siteData,
+			isRequestingSite: ! base,
 			homepageId:
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
+			url: base?.home,
 		};
 	}, [] );
 
@@ -30,13 +32,7 @@ export default function useInitEditedEntityFromURL() {
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
-		if (
-			postType &&
-			postId &&
-			// This is just a special case to support old WP versions that perform redirects.
-			// This code should be removed when we minimum WP version becomes 6.2.
-			postId !== 'none'
-		) {
+		if ( postType && postId ) {
 			switch ( postType ) {
 				case 'wp_template':
 					setTemplate( postId );
@@ -60,10 +56,11 @@ export default function useInitEditedEntityFromURL() {
 			} );
 		} else if ( ! isRequestingSite ) {
 			setPage( {
-				path: '/',
+				path: url,
 			} );
 		}
 	}, [
+		url,
 		postId,
 		postType,
 		homepageId,

@@ -38,12 +38,8 @@ const PlaceholderIllustration = (
  * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
  * ```
  */
-export function Placeholder< IconProps = unknown >(
-	props: WordPressComponentProps<
-		PlaceholderProps< IconProps >,
-		'div',
-		false
-	>
+export function Placeholder(
+	props: WordPressComponentProps< PlaceholderProps, 'div', false >
 ) {
 	const {
 		icon,

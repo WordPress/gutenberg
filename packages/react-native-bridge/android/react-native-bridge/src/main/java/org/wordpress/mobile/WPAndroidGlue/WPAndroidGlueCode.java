@@ -430,8 +430,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
+            public void performGetRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performGetRequest(pathFromJS, enableCaching, onSuccess, onError);
+            }
+
+            @Override
+            public void performPostRequest(String pathFromJS, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performPostRequest(pathFromJS, data, onSuccess, onError);
             }
 
             @Override
@@ -985,6 +990,10 @@ public class WPAndroidGlueCode {
             }
         }
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+    }
+
+    public void sendToJSPostSaveEvent() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().sendToJSPostSaveEvent();
     }
 
     public void appendMediaFiles(ArrayList<Media> mediaList) {

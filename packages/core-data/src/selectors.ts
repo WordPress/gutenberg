@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +16,11 @@ import deprecated from '@wordpress/deprecated';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+import {
+	getNormalizedCommaSeparable,
+	isRawAttribute,
+	setNestedValue,
+} from './utils';
 import type * as ET from './entity-types';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -336,7 +339,7 @@ export const getEntityRecord = createSelector(
 				field.forEach( ( fieldName ) => {
 					value = value[ fieldName ];
 				} );
-				set( filteredItem, field, value );
+				setNestedValue( filteredItem, field, value );
 			}
 			return filteredItem as EntityRecord;
 		}

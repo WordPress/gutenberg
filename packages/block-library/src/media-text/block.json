@@ -10,7 +10,7 @@
 	"attributes": {
 		"align": {
 			"type": "string",
-			"default": "wide"
+			"default": "none"
 		},
 		"mediaAlt": {
 			"type": "string",

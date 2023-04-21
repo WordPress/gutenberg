@@ -40,7 +40,7 @@
  * Example:
  * ```php
  *     $tags = new WP_HTML_Tag_Processor( $html );
- *     if ( $tags->next_tag( array( 'tag_name' => 'option' ) ) ) {
+ *     if ( $tags->next_tag( 'option' ) ) {
  *         $tags->set_attribute( 'selected', true );
  *     }
  * ```
@@ -58,10 +58,11 @@
  *     $tags->next_tag();
  * ```
  *
- * | Goal                                                      | Query                                                                      |
- * |-----------------------------------------------------------|----------------------------------------------------------------------------|
- * | Find any tag.                                             | `$tags->next_tag();`                                                       |
+ * | Goal                                                      | Query                                                                           |
+ * |-----------------------------------------------------------|---------------------------------------------------------------------------------|
+ * | Find any tag.                                             | `$tags->next_tag();`                                                            |
  * | Find next image tag.                                      | `$tags->next_tag( array( 'tag_name' => 'img' ) );`                              |
+ * | Find next image tag (without passing the array).          | `$tags->next_tag( 'img' );`                                                     |
  * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next_tag( array( 'class_name' => 'fullwidth' ) );`                      |
  * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next_tag( array( 'tag_name' => 'img', 'class_name' => 'fullwidth' ) );` |
  *
@@ -274,7 +275,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * @since 6.2.0
 	 * @var string
 	 */
-	private $html;
+	protected $html;
 
 	/**
 	 * The last query passed to next_tag().
@@ -722,7 +723,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		}
 
 		$this->bookmarks[ $name ] = new WP_HTML_Span(
-			$this->tag_name_starts_at - 1,
+			$this->tag_name_starts_at - ( $this->is_closing_tag ? 2 : 1 ),
 			$this->tag_ends_at
 		);
 
@@ -775,7 +776,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				return false;
 			}
 
-			$at += 2;
+			$closer_potentially_starts_at = $at;
+			$at                          += 2;
 
 			/*
 			 * Find a case-insensitive match to the tag name.
@@ -818,7 +820,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( '>' === $html[ $at ] || '/' === $html[ $at ] ) {
-				++$this->bytes_already_parsed;
+				$this->bytes_already_parsed = $closer_potentially_starts_at;
 				return true;
 			}
 		}
@@ -887,7 +889,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( '/' === $html[ $at ] ) {
-				$is_closing = true;
+				$closer_potentially_starts_at = $at - 1;
+				$is_closing                   = true;
 				++$at;
 			} else {
 				$is_closing = false;
@@ -938,7 +941,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( $is_closing ) {
-				$this->bytes_already_parsed = $at;
+				$this->bytes_already_parsed = $closer_potentially_starts_at;
 				if ( $this->bytes_already_parsed >= $doc_length ) {
 					return false;
 				}
@@ -948,7 +951,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				}
 
 				if ( '>' === $html[ $this->bytes_already_parsed ] ) {
-					++$this->bytes_already_parsed;
+					$this->bytes_already_parsed = $closer_potentially_starts_at;
 					return true;
 				}
 			}
@@ -1519,7 +1522,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		$this->bytes_already_parsed = $this->bookmarks[ $bookmark_name ]->start;
 		$this->bytes_already_copied = $this->bytes_already_parsed;
 		$this->output_buffer        = substr( $this->html, 0, $this->bytes_already_copied );
-		return $this->next_tag();
+		return $this->next_tag( array( 'tag_closers' => 'visit' ) );
 	}
 
 	/**
@@ -1623,7 +1626,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *     $p->get_attribute( 'enabled' ) === true;
 	 *     $p->get_attribute( 'aria-label' ) === null;
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_attribute( 'class' ) === null;
 	 * ```
 	 *
@@ -1704,7 +1707,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *     $p->next_tag( array( 'class_name' => 'test' ) ) === true;
 	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
 	 * ```
 	 *
@@ -1735,10 +1738,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Example:
 	 * ```php
 	 *     $p = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
-	 *     $p->next_tag( array() ) === true;
+	 *     $p->next_tag() === true;
 	 *     $p->get_tag() === 'DIV';
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_tag() === null;
 	 * ```
 	 *
@@ -1754,6 +1757,31 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
 
 		return strtoupper( $tag_name );
+	}
+
+	/**
+	 * Indicates if the currently matched tag contains the self-closing flag.
+	 *
+	 * No HTML elements ought to have the self-closing flag and for those, the self-closing
+	 * flag will be ignored. For void elements this is benign because they "self close"
+	 * automatically. For non-void HTML elements though problems will appear if someone
+	 * intends to use a self-closing element in place of that element with an empty body.
+	 * For HTML foreign elements and custom elements the self-closing flag determines if
+	 * they self-close or not.
+	 *
+	 * This function does not determine if a tag is self-closing,
+	 * but only if the self-closing flag is present in the syntax.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return bool Whether the currently matched tag contains the self-closing flag.
+	 */
+	public function has_self_closing_flag() {
+		if ( ! $this->tag_name_starts_at ) {
+			return false;
+		}
+
+		return '/' === $this->html[ $this->tag_ends_at - 1 ];
 	}
 
 	/**

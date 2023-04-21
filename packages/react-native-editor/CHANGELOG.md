@@ -10,7 +10,30 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
+## 1.93.0
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
+## 1.92.0
+* No User facing changes *
+
+## 1.91.0
+-   [*] Allow new block transformations for most blocks. [#48792]
+
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
 -   [*] Add metadata parameter to media upload events [#48103]  
+
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
 
 ## 1.89.0 
 * No User facing changes *

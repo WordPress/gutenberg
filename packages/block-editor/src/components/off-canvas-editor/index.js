@@ -54,25 +54,31 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                 Components props.
- * @param {string}  props.id              An HTML element id for the root element of ListView.
- * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers Flag to enable block movers
- * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
- * @param {string}  props.description     Optional accessible description for the tree grid component.
- * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
- * @param {Object}  ref                   Forwarded ref
+ * @param {Object}   props                         Components props.
+ * @param {string}   props.id                      An HTML element id for the root element of ListView.
+ * @param {string}   props.parentClientId          The client id of the parent block.
+ * @param {Array}    props.blocks                  Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean}  props.showBlockMovers         Flag to enable block movers
+ * @param {boolean}  props.isExpanded              Flag to determine whether nested levels are expanded by default.
+ * @param {Object}   props.LeafMoreMenu            Optional more menu substitution.
+ * @param {string}   props.description             Optional accessible description for the tree grid component.
+ * @param {string}   props.onSelect                Optional callback to be invoked when a block is selected.
+ * @param {string}   props.showAppender            Flag to show or hide the block appender.
+ * @param {Function} props.renderAdditionalBlockUI Function that renders additional block content UI.
+ * @param {Object}   ref                           Forwarded ref.
  */
 function OffCanvasEditor(
 	{
 		id,
+		parentClientId,
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
+		showAppender = true,
 		LeafMoreMenu,
 		description = __( 'Block navigation structure' ),
 		onSelect,
+		renderAdditionalBlockUI,
 	},
 	ref
 ) {
@@ -80,10 +86,9 @@ function OffCanvasEditor(
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
-	const { visibleBlockCount, shouldShowInnerBlocks, parentId } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
 			const {
-				getBlockRootClientId,
 				getGlobalBlockCount,
 				getClientIdsOfDescendants,
 				__unstableGetEditorMode,
@@ -95,10 +100,6 @@ function OffCanvasEditor(
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
-				parentId:
-					blocks.length > 0
-						? getBlockRootClientId( blocks[ 0 ].clientId )
-						: undefined,
 			};
 		},
 		[ draggedClientIds, blocks ]
@@ -201,6 +202,7 @@ function OffCanvasEditor(
 			expand,
 			collapse,
 			LeafMoreMenu,
+			renderAdditionalBlockUI,
 		} ),
 		[
 			isMounted.current,
@@ -209,6 +211,7 @@ function OffCanvasEditor(
 			expand,
 			collapse,
 			LeafMoreMenu,
+			renderAdditionalBlockUI,
 		]
 	);
 
@@ -232,7 +235,7 @@ function OffCanvasEditor(
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
-							parentId={ parentId }
+							parentId={ parentClientId }
 							blocks={ clientIdsTree }
 							selectBlock={ selectEditorBlock }
 							showBlockMovers={ showBlockMovers }
@@ -240,6 +243,7 @@ function OffCanvasEditor(
 							selectedClientIds={ selectedClientIds }
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							showAppender={ showAppender }
 						/>
 						<TreeGridRow
 							level={ 1 }

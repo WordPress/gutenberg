@@ -342,6 +342,7 @@ test.describe( 'Widgets Customizer', () => {
 		editor,
 		page,
 		widgetsCustomizerPage,
+		pageUtils,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
@@ -368,7 +369,7 @@ test.describe( 'Widgets Customizer', () => {
 		await titleInput.type( 'Hello Title' );
 
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 		const legacyWidgetPreviewFrame = page.frameLocator(
@@ -392,7 +393,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Testing removing the block.
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name=/Remove Legacy Widget/]' );
+		await page.click( 'role=menuitem[name=/Delete/]' );
 
 		// Add it back again using the variant.
 		const testWidgetBlock = await widgetsCustomizerPage.addBlock(
@@ -403,7 +404,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		await titleInput.type( 'Hello again!' );
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		// Expect the preview in block to show when unfocusing the legacy widget block.
 		await expect(

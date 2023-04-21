@@ -97,6 +97,7 @@ function ListViewBranch( props ) {
 		isExpanded,
 		parentId,
 		shouldShowInnerBlocks = true,
+		showAppender: showAppenderProp = true,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -116,8 +117,8 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
-	// Only show the appender at the first level and if there is a parent block.
-	const showAppender = level === 1 && parentId;
+	// Only show the appender at the first level.
+	const showAppender = showAppenderProp && level === 1;
 
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
@@ -205,6 +206,7 @@ function ListViewBranch( props ) {
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
+								showAppender={ showAppenderProp }
 							/>
 						) }
 					</AsyncModeProvider>

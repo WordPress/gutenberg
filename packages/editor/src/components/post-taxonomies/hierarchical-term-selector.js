@@ -9,7 +9,8 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
-	__experimentalVStack as VStack,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -392,11 +393,10 @@ export function HierarchicalTermSelector( { slug } ) {
 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 	return (
-		<>
+		<Flex direction="column" gap="4">
 			{ showFilter && (
 				<TextControl
 					__nextHasNoMarginBottom
-					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
@@ -413,18 +413,20 @@ export function HierarchicalTermSelector( { slug } ) {
 				) }
 			</div>
 			{ ! loading && hasCreateAction && (
-				<Button
-					onClick={ onToggleForm }
-					className="editor-post-taxonomies__hierarchical-terms-add"
-					aria-expanded={ showForm }
-					variant="link"
-				>
-					{ newTermButtonLabel }
-				</Button>
+				<FlexItem>
+					<Button
+						onClick={ onToggleForm }
+						className="editor-post-taxonomies__hierarchical-terms-add"
+						aria-expanded={ showForm }
+						variant="link"
+					>
+						{ newTermButtonLabel }
+					</Button>
+				</FlexItem>
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<VStack>
+					<Flex direction="column" gap="4">
 						<TextControl
 							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
@@ -435,6 +437,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
+								__nextHasNoMarginBottom
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }
@@ -442,17 +445,19 @@ export function HierarchicalTermSelector( { slug } ) {
 								tree={ availableTermsTree }
 							/>
 						) }
-					</VStack>
-					<Button
-						variant="secondary"
-						type="submit"
-						className="editor-post-taxonomies__hierarchical-terms-submit"
-					>
-						{ newTermSubmitLabel }
-					</Button>
+						<FlexItem>
+							<Button
+								variant="secondary"
+								type="submit"
+								className="editor-post-taxonomies__hierarchical-terms-submit"
+							>
+								{ newTermSubmitLabel }
+							</Button>
+						</FlexItem>
+					</Flex>
 				</form>
 			) }
-		</>
+		</Flex>
 	);
 }
 

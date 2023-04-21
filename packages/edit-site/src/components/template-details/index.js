@@ -18,7 +18,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { store as editSiteStore } from '../../store';
-import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
 import { useLink } from '../routes/link';
 import TemplatePartAreaSelector from './template-part-area-selector';
@@ -33,9 +32,6 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	// TODO: We should update this to filter by template part's areas as well.
 	const browseAllLinkProps = useLink( {
-		canvas: 'view',
-		postType: template.type,
-		postId: undefined,
 		path: '/' + template.type + '/all',
 	} );
 
@@ -89,8 +85,6 @@ export default function TemplateDetails( { template, onClose } ) {
 				</div>
 			) }
 
-			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
-
 			{ isTemplateRevertable( template ) && (
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
@@ -110,8 +104,8 @@ export default function TemplateDetails( { template, onClose } ) {
 				{ ...browseAllLinkProps }
 			>
 				{ template?.type === 'wp_template'
-					? __( 'Browse all templates' )
-					: __( 'Browse all template parts' ) }
+					? __( 'Manage all templates' )
+					: __( 'Manage all template parts' ) }
 			</Button>
 		</div>
 	);

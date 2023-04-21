@@ -16,12 +16,7 @@ import {
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
-import { useSetting } from '../components';
-import { cleanEmptyObject } from './utils';
-import {
-	overrideSettingsWithSupports,
-	useSupportedStyles,
-} from '../components/global-styles/hooks';
+import { cleanEmptyObject, useBlockSettings } from './utils';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -32,6 +27,7 @@ function omit( object, keys ) {
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
@@ -41,6 +37,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
@@ -107,58 +104,14 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function useBlockSettings( name ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
-	const fontSizes = useSetting( 'typography.fontSizes' );
-	const customFontSize = useSetting( 'typography.customFontSize' );
-	const fontStyle = useSetting( 'typography.fontStyle' );
-	const fontWeight = useSetting( 'typography.fontWeight' );
-	const lineHeight = useSetting( 'typography.lineHeight' );
-	const textDecoration = useSetting( 'typography.textDecoration' );
-	const textTransform = useSetting( 'typography.textTransform' );
-	const letterSpacing = useSetting( 'typography.letterSpacing' );
-	const supports = useSupportedStyles( name, null );
-
-	return useMemo( () => {
-		const rawSettings = {
-			typography: {
-				fontFamilies: {
-					custom: fontFamilies,
-				},
-				fontSizes: {
-					custom: fontSizes,
-				},
-				customFontSize,
-				fontStyle,
-				fontWeight,
-				lineHeight,
-				textDecoration,
-				textTransform,
-				letterSpacing,
-			},
-		};
-		return overrideSettingsWithSupports( rawSettings, supports );
-	}, [
-		fontFamilies,
-		fontSizes,
-		customFontSize,
-		fontStyle,
-		fontWeight,
-		lineHeight,
-		textDecoration,
-		textTransform,
-		letterSpacing,
-		supports,
-	] );
-}
-
 export function TypographyPanel( {
 	clientId,
 	name,
 	attributes,
 	setAttributes,
+	__unstableParentLayout,
 } ) {
-	const settings = useBlockSettings( name );
+	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo( () => {
 		return attributesToStyle( {
@@ -185,7 +138,6 @@ export function TypographyPanel( {
 		<StylesTypographyPanel
 			as={ TypographyInspectorControl }
 			panelId={ clientId }
-			name={ name }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }

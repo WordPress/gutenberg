@@ -5,7 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	Button,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
@@ -16,12 +16,14 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
+import SidebarButton from '../sidebar-button';
 
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
 	content,
+	description,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -34,31 +36,39 @@ export default function SidebarNavigationScreen( {
 		<VStack spacing={ 2 }>
 			<HStack
 				spacing={ 4 }
-				justify="flex-start"
+				alignment="flex-start"
 				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
 				{ ! isRoot ? (
 					<NavigatorToParentButton
-						className="edit-site-sidebar-navigation-screen__back"
+						as={ SidebarButton }
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						aria-label={ __( 'Back' ) }
 					/>
 				) : (
-					<Button
-						className="edit-site-sidebar-navigation-screen__back"
+					<SidebarButton
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Navigate to the Dashboard' ) }
+						label={ __( 'Go back to the Dashboard' ) }
 						href={ dashboardLink || 'index.php' }
-						label={ __( 'Dashboard' ) }
 					/>
 				) }
-				<h2 className="edit-site-sidebar-navigation-screen__title">
+				<Heading
+					className="edit-site-sidebar-navigation-screen__title"
+					color={ 'white' }
+					level={ 2 }
+					size={ 20 }
+				>
 					{ title }
-				</h2>
+				</Heading>
 				{ actions }
 			</HStack>
 
 			<nav className="edit-site-sidebar-navigation-screen__content">
+				{ description && (
+					<p className="edit-site-sidebar-navigation-screen__description">
+						{ description }
+					</p>
+				) }
 				{ content }
 			</nav>
 		</VStack>

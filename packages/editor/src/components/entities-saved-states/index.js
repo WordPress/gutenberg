@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
@@ -83,7 +78,14 @@ export default function EntitiesSavedStates( { close } ) {
 		useDispatch( noticesStore );
 
 	// To group entities by type.
-	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+		const { name } = record;
+		if ( ! acc[ name ] ) {
+			acc[ name ] = [];
+		}
+		acc[ name ].push( record );
+		return acc;
+	}, {} );
 
 	// Sort entity groups.
 	const {

@@ -169,6 +169,12 @@ export interface FormTokenFieldProps
 	 * Custom renderer for suggestions.
 	 */
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
+	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @default false
+	 */
+	__nextHasNoMarginBottom?: boolean;
 }
 
 /**

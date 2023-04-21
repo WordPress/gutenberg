@@ -219,7 +219,7 @@ test.describe( 'Image', () => {
 
 		// Add caption and navigate to inline toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
@@ -327,12 +327,12 @@ test.describe( 'Image', () => {
 			page.locator( 'role=slider[name="Zoom"i]' )
 		).toBeFocused();
 
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Zoom"i]' )
 		).toBeFocused();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.type( '200' );
 		await page.keyboard.press( 'Escape' );
 		await editor.clickBlockToolbarButton( 'Apply' );
@@ -530,7 +530,7 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 		await page.focus( '.wp-block-image' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a
 		// broken temporary URL.
