@@ -23,7 +23,6 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		},
 		[ attributes.slug, clientId ]
 	);
-
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -53,7 +52,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
-	return <> { innerBlocksProps.children } </>;
+	return <div { ...innerBlocksProps }> { innerBlocksProps.children } </div>;
 };
 
 export default PatternEdit;
