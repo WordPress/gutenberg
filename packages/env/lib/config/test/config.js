@@ -853,6 +853,14 @@ describe( 'readConfig', () => {
 			}
 		} );
 
+		it( 'should not throw an error if just port is passed', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( { port: 10 } ) )
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.port ).toBe( 10 );
+		} );
+
 		it( 'should parse custom ports', async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve(
