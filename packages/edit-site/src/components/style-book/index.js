@@ -201,7 +201,6 @@ function StyleBook( { isSelected, onSelect } ) {
 					color: textColor,
 					background: backgroundColor,
 				} }
-				aria-label={ __( 'Style Book' ) }
 			>
 				{ resizeObserver }
 				<TabPanel

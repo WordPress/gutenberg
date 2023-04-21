@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, useState } from '@wordpress/element';
+import { Children, cloneElement, useState, useMemo } from '@wordpress/element';
 import { createSlotFill, Button } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 
@@ -25,7 +25,7 @@ import { store as editSiteStore } from '../../store';
 export function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
-			return __( 'Style book' );
+			return __( 'Style Book' );
 		default:
 			return '';
 	}
@@ -40,13 +40,21 @@ function EditorCanvasContainer( {
 	closeButtonLabel,
 	onClose = () => {},
 } ) {
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	const [ isClosed, setIsClosed ] = useState( false );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
-
+	const title = useMemo(
+		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
+		[ editorCanvasContainerView ]
+	);
 	function onCloseContainer() {
 		onClose();
 		setEditorCanvasContainerView( 'init' );
@@ -78,11 +86,12 @@ function EditorCanvasContainer( {
 
 	return (
 		<EditorCanvasContainerFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<section
 				className="edit-site-editor-canvas-container"
 				ref={ focusOnMountRef }
 				onKeyDown={ closeOnEscape }
+				aria-label={ title }
 			>
 				<Button
 					className="edit-site-editor-canvas-container__close-button"
