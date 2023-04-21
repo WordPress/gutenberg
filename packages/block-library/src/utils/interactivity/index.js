@@ -8,9 +8,7 @@ export { store } from './store';
 /**
  * Initialize the Interactivity API.
  */
-window.addEventListener( 'DOMContentLoaded', () => {
-	registerDirectives();
-	hydrate();
-	// eslint-disable-next-line no-console
-	console.log( 'Interactivity API started' );
-} );
+registerDirectives();
+hydrate();
+// eslint-disable-next-line no-console
+console.log( 'Interactivity API started' );
