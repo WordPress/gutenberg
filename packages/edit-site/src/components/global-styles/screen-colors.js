@@ -139,7 +139,7 @@ function HeadingColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
 	const supports = useSupportedStyles( name );
-	const hasSupport = supports.includes( 'color' );
+	const hasSupport = supports.includes( 'headingColor' );
 	const [ color ] = useGlobalStyle(
 		prefix + 'elements.heading.color.text',
 		name
