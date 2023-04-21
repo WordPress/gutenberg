@@ -14,18 +14,8 @@
  * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content ) {
-	wp_enqueue_script(
-		'interactivity-image',
-		plugins_url('../interactive-blocks/image.min.js', __FILE__ ),
-		array( 'interactivity-runtime' )
-	);
-
 	$processor = new WP_HTML_Tag_Processor( $content );
-	$processor->next_tag( 'figure' );
-	$processor->set_attribute( 'data-wp-island', '' );
-	$processor->set_attribute( 'data-wp-context', '{ "text": "image hydrated" }' );
 	$processor->next_tag( 'img' );
-	$processor->set_attribute( 'data-wp-effect', 'effects.alert' );
 
 	if ( $processor->get_attribute( 'src' ) === null ) {
 		return '';
@@ -37,10 +27,8 @@ function render_block_core_image( $attributes, $content ) {
 		// which now wraps Image Blocks within innerBlocks.
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
+		$content = $processor->get_updated_html();
 	}
-
-	$content = $processor->get_updated_html();
-
 	return $content;
 }
 
