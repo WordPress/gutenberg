@@ -60,14 +60,14 @@ const Edit = ( props ) => {
 					position="bottom center"
 				>
 					<TextControl
-						label={ __( 'Lang attribute' ) }
+						label={ title }
 						value={ lang }
 						onChange={ ( val ) => setLang( val ) }
 					/>
 					<p className="lang-attribute-info">
 						<em>
 							{ __(
-								'Should be a valid lang attribute, like "en" or "fr".'
+								'A valid language attribute, like "en" or "fr".'
 							) }
 						</em>
 					</p>
