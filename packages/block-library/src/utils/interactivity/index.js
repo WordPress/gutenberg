@@ -3,15 +3,14 @@
  */
 import registerDirectives from './directives';
 import { init } from './hydration';
+export { store } from './store';
 
 /**
  * Initialize the Interactivity API.
  */
-export default () => {
-	window.addEventListener( 'DOMContentLoaded', () => {
-		registerDirectives();
-		init();
-		// eslint-disable-next-line no-console
-		console.log( 'hydrated!' );
-	} );
-};
+window.addEventListener( 'DOMContentLoaded', () => {
+	registerDirectives();
+	init();
+	// eslint-disable-next-line no-console
+	console.log( 'Interactivity API started' );
+} );
