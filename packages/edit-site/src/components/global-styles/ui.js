@@ -225,7 +225,7 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
-				<ScreenCSS name={ name } />
+				<ScreenCSS name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (

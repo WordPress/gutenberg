@@ -75,6 +75,9 @@ function ContextMenu( { name, parentMenu = '' } ) {
 		parentMenu.includes( 'blocks' ) &&
 		! parentMenu.includes( 'variations' );
 
+	const isVariationsPanel =
+		parentMenu.includes( 'blocks' ) && parentMenu.includes( 'variations' );
+
 	return (
 		<>
 			<ItemGroup>
@@ -135,23 +138,38 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				{ hasVariationsPanel && (
 					<ScreenVariations name={ name } path={ parentMenu } />
 				) }
-				{ isBlocksPanel && canEditCSS && (
+				{ ( isBlocksPanel || isVariationsPanel ) && canEditCSS && (
 					<>
 						<CardDivider />
 						<CardBody>
 							<Spacer as="p" paddingTop={ 2 } marginBottom={ 4 }>
-								{ __(
-									'Add your own CSS to customize the block appearance.'
-								) }
+								{ isVariationsPanel &&
+									__(
+										'Add your own CSS to customize the style variation.'
+									) }
+								{ isBlocksPanel &&
+									__(
+										'Add your own CSS to customize the block appearance.'
+									) }
 							</Spacer>
 							<ItemGroup>
 								<NavigationButtonAsItem
 									path={ parentMenu + '/css' }
-									aria-label={ __( 'Additional block CSS' ) }
+									aria-label={
+										!! isVariationsPanel
+											? __(
+													'Additional style variation CSS'
+											  )
+											: !! __( 'Additional block CSS' )
+									}
 								>
 									<HStack justify="space-between">
 										<FlexItem>
-											{ __( 'Additional block CSS' ) }
+											{ !! isVariationsPanel
+												? __(
+														'Additional style variation CSS'
+												  )
+												: __( 'Additional block CSS' ) }
 										</FlexItem>
 										<IconWithCurrentColor
 											icon={

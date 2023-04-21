@@ -11,21 +11,31 @@ import { getBlockType } from '@wordpress/blocks';
 import ScreenHeader from './header';
 import CustomCSSControl from './custom-css';
 
-function ScreenCSS( { name } ) {
+function ScreenCSS( { name, variation } ) {
 	// If name is defined, we are customizing CSS at the block level.
 	// Display the block title in the description.
 	const blockType = getBlockType( name );
-	const title = blockType?.title;
+
+	const title = variation
+		? sprintf(
+				// translators: %1$s: is the name of a block e.g., 'Image' or 'Table'. %2$s: is the name of a block variation e.g., 'Rounded' or 'Outline'.
+				__(
+					'Add your own CSS to customize the appearance of the %1$s block when using the %2$s variation.'
+				),
+				blockType?.title,
+				variation
+		  )
+		: sprintf(
+				// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+				__(
+					'Add your own CSS to customize the appearance of the %s block.'
+				),
+				blockType?.title
+		  );
 
 	const description =
 		title !== undefined
-			? sprintf(
-					// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-					__(
-						'Add your own CSS to customize the appearance of the %s block.'
-					),
-					title
-			  )
+			? title
 			: __(
 					'Add your own CSS to customize the appearance and layout of your site.'
 			  );
@@ -47,7 +57,7 @@ function ScreenCSS( { name } ) {
 				}
 			/>
 			<div className="edit-site-global-styles-screen-css">
-				<CustomCSSControl blockName={ name } />
+				<CustomCSSControl blockName={ name } variation={ variation } />
 			</div>
 		</>
 	);
