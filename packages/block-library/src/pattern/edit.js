@@ -7,9 +7,11 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 	useInnerBlocksProps,
+	BlockControls,
 } from '@wordpress/block-editor';
+import { ToolbarButton } from '@wordpress/components';
 
-const PatternEdit = ( { attributes, clientId } ) => {
+const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -52,7 +54,18 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
-	return <div { ...innerBlocksProps }> { innerBlocksProps.children } </div>;
+	return (
+		<>
+			<div { ...innerBlocksProps } />
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => setAttributes( { unsynced: true } ) }
+				>
+					Unsync
+				</ToolbarButton>
+			</BlockControls>
+		</>
+	);
 };
 
 export default PatternEdit;

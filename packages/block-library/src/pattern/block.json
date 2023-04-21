@@ -13,6 +13,10 @@
 	"attributes": {
 		"slug": {
 			"type": "string"
+		},
+		"unsynced": {
+			"type": "boolean",
+			"default": false
 		}
 	}
 }
