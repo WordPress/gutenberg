@@ -11,10 +11,11 @@ import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
 import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-utils';
 
-// This utility is intended to assist where the serialization of the typography
-// block support is being skipped for a block but the typography related CSS
-// styles still need to be generated so they can be applied to inner elements.
-
+/*
+ * This utility is intended to assist where the serialization of the typography
+ * block support is being skipped for a block but the typography related CSS
+ * styles still need to be generated so they can be applied to inner elements.
+ */
 /**
  * Provides the CSS class names and inline styles for a block's typography support
  * attributes.
