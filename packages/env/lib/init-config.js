@@ -84,14 +84,34 @@ module.exports = async function initConfig( {
 		await writeFile(
 			path.resolve( config.workDirectoryPath, 'WordPress.Dockerfile' ),
 			wordpressDockerFileContents(
-				dockerComposeConfig.services.wordpress.image,
+				getBaseDockerImage( config.env.development.phpVersion, false ),
+				config
+			)
+		);
+		await writeFile(
+			path.resolve(
+				config.workDirectoryPath,
+				'Tests-WordPress.Dockerfile'
+			),
+			wordpressDockerFileContents(
+				getBaseDockerImage( config.env.tests.phpVersion, false ),
 				config
 			)
 		);
 
 		await writeFile(
 			path.resolve( config.workDirectoryPath, 'CLI.Dockerfile' ),
-			cliDockerFileContents( dockerComposeConfig.services.cli.image )
+			cliDockerFileContents(
+				getBaseDockerImage( config.env.development.phpVersion, true ),
+				config
+			)
+		);
+		await writeFile(
+			path.resolve( config.workDirectoryPath, 'Tests-CLI.Dockerfile' ),
+			cliDockerFileContents(
+				getBaseDockerImage( config.env.tests.phpVersion, true ),
+				config
+			)
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
@@ -102,6 +122,29 @@ module.exports = async function initConfig( {
 
 	return config;
 };
+
+/**
+ * Gets the base docker image to use based on our input.
+ *
+ * @param {string}  phpVersion The version of PHP to get an image for.
+ * @param {boolean} isCLI      Indicates whether or not the image is for a CLI.
+ * @return {string} The Docker image to use.
+ */
+function getBaseDockerImage( phpVersion, isCLI ) {
+	// We can rely on a consistent format for PHP versions.
+	if ( phpVersion ) {
+		phpVersion = ( isCLI ? '-' : ':' ) + 'php' + phpVersion;
+	} else {
+		phpVersion = '';
+	}
+
+	let wordpressImage = 'wordpress';
+	if ( isCLI ) {
+		wordpressImage += ':cli';
+	}
+
+	return wordpressImage + phpVersion;
+}
 
 /**
  * Checks the configured PHP version

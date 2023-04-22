@@ -160,48 +160,23 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	const developmentPhpVersion = config.env.development.phpVersion
-		? config.env.development.phpVersion
-		: '';
-	const testsPhpVersion = config.env.tests.phpVersion
-		? config.env.tests.phpVersion
-		: '';
-
-	// Set the WordPress images with the PHP version tag.
-	const developmentWpImage = `wordpress${
-		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
-	}`;
-	const testsWpImage = `wordpress${
-		testsPhpVersion ? ':php' + testsPhpVersion : ''
-	}`;
-	// Set the WordPress CLI images with the PHP version tag.
-	const developmentWpCliImage = `wordpress:cli${
-		! developmentPhpVersion || developmentPhpVersion.length === 0
-			? ''
-			: '-php' + developmentPhpVersion
-	}`;
-	const testsWpCliImage = `wordpress:cli${
-		! testsPhpVersion || testsPhpVersion.length === 0
-			? ''
-			: '-php' + testsPhpVersion
-	}`;
-
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.
 	// PHP Unit is assumed to be for Tests so use the testsPhpVersion.
 	let phpunitTag = 'latest';
-	const phpunitPhpVersion = '-php-' + testsPhpVersion + '-fpm';
-	if ( testsPhpVersion === '5.6' ) {
+	const phpunitPhpVersion = '-php-' + config.env.tests.phpVersion + '-fpm';
+	if ( config.env.tests.phpVersion === '5.6' ) {
 		phpunitTag = '5' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.0' ) {
+	} else if ( config.env.tests.phpVersion === '7.0' ) {
 		phpunitTag = '6' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.1' ) {
+	} else if ( config.env.tests.phpVersion === '7.1' ) {
 		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.2' ) {
+	} else if ( config.env.tests.phpVersion === '7.2' ) {
 		phpunitTag = '8' + phpunitPhpVersion;
 	} else if (
-		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf( testsPhpVersion ) >= 0
+		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf(
+			config.env.tests.phpVersion
+		) >= 0
 	) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
@@ -238,6 +213,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
+				depends_on: [ 'mysql' ],
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -247,8 +223,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 						HOST_GID: hostUser.gid,
 					},
 				},
-				depends_on: [ 'mysql' ],
-				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
@@ -261,7 +235,15 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-wordpress': {
 				depends_on: [ 'tests-mysql' ],
-				image: testsWpImage,
+				build: {
+					context: '.',
+					dockerfile: 'Tests-WordPress.Dockerfile',
+					args: {
+						HOST_USERNAME: hostUser.name,
+						HOST_UID: hostUser.uid,
+						HOST_GID: hostUser.gid,
+					},
+				},
 				ports: [ testsPorts ],
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
@@ -273,6 +255,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: testsMounts,
 			},
 			cli: {
+				depends_on: [ 'wordpress' ],
 				build: {
 					context: '.',
 					dockerfile: 'CLI.Dockerfile',
@@ -282,8 +265,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 						HOST_GID: hostUser.gid,
 					},
 				},
-				depends_on: [ 'wordpress' ],
-				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: hostUser.fullUser,
 				environment: {
@@ -294,7 +275,15 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: testsWpCliImage,
+				build: {
+					context: '.',
+					dockerfile: 'Tests-CLI.Dockerfile',
+					args: {
+						HOST_USERNAME: hostUser.name,
+						HOST_UID: hostUser.uid,
+						HOST_GID: hostUser.gid,
+					},
+				},
 				volumes: testsMounts,
 				user: hostUser.fullUser,
 				environment: {

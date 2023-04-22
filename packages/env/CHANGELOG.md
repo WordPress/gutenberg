@@ -10,6 +10,9 @@
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
 between the host, web container, and cli container.
 
+### Bug fix
+
+-   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
 
 ## 5.16.0 (2023-04-12)
 
