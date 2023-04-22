@@ -73,12 +73,12 @@ const wpOrgTests = [
 	},
 	{
 		sourceString: 'wp.org/gutenberg',
-		url: 'https://downloads.wordpress.org/plugins/gutenberg.zip',
+		url: 'https://downloads.wordpress.org/plugin/gutenberg.zip',
 		sourceType: 'plugin',
 	},
 	{
 		sourceString: 'wp.org/gutenberg.15.0.0',
-		url: 'https://downloads.wordpress.org/plugins/gutenberg.15.0.0.zip',
+		url: 'https://downloads.wordpress.org/plugin/gutenberg.15.0.0.zip',
 		sourceType: 'plugin',
 	},
 	{
