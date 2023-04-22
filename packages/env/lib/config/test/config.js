@@ -829,11 +829,15 @@ describe( 'readConfig', () => {
 	describe( 'port number parsing', () => {
 		it( 'should throw a validaton error if the ports are not numbers', async () => {
 			expect.assertions( 10 );
-			await testPortNumberValidation( 'port', 'string' );
+			await testPortNumberValidation(
+				'port',
+				'string',
+				'env.development.'
+			);
 			await testPortNumberValidation( 'testsPort', [], 'env.tests.' );
-			await testPortNumberValidation( 'port', {} );
+			await testPortNumberValidation( 'port', {}, 'env.development.' );
 			await testPortNumberValidation( 'testsPort', false, 'env.tests.' );
-			await testPortNumberValidation( 'port', null );
+			await testPortNumberValidation( 'port', null, 'env.development.' );
 		} );
 
 		it( 'should throw a validaton error if the ports are the same', async () => {
