@@ -59,3 +59,47 @@ describe.each( gitTests )( 'parseSourceString', ( source ) => {
 		expect( basename ).toBe( source.basename );
 	} );
 } );
+
+const wpOrgTests = [
+	{
+		sourceString: 'wp.org/latest',
+		url: 'https://wordpress.org/latest.zip',
+		sourceType: 'core',
+	},
+	{
+		sourceString: 'wp.org/wordpress-6.2',
+		url: 'https://wordpress.org/wordpress-6.2.zip',
+		sourceType: 'core',
+	},
+	{
+		sourceString: 'wp.org/gutenberg',
+		url: 'https://downloads.wordpress.org/plugins/gutenberg.zip',
+		sourceType: 'plugin',
+	},
+	{
+		sourceString: 'wp.org/gutenberg.15.0.0',
+		url: 'https://downloads.wordpress.org/plugins/gutenberg.15.0.0.zip',
+		sourceType: 'plugin',
+	},
+	{
+		sourceString: 'wp.org/twentytwentytwo',
+		url: 'https://downloads.wordpress.org/theme/twentytwentytwo.zip',
+		sourceType: 'theme',
+	},
+	{
+		sourceString: 'wp.org/twentytwentytwo.1.0',
+		url: 'https://downloads.wordpress.org/theme/twentytwentytwo.1.0.zip',
+		sourceType: 'theme',
+	},
+];
+
+describe.each( wpOrgTests )( 'parseSourceString', ( source ) => {
+	it( `parses ${ source.sourceString }`, () => {
+		const { type, url } = parseSourceString( source.sourceString, {
+			...parseSourceStringOptions,
+			sourceType: source.sourceType,
+		} );
+		expect( type ).toBe( 'zip' );
+		expect( url ).toBe( source.url );
+	} );
+} );

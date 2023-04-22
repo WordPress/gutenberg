@@ -260,7 +260,10 @@ function withOverrides( config ) {
 	// Override WordPress core with environment variable.
 	if ( process.env.WP_ENV_CORE ) {
 		const coreSource = includeTestsPath(
-			parseSourceString( process.env.WP_ENV_CORE, { workDirectoryPath } ),
+			parseSourceString( process.env.WP_ENV_CORE, {
+				workDirectoryPath,
+				sourceType: 'core',
+			} ),
 			{ workDirectoryPath }
 		);
 		config.env.development.coreSource = coreSource;

@@ -38,14 +38,23 @@ module.exports = async function parseConfig( config, options ) {
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
-			await parseCoreSource( config.core, options ),
+			await parseCoreSource( config.core, {
+				...options,
+				sourceType: 'core',
+			} ),
 			options
 		),
 		pluginSources: config.plugins.map( ( sourceString ) =>
-			parseSourceString( sourceString, options )
+			parseSourceString( sourceString, {
+				...options,
+				sourceType: 'plugin',
+			} )
 		),
 		themeSources: config.themes.map( ( sourceString ) =>
-			parseSourceString( sourceString, options )
+			parseSourceString( sourceString, {
+				...options,
+				sourceType: 'theme',
+			} )
 		),
 		config: config.config,
 		mappings: Object.entries( config.mappings ).reduce(
@@ -77,13 +86,14 @@ async function parseCoreSource( coreSource, options ) {
 /**
  * Parses a source string into a source object.
  *
- * @param {?string} sourceString              The source string. See README.md for documentation on valid source string patterns.
- * @param {Object}  options
- * @param {string}  options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {?string}                           sourceString              The source string. See README.md for documentation on valid source string patterns.
+ * @param {Object}                            options
+ * @param {string}                            options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {'core'|'plugin'|'theme'|undefined} options.sourceType        The type of source.
  *
  * @return {?WPSource} A source object.
  */
-function parseSourceString( sourceString, { workDirectoryPath } ) {
+function parseSourceString( sourceString, { workDirectoryPath, sourceType } ) {
 	if ( sourceString === null ) {
 		return null;
 	}
@@ -106,6 +116,23 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		return {
 			type: 'local',
 			path: sourcePath,
+			basename,
+		};
+	}
+
+	// Allow shortcut for .zip sources on WordPress.org.
+	const wpOrgShortSource = sourceString.match( /^wp.org\/(.*)/ );
+	if ( wpOrgShortSource ) {
+		const basename = encodeURIComponent( wpOrgShortSource[ 1 ] );
+		const url =
+			sourceType === 'core'
+				? `https://wordpress.org/${ basename }.zip`
+				: `https://downloads.wordpress.org/${ sourceType }/${ basename }.zip`;
+
+		return {
+			type: 'zip',
+			url,
+			path: path.resolve( workDirectoryPath, basename ),
 			basename,
 		};
 	}
