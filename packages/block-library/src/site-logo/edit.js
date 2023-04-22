@@ -602,8 +602,7 @@ export default function LogoEdit( {
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button onClick={ open }>
-											{ isLoading && <Spinner /> }
-											{ ! isLoading && label }
+											{ isLoading ? <Spinner /> : label }
 										</Button>
 										<DropZone onFilesDrop={ onFilesDrop } />
 									</div>
