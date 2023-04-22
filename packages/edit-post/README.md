@@ -306,8 +306,8 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.order_ `[number]`: An optional order value for the row Fill order. Default is 10.
 -   _props.children_ `WPElement`: Children to be rendered.
--   _props.priority_ `number`: An optional priority value for the row Fill order. Default is 10.
 
 _Returns_
 

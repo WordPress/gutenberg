@@ -27,7 +27,7 @@ import PostURL from '../post-url';
 
 function One() {
 	return (
-		<PluginPostStatusInfoFill priority={ 1 }>
+		<PluginPostStatusInfoFill order={ 1 }>
 			<div>One</div>
 		</PluginPostStatusInfoFill>
 	);
@@ -35,7 +35,7 @@ function One() {
 
 function Two() {
 	return (
-		<PluginPostStatusInfoFill priority={ 2 }>
+		<PluginPostStatusInfoFill order={ 2 }>
 			<div>Two</div>
 		</PluginPostStatusInfoFill>
 	);
@@ -43,7 +43,7 @@ function Two() {
 
 function Three() {
 	return (
-		<PluginPostStatusInfoFill priority={ 3 }>
+		<PluginPostStatusInfoFill order={ 3 }>
 			<div>Three</div>
 		</PluginPostStatusInfoFill>
 	);
@@ -51,7 +51,7 @@ function Three() {
 
 function Four() {
 	return (
-		<PluginPostStatusInfoFill priority={ 4 }>
+		<PluginPostStatusInfoFill order={ 4 }>
 			<div>Four</div>
 		</PluginPostStatusInfoFill>
 	);
@@ -64,14 +64,14 @@ const PANEL_NAME = 'post-status';
 
 const PostStatusTrashFill = () => {
 	return (
-		<PluginPostStatusInfoFill priority={ 99 }>
+		<PluginPostStatusInfoFill order={ 99 }>
 			<PostTrash />
 		</PluginPostStatusInfoFill>
 	);
 };
 const PostStatusInfoFill = () => {
 	return (
-		<PluginPostStatusInfoFill priority={ 2 }>
+		<PluginPostStatusInfoFill order={ 2 }>
 			<PostVisibility />
 			<PostSchedule />
 			<PostTemplate />

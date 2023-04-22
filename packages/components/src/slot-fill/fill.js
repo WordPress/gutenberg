@@ -14,7 +14,7 @@ import useSlot from './use-slot';
 function FillComponent( {
 	name,
 	children,
-	priority,
+	order,
 	registerFill,
 	unregisterFill,
 } ) {
@@ -23,7 +23,7 @@ function FillComponent( {
 	const ref = useRef( {
 		name,
 		children,
-		priority,
+		order,
 	} );
 
 	useLayoutEffect( () => {

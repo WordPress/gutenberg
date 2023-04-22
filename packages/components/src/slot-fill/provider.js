@@ -56,7 +56,7 @@ export default class SlotFillProvider extends Component {
 	}
 
 	registerFill( name, instance ) {
-		instance.priority = instance?.priority ? instance.priority : 10;
+		instance.order = instance?.order ? instance.order : 10;
 
 		this.fills[ name ] = this.reorderFills( [
 			...( this.fills[ name ] || [] ),
@@ -67,13 +67,13 @@ export default class SlotFillProvider extends Component {
 	}
 
 	/**
-	 * Reorder an array based on a key named priority.
+	 * Reorder an array based on a key named order.
 	 *
 	 * @param { Array } fills - The array of fills to reorder.
 	 * @return { Array } fills - The reordered array of fills.
 	 */
 	reorderFills( fills ) {
-		return fills.sort( ( a, b ) => a.priority - b.priority );
+		return fills.sort( ( a, b ) => a.order - b.order );
 	}
 
 	unregisterSlot( name, instance ) {

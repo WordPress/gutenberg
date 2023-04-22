@@ -58,9 +58,9 @@ function useSlotRegistry() {
 
 	const registerFill = useCallback( ( name, ref ) => {
 		const slot = slots.current.get( name );
-		ref.current.priority = ref.current.priority ?? 10;
+		ref.current.order = ref.current.order ?? 10;
 		const newRef = [ ...( fills.current.get( name ) || [] ), ref ].sort(
-			( a, b ) => a.current.priority - b.current.priority
+			( a, b ) => a.current.order - b.current.order
 		);
 		fills.current.set( name, valRef( newRef ) );
 		slot?.fillProps?.rerenderSlot();
