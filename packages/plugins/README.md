@@ -141,7 +141,6 @@ const Component = () => (
 registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
-	scope: 'my-page',
 } );
 ```
 
