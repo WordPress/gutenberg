@@ -220,10 +220,8 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+z' );
-		const visibleResult = await page.evaluate(
-			() => document.activeElement.innerHTML
-		);
-		expect( visibleResult ).toBe( 'test' );
+		const activeElementLocator = page.locator( ':focus' );
+		await expect( activeElementLocator ).toHaveText( 'test' );
 	} );
 
 	test( 'Should undo/redo to expected level intervals', async ( {
@@ -417,10 +415,8 @@ test.describe( 'undo', () => {
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const visibleContent = await page.evaluate(
-			() => document.activeElement.textContent
-		);
-		expect( visibleContent ).toBe( 'original' );
+		const activeElementLocator = page.locator( ':focus' );
+		await expect( activeElementLocator ).toHaveText( 'original' );
 	} );
 
 	test( 'should not create undo levels when saving', async ( {
