@@ -507,7 +507,10 @@ test.describe( 'undo', () => {
 		await editor.publishPost();
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
-		await page.click( '.editor-history__redo[aria-disabled="false"]' );
+		await expect(
+			page.locator( 'role=button[name="Redo"]' )
+		).not.toBeDisabled();
+		await page.click( 'role=button[name="Redo"]' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>tonis</p>
