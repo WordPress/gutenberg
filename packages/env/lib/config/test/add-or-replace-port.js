@@ -4,7 +4,7 @@
 const addOrReplacePort = require( '../add-or-replace-port.js' );
 
 describe( 'addOrReplacePort', () => {
-	beforeEach( () => {
+	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 

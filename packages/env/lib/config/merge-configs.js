@@ -60,8 +60,8 @@ function mergeConfig( config, toMerge ) {
 			case 'config':
 			case 'mappings': {
 				config[ option ] = Object.assign(
-					...config[ option ],
-					...toMerge[ option ]
+					config[ option ],
+					toMerge[ option ]
 				);
 				break;
 			}

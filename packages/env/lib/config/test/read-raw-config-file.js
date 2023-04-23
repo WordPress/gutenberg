@@ -1,3 +1,4 @@
+'use strict';
 /* eslint-disable jest/no-conditional-expect */
 /**
  * External dependencies
@@ -17,7 +18,7 @@ jest.mock( 'fs', () => ( {
 } ) );
 
 describe( 'readRawConfigFile', () => {
-	beforeEach( () => {
+	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 

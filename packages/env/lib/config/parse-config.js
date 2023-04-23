@@ -84,7 +84,7 @@ module.exports = async function parseConfig( configDirectoryPath ) {
 	// infer the project type when there is no local
 	// config file present to use.
 	const defaultConfig = await getDefaultConfig( configDirectoryPath, {
-		shouldInferType: ! localConfig,
+		shouldInferType: !! localConfig,
 		cacheDirectoryPath,
 	} );
 
