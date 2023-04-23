@@ -76,24 +76,27 @@ function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
 		return;
 	}
 
-	if ( typeof obj !== 'object' ) {
+	if ( allowTypes === undefined ) {
+		allowTypes = [];
+	}
+
+	if ( typeof obj !== 'object' || Array.isArray( obj ) ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be an object.`
 		);
 	}
 
-	if ( ! allowTypes ) {
-		return;
-	}
-
 	for ( const key in obj ) {
 		if ( ! obj[ key ] && ! allowTypes.includes( 'empty' ) ) {
 			throw new ValidationError(
-				`Invalid ${ configFile }: "${ configKey }.${ key }" must not be empty..`
+				`Invalid ${ configFile }: "${ configKey }.${ key }" must not be empty.`
 			);
 		}
 
-		if ( ! allowTypes.includes( typeof obj[ key ] ) ) {
+		// Identify arrays uniquely.
+		const type = Array.isArray( obj[ key ] ) ? 'array' : typeof obj[ key ];
+
+		if ( ! allowTypes.includes( type ) ) {
 			throw new ValidationError(
 				`Invalid ${ configFile }: "${ configKey }.${ key }" must be a ${ allowTypes.join(
 					' or '
@@ -121,9 +124,9 @@ function checkVersion( configFile, configKey, version ) {
 		);
 	}
 
-	if ( ! version.match( /[0-9]+\.[0-9]+/ ) ) {
+	if ( ! version.match( /[0-9]+(?:\.[0-9]+)*/ ) ) {
 		throw new ValidationError(
-			`Invalid ${ configFile }: "${ configKey }" must be a string of the format "0.0".`
+			`Invalid ${ configFile }: "${ configKey }" must be a string of the format "X", "X.X", or "X.X.X".`
 		);
 	}
 }
@@ -142,7 +145,7 @@ function checkValidURL( configFile, configKey, url ) {
 
 	try {
 		new URL( url );
-	} catch {
+	} catch ( e ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a valid URL.`
 		);

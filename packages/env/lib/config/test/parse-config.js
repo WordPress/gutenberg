@@ -90,7 +90,7 @@ describe( 'parseConfig', () => {
 	it( 'should return default config', async () => {
 		const parsed = await parseConfig( './' );
 
-		expect( parsed ).toMatchObject( DEFAULT_CONFIG );
+		expect( parsed ).toEqual( DEFAULT_CONFIG );
 	} );
 
 	it( 'should merge configs with precedence', async () => {
@@ -131,15 +131,18 @@ describe( 'parseConfig', () => {
 			coreSource: {
 				basename: 'WordPress',
 				path: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+				clonePath: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+				ref: 'Test',
 				testsPath:
 					'/test/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+				url: 'https://github.com/WordPress/WordPress.git',
 				type: 'git',
 			},
 			phpVersion: '2.0',
 		};
 		expected.env.development.port = 1234;
 		expected.env.tests.port = 1011;
-		expect( parsed ).toMatchObject( expected );
+		expect( parsed ).toEqual( expected );
 	} );
 
 	it( 'should override with environment variables', async () => {
@@ -150,23 +153,57 @@ describe( 'parseConfig', () => {
 
 		const parsed = await parseConfig( './' );
 
-		const expected = {
+		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
 			port: 123,
 			testsPort: 456,
 			coreSource: {
 				basename: 'WordPress',
 				path: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+				clonePath: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+				ref: 'test',
 				testsPath:
 					'/test/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+				url: 'https://github.com/WordPress/WordPress.git',
 				type: 'git',
 			},
 			phpVersion: '3.0',
-		};
-		expected.env.development.port = 123;
-		expected.env.development.phpVersion = '3.0';
-		expected.env.tests.port = 456;
-		expected.env.tests.phpVersion = '3.0';
-		expect( parsed ).toMatchObject( expected );
+			env: {
+				development: {
+					port: 123,
+					phpVersion: '3.0',
+					coreSource: {
+						basename: 'WordPress',
+						path: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+						clonePath:
+							'/test/0afa32312977c8e3510775b85c20017d/WordPress',
+						ref: 'test',
+						testsPath:
+							'/test/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+						url: 'https://github.com/WordPress/WordPress.git',
+						type: 'git',
+					},
+				},
+				tests: {
+					port: 456,
+					phpVersion: '3.0',
+					coreSource: {
+						basename: 'WordPress',
+						path: '/test/0afa32312977c8e3510775b85c20017d/WordPress',
+						clonePath:
+							'/test/0afa32312977c8e3510775b85c20017d/WordPress',
+						ref: 'test',
+						testsPath:
+							'/test/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+						url: 'https://github.com/WordPress/WordPress.git',
+						type: 'git',
+					},
+					config: {
+						WP_DEBUG: false,
+						SCRIPT_DEBUG: false,
+					},
+				},
+			},
+		} );
 	} );
 } );
