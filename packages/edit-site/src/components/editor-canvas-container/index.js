@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { Children, cloneElement, useState, useMemo } from '@wordpress/element';
-import { createSlotFill, Button } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -31,9 +34,11 @@ export function getEditorCanvasContainerTitle( view ) {
 	}
 }
 
+// Creates a private slot fill.
+const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const SLOT_FILL_NAME = 'EditSiteEditorCanvasContainerSlot';
 const { Slot: EditorCanvasContainerSlot, Fill: EditorCanvasContainerFill } =
-	createSlotFill( SLOT_FILL_NAME );
+	createPrivateSlotFill( SLOT_FILL_NAME );
 
 function EditorCanvasContainer( {
 	children,
