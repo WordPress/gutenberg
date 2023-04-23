@@ -72,13 +72,12 @@ module.exports = async function readConfig( configPath ) {
 	// The specified base configuration from .wp-env.json or from the local
 	// source type which was automatically detected.
 	const baseConfig =
-		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
+		( await readRawConfigFile( configPath ) ) ||
 		( await getDefaultBaseConfig( configPath ) );
 
 	// Overriden .wp-env.json on a per-user case.
 	const overrideConfig =
 		( await readRawConfigFile(
-			'.wp-env.override.json',
 			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
 		) ) || {};
 

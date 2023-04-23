@@ -6,9 +6,9 @@ const { ValidationError } = require( './validate-config' );
 const dbEnv = require( './db-env' );
 
 /**
- * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
- * @typedef {import('./config').WPSource} WPSource
+ * @typedef {import('./parse-config').WPConfig} WPConfig
+ * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./parse-source-string').WPSource} WPSource
  */
 
 module.exports = {
