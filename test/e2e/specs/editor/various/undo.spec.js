@@ -81,7 +81,7 @@ test.describe( 'undo', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'before pause' );
-		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		await editor.page.waitForTimeout( 1000 );
 		await page.keyboard.type( ' after pause' );
 
 		const after = await editor.getEditedPostContent();
