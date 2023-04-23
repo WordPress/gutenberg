@@ -383,6 +383,7 @@ test.describe( 'undo', () => {
 	test( 'should undo for explicit persistence editing post', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
 		// Regression test: An issue had occurred where the creation of an
 		// explicit undo level would interfere with blocks values being synced
@@ -408,7 +409,7 @@ test.describe( 'undo', () => {
 
 		// The issue is demonstrated after the one second delay to trigger the
 		// creation of an explicit undo persistence level.
-		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		await editor.page.waitForTimeout( 1000 );
 
 		await pageUtils.pressKeys( 'primary+z' );
 
