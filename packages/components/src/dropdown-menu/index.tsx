@@ -14,6 +14,7 @@ import { menu } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
+import type { DropdownMenuProps } from './types';
 
 function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {
@@ -41,7 +42,7 @@ function isFunction( maybeFunc ) {
 	return typeof maybeFunc === 'function';
 }
 
-function DropdownMenu( dropdownMenuProps ) {
+function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const {
 		children,
 		className,
