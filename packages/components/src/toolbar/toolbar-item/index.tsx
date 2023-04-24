@@ -14,18 +14,15 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import ToolbarContext from '../toolbar-context';
-import type { ToolbarItemProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
 
 function ToolbarItem(
 	{
 		children,
-		as,
+		as: Component,
 		...props
-	}: WordPressComponentProps< ToolbarItemProps, 'div', false >,
+	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
 	ref: ForwardedRef< any >
 ) {
-	const Component = as;
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( typeof children !== 'function' && ! Component ) {
@@ -43,10 +40,6 @@ function ToolbarItem(
 			return <Component { ...allProps }>{ children }</Component>;
 		}
 		if ( typeof children !== 'function' ) {
-			warning(
-				'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component. ' +
-					'See https://developer.wordpress.org/block-editor/components/toolbar-item/'
-			);
 			return null;
 		}
 		return children( allProps );
@@ -56,7 +49,7 @@ function ToolbarItem(
 		<BaseToolbarItem
 			{ ...accessibleToolbarState }
 			{ ...allProps }
-			as={ Component ?? 'button' }
+			as={ Component }
 		>
 			{ children }
 		</BaseToolbarItem>
