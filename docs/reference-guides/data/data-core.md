@@ -317,6 +317,10 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
+### getNavigationFallback
+
+Undocumented declaration.
+
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
@@ -606,6 +610,10 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### receiveNavigationFallback
+
+Undocumented declaration.
 
 ### receiveThemeSupports
 

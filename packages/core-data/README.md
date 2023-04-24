@@ -106,6 +106,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveNavigationFallback
+
+Undocumented declaration.
+
 ### receiveThemeSupports
 
 > **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
@@ -481,6 +485,10 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
+
+### getNavigationFallback
+
+Undocumented declaration.
 
 ### getRawEntityRecord
 

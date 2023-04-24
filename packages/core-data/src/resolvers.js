@@ -525,3 +525,23 @@ export const getBlockPatternCategories =
 		} );
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 	};
+
+export const getNavigationFallback =
+	() =>
+	async ( { dispatch } ) => {
+		const fallback = await apiFetch( {
+			path: '/wp-block-editor/v1/navigation-fallbacks?_embed',
+		} );
+
+		const record = fallback?._embedded?.self;
+
+		dispatch.receiveNavigationFallback( fallback );
+
+		if ( record ) {
+			dispatch.receiveEntityRecords(
+				'postType',
+				'wp_navigation',
+				record
+			);
+		}
+	};

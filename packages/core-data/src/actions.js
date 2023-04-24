@@ -834,3 +834,10 @@ export function receiveAutosaves( postId, autosaves ) {
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }
+
+export function receiveNavigationFallback( fallback ) {
+	return {
+		type: 'RECEIVE_NAVIGATION_FALLBACK',
+		fallback,
+	};
+}
