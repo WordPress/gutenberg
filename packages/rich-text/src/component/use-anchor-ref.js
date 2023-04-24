@@ -9,7 +9,10 @@ import deprecated from '@wordpress/deprecated';
  */
 import { getActiveFormat } from '../get-active-format';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
+/**
+ * @template T
+ * @typedef {import('@wordpress/element').RefObject<T>} RefObject<T>
+ */
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
 

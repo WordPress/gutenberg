@@ -55,7 +55,8 @@ import {
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {import('react').RefObject} RefObject
+ * @template T
+ * @typedef {import('react').RefObject<T>} RefObject<T>
  */
 
 /**
