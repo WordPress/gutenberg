@@ -75,6 +75,28 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
+	// When cover target is enabled, the popover dimensions need to be recomputed
+	// when the window is resized. This is to ensure that the calculated dimensions
+	// of the popover are correct when the block editor is resized.
+	useLayoutEffect( () => {
+		if ( ! __unstableCoverTarget || ! selectedElement ) {
+			return;
+		}
+
+		const defaultView = selectedElement?.ownerDocument.defaultView;
+		defaultView.addEventListener(
+			'resize',
+			forceRecomputePopoverDimensions
+		);
+
+		return () => {
+			defaultView.removeEventListener(
+				'resize',
+				forceRecomputePopoverDimensions
+			);
+		};
+	}, [ __unstableCoverTarget, selectedElement ] );
+
 	const style = useMemo( () => {
 		if (
 			// popoverDimensionsRecomputeCounter is by definition always equal or greater
