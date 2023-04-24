@@ -85,6 +85,10 @@ describe( 'parseConfig', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
 		delete process.env.WP_ENV_HOME;
+		delete process.env.WP_ENV_PORT;
+		delete process.env.WP_ENV_TESTS_PORT;
+		delete process.env.WP_ENV_CORE;
+		delete process.env.WP_ENV_PHP_VERSION;
 	} );
 
 	it( 'should return default config', async () => {
@@ -191,9 +195,17 @@ describe( 'parseConfig', () => {
 				type: 'git',
 			},
 			phpVersion: '2.0',
+			env: {
+				development: {
+					...DEFAULT_CONFIG.env.development,
+					port: 1234,
+				},
+				tests: {
+					...DEFAULT_CONFIG.env.tests,
+					port: 1011,
+				},
+			},
 		};
-		expected.env.development.port = 1234;
-		expected.env.tests.port = 1011;
 		expect( parsed ).toEqual( expected );
 	} );
 

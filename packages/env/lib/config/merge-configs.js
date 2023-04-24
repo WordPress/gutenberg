@@ -8,31 +8,19 @@
  * Deep-merges the values in the given service environment. This allows us to
  * merge the wp-config.php values instead of overwriting them.
  *
- * @param {WPServiceConfig} defaultConfig           The default config options.
- * @param {WPServiceConfig} localConfig             The local config options.
- * @param {WPServiceConfig} overrideConfig          The override config options.
- * @param {WPServiceConfig} environmentVarOverrides The environment variable config options to override with.
+ * @param {WPServiceConfig} defaultConfig The default config options.
+ * @param {...string}       configs       The config options to merge.
  *
- * @return {WPServiceConfig} The merged config object. Contains an extra `env` property at the root.
+ * @return {WPServiceConfig} The merged config object.
  */
-module.exports = function mergeConfigs(
-	defaultConfig,
-	localConfig,
-	overrideConfig,
-	environmentVarOverrides
-) {
+module.exports = function mergeConfigs( defaultConfig, ...configs ) {
 	// Start with our default config object. This has all
 	// of the options filled out already and we can use
 	// that to make performing the merge easier.
 	let config = defaultConfig;
 
-	// Merge the configs in order of precedence.
-	const mergePrecedence = [
-		localConfig,
-		overrideConfig,
-		environmentVarOverrides,
-	];
-	for ( const merge of mergePrecedence ) {
+	// Merge the configs
+	for ( const merge of configs ) {
 		config = mergeConfig( config, merge );
 	}
 
