@@ -63,7 +63,6 @@ const Edit = ( props ) => {
 						label={ title }
 						value={ lang }
 						onChange={ ( val ) => setLang( val ) }
-						aria-describedby={ `language-selector-describe-${ contentRef.current.id }` }
 						help={ __(
 							'A valid language attribute, like "en" or "fr".'
 						) }
