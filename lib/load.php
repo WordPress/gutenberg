@@ -119,6 +119,7 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/navigation-fallback.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
@@ -168,3 +169,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
+
