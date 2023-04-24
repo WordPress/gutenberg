@@ -31,12 +31,12 @@ function useEditTemplateNotification() {
 
 	return useRefEffect(
 		( node ) => {
-			if ( ! hasPageContentLock || alreadySeen.current ) {
-				return;
-			}
-
 			const handleClick = ( event ) => {
-				if ( event.target.classList.contains( 'is-root-container' ) ) {
+				if (
+					! alreadySeen.current &&
+					hasPageContentLock &&
+					event.target.classList.contains( 'is-root-container' )
+				) {
 					createInfoNotice(
 						__( 'Edit your template to edit this block' ),
 						{
@@ -54,11 +54,15 @@ function useEditTemplateNotification() {
 					alreadySeen.current = true;
 				}
 			};
-
 			node.addEventListener( 'click', handleClick );
 			return () => node.removeEventListener( 'click', handleClick );
 		},
-		[ hasPageContentLock, alreadySeen.current ]
+		[
+			hasPageContentLock,
+			alreadySeen,
+			createInfoNotice,
+			togglePageContentLock,
+		]
 	);
 }
 
@@ -75,10 +79,11 @@ function useBackToPageNotification() {
 	const { togglePageContentLock } = useDispatch( editSiteStore );
 
 	useEffect( () => {
-		if ( alreadySeen.current ) {
-			return;
-		}
-		if ( prevHasPageContentLock.current && ! hasPageContentLock ) {
+		if (
+			! alreadySeen.current &&
+			prevHasPageContentLock.current &&
+			! hasPageContentLock
+		) {
 			createInfoNotice( __( 'You are editing a template' ), {
 				isDismissible: true,
 				type: 'snackbar',
