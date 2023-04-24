@@ -250,3 +250,8 @@
 	}
 
 }
+
+body:has(.edit-site-the-frame__inner.resizing) {
+	user-select: none;
+	-webkit-user-select: none;
+}

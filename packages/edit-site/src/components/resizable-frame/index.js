@@ -83,6 +83,7 @@ function ResizableFrame( { isFull, children } ) {
 			lerpFactor
 		);
 		const newHeight = updatedWidth / intermediateAspectRatio;
+		setIsResizing( true );
 		setFrameSize( { width: updatedWidth, height: newHeight } );
 	};
 
@@ -102,6 +103,8 @@ function ResizableFrame( { isFull, children } ) {
 				setFrameSize( { width: '100%', height: '100%' } );
 			}, 500 );
 		}
+
+		setIsResizing( false );
 	};
 
 	// Check if the frame is bleeding over the sidebar.
@@ -149,7 +152,6 @@ function ResizableFrame( { isFull, children } ) {
 						key="handle"
 						className="edit-site-the-frame__handle"
 						title="drag to resize"
-						onMouseDown={ () => setIsResizing( true ) }
 						initial={ {
 							opacity: 0,
 							left: 0,
