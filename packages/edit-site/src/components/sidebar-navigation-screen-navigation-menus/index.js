@@ -17,6 +17,10 @@ import NavigationMenuContent from './navigation-menu-content';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -86,12 +90,18 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: attributes.type,
 					postId: attributes.id,
+					...( isPreviewingTheme() && {
+						theme_preview: currentlyPreviewingTheme(),
+					} ),
 				} );
 			}
 			if ( name === 'core/page-list-item' && attributes.id && history ) {
 				history.push( {
 					postType: 'page',
 					postId: attributes.id,
+					...( isPreviewingTheme() && {
+						theme_preview: currentlyPreviewingTheme(),
+					} ),
 				} );
 			}
 		},
