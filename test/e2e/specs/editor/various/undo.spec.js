@@ -84,23 +84,21 @@ test.describe( 'undo', () => {
 		await editor.page.waitForTimeout( 1000 );
 		await page.keyboard.type( ' after pause' );
 
-		const after = await editor.getEditedPostContent();
-
-		expect( after ).toBe(
-			`<!-- wp:paragraph -->
-<p>before pause after pause</p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause after pause' },
+			},
+		] );
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		const before = await editor.getEditedPostContent();
-		expect( before ).toBe(
-			`<!-- wp:paragraph -->
-<p>before pause</p>
-<!-- /wp:paragraph -->`
-		);
-
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause' },
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -120,7 +118,12 @@ test.describe( 'undo', () => {
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe( before );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause' },
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -130,7 +133,12 @@ test.describe( 'undo', () => {
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe( after );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause after pause' },
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -151,23 +159,25 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'after keyboard' );
 
-		const after = await editor.getEditedPostContent();
-
-		expect( after ).toBe(
-			`<!-- wp:paragraph -->
-<p>before keyboard <strong>after keyboard</strong></p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before keyboard <strong>after keyboard</strong>',
+				},
+			},
+		] );
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		const before = await editor.getEditedPostContent();
-
-		expect( before ).toBe(
-			`<!-- wp:paragraph -->
-<p>before keyboard </p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before keyboard ',
+				},
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -187,7 +197,14 @@ test.describe( 'undo', () => {
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe( before );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before keyboard ',
+				},
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -197,7 +214,14 @@ test.describe( 'undo', () => {
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe( after );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before keyboard <strong>after keyboard</strong>',
+				},
+			},
+		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
@@ -481,12 +505,14 @@ test.describe( 'undo', () => {
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		// Expect "1".
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '1',
+				},
+			},
+		] );
 	} );
 
 	test( 'should be able to undo and redo when transient changes have been made and we update/publish', async ( {
@@ -507,10 +533,14 @@ test.describe( 'undo', () => {
 			page.locator( 'role=button[name="Redo"]' )
 		).not.toBeDisabled();
 		await page.click( 'role=button[name="Redo"]' );
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:paragraph -->
-<p>tonis</p>
-<!-- /wp:paragraph -->`
-		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'tonis',
+				},
+			},
+		] );
 	} );
 } );
