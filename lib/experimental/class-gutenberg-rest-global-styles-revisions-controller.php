@@ -55,7 +55,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 			array(
 				'args'   => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent of the revision.' ),
+						'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -219,71 +219,71 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 				 * Leaves out GUID as global styles shouldn't be accessible via URL.
 				 */
 				'author'              => array(
-					'description' => __( 'The ID for the author of the revision.' ),
+					'description' => __( 'The ID for the author of the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'date'                => array(
-					'description' => __( "The date the revision was published, in the site's timezone." ),
+					'description' => __( "The date the revision was published, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'date_gmt'            => array(
-					'description' => __( 'The date the revision was published, as GMT.' ),
+					'description' => __( 'The date the revision was published, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'id'                  => array(
-					'description' => __( 'Unique identifier for the revision.' ),
+					'description' => __( 'Unique identifier for the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'modified'            => array(
-					'description' => __( "The date the revision was last modified, in the site's timezone." ),
+					'description' => __( "The date the revision was last modified, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'modified_gmt'        => array(
-					'description' => __( 'The date the revision was last modified, as GMT.' ),
+					'description' => __( 'The date the revision was last modified, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
 				'parent'              => array(
-					'description' => __( 'The ID for the parent of the revision.' ),
+					'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 
 				// Adds custom global styles revisions schema.
 				'author_display_name' => array(
-					'description' => __( 'The display name of the author.' ),
+					'description' => __( 'The display name of the author.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
 
 				'author_avatar_url'   => array(
-					'description' => __( 'A URL to the avatar image of the author' ),
+					'description' => __( 'A URL to the avatar image of the author', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
 
 				'date_display'        => array(
-					'description' => __( 'A human-friendly rendering of the date' ),
+					'description' => __( 'A human-friendly rendering of the date', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
 				// Adds settings and styles from the WP_REST_Global_Styles_Controller parent schema.
 				'styles'              => array(
-					'description' => __( 'Global styles.' ),
+					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'settings'            => array(
-					'description' => __( 'Global settings.' ),
+					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
@@ -312,7 +312,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		if ( ! current_user_can( 'read_post', $post->ID ) ) {
 			return new WP_Error(
 				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view revisions for this global style.' ),
+				__( 'Sorry, you are not allowed to view revisions for this global style.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -331,7 +331,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 	protected function get_parent( $parent_post_id ) {
 		$error = new WP_Error(
 			'rest_post_invalid_parent',
-			__( 'Invalid post parent ID.' ),
+			__( 'Invalid post parent ID.', 'gutenberg' ),
 			array( 'status' => 404 )
 		);
 

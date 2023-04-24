@@ -43,6 +43,9 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		);
 	}
 
+	/**
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::register_routes
+	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
@@ -53,6 +56,9 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		);
 	}
 
+	/**
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_items
+	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
 		// Update post to create a new revision.
@@ -79,7 +85,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$this->assertCount( 1, $data, 'Check that only one revision exists' );
 		$this->assertArrayHasKey( 'id', $data[0], 'Check that an id key exists' );
 		$this->assertEquals( self::$global_styles_id, $data[0]['parent'], 'Check that an id for the parent exists' );
-
 
 		// Dates.
 		$this->assertArrayHasKey( 'date', $data[0], 'Check that an date key exists' );
@@ -112,6 +117,29 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 			'Check that the revision styles match the last updated styles.'
 		);
+	}
+
+	/**
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_item_schema
+	 */
+	public function test_get_item_schema() {
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$properties = $data['schema']['properties'];
+		$this->assertCount( 12, $properties, 'Schema properties array does not have exactly 4 elements' );
+		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array does not have "id" key' );
+		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "styles" key' );
+		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array does not have "settings" key' );
+		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array does not have "parent" key' );
+		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array does not have "author" key' );
+		$this->assertArrayHasKey( 'author_display_name', $properties, 'Schema properties array does not have "author_display_name" key' );
+		$this->assertArrayHasKey( 'author_avatar_url', $properties, 'Schema properties array does not have "author_avatar_url" key' );
+		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array does not have "date" key' );
+		$this->assertArrayHasKey( 'date_gmt', $properties, 'Schema properties array does not have "date_gmt" key' );
+		$this->assertArrayHasKey( 'date_display', $properties, 'Schema properties array does not have "date_display" key' );
+		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array does not have "modified" key' );
+		$this->assertArrayHasKey( 'modified_gmt', $properties, 'Schema properties array does not have "modified_gmt" key' );
 	}
 
 	/**
@@ -152,7 +180,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	/**
 	 * @doesNotPerformAssertions
 	 */
-	public function test_get_item_schema() {
-		// Covered by the core.
+	public function test_update_item() {
+		// Controller does not implement update_item().
 	}
 }
