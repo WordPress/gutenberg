@@ -2,10 +2,6 @@
  * Internal dependencies
  */
 import type { AnyConfig, CurriedSelectorsOf, StoreDescriptor } from './types';
-
-/**
- * Internal dependencies
- */
 import defaultRegistry from './default-registry';
 
 /**

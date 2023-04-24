@@ -7,10 +7,6 @@ import type {
 	ConfigOf,
 	StoreDescriptor,
 } from './types';
-
-/**
- * Internal dependencies
- */
 import defaultRegistry from './default-registry';
 
 /**
