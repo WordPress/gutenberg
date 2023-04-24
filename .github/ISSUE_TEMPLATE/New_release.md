@@ -44,7 +44,7 @@ This issue is to provide visibility on the progress of the release process of Gu
 -   [ ] Start the release process by triggering the `stable` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-workflow)
 -   [ ] Update the created Draft Release accordingly. Typically by copy/pasting the last RC release notes and add any changes/updates as needed.
 -   [ ] Publish Release
--   [ ] Trigger the update to the plugin directory - SVN _(get approval from member of Core team if necessary)_
+-   [ ] Trigger the update to the plugin directory. _(Get approval from member of [Gutenberg Release team](https://github.com/orgs/WordPress/teams/gutenberg-release/members) if necessary)_
 -   [ ] Announce in `#core-editor` channel that the plugin has been released
 -   [ ] Reach out to other contributors to help get the post reviewed
 -   [ ] Publish Release post on Make Core blog
