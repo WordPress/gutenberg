@@ -26,6 +26,7 @@ import {
 	Button,
 	DropZone,
 	FlexItem,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -444,7 +445,8 @@ export default function LogoEdit( {
 	const {
 		alt_text: alt,
 		source_url: logoUrl,
-		title: logoTitle,
+		slug: logoSlug,
+		media_details: logoMediaDetails,
 	} = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
@@ -501,19 +503,24 @@ export default function LogoEdit( {
 		} );
 	};
 
-	const InspectorLogoPreview = () => (
-		<HStack justify="flex-start">
-			<img src={ logoUrl } alt={ alt } />
-			<FlexItem>
-				<Truncate
-					numberOfLines={ 1 }
-					className="block-library-site-logo__inspector-media-replace-title"
-				>
-					{ logoTitle.rendered }
-				</Truncate>
-			</FlexItem>
-		</HStack>
-	);
+	const InspectorLogoPreview = ( { itemGroupProps } ) => {
+		const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
+		return (
+			<ItemGroup { ...itemGroupProps }>
+				<HStack justify="flex-start">
+					<img src={ logoUrl } alt={ alt } />
+					<FlexItem>
+						<Truncate
+							numberOfLines={ 1 }
+							className="block-library-site-logo__inspector-media-replace-title"
+						>
+							{ logoLabel }
+						</Truncate>
+					</FlexItem>
+				</HStack>
+			</ItemGroup>
+		);
+	};
 
 	const mediaReplaceFlowProps = {
 		mediaURL: logoUrl,
@@ -586,23 +593,36 @@ export default function LogoEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Media' ) }>
 				<div className="block-library-site-logo__inspector-media-replace-container">
-					{ ! canUserEdit && !! logoUrl && <InspectorLogoPreview /> }
+					{ ! canUserEdit && !! logoUrl && (
+						<InspectorLogoPreview
+							itemGroupProps={ {
+								isBordered: true,
+								size: 'large',
+								className:
+									'block-library-site-logo__inspector-readonly-logo-preview',
+							} }
+						/>
+					) }
 					{ canUserEdit && !! logoUrl && (
 						<SiteLogoReplaceFlow
 							{ ...mediaReplaceFlowProps }
 							name={ <InspectorLogoPreview /> }
+							popoverProps={ {} }
 						/>
 					) }
 					{ canUserEdit && ! logoUrl && (
 						<MediaUploadCheck>
 							<MediaUpload
-								title={ label }
 								onSelect={ onInitialSelectLogo }
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button onClick={ open }>
-											{ isLoading ? <Spinner /> : label }
+											{ isLoading ? (
+												<Spinner />
+											) : (
+												__( 'Add Media' )
+											) }
 										</Button>
 										<DropZone onFilesDrop={ onFilesDrop } />
 									</div>

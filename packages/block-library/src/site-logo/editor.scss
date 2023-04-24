@@ -110,6 +110,7 @@
 		box-shadow: inset 0 0 0 1px $gray-400;
 		width: 100%;
 		display: block;
+		height: $grid-unit-50;
 
 		&:focus,
 		&:hover {
@@ -150,8 +151,13 @@
 	}
 
 	img {
-		width: $grid-unit-30;
-		border-radius: 50%;
+		width: $grid-unit-50 * 0.5;
 		aspect-ratio: 1;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		border-radius: 50% !important;
+	}
+
+	.block-library-site-logo__inspector-readonly-logo-preview {
+		padding: 6px 12px;
 	}
 }
