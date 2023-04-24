@@ -40,6 +40,7 @@
 -   `Modal`: Updated spacing / dimensions of `isFullScreen` ([#49894](https://github.com/WordPress/gutenberg/pull/49894)).
 -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
 -   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
+-   `PaletteEdit`: Allow custom position for color popovers ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
 
 ### Bug Fix
 
