@@ -53,7 +53,8 @@
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
 			"default": {
-				"type": "flex"
+				"type": "flex",
+				"justifyContent": "left"
 			}
 		},
 		"color": {
