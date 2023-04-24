@@ -96,7 +96,7 @@ export default function PostTemplateEdit( {
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
-		displayLayout: { type: layoutType = 'grid', columnWidth = 12 } = {},
+		displayLayout: { type: layoutType = 'grid', columns = 3 } = {},
 		previewPostType,
 	},
 	__unstableLayoutClassNames,
@@ -108,10 +108,10 @@ export default function PostTemplateEdit( {
 		setAttributes( {
 			layout: {
 				type: updatedLayoutType,
-				minimumColumnWidth: `${ columnWidth }rem`,
+				__unstableColumns: columns,
 			},
 		} );
-	}, [ updatedLayoutType, columnWidth, setAttributes ] );
+	}, [ updatedLayoutType, columns, setAttributes ] );
 
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
