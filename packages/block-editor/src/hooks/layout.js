@@ -141,11 +141,11 @@ function LayoutPanel( {
 	const defaultThemeLayout = useSetting( 'layout' );
 	const { themeSupportsLayout, isContentLocked } = useSelect(
 		( select ) => {
-			const { getSettings, __experimentalIsContentLockedBlock } =
+			const { getSettings, isContentLockedBlock } =
 				select( blockEditorStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentLocked: __experimentalIsContentLockedBlock( clientId ),
+				isContentLocked: isContentLockedBlock( clientId ),
 			};
 		},
 		[ clientId ]

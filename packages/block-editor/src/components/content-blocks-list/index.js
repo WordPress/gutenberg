@@ -15,17 +15,18 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import { unlock } from '../../lock-unlock';
 
 export default function ContentBlocksList( { rootClientId } ) {
 	const contentBlocks = useSelect(
 		( select ) => {
 			const {
 				getSelectedBlockClientId,
-				__experimentalGetContentClientIdsTree,
+				getContentClientIdsTree,
 				getBlockName,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
-			return __experimentalGetContentClientIdsTree( rootClientId )
+			return getContentClientIdsTree( rootClientId )
 				.map( ( block ) => ( {
 					...block,
 					blockName: getBlockName( block.clientId ),

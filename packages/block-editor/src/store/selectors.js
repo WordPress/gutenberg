@@ -14,7 +14,6 @@ import {
 	getPossibleBlockTransformations,
 	parse,
 	switchToBlockType,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
@@ -22,13 +21,17 @@ import { symbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
+import {
+	getContentLockingBlock,
+	getTemporarilyUnlockedBlock,
+	isContentBlock,
+} from './private-selectors';
 
 /**
  * A block selection object.
@@ -1674,10 +1677,10 @@ export const isInsertionLocked = createSelector(
 		if ( rootClientId && templateLock === 'contentOnly' ) {
 			// Lock insertion into a non content block.
 			const isWithinContentBlock =
-				__experimentalIsContentBlock( state, rootClientId ) ||
+				isContentBlock( state, rootClientId ) ||
 				getBlockParents( state, rootClientId ).some(
 					( parentClientId ) =>
-						__experimentalIsContentBlock( state, parentClientId )
+						isContentBlock( state, parentClientId )
 				);
 			return ! isWithinContentBlock;
 		}
@@ -1722,8 +1725,7 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( templateLock === 'contentOnly' ) {
 		// Permit removal when inside a content block.
 		const isWithinContentBlock = getBlockParents( state, clientId ).some(
-			( parentClientId ) =>
-				__experimentalIsContentBlock( state, parentClientId )
+			( parentClientId ) => isContentBlock( state, parentClientId )
 		);
 		return isWithinContentBlock;
 	} else if ( templateLock ) {
@@ -2821,86 +2823,6 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
-export const __experimentalIsContentLockingBlock = ( state, clientId ) =>
-	__experimentalGetRootContentLockingBlock( state, clientId ) === clientId;
-
-export const __experimentalIsContentLockedBlock = createSelector(
-	( state, clientId ) => {
-		const isWithinContentBlock = getBlockParents( state, clientId ).some(
-			( parentClientId ) =>
-				__experimentalIsContentBlock( state, parentClientId )
-		);
-		if ( isWithinContentBlock ) {
-			return false;
-		}
-
-		if ( getTemplateLock( state ) === 'contentOnly' ) {
-			return true;
-		}
-
-		const isWithinContentLockingBlock =
-			!! __experimentalGetRootContentLockingBlock( state, clientId );
-		return isWithinContentLockingBlock;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.settings.contentBlockTypes,
-		state.settings.templateLock,
-		state.blockListSettings,
-	]
-);
-
-export const __experimentalGetRootContentLockingBlock = createSelector(
-	( state, clientId ) => {
-		if ( getTemplateLock( state ) === 'contentOnly' ) {
-			return;
-		}
-
-		return [ ...getBlockParents( state, clientId ), clientId ].find(
-			( candidateClientId ) =>
-				getTemplateLock( state, candidateClientId ) === 'contentOnly'
-		);
-	},
-	( state ) => [
-		state.settings.templateLock,
-		state.blocks.parents,
-		state.blockListSettings,
-	]
-);
-
-export const __experimentalIsContentBlock = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
-		const blockName = getBlockName( state, clientId );
-		return state.settings.contentBlockTypes
-			? state.settings.contentBlockTypes.includes( blockName )
-			: select( blocksStore ).__experimentalHasContentRoleAttribute(
-					blockName
-			  );
-	}
-);
-
-export const __experimentalGetContentClientIdsTree = createSelector(
-	( state, rootClientId = null ) => {
-		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) =>
-			__experimentalIsContentBlock( state, clientId )
-				? [ __unstableGetClientIdWithClientIdsTree( state, clientId ) ]
-				: __experimentalGetContentClientIdsTree( state, clientId )
-		);
-	},
-	( state ) => [ state.blocks.order ]
-);
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
@@ -2940,6 +2862,65 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		! hasSelectedInnerBlock( state, clientId, true )
 	);
 }
+
+export function __unstableGetContentLockingParent( state, clientId ) {
+	deprecated( '__unstableGetContentLockingParent', {
+		since: '6.3',
+		version: '6.4',
+		alternative: 'isContentLockedBlock',
+	} );
+	return getContentLockingBlock( state, clientId );
+}
+
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	deprecated( '__unstableGetTemporarilyEditingAsBlocks', {
+		since: '6.3',
+		version: '6.4',
+	} );
+	return getTemporarilyUnlockedBlock( state );
+}
+
+/**
+ * Returns whether or not the given block is _content locked_.
+ *
+ * A block is _content locked_ if it is nested within a block that has a
+ * `templateLock` attribute set to `'contentOnly'` (a _content locking_ block),
+ * or if the editor has a `templateLock` of `'contentOnly'`.
+ *
+ * If the block is nested within a content block type (see
+ * `settings.contentBlockTypes`) then it is not _content locked_.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The client ID of the block to check.
+ *
+ * @return {boolean} Whether or not the block is content locked.
+ */
+export const isContentLockedBlock = createSelector(
+	( state, clientId ) => {
+		const isWithinContentBlock = getBlockParents( state, clientId ).some(
+			( parentClientId ) => isContentBlock( state, parentClientId )
+		);
+		if ( isWithinContentBlock ) {
+			return false;
+		}
+
+		if ( getTemplateLock( state ) === 'contentOnly' ) {
+			return true;
+		}
+
+		const isWithinContentLockingBlock = !! getContentLockingBlock(
+			state,
+			clientId
+		);
+		return isWithinContentLockingBlock;
+	},
+	( state ) => [
+		state.blocks.parents,
+		state.settings.contentBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings,
+	]
+);
 
 export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	let parent = state.blocks.parents.get( clientId );

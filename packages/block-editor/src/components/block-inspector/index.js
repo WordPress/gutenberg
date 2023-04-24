@@ -30,14 +30,15 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
 import ContentBlocksList from '../content-blocks-list';
+import { unlock } from '../../lock-unlock';
 
-function BlockInspectorLockedBlocks( { contentLockingBlockClientId } ) {
-	const selectedBlockClientId = useSelect(
+function BlockInspectorLockedBlocks( { contentLockingBlock } ) {
+	const selectedBlock = useSelect(
 		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
 		[]
 	);
 	const blockInformation = useBlockDisplayInformation(
-		contentLockingBlockClientId ?? selectedBlockClientId
+		contentLockingBlock ?? selectedBlock
 	);
 	return (
 		<div className="block-editor-block-inspector">
@@ -45,17 +46,15 @@ function BlockInspectorLockedBlocks( { contentLockingBlockClientId } ) {
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
-			{ contentLockingBlockClientId && (
+			{ contentLockingBlock && (
 				<BlockVariationTransforms
-					blockClientId={ contentLockingBlockClientId }
+					blockClientId={ contentLockingBlock }
 				/>
 			) }
 			<BlockInfo.Slot />
-			{ contentLockingBlockClientId && (
+			{ contentLockingBlock && (
 				<PanelBody title={ __( 'Content' ) }>
-					<ContentBlocksList
-						rootClientId={ contentLockingBlockClientId }
-					/>
+					<ContentBlocksList rootClientId={ contentLockingBlock } />
 				</PanelBody>
 			) }
 		</div>
@@ -69,15 +68,15 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		isContentLocked,
-		rootContentLockingBlock,
+		contentLockingBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-			__experimentalIsContentLockedBlock,
-			__experimentalGetRootContentLockingBlock,
-		} = select( blockEditorStore );
+			isContentLockedBlock,
+			getContentLockingBlock,
+		} = unlock( select( blockEditorStore ) );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
@@ -90,10 +89,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			isContentLocked: __experimentalIsContentLockedBlock(
-				_selectedBlockClientId
-			),
-			rootContentLockingBlock: __experimentalGetRootContentLockingBlock(
+			isContentLocked: isContentLockedBlock( _selectedBlockClientId ),
+			contentLockingBlock: getContentLockingBlock(
 				_selectedBlockClientId
 			),
 		};
@@ -171,7 +168,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	if ( isContentLocked ) {
 		return (
 			<BlockInspectorLockedBlocks
-				contentLockingBlockClientId={ rootContentLockingBlock }
+				contentLockingBlock={ contentLockingBlock }
 			/>
 		);
 	}

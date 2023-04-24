@@ -48,9 +48,7 @@ export default function PostTitleEdit( {
 	} );
 	const isContentLocked = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__experimentalIsContentLockedBlock(
-				clientId
-			),
+			select( blockEditorStore ).isContentLockedBlock( clientId ),
 		[ clientId ]
 	);
 

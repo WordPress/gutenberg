@@ -25,7 +25,10 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
-import { __experimentalUpdateSettings } from './private-actions';
+import {
+	__experimentalUpdateSettings,
+	setTemporarilyUnlockedBlock,
+} from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1719,20 +1722,12 @@ export function setBlockVisibility( updates ) {
 	};
 }
 
-/**
- * Action that sets whether a block is being temporaritly edited as blocks.
- *
- * DO-NOT-USE in production.
- * This action is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
- */
 export function __unstableSetTemporarilyEditingAsBlocks(
 	temporarilyEditingAsBlocks
 ) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-	};
+	deprecated( '__unstableSetTemporarilyEditingAsBlocks', {
+		since: '6.3',
+		version: '6.4',
+	} );
+	return setTemporarilyUnlockedBlock( temporarilyEditingAsBlocks );
 }

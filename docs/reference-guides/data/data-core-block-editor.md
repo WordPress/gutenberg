@@ -1000,6 +1000,23 @@ _Returns_
 
 -   `boolean`: Whether the caret is within formatted text.
 
+### isContentLockedBlock
+
+Returns whether or not the given block is _content locked_.
+
+A block is _content locked_ if it is nested within a block that has a `templateLock` attribute set to `'contentOnly'` (a _content locking_ block), or if the editor has a `templateLock` of `'contentOnly'`.
+
+If the block is nested within a content block type (see `settings.contentBlockTypes`) then it is not _content locked_.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The client ID of the block to check.
+
+_Returns_
+
+-   `boolean`: Whether or not the block is content locked.
+
 ### isDraggingBlocks
 
 Returns true if the user is dragging blocks, or false otherwise.

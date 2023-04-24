@@ -17,6 +17,7 @@ import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -105,17 +106,17 @@ function ListViewBranch( props ) {
 		( select ) => {
 			const {
 				getTemplateLock,
-				__experimentalIsContentLockingBlock,
-				__experimentalGetContentClientIdsTree,
+				isContentLockingBlock,
+				getContentClientIdsTree,
 				canEditBlock,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 
 			const isContentLocking = parentId
-				? __experimentalIsContentLockingBlock( parentId )
+				? isContentLockingBlock( parentId )
 				: getTemplateLock() === 'contentOnly';
 
 			if ( isContentLocking ) {
-				return __experimentalGetContentClientIdsTree( parentId );
+				return getContentClientIdsTree( parentId );
 			}
 
 			if ( ! parentId || canEditBlock( parentId ) ) {

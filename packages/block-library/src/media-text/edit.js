@@ -148,10 +148,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const { imageSizes, image, isContentLocked } = useSelect(
 		( select ) => {
-			const { __experimentalIsContentLockedBlock, getSettings } =
+			const { isContentLockedBlock, getSettings } =
 				select( blockEditorStore );
 			return {
-				isContentLocked: __experimentalIsContentLockedBlock( clientId ),
+				isContentLocked: isContentLockedBlock( clientId ),
 				image:
 					mediaId && isSelected
 						? select( coreStore ).getMedia( mediaId, {

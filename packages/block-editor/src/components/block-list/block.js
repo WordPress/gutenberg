@@ -42,6 +42,8 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import { unlock } from '../../lock-unlock';
+
 export const BlockListBlockContext = createContext();
 
 /**
@@ -99,26 +101,25 @@ function BlockListBlock( {
 	const {
 		themeSupportsLayout,
 		isContentLocked,
-		isContentBlock,
+		isContent,
 		isContentLocking,
-		isTemporarilyEditingAsBlocks,
+		isTemporarilyUnlocked,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
-				__unstableGetTemporarilyEditingAsBlocks,
-				__experimentalIsContentBlock,
-				__experimentalIsContentLockedBlock,
-				__experimentalIsContentLockingBlock,
-			} = select( blockEditorStore );
+				getTemporarilyUnlockedBlock,
+				isContentBlock,
+				isContentLockedBlock,
+				isContentLockingBlock,
+			} = unlock( select( blockEditorStore ) );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock: __experimentalIsContentBlock( clientId ),
-				isContentLocked: __experimentalIsContentLockedBlock( clientId ),
-				isContentLocking:
-					__experimentalIsContentLockingBlock( clientId ),
-				isTemporarilyEditingAsBlocks:
-					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+				isContent: isContentBlock( clientId ),
+				isContentLocked: isContentLockedBlock( clientId ),
+				isContentLocking: isContentLockingBlock( clientId ),
+				isTemporarilyUnlocked:
+					getTemporarilyUnlockedBlock() === clientId,
 			};
 		},
 		[ name, clientId ]
@@ -154,7 +155,7 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( isContentLocked && ! isContentBlock ) {
+	if ( isContentLocked && ! isContent ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -229,9 +230,8 @@ function BlockListBlock( {
 		className: classnames(
 			{
 				'is-content-locked': isContentLocking,
-				'is-content-locked-temporarily-editing-as-blocks':
-					isTemporarilyEditingAsBlocks,
-				'is-content-block': isContentLocked && isContentBlock,
+				'is-content-temporarily-unlocked': isTemporarilyUnlocked,
+				'is-content-block': isContentLocked && isContent,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className

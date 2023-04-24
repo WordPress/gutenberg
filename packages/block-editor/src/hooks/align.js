@@ -134,11 +134,10 @@ export const withToolbarControls = createHigherOrderComponent(
 			blockAllowedAlignments
 		).map( ( { name } ) => name );
 		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__experimentalIsContentLockedBlock( props.clientId );
-			},
+			( select ) =>
+				select( blockEditorStore ).isContentLockedBlock(
+					props.clientId
+				),
 			[ props.clientId ]
 		);
 		if ( ! validAlignments.length || isContentLocked ) {
