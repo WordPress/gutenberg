@@ -251,48 +251,6 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	// useEffect( () => {
-	// 	// If:
-	// 	// - there is an existing menu, OR
-	// 	// - there are existing (uncontrolled) inner blocks
-	// 	// ...then don't request a fallback menu.
-	// 	if ( ref || hasUnsavedBlocks || ! getNavigationFallback ) {
-	// 		return;
-	// 	}
-
-	// 	debugger;
-
-	// 	getNavigationFallback()
-	// 		.then( ( fallbackNavigationMenu ) => {
-	// 			if ( ! fallbackNavigationMenu?.id ) {
-	// 				showNavigationMenuStatusNotice(
-	// 					__( 'Unable to fetch a fallback Navigation Menu.' )
-	// 				);
-	// 				return;
-	// 			}
-
-	// 			/**
-	// 			 *  This fallback displays (both in editor and on front)
-	// 			 *  The fallback should not request a save (entity dirty state)
-	// 			 *  nor to be undoable, hence why it is marked as non persistent
-	// 			 */
-	// 			__unstableMarkNextChangeAsNotPersistent();
-	// 			setRef( fallbackNavigationMenu.id );
-	// 		} )
-	// 		.catch( () => {
-	// 			showNavigationMenuStatusNotice(
-	// 				__( 'Unable to fetch a fallback Navigation Menu.' )
-	// 			);
-	// 		} );
-	// }, [
-	// 	ref,
-	// 	hasUnsavedBlocks,
-	// 	setRef,
-	// 	showNavigationMenuStatusNotice,
-	// 	__unstableMarkNextChangeAsNotPersistent,
-	// 	getNavigationFallback,
-	// ] );
-
 	const navRef = useRef();
 
 	// The standard HTML5 tag for the block wrapper.
