@@ -23,7 +23,7 @@ import { useCallback, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, normalizeFalsyValue } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -226,7 +226,11 @@ export default function DimensionsPanel( {
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'layout', 'contentSize' ], newValue )
+			immutableSet(
+				value,
+				[ 'layout', 'contentSize' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
@@ -237,7 +241,13 @@ export default function DimensionsPanel( {
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
-		onChange( immutableSet( value, [ 'layout', 'wideSize' ], newValue ) );
+		onChange(
+			immutableSet(
+				value,
+				[ 'layout', 'wideSize' ],
+				normalizeFalsyValue( newValue )
+			)
+		);
 	};
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );

@@ -19,7 +19,7 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, normalizeFalsyValue } from './utils';
 import { immutableSet } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -166,7 +166,9 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'fontFamily' ],
-				slug ? `var:preset|font-family|${ slug }` : newValue
+				slug
+					? `var:preset|font-family|${ slug }`
+					: normalizeFalsyValue( newValue )
 			)
 		);
 	};
@@ -188,7 +190,11 @@ export default function TypographyPanel( {
 			: newValue;
 
 		onChange(
-			immutableSet( value, [ 'typography', 'fontSize' ], actualValue )
+			immutableSet(
+				value,
+				[ 'typography', 'fontSize' ],
+				normalizeFalsyValue( actualValue )
+			)
 		);
 	};
 	const hasFontSize = () => !! value?.typography?.fontSize;
@@ -209,8 +215,8 @@ export default function TypographyPanel( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontStyle: newFontStyle,
-				fontWeight: newFontWeight,
+				fontStyle: normalizeFalsyValue( newFontStyle ),
+				fontWeight: normalizeFalsyValue( newFontWeight ),
 			},
 		} );
 	};
@@ -225,7 +231,11 @@ export default function TypographyPanel( {
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'lineHeight' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'lineHeight' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasLineHeight = () => !! value?.typography?.lineHeight;
@@ -238,7 +248,11 @@ export default function TypographyPanel( {
 	);
 	const setLetterSpacing = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'letterSpacing' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'letterSpacing' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
@@ -249,7 +263,11 @@ export default function TypographyPanel( {
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
 	const setTextColumns = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textColumns' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textColumns' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasTextColumns = () => !! value?.typography?.textColumns;
@@ -262,7 +280,11 @@ export default function TypographyPanel( {
 	);
 	const setTextTransform = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textTransform' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textTransform' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasTextTransform = () => !! value?.typography?.textTransform;
@@ -275,7 +297,11 @@ export default function TypographyPanel( {
 	);
 	const setTextDecoration = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textDecoration' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textDecoration' ],
+				normalizeFalsyValue( newValue )
+			)
 		);
 	};
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
