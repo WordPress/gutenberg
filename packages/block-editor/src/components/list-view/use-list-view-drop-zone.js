@@ -215,12 +215,27 @@ export function getListViewDropTarget( blocksData, position ) {
 				0
 			);
 
+			// TODO: This still isn't quite right as the default block index.
+			// It should really be one more than the last block in that level of the tree.
+			let newBlockIndex = candidateBlockData.blockIndex;
+
+			// If the next block is at the same level, use that as the default
+			// block index. This ensures that the block is dropped in the correct
+			// position when dragging to the bottom of a block.
+			if (
+				candidateBlockParents[ targetParentIndex ].nestingLevel ===
+				blocksData[ candidateBlockIndex + 1 ]?.nestingLevel
+			) {
+				newBlockIndex =
+					blocksData[ candidateBlockIndex + 1 ]?.blockIndex;
+			}
+
 			if ( candidateBlockParents[ targetParentIndex ] ) {
 				return {
 					rootClientId:
 						candidateBlockParents[ targetParentIndex ].rootClientId,
 					clientId: candidateBlockData.clientId,
-					blockIndex: candidateBlockData.blockIndex, // TODO: This still isn't quite right.
+					blockIndex: newBlockIndex,
 					dropPosition: candidateEdge,
 				};
 			}
