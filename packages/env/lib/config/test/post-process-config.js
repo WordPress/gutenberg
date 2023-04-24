@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 
 describe( 'postProcessConfig', () => {
@@ -144,6 +145,90 @@ describe( 'postProcessConfig', () => {
 					},
 				},
 			} );
+		} );
+	} );
+
+	describe( 'validatePortUniqueness', () => {
+		it( 'should fail when the root port and testsPort are the same', () => {
+			expect( () => {
+				postProcessConfig( {
+					port: 123,
+					testsPort: 123,
+				} );
+			} ).toThrow(
+				new ValidationError(
+					'The "development" and "tests" environments may not have the same port.'
+				)
+			);
+		} );
+
+		it( 'should fail when two environments have the same port', () => {
+			expect( () => {
+				postProcessConfig( {
+					env: {
+						development: {
+							port: 123,
+						},
+						tests: {
+							port: 123,
+						},
+					},
+				} );
+			} ).toThrow(
+				new ValidationError(
+					'The "development" and "tests" environments may not have the same port.'
+				)
+			);
+		} );
+
+		it( 'should fail when root port and an environment port are the same', () => {
+			expect( () => {
+				postProcessConfig( {
+					port: 123,
+					env: {
+						tests: {
+							port: 123,
+						},
+					},
+				} );
+			} ).toThrow(
+				new ValidationError(
+					'The "development" and "tests" environments may not have the same port.'
+				)
+			);
+		} );
+
+		it( 'should pass when no ports are the same', () => {
+			expect( () => {
+				postProcessConfig( {
+					port: 123,
+					testsPort: 456,
+				} );
+			} ).not.toThrow();
+
+			expect( () => {
+				postProcessConfig( {
+					env: {
+						development: {
+							port: 123,
+						},
+						tests: {
+							port: 456,
+						},
+					},
+				} );
+			} ).not.toThrow();
+
+			expect( () => {
+				postProcessConfig( {
+					port: 123,
+					env: {
+						tests: {
+							port: 456,
+						},
+					},
+				} );
+			} ).not.toThrow();
 		} );
 	} );
 } );

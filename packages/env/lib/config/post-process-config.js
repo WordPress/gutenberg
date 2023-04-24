@@ -3,6 +3,7 @@
  * Internal dependencies
  */
 const addOrReplacePort = require( './add-or-replace-port' );
+const { ValidationError } = require( './validate-config' );
 
 /**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
@@ -17,6 +18,9 @@ const addOrReplacePort = require( './add-or-replace-port' );
  */
 module.exports = function postProcessConfig( config ) {
 	config = appendPortToWPConfigs( config );
+
+	validatePortUniqueness( config );
+
 	return config;
 };
 
@@ -67,4 +71,47 @@ function appendPortToWPConfigs( config ) {
 	}
 
 	return config;
+}
+
+/**
+ * Examines the config to make sure that none of the environments share the same port.
+ *
+ * @param {WPServiceConfig} config The config to process.
+ */
+function validatePortUniqueness( config ) {
+	// We're going to build a map of the environments and their port
+	// so we can accomodate root-level config options more easily.
+	const environmentPorts = {};
+
+	// Start by translating the root options into an environment-specific one.
+	if ( config.port !== undefined ) {
+		environmentPorts.development = config.port;
+	}
+	if ( config.testsPort !== undefined ) {
+		environmentPorts.tests = config.testsPort;
+	}
+
+	// Add all of the environments to the map. This will
+	// overwrite any root-level options if necessary.
+	for ( const env in config.env ) {
+		if ( config.env[ env ].port !== undefined ) {
+			environmentPorts[ env ] = config.env[ env ].port;
+		}
+	}
+
+	// This search isn't very performant, but, we won't ever be
+	// checking more than a few entries so it doesn't matter.
+	for ( const env in environmentPorts ) {
+		for ( const check in environmentPorts ) {
+			if ( env === check ) {
+				continue;
+			}
+
+			if ( environmentPorts[ env ] === environmentPorts[ check ] ) {
+				throw new ValidationError(
+					`The "${ env }" and "${ check }" environments may not have the same port.`
+				);
+			}
+		}
+	}
 }
