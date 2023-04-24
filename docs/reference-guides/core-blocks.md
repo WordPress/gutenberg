@@ -269,6 +269,15 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
+## Footnotes
+
+ ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+
+-	**Name:** core/footnotes
+-	**Category:** text
+-	**Supports:** ~~html~~
+-	**Attributes:** footnotes
+
 ## Classic
 
 Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
