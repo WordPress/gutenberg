@@ -11,6 +11,13 @@ import {
 	ResizableBox,
 	__unstableMotion as motion,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -37,19 +44,21 @@ function ResizableFrame( { isFull, children } ) {
 	} );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
-
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
-
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 
+	// Calculate the frame size based on the window width as its resized.
 	const handleResize = ( event, direction, ref ) => {
 		const updatedWidth = ref.offsetWidth;
 		const updatedHeight = ref.offsetHeight;
 
+		// Set the initial aspect ratio if it hasn't been set yet.
 		if ( initialAspectRatioRef.current === null ) {
 			initialAspectRatioRef.current = updatedWidth / updatedHeight;
 		}
 
+		// Calculate the intermediate aspect ratio based on the current width.
 		const lerpFactor =
 			1 -
 			Math.max(
@@ -60,6 +69,9 @@ function ResizableFrame( { isFull, children } ) {
 						( 1300 - MIN_FRAME_SIZE )
 				)
 			);
+
+		// Calculate the height based on the intermediate aspect ratio
+		// ensuring the frame arrives at a 9:19.5 aspect ratio.
 		const intermediateAspectRatio = lerp(
 			initialAspectRatioRef.current,
 			9 / 19.5,
@@ -67,6 +79,24 @@ function ResizableFrame( { isFull, children } ) {
 		);
 		const newHeight = updatedWidth / intermediateAspectRatio;
 		setFrameSize( { width: updatedWidth, height: newHeight } );
+	};
+
+	// Make the frame full screen when the user resizes it to the left.
+	const handleResizeStop = ( event ) => {
+		// Reset the initial aspect ratio if the frame is resized slightly
+		// above the sidebar but not far enough to trigger full screen.
+		if ( event.clientX < 360 && event.clientX > 250 ) {
+			setFrameSize( { width: '100%', height: '100%' } );
+		}
+
+		// Trigger full screen if the frame is resized far enough to the left.
+		if ( event.clientX < 250 ) {
+			setCanvasMode( 'edit' );
+			// Wait for the frame to animate to full screen before resetting its size.
+			setInterval( () => {
+				setFrameSize( { width: '100%', height: '100%' } );
+			}, 500 );
+		}
 	};
 
 	return (
@@ -96,7 +126,7 @@ function ResizableFrame( { isFull, children } ) {
 				right: HANDLE_STYLES_OVERRIDE,
 			} }
 			minWidth={ MIN_FRAME_SIZE }
-			maxWidth={ '100%' }
+			maxWidth={ '200%' }
 			maxHeight={ '100%' }
 			onMouseOver={ () => setIsHovering( true ) }
 			onMouseOut={ () => setIsHovering( false ) }
@@ -124,6 +154,7 @@ function ResizableFrame( { isFull, children } ) {
 				),
 			} }
 			onResize={ handleResize }
+			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-the-frame__inner', {
 				resizing: isResizing,
 			} ) }
