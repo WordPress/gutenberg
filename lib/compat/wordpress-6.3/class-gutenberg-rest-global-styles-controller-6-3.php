@@ -18,6 +18,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 	 * @return void
 	 */
 	public function register_routes() {
+		// Lists revisions for a single global style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)/revisions',
@@ -103,82 +104,33 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 	}
 
 	/**
-	 * Prepare a global styles config output for response.
+	 * Prepares links for the request.
 	 *
 	 * @since 5.9.0
-	 * @since 6.2 Handling of style.css was added to WP_Theme_JSON.
-	 * @since 6.3 Adds version-history to the response object.
+	 * @since 6.3 Adds revisions to version-history.
 	 *
-	 * @param WP_Post         $post Global Styles post object.
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response Response object.
+	 * @param integer $id ID.
+	 * @return array Links for the given post.
 	 */
-	public function prepare_item_for_response( $post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$raw_config                       = json_decode( $post->post_content, true );
-		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
-		$config                           = array();
-		if ( $is_global_styles_user_theme_json ) {
-			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
+	protected function prepare_links( $id ) {
+		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
+
+		$links = array(
+			'self' => array(
+				'href' => rest_url( trailingslashit( $base ) . $id ),
+			),
+		);
+
+		if ( post_type_supports( $this->post_type, 'revisions' ) ) {
+			$revisions                = wp_get_latest_revision_id_and_total_count( $id );
+			$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
+			$revisions_base           = sprintf( '/%s/%s/%d/revisions', $this->namespace, $this->rest_base, $id );
+			$links['version-history'] = array(
+				'href'  => rest_url( $revisions_base ),
+				'count' => $revisions_count,
+			);
 		}
 
-		// Base fields for every post.
-		$data   = array();
-		$fields = $this->get_fields_for_response( $request );
-
-		if ( rest_is_field_included( 'id', $fields ) ) {
-			$data['id'] = $post->ID;
-		}
-
-		if ( rest_is_field_included( 'title', $fields ) ) {
-			$data['title'] = array();
-		}
-		if ( rest_is_field_included( 'title.raw', $fields ) ) {
-			$data['title']['raw'] = $post->post_title;
-		}
-		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
-			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
-
-			$data['title']['rendered'] = get_the_title( $post->ID );
-
-			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
-		}
-
-		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$data['settings'] = ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass();
-		}
-
-		if ( rest_is_field_included( 'styles', $fields ) ) {
-			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
-		}
-
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
-
-		// Wrap the data in a response object.
-		$response = rest_ensure_response( $data );
-
-		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = $this->prepare_links( $post->ID );
-			if ( $is_global_styles_user_theme_json ) {
-				$revisions                = wp_get_latest_revision_id_and_total_count( $post->ID );
-				$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
-				$revisions_base           = sprintf( '/%s/%s/%d/revisions', $this->namespace, $this->rest_base, $post->ID );
-				$links['version-history'] = array(
-					'href'  => rest_url( $revisions_base ),
-					'count' => $revisions_count,
-				);
-			}
-			$response->add_links( $links );
-			if ( ! empty( $links['self']['href'] ) ) {
-				$actions = $this->get_available_actions();
-				$self    = $links['self']['href'];
-				foreach ( $actions as $rel ) {
-					$response->add_link( $rel, $self );
-				}
-			}
-		}
-
-		return $response;
+		return $links;
 	}
 }
