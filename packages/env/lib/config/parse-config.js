@@ -79,18 +79,22 @@ module.exports = async function parseConfig( configDirectoryPath ) {
 		cacheDirectoryPath,
 	} );
 
+	// Any overrides that can be used in place
+	// of properties set by the local config.
+	const overrideConfig = await parseConfigFile( overrideConfigFile, {
+		cacheDirectoryPath,
+	} );
+
+	// It's important to know whether or not the user
+	// has configured the tool using a JSON file.
+	const hasUserConfig = localConfig || overrideConfig;
+
 	// The default config will be used when no local config
 	// file is present in this directory. We should also
 	// infer the project type when there is no local
 	// config file present to use.
 	const defaultConfig = await getDefaultConfig( configDirectoryPath, {
-		shouldInferType: !! localConfig,
-		cacheDirectoryPath,
-	} );
-
-	// Any overrides that can be used in place
-	// of properties set by the local config.
-	const overrideConfig = await parseConfigFile( overrideConfigFile, {
+		shouldInferType: ! hasUserConfig,
 		cacheDirectoryPath,
 	} );
 
