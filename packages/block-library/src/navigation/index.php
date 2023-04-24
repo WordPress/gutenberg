@@ -749,6 +749,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_block_content = $inner_block->render();
+
 		if ( ! empty( $inner_block_content ) ) {
 			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
 				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
@@ -816,35 +817,103 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
-	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
-			<div class="%5$s" style="%7$s" id="%1$s">
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
+	if ( $is_interactivity_api_enabled ) {
+		$responsive_container_markup = sprintf(
+			'<button 
+				data-wp-on.click="actions.core.navigation.openMenu"
+				aria-haspopup="true"
+				%3$s
+				class="%6$s""
+			>
+				%9$s
+			</button>
+			<div 
+				class="%5$s"
+				data-wp-class.has-modal-open="context.isMenuOpen"
+				data-wp-class.is-menu-open="context.isMenuOpen"
+				data-wp-bind.aria-hidden="!context.isMenuOpen"
+				data-wp-effect="effects.core.navigation.focusElement"
+				data-wp-on.keydown="effects.core.navigation.focusElement"
+				style="%7$s"
+				id="%1$s"
+			>
+				<div class="wp-block-navigation__responsive-close" tabindex="-1">
+					<div
+						class="wp-block-navigation__responsive-dialog"
+						aria-label="%8$s"
+						data-wp-bind.aria-modal="context.isMenuOpen"
+						data-wp-bind.role="context.roleAttribute"
+					>
+						<button
+							%4$s
+							class="wp-block-navigation__responsive-container-close"
+							data-wp-on.click="actions.core.navigation.closeMenu"
+						>
+							%10$s
+						</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
 					</div>
 				</div>
 			</div>',
-		esc_attr( $modal_unique_id ),
-		$inner_blocks_html,
-		$toggle_aria_label_open,
-		$toggle_aria_label_close,
-		esc_attr( implode( ' ', $responsive_container_classes ) ),
-		esc_attr( implode( ' ', $open_button_classes ) ),
-		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
-		__( 'Menu' ),
-		$toggle_button_content,
-		$toggle_close_button_content
-	);
+			esc_attr( $modal_unique_id ),
+			$inner_blocks_html,
+			$toggle_aria_label_open,
+			$toggle_aria_label_close,
+			esc_attr( implode( ' ', $responsive_container_classes ) ),
+			esc_attr( implode( ' ', $open_button_classes ) ),
+			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+			__( 'Menu' ),
+			$toggle_button_content,
+			$toggle_close_button_content
+		);
+	} else {
+		$responsive_container_markup = sprintf(
+			'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
+				<div class="%5$s" style="%7$s" id="%1$s">
+					<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
+						<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
+								<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
+							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
+								%2$s
+							</div>
+						</div>
+					</div>
+				</div>',
+			esc_attr( $modal_unique_id ),
+			$inner_blocks_html,
+			$toggle_aria_label_open,
+			$toggle_aria_label_close,
+			esc_attr( implode( ' ', $responsive_container_classes ) ),
+			esc_attr( implode( ' ', $open_button_classes ) ),
+			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+			__( 'Menu' ),
+			$toggle_button_content,
+			$toggle_close_button_content
+		);
+	}
 
-	return sprintf(
-		'<nav %1$s>%2$s</nav>',
-		$wrapper_attributes,
-		$responsive_container_markup
-	);
+	if ( $is_interactivity_api_enabled ) {
+		return sprintf(
+			'<nav
+				data-wp-island
+				data-wp-context=\'{ "isMenuOpen": false, "focusedElement": null, "menuButton": null, "roleAttribute": "" }\'
+				%2$s
+			>
+				%3$s
+			</nav>',
+			$modal_unique_id,
+			$wrapper_attributes,
+			$responsive_container_markup
+		);
+	} else {
+		return sprintf(
+			'<nav %1$s>%2$s</nav>',
+			$wrapper_attributes,
+			$responsive_container_markup
+		);
+	}
 }
 
 /**

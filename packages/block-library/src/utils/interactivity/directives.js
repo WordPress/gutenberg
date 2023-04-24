@@ -80,7 +80,7 @@ export default () => {
 		const contextValue = useContext( context );
 		Object.entries( on ).forEach( ( [ name, path ] ) => {
 			element.props[ `on${ name }` ] = ( event ) => {
-				return evaluate( path, { event, context: contextValue } );
+				return evaluate( path, { event, context: contextValue, tick } );
 			};
 		} );
 	} );
