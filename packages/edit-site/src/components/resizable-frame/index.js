@@ -46,12 +46,17 @@ function ResizableFrame( { isFull, children } ) {
 	const [ isHovering, setIsHovering ] = useState( false );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
+	const initialComputedWidthRef = useRef( null );
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 
 	// Calculate the frame size based on the window width as its resized.
 	const handleResize = ( event, direction, ref ) => {
 		const updatedWidth = ref.offsetWidth;
 		const updatedHeight = ref.offsetHeight;
+
+		if ( initialComputedWidthRef.current === null ) {
+			initialComputedWidthRef.current = updatedWidth;
+		}
 
 		// Set the initial aspect ratio if it hasn't been set yet.
 		if ( initialAspectRatioRef.current === null ) {
@@ -99,6 +104,14 @@ function ResizableFrame( { isFull, children } ) {
 		}
 	};
 
+	// Check if the frame is bleeding over the sidebar.
+	const isFrameBleeding = () => {
+		return (
+			initialComputedWidthRef.current !== null &&
+			frameSize.width > initialComputedWidthRef.current
+		);
+	};
+
 	return (
 		<ResizableBox
 			as={ motion.div }
@@ -119,7 +132,7 @@ function ResizableFrame( { isFull, children } ) {
 				bottomLeft: false,
 				topLeft: false,
 			} }
-			resizeRatio={ 2 }
+			resizeRatio={ isFrameBleeding() ? 1 : 2 }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
@@ -157,6 +170,7 @@ function ResizableFrame( { isFull, children } ) {
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-the-frame__inner', {
 				resizing: isResizing,
+				'is-bleeding': isFrameBleeding(),
 			} ) }
 		>
 			<motion.div

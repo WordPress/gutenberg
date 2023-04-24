@@ -139,6 +139,10 @@
 	}
 }
 
+.edit-site-layout__canvas:has(.is-bleeding) {
+	justify-content: flex-end;
+	align-items: flex-end;
+}
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
 .edit-site-layout__canvas .interface-interface-skeleton {
 	position: relative !important;
