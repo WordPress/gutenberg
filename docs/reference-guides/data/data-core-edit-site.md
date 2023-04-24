@@ -133,7 +133,15 @@ _Returns_
 
 ### hasPageContentLock
 
-Undocumented declaration.
+Whether or not the editor is locked so that only page content can be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor is locked.
 
 ### isFeatureActive
 
@@ -180,7 +188,19 @@ _Returns_
 
 ### isPage
 
-Undocumented declaration.
+Whether or not the editor has a page loaded into it.
+
+_Related_
+
+-   setPage
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -365,7 +385,15 @@ _Parameters_
 
 ### togglePageContentLock
 
-Undocumented declaration.
+Action that toggles whether or not the editor is locked so that only page content can be edited.
+
+_Parameters_
+
+-   _hasPageContentLock_ `boolean`: True to enable lock, false to disable, or undefined to toggle.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### updateSettings
 
