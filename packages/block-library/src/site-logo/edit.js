@@ -622,7 +622,10 @@ export default function LogoEdit( {
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
-										<Button onClick={ open }>
+										<Button
+											onClick={ open }
+											variant="secondary"
+										>
 											{ isLoading ? (
 												<Spinner />
 											) : (
