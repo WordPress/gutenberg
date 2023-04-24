@@ -51,6 +51,7 @@ function _wp_get_iframed_editor_assets__63() {
 	remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
 
 	wp_enqueue_style( 'wp-block-editor-content' );
+	wp_enqueue_script( 'wp-polyfill' );
 
 	ob_start();
 	wp_print_styles();
