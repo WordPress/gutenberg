@@ -17,26 +17,24 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
 export default function ContentBlocksList( { rootClientId } ) {
-	const { contentBlocks, selectedBlockClientId } = useSelect(
+	const contentBlocks = useSelect(
 		( select ) => {
 			const {
+				getSelectedBlockClientId,
 				__experimentalGetContentClientIdsTree,
 				getBlockName,
-				getSelectedBlockClientId,
 			} = select( blockEditorStore );
-			return {
-				contentBlocks: __experimentalGetContentClientIdsTree(
-					rootClientId
-				)
-					.map( ( block ) => ( {
-						...block,
-						blockName: getBlockName( block.clientId ),
-					} ) )
-					.filter(
-						( { blockName } ) => blockName !== 'core/list-item'
+			const selectedBlockClientId = getSelectedBlockClientId();
+			return __experimentalGetContentClientIdsTree( rootClientId )
+				.map( ( block ) => ( {
+					...block,
+					blockName: getBlockName( block.clientId ),
+					isSelected: blockHasDescendant(
+						block,
+						selectedBlockClientId
 					),
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
+				} ) )
+				.filter( ( { blockName } ) => blockName !== 'core/list-item' );
 		},
 		[ rootClientId ]
 	);
@@ -49,12 +47,12 @@ export default function ContentBlocksList( { rootClientId } ) {
 
 	return (
 		<VStack spacing={ 1 }>
-			{ contentBlocks.map( ( { clientId, blockName } ) => {
+			{ contentBlocks.map( ( { clientId, blockName, isSelected } ) => {
 				const blockType = getBlockType( blockName );
 				return (
 					<Button
 						key={ clientId }
-						isPressed={ clientId === selectedBlockClientId }
+						isPressed={ isSelected }
 						onClick={ () => selectBlock( clientId ) }
 					>
 						<HStack justify="flex-start">
@@ -65,5 +63,14 @@ export default function ContentBlocksList( { rootClientId } ) {
 				);
 			} ) }
 		</VStack>
+	);
+}
+
+function blockHasDescendant( block, clientId ) {
+	return (
+		block.clientId === clientId ||
+		block.innerBlocks.some( ( child ) =>
+			blockHasDescendant( child, clientId )
+		)
 	);
 }
