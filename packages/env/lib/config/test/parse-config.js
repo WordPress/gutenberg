@@ -22,12 +22,14 @@ jest.mock( 'fs', () => ( {
 	},
 } ) );
 jest.mock( 'os', () => ( {
-	homedir: jest.fn().mockReturnValue( '/home/test' ),
+	homedir: jest.fn(),
 } ) );
 jest.mock( 'got', () => jest.fn() );
 jest.mock( '../read-raw-config-file', () => jest.fn() );
 jest.mock( '../detect-directory-type', () => jest.fn() );
-jest.mock( '../../wordpress' );
+jest.mock( '../../wordpress', () => ( {
+	getLatestWordPressVersion: jest.fn(),
+} ) );
 
 /**
  * Since our configurations are merged, we will want to refer to the parsed default config frequently.
@@ -74,14 +76,12 @@ const DEFAULT_CONFIG = {
 
 describe( 'parseConfig', () => {
 	beforeEach( () => {
-		stat.mockReturnValue( Promise.reject( false ) );
-		readRawConfigFile.mockReturnValue( null );
-		getLatestWordPressVersion.mockReturnValue(
-			Promise.resolve( '100.0.0' )
-		);
-		detectDirectoryType.mockReturnValue( Promise.resolve( null ) );
+		stat.mockRejectedValue( false );
+		homedir.mockReturnValue( '/home/test' );
+		readRawConfigFile.mockResolvedValue( null );
+		detectDirectoryType.mockResolvedValue( null );
+		getLatestWordPressVersion.mockResolvedValue( '100.0.0' );
 	} );
-
 	afterEach( () => {
 		jest.clearAllMocks();
 		delete process.env.WP_ENV_HOME;
@@ -98,7 +98,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'should infer a core mounting default when ran from a WordPress directory', async () => {
-		detectDirectoryType.mockReturnValue( Promise.resolve( 'core' ) );
+		detectDirectoryType.mockResolvedValue( 'core' );
 
 		const parsed = await parseConfig( './' );
 
@@ -115,7 +115,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'should infer a plugin mounting default when ran from a plugin directory', async () => {
-		detectDirectoryType.mockReturnValue( Promise.resolve( 'plugin' ) );
+		detectDirectoryType.mockResolvedValue( 'plugin' );
 
 		const parsed = await parseConfig( './' );
 
@@ -132,7 +132,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'should infer a theme mounting default when ran from a theme directory', async () => {
-		detectDirectoryType.mockReturnValue( Promise.resolve( 'theme' ) );
+		detectDirectoryType.mockResolvedValue( 'theme' );
 
 		const parsed = await parseConfig( './' );
 
@@ -345,12 +345,11 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'throws when latest WordPress version needed but not found', async () => {
-		getLatestWordPressVersion.mockReturnValue( null );
+		getLatestWordPressVersion.mockResolvedValue( null );
 
 		expect.assertions( 1 );
 		try {
-			const parsed = await parseConfig( './' );
-			console.log( parsed );
+			await parseConfig( './' );
 		} catch ( e ) {
 			expect( e ).toEqual(
 				new ValidationError(
@@ -372,7 +371,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'uses non-hidden cache directory when using Snao-installed Docker', async () => {
-		stat.mockReturnValue( Promise.resolve( true ) );
+		stat.mockResolvedValue( true );
 
 		const parsed = await parseConfig( './' );
 

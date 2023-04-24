@@ -4,6 +4,7 @@
  * External dependencies
  */
 const path = require( 'path' );
+const { homedir } = require( 'os' );
 
 /**
  * Internal dependencies
@@ -12,13 +13,17 @@ const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
 jest.mock( 'os', () => ( {
-	homedir: jest.fn().mockReturnValue( '/home/test' ),
+	homedir: jest.fn(),
 } ) );
 
 describe( 'parseSourceString', () => {
 	const options = {
 		cacheDirectoryPath: '/test/cache',
 	};
+
+	beforeEach( () => {
+		homedir.mockReturnValue( '/home/test' );
+	} );
 
 	it( 'should do nothing when given an empty source', () => {
 		expect( parseSourceString( null, options ) ).toEqual( null );
