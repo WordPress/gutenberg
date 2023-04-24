@@ -8,6 +8,7 @@ module.exports = {
 				assert: 'htmlFor',
 			},
 		],
+		'jsx-a11y/anchor-has-content': 'off',
 		'jsx-a11y/media-has-caption': 'off',
 		'jsx-a11y/no-noninteractive-tabindex': 'off',
 		'jsx-a11y/role-has-required-aria-props': 'off',
