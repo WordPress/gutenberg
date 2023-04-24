@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/navigation` block.
  *
@@ -279,7 +280,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);
@@ -370,7 +371,6 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
-
 	// Default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'              => 'wp_navigation',
@@ -403,7 +403,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		function( $block ) {
+		function ( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -530,6 +530,12 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
+	$is_interactivity_api_enabled = false;
+	$gutenberg_experiments        = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
+		$is_interactivity_api_enabled = true;
+	}
+
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
@@ -561,13 +567,30 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
 	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-view' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
-	if ( $should_load_view_script ) {
-		wp_enqueue_script( 'wp-block-navigation-view' );
-	}
 
-	$should_load_modal_view_script = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'];
-	if ( $should_load_modal_view_script ) {
-		wp_enqueue_script( 'wp-block-navigation-view-modal' );
+	if ( $should_load_view_script ) {
+		if ( $is_interactivity_api_enabled ) {
+			wp_enqueue_script(
+				'interactivity-navigation',
+				plugins_url( '../interactive-blocks/navigation.min.js', __FILE__ ),
+				array( 'interactivity-runtime' )
+			);
+		} else {
+			wp_enqueue_script(
+				'wp-block-navigation-view',
+				plugins_url( '../blocks/navigation/view.min.js', __FILE__ ),
+				array()
+			);
+
+			$should_load_modal_view_script = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'];
+			if ( $should_load_modal_view_script ) {
+				wp_enqueue_script(
+					'wp-block-navigation-view-modal',
+					plugins_url( '../blocks/navigation/view-modal.min.js', __FILE__ ),
+					array()
+				);
+			}
+		}
 	}
 
 	$inner_blocks = $block->inner_blocks;
