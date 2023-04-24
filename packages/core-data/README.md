@@ -488,7 +488,15 @@ _Returns_
 
 ### getNavigationFallback
 
-Undocumented declaration.
+Retrieve the fallback Navigation.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `any`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 

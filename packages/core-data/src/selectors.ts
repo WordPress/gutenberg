@@ -1236,6 +1236,12 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
 }
 
+/**
+ * Retrieve the fallback Navigation.
+ *
+ * @param state Data state.
+ * @return The ID for the fallback Navigation post.
+ */
 export function getNavigationFallback( state: State ): any {
 	return state.navigationFallback;
 }
