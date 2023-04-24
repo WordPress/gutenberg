@@ -50,9 +50,7 @@ function _wp_get_iframed_editor_assets__63() {
 	do_action( 'enqueue_block_assets' );
 	remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
 
-	// This is a new hook for cases where we want to enqueue scripts/styles for
-	// the (iframed) editor content, but not for the front-end.
-	do_action( 'enqueue_block_editor_content_assets' );
+	wp_enqueue_style( 'wp-block-editor-content' );
 
 	ob_start();
 	wp_print_styles();
@@ -72,13 +70,6 @@ function _wp_get_iframed_editor_assets__63() {
 		'scripts' => $scripts,
 	);
 }
-
-add_action(
-	'enqueue_block_editor_content_assets',
-	function() {
-		wp_enqueue_style( 'wp-block-editor-content' );
-	}
-);
 
 add_filter(
 	'block_editor_settings_all',
