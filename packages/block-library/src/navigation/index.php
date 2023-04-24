@@ -79,6 +79,9 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * @return array An array of parsed block data.
  */
 function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::parse_blocks_from_menu_items' );
+
 	if ( empty( $menu_items ) ) {
 		return array();
 	}
@@ -254,6 +257,9 @@ function block_core_navigation_render_submenu_icon() {
  * @return object WP_Term The classic navigation.
  */
 function block_core_navigation_get_classic_menu_fallback() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback' );
+
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
@@ -294,6 +300,9 @@ function block_core_navigation_get_classic_menu_fallback() {
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback_blocks' );
+
 	// BEGIN: Code that already exists in wp_nav_menu().
 	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
 
@@ -330,6 +339,9 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::create_classic_menu_fallback' );
+
 	// See if we have a classic menu.
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
 
@@ -370,6 +382,8 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_most_recently_published_navigation' );
 
 	// Default to the most recently created menu.
 	$parsed_args = array(
@@ -452,14 +466,7 @@ function block_core_navigation_get_fallback_blocks() {
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	// Default to a list of Pages.
-	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
-
-	// If there are no navigation posts then try to find a classic menu
-	// and convert it into a block based navigation menu.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
-	}
+	$navigation_post = WP_Navigation_Fallback_Gutenberg::get_fallback();
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
