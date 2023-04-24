@@ -39,3 +39,21 @@
 .block-editor-hooks__toggle-control.block-editor-hooks__toggle-control {
 	margin-bottom: $grid-unit-20;
 }
+
+
+// Temporary
+
+.components-toggle-group-control__full-width {
+	.components-toggle-group-control-option-base {
+		width: 100%;
+		button {
+			width: 100%;
+		}
+	}
+}
+
+.components-wrapper-vstack {
+	> div {
+		margin-bottom: 0 !important;
+	}
+}

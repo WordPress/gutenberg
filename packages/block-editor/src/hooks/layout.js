@@ -13,17 +13,30 @@ import { useSelect } from '@wordpress/data';
 import {
 	// Button,
 	// ButtonGroup,
-	CustomSelectControl,
-	Flex,
-	FlexItem,
+	FlexBlock,
 	// ToggleControl,
+	Rect,
+	Path,
 	PanelBody,
 	RangeControl,
+	SVG,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, createPortal } from '@wordpress/element';
+import {
+	arrowRight,
+	arrowDown,
+	grid,
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+	justifySpaceBetween,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,6 +59,171 @@ function hasLayoutBlockSupport( blockName ) {
 		hasBlockSupport( blockName, '__experimentalLayout' )
 	);
 }
+import {
+	alignTop,
+	alignCenter,
+	alignBottom,
+	spaceBetween,
+} from '../components/block-vertical-alignment-control/icons';
+
+const horizontalAlignmentOptions = [
+	{
+		value: 'left',
+		icon: justifyLeft,
+		label: __( 'Left' ),
+	},
+	{
+		value: 'center',
+		icon: justifyCenter,
+		label: __( 'Middle' ),
+	},
+	{
+		value: 'right',
+		icon: justifyRight,
+		label: __( 'Right' ),
+	},
+	{
+		value: 'space-between',
+		icon: justifySpaceBetween,
+		label: __( 'Space Between' ),
+	},
+];
+
+const verticalAlignmentOptions = [
+	{
+		value: 'top',
+		icon: alignTop,
+		label: __( 'Top' ),
+	},
+	{
+		value: 'center',
+		icon: alignCenter,
+		label: __( 'Middle' ),
+	},
+	{
+		value: 'bottom',
+		icon: alignBottom,
+		label: __( 'Bottom' ),
+	},
+	{
+		value: 'space-between',
+		icon: spaceBetween,
+		label: __( 'Space Between' ),
+	},
+];
+
+const innerWidthOptions = [
+	{
+		value: 'fill',
+		icon: (
+			<SVG
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<Rect
+					x="19"
+					y="5"
+					width="1.5"
+					height="14"
+					fill="currentColor"
+				/>
+				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
+				<Path
+					d="M13.0005 9L16.0005 12L13.0005 15"
+					stroke="currentColor"
+				/>
+				<Path d="M11 15L8 12L11 9" stroke="currentColor" />
+			</SVG>
+		),
+		label: __( 'Fill' ),
+	},
+	{
+		value: 'fit',
+		icon: (
+			<SVG
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<Rect
+					x="13.0002"
+					y="5"
+					width="1.5"
+					height="14"
+					fill="currentColor"
+				/>
+				<Rect
+					x="8.00024"
+					y="5"
+					width="1.5"
+					height="14"
+					fill="currentColor"
+				/>
+				<Path
+					d="M21.0002 15L18.0002 12L21.0002 9"
+					stroke="currentColor"
+				/>
+				<Path d="M2 9L5 12L2 15" stroke="currentColor" />
+			</SVG>
+		),
+		label: __( 'Fit' ),
+	},
+	{
+		value: 'theme',
+		icon: (
+			<SVG
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<Rect
+					x="7"
+					y="11"
+					width="1.5"
+					height="1.5"
+					fill="currentColor"
+				/>
+				<Rect
+					x="10"
+					y="11"
+					width="1.5"
+					height="1.5"
+					fill="currentColor"
+				/>
+				<Rect
+					x="13"
+					y="11"
+					width="1.5"
+					height="1.5"
+					fill="currentColor"
+				/>
+				<Rect
+					x="16"
+					y="11"
+					width="1.5"
+					height="1.5"
+					fill="currentColor"
+				/>
+				<Rect
+					x="19"
+					y="5"
+					width="1.5"
+					height="14"
+					fill="currentColor"
+				/>
+				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
+			</SVG>
+		),
+		label: __( 'Fixed' ),
+	},
+];
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -227,10 +405,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		}
 	};
 
-	const onChangeInnerWidth = ( newInnerWidth ) => {
-		const {
-			selectedItem: { key },
-		} = newInnerWidth;
+	const onChangeInnerWidth = ( key ) => {
 		if ( key === 'theme' ) {
 			setAttributes( {
 				layout: { ...usedLayout, type: 'constrained', innerWidth: key },
@@ -284,63 +459,6 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		} );
 	};
 
-	const innerWidthOptions = [
-		{
-			key: 'fill',
-			name: __( 'Fill' ),
-		},
-		{
-			key: 'fit',
-			name: __( 'Fit' ),
-		},
-		{
-			key: 'theme',
-			name: __( 'Theme' ),
-		},
-		{
-			key: 'custom',
-			name: __( 'Custom' ),
-		},
-	];
-
-	const horizontalAlignmentOptions = [
-		{
-			key: 'left',
-			name: __( 'Left' ),
-		},
-		{
-			key: 'center',
-			name: __( 'Middle' ),
-		},
-		{
-			key: 'right',
-			name: __( 'Right' ),
-		},
-		{
-			key: 'space-between',
-			name: __( 'Space Between' ),
-		},
-	];
-
-	const verticalAlignmentOptions = [
-		{
-			key: 'top',
-			name: __( 'Top' ),
-		},
-		{
-			key: 'center',
-			name: __( 'Middle' ),
-		},
-		{
-			key: 'bottom',
-			name: __( 'Bottom' ),
-		},
-		{
-			key: 'space-between',
-			name: __( 'Space Between' ),
-		},
-	];
-
 	return (
 		<>
 			<InspectorControls>
@@ -349,6 +467,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
+								style={{marginBottom: , marginTop: 00}}
 								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
@@ -387,119 +506,160 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							onChange={ onChangeType }
 						/>
 					) } */ }
-
-					<ToggleGroupControl
-						__nextHasNoMarginBottom
-						size={ '__unstable-large' }
-						label={ __( 'Layout direction' ) }
-						value={
-							type === 'default' ||
-							type === 'constrained' ||
-							( type === 'flex' && orientation === 'vertical' )
-								? 'stack'
-								: type
-						}
-						onChange={ onChangeType }
-						isBlock={ true }
-					>
-						<ToggleGroupControlOption
-							key={ 'stack' }
-							value="stack"
-							label={ __( 'Stack' ) }
-						/>
-						<ToggleGroupControlOption
-							key={ 'row' }
-							value="flex"
-							label={ __( 'Row' ) }
-						/>
-						<ToggleGroupControlOption
-							key={ 'grid' }
-							value="grid"
-							label={ __( 'Grid' ) }
-						/>
-					</ToggleGroupControl>
-					{ layoutType && layoutType.name === 'grid' && (
-						<layoutType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
-						/>
-					) }
-					<RangeControl
-						label={ __( 'Gap' ) }
-						onChange={ onChangeGap }
-						value={ style?.spacing?.blockGap }
-						min={ 0 }
-						max={ 100 }
-						withInputField={ false }
-					/>
-					<p>ALIGN</p>
-					<Flex>
-						<FlexItem>
-							<CustomSelectControl
-								__nextUnconstrainedWidth
-								label="Vertical"
-								options={ verticalAlignmentOptions }
-								onChange={ ( { selectedItem } ) => {
-									setAttributes( {
-										layout: {
-											...usedLayout,
-											verticalAlignment: selectedItem.key,
-										},
-									} );
-								} }
+					<VStack spacing={ 3 } className="components-wrapper-vstack">
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							style={ { marginBottom: 0, marginTop: 0 } }
+							size={ '__unstable-large' }
+							label={ __( 'Layout direction' ) }
+							value={
+								type === 'default' ||
+								type === 'constrained' ||
+								( type === 'flex' &&
+									orientation === 'vertical' )
+									? 'stack'
+									: type
+							}
+							onChange={ onChangeType }
+							isBlock={ true }
+							className="components-toggle-group-control__full-width"
+						>
+							<ToggleGroupControlOptionIcon
+								key={ 'stack' }
+								icon={ arrowDown }
+								value="stack"
+								label={ __( 'Stack' ) }
 							/>
-						</FlexItem>
-						<FlexItem>
-							<CustomSelectControl
-								__nextUnconstrainedWidth
-								label="Horizontal"
-								options={ horizontalAlignmentOptions }
-								onChange={ ( { selectedItem } ) =>
-									setAttributes( {
-										layout: {
-											...usedLayout,
-											justifyContent: selectedItem.key,
-										},
-									} )
-								}
+							<ToggleGroupControlOptionIcon
+								key={ 'row' }
+								icon={ arrowRight }
+								value="flex"
+								label={ __( 'Row' ) }
 							/>
-						</FlexItem>
-					</Flex>
-					<div style={ { marginTop: '24px' } }>
-						<CustomSelectControl
-							__nextUnconstrainedWidth
-							label="Inner block width"
-							options={ innerWidthOptions }
-							onChange={ onChangeInnerWidth }
-						/>
-					</div>
-					{ layoutType &&
-						layoutType.name === 'grid' &&
-						orientation === 'horizontal' && (
-							<div style={ { marginTop: '24px' } }>
+							<ToggleGroupControlOptionIcon
+								key={ 'grid' }
+								icon={ grid }
+								value="grid"
+								label={ __( 'Grid' ) }
+							/>
+						</ToggleGroupControl>
+						{ layoutType && layoutType.name === 'grid' && (
+							<layoutType.inspectorControls
+								layout={ usedLayout }
+								onChange={ onChangeLayout }
+								layoutBlockSupport={ layoutBlockSupport }
+							/>
+						) }
+						<HStack spacing={ 2 } justify="stretch">
+							<FlexBlock>
 								<ToggleGroupControl
 									__nextHasNoMarginBottom
-									size={ '__unstable-large' }
-									label={ __( 'Wrap' ) }
-									value={ flexWrap }
-									onChange={ onChangeWrap }
+									style={ { marginBottom: 0, marginTop: 0 } }
+									label={ __( 'Vertical' ) }
+									value={
+										usedLayout?.verticalAlignment || 'top'
+									}
+									onChange={ ( selectedItem ) => {
+										setAttributes( {
+											layout: {
+												...usedLayout,
+												verticalAlignment: selectedItem,
+											},
+										} );
+									} }
 									isBlock={ true }
+									className="components-toggle-group-control__full-width"
 								>
-									<ToggleGroupControlOption
-										key={ 'wrap' }
-										value="wrap"
-										label={ __( 'Yes' ) }
-									/>
-									<ToggleGroupControlOption
-										key={ 'nowrap' }
-										value="nowrap"
-										label={ __( 'No' ) }
-									/>
+									{ verticalAlignmentOptions.map(
+										( option ) => (
+											<ToggleGroupControlOptionIcon
+												key={ option.value }
+												icon={ option.icon }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
 								</ToggleGroupControl>
-							</div>
-						) }
-					{ /* { layoutType &&
+							</FlexBlock>
+							<FlexBlock>
+								<ToggleGroupControl
+									__nextHasNoMarginBottom
+									style={ { marginBottom: 0, marginTop: 0 } }
+									label={ __( 'Horizontal' ) }
+									value={ 'left' }
+									isBlock={ true }
+									onChange={ ( selectedItem ) => {
+										setAttributes( {
+											layout: {
+												...usedLayout,
+												justifyContent: selectedItem,
+											},
+										} );
+									} }
+									className="components-toggle-group-control__full-width"
+								>
+									{ horizontalAlignmentOptions.map(
+										( { value, icon, label } ) => (
+											<ToggleGroupControlOptionIcon
+												key={ value }
+												icon={ icon }
+												value={ value }
+												label={ label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							</FlexBlock>
+						</HStack>
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							style={ { marginBottom: 0, marginTop: 0 } }
+							label={ __( 'Content width' ) }
+							value={ usedLayout?.verticalAlignment || 'top' }
+							onChange={ onChangeInnerWidth }
+							isBlock={ true }
+							className="components-toggle-group-control__full-width"
+						>
+							{ innerWidthOptions.map( ( option ) => (
+								<ToggleGroupControlOptionIcon
+									key={ option.value }
+									icon={ option.icon }
+									value={ option.value }
+									label={ option.label }
+								/>
+							) ) }
+						</ToggleGroupControl>
+						{ layoutType &&
+							layoutType.name === 'grid' &&
+							orientation === 'horizontal' && (
+								<div style={ { marginTop: '24px' } }>
+									<ToggleGroupControl
+										__nextHasNoMarginBottom
+										style={ {
+											marginBottom: 0,
+											marginTop: 0,
+										} }
+										size={ '__unstable-large' }
+										label={ __( 'Wrap' ) }
+										value={ flexWrap }
+										onChange={ onChangeWrap }
+										isBlock={ true }
+									>
+										<ToggleGroupControlOption
+											key={ 'wrap' }
+											value="wrap"
+											label={ __( 'Yes' ) }
+										/>
+										<ToggleGroupControlOption
+											key={ 'nowrap' }
+											value="nowrap"
+											label={ __( 'No' ) }
+										/>
+									</ToggleGroupControl>
+								</div>
+							) }
+						{ /* { layoutType &&
 						layoutType.name !== 'default' &&
 						layoutType.name !== 'constrained' && (
 							<layoutType.inspectorControls
@@ -508,13 +668,23 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								layoutBlockSupport={ layoutBlockSupport }
 							/>
 						) } */ }
-					{ constrainedType && displayControlsForLegacyLayouts && (
-						<constrainedType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
+						{ constrainedType &&
+							displayControlsForLegacyLayouts && (
+								<constrainedType.inspectorControls
+									layout={ usedLayout }
+									onChange={ onChangeLayout }
+									layoutBlockSupport={ layoutBlockSupport }
+								/>
+							) }
+						<RangeControl
+							label={ __( 'Gap' ) }
+							onChange={ onChangeGap }
+							value={ style?.spacing?.blockGap }
+							min={ 0 }
+							max={ 100 }
+							withInputField={ false }
 						/>
-					) }
+					</VStack>
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && blockEditingMode === 'default' && layoutType && (
