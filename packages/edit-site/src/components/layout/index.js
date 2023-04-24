@@ -144,16 +144,7 @@ export default function Layout() {
 					}
 				) }
 			>
-				<SiteHub
-					ref={ hubRef }
-					className="edit-site-layout__hub"
-					style={ {
-						width:
-							isResizingEnabled && forcedWidth
-								? forcedWidth - 48
-								: undefined,
-					} }
-				/>
+				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
 
 				<AnimatePresence initial={ false }>
 					{ isEditorPage && canvasMode === 'edit' && (
