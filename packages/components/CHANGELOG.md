@@ -8,6 +8,7 @@
 -   `parseStylesVariables()`: Refactor away from Lodash (mobile) ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
 -   Remove Lodash dependency from components package ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
 -   Tweak `WordPressComponent` type so `selector` property is optional ([#49960](https://github.com/WordPress/gutenberg/pull/49960)).
+-   `ToolbarItem`: Convert to TypeScript ([#49190](https://github.com/WordPress/gutenberg/pull/49190)).
 
 ### Enhancements
 
