@@ -51,6 +51,7 @@ const Edit = ( props ) => {
 					}
 				} }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 
 			{ isPopoverVisible && (
