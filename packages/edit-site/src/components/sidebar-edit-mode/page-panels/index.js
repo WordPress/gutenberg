@@ -14,7 +14,7 @@ import { useEntityRecord } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockPreview,
-	__experimentalContentBlocksList as ContentBlocksList,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
@@ -25,6 +25,9 @@ import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import removePageFromBlockContext from '../../../utils/remove-page-from-block-context';
 import SidebarCard from '../sidebar-card';
+import { unlock } from '../../../private-apis';
+
+const { ContentBlocksList } = unlock( blockEditorPrivateApis );
 
 export default function PagePanels() {
 	const context = useSelect(
