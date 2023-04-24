@@ -370,6 +370,31 @@ function SiteLogoReplaceFlow( { onRemoveLogo, ...mediaReplaceProps } ) {
 	);
 }
 
+const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
+	const {
+		alt_text: alt,
+		source_url: logoUrl,
+		slug: logoSlug,
+		media_details: logoMediaDetails,
+	} = mediaItemData;
+	const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
+	return (
+		<ItemGroup { ...itemGroupProps }>
+			<HStack justify="flex-start">
+				<img src={ logoUrl } alt={ alt } />
+				<FlexItem>
+					<Truncate
+						numberOfLines={ 1 }
+						className="block-library-site-logo__inspector-media-replace-title"
+					>
+						{ logoLabel }
+					</Truncate>
+				</FlexItem>
+			</HStack>
+		</ItemGroup>
+	);
+};
+
 export default function LogoEdit( {
 	attributes,
 	className,
@@ -442,12 +467,7 @@ export default function LogoEdit( {
 			site_icon: newValue ?? null,
 		} );
 
-	const {
-		alt_text: alt,
-		source_url: logoUrl,
-		slug: logoSlug,
-		media_details: logoMediaDetails,
-	} = mediaItemData ?? {};
+	const { alt_text: alt, source_url: logoUrl } = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
@@ -501,25 +521,6 @@ export default function LogoEdit( {
 			},
 			onError: onUploadError,
 		} );
-	};
-
-	const InspectorLogoPreview = ( { itemGroupProps } ) => {
-		const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
-		return (
-			<ItemGroup { ...itemGroupProps }>
-				<HStack justify="flex-start">
-					<img src={ logoUrl } alt={ alt } />
-					<FlexItem>
-						<Truncate
-							numberOfLines={ 1 }
-							className="block-library-site-logo__inspector-media-replace-title"
-						>
-							{ logoLabel }
-						</Truncate>
-					</FlexItem>
-				</HStack>
-			</ItemGroup>
-		);
 	};
 
 	const mediaReplaceFlowProps = {
@@ -595,9 +596,9 @@ export default function LogoEdit( {
 				<div className="block-library-site-logo__inspector-media-replace-container">
 					{ ! canUserEdit && !! logoUrl && (
 						<InspectorLogoPreview
+							mediaItemData={ mediaItemData }
 							itemGroupProps={ {
 								isBordered: true,
-								size: 'large',
 								className:
 									'block-library-site-logo__inspector-readonly-logo-preview',
 							} }
@@ -606,7 +607,11 @@ export default function LogoEdit( {
 					{ canUserEdit && !! logoUrl && (
 						<SiteLogoReplaceFlow
 							{ ...mediaReplaceFlowProps }
-							name={ <InspectorLogoPreview /> }
+							name={
+								<InspectorLogoPreview
+									mediaItemData={ mediaItemData }
+								/>
+							}
 							popoverProps={ {} }
 						/>
 					) }
