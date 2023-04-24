@@ -45,14 +45,14 @@ function useAppender( rootClientId, CustomAppender ) {
 			const {
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
-				__experimentalIsInsertionLocked,
+				isInsertionLocked,
 			} = select( blockEditorStore );
 
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			return {
 				hideInserter:
-					__experimentalIsInsertionLocked( rootClientId ) ||
+					isInsertionLocked( rootClientId ) ||
 					__unstableGetEditorMode() === 'zoom-out',
 				isParentSelected:
 					rootClientId === selectedBlockClientId ||

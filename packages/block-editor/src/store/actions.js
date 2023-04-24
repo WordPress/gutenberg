@@ -1625,7 +1625,7 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.__experimentalIsInsertionLocked( rootClientId );
+		const isLocked = select.isInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}
@@ -1650,7 +1650,7 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.__experimentalIsInsertionLocked( rootClientId );
+		const isLocked = select.isInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}

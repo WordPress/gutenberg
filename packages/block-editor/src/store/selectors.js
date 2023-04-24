@@ -1481,32 +1481,6 @@ export function getTemplateLock( state, rootClientId ) {
 	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
 }
 
-export const __experimentalIsInsertionLocked = createSelector(
-	( state, rootClientId = null ) => {
-		const templateLock = getTemplateLock( state, rootClientId );
-		if ( rootClientId && templateLock === 'contentOnly' ) {
-			// Lock insertion into a non content block.
-			const isWithinContentBlock =
-				__experimentalIsContentBlock( state, rootClientId ) ||
-				getBlockParents( state, rootClientId ).some(
-					( parentClientId ) =>
-						__experimentalIsContentBlock( state, parentClientId )
-				);
-			return ! isWithinContentBlock;
-		}
-		// Otherwise lock insertion when there is a lock.
-		return !! templateLock;
-	},
-	( state, rootClientId ) =>
-		rootClientId
-			? [
-					state.blockListSettings[ rootClientId ],
-					state.blocks.parents,
-					state.settings.contentBlockTypes,
-			  ]
-			: [ state.settings.templateLock ]
-);
-
 const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
 		return list;
@@ -1563,7 +1537,7 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	if ( __experimentalIsInsertionLocked( state, rootClientId ) ) {
+	if ( isInsertionLocked( state, rootClientId ) ) {
 		return false;
 	}
 
@@ -1679,6 +1653,46 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 		canInsertBlockType( state, getBlockName( state, id ), rootClientId )
 	);
 }
+
+/**
+ * Determines if the editor or a given container is locked and does not allow
+ * block insertion.
+ *
+ * Only the `templateLock` settings of the editor or container block are
+ * checked. For more rigorous checking that checks the `allowedBlockTypes`
+ * attribute, use `canInsertBlockType()`.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Container block's client ID, or `null` to check
+ *                               the editor.
+ *
+ * @return {boolean} Whether block insertion is locked.
+ */
+export const isInsertionLocked = createSelector(
+	( state, rootClientId = null ) => {
+		const templateLock = getTemplateLock( state, rootClientId );
+		if ( rootClientId && templateLock === 'contentOnly' ) {
+			// Lock insertion into a non content block.
+			const isWithinContentBlock =
+				__experimentalIsContentBlock( state, rootClientId ) ||
+				getBlockParents( state, rootClientId ).some(
+					( parentClientId ) =>
+						__experimentalIsContentBlock( state, parentClientId )
+				);
+			return ! isWithinContentBlock;
+		}
+		// Otherwise lock insertion when there is a lock.
+		return !! templateLock;
+	},
+	( state, rootClientId ) =>
+		rootClientId
+			? [
+					state.blockListSettings[ rootClientId ],
+					state.blocks.parents,
+					state.settings.contentBlockTypes,
+			  ]
+			: [ state.settings.templateLock ]
+);
 
 /**
  * Determines if the given block is allowed to be deleted.

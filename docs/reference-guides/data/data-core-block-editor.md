@@ -1025,6 +1025,21 @@ _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
 
+### isInsertionLocked
+
+Determines if the editor or a given container is locked and does not allow block insertion.
+
+Only the `templateLock` settings of the editor or container block are checked. For more rigorous checking that checks the `allowedBlockTypes` attribute, use `canInsertBlockType()`.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Container block's client ID, or `null` to check the editor.
+
+_Returns_
+
+-   `boolean`: Whether block insertion is locked.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
