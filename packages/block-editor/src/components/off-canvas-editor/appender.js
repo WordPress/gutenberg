@@ -17,9 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
-
-import { unlock } from '../../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+import { ComposedPrivateInserter as PrivateInserter } from '../inserter';
 
 const prioritizedInserterBlocks = [
 	'core/navigation-link/page',
@@ -86,7 +84,6 @@ export const Appender = forwardRef(
 		if ( hideInserter ) {
 			return null;
 		}
-		const { PrivateInserter } = unlock( blockEditorPrivateApis );
 		const descriptionId = `off-canvas-editor-appender__${ instanceId }`;
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
