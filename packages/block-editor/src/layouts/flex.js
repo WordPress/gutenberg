@@ -197,12 +197,7 @@ function FlexLayoutVerticalAlignmentControl( {
 } ) {
 	const { orientation = 'horizontal' } = layout;
 
-	const defaultVerticalAlignment =
-		orientation === 'horizontal'
-			? verticalAlignmentMap.center
-			: verticalAlignmentMap.top;
-
-	const { verticalAlignment = defaultVerticalAlignment } = layout;
+	const { verticalAlignment = 'top' } = layout;
 
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
@@ -264,7 +259,10 @@ function FlexLayoutJustifyContentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { justifyContent = 'left', orientation = 'horizontal' } = layout;
+	const { orientation = 'horizontal' } = layout;
+	const defaultJustification =
+		orientation === 'horizontal' ? 'left' : 'stretch';
+	const { justifyContent = defaultJustification } = layout;
 	const onJustificationChange = ( value ) => {
 		onChange( {
 			...layout,
