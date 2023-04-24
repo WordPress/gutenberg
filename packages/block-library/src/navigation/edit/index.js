@@ -27,9 +27,9 @@ import {
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -41,7 +41,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -220,44 +219,79 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
+	const { navigationFallback } = useSelect( ( select ) => {
+		const { getNavigationFallback } = select( coreStore );
+		return {
+			navigationFallback:
+				ref || hasUnsavedBlocks ? null : getNavigationFallback(),
+		};
+	}, [] );
+
 	useEffect( () => {
 		// If:
 		// - there is an existing menu, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks ) {
+		if ( ref || hasUnsavedBlocks || ! navigationFallback?.id ) {
 			return;
 		}
 
-		apiFetch( { path: '/wp-block-editor/v1/navigation-fallback' } )
-			.then( ( fallbackNavigationMenu ) => {
-				if ( ! fallbackNavigationMenu?.id ) {
-					showNavigationMenuStatusNotice(
-						__( 'Unable to fetch a fallback Navigation Menu.' )
-					);
-					return;
-				}
-
-				/**
-				 *  This fallback displays (both in editor and on front)
-				 *  The fallback should not request a save (entity dirty state)
-				 *  nor to be undoable, hence why it is marked as non persistent
-				 */
-				__unstableMarkNextChangeAsNotPersistent();
-				setRef( fallbackNavigationMenu.id );
-			} )
-			.catch( () => {
-				showNavigationMenuStatusNotice(
-					__( 'Unable to fetch a fallback Navigation Menu.' )
-				);
-			} );
+		/**
+		 *  This fallback displays (both in editor and on front)
+		 *  The fallback should not request a save (entity dirty state)
+		 *  nor to be undoable, hence why it is marked as non persistent
+		 */
+		__unstableMarkNextChangeAsNotPersistent();
+		setRef( navigationFallback.id );
 	}, [
 		ref,
-		hasUnsavedBlocks,
 		setRef,
-		showNavigationMenuStatusNotice,
+		hasUnsavedBlocks,
+		navigationFallback,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	// useEffect( () => {
+	// 	// If:
+	// 	// - there is an existing menu, OR
+	// 	// - there are existing (uncontrolled) inner blocks
+	// 	// ...then don't request a fallback menu.
+	// 	if ( ref || hasUnsavedBlocks || ! getNavigationFallback ) {
+	// 		return;
+	// 	}
+
+	// 	debugger;
+
+	// 	getNavigationFallback()
+	// 		.then( ( fallbackNavigationMenu ) => {
+	// 			if ( ! fallbackNavigationMenu?.id ) {
+	// 				showNavigationMenuStatusNotice(
+	// 					__( 'Unable to fetch a fallback Navigation Menu.' )
+	// 				);
+	// 				return;
+	// 			}
+
+	// 			/**
+	// 			 *  This fallback displays (both in editor and on front)
+	// 			 *  The fallback should not request a save (entity dirty state)
+	// 			 *  nor to be undoable, hence why it is marked as non persistent
+	// 			 */
+	// 			__unstableMarkNextChangeAsNotPersistent();
+	// 			setRef( fallbackNavigationMenu.id );
+	// 		} )
+	// 		.catch( () => {
+	// 			showNavigationMenuStatusNotice(
+	// 				__( 'Unable to fetch a fallback Navigation Menu.' )
+	// 			);
+	// 		} );
+	// }, [
+	// 	ref,
+	// 	hasUnsavedBlocks,
+	// 	setRef,
+	// 	showNavigationMenuStatusNotice,
+	// 	__unstableMarkNextChangeAsNotPersistent,
+	// 	getNavigationFallback,
+	// ] );
 
 	const navRef = useRef();
 
