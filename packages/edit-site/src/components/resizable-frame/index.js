@@ -6,11 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	ResizableBox,
 	__unstableMotion as motion,
-	__experimentalText as Text,
 } from '@wordpress/components';
 
 // Removes the inline styles in the drag handles.
@@ -26,33 +25,49 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-const devices = [
-	{
-		label: 'Mobile',
-		width: 480,
-		height: 640,
-	},
-	{
-		label: 'Tablet',
-		width: 1024,
-		height: 768,
-	},
-	{
-		label: 'Desktop',
-		width: null,
-		height: '100%',
-	},
-];
-
-const FRAME_TRANSITION = { type: 'tween', duration: 0.5 };
-const MIN_FRAME_SIZE = 240;
+const MIN_FRAME_SIZE = 340;
+const lerp = ( a, b, amount ) => {
+	return a + ( b - a ) * amount;
+};
 
 function ResizableFrame( { isFull, children } ) {
-	const [ frameWidth, setFrameWidth ] = useState( '100%' );
-	const [ frameDevice, setFrameDevice ] = useState( devices[ 2 ] );
-	const frameHeight = isFull ? '100%' : frameDevice?.height || '100%';
+	const [ frameSize, setFrameSize ] = useState( {
+		width: '100%',
+		height: '100%',
+	} );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
+
+	const initialAspectRatioRef = useRef( null );
+
+	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
+
+	const handleResize = ( event, direction, ref ) => {
+		const updatedWidth = ref.offsetWidth;
+		const updatedHeight = ref.offsetHeight;
+
+		if ( initialAspectRatioRef.current === null ) {
+			initialAspectRatioRef.current = updatedWidth / updatedHeight;
+		}
+
+		const lerpFactor =
+			1 -
+			Math.max(
+				0,
+				Math.min(
+					1,
+					( updatedWidth - MIN_FRAME_SIZE ) /
+						( 1300 - MIN_FRAME_SIZE )
+				)
+			);
+		const intermediateAspectRatio = lerp(
+			initialAspectRatioRef.current,
+			9 / 19.5,
+			lerpFactor
+		);
+		const newHeight = updatedWidth / intermediateAspectRatio;
+		setFrameSize( { width: updatedWidth, height: newHeight } );
+	};
 
 	return (
 		<ResizableBox
@@ -60,13 +75,10 @@ function ResizableFrame( { isFull, children } ) {
 			initial={ false }
 			animate={ {
 				flexGrow: isFull ? 1 : 0,
-				height: frameHeight,
+				height: frameSize.height,
 			} }
 			transition={ FRAME_TRANSITION }
-			size={ {
-				width: frameWidth,
-				height: frameHeight,
-			} }
+			size={ frameSize }
 			enable={ {
 				top: false,
 				right: false,
@@ -107,41 +119,11 @@ function ResizableFrame( { isFull, children } ) {
 							opacity: 0,
 							left: 0,
 						} }
-					>
-						{ isResizing && ! isFull && (
-							<motion.div
-								as={ Text }
-								size="footnote"
-								key="handle-label"
-								initial={ {
-									opacity: 0,
-									x: 20,
-								} }
-								animate={ {
-									opacity: 1,
-									x: 0,
-								} }
-								exit={ {
-									opacity: 0,
-									x: 20,
-								} }
-								className="edit-site-the-frame__handle-label"
-							>
-								{ frameDevice.label }
-							</motion.div>
-						) }
-					</motion.div>
+						whileHover={ { scale: 1.1 } }
+					/>
 				),
 			} }
-			onResizeStop={ ( e, direction, ref, d ) => {
-				setFrameWidth( frameWidth + d.width );
-			} }
-			onResize={ ( e, direction, ref ) => {
-				const device = devices.find( ( dev ) =>
-					dev.width ? ref.clientWidth < dev.width : dev
-				);
-				setFrameDevice( device );
-			} }
+			onResize={ handleResize }
 			className={ classnames( 'edit-site-the-frame__inner', {
 				resizing: isResizing,
 			} ) }
