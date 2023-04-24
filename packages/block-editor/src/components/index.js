@@ -97,6 +97,7 @@ export {
 	isValueSpacingPreset,
 	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
+export { default as __experimentalContentBlocksList } from './content-blocks-list';
 /*
  * Content Related Components
  */

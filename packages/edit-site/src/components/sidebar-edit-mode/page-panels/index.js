@@ -12,12 +12,10 @@ import { humanTimeDiff } from '@wordpress/date';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import {
-	store as blockEditorStore,
-	BlockIcon,
 	BlockContextProvider,
 	BlockPreview,
+	__experimentalContentBlocksList as ContentBlocksList,
 } from '@wordpress/block-editor';
-import { getBlockType } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -29,29 +27,8 @@ import removePageFromBlockContext from '../../../utils/remove-page-from-block-co
 import SidebarCard from '../sidebar-card';
 
 export default function PagePanels() {
-	const { context, contentBlocks, selectedBlockClientId } = useSelect(
-		( select ) => {
-			const { getEditedPostContext } = select( editSiteStore );
-			const {
-				getSettings,
-				getClientIdsWithDescendants,
-				getBlockName,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const { contentBlockTypes } = getSettings();
-			return {
-				context: getEditedPostContext(),
-				contentBlocks: getClientIdsWithDescendants()
-					.map( ( clientId ) => ( {
-						clientId,
-						blockName: getBlockName( clientId ),
-					} ) )
-					.filter( ( { blockName } ) =>
-						contentBlockTypes.includes( blockName )
-					),
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		},
+	const context = useSelect(
+		( select ) => select( editSiteStore ).getEditedPostContext(),
 		[]
 	);
 
@@ -64,7 +41,6 @@ export default function PagePanels() {
 		record: template,
 	} = useEditedEntityRecord();
 
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const { togglePageContentLock } = useDispatch( editSiteStore );
 
 	const blockContext = useMemo(
@@ -89,23 +65,8 @@ export default function PagePanels() {
 					) }
 				/>
 			</PanelBody>
-			{ /* TODO: DRY this with BlockInspectorLockedBlocks. */ }
 			<PanelBody title={ __( 'Content' ) }>
-				<VStack>
-					{ contentBlocks.map( ( { clientId, blockName } ) => {
-						const blockType = getBlockType( blockName );
-						return (
-							<Button
-								key={ clientId }
-								icon={ <BlockIcon icon={ blockType.icon } /> }
-								isPressed={ clientId === selectedBlockClientId }
-								onClick={ () => selectBlock( clientId ) }
-							>
-								{ blockType.title }
-							</Button>
-						);
-					} ) }
-				</VStack>
+				<ContentBlocksList />
 			</PanelBody>
 			<PanelBody
 				className="edit-site-edit-template-panel"
