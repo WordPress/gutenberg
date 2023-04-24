@@ -409,15 +409,13 @@ export const getAutosave =
 export const __experimentalGetTemplateForLink =
 	( link ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		// Ideally this should be using an apiFetch call
-		// We could potentially do so by adding a "filter" to the `wp_template` end point.
-		// Also it seems the returned object is not a regular REST API post type.
 		let template;
 		try {
-			template = await window
-				.fetch( addQueryArgs( link, { '_wp-find-template': true } ) )
-				.then( ( res ) => res.json() )
-				.then( ( { data } ) => data );
+			template = await apiFetch( {
+				url: addQueryArgs( link, {
+					'_wp-find-template': true,
+				} ),
+			} ).then( ( { data } ) => data );
 		} catch ( e ) {
 			// For non-FSE themes, it is possible that this request returns an error.
 		}
