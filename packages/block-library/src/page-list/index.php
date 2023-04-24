@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/pages` block.
  *
@@ -150,6 +151,12 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
+	$is_interactivity_api_enabled = false;
+	$gutenberg_experiments        = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
+		$is_interactivity_api_enabled = true;
+	}
+
 	$front_page_id = (int) get_option( 'page_on_front' );
 	$markup        = '';
 	foreach ( (array) $nested_pages as $page ) {
@@ -193,26 +200,53 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			wp_strip_all_tags( $title )
 		);
 
-		$markup .= '<li class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
+		if ( $is_interactivity_api_enabled ) {
+			$markup .= '<li data-wp-context=\' { "isSubmenuOpen": false } \' class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
 
-		if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
-			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) .
-			'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
-		} else {
-			$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . $title . '</a>';
-		}
-
-		if ( isset( $page['children'] ) ) {
-			if ( $is_navigation_child && $show_submenu_icons && ! $open_submenus_on_click ) {
-				$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
-				$markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
-				$markup .= '</button>';
+			if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
+				$markup .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" data-wp-bind.aria-expanded="context.isSubmenuOpen" aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) .
+					'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+			} else {
+				$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . $title . '</a>';
 			}
-			$markup .= '<ul class="wp-block-navigation__submenu-container">';
-			$markup .= block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $is_nested, $active_page_ancestor_ids, $colors, $depth + 1 );
-			$markup .= '</ul>';
+
+			if ( isset( $page['children'] ) ) {
+				if ( $is_navigation_child && $show_submenu_icons && ! $open_submenus_on_click ) {
+					$markup .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" data-wp-bind.aria-expanded="context.isSubmenuOpen" aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+					$markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+					$markup .= '</button>';
+				}
+				$markup .= '<ul 
+								data-wp-effect="effects.core.navigation.handleSubmenu" 
+								data-wp-context=\'{ "submenuButton": null }\'
+								class="wp-block-navigation__submenu-container"
+							>';
+				$markup .= block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $is_nested, $active_page_ancestor_ids, $colors, $depth + 1 );
+				$markup .= '</ul>';
+			}
+			$markup .= '</li>';
+		} else {
+			$markup .= '<li class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
+
+			if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
+				$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) .
+					'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+			} else {
+				$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . $title . '</a>';
+			}
+
+			if ( isset( $page['children'] ) ) {
+				if ( $is_navigation_child && $show_submenu_icons && ! $open_submenus_on_click ) {
+					$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+					$markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+					$markup .= '</button>';
+				}
+				$markup .= '<ul class="wp-block-navigation__submenu-container">';
+				$markup .= block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $is_nested, $active_page_ancestor_ids, $colors, $depth + 1 );
+				$markup .= '</ul>';
+			}
+			$markup .= '</li>';
 		}
-		$markup .= '</li>';
 	}
 	return $markup;
 }
@@ -292,7 +326,6 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 				'link'      => get_permalink( $page ),
 				'is_active' => $is_active,
 			);
-
 		}
 	}
 
