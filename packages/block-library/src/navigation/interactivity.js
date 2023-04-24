@@ -26,6 +26,13 @@ store( {
 						'has-modal-open'
 					);
 				},
+				openSubmenu: ( { context, ref } ) => {
+					context.isSubmenuOpen = true;
+					context.submenuButton = ref;
+				},
+				closeSubmenu: ( { context } ) => {
+					context.isSubmenuOpen = false;
+				},
 			},
 		},
 	},
@@ -59,23 +66,69 @@ store( {
 
 						// Focus the first element when menu is open
 						if ( ! context.focusedElement ) {
-							ref.querySelector( 'a:first-child' ).focus();
+							ref.querySelector(
+								'.wp-block-navigation-item > *:first-child'
+							).focus();
 						}
 
 						// Focus the close button when it gets out of the modal
 						if ( event?.key === 'Tab' ) {
 							if (
-								// Due to linting, it is used `ref.ownerDocument` instead of `document`
-								ref.ownerDocument.activeElement.closest(
+								window.document.activeElement.closest(
 									'.is-menu-open'
 								) !== ref
 							) {
-								ref.querySelector( 'button' ).focus();
+								ref.querySelector(
+									'button.wp-block-navigation__responsive-container-close'
+								).focus();
 							}
 						}
 
-						context.focusedElement =
-							ref.ownerDocument.activeElement;
+						context.focusedElement = window.document.activeElement;
+					}
+				},
+				handleSubmenu: async ( { actions, context, ref, tick } ) => {
+					if ( context.isSubmenuOpen ) {
+						async function closeSubmenu( e ) {
+							// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
+							await tick();
+							// Only close submenu if it gets outside of it while tabbing
+							if (
+								e.key &&
+								e.key !== 'Escape' &&
+								ref.contains( window.document.activeElement )
+							) {
+								return;
+							}
+
+							if (
+								e.key === 'Escape' ||
+								! ref.contains( window.document.activeElement )
+							) {
+								document.removeEventListener(
+									'click',
+									closeSubmenu
+								);
+								document.removeEventListener(
+									'keydown',
+									closeSubmenu
+								);
+
+								actions.core.navigation.closeSubmenu( {
+									context,
+								} );
+							}
+
+							// Return focus to the button when closing with "Escape"
+							if ( e.key === 'Escape' ) {
+								context.submenuButton.focus();
+							}
+						}
+
+						// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
+						await tick();
+						document.addEventListener( 'click', closeSubmenu );
+						document.addEventListener( 'keydown', closeSubmenu );
 					}
 				},
 			},

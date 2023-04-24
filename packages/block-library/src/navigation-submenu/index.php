@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/navigation-submenu` block.
  *
@@ -69,6 +70,12 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
+	$is_interactivity_api_enabled = false;
+	$gutenberg_experiments        = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
+		$is_interactivity_api_enabled = true;
+	}
+
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
@@ -99,8 +106,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-			( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
-			( $is_active ? ' current-menu-item' : '' ),
+				( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
+				( $is_active ? ' current-menu-item' : '' ),
 			'style' => $style_attribute,
 		)
 	);
@@ -117,7 +124,11 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		wp_strip_all_tags( $label )
 	);
 
-	$html = '<li ' . $wrapper_attributes . '>';
+	if ( $is_interactivity_api_enabled ) {
+		$html = '<li data-wp-context=\' { "isSubmenuOpen": false } \'' . $wrapper_attributes . '>';
+	} else {
+		$html = '<li ' . $wrapper_attributes . '>';
+	}
 
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
@@ -164,11 +175,19 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			if ( $is_interactivity_api_enabled ) {
+				$html .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false" data-wp-bind.aria-expanded="context.isSubmenuOpen">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			} else {
+				$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			}
 		}
 	} else {
 		// If menus open on click, we render the parent as a button.
-		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		if ( $is_interactivity_api_enabled ) {
+			$html .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false" data-wp-bind.aria-expanded="context.isSubmenuOpen">';
+		} else {
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		}
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';
@@ -180,7 +199,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
-
 	}
 
 	if ( $has_submenu ) {
@@ -232,12 +250,25 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			)
 		);
 
-		$html .= sprintf(
-			'<ul %s>%s</ul>',
-			$wrapper_attributes,
-			$inner_blocks_html
-		);
-
+		if ( $is_interactivity_api_enabled ) {
+			$html .= sprintf(
+				'<ul
+					data-wp-effect="effects.core.navigation.handleSubmenu" 
+					data-wp-context=\'{ "submenuButton": null }\'
+					%s
+				>
+					%s
+				</ul>',
+				$wrapper_attributes,
+				$inner_blocks_html
+			);
+		} else {
+			$html .= sprintf(
+				'<ul %s>%s</ul>',
+				$wrapper_attributes,
+				$inner_blocks_html
+			);
+		}
 	}
 
 	$html .= '</li>';
