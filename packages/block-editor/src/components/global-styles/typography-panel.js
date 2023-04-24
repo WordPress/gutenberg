@@ -19,7 +19,7 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
-import { getValueFromVariable, normalizeFalsyValue } from './utils';
+import { getValueFromVariable } from './utils';
 import { immutableSet } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -168,7 +168,7 @@ export default function TypographyPanel( {
 				[ 'typography', 'fontFamily' ],
 				slug
 					? `var:preset|font-family|${ slug }`
-					: normalizeFalsyValue( newValue )
+					: newValue || undefined
 			)
 		);
 	};
@@ -193,7 +193,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'fontSize' ],
-				normalizeFalsyValue( actualValue )
+				actualValue || undefined
 			)
 		);
 	};
@@ -215,8 +215,8 @@ export default function TypographyPanel( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontStyle: normalizeFalsyValue( newFontStyle ),
-				fontWeight: normalizeFalsyValue( newFontWeight ),
+				fontStyle: newFontStyle || undefined,
+				fontWeight: newFontWeight || undefined,
 			},
 		} );
 	};
@@ -234,7 +234,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'lineHeight' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
@@ -251,7 +251,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'letterSpacing' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
@@ -266,7 +266,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'textColumns' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
@@ -283,7 +283,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'textTransform' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
@@ -300,7 +300,7 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'textDecoration' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};

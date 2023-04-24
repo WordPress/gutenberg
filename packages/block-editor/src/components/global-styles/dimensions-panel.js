@@ -23,7 +23,7 @@ import { useCallback, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, normalizeFalsyValue } from './utils';
+import { getValueFromVariable } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -229,7 +229,7 @@ export default function DimensionsPanel( {
 			immutableSet(
 				value,
 				[ 'layout', 'contentSize' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
@@ -245,7 +245,7 @@ export default function DimensionsPanel( {
 			immutableSet(
 				value,
 				[ 'layout', 'wideSize' ],
-				normalizeFalsyValue( newValue )
+				newValue || undefined
 			)
 		);
 	};
