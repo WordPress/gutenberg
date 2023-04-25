@@ -15,26 +15,17 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
 class Tests_Fonts_GutenbergAddRegisteredFontsToThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
+	/**
+	 * Cache of test themes' `theme.json` contents.
+	 *
+	 * @var array
+	 */
 	private static $theme_json_data = array();
 
-	/**
-	 * Theme root directory.
-	 *
-	 * @var string
-	 */
-	private static $theme_root;
-
-	/**
-	 * Original theme directory.
-	 *
-	 * @var string
-	 */
-	private $orig_theme_dir;
-
 	public static function set_up_before_class() {
-		parent::set_up_before_class();
+		self::$requires_switch_theme_fixtures = true;
 
-		self::$theme_root = realpath( __DIR__ . '/../data/themedir1' );
+		parent::set_up_before_class();
 
 		$themes = array(
 			'block-theme',
@@ -44,60 +35,6 @@ class Tests_Fonts_GutenbergAddRegisteredFontsToThemeJson extends WP_Fonts_TestCa
 			$file                            = self::$theme_root . "/{$theme}/theme.json";
 			self::$theme_json_data[ $theme ] = json_decode( file_get_contents( $file ), true );
 		}
-	}
-
-	public function set_up() {
-		parent::set_up();
-
-		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
-
-		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
-		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', self::$theme_root );
-
-		// Set up the new root.
-		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
-		add_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
-		add_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
-
-		// Clear caches.
-		wp_clean_themes_cache();
-		unset( $GLOBALS['wp_themes'] );
-	}
-
-	public function tear_down() {
-		// Clear up the filters to modify the theme root.
-		remove_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
-		remove_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
-		remove_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
-
-		WP_Theme_JSON_Resolver::clean_cached_data();
-
-		parent::tear_down();
-	}
-	/**
-	 * Cleans up global scope.
-	 *
-	 * @global WP_Styles $wp_styles
-	 */
-	public function clean_up_global_scope() {
-		parent::clean_up_global_scope();
-
-		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
-		wp_clean_themes_cache();
-
-		if ( function_exists( 'wp_clean_theme_json_cache' ) ) {
-			wp_clean_theme_json_cache();
-		}
-
-		if ( function_exists( '_gutenberg_clean_theme_json_caches' ) ) {
-			_gutenberg_clean_theme_json_caches();
-		}
-
-		unset( $GLOBALS['wp_themes'] );
-	}
-
-	public function filter_set_theme_root() {
-		return self::$theme_root;
 	}
 
 	/**
