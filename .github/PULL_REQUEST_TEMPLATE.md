@@ -5,7 +5,7 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 <!-- In a few words, what is the PR actually doing? -->
 
 
-<!-- The next marker, if not removed, will generate a copilot-assited summary of the commits. -->
+<!-- The following marker, if not removed, will generate a copilot-assited summary of the commits. -->
 copilot:summary
 
 ## Why?
@@ -15,7 +15,7 @@ copilot:summary
 <!-- How is your PR addressing the issue at hand? What are the implementation details? -->
 
 
-<!-- The next marker, if not removed, will generate a copilot-assited detailed description, with implementation details, of the commits. -->
+<!-- The following marker, if not removed, will generate a copilot-assited detailed description, with implementation details, of the commits. -->
 copilot:walkthrough
 
 ## Testing Instructions
