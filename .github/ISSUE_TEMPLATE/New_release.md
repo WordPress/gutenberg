@@ -36,7 +36,7 @@ This issue is to provide visibility on the progress of the release process of Gu
 ### Between RC and Release
 
 -   [ ] Post a reminder in #core-editor for backporting PRs to RC (~Label Backport to Gutenberg RC)
-[ ] If there are any PRs marked as [Backport to RC](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed), run the [cherry-pick command to apply them](https://developer.wordpress.org/block-editor/contributors/code/release/auto-cherry-picking/#how-can-i-use-it-for-a-gutenberg-plugin-release) to the release branch. **This needs to be run locally**
+-   [ ] If there are any PRs marked as [Backport to RC](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed), run the [cherry-pick command to apply them](https://developer.wordpress.org/block-editor/contributors/code/release/auto-cherry-picking/#how-can-i-use-it-for-a-gutenberg-plugin-release) to the release branch. **This needs to be run locally**
 -   [ ] [Draft Release Post Highlights and Change Log](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit)
 -   [ ] Get assets from [Design Team](https://make.wordpress.org/design/) for the post
 -   [ ] Reach out to Highlight Authors to draft sections (if necessary)
