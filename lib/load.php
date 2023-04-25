@@ -121,6 +121,7 @@ require __DIR__ . '/experimental/l10n.php';
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-gutenberg-fonts-api-bc-layer.php';
 	require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
 	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-utils.php';
 	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';

@@ -148,66 +148,6 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Migrates deprecated webfonts structure into new API data structure,
-	 * i.e. variations grouped by their font-family.
-	 *
-	 * @param array $webfonts Array of webfonts to migrate.
-	 * @return array
-	 */
-	public function migrate_deprecated_structure( array $webfonts ) {
-		$message = 'A deprecated fonts array structure passed to wp_register_fonts(). ' .
-			'Variations must be grouped and keyed by their font family.';
-		_deprecated_argument( __METHOD__, '14.9.1', $message );
-
-		$new_webfonts = array();
-		foreach ( $webfonts as $webfont ) {
-			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
-			if ( ! $font_family ) {
-				continue;
-			}
-
-			if ( ! isset( $new_webfonts[ $font_family ] ) ) {
-				$new_webfonts[ $font_family ] = array();
-			}
-
-			$new_webfonts[ $font_family ][] = $webfont;
-		}
-
-		return $new_webfonts;
-	}
-
-	/**
-	 * Determines if the given webfonts array is the deprecated array structure.
-	 *
-	 * @param array $webfonts Array of webfonts to check.
-	 * @return bool True when deprecated structure, else false.
-	 */
-	public function is_deprecated_structure( array $webfonts ) {
-		// Checks the first key to determine if it's empty or non-string.
-		foreach ( $webfonts as $font_family => $variations ) {
-			return ! WP_Fonts_Utils::is_defined( $font_family );
-		}
-	}
-
-	/**
-	 * Handle the deprecated web fonts structure.
-	 *
-	 * @param array  $webfont Web font for extracting font family.
-	 * @param string $message Deprecation message to throw.
-	 * @return string|null The font family slug if successfully registered. Else null.
-	 */
-	protected function extract_font_family_from_deprecated_webfonts_structure( array $webfont, $message ) {
-		_deprecated_argument( __METHOD__, '14.9.1', $message );
-
-		$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
-		if ( ! $font_family ) {
-			return null;
-		}
-
-		return WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
-	}
-
-	/**
 	 * Gets the font slug.
 	 *
 	 * Helper function for reuse without the deprecation.

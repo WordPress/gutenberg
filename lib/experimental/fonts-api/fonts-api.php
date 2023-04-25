@@ -57,8 +57,8 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 		$wp_fonts   = wp_fonts();
 
 		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( $wp_fonts->is_deprecated_structure( $fonts ) ) {
-			$fonts = $wp_fonts->migrate_deprecated_structure( $fonts );
+		if ( Gutenberg_Fonts_API_BC_Layer::is_deprecated_structure( $fonts ) ) {
+			$fonts = Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure( $fonts );
 		}
 		// BACKPORT NOTE: end of code block.
 
