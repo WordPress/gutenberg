@@ -110,6 +110,5 @@ export const language = {
 	tagName: 'span',
 	className: 'lang-attribute',
 	edit: Edit,
-	icon: 'translation',
 	title,
 };
