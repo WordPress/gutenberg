@@ -3,51 +3,64 @@
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { useRefEffect } from '@wordpress/compose';
+import { useReducer } from '@wordpress/element';
 
-export default function FootnotesEdit( { attributes, setAttributes } ) {
-	const ref = useRefEffect(
-		( element ) => {
-			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
-			const config = { childList: true, subtree: true };
-			const observer = new defaultView.MutationObserver( () => {
-				const newOrder = Array.from(
-					ownerDocument.querySelectorAll( 'a.fn' )
-				).map( ( node ) => {
-					return node.getAttribute( 'href' ).slice( 1 );
-				} );
-				const currentOrder = attributes.footnotes.map(
-					( footnote ) => footnote.id
-				);
+export const order = new Map();
 
-				if ( newOrder.join( '' ) === currentOrder.join( '' ) ) {
-					return;
-				}
-
-				const newFootnotes = attributes.footnotes.filter( ( a ) => {
-					return newOrder.indexOf( a.id ) !== -1;
-				} );
-				newFootnotes.sort( ( a, b ) => {
-					return newOrder.indexOf( a.id ) - newOrder.indexOf( b.id );
-				} );
-				setAttributes( { footnotes: newFootnotes } );
+export default function FootnotesEdit( {
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
+	const ref = useRefEffect( ( element ) => {
+		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
+		const config = { childList: true, subtree: true };
+		const observer = new defaultView.MutationObserver( () => {
+			const newOrder = Array.from(
+				ownerDocument.querySelectorAll( 'a.fn' )
+			).map( ( node ) => {
+				return node.getAttribute( 'href' ).slice( 1 );
 			} );
+			const footnotes = Object.fromEntries(
+				attributes.footnotes.map( ( { content, id } ) => [
+					id,
+					content,
+				] )
+			);
+			attributes.footnotes = newOrder.map( ( id ) => {
+				return {
+					content: footnotes[ id ],
+					id,
+				};
+			} );
+			forceRender();
+		} );
 
-			observer.observe( ownerDocument, config );
-			return () => {
-				observer.disconnect();
-			};
-		},
-		[ attributes.footnotes ]
+		observer.observe( ownerDocument, config );
+		return () => {
+			observer.disconnect();
+		};
+	}, [] );
+	const footnotes = Object.fromEntries(
+		attributes.footnotes.map( ( { content, id } ) => [ id, content ] )
+	);
+	order.set(
+		clientId,
+		new Set( [
+			...( order.get( clientId ) || [] ),
+			...Object.keys( footnotes ),
+		] )
 	);
 	return (
 		<footer { ...useBlockProps( { ref } ) }>
 			<ol>
-				{ attributes.footnotes.map( ( { id, content } ) => (
+				{ Array.from( order.get( clientId ) ).map( ( id ) => (
 					<li id={ id } key={ id }>
 						<RichText
 							tagName="span"
-							value={ content }
+							value={ footnotes[ id ] }
 							onChange={ ( nextFootnote ) => {
 								setAttributes( {
 									footnotes: attributes.footnotes.map(
