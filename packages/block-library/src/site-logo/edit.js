@@ -379,10 +379,10 @@ const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
 	} = mediaItemData;
 	const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
 	return (
-		<ItemGroup { ...itemGroupProps }>
-			<HStack justify="flex-start">
+		<ItemGroup { ...itemGroupProps } as="span">
+			<HStack justify="flex-start" as="span">
 				<img src={ logoUrl } alt={ alt } />
-				<FlexItem>
+				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-library-site-logo__inspector-media-replace-title"
