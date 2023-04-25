@@ -13,7 +13,6 @@
 const anchorRule = require( 'eslint-plugin-jsx-a11y' ).rules[
 	'anchor-has-content'
 ];
-
 /**
  * Internal dependencies
  */
@@ -25,6 +24,14 @@ const meta = {
 			'Checks that anchors are not empty and have an href, relies on eslint-plugin-jsx-a11y/anchor-has-content under the hood. Supports usage of createInterpolateElement.',
 	},
 	fixable: 'code',
+	messages: {
+		anchorHasContent:
+			'Anchors must have content and the content must be accessible by a screen reader. Check the first parameter to createInterpolateElement.',
+		invalidMarkup:
+			'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
+		anchorHasHrefInterpolated:
+			'The second parameter to createInterpolateElement must have an anchor with an href when using an anchor.',
+	},
 	schema: [], // no options
 };
 
@@ -38,7 +45,8 @@ const getATagsContent = ( str ) => {
 const rule = function ( context ) {
 	return {
 		JSXOpeningElement: ( node ) => {
-			const isAnchor = node?.key?.name === 'a';
+			const isAnchor =
+				node?.key?.name === 'a' || node?.name?.name === 'a';
 			if ( ! isAnchor ) {
 				// not an anchor, so we don't care
 				return;
@@ -56,45 +64,28 @@ const rule = function ( context ) {
 			}
 			// createInterpolateElement's 1st argument (a string with markup).
 			const textParam = interpolatedEl.arguments[ 0 ] ?? [];
-			// createInterpolateElement's 2nd argument (a conversion map).
-			const hasTagProperties =
-				interpolatedEl.arguments[ 1 ]?.properties?.find(
-					( e ) => e.key.name === 'a'
-				);
-			if ( ! hasTagProperties ) {
-				// createInterpolateElement throws an error when there is an invalid or missing conversion map (2nd arg)
-				// but we still throw a lint error here in case we can catch some classes of problems early
-				context.report( {
-					node: interpolatedEl,
-					message:
-						'The second parameter to createInterpolateElement must have an anchor with an href in it when interpolation an anchor.',
-				} );
-			}
+
 			// this should always just be one node, but we will receive an array anyway
 			const nodeStr = textParam.arguments
 				.map( ( a ) => getTextContentFromNode( a ) )
 				.join( '' );
+			const tags = getATagsContent( nodeStr );
 			// if any of the anchors do not have content, we need to report an error like anchor-has-content does
-			getATagsContent( nodeStr ).forEach( ( content ) => {
+			tags.forEach( ( content ) => {
 				if ( content.length === 0 ) {
 					context.report( {
 						node: textParam,
-						message:
-							'Anchors must have content and the content must be accessible by a screen reader. Check the first parameter to createInterpolateElement.',
+						messageId: 'anchorHasContent',
 					} );
 				}
 			} );
 			/**
 			 * If the string does not contain a valid anchor, we need to report an error like anchor-has-content does.
 			 */
-			const unmatched = ! (
-				nodeStr.includes( '<a>' ) && nodeStr.includes( '</a>' )
-			);
-			if ( unmatched ) {
+			if ( tags.length === 0 ) {
 				context.report( {
 					node: interpolatedEl,
-					message:
-						'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
+					messageId: 'invalidMarkup',
 				} );
 			}
 		},
