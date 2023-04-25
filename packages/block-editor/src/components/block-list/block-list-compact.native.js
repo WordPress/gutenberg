@@ -14,27 +14,37 @@ import { useSelect } from '@wordpress/data';
  */
 import styles from './style.scss';
 import BlockListBlock from './block';
+import BlockListAppender from '../block-list-appender';
 
 /**
- * NOTE: This is a component currently used by the List block (V2)
- * It only passes the needed props for this block, if other blocks will use it
- * make sure you pass other props that might be required coming from:
- * components/inner-blocks/index.native.js
+ * NOTE: This component is only used by the List (V2) and Group blocks. It only
+ * passes the props required for these blocks. To use it with other blocks,
+ * update this component to support any additional props required by the new
+ * block: components/inner-blocks/index.native.js
  */
 
 function BlockListCompact( props ) {
 	const {
+		blockWidth,
 		marginHorizontal = styles.defaultBlock.marginLeft,
 		marginVertical = styles.defaultBlock.marginTop,
+		parentWidth,
+		renderAppender,
 		rootClientId,
 	} = props;
-	const { blockClientIds } = useSelect(
+	const { blockClientIds, isParentSelected } = useSelect(
 		( select ) => {
-			const { getBlockOrder } = select( blockEditorStore );
+			const { getBlockOrder, getSelectedBlockClientId } =
+				select( blockEditorStore );
 			const blockOrder = getBlockOrder( rootClientId );
+
+			const selectedBlockClientId = getSelectedBlockClientId();
 
 			return {
 				blockClientIds: blockOrder,
+				isParentSelected:
+					rootClientId === selectedBlockClientId ||
+					( ! rootClientId && ! selectedBlockClientId ),
 			};
 		},
 		[ rootClientId ]
@@ -45,10 +55,14 @@ function BlockListCompact( props ) {
 		marginHorizontal: -marginHorizontal,
 	};
 
+	const isEmptylist = blockClientIds.length === 0;
+
 	return (
 		<View style={ containerStyle } testID="block-list-wrapper">
 			{ blockClientIds.map( ( currentClientId ) => (
 				<BlockListBlock
+					blockWidth={ blockWidth }
+					parentWidth={ parentWidth }
 					clientId={ currentClientId }
 					rootClientId={ rootClientId }
 					key={ currentClientId }
@@ -56,6 +70,23 @@ function BlockListCompact( props ) {
 					marginVertical={ marginVertical }
 				/>
 			) ) }
+			{ renderAppender && isParentSelected && (
+				<View
+					style={ {
+						marginVertical:
+							isEmptylist && styles.defaultAppender.marginTop,
+						marginHorizontal:
+							! isEmptylist &&
+							marginHorizontal - styles.innerAppender.marginLeft,
+					} }
+				>
+					<BlockListAppender
+						rootClientId={ rootClientId }
+						renderAppender={ renderAppender }
+						showSeparator
+					/>
+				</View>
+			) }
 		</View>
 	);
 }

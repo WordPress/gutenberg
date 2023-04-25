@@ -65,6 +65,7 @@ function GroupEdit( {
 			blockWidth,
 			parentWidth: width,
 			renderAppender: isSelected && renderAppender,
+			useCompactList: true,
 		}
 	);
 
