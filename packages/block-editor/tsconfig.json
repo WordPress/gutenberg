@@ -23,6 +23,7 @@
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
+		{ "path": "../notices" },
 		{ "path": "../style-engine" },
 		{ "path": "../token-list" },
 		{ "path": "../url" },

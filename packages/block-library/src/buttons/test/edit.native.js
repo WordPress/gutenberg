@@ -2,12 +2,15 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
 	getEditorHtml,
 	within,
 	getBlock,
 	initializeEditor,
+	triggerBlockListLayout,
 	typeInRichText,
+	waitFor,
 } from 'test/helpers';
 
 /**
@@ -270,5 +273,123 @@ describe( 'Buttons block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
 		);
+	} );
+
+	describe( 'color customization', () => {
+		it( 'sets a text color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Luminous vivid amber' ) );
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a gradient background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap on the gradient segment
+			fireEvent.press( screen.getByLabelText( 'Gradient' ) );
+
+			// Tap one gradient color
+			fireEvent.press(
+				screen.getByLabelText( 'Light green cyan to vivid green cyan' )
+			);
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );

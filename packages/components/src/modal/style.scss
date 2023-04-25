@@ -39,8 +39,16 @@
 		@include reduce-motion("animation");
 
 		&.is-full-screen {
-			width: 90vw;
-			min-height: 90vh;
+			@include break-small() {
+				width: calc(100% - #{ $grid-unit-20 * 2 });
+				height: calc(100% - #{ $grid-unit-20 * 2 });
+				max-height: none;
+			}
+			@include break-medium() {
+				width: calc(100% - #{ $grid-unit-50 * 2 });
+				height: calc(100% - #{ $grid-unit-50 * 2 });
+				max-width: none;
+			}
 		}
 	}
 
