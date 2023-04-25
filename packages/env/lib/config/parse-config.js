@@ -3,12 +3,11 @@
  * External dependencies
  */
 const path = require( 'path' );
-const fs = require( 'fs' ).promises;
-const os = require( 'os' );
 
 /**
  * Internal dependencies
  */
+const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const {
@@ -107,8 +106,8 @@ module.exports = async function parseConfig( configDirectoryPath ) {
 	// containing the desired options in order of precedence.
 	const mergedConfig = mergeConfigs(
 		defaultConfig,
-		localConfig,
-		overrideConfig,
+		localConfig ?? {},
+		overrideConfig ?? {},
 		environmentVarOverrides
 	);
 
@@ -219,50 +218,18 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 }
 
 /**
- * Gets the directory in which generated files are created.
- *
- * By default: '~/.wp-env/'. On Linux with snap packages: '~/wp-env/'. Can be
- * overridden with the WP_ENV_HOME environment variable.
- *
- * @return {Promise<string>} The absolute path to the `wp-env` home directory.
- */
-async function getCacheDirectory() {
-	// Allow user to override download location.
-	if ( process.env.WP_ENV_HOME ) {
-		return path.resolve( process.env.WP_ENV_HOME );
-	}
-
-	/**
-	 * Installing docker with Snap Packages on Linux is common, but does not
-	 * support hidden directories. Therefore we use a public directory when
-	 * snap packages exist.
-	 *
-	 * @see https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325
-	 */
-	let usesSnap;
-	try {
-		await fs.stat( '/snap' );
-		usesSnap = true;
-	} catch {
-		usesSnap = false;
-	}
-
-	return path.resolve( os.homedir(), usesSnap ? 'wp-env' : '.wp-env' );
-}
-
-/**
  * Parses a raw config into an unvalidated service config.
  *
  * @param {string} configFile                 The config file that we're parsing.
  * @param {Object} options
  * @param {string} options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {Promise<WPServiceConfig>} The config service object.
+ * @return {Promise<WPServiceConfig|null>} The config service object.
  */
 async function parseConfigFile( configFile, options ) {
 	const rawConfig = await readRawConfigFile( configFile );
 	if ( ! rawConfig ) {
-		return {};
+		return null;
 	}
 
 	return await parseRootConfig( configFile, rawConfig, options );

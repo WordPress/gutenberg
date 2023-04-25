@@ -3,28 +3,20 @@
 /**
  * External dependencies
  */
-const { stat } = require( 'fs' ).promises;
-const { homedir } = require( 'os' );
 const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
 const parseConfig = require( '../parse-config' );
+const getCacheDirectory = require( '../get-cache-directory' );
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { getLatestWordPressVersion } = require( '../../wordpress' );
 const { ValidationError } = require( '../validate-config' );
 const detectDirectoryType = require( '../detect-directory-type' );
 
-jest.mock( 'fs', () => ( {
-	promises: {
-		stat: jest.fn(),
-	},
-} ) );
-jest.mock( 'os', () => ( {
-	homedir: jest.fn(),
-} ) );
 jest.mock( 'got', () => jest.fn() );
+jest.mock( '../get-cache-directory', () => jest.fn() );
 jest.mock( '../read-raw-config-file', () => jest.fn() );
 jest.mock( '../detect-directory-type', () => jest.fn() );
 jest.mock( '../../wordpress', () => ( {
@@ -76,15 +68,14 @@ const DEFAULT_CONFIG = {
 
 describe( 'parseConfig', () => {
 	beforeEach( () => {
-		stat.mockRejectedValue( false );
-		homedir.mockReturnValue( '/home/test' );
+		getCacheDirectory.mockResolvedValue( '/home/test/.wp-env' );
 		readRawConfigFile.mockResolvedValue( null );
 		detectDirectoryType.mockResolvedValue( null );
 		getLatestWordPressVersion.mockResolvedValue( '100.0.0' );
 	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
-		delete process.env.WP_ENV_HOME;
 		delete process.env.WP_ENV_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
@@ -357,28 +348,6 @@ describe( 'parseConfig', () => {
 				)
 			);
 		}
-	} );
-
-	it( 'uses WP_ENV_HOME for cache directory when set', async () => {
-		process.env.WP_ENV_HOME = '/test';
-
-		const parsed = await parseConfig( './' );
-
-		expect( homedir ).not.toHaveBeenCalled();
-		expect( parsed.coreSource.path ).toEqual(
-			'/test/0afa32312977c8e3510775b85c20017d/WordPress'
-		);
-	} );
-
-	it( 'uses non-hidden cache directory when using Snao-installed Docker', async () => {
-		stat.mockResolvedValue( true );
-
-		const parsed = await parseConfig( './' );
-
-		expect( homedir ).toHaveBeenCalled();
-		expect( parsed.coreSource.path ).toEqual(
-			'/home/test/wp-env/0afa32312977c8e3510775b85c20017d/WordPress'
-		);
 	} );
 } );
 /* eslint-enable jest/no-conditional-expect */
