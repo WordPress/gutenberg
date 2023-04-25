@@ -19,8 +19,6 @@ remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
  * @since 6.0.0
  * @access private
  *
- * @global string $pagenow The filename of the current screen.
- *
  * @return array {
  *     The block editor assets.
  *
@@ -28,7 +26,7 @@ remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
  *     @type string|false $scripts String containing the HTML for scripts.
  * }
  */
-function _wp_get_iframed_editor_assets__63() {
+function _gutenberg_get_iframed_editor_assets() {
 	global $wp_styles, $wp_scripts;
 
 	// Keep track of the styles and scripts instance to restore later.
@@ -76,7 +74,7 @@ add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
 		// We must override what core is passing now.
-		$settings['__unstableResolvedAssets'] = _wp_get_iframed_editor_assets__63();
+		$settings['__unstableResolvedAssets'] = _gutenberg_get_iframed_editor_assets();
 		return $settings;
 	},
 	100
