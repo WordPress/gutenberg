@@ -34,6 +34,8 @@ module.exports = function postProcessConfig( config ) {
 function appendPortToWPConfigs( config ) {
 	const options = [ 'WP_TESTS_DOMAIN', 'WP_SITEURL', 'WP_HOME' ];
 
+	console.log( config );
+
 	// We are only interested in editing the config options for environment-specific configs.
 	// If we made this change to the root config it would cause problems since they would
 	// be mapped to all environments even though the ports will be different.

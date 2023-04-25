@@ -63,12 +63,8 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 		const rootConfig = Object.assign( {
 			...config,
 			config: Object.assign( {}, config.config ),
-			pluginSources: {
-				...config.pluginSources,
-			},
-			themeSources: {
-				...config.themeSources,
-			},
+			pluginSources: [ ...config.pluginSources ],
+			themeSources: [ ...config.themeSources ],
 			mappings: Object.assign( {}, config.mappings ),
 		} );
 
