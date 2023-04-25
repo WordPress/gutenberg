@@ -21,19 +21,17 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'a11y-anchor-has-content', rule, {
 	valid: [
 		{
-			// Interpolated anchor with href and content in/out of the anchor
 			code: `
 			( ) => {
 				( <div>
-					   { createInterpolateElement( __( 'help me <a> test with multiple words </a>.' ), {
-							   a: <a href="https://example.com" />,
+					   { createInterpolateElement( __( 'This is a <a> link </a>.' ), {
+							   a: <a href="https://wordpress.org" />,
 					   } ) }
 				   </div>
 			   )
 		   };`,
 		},
 		{
-			// Interpolated anchor with href and target
 			code: `
 			( ) => {
 				( <div>
@@ -55,7 +53,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			// ⚠️ this is INVALID code, but out of scope for a11y-anchor-has-content so it should pass here (it gets caught by jsx-a11y/anchor-is-valid instead)
+			// ⚠️ This is invalid code that would get flagged by jsx-a11y/anchor-is-valid, but NOT by eslint-plugin-jsx-a11y/anchor-has-content or @wordpress/a11-anchor-has-content.
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -67,7 +65,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			// ⚠️ this is INVALID code, but to really catch this usecase we'd need a lint rule about createInterpolate + <a> tags that's out of scope right now
+			// ⚠️ This passes the linter, but it's actually invalid code that would fail in runtime with createInterpolateElement due to missing the conversion map.
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -75,12 +73,6 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 				   </div>
 			   )
 		   };`,
-			errors: [
-				{
-					//we are in the interpolate wrapper
-					messageId: 'anchorHasHrefInterpolated',
-				},
-			],
 		},
 	],
 	invalid: [
@@ -89,7 +81,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 			<a ></a>`,
 			errors: [
 				{
-					// we are in the eslint/a11y plugin rule, and there is no messageId there
+					// Linter failure and message by eslint-plugin-jsx-a11y/anchor-has-content.
 					message:
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
@@ -105,7 +97,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					// we are in the eslint/a11y plugin rule, and there is no messageId there
+					// Linter failure and message by eslint-plugin-jsx-a11y/anchor-has-content.
 					message:
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
@@ -123,7 +115,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					//we are in the interpolate wrapper
+					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'anchorHasContent',
 				},
 			],
@@ -140,7 +132,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					//we are in the interpolate wrapper
+					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'invalidMarkup',
 				},
 			],
@@ -157,7 +149,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					//we are in the interpolate wrapper
+					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'invalidMarkup',
 				},
 			],
