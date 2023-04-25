@@ -43,6 +43,8 @@ function _gutenberg_get_iframed_editor_assets() {
 	$wp_scripts->registered = $current_wp_scripts->registered;
 
 	wp_enqueue_style( 'wp-block-editor-content' );
+	// To do: investigate why this is not enqueued through enqueue_block_assets,
+	// as styles for non-core blocks are.
 	wp_enqueue_style( 'wp-block-library' );
 	wp_enqueue_script( 'wp-polyfill' );
 
