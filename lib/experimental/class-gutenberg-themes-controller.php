@@ -439,7 +439,7 @@ class Gutenberg_Themes_Controller extends WP_REST_Themes_Controller {
 	 * Handle updating a theme's status.
 	 *
 	 * @param string $stylesheet The theme to update.
-	 * @param string $new_status The plugin's new status.
+	 * @param string $new_status The theme's new status.
 	 * @param string $current_status The plugin's current status.
 	 *
 	 * @return boolean
