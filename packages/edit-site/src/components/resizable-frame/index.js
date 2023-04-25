@@ -99,9 +99,12 @@ function ResizableFrame( { isFull, children } ) {
 		if ( event.clientX < 250 ) {
 			setCanvasMode( 'edit' );
 			// Wait for the frame to animate to full screen before resetting its size.
-			setInterval( () => {
+			const timeoutId = setTimeout( () => {
 				setFrameSize( { width: '100%', height: '100%' } );
 			}, 500 );
+
+			// Clean up the timeout when the effect is no longer needed.
+			return () => clearTimeout( timeoutId );
 		}
 
 		setIsResizing( false );
@@ -135,14 +138,14 @@ function ResizableFrame( { isFull, children } ) {
 				bottomLeft: false,
 				topLeft: false,
 			} }
-			resizeRatio={ isFrameBleeding() ? 1 : 2 }
+			resizeRatio={ 1.5 }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
 				right: HANDLE_STYLES_OVERRIDE,
 			} }
 			minWidth={ MIN_FRAME_SIZE }
-			maxWidth={ '200%' }
+			maxWidth={ '150%' }
 			maxHeight={ '100%' }
 			onMouseOver={ () => setIsHovering( true ) }
 			onMouseOut={ () => setIsHovering( false ) }
