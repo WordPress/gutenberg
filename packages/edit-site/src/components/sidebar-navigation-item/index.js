@@ -28,24 +28,23 @@ export default function SidebarNavigationItem( {
 			) }
 			{ ...props }
 		>
-			{ icon && (
-				<HStack justify="flex-start">
+			<HStack justify="flex-start">
+				{ icon && (
 					<Icon
 						style={ { fill: 'currentcolor' } }
 						icon={ icon }
 						size={ 24 }
 					/>
-					<FlexBlock>{ children }</FlexBlock>
-					{ withChevron && (
-						<Icon
-							style={ { fill: 'currentcolor' } }
-							icon={ chevronRight }
-							size={ 24 }
-						/>
-					) }
-				</HStack>
-			) }
-			{ ! icon && children }
+				) }
+				<FlexBlock>{ children }</FlexBlock>
+				{ withChevron && (
+					<Icon
+						style={ { fill: 'currentcolor' } }
+						icon={ chevronRight }
+						size={ 24 }
+					/>
+				) }
+			</HStack>
 		</Item>
 	);
 }

@@ -112,6 +112,7 @@ export default function SidebarNavigationScreenTemplates() {
 									postType={ postType }
 									postId={ template.id }
 									key={ template.id }
+									withChevron
 								>
 									{ decodeEntities(
 										template.title?.rendered ||
