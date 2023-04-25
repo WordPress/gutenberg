@@ -42,6 +42,18 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 			   )
 		   };`,
 		},
+		// Anchor with a custom component as content. It may or may not be valid. No errors are triggered.
+		{
+			code: `
+			( ) => {
+				( <div>
+					   { createInterpolateElement( __( 'help me <a> <TextWrapper /> </a>.' ), {
+							   a: <a href="https://example.com" target="_blank" />,
+					   } ) }
+				   </div>
+			   )
+		   };`,
+		},
 		{
 			// Anchor without createInterpolateElement
 			code: `
