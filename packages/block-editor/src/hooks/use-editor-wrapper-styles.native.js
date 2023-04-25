@@ -213,14 +213,15 @@ export function useEditorWrapperStyles( {
 	);
 
 	const wrapperStyles = useMemo( () => {
-		const stretchStyle = contentResizeMode === 'stretch' && { flex: 1 };
-		let canvasStyles = ! reversed
-			? styles[ 'use-editor-wrapper-styles' ]
-			: styles[ 'use-editor-wrapper-styles--reversed' ];
+		let canvasStyles;
 
-		// For these cases, no width constraints should be added.
-		if ( stretchStyle ) {
-			canvasStyles = stretchStyle;
+		if ( contentResizeMode === 'stretch' ) {
+			// For these cases, no width constraints should be added.
+			canvasStyles = { flex: 1 };
+		} else if ( reversed ) {
+			canvasStyles = styles[ 'use-editor-wrapper-styles--reversed' ];
+		} else {
+			canvasStyles = styles[ 'use-editor-wrapper-styles' ];
 		}
 
 		const alignmentStyles = {
