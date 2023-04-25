@@ -15,30 +15,15 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { useEditorWrapperStyles } from '../use-editor-wrapper-styles';
 
 jest.mock( '../use-editor-wrapper-styles.scss', () => ( {
-	'block-editor-hooks__use-editor-wrapper-styles': {
+	'use-editor-wrapper-styles': {
 		width: '100%',
 		maxWidth: 580,
 		alignSelf: 'center',
 	},
-	'block-editor-hooks__use-editor-wrapper-styles--reversed': {
+	'use-editor-wrapper-styles--reversed': {
 		flexDirection: 'column-reverse',
 		width: '100%',
 		maxWidth: 580,
-	},
-	'block-editor-hooks__use-editor-wrapper-styles-alignment--full': {
-		maxWidth: '100%',
-	},
-	'block-editor-hooks__use-editor-wrapper-styles-alignment--wide': {
-		maxWidth: 1054,
-	},
-	'block-editor-hooks__use-editor-wrapper-styles-alignment--wide-medium': {
-		maxWidth: 770,
-	},
-	'block-editor-hooks__use-editor-wrapper-styles-alignment--wide-landscape': {
-		maxWidth: 662,
-	},
-	'block-editor-hooks__use-editor-wrapper-styles-block': {
-		marginLeft: 16,
 	},
 } ) );
 

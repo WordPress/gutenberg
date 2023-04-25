@@ -18,6 +18,15 @@ import {
  */
 import styles from './use-editor-wrapper-styles.scss';
 
+const ALIGNMENT_MAX_WIDTH = {
+	full: '100%',
+	wide: 1054,
+	wideMedium: 770,
+	wideLandscape: 662,
+};
+
+const BLOCK_DEFAULT_MARGIN = 16;
+
 /**
  * Get the styles for the wide width alignment.
  *
@@ -32,9 +41,7 @@ function getWideWidthStyles( align, isLandscape, width ) {
 	}
 
 	if ( isLandscape && width < ALIGNMENT_BREAKPOINTS.large ) {
-		return styles[
-			'block-editor-hooks__use-editor-wrapper-styles-alignment--wide-landscape'
-		];
+		return { maxWidth: ALIGNMENT_MAX_WIDTH.wideLandscape };
 	}
 
 	if ( width <= ALIGNMENT_BREAKPOINTS.small ) {
@@ -45,14 +52,10 @@ function getWideWidthStyles( align, isLandscape, width ) {
 		width >= ALIGNMENT_BREAKPOINTS.medium &&
 		width < ALIGNMENT_BREAKPOINTS.wide
 	) {
-		return styles[
-			'block-editor-hooks__use-editor-wrapper-styles-alignment--wide-medium'
-		];
+		return { maxWidth: ALIGNMENT_MAX_WIDTH.wideMedium };
 	}
 
-	return styles[
-		'block-editor-hooks__use-editor-wrapper-styles-alignment--wide'
-	];
+	return { maxWidth: ALIGNMENT_MAX_WIDTH.wide };
 }
 
 /**
@@ -67,9 +70,7 @@ function getWideWidthStyles( align, isLandscape, width ) {
 function getFullWidthStyles( align, blockName, hasParents, parentBlockName ) {
 	const { isContainerRelated, isFullWidth } = alignmentHelpers;
 	const fullWidthStyles = isFullWidth( align )
-		? styles[
-				'block-editor-hooks__use-editor-wrapper-styles-alignment--full'
-		  ]
+		? { maxWidth: ALIGNMENT_MAX_WIDTH.full }
 		: {};
 
 	if (
@@ -78,10 +79,7 @@ function getFullWidthStyles( align, blockName, hasParents, parentBlockName ) {
 		! isContainerRelated( parentBlockName ) &&
 		isContainerRelated( blockName )
 	) {
-		fullWidthStyles.paddingHorizontal =
-			styles[
-				'block-editor-hooks__use-editor-wrapper-styles-block'
-			].marginLeft;
+		fullWidthStyles.paddingHorizontal = BLOCK_DEFAULT_MARGIN;
 	}
 
 	return fullWidthStyles;
@@ -209,10 +207,8 @@ export function useEditorWrapperStyles( {
 	const wrapperStyles = useMemo( () => {
 		const stretchStyle = contentResizeMode === 'stretch' && { flex: 1 };
 		let canvasStyles = ! reversed
-			? styles[ 'block-editor-hooks__use-editor-wrapper-styles' ]
-			: styles[
-					'block-editor-hooks__use-editor-wrapper-styles--reversed'
-			  ];
+			? styles[ 'use-editor-wrapper-styles' ]
+			: styles[ 'use-editor-wrapper-styles--reversed' ];
 
 		// For these cases, no width constraints should be added.
 		if ( stretchStyle ) {
