@@ -59,7 +59,9 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			<div { ...innerBlocksProps } />
 			<BlockControls group="other">
 				<ToolbarButton
-					onClick={ () => setAttributes( { unsynced: true } ) }
+					onClick={ () =>
+						setAttributes( { syncStatus: 'unsynced' } )
+					}
 				>
 					Unsync
 				</ToolbarButton>
