@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../a11y-interpolated-anchor';
+import rule from '../a11y-anchor-has-content';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -18,7 +18,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'a11y-interpolated-anchor', rule, {
+ruleTester.run( 'a11y-anchor-has-content', rule, {
 	valid: [
 		{
 			// Interpolated anchor with href and content in/out of the anchor
@@ -55,7 +55,7 @@ ruleTester.run( 'a11y-interpolated-anchor', rule, {
 		   };`,
 		},
 		{
-			// ⚠️ this is INVALID code, but out of scope for a11y-interpolated-anchor so it should pass here (it gets caught by jsx-a11y/anchor-is-valid instead)
+			// ⚠️ this is INVALID code, but out of scope for a11y-anchor-has-content so it should pass here (it gets caught by jsx-a11y/anchor-is-valid instead)
 			code: `
 			const a = ( ) => {
 				( <div>
