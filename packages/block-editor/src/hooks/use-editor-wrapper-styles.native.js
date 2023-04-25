@@ -30,12 +30,13 @@ const BLOCK_DEFAULT_MARGIN = 16;
 /**
  * Get the styles for the wide width alignment.
  *
- * @param {string}  align       The alignment value.
- * @param {boolean} isLandscape Whether the screen is in landscape mode.
- * @param {number}  width       The width of the screen.
+ * @param {Object}  [options]           The options for the helper.
+ * @param {string}  options.align       The alignment value.
+ * @param {boolean} options.isLandscape Whether the screen is in landscape mode.
+ * @param {number}  options.width       The width of the screen.
  * @return {Object} An object containing the styles for the wide width alignment.
  */
-function getWideWidthStyles( align, isLandscape, width ) {
+function getWideWidthStyles( { align, isLandscape, width } = {} ) {
 	if ( align !== WIDE_ALIGNMENTS.alignments.wide ) {
 		return {};
 	}
@@ -61,13 +62,19 @@ function getWideWidthStyles( align, isLandscape, width ) {
 /**
  * Get the styles for the full width alignment.
  *
- * @param {string}  align           The alignment value.
- * @param {string}  blockName       The name of the block.
- * @param {boolean} hasParents      Whether the block has parents.
- * @param {string}  parentBlockName The name of the parent block.
+ * @param {Object}  [options]               The options for the helper.
+ * @param {string}  options.align           The alignment value.
+ * @param {string}  options.blockName       The name of the block.
+ * @param {boolean} options.hasParents      Whether the block has parents.
+ * @param {string}  options.parentBlockName The name of the parent block.
  * @return {Object} An object containing the styles for the full width alignment.
  */
-function getFullWidthStyles( align, blockName, hasParents, parentBlockName ) {
+function getFullWidthStyles( {
+	align,
+	blockName,
+	hasParents,
+	parentBlockName,
+} = {} ) {
 	const { isContainerRelated, isFullWidth } = alignmentHelpers;
 	const fullWidthStyles = isFullWidth( align )
 		? { maxWidth: ALIGNMENT_MAX_WIDTH.full }
@@ -88,18 +95,19 @@ function getFullWidthStyles( align, blockName, hasParents, parentBlockName ) {
 /**
  * Get the block margin based on various conditions.
  *
- * @param {string}  align                The alignment value.
- * @param {string}  blockName            The name of the block.
- * @param {number}  blockWidth           The width of the block.
- * @param {boolean} hasParents           Whether the block has parents.
- * @param {number}  marginHorizontal     Default horizontal margin.
- * @param {string}  parentBlockAlignment The alignment of the parent block.
- * @param {string}  parentBlockName      The name of the parent block.
- * @param {number}  parentWidth          The width of the parent block.
- * @param {number}  width                The width of the screen.
+ * @param {Object}  [options]                    The options for the helper.
+ * @param {string}  options.align                The alignment value.
+ * @param {string}  options.blockName            The name of the block.
+ * @param {number}  options.blockWidth           The width of the block.
+ * @param {boolean} options.hasParents           Whether the block has parents.
+ * @param {number}  options.marginHorizontal     Default horizontal margin.
+ * @param {string}  options.parentBlockAlignment The alignment of the parent block.
+ * @param {string}  options.parentBlockName      The name of the parent block.
+ * @param {number}  options.parentWidth          The width of the parent block.
+ * @param {number}  options.width                The width of the screen.
  * @return {number} The calculated block margin.
  */
-function getBlockMargin(
+function getBlockMargin( {
 	align,
 	blockName,
 	blockWidth,
@@ -108,8 +116,8 @@ function getBlockMargin(
 	parentBlockAlignment,
 	parentBlockName,
 	parentWidth,
-	width
-) {
+	width,
+} = {} ) {
 	const { isContainerRelated, isWider, isWideWidth, isFullWidth } =
 		alignmentHelpers;
 
@@ -180,7 +188,7 @@ export function useEditorWrapperStyles( {
 
 	const blockMargin = useMemo(
 		() =>
-			getBlockMargin(
+			getBlockMargin( {
 				align,
 				blockName,
 				blockWidth,
@@ -189,8 +197,8 @@ export function useEditorWrapperStyles( {
 				parentBlockAlignment,
 				parentBlockName,
 				parentWidth,
-				width
-			),
+				width,
+			} ),
 		[
 			align,
 			blockName,
@@ -216,13 +224,13 @@ export function useEditorWrapperStyles( {
 		}
 
 		const alignmentStyles = {
-			...getWideWidthStyles( align, isLandscape, width ),
-			...getFullWidthStyles(
+			...getWideWidthStyles( { align, isLandscape, width } ),
+			...getFullWidthStyles( {
 				align,
 				blockName,
 				hasParents,
-				parentBlockName
-			),
+				parentBlockName,
+			} ),
 		};
 
 		return [ canvasStyles, alignmentStyles ];
