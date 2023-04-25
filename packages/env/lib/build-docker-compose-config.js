@@ -106,6 +106,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 		'tests-wordpress'
 	);
 
+	// We use a custom Dockerfile in order to make sure that
+	// the current host user exists inside the container.
+	const imageBuildArgs = {
+		HOST_USERNAME: hostUser.name,
+		HOST_UID: hostUser.uid,
+		HOST_GID: hostUser.gid,
+	};
+
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains
 	// a separate DB and config. Additionally, if the source type is local we
@@ -217,11 +225,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
-					args: {
-						HOST_USERNAME: hostUser.name,
-						HOST_UID: hostUser.uid,
-						HOST_GID: hostUser.gid,
-					},
+					args: imageBuildArgs,
 				},
 				ports: [ developmentPorts ],
 				environment: {
@@ -238,11 +242,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',
-					args: {
-						HOST_USERNAME: hostUser.name,
-						HOST_UID: hostUser.uid,
-						HOST_GID: hostUser.gid,
-					},
+					args: imageBuildArgs,
 				},
 				ports: [ testsPorts ],
 				environment: {
@@ -259,11 +259,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				build: {
 					context: '.',
 					dockerfile: 'CLI.Dockerfile',
-					args: {
-						HOST_USERNAME: hostUser.name,
-						HOST_UID: hostUser.uid,
-						HOST_GID: hostUser.gid,
-					},
+					args: imageBuildArgs,
 				},
 				volumes: developmentMounts,
 				user: hostUser.fullUser,
@@ -278,11 +274,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				build: {
 					context: '.',
 					dockerfile: 'Tests-CLI.Dockerfile',
-					args: {
-						HOST_USERNAME: hostUser.name,
-						HOST_UID: hostUser.uid,
-						HOST_GID: hostUser.gid,
-					},
+					args: imageBuildArgs,
 				},
 				volumes: testsMounts,
 				user: hostUser.fullUser,
