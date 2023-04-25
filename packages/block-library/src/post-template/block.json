@@ -18,7 +18,7 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
-		"align": true,
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"__experimentalLayout": {
 			"allowEditing": false

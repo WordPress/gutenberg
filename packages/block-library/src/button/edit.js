@@ -32,6 +32,7 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
+import { prependHTTP } from '@wordpress/url';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -240,7 +241,7 @@ function ButtonEdit( props ) {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
 						} ) => {
-							setAttributes( { url: newURL } );
+							setAttributes( { url: prependHTTP( newURL ) } );
 
 							if ( opensInNewTab !== newOpensInNewTab ) {
 								onToggleOpenInNewTab( newOpensInNewTab );

@@ -395,7 +395,7 @@ export const moveBlockToWidgetArea =
 	async ( { dispatch, select, registry } ) => {
 		const sourceRootClientId = registry
 			.select( blockEditorStore )
-			.getBlockRootClientId( [ clientId ] );
+			.getBlockRootClientId( clientId );
 
 		// Search the top level blocks (widget areas) for the one with the matching
 		// id attribute. Makes the assumption that all top-level blocks are widget

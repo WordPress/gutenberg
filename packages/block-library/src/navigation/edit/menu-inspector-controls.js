@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -19,8 +19,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { LeafMoreMenu } from '../leaf-more-menu';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 
@@ -34,7 +33,7 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -45,10 +44,6 @@ const MainContent = ( {
 		[ clientId ]
 	);
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
-
-	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <p>{ __( 'Select or create a menu' ) }</p>;
-	}
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
@@ -70,6 +65,7 @@ const MainContent = ( {
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
+			parentClientId={ clientId }
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
@@ -90,9 +86,7 @@ const MenuInspectorControls = ( props ) => {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody
-				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
-			>
+			<PanelBody title={ null }>
 				<HStack className="wp-block-navigation-off-canvas-editor__header">
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"

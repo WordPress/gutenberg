@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
+
+## 3.31.0 (2023-04-12)
+
+## 3.30.0 (2023-03-29)
+
+## 3.29.0 (2023-03-15)
+
+## 3.28.0 (2023-03-01)
+
+## 3.27.0 (2023-02-15)
+
 ## 3.26.0 (2023-02-01)
 
 ## 3.25.0 (2023-01-11)

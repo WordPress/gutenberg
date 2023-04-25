@@ -1,0 +1,62 @@
+.edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-30;
+	width: 100%;
+	margin-top: $grid-unit-05;
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+		margin-bottom: 0;
+		aspect-ratio: 3/4;
+		width: calc(50% - #{ $grid-unit-30 * 1 } / 2);
+
+		@include break-medium() {
+			width: calc(33.333% - #{ $grid-unit-30 * 2 } / 3);
+		}
+
+		@include break-wide() {
+			width: calc(25% - #{ $grid-unit-30 * 3 } / 4);
+		}
+
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+
+		.block-editor-block-preview__content {
+			width: 100%;
+			position: absolute;
+		}
+
+		.block-editor-block-patterns-list__item-title {
+			display: none;
+		}
+	}
+
+	.block-editor-block-patterns-list__item {
+		// Avoid to override the BlockPatternList component
+		// default hover and focus styles.
+		&:not(:focus):not(:hover) .block-editor-block-preview__container {
+			box-shadow: 0 0 0 1px $gray-300;
+		}
+	}
+
+	// The start blank pattern is the last and we are selecting it.
+	.block-editor-block-patterns-list__list-item:nth-last-child(2) {
+		.block-editor-block-preview__container {
+			position: absolute;
+			padding: 0;
+			background: #f0f0f0;
+			&::after {
+				width: 100%;
+				top: 50%;
+				margin-top: -1em;
+				content: var(--wp-edit-site-start-template-options-start-blank);
+				text-align: center;
+			}
+		}
+		iframe {
+			display: none;
+		}
+	}
+}

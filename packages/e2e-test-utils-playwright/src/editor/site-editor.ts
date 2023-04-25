@@ -6,7 +6,7 @@ import type { Editor } from './index';
 /**
  * Save entities in the site editor. Assumes the editor is in a dirty state.
  *
- * @param {Editor} this
+ * @param this
  */
 export async function saveSiteEditorEntities( this: Editor ) {
 	await this.page.click(

@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'List', () => {
+test.describe( 'List (@firefox)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -40,7 +40,7 @@ test.describe( 'List', () => {
 		// Create a list with the slash block shortcut.
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.type( '* ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -75,7 +75,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1. ' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
@@ -84,7 +84,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace', async ( {
+	test( 'should undo asterisk transform with backspace (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -99,7 +99,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -115,7 +115,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace setting isTyping state', async ( {
+	test( 'should undo asterisk transform with backspace setting isTyping state (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -131,7 +131,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -148,7 +148,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with escape', async ( {
+	test( 'should undo asterisk transform with escape (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -182,6 +182,9 @@ test.describe( 'List', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* ' );
 		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
+		// Wait until the automatic change is marked as "final", which is done
+		// with an idle callback, see __unstableMarkAutomaticChange.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
@@ -258,7 +261,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'core/list' );
 
@@ -282,7 +285,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '...' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -333,7 +336,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 4 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -393,7 +396,7 @@ test.describe( 'List', () => {
 		);
 
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'two'.length } );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -462,7 +465,7 @@ test.describe( 'List', () => {
 
 		// Should merge lists into one.
 		await page.keyboard.press( 'ArrowDown' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'two'.length } );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -756,7 +759,7 @@ test.describe( 'List', () => {
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -783,7 +786,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -806,7 +809,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
 		await page.keyboard.press( 'ArrowUp' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -947,7 +950,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
@@ -978,7 +981,7 @@ test.describe( 'List', () => {
 
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Space' );
+		await pageUtils.pressKeys( 'shift+Space' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1009,7 +1012,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should preserve indentation after merging backward and forward', async ( {
+	test( 'should preserve indentation after merging backward and forward (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1158,25 +1161,29 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'can be created by pasting an empty list', async ( {
+	test( 'can be created by pasting an empty list (-firefox)', async ( {
 		editor,
 		pageUtils,
 	} ) => {
 		// Open code editor
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Paste empty list block
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText:
 				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
 		} );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		// Go back to normal editor
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 
 	test( 'should merge two list with same attributes', async ( {
@@ -1231,7 +1238,15 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->` );
 	} );
 
 	test( 'selects all transformed output', async ( { editor, page } ) => {
@@ -1247,14 +1262,29 @@ test.describe( 'List', () => {
 			page.locator( 'role=document[name="Block: List"i]' )
 		);
 
-		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->` );
 
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 } );

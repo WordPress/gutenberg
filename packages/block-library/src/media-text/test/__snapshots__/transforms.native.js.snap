@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Media & Text block transformations with Image to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:media-text {"align":"wide","mediaId":4674,"mediaType":"image","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Media & Text block transformations with Image to Cover block 1`] = `
+"<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":4674,"dimRatio":50,"align":"wide"} -->
+<div class="wp-block-cover alignwide"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-4674" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`Media & Text block transformations with Image to Group block 1`] = `
+"<!-- wp:group {"align":"wide","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignwide"><!-- wp:media-text {"align":"wide","mediaId":4674,"mediaType":"image","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Media & Text block transformations with Image to Image block 1`] = `
+"<!-- wp:image {"id":4674} -->
+<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674"/></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`Media & Text block transformations with Video to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:media-text {"align":"wide","mediaId":4675,"mediaType":"video","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Cloudup</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Media & Text block transformations with Video to Cover block 1`] = `
+"<!-- wp:cover {"url":"https://i.cloudup.com/YtZFJbuQCE.mov","id":4675,"dimRatio":50,"backgroundType":"video","align":"wide"} -->
+<div class="wp-block-cover alignwide"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline src="https://i.cloudup.com/YtZFJbuQCE.mov" data-object-fit="cover"></video><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Cloudup</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`Media & Text block transformations with Video to Group block 1`] = `
+"<!-- wp:group {"align":"wide","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignwide"><!-- wp:media-text {"align":"wide","mediaId":4675,"mediaType":"video","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Cloudup</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Media & Text block transformations with Video to Video block 1`] = `
+"<!-- wp:video {"id":4675} -->
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure>
+<!-- /wp:video -->"
+`;

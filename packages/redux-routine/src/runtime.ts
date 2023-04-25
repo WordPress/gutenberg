@@ -13,8 +13,8 @@ import { isActionOfType, isAction } from './is-action';
 /**
  * Create a co-routine runtime.
  *
- * @param  controls Object of control handlers.
- * @param  dispatch Unhandled action dispatch.
+ * @param controls Object of control handlers.
+ * @param dispatch Unhandled action dispatch.
  */
 export default function createRuntime(
 	controls: Record<

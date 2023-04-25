@@ -138,9 +138,12 @@ describe( 'Popover', () => {
 		} );
 
 		describe( 'focus behavior', () => {
-			it( 'should focus the popover by default when opened', async () => {
+			it( 'should focus the popover container when opened', async () => {
 				render(
-					<Popover data-testid="popover-element">
+					<Popover
+						focusOnMount={ true }
+						data-testid="popover-element"
+					>
 						Popover content
 					</Popover>
 				);

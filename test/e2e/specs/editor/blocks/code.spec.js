@@ -38,9 +38,9 @@ test.describe( 'Code', () => {
 		await editor.insertBlock( { name: 'core/code' } );
 
 		// Test to see if HTML and white space is kept.
-		await pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
+		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

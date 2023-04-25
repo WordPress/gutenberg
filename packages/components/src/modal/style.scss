@@ -20,7 +20,7 @@
 	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	border-radius: $radius-block-ui;
+	border-radius: $grid-unit-10;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
@@ -39,8 +39,16 @@
 		@include reduce-motion("animation");
 
 		&.is-full-screen {
-			width: 90vw;
-			min-height: 90vh;
+			@include break-small() {
+				width: calc(100% - #{ $grid-unit-20 * 2 });
+				height: calc(100% - #{ $grid-unit-20 * 2 });
+				max-height: none;
+			}
+			@include break-medium() {
+				width: calc(100% - #{ $grid-unit-50 * 2 });
+				height: calc(100% - #{ $grid-unit-50 * 2 });
+				max-width: none;
+			}
 		}
 	}
 
@@ -64,12 +72,12 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-20;
+	height: $header-height + $grid-unit-15;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -121,12 +129,20 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-20;
+	margin-top: $header-height + $grid-unit-15;
 	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {
 		margin-top: 0;
 		padding-top: $grid-unit-30;
+	}
+
+	&.is-scrollable:focus-visible {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
 	}
 }
