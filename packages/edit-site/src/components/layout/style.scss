@@ -142,9 +142,13 @@
 	}
 }
 
-.edit-site-layout__canvas:has(.is-bleeding) {
+.edit-site-layout__canvas:has(.is-oversized) {
 	justify-content: flex-end;
 	align-items: flex-end;
+
+	.components-resizable-box__container {
+		min-width: 100% !important;
+	}
 }
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
 .edit-site-layout__canvas .interface-interface-skeleton {

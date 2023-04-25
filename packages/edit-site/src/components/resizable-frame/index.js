@@ -44,6 +44,7 @@ function ResizableFrame( { isFull, children } ) {
 	} );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
+	const [ isOversized, setIsOversized ] = useState( false );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
 	const initialComputedWidthRef = useRef( null );
@@ -83,20 +84,37 @@ function ResizableFrame( { isFull, children } ) {
 			lerpFactor
 		);
 		const newHeight = updatedWidth / intermediateAspectRatio;
+
 		setIsResizing( true );
-		setFrameSize( { width: updatedWidth, height: newHeight } );
+
+		if ( event.clientX < 344 ) {
+			const oversizeWidth = Math.max(
+				initialComputedWidthRef.current +
+					( updatedWidth - initialComputedWidthRef.current ) / 2,
+				initialComputedWidthRef.current
+			);
+
+			setFrameSize( {
+				width: oversizeWidth,
+				height: '100%',
+			} );
+			setIsOversized( true );
+		} else {
+			setFrameSize( { width: updatedWidth, height: newHeight } );
+			setIsOversized( false );
+		}
 	};
 
 	// Make the frame full screen when the user resizes it to the left.
 	const handleResizeStop = ( event ) => {
 		// Reset the initial aspect ratio if the frame is resized slightly
 		// above the sidebar but not far enough to trigger full screen.
-		if ( event.clientX < 360 && event.clientX > 250 ) {
+		if ( event.clientX < 344 && event.clientX > 200 ) {
 			setFrameSize( { width: '100%', height: '100%' } );
 		}
 
 		// Trigger full screen if the frame is resized far enough to the left.
-		if ( event.clientX < 250 ) {
+		if ( event.clientX < 200 ) {
 			setCanvasMode( 'edit' );
 			// Wait for the frame to animate to full screen before resetting its size.
 			const timeoutId = setTimeout( () => {
@@ -108,14 +126,6 @@ function ResizableFrame( { isFull, children } ) {
 		}
 
 		setIsResizing( false );
-	};
-
-	// Check if the frame is bleeding over the sidebar.
-	const isFrameBleeding = () => {
-		return (
-			initialComputedWidthRef.current !== null &&
-			frameSize.width > initialComputedWidthRef.current
-		);
 	};
 
 	return (
@@ -138,7 +148,7 @@ function ResizableFrame( { isFull, children } ) {
 				bottomLeft: false,
 				topLeft: false,
 			} }
-			resizeRatio={ 1.5 }
+			resizeRatio={ isOversized ? 1 : 2 }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
@@ -175,7 +185,7 @@ function ResizableFrame( { isFull, children } ) {
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-the-frame__inner', {
 				resizing: isResizing,
-				'is-bleeding': isFrameBleeding(),
+				'is-oversized': isOversized,
 			} ) }
 		>
 			<motion.div
