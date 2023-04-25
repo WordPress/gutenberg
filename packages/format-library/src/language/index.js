@@ -24,7 +24,7 @@ const Edit = ( props ) => {
 	const { contentRef, isActive, onChange, value } = props;
 	const anchorRef = useAnchor( {
 		editableContentElement: contentRef.current,
-		language,
+		settings: language,
 	} );
 
 	const [ lang, setLang ] = useState( '' );
