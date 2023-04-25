@@ -42,14 +42,14 @@ function _gutenberg_get_iframed_editor_assets() {
 	$wp_styles->registered  = $current_wp_styles->registered;
 	$wp_scripts->registered = $current_wp_scripts->registered;
 
+	wp_enqueue_style( 'wp-block-editor-content' );
+	wp_enqueue_script( 'wp-polyfill' );
+
 	// We don't want to load EDITOR scripts and styles in the iframe, only
 	// assets for the content.
 	add_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
 	do_action( 'enqueue_block_assets' );
 	remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
-
-	wp_enqueue_style( 'wp-block-editor-content' );
-	wp_enqueue_script( 'wp-polyfill' );
 
 	ob_start();
 	wp_print_styles();
