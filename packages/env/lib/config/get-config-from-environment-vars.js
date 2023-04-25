@@ -23,13 +23,13 @@ const { checkPort, checkVersion } = require( './validate-config' );
  */
 
 /**
- * Parses configuration options from environment variables.
+ * Gets configuration options from environment variables.
  *
  * @param {string} cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {WPEnvironmentVariableConfig} Any configuration options parsed from the environment variables.
  */
-module.exports = function parseConfigFromEnvironmentVars( cacheDirectoryPath ) {
+module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 	const environmentConfig = {
 		port: getPortFromEnvironmentVariable( 'WP_ENV_PORT' ),
 		testsPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_PORT' ),

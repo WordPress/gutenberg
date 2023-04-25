@@ -8,15 +8,13 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const parseConfig = require( '../parse-config' );
-const getCacheDirectory = require( '../get-cache-directory' );
+const { parseConfig } = require( '../parse-config' );
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { getLatestWordPressVersion } = require( '../../wordpress' );
 const { ValidationError } = require( '../validate-config' );
 const detectDirectoryType = require( '../detect-directory-type' );
 
 jest.mock( 'got', () => jest.fn() );
-jest.mock( '../get-cache-directory', () => jest.fn() );
 jest.mock( '../read-raw-config-file', () => jest.fn() );
 jest.mock( '../detect-directory-type', () => jest.fn() );
 jest.mock( '../../wordpress', () => ( {
@@ -33,12 +31,10 @@ const DEFAULT_CONFIG = {
 		type: 'git',
 		url: 'https://github.com/WordPress/WordPress.git',
 		ref: '100.0.0',
-		path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-		clonePath:
-			'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+		path: '/cache/WordPress',
+		clonePath: '/cache/WordPress',
 		basename: 'WordPress',
-		testsPath:
-			'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+		testsPath: '/cache/tests-WordPress',
 	},
 	pluginSources: [],
 	themeSources: [],
@@ -68,7 +64,6 @@ const DEFAULT_CONFIG = {
 
 describe( 'parseConfig', () => {
 	beforeEach( () => {
-		getCacheDirectory.mockResolvedValue( '/home/test/.wp-env' );
 		readRawConfigFile.mockResolvedValue( null );
 		detectDirectoryType.mockResolvedValue( null );
 		getLatestWordPressVersion.mockResolvedValue( '100.0.0' );
@@ -83,7 +78,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'should return default config', async () => {
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( DEFAULT_CONFIG );
 	} );
@@ -91,15 +86,14 @@ describe( 'parseConfig', () => {
 	it( 'should infer a core mounting default when ran from a WordPress directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'core' );
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
 			coreSource: {
 				basename: 'gutenberg',
 				path: path.resolve( '.' ),
-				testsPath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-gutenberg',
+				testsPath: '/cache/tests-gutenberg',
 				type: 'local',
 			},
 		} );
@@ -108,7 +102,7 @@ describe( 'parseConfig', () => {
 	it( 'should infer a plugin mounting default when ran from a plugin directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'plugin' );
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
@@ -125,7 +119,7 @@ describe( 'parseConfig', () => {
 	it( 'should infer a theme mounting default when ran from a theme directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'theme' );
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
@@ -141,7 +135,7 @@ describe( 'parseConfig', () => {
 
 	it( 'should merge configs with precedence', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === './.wp-env.json' ) {
+			if ( configFile === path.resolve( './.wp-env.json' ) ) {
 				return {
 					core: 'WordPress/WordPress#Test',
 					phpVersion: '1.0',
@@ -156,7 +150,7 @@ describe( 'parseConfig', () => {
 				};
 			}
 
-			if ( configFile === './.wp-env.override.json' ) {
+			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
 				return {
 					phpVersion: '2.0',
 					env: {
@@ -170,18 +164,16 @@ describe( 'parseConfig', () => {
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		const expected = {
 			...DEFAULT_CONFIG,
 			coreSource: {
 				basename: 'WordPress',
-				path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-				clonePath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+				path: '/cache/WordPress',
+				clonePath: '/cache/WordPress',
 				ref: 'Test',
-				testsPath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+				testsPath: '/cache/tests-WordPress',
 				url: 'https://github.com/WordPress/WordPress.git',
 				type: 'git',
 			},
@@ -202,7 +194,7 @@ describe( 'parseConfig', () => {
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === './.wp-env.json' ) {
+			if ( configFile === path.resolve( '.', './.wp-env.json' ) ) {
 				return {
 					core: 'WordPress/WordPress#Test',
 					plugins: [ 'WordPress/TestPlugin#Test' ],
@@ -214,34 +206,33 @@ describe( 'parseConfig', () => {
 				};
 			}
 
-			if ( configFile === './.wp-env.override.json' ) {
+			if (
+				configFile === path.resolve( '.', './.wp-env.override.json' )
+			) {
 				return {};
 			}
 
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
 			coreSource: {
 				basename: 'WordPress',
-				path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-				clonePath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+				path: '/cache/WordPress',
+				clonePath: '/cache/WordPress',
 				ref: 'Test',
-				testsPath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+				testsPath: '/cache/tests-WordPress',
 				url: 'https://github.com/WordPress/WordPress.git',
 				type: 'git',
 			},
 			pluginSources: [
 				{
 					basename: 'TestPlugin',
-					path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestPlugin',
-					clonePath:
-						'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestPlugin',
+					path: '/cache/TestPlugin',
+					clonePath: '/cache/TestPlugin',
 					ref: 'Test',
 					url: 'https://github.com/WordPress/TestPlugin.git',
 					type: 'git',
@@ -250,9 +241,8 @@ describe( 'parseConfig', () => {
 			themeSources: [
 				{
 					basename: 'TestTheme',
-					path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestTheme',
-					clonePath:
-						'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestTheme',
+					path: '/cache/TestTheme',
+					clonePath: '/cache/TestTheme',
 					ref: 'Test',
 					url: 'https://github.com/WordPress/TestTheme.git',
 					type: 'git',
@@ -261,9 +251,8 @@ describe( 'parseConfig', () => {
 			mappings: {
 				'/var/www/html/wp-content/plugins/test-mapping': {
 					basename: 'TestMapping',
-					path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestMapping',
-					clonePath:
-						'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/TestMapping',
+					path: '/cache/TestMapping',
+					clonePath: '/cache/TestMapping',
 					ref: 'Test',
 					url: 'https://github.com/WordPress/TestMapping.git',
 					type: 'git',
@@ -278,7 +267,7 @@ describe( 'parseConfig', () => {
 		process.env.WP_ENV_CORE = 'WordPress/WordPress#test';
 		process.env.WP_ENV_PHP_VERSION = '3.0';
 
-		const parsed = await parseConfig( './' );
+		const parsed = await parseConfig( './', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
@@ -286,12 +275,10 @@ describe( 'parseConfig', () => {
 			testsPort: 456,
 			coreSource: {
 				basename: 'WordPress',
-				path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-				clonePath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+				path: '/cache/WordPress',
+				clonePath: '/cache/WordPress',
 				ref: 'test',
-				testsPath:
-					'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+				testsPath: '/cache/tests-WordPress',
 				url: 'https://github.com/WordPress/WordPress.git',
 				type: 'git',
 			},
@@ -302,12 +289,10 @@ describe( 'parseConfig', () => {
 					phpVersion: '3.0',
 					coreSource: {
 						basename: 'WordPress',
-						path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-						clonePath:
-							'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+						path: '/cache/WordPress',
+						clonePath: '/cache/WordPress',
 						ref: 'test',
-						testsPath:
-							'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+						testsPath: '/cache/tests-WordPress',
 						url: 'https://github.com/WordPress/WordPress.git',
 						type: 'git',
 					},
@@ -317,12 +302,10 @@ describe( 'parseConfig', () => {
 					phpVersion: '3.0',
 					coreSource: {
 						basename: 'WordPress',
-						path: '/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
-						clonePath:
-							'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/WordPress',
+						path: '/cache/WordPress',
+						clonePath: '/cache/WordPress',
 						ref: 'test',
-						testsPath:
-							'/home/test/.wp-env/0afa32312977c8e3510775b85c20017d/tests-WordPress',
+						testsPath: '/cache/tests-WordPress',
 						url: 'https://github.com/WordPress/WordPress.git',
 						type: 'git',
 					},
@@ -340,7 +323,7 @@ describe( 'parseConfig', () => {
 
 		expect.assertions( 1 );
 		try {
-			await parseConfig( './' );
+			await parseConfig( './', '/cache' );
 		} catch ( e ) {
 			expect( e ).toEqual(
 				new ValidationError(

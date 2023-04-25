@@ -7,8 +7,6 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const getCacheDirectory = require( './get-cache-directory' );
-const md5 = require( '../md5' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const {
 	parseSourceString,
@@ -22,11 +20,10 @@ const {
 	checkVersion,
 	checkValidURL,
 } = require( './validate-config' );
-const parseConfigFromEnvironmentVars = require( './parse-config-from-environment-vars' );
+const getConfigFromEnvironmentVars = require( './get-config-from-environment-vars' );
 const detectDirectoryType = require( './detect-directory-type' );
 const { getLatestWordPressVersion } = require( '../wordpress' );
 const mergeConfigs = require( './merge-configs' );
-const postProcessConfig = require( './post-process-config' );
 
 /**
  * @typedef {import('./parse-source-string').WPSource} WPSource
@@ -60,29 +57,25 @@ const postProcessConfig = require( './post-process-config' );
  * Given a directory, this parses any relevant config files and
  * constructs an object in the format used internally.
  *
+ *
  * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
+ * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
  *
  * @return {WPServiceConfig} Parsed config.
  */
-module.exports = async function parseConfig( configDirectoryPath ) {
-	const configFile = configDirectoryPath + '.wp-env.json';
-	const overrideConfigFile = configDirectoryPath + '.wp-env.override.json';
-
-	const cacheDirectoryPath = path.resolve(
-		await getCacheDirectory(),
-		md5( configFile )
-	);
-
+async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 	// The local config will be used to override any defaults.
-	const localConfig = await parseConfigFile( configFile, {
-		cacheDirectoryPath,
-	} );
+	const localConfig = await parseConfigFile(
+		getConfigFilePath( configDirectoryPath ),
+		{ cacheDirectoryPath }
+	);
 
 	// Any overrides that can be used in place
 	// of properties set by the local config.
-	const overrideConfig = await parseConfigFile( overrideConfigFile, {
-		cacheDirectoryPath,
-	} );
+	const overrideConfig = await parseConfigFile(
+		getConfigFilePath( configDirectoryPath, 'override' ),
+		{ cacheDirectoryPath }
+	);
 
 	// It's important to know whether or not the user
 	// has configured the tool using a JSON file.
@@ -104,18 +97,42 @@ module.exports = async function parseConfig( configDirectoryPath ) {
 
 	// Merge all of our configs so that we have a complete object
 	// containing the desired options in order of precedence.
-	const mergedConfig = mergeConfigs(
+	return mergeConfigs(
 		defaultConfig,
 		localConfig ?? {},
 		overrideConfig ?? {},
 		environmentVarOverrides
 	);
+}
 
-	// Make sure to perform any additional post-processing that
-	// may be needed before the config object is ready for
-	// consumption elsewhere in the tool.
-	return postProcessConfig( mergedConfig );
-};
+/**
+ * Gets the path to the config file.
+ *
+ * @param {string} configDirectoryPath The path to the directory containing config files.
+ * @param {string} type                The type of config file we're interested in: 'local' or 'override'.
+ *
+ * @return {string} The path to the config file.
+ */
+function getConfigFilePath( configDirectoryPath, type = 'local' ) {
+	let fileName;
+	switch ( type ) {
+		case 'local': {
+			fileName = '.wp-env.json';
+			break;
+		}
+
+		case 'override': {
+			fileName = '.wp-env.override.json';
+			break;
+		}
+
+		default: {
+			throw new Error( `Invalid config file type "${ type }.` );
+		}
+	}
+
+	return path.resolve( configDirectoryPath, fileName );
+}
 
 /**
  * Gets the default config that can be overridden.
@@ -177,7 +194,7 @@ async function getDefaultConfig(
  * @return {WPServiceConfig} An object containing the environment variable overrides.
  */
 function getEnvironmentVarOverrides( cacheDirectoryPath ) {
-	const overrides = parseConfigFromEnvironmentVars( cacheDirectoryPath );
+	const overrides = getConfigFromEnvironmentVars( cacheDirectoryPath );
 
 	// Create a service config object so we can merge it with the others
 	// and override anything that the configuration options need to.
@@ -399,3 +416,8 @@ async function parseCoreSource( coreSource, options ) {
 	}
 	return parseSourceString( coreSource, options );
 }
+
+module.exports = {
+	parseConfig,
+	getConfigFilePath,
+};

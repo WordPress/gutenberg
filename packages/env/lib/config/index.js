@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const readConfig = require( './config' );
+const loadConfig = require( './load-config' );
 const { ValidationError } = require( './validate-config' );
 const dbEnv = require( './db-env' );
 
@@ -13,6 +13,6 @@ const dbEnv = require( './db-env' );
 
 module.exports = {
 	ValidationError,
-	readConfig,
+	loadConfig,
 	dbEnv,
 };

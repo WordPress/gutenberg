@@ -121,6 +121,19 @@ describe( 'parseSourceString', () => {
 				url: 'git+ssh://test/test.git',
 			} );
 		} );
+
+		it( 'should work without ref', () => {
+			expect(
+				parseSourceString( 'ssh://test/test.git', options )
+			).toEqual( {
+				basename: 'test',
+				path: '/test/cache/test',
+				clonePath: '/test/cache/test',
+				ref: undefined,
+				type: 'git',
+				url: 'ssh://test/test.git',
+			} );
+		} );
 	} );
 
 	describe( 'GitHub sources', () => {
