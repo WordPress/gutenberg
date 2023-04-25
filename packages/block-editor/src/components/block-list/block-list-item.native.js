@@ -138,8 +138,10 @@ function BlockListItemContent( {
 				marginHorizontal={ margin }
 				marginVertical={ marginVertical }
 				onAddBlock={ onAddBlock }
+				parentBlockAlignment={ parentBlockAlignment }
 				onDeleteBlock={ onDeleteBlock }
 				parentWidth={ parentWidth }
+				rootClientId={ rootClientId }
 			/>
 			{ shouldShowBlockInsertionPointAfter && <BlockInsertionPoint /> }
 		</View>
