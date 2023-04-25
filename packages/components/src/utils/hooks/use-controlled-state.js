@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,8 +11,8 @@ import { isValueDefined, getDefinedValue } from '../values';
 /**
  * @template T
  * @typedef Options
- * @property {T | undefined} initial  Initial value
- * @property {T | ""}        fallback Fallback value
+ * @property {T}      [initial] Initial value
+ * @property {T | ""} fallback  Fallback value
  */
 
 /** @type {Readonly<{ initial: undefined, fallback: '' }>} */
@@ -70,11 +70,14 @@ function useControlledState( currentState, options = defaultOptions ) {
 
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {(nextState: T) => void} */
-	const setState = ( nextState ) => {
-		if ( ! hasCurrentState ) {
-			setInternalState( nextState );
-		}
-	};
+	const setState = useCallback(
+		( nextState ) => {
+			if ( ! hasCurrentState ) {
+				setInternalState( nextState );
+			}
+		},
+		[ hasCurrentState ]
+	);
 	/* eslint-enable jsdoc/no-undefined-types */
 
 	return [ state, setState ];

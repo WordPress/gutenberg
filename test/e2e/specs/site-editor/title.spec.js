@@ -20,10 +20,10 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-
-		const title = await page.locator(
-			'role=region[name="Header"i] >> role=heading[level=1]'
+		const title = page.locator(
+			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
 
 		await expect( title ).toHaveText( 'Editing template: Index' );
@@ -37,10 +37,10 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-
-		const title = await page.locator(
-			'role=region[name="Header"i] >> role=heading[level=1]'
+		const title = page.locator(
+			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
 
 		await expect( title ).toHaveText( 'Editing template part: header' );
@@ -53,18 +53,18 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-
 		// Select the header template part via list view.
 		await page.click( 'role=button[name="List View"i]' );
-		const listView = await page.locator(
+		const listView = page.locator(
 			'role=treegrid[name="Block navigation structure"i]'
 		);
 		await listView.locator( 'role=gridcell >> text="header"' ).click();
 		await page.click( 'role=button[name="Close List View Sidebar"i]' );
 
 		// Evaluate the document settings secondary title.
-		const secondaryTitle = await page.locator(
+		const secondaryTitle = page.locator(
 			'.edit-site-document-actions__secondary-item'
 		);
 

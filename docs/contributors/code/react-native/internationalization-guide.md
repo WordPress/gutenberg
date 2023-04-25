@@ -41,7 +41,7 @@ npm run native i18n:extract-used-strings -- "$PWD/used-strings.json"
 
 ***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.*
 
-Extract used strings including extra plugins: 
+Extract used strings including extra plugins:
 ```sh
 npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plugin-1" <PLUGIN-1_SOURCE_PATH> "domain-plugin-2" <PLUGIN-2_SOURCE_PATH> ...
 ```

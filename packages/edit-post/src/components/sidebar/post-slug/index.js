@@ -7,7 +7,7 @@ import { PostSlug as PostSlugForm, PostSlugCheck } from '@wordpress/editor';
 export function PostSlug() {
 	return (
 		<PostSlugCheck>
-			<PanelRow>
+			<PanelRow className="edit-post-post-slug">
 				<PostSlugForm />
 			</PanelRow>
 		</PostSlugCheck>

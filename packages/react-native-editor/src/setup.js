@@ -9,8 +9,9 @@ import { I18nManager, LogBox } from 'react-native';
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
-import { initializeEditor } from '@wordpress/edit-post';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// eslint-disable-next-line no-restricted-imports
+import { initializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -59,11 +60,8 @@ const gutenbergSetup = () => {
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		const capabilities = props.capabilities ?? {};
-		const blocksFlags = {
-			__experimentalEnableQuoteBlockV2: props?.quoteBlockV2,
-		};
 
-		registerBlocks( blocksFlags );
+		registerBlocks();
 
 		// Unregister non-supported blocks by capabilities
 		if (
@@ -85,6 +83,7 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				rawStyles,
 				rawFeatures,
@@ -107,6 +106,7 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				capabilities,
 				rawStyles,
@@ -119,12 +119,12 @@ const setupInitHooks = () => {
 };
 
 let blocksRegistered = false;
-const registerBlocks = ( blocksFlags ) => {
+const registerBlocks = () => {
 	if ( blocksRegistered ) {
 		return;
 	}
 
-	registerCoreBlocks( blocksFlags );
+	registerCoreBlocks();
 
 	blocksRegistered = true;
 };

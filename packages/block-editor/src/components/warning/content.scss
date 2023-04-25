@@ -1,0 +1,54 @@
+.block-editor-warning {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	font-family: $default-font;
+	padding: 1em;
+
+	// Block UI appearance.
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+
+	.block-editor-warning__message {
+		line-height: $default-line-height;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin: 0;
+	}
+
+	// Required extra-specifity to override paragraph block styles.
+	p.block-editor-warning__message.block-editor-warning__message {
+		min-height: auto;
+	}
+
+	.block-editor-warning__contents {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		align-items: baseline;
+		width: 100%;
+	}
+
+	.block-editor-warning__actions {
+		align-items: center;
+		display: flex;
+		margin-top: 1em;
+	}
+
+	.block-editor-warning__action {
+		margin: 0 $grid-unit-10 0 0;
+	}
+}
+
+.block-editor-warning__secondary {
+	margin: auto 0 auto $grid-unit-10;
+}
+
+.components-popover.block-editor-warning__dropdown {
+	// Set z-index as if it's displayed on the bottom, otherwise the modal
+	// dialog popover might overlap if displayed on the bottom.
+	z-index: z-index(".components-popover.block-editor-warning__dropdown");
+}

@@ -2,8 +2,10 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
-	<rule ref="PHPCompatibility"/>
 	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
@@ -24,11 +26,15 @@
 	</rule>
 
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
+		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
 	</rule>
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+
+	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache" value=".cache/phpcs.json"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
@@ -87,5 +93,14 @@
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
 </ruleset>

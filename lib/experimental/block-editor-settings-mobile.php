@@ -22,13 +22,15 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		isset( $_GET['context'] ) &&
 		'mobile' === $_GET['context']
 	) {
-		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$settings['__experimentalStyles'] = gutenberg_get_global_styles();
+		if ( wp_theme_has_theme_json() ) {
+			$settings['__experimentalStyles'] = wp_get_global_styles();
 		}
 
-		// To be set to true when the web makes quote v2 (inner blocks) the default.
+		// To tell mobile that the site uses quote v2 (inner blocks).
 		// See https://github.com/WordPress/gutenberg/pull/25892.
-		$settings['__experimentalEnableQuoteBlockV2'] = gutenberg_is_quote_v2_enabled();
+		$settings['__experimentalEnableQuoteBlockV2'] = true;
+		// To tell mobile that the site uses list v2 (inner blocks).
+		$settings['__experimentalEnableListBlockV2'] = true;
 	}
 
 	return $settings;

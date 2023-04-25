@@ -10,6 +10,7 @@ import type { DragProps } from '../types';
 
 export const CHANGE = 'CHANGE';
 export const COMMIT = 'COMMIT';
+export const CONTROL = 'CONTROL';
 export const DRAG_END = 'DRAG_END';
 export const DRAG_START = 'DRAG_START';
 export const DRAG = 'DRAG';
@@ -23,7 +24,7 @@ interface EventPayload {
 	event?: SyntheticEvent;
 }
 
-interface Action< Type, ExtraPayload = {} > {
+export interface Action< Type = string, ExtraPayload = {} > {
 	type: Type;
 	payload: EventPayload & ExtraPayload;
 }
@@ -34,6 +35,7 @@ interface ValuePayload {
 
 export type ChangeAction = Action< typeof CHANGE, ValuePayload >;
 export type CommitAction = Action< typeof COMMIT, ValuePayload >;
+export type ControlAction = Action< typeof CONTROL, ValuePayload >;
 export type PressUpAction = Action< typeof PRESS_UP >;
 export type PressDownAction = Action< typeof PRESS_DOWN >;
 export type PressEnterAction = Action< typeof PRESS_ENTER >;

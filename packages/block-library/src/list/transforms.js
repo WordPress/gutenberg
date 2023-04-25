@@ -1,15 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-import {
-	__UNSTABLE_LINE_SEPARATOR,
-	create,
-	join,
-	replace,
-	split,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { createBlock } from '@wordpress/blocks';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { createListBlockFromDOMElement } from './utils';
 
 function getListContentSchema( { phrasingContentSchema } ) {
 	const listContentSchema = {
@@ -32,6 +30,15 @@ function getListContentSchema( { phrasingContentSchema } ) {
 	return listContentSchema;
 }
 
+function getListContentFlat( blocks ) {
+	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
+		if ( name === 'core/list-item' ) {
+			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+		}
+		return getListContentFlat( innerBlocks );
+	} );
+}
+
 const transforms = {
 	from: [
 		{
@@ -39,43 +46,28 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: join(
-							blockAttributes.map( ( { content } ) => {
-								const value = create( { html: content } );
-
-								if ( blockAttributes.length > 1 ) {
-									return value;
-								}
-
-								// When converting only one block, transform
-								// every line to a list item.
-								return replace(
-									value,
-									/\n/g,
-									__UNSTABLE_LINE_SEPARATOR
-								);
-							} ),
-							__UNSTABLE_LINE_SEPARATOR
-						),
-						multilineTag: 'li',
-					} ),
-					anchor: blockAttributes.anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: create( { html: value, multilineTag: 'p' } ),
-						multilineTag: 'li',
-					} ),
-					anchor,
-				} );
+				let childBlocks = [];
+				if ( blockAttributes.length > 1 ) {
+					childBlocks = blockAttributes.map( ( { content } ) => {
+						return createBlock( 'core/list-item', { content } );
+					} );
+				} else if ( blockAttributes.length === 1 ) {
+					const value = create( {
+						html: blockAttributes[ 0 ].content,
+					} );
+					childBlocks = split( value, '\n' ).map( ( result ) => {
+						return createBlock( 'core/list-item', {
+							content: toHTMLString( { value: result } ),
+						} );
+					} );
+				}
+				return createBlock(
+					'core/list',
+					{
+						anchor: blockAttributes.anchor,
+					},
+					childBlocks
+				);
 			},
 		},
 		{
@@ -85,136 +77,43 @@ const transforms = {
 				ol: getListContentSchema( args ).ol,
 				ul: getListContentSchema( args ).ul,
 			} ),
-			transform( node ) {
-				const attributes = {
-					ordered: node.nodeName === 'OL',
-					anchor: node.id === '' ? undefined : node.id,
-				};
-
-				if ( attributes.ordered ) {
-					const type = node.getAttribute( 'type' );
-
-					if ( type ) {
-						attributes.type = type;
-					}
-
-					if ( node.getAttribute( 'reversed' ) !== null ) {
-						attributes.reversed = true;
-					}
-
-					const start = parseInt( node.getAttribute( 'start' ), 10 );
-
-					if (
-						! isNaN( start ) &&
-						// start=1 only makes sense if the list is reversed.
-						( start !== 1 || attributes.reversed )
-					) {
-						attributes.start = start;
-					}
-				}
-
-				return createBlock( 'core/list', {
-					...getBlockAttributes( 'core/list', node.outerHTML ),
-					...attributes,
-				} );
-			},
+			transform: createListBlockFromDOMElement,
 		},
 		...[ '*', '-' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
 			transform( content ) {
-				return createBlock( 'core/list', {
-					values: `<li>${ content }</li>`,
-				} );
+				return createBlock( 'core/list', {}, [
+					createBlock( 'core/list-item', { content } ),
+				] );
 			},
 		} ) ),
 		...[ '1.', '1)' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
 			transform( content ) {
-				return createBlock( 'core/list', {
-					ordered: true,
-					values: `<li>${ content }</li>`,
-				} );
+				return createBlock(
+					'core/list',
+					{
+						ordered: true,
+					},
+					[ createBlock( 'core/list-item', { content } ) ]
+				);
 			},
 		} ) ),
 	],
 	to: [
-		{
+		...[ 'core/paragraph', 'core/heading' ].map( ( block ) => ( {
 			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			transform: ( { values } ) =>
-				split(
-					create( {
-						html: values,
-						multilineTag: 'li',
-						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ),
-					__UNSTABLE_LINE_SEPARATOR
-				).map( ( piece ) =>
-					createBlock( 'core/paragraph', {
-						content: toHTMLString( { value: piece } ),
+			blocks: [ block ],
+			transform: ( _attributes, childBlocks ) => {
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( block, {
+						content,
 					} )
-				),
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/heading' ],
-			transform: ( { values } ) =>
-				split(
-					create( {
-						html: values,
-						multilineTag: 'li',
-						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ),
-					__UNSTABLE_LINE_SEPARATOR
-				).map( ( piece ) =>
-					createBlock( 'core/heading', {
-						content: toHTMLString( { value: piece } ),
-					} )
-				),
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/quote', {
-					value: toHTMLString( {
-						value: create( {
-							html: values,
-							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
-						multilineTag: 'p',
-					} ),
-					anchor,
-				} );
+				);
 			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/pullquote' ],
-			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/pullquote', {
-					value: toHTMLString( {
-						value: create( {
-							html: values,
-							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
-						multilineTag: 'p',
-					} ),
-					anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/table-of-contents' ],
-			transform: () => {
-				return createBlock( 'core/table-of-contents' );
-			},
-		},
+		} ) ),
 	],
 };
 

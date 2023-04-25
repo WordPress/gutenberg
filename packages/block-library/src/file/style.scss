@@ -1,5 +1,7 @@
 .wp-block-file {
-	margin-bottom: 1.5em;
+	&:not(.wp-element-button) {
+		font-size: 0.8em;
+	}
 
 	&.aligncenter {
 		text-align: center;
@@ -15,20 +17,22 @@
 	}
 }
 
+// Lowest specificity to avoid overriding layout styles.
+:where(.wp-block-file) {
+	margin-bottom: 1.5em;
+}
+
 .wp-block-file__embed {
 	margin-bottom: 1em;
 }
 
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
-.wp-block-file__button {
-	background: #32373c;
+:where(.wp-block-file__button) {
 	border-radius: 2em;
-	color: $white;
-	font-size: 0.8em;
 	padding: 0.5em 1em;
+	display: inline-block;
 
 	&:is(a) {
-		text-decoration: none;
 
 		&:hover,
 		&:visited,

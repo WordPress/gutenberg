@@ -10,4 +10,4 @@ exports[`Shortcut should render a span with the shortcut text 1`] = `
 </span>
 `;
 
-exports[`Shortcut should render null when no shortcut is provided 1`] = `null`;
+exports[`Shortcut should render null when no shortcut is provided 1`] = `<div />`;

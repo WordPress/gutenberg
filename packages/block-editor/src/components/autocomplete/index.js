@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clone } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
@@ -32,22 +27,21 @@ const EMPTY_ARRAY = [];
 function useCompleters( { completers = EMPTY_ARRAY } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
-		let filteredCompleters = completers;
+		let filteredCompleters = [ ...completers, linkAutocompleter ];
 
 		if (
 			name === getDefaultBlockName() ||
 			getBlockSupport( name, '__experimentalSlashInserter', false )
 		) {
-			filteredCompleters = filteredCompleters.concat( [
-				blockAutocompleter,
-				linkAutocompleter,
-			] );
+			filteredCompleters = [ ...filteredCompleters, blockAutocompleter ];
 		}
 
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
 			// Provide copies so filters may directly modify them.
 			if ( filteredCompleters === completers ) {
-				filteredCompleters = filteredCompleters.map( clone );
+				filteredCompleters = filteredCompleters.map(
+					( completer ) => ( { ...completer } )
+				);
 			}
 
 			filteredCompleters = applyFilters(

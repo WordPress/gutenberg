@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -10,49 +9,73 @@ import classnames from 'classnames';
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../provider';
-import LiveBlockPreview from './live';
+import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
-	__experimentalPadding = 0,
 	viewportWidth = 1200,
-	__experimentalLive = false,
-	__experimentalOnClick,
+	minHeight,
+	additionalStyles = [],
+	// Deprecated props:
 	__experimentalMinHeight,
+	__experimentalPadding,
 } ) {
+	if ( __experimentalMinHeight ) {
+		minHeight = __experimentalMinHeight;
+		deprecated( 'The __experimentalMinHeight prop', {
+			since: '6.2',
+			version: '6.4',
+			alternative: 'minHeight',
+		} );
+	}
+	if ( __experimentalPadding ) {
+		additionalStyles = [
+			...additionalStyles,
+			{ css: `body { padding: ${ __experimentalPadding }px; }` },
+		];
+		deprecated( 'The __experimentalPadding prop of BlockPreview', {
+			since: '6.2',
+			version: '6.4',
+			alternative: 'additionalStyles',
+		} );
+	}
+
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
+
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
+
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ __experimentalLive ? (
-				<LiveBlockPreview onClick={ __experimentalOnClick } />
-			) : (
-				<AutoHeightBlockPreview
-					viewportWidth={ viewportWidth }
-					__experimentalPadding={ __experimentalPadding }
-					__experimentalMinHeight={ __experimentalMinHeight }
-				/>
-			) }
-		</BlockEditorProvider>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
+			<AutoHeightBlockPreview
+				viewportWidth={ viewportWidth }
+				minHeight={ minHeight }
+				additionalStyles={ additionalStyles }
+			/>
+		</ExperimentalBlockEditorProvider>
 	);
 }
 
@@ -94,21 +117,27 @@ export function useBlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const disabledRef = useDisabled();
+	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
 	const children = (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
 			<BlockListItems
 				renderAppender={ false }
 				__experimentalLayout={ __experimentalLayout }
 			/>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 
 	return {

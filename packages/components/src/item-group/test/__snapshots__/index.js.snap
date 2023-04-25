@@ -5,32 +5,32 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -7,11 +7,11 @@
-    <div
-      class="css-dcjs67-itemWrapper"
-      role="listitem"
-    >
+@@ -8,11 +8,11 @@
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
-        data-wp-c16t="true"
-        data-wp-component="Item"
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
       >
-        Code
-      </div>
-@@ -19,11 +19,11 @@
-    <div
-      class="css-dcjs67-itemWrapper"
-      role="listitem"
-    >
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code
+        </div>
+@@ -20,11 +20,11 @@
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
-        data-wp-c16t="true"
-        data-wp-component="Item"
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
       >
-        Is
-      </div>
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Is
+        </div>
 `;
 
 exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
@@ -38,19 +38,19 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,11 +1,11 @@
-  <div
-    class="css-dcjs67-itemWrapper"
-    role="listitem"
-  >
+@@ -2,11 +2,11 @@
     <div
--     class="components-item css-bsdqin-View-medium-item em57xhy0"
-+     class="components-item css-1ohjtsa-View-large-item em57xhy0"
-      data-wp-c16t="true"
-      data-wp-component="Item"
+      class="css-dcjs67-itemWrapper"
+      role="listitem"
     >
-      Code is poetry
-    </div>
+      <div
+-       class="components-item css-cl593w-View-medium-item e19lxcc00"
++       class="components-item css-1yvqxd-View-large-item e19lxcc00"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
 `;
 
 exports[`ItemGroup ItemGroup component should render correctly 1`] = `
@@ -75,6 +75,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
 
 .emotion-3 {
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
   width: 100%;
   display: block;
   margin: 0;
@@ -82,22 +83,24 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   border-radius: 2px;
 }
 
-<div
-  class="components-item-group emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="ItemGroup"
-  role="list"
->
+<div>
   <div
-    class="emotion-2"
-    role="listitem"
+    class="components-item-group emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="ItemGroup"
+    role="list"
   >
     <div
-      class="components-item emotion-3 emotion-1"
-      data-wp-c16t="true"
-      data-wp-component="Item"
+      class="emotion-2"
+      role="listitem"
     >
-      Code is poetry
+      <div
+        class="components-item emotion-3 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
     </div>
   </div>
 </div>
@@ -108,26 +111,27 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,17 +1,17 @@
-  <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-18qvw1m-View-separated-rounded em57xhy0"
-    data-wp-c16t="true"
-    data-wp-component="ItemGroup"
-    role="list"
-  >
+@@ -1,18 +1,18 @@
+  <div>
     <div
-      class="css-dcjs67-itemWrapper"
-      role="listitem"
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-bsdqin-View-medium-item em57xhy0"
-        data-wp-c16t="true"
-        data-wp-component="Item"
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
       >
-        Code is poetry
-      </div>
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-cl593w-View-medium-item e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
 `;
 
 exports[`ItemGroup ItemGroup component should show borders when the isBordered prop is true 1`] = `
@@ -135,26 +139,27 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,17 +1,17 @@
-  <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-acyoj6-View-bordered-rounded em57xhy0"
-    data-wp-c16t="true"
-    data-wp-component="ItemGroup"
-    role="list"
-  >
+@@ -1,18 +1,18 @@
+  <div>
     <div
-      class="css-dcjs67-itemWrapper"
-      role="listitem"
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-bsdqin-View-medium-item em57xhy0"
-        data-wp-c16t="true"
-        data-wp-component="Item"
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
       >
-        Code is poetry
-      </div>
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-cl593w-View-medium-item e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
 `;
 
 exports[`ItemGroup ItemGroup component should show rounded corners when the isRounded prop is true 1`] = `
@@ -162,13 +167,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,7 +1,7 @@
-  <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-1mm2cvy-View em57xhy0"
-    data-wp-c16t="true"
-    data-wp-component="ItemGroup"
-    role="list"
-  >
+@@ -1,8 +1,8 @@
+  <div>
     <div
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-1mm2cvy-View e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
 `;

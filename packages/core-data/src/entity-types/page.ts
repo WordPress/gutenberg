@@ -12,7 +12,6 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -140,5 +139,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Page< C extends Context = DefaultContextOf< 'postType', 'page' > > =
-	OmitNevers< _BaseEntityRecords.Page< C > >;
+export type Page< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Page< C >
+>;

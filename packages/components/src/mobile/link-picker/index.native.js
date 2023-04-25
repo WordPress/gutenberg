@@ -3,7 +3,6 @@
  */
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +25,7 @@ import styles from './styles.scss';
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
-	const protocol = lowerCase( getProtocol( value ) ) || '';
+	const protocol = getProtocol( value )?.toLowerCase() || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
 		type = 'mailto';
@@ -36,7 +35,7 @@ export const createDirectEntry = ( value ) => {
 		type = 'tel';
 	}
 
-	if ( startsWith( value, '#' ) ) {
+	if ( value?.startsWith( '#' ) ) {
 		type = 'internal';
 	}
 
@@ -92,6 +91,9 @@ export const LinkPicker = ( {
 		getURLFromClipboard()
 			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
 			.catch( () => setValue( { value, clipboardUrl: '' } ) );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	// TODO: Localize the accessibility label.

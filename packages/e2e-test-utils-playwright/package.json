@@ -34,8 +34,9 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2",
 		"form-data": "^4.0.0",
-		"lodash": "^4.17.21"
+		"mime": "^3.0.0"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1"

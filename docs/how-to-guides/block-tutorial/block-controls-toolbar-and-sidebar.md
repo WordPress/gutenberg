@@ -30,8 +30,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -109,8 +109,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 
 		attributes: {
 			content: {
-				type: 'array',
-				source: 'children',
+				type: 'string',
+				source: 'html',
 				selector: 'p',
 			},
 			alignment: {

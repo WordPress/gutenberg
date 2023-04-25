@@ -5,7 +5,6 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	fireEvent,
-	waitFor,
 	within,
 } from 'test/helpers';
 
@@ -24,7 +23,7 @@ const getMockedReusableBlock = ( id ) => ( {
 	content: {
 		raw: `
     <!-- wp:heading -->
-    <h2>First Reusable block</h2>
+    <h2 class="wp-block-heading">First Reusable block</h2>
     <!-- /wp:heading -->
 
     <!-- wp:paragraph -->
@@ -70,21 +69,24 @@ describe( 'Reusable block', () => {
 				response = [ reusableBlockMock1, reusableBlockMock2 ];
 			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
 				response = reusableBlockMock1;
+			} else if (
+				path.startsWith( '/wp/v2/block-patterns/categories' )
+			) {
+				response = [];
 			}
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor( {
-				initialHtml: '',
-				capabilities: { reusableBlock: true },
-			} );
+		const screen = await initializeEditor( {
+			initialHtml: '',
+			capabilities: { reusableBlock: true },
+		} );
 
 		// Open the inserter menu.
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+		fireEvent.press( await screen.findByLabelText( 'Add block' ) );
 
 		// Navigate to reusable tab.
-		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
+		const reusableSegment = await screen.findByText( 'Reusable' );
 		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -95,7 +97,9 @@ describe( 'Reusable block', () => {
 		} );
 		fireEvent.press( reusableSegment );
 
-		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
+		const reusableBlockList = screen.getByTestId(
+			'InserterUI-ReusableBlocks'
+		);
 		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
@@ -106,13 +110,11 @@ describe( 'Reusable block', () => {
 		} );
 
 		// Insert a reusable block.
-		fireEvent.press(
-			await waitFor( () => getByText( `Reusable block - 1` ) )
-		);
+		fireEvent.press( await screen.findByText( `Reusable block - 1` ) );
 
 		// Get the reusable block.
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const [ reusableBlock ] = await screen.findAllByLabelText(
+			/Reusable block Block\. Row 1/
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -124,18 +126,16 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const [ reusableBlock ] = await screen.findAllByLabelText(
+			/Reusable block Block\. Row 1/
 		);
 
-		const blockDeleted = await waitFor( () =>
-			within( reusableBlock ).getByText(
-				'Block has been deleted or is unavailable.'
-			)
+		const blockDeleted = within( reusableBlock ).getByText(
+			'Block has been deleted or is unavailable.'
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -159,17 +159,17 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const [ reusableBlock ] = await screen.findByLabelText(
+			/Reusable block Block\. Row 1/
 		);
 
-		const innerBlockListWrapper = await waitFor( () =>
-			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
-		);
+		const innerBlockListWrapper = await within(
+			reusableBlock
+		).findByTestId( 'block-list-wrapper' );
 
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
@@ -181,10 +181,10 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		const headingInnerBlock = await waitFor( () =>
-			within( reusableBlock ).getByA11yLabel(
-				'Heading Block. Row 1. Level 2. First Reusable block'
-			)
+		const [ headingInnerBlock ] = await within(
+			reusableBlock
+		).findAllByLabelText(
+			'Heading Block. Row 1. Level 2. First Reusable block'
 		);
 
 		expect( reusableBlock ).toBeDefined();

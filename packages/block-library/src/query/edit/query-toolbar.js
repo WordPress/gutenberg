@@ -11,8 +11,11 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { usePatterns } from '../utils';
 
 export default function QueryToolbar( {
 	attributes: { query, displayLayout },
@@ -22,20 +25,7 @@ export default function QueryToolbar( {
 	name,
 	clientId,
 } ) {
-	const hasPatterns = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-			return !! __experimentalGetPatternsByBlockTypes(
-				name,
-				rootClientId
-			).length;
-		},
-		[ name, clientId ]
-	);
+	const hasPatterns = !! usePatterns( clientId, name ).length;
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'

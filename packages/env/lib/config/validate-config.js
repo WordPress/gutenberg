@@ -6,7 +6,7 @@
  */
 
 /**
- * Error subtype which indicates that an expected validation erorr occured
+ * Error subtype which indicates that an expected validation erorr occurred
  * while reading wp-env configuration.
  */
 class ValidationError extends Error {}
@@ -16,7 +16,7 @@ class ValidationError extends Error {}
  * do not match the required format.
  *
  * @param {Object}  config      A config object to validate.
- * @param {?string} envLocation Identifies if the error occured in a specific environment property.
+ * @param {?string} envLocation Identifies if the error occurred in a specific environment property.
  * @return {Object} The passed config object with no modifications.
  */
 function validateConfig( config, envLocation ) {
@@ -83,7 +83,31 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	checkValidURL( envPrefix, config.config, 'WP_SITEURL' );
+	checkValidURL( envPrefix, config.config, 'WP_HOME' );
+
 	return config;
+}
+
+/**
+ * Validates the input and throws if it isn't a valid URL.
+ *
+ * @param {string} envPrefix The environment we're validating.
+ * @param {Object} config    The configuration object we're looking at.
+ * @param {string} configKey The configuration key we're validating.
+ */
+function checkValidURL( envPrefix, config, configKey ) {
+	if ( config[ configKey ] === undefined ) {
+		return;
+	}
+
+	try {
+		new URL( config[ configKey ] );
+	} catch {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }config.${ configKey }" must be a valid URL.`
+		);
+	}
 }
 
 module.exports = {

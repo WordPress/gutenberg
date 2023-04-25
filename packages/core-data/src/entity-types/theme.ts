@@ -4,7 +4,6 @@
 import type { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -78,6 +77,10 @@ declare module './base-entity-records' {
 			 * Whether theme opts in to wide alignment CSS class.
 			 */
 			'align-wide': boolean;
+			/**
+			 * Whether appearanceTools are enabled in Global Styles.
+			 */
+			'appearance-tools': boolean;
 			/**
 			 * Whether posts and comments RSS feed links are added to head.
 			 */
@@ -218,5 +221,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Theme< C extends Context = DefaultContextOf< 'root', 'theme' > > =
-	OmitNevers< _BaseEntityRecords.Theme< C > >;
+export type Theme< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Theme< C >
+>;

@@ -394,7 +394,7 @@ function getTypeAnnotation( typeAnnotation ) {
  *
  * @param {ASTNode} token Contains either a function or a call to a function-wrapper.
  *
- * TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
+ *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
 	if ( babelTypes.isFunctionDeclaration( token ) ) {
@@ -405,18 +405,24 @@ function unwrapWrappedSelectors( token ) {
 		return token;
 	}
 
+	if ( babelTypes.isTSAsExpression( token ) ) {
+		// ( ( state, queryId ) => state.queries[ queryId ] ) as any;
+		// \------------------------------------------------/ CallExpression.expression
+		return unwrapWrappedSelectors( token.expression );
+	}
+
 	if ( babelTypes.isCallExpression( token ) ) {
 		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
 		//                 \--------------------------------------------/ CallExpression.arguments[0]
 		if ( token.callee.name === 'createSelector' ) {
-			return token.arguments[ 0 ];
+			return unwrapWrappedSelectors( token.arguments[ 0 ] );
 		}
 
 		// createRegistrySelector( ( selector ) => ( state, queryId ) => select( 'core/queries' ).get( queryId ) );
 		//                                         \-----------------------------------------------------------/ CallExpression.arguments[0].body
 		//                         \---------------------------------------------------------------------------/ CallExpression.arguments[0]
 		if ( token.callee.name === 'createRegistrySelector' ) {
-			return token.arguments[ 0 ].body;
+			return unwrapWrappedSelectors( token.arguments[ 0 ].body );
 		}
 	}
 }
@@ -502,7 +508,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
  * @param {CommentTag} tag              The documented parameter.
  * @param {ASTNode}    declarationToken The function the parameter is documented on.
  * @param {number}     paramIndex       The parameter index.
- * @return {string?} The parameter's type annotation.
+ * @return {string | undefined} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -551,7 +557,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {string?} The function's return type annotation.
+ * @return {string | undefined} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -564,7 +570,7 @@ function getReturnTypeAnnotation( declarationToken ) {
 
 /**
  * @param {ASTNode} declarationToken
- * @return {string?} The type annotation for the variable.
+ * @return {string | undefined} The type annotation for the variable.
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;

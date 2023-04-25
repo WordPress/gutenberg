@@ -277,8 +277,14 @@ describe( 'Inserting blocks', () => {
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403
 	it( 'inserts a block in proper place after having clicked `Browse All` from block appender', async () => {
 		await insertBlock( 'Group' );
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'
@@ -293,8 +299,14 @@ describe( 'Inserting blocks', () => {
 		const INSERTER_SEARCH_SELECTOR =
 			'.block-editor-inserter__search input,.block-editor-inserter__search-input,input.block-editor-inserter__search';
 		await insertBlock( 'Group' );
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Text' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 		await page.focus( INSERTER_SEARCH_SELECTOR );
@@ -306,7 +318,7 @@ describe( 'Inserting blocks', () => {
 		);
 		await browseAll.click();
 		const availableBlocks = await page.$$(
-			'.block-editor-block-types-list__list-item'
+			'.edit-post-editor__inserter-panel .block-editor-block-types-list__list-item'
 		);
 		expect( availableBlocks ).toHaveLength( 1 );
 	} );
@@ -335,8 +347,10 @@ describe( 'Inserting blocks', () => {
 
 	it( 'shows block preview when hovering over block in inserter', async () => {
 		await openGlobalBlockInserter();
-		await page.waitForSelector( '.editor-block-list-item-paragraph' );
-		await page.focus( '.editor-block-list-item-paragraph' );
+		const paragraphButton = (
+			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
+		 )[ 0 ];
+		await paragraphButton.hover();
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',
 			{

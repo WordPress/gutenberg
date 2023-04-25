@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const { get } = require( 'lodash' );
-
-/**
  * Internal dependencies
  */
 const getExportEntries = require( './get-export-entries' );
@@ -154,8 +149,8 @@ module.exports = (
 			ir.push( {
 				path,
 				name: entry.exportName,
-				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				tags: get( doc, [ 'tags' ], [] ),
+				description: doc?.description ?? UNDOCUMENTED,
+				tags: doc?.tags ?? [],
 				lineStart: entry.lineStart,
 				lineEnd: entry.lineEnd,
 			} );

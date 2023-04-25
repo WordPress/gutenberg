@@ -23,8 +23,7 @@ function BlockAlignmentMatrixControl( props ) {
 
 	return (
 		<Dropdown
-			position="bottom right"
-			popoverProps={ { isAlternate: true } }
+			popoverProps={ { variant: 'toolbar', placement: 'bottom-start' } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {

@@ -1,0 +1,15 @@
+.edit-site-save-hub {
+	color: $gray-600;
+}
+
+.edit-site-save-hub__button {
+	color: inherit;
+
+	&[aria-disabled="true"] {
+		opacity: 1;
+	}
+
+	&[aria-disabled="true"]:hover {
+		color: inherit;
+	}
+}

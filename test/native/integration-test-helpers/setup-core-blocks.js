@@ -6,11 +6,7 @@ import {
 	setDefaultBlockName,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import {
-	coreBlocks,
-	registerBlock,
-	registerCoreBlocks,
-} from '@wordpress/block-library';
+import { coreBlocks, registerCoreBlocks } from '@wordpress/block-library';
 
 /**
  * Registers all core blocks or a specific list of blocks before running tests.
@@ -21,15 +17,13 @@ import {
 export const setupCoreBlocks = ( blocks ) => {
 	beforeAll( () => {
 		if ( blocks ) {
-			blocks.forEach( ( blockName ) =>
-				registerBlock( coreBlocks[ blockName ] )
-			);
+			blocks.forEach( ( blockName ) => coreBlocks[ blockName ].init() );
 
 			// Paragraph block should always be registered as it's
 			// the default block.
 			const paragraphBlock = coreBlocks[ 'core/paragraph' ];
 			if ( ! blocks.includes( paragraphBlock.name ) ) {
-				registerBlock( paragraphBlock );
+				paragraphBlock.init();
 			}
 
 			setDefaultBlockName( paragraphBlock.name );

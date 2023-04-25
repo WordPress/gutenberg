@@ -203,6 +203,7 @@ function useResizeObserver< T extends HTMLElement >(
 	// the component unmounted.
 	const didUnmount = useRef( false );
 	useEffect( () => {
+		didUnmount.current = false;
 		return () => {
 			didUnmount.current = true;
 		};

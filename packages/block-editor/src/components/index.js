@@ -5,6 +5,7 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
+export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
@@ -52,10 +53,8 @@ export { default as __experimentalColorGradientControl } from './colors-gradient
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
-export {
-	default as __experimentalImageEditor,
-	ImageEditingProvider as __experimentalImageEditingProvider,
-} from './image-editor';
+export { default as HeightControl } from './height-control';
+export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
 export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
@@ -92,7 +91,12 @@ export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
 export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
-
+export { default as __experimentalSpacingSizesControl } from './spacing-sizes-control';
+export {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+	getCustomValueFromPreset,
+} from './spacing-sizes-control/utils';
 /*
  * Content Related Components
  */
@@ -146,7 +150,10 @@ export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
-export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export {
+	RecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion as __experimentalUseHasRecursion,
+} from './recursion-provider';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';

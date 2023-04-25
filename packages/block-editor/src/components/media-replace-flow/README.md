@@ -54,7 +54,7 @@ Callback used when media is replaced from the Media Library or when a new media 
 Callback used when media is replaced with an URL. It is called with one argument `newURL` which is a `string` containing the new URL.
 
 -   Type: `func`
--   Required: Yes
+-   Required: No
 
 ### onError
 
@@ -65,10 +65,11 @@ Callback called when an upload error happens and receives an error message as an
 
 ### name
 
-The label of the replace button.
+A `string` value will be used as the label of the replace button. It can also accept `Phrasing content` elements(ex. `span`).
 
--   Type: `string`
+-   Type: `string|Element`
 -   Required: No
+-   Default: `Replace`
 
 ### createNotice
 

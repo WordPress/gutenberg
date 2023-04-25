@@ -7,12 +7,14 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { font, COLORS } from '../../utils';
+import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: ${ font( 'default.fontSize' ) };
+
+	${ boxSizingReset }
 `;
 
 const deprecatedMarginField = ( { __nextHasNoMarginBottom = false } ) => {
@@ -33,8 +35,15 @@ export const StyledField = styled.div`
 `;
 
 const labelStyles = css`
+	${ baseLabelTypography };
+
 	display: inline-block;
 	margin-bottom: ${ space( 2 ) };
+	/**
+	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
+	 * StyledLabel when it is rendered as a legend.
+	 */
+	padding: 0;
 `;
 
 export const StyledLabel = styled.label`
@@ -55,7 +64,7 @@ export const StyledHelp = styled.p`
 	margin-bottom: 0;
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ COLORS.mediumGray.text };
+	color: ${ COLORS.gray[ 700 ] };
 
 	${ deprecatedMarginHelp }
 `;

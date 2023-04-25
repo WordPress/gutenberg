@@ -1,4 +1,10 @@
 .wp-block-avatar {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+	img {
+		box-sizing: border-box;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}

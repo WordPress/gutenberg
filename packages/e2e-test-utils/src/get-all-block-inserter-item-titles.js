@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { sortBy, uniq } from 'lodash';
-
-/**
  * Returns an array of strings with all inserter item titles.
  *
  * @return {Promise} Promise resolving with an array containing all inserter item titles.
@@ -25,5 +20,5 @@ export async function getAllBlockInserterItemTitles() {
 			return inserterItem.innerText;
 		} );
 	} );
-	return sortBy( uniq( inserterItemTitles ) );
+	return [ ...new Set( inserterItemTitles ) ].sort();
 }

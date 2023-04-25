@@ -12,8 +12,8 @@ import {
 	Modal,
 	Button,
 	TextControl,
-	Flex,
-	FlexItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -115,12 +115,11 @@ export default function ReusableBlockConvertButton( {
 							setIsModalOpen( true );
 						} }
 					>
-						{ __( 'Add to Reusable blocks' ) }
+						{ __( 'Create Reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create Reusable block' ) }
-							closeLabel={ __( 'Close' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -136,16 +135,14 @@ export default function ReusableBlockConvertButton( {
 									onClose();
 								} }
 							>
-								<TextControl
-									label={ __( 'Name' ) }
-									value={ title }
-									onChange={ setTitle }
-								/>
-								<Flex
-									className="reusable-blocks-menu-items__convert-modal-actions"
-									justify="flex-end"
-								>
-									<FlexItem>
+								<VStack spacing="5">
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Name' ) }
+										value={ title }
+										onChange={ setTitle }
+									/>
+									<HStack justify="right">
 										<Button
 											variant="tertiary"
 											onClick={ () => {
@@ -155,13 +152,12 @@ export default function ReusableBlockConvertButton( {
 										>
 											{ __( 'Cancel' ) }
 										</Button>
-									</FlexItem>
-									<FlexItem>
+
 										<Button variant="primary" type="submit">
 											{ __( 'Save' ) }
 										</Button>
-									</FlexItem>
-								</Flex>
+									</HStack>
+								</VStack>
 							</form>
 						</Modal>
 					) }

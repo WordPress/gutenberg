@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"__experimental": "list-v2",
 	"name": "core/list-item",
 	"title": "List item",
 	"category": "text",
@@ -22,6 +21,19 @@
 	},
 	"supports": {
 		"className": false,
-		"__experimentalSelector": "li"
+		"__experimentalSelector": "li",
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	}
 }

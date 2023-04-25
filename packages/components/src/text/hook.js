@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import { isPlainObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -167,8 +166,11 @@ export default function useText( props ) {
 	 */
 	if ( ! truncate && Array.isArray( children ) ) {
 		content = Children.map( children, ( child ) => {
-			// @ts-ignore
-			if ( ! isPlainObject( child ) || ! ( 'props' in child ) ) {
+			if (
+				typeof child !== 'object' ||
+				child === null ||
+				! ( 'props' in child )
+			) {
 				return child;
 			}
 

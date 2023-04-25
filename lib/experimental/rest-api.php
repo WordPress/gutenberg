@@ -38,6 +38,14 @@ function gutenberg_register_theme_controller() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_theme_controller' );
 
+ * Registers the Navigation Fallbacks REST API routes.
+ */
+function gutenberg_register_rest_navigation_fallbacks() {
+	$editor_settings = new WP_REST_Navigation_Fallback_Controller();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_fallbacks' );
+
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *

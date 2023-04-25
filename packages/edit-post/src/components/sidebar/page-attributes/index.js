@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -46,16 +41,15 @@ export function PageAttributes() {
 		return null;
 	}
 
-	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
+	const onTogglePanel = ( ...args ) =>
+		toggleEditorPanelOpened( PANEL_NAME, ...args );
 
 	return (
 		<PageAttributesCheck>
 			<PanelBody
-				title={ get(
-					postType,
-					[ 'labels', 'attributes' ],
-					__( 'Page attributes' )
-				) }
+				title={
+					postType?.labels?.attributes ?? __( 'Page attributes' )
+				}
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>

@@ -1,31 +1,17 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import withState from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-
-// This is needed because TestUtils does not accept a stateless component.
-// anything run through a HOC ends up as a stateless component.
-const getTestComponent = ( WrappedComponent ) => {
-	class TestComponent extends Component {
-		render() {
-			return <WrappedComponent { ...this.props } />;
-		}
-	}
-	return <TestComponent />;
-};
-
 describe( 'withState', () => {
-	it( 'should pass initial state and allow updates', () => {
+	it( 'should pass initial state and allow updates', async () => {
+		const user = userEvent.setup();
 		const EnhancedComponent = withState( {
 			count: 0,
 		} )( ( { count, setState } ) => (
@@ -38,16 +24,15 @@ describe( 'withState', () => {
 			</button>
 		) );
 
-		const wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( EnhancedComponent )
-		);
+		render( <EnhancedComponent /> );
 
-		const buttonElement = () =>
-			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+		const button = screen.getByRole( 'button' );
 
 		expect( console ).toHaveWarned();
-		expect( buttonElement().outerHTML ).toBe( '<button>0</button>' );
-		TestUtils.Simulate.click( buttonElement() );
-		expect( buttonElement().outerHTML ).toBe( '<button>1</button>' );
+		expect( button ).toHaveTextContent( '0' );
+
+		await user.click( button );
+
+		expect( button ).toHaveTextContent( '1' );
 	} );
 } );

@@ -24,9 +24,14 @@
 		"linkLabel": {
 			"type": "boolean",
 			"default": false
+		},
+		"arrow": {
+			"type": "string",
+			"default": "none"
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -36,13 +41,15 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
-			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
 		}
-	}
+	},
+	"style": "wp-block-post-navigation-link"
 }

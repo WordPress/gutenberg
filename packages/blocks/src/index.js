@@ -10,4 +10,4 @@
 
 export { store } from './store';
 export * from './api';
-export { withBlockContentContext } from './block-content-provider';
+export * from './deprecated';

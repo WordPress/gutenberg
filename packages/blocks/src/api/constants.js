@@ -23,6 +23,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
+		useEngine: true,
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
@@ -33,6 +34,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderRadius: {
 		value: [ 'border', 'radius' ],
@@ -43,62 +45,77 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			borderBottomLeftRadius: 'bottomLeft',
 			borderBottomRightRadius: 'bottomRight',
 		},
+		useEngine: true,
 	},
 	borderStyle: {
 		value: [ 'border', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderWidth: {
 		value: [ 'border', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderTopColor: {
 		value: [ 'border', 'top', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderTopStyle: {
 		value: [ 'border', 'top', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderTopWidth: {
 		value: [ 'border', 'top', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderRightColor: {
 		value: [ 'border', 'right', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderRightStyle: {
 		value: [ 'border', 'right', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderRightWidth: {
 		value: [ 'border', 'right', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderBottomColor: {
 		value: [ 'border', 'bottom', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderBottomStyle: {
 		value: [ 'border', 'bottom', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderBottomWidth: {
 		value: [ 'border', 'bottom', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderLeftColor: {
 		value: [ 'border', 'left', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderLeftStyle: {
 		value: [ 'border', 'left', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderLeftWidth: {
 		value: [ 'border', 'left', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	color: {
 		value: [ 'color', 'text' ],
@@ -106,17 +123,35 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	columnCount: {
+		value: [ 'typography', 'textColumns' ],
+		support: [ 'typography', 'textColumns' ],
+		useEngine: true,
+	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
-		support: [ 'color', '__experimentalDuotone' ],
+		support: [ 'filter', 'duotone' ],
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
 	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
+	},
+	buttonColor: {
+		value: [ 'elements', 'button', 'color', 'text' ],
+		support: [ 'color', 'button' ],
+	},
+	buttonBackgroundColor: {
+		value: [ 'elements', 'button', 'color', 'background' ],
+		support: [ 'color', 'button' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
+		useEngine: true,
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
@@ -149,6 +184,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	minHeight: {
+		value: [ 'dimensions', 'minHeight' ],
+		support: [ 'dimensions', 'minHeight' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -175,14 +215,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
-	'--wp--style--block-gap': {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
+	'--wp--style--root--padding': {
+		value: [ 'spacing', 'padding' ],
+		support: [ 'spacing', 'padding' ],
+		properties: {
+			'--wp--style--root--padding-top': 'top',
+			'--wp--style--root--padding-right': 'right',
+			'--wp--style--root--padding-bottom': 'bottom',
+			'--wp--style--root--padding-left': 'left',
+		},
+		rootOnly: true,
 	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {
 	link: 'a',
+	heading: 'h1, h2, h3, h4, h5, h6',
 	h1: 'h1',
 	h2: 'h2',
 	h3: 'h3',
@@ -190,6 +238,9 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h5: 'h5',
 	h6: 'h6',
 	button: '.wp-element-button, .wp-block-button__link',
+	caption:
+		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
+	cite: 'cite',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
@@ -198,4 +249,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

@@ -8,12 +8,7 @@
 		border-top: $border-width solid $gray-400;
 	}
 
-	.edit-site-template-details__title {
-		margin: 0;
-	}
-
 	.edit-site-template-details__description {
-		margin: $grid-unit-15 0 0;
 		color: $gray-700;
 	}
 
@@ -24,6 +19,10 @@
 
 	.edit-site-template-details__template-areas-item {
 		position: relative;
+
+		.components-menu-items__item-icon {
+			color: var(--wp-block-synced-color);
+		}
 
 		.edit-site-template-details__template-areas-item-more {
 			position: absolute;

@@ -45,9 +45,9 @@ $input-size: 300px;
 
 	.components-spinner {
 		position: absolute;
-		right: $input-padding;
-		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $grid-unit;
 	}
 }
 

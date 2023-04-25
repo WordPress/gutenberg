@@ -2,16 +2,16 @@
 	z-index: z-index(".components-tooltip");
 
 	.components-popover__content {
-		min-width: 0;
+		min-width: min-content;
 	}
 }
 
 .components-tooltip .components-popover__content {
-	background: $gray-900;
+	background: $components-color-foreground; // TODO: Discuss with designers.
 	border-radius: $radius-block-ui;
 	border-width: 0;
 	outline: none;
-	color: $white;
+	color: $components-color-foreground-inverted;
 	white-space: nowrap;
 	text-align: center;
 	line-height: 1.4;

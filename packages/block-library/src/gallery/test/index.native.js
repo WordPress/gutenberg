@@ -3,7 +3,7 @@
  */
 import {
 	act,
-	changeTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getBlock,
 	getEditorHtml,
@@ -100,7 +100,7 @@ describe( 'Gallery block', () => {
 	// is addressed.
 	it.skip( 'displays media options picker when selecting the block', async () => {
 		// Initialize with an empty gallery
-		const { getByA11yLabel, getByText, getByTestId } =
+		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
 				initialHtml: generateGalleryBlock( 0 ),
 			} );
@@ -121,7 +121,7 @@ describe( 'Gallery block', () => {
 
 		// Observe that the block is selected, this is done by checking if the block settings
 		// button is visible
-		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		expect( blockActionsButton ).toBeVisible();
 	} );
 
@@ -160,20 +160,20 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc003
 	it( 'sets caption to gallery', async () => {
 		// Initialize with a gallery that contains one item
-		const { getByA11yLabel } = await initializeWithGalleryBlock( {
+		const { getByLabelText } = await initializeWithGalleryBlock( {
 			numberOfItems: 1,
 			media,
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByA11yLabel( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption
 		const captionField = within(
-			getByA11yLabel( /Gallery caption. Empty/ )
+			getByLabelText( /Gallery caption. Empty/ )
 		).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption'
 		);
@@ -197,7 +197,7 @@ describe( 'Gallery block', () => {
 		// Set gallery item caption
 		const captionField =
 			within( galleryItem ).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption'
 		);
@@ -456,7 +456,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem3 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem3 ).getByA11yLabel(
+				within( galleryItem3 ).getByLabelText(
 					/Move block left from position 3 to position 2/
 				)
 			)
@@ -465,7 +465,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem1 ).getByA11yLabel(
+				within( galleryItem1 ).getByLabelText(
 					/Move block right from position 1 to position 2/
 				)
 			)
@@ -537,7 +537,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
@@ -563,14 +563,14 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			await openBlockSettings( screen );
 
 			// Can't increment due to maximum value
 			// NOTE: Default columns value is 3
 			fireEvent(
-				getByA11yLabel( /Columns\. Value is 3/ ),
+				getByLabelText( /Columns\. Value is 3/ ),
 				'accessibilityAction',
 				{
 					nativeEvent: { actionName: 'increment' },
@@ -585,13 +585,13 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			await openBlockSettings( screen );
 
 			// Decrement columns
 			fireEvent(
-				getByA11yLabel( /Columns\. Value is 3/ ),
+				getByLabelText( /Columns\. Value is 3/ ),
 				'accessibilityAction',
 				{
 					nativeEvent: { actionName: 'decrement' },

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { act } from 'react-test-renderer';
-import { fireEvent, render } from 'test/helpers';
+import { fireEvent, render, act } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
 /**

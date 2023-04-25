@@ -23,6 +23,9 @@ const BottomSheetSubSheet = ( {
 		if ( showSheet ) {
 			setIsFullScreen( isFullScreen );
 		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ showSheet, isFullScreen ] );
 
 	return (

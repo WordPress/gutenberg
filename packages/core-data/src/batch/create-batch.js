@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { zip } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import defaultProcessor from './default-processor';
@@ -138,12 +133,8 @@ export default function createBatch( processor = defaultProcessor ) {
 
 			let isSuccess = true;
 
-			for ( const pair of zip( results, queue ) ) {
-				/** @type {{error?: unknown, output?: unknown}} */
-				const result = pair[ 0 ];
-
-				/** @type {{resolve: (value: any) => void; reject: (error: any) => void} | undefined} */
-				const queueItem = pair[ 1 ];
+			results.forEach( ( result, key ) => {
+				const queueItem = queue[ key ];
 
 				if ( result?.error ) {
 					queueItem?.reject( result.error );
@@ -151,7 +142,7 @@ export default function createBatch( processor = defaultProcessor ) {
 				} else {
 					queueItem?.resolve( result?.output ?? result );
 				}
-			}
+			} );
 
 			queue = [];
 

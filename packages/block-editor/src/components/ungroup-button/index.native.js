@@ -14,6 +14,7 @@ import UngroupIcon from './icon';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+const EMPTY_BLOCKS_LIST = [];
 
 export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
@@ -45,9 +46,12 @@ export default compose( [
 		const isUngroupable =
 			selectedBlock &&
 			selectedBlock.innerBlocks &&
-			!! selectedBlock.innerBlocks.length &&
+			selectedBlock.innerBlocks.length > 0 &&
 			selectedBlock.name === groupingBlockName;
-		const innerBlocks = isUngroupable ? selectedBlock.innerBlocks : [];
+
+		const innerBlocks = isUngroupable
+			? selectedBlock.innerBlocks
+			: EMPTY_BLOCKS_LIST;
 
 		return {
 			isUngroupable,

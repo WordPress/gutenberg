@@ -2,7 +2,6 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { filter } from 'lodash';
 
 /**
  * Internal dependencies
@@ -135,9 +134,11 @@ describe( 'entities', () => {
 			entities: [ { kind: 'postType', name: 'posts' } ],
 		} );
 
-		expect( filter( state.config, { kind: 'postType' } ) ).toEqual( [
-			{ kind: 'postType', name: 'posts' },
-		] );
+		expect(
+			Object.entries( state.config )
+				.filter( ( [ , cfg ] ) => cfg.kind === 'postType' )
+				.map( ( [ , cfg ] ) => cfg )
+		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
 } );
 

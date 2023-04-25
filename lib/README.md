@@ -18,12 +18,13 @@ structure for its PHP code:
   Core in the future X.Y release, or that were previously merged to Core in the
   X.Y release and remain in the plugin for backwards compatibility when running
   the plugin on older versions of WordPress.
+- `lib/compat/plugin` - Features for backwards compatibility for the plugin consumers. These files don't need to be merged to Core and should have a timeline for when they should be removed from the plugin.
 
 ## Best practices
 
 ### Prefer the `wp` prefix
 
-For features that may be merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes. 
+For features that may be merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes.
 
 This applies to both experimental and stable features.
 
@@ -86,7 +87,7 @@ When writing new functions and classes, it's good practice to use `! function_ex
 
 If Core has defined a symbol once and then Gutenberg defines it a second time, fatal errors will occur.
 
-Wrapping functions and classes avoids such errors if the feature is merged to Core. 
+Wrapping functions and classes avoids such errors if the feature is merged to Core.
 
 #### Good
 
@@ -122,7 +123,7 @@ Furthermore, a quick codebase search will also help you know if your new method 
 
 ### Note how your feature should look when merged to Core
 
-Developers should write a brief note about how their feature should be merged to Core, for example, which Core file or function should be patched. 
+Developers should write a brief note about how their feature should be merged to Core, for example, which Core file or function should be patched.
 
 Notes can be included in the doc comment.
 
@@ -133,7 +134,7 @@ This helps future developers know what to do when merging Gutenberg features int
 ```php
 /**
  * Returns a navigation object for the given slug.
- * 
+ *
  * Should live in `wp-includes/navigation.php` when merged to Core.
  *
  * @param string $slug

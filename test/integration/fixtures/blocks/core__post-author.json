@@ -4,7 +4,9 @@
 		"isValid": true,
 		"attributes": {
 			"avatarSize": 48,
-			"showAvatar": true
+			"showAvatar": true,
+			"isLink": false,
+			"linkTarget": "_self"
 		},
 		"innerBlocks": []
 	}

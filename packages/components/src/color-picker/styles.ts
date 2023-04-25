@@ -9,17 +9,15 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
+import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
-	Input,
 } from '../input-control/styles/input-control-styles';
-import InputControl from '../input-control';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
@@ -39,19 +37,7 @@ export const SelectControl = styled( InnerSelectControl )`
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
 	margin-right: ${ space( 2 ) };
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
-
-// All inputs should be the same height so this should be changed at the component level.
-// That involves changing heights of multiple input types probably buttons too etc.
-// So until that is done we are already using the new height on the color picker so it matches the mockups.
-const inputHeightStyle = `
-&&& ${ Input } {
-	height: 40px;
-}`;
 
 // Make the Hue circle picker not go out of the bar.
 const interactiveHueStyles = `
@@ -80,6 +66,8 @@ export const ColorInputWrapper = styled( Flex )`
 `;
 
 export const ColorfulWrapper = styled.div`
+	${ boxSizingReset };
+
 	width: 216px;
 
 	.react-colorful {
@@ -122,12 +110,6 @@ export const ColorfulWrapper = styled.div`
 	}
 
 	${ interactiveHueStyles }
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
-
-	${ inputHeightStyle }
 `;
 
 export const CopyButton = styled( Button )`
@@ -139,8 +121,4 @@ export const CopyButton = styled( Button )`
 			margin-right: 0;
 		}
 	}
-`;
-
-export const ColorHexInputControl = styled( InputControl )`
-	width: 8em;
 `;

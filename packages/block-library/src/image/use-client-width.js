@@ -7,7 +7,7 @@ export default function useClientWidth( ref, dependencies ) {
 	const [ clientWidth, setClientWidth ] = useState();
 
 	function calculateClientWidth() {
-		setClientWidth( ref.current.clientWidth );
+		setClientWidth( ref.current?.clientWidth );
 	}
 
 	useEffect( calculateClientWidth, dependencies );

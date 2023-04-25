@@ -1,0 +1,8 @@
+[
+	{
+		"title": "External Project Templates",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	}
+]

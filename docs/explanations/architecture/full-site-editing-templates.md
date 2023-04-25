@@ -1,4 +1,4 @@
-# Full Site Editing Templates
+# Site Editing Templates
 
 ## Template and template part flows
 

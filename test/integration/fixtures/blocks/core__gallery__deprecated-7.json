@@ -1,0 +1,120 @@
+[
+	{
+		"name": "core/gallery",
+		"isValid": true,
+		"attributes": {
+			"images": [],
+			"ids": [],
+			"shortCodeTransforms": [],
+			"caption": "",
+			"imageCrop": true,
+			"fixedHeight": true,
+			"linkTo": "media",
+			"sizeSlug": "large",
+			"allowResize": false
+		},
+		"innerBlocks": [
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"id": 705,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"id": 704,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"id": 703,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			}
+		]
+	},
+	{
+		"name": "core/gallery",
+		"isValid": true,
+		"attributes": {
+			"images": [],
+			"ids": [],
+			"shortCodeTransforms": [],
+			"caption": "This gallery has a caption",
+			"imageCrop": true,
+			"fixedHeight": true,
+			"linkTo": "media",
+			"sizeSlug": "large",
+			"allowResize": false
+		},
+		"innerBlocks": [
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"id": 705,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"id": 704,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/image",
+				"isValid": true,
+				"attributes": {
+					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"alt": "",
+					"caption": "",
+					"href": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"id": 703,
+					"sizeSlug": "large",
+					"linkDestination": "media"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

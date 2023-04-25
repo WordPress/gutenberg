@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { matcherHint, printExpected, printReceived } from 'jest-matcher-utils';
-import { isEqual, reduce, some } from 'lodash';
 
 /**
  * Internal dependencies
@@ -33,12 +32,13 @@ const createToHaveBeenCalledMatcher =
 		};
 	};
 
-const createToHaveBeenCalledWith =
-	( matcherName, methodName ) =>
-	( received, ...expected ) => {
+const createToHaveBeenCalledWith = ( matcherName, methodName ) =>
+	function ( received, ...expected ) {
 		const spy = received[ methodName ];
 		const calls = spy.mock.calls;
-		const pass = some( calls, ( objects ) => isEqual( objects, expected ) );
+		const pass = calls.some( ( objects ) =>
+			this.equals( objects, expected )
+		);
 		const message = pass
 			? () =>
 					matcherHint( `.not${ matcherName }`, spy.getMockName() ) +
@@ -63,9 +63,8 @@ const createToHaveBeenCalledWith =
 	};
 
 expect.extend(
-	reduce(
-		supportedMatchers,
-		( result, matcherName, methodName ) => {
+	Object.entries( supportedMatchers ).reduce(
+		( result, [ methodName, matcherName ] ) => {
 			const matcherNameWith = `${ matcherName }With`;
 
 			return {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -153,7 +148,6 @@ const {
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
-	hasChangedContent,
 	isEditedPostDirty,
 	hasNonPostEntityChanges,
 	isCleanNewPost,
@@ -227,7 +221,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
@@ -392,57 +388,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasChangedContent', () => {
-		it( 'should return false if no dirty blocks nor content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if dirty blocks', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: true,
-							value: [],
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-							value: [],
-						},
-						edits: {
-							content: 'text mode edited',
-						},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
 		} );
 	} );
 
@@ -1569,11 +1514,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-							isDirty: true,
+						edits: {
+							content: () => 'new-content',
 						},
-						edits: {},
 					},
 				},
 				currentPost: {
@@ -1598,10 +1541,11 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true if title or excerpt have changed', () => {
-			for ( const variantField of [ 'title', 'excerpt' ] ) {
-				for ( const constantField of without(
-					[ 'title', 'excerpt' ],
-					variantField
+			const fields = [ 'title', 'excerpt' ];
+
+			for ( const variantField of fields ) {
+				for ( const constantField of fields.filter(
+					( f ) => f !== variantField
 				) ) {
 					const state = {
 						editor: {

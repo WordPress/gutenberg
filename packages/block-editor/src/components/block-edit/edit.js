@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +37,11 @@ export const Edit = ( props ) => {
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
 		return blockType && blockType.usesContext
-			? pick( blockContext, blockType.usesContext )
+			? Object.fromEntries(
+					Object.entries( blockContext ).filter( ( [ key ] ) =>
+						blockType.usesContext.includes( key )
+					)
+			  )
 			: DEFAULT_BLOCK_CONTEXT;
 	}, [ blockType, blockContext ] );
 
@@ -59,7 +62,11 @@ export const Edit = ( props ) => {
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames( generatedClassName, attributes.className );
+	const className = classnames(
+		generatedClassName,
+		attributes.className,
+		props.className
+	);
 
 	return (
 		<Component { ...props } context={ context } className={ className } />

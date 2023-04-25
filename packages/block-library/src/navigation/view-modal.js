@@ -27,6 +27,16 @@ function navigationToggleModal( modal ) {
 	htmlElement.classList.toggle( 'has-modal-open' );
 }
 
+function isLinkToAnchorOnCurrentPage( node ) {
+	return (
+		node.hash &&
+		node.protocol === window.location.protocol &&
+		node.host === window.location.host &&
+		node.pathname === window.location.pathname &&
+		node.search === window.location.search
+	);
+}
+
 window.addEventListener( 'load', () => {
 	MicroModal.init( {
 		onShow: navigationToggleModal,
@@ -42,7 +52,7 @@ window.addEventListener( 'load', () => {
 	navigationLinks.forEach( function ( link ) {
 		// Ignore non-anchor links and anchor links which open on a new tab.
 		if (
-			! link.getAttribute( 'href' )?.startsWith( '#' ) ||
+			! isLinkToAnchorOnCurrentPage( link ) ||
 			link.attributes?.target === '_blank'
 		) {
 			return;

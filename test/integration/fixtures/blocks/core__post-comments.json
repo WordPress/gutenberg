@@ -1,8 +1,11 @@
 [
 	{
-		"name": "core/post-comments",
+		"name": "core/comments",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"tagName": "div",
+			"legacy": true
+		},
 		"innerBlocks": []
 	}
 ]

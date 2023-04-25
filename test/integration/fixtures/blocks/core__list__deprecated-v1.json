@@ -4,9 +4,57 @@
 		"isValid": true,
 		"attributes": {
 			"ordered": false,
-			"values": "<li>one</li><li>two</li><li>three</li>",
-			"fontFamily": "cambria-georgia"
+			"values": ""
 		},
-		"innerBlocks": []
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Text &amp; Headings"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Images &amp; Videos"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Galleries"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Embeds, like YouTube, Tweets, or other WordPress posts."
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Layout blocks, like Buttons, Hero Images, Separators, etc."
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "And <em>Lists</em> like this one of course :)"
+				},
+				"innerBlocks": []
+			}
+		]
 	}
 ]

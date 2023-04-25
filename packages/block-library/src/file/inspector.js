@@ -43,6 +43,7 @@ export default function FileBlockInspector( {
 				{ href.endsWith( '.pdf' ) && (
 					<PanelBody title={ __( 'PDF settings' ) }>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show inline embed' ) }
 							help={
 								displayPreview
@@ -56,6 +57,7 @@ export default function FileBlockInspector( {
 						/>
 						{ displayPreview && (
 							<RangeControl
+								__nextHasNoMarginBottom
 								label={ __( 'Height in pixels' ) }
 								min={ MIN_PREVIEW_HEIGHT }
 								max={ Math.max(
@@ -70,17 +72,20 @@ export default function FileBlockInspector( {
 				) }
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ textLinkHref }
 						options={ linkDestinationOptions }
 						onChange={ changeLinkDestinationOption }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open in new tab' ) }
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }
 						onChange={ changeShowDownloadButton }

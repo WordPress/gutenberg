@@ -9,7 +9,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { getBlockSupport } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 
 /**
@@ -22,22 +21,17 @@ const TEMPLATE = [
 	[ 'core/query-pagination-numbers' ],
 	[ 'core/query-pagination-next' ],
 ];
-
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
+const ALLOWED_BLOCKS = [
+	'core/query-pagination-previous',
+	'core/query-pagination-numbers',
+	'core/query-pagination-next',
+];
 
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow, layout },
+	attributes: { paginationArrow },
 	setAttributes,
 	clientId,
-	name,
 } ) {
-	const usedLayout = layout || getDefaultBlockLayout( name );
 	const hasNextPreviousBlocks = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
@@ -55,12 +49,7 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: [
-			'core/query-pagination-previous',
-			'core/query-pagination-numbers',
-			'core/query-pagination-next',
-		],
-		__experimentalLayout: usedLayout,
+		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	return (
 		<>

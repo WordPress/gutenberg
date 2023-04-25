@@ -13,7 +13,7 @@ describe( 'formatTypes', () => {
 		expect( formatTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add add a new format type', () => {
+	it( 'should add a new format type', () => {
 		const original = deepFreeze( {
 			'core/bold': { name: 'core/bold' },
 		} );

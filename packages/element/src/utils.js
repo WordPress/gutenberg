@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isString } from 'lodash';
-
-/**
  * Checks if the provided WP element is empty.
  *
  * @param {*} element WP element to check.
@@ -14,7 +9,7 @@ export const isEmptyElement = ( element ) => {
 		return false;
 	}
 
-	if ( isString( element ) || Array.isArray( element ) ) {
+	if ( typeof element?.valueOf() === 'string' || Array.isArray( element ) ) {
 		return ! element.length;
 	}
 

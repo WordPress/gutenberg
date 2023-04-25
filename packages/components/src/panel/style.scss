@@ -35,8 +35,11 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 $grid-unit-20;
-	height: $grid-unit-60;
 	border-bottom: $border-width solid $gray-300;
+
+	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
+	box-sizing: content-box;
+	height: $grid-unit-60 - $border-width;
 
 	h2 {
 		margin: 0;
@@ -88,7 +91,7 @@
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		border-radius: 0;
 	}
 

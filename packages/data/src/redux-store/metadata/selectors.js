@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { selectorArgsToStateKey } from './utils';
@@ -25,7 +20,7 @@ import { selectorArgsToStateKey } from './utils';
  * @return {StateValue|undefined} isResolving value.
  */
 export function getResolutionState( state, selectorName, args ) {
-	const map = get( state, [ selectorName ] );
+	const map = state[ selectorName ];
 	if ( ! map ) {
 		return;
 	}

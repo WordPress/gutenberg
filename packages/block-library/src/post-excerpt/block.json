@@ -16,10 +16,15 @@
 		"showMoreOnNewLine": {
 			"type": "boolean",
 			"default": true
+		},
+		"excerptLength": {
+			"type": "number",
+			"default": 55
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -37,10 +42,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

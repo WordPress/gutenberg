@@ -15,6 +15,7 @@ function useForceUpdate() {
 	const mounted = useRef( true );
 
 	useEffect( () => {
+		mounted.current = true;
 		return () => {
 			mounted.current = false;
 		};
@@ -28,18 +29,18 @@ function useForceUpdate() {
 }
 
 export default function Fill( { name, children } ) {
-	const slot = useSlot( name );
+	const { registerFill, unregisterFill, ...slot } = useSlot( name );
 	const ref = useRef( { rerender: useForceUpdate() } );
 
 	useEffect( () => {
-		// We register fills so we can keep track of their existance.
+		// We register fills so we can keep track of their existence.
 		// Some Slot implementations need to know if there're already fills
 		// registered so they can choose to render themselves or not.
-		slot.registerFill( ref );
+		registerFill( ref );
 		return () => {
-			slot.unregisterFill( ref );
+			unregisterFill( ref );
 		};
-	}, [ slot.registerFill, slot.unregisterFill ] );
+	}, [ registerFill, unregisterFill ] );
 
 	if ( ! slot.ref || ! slot.ref.current ) {
 		return null;

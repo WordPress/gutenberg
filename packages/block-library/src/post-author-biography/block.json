@@ -13,6 +13,7 @@
 	},
 	"usesContext": [ "postType", "postId" ],
 	"supports": {
+		"anchor": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -32,6 +33,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

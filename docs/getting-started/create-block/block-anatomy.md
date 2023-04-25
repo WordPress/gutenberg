@@ -29,7 +29,7 @@ registerBlockType( metadata.name, {
 } );
 ```
 
-The first parameter in the **registerBlockType** function is the block name, this should match exactly to the name registered in the PHP file.
+The first parameter in the **registerBlockType** function is the block name, this should match exactly to the `name` property in the `block.json` file. By importing the metadata from `block.json` and referencing the `name` property in the first parameter we ensure that they will match, and continue to match even if the name is subsequently changed in `block.json`.
 
 The second parameter to the function is the block object. See the [block registration documentation](/docs/reference-guides/block-api/block-registration.md) for full details.
 
@@ -37,7 +37,7 @@ The last two block object properties are **edit** and **save**, these are the ke
 
 The results of the edit function is what the editor will render to the editor page when the block is inserted.
 
-The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
+The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the **wp_posts** table in the WordPress database that is used to store the content of the post.
 
 Most of the properties are set in the `src/block.json` file.
 

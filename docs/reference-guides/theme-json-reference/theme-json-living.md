@@ -4,7 +4,7 @@
 >
 > There're related documents you may be interested in: the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification and the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
-This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme. 
+This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme.
 
 ## Schema
 
@@ -22,8 +22,21 @@ Setting that enables the following UI tools:
 
 - border: color, radius, style, width
 - color: link
+- dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+
+
+---
+
+### useRootPaddingAwareAlignments
+
+_**Note:** Since WordPress 6.1._
+
+Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
+
+Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
 
 
 ---
@@ -38,6 +51,17 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
+| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -62,6 +86,16 @@ Settings related to colors.
 
 ---
 
+### dimensions
+
+Settings related to dimensions.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| minHeight | boolean | false |  |
+
+---
+
 ### layout
 
 Settings related to layout.
@@ -70,6 +104,16 @@ Settings related to layout.
 | ---       | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
+
+---
+
+### position
+
+Settings related to position.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| sticky | boolean | false |  |
 
 ---
 
@@ -83,6 +127,9 @@ Settings related to spacing.
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
+| customSpacingSize | boolean | true |  |
+| spacingSizes | array |  | name, size, slug |
+| spacingScale | object |  |  |
 
 ---
 
@@ -95,13 +142,15 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
+| fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | name, size, slug |
-| fontFamilies | array |  | fontFamily, name, slug |
+| fontSizes | array |  | fluid, name, size, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
 
@@ -120,14 +169,14 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
-| radius | undefined |  |
-| style | string |  |
-| width | string |  |
-| top | undefined |  |
-| right | undefined |  |
-| bottom | undefined |  |
-| left | undefined |  |
+| color | string, object |  |
+| radius | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+| top | object | color, style, width |
+| right | object | color, style, width |
+| bottom | object | color, style, width |
+| left | object | color, style, width |
 
 ---
 
@@ -137,9 +186,19 @@ Color styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| background | string |  |
-| gradient | string |  |
-| text | string |  |
+| background | string, object |  |
+| gradient | string, object |  |
+| text | string, object |  |
+
+---
+
+### dimensions
+
+Dimensions styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| minHeight | string, object |  |
 
 ---
 
@@ -149,7 +208,7 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | string |  |
+| blockGap | string, object |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -161,15 +220,84 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | string |  |
-| fontSize | string |  |
-| fontStyle | string |  |
-| fontWeight | string |  |
-| letterSpacing | string |  |
-| lineHeight | string |  |
-| textDecoration | string |  |
-| textTransform | string |  |
+| fontFamily | string, object |  |
+| fontSize | string, object |  |
+| fontStyle | string, object |  |
+| fontWeight | string, object |  |
+| letterSpacing | string, object |  |
+| lineHeight | string, object |  |
+| textColumns | string |  |
+| textDecoration | string, object |  |
+| textTransform | string, object |  |
 
 ---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string, object |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+
+---
+
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
+
+---
+## customTemplates
+
+Additional metadata for custom templates defined in the templates folder.
+
+Type: `object`.
+
+| Property | Description | Type |
+| ---      | ---         | ---  |
+| name | Filename, without extension, of the template in the templates folder. | string |
+| title | Title of the template, translatable. | string |
+| postTypes | List of post types that can use this custom template. | array |
+
+
+## templateParts
+
+Additional metadata for template parts defined in the parts folder.
+
+Type: `object`.
+
+| Property | Description | Type |
+| ---      | ---         | ---  |
+| name | Filename, without extension, of the template in the parts folder. | string |
+| title | Title of the template, translatable. | string |
+| area | The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. | string |
+
+
+## Patterns
+
+An array of pattern slugs to be registered from the Pattern Directory.
+Type: `array`.
+
 
 <!-- END TOKEN Autogenerated - DO NOT EDIT -->

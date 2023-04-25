@@ -21,6 +21,7 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		hideLabelFromVision,
 		value,
@@ -37,6 +38,7 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -60,8 +62,6 @@ function UnforwardedTextControl(
 /**
  * TextControl components let users enter and edit text.
  *
- *
- * @example
  * ```jsx
  * import { TextControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

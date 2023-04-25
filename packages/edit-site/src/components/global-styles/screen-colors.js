@@ -2,107 +2,40 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	FlexItem,
-	ColorIndicator,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
-import Subtitle from './subtitle';
-import ColorIndicatorWrapper from './color-indicator-wrapper';
+import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
+import { unlock } from '../../private-apis';
 
-function BackgroundColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport =
-		supports.includes( 'backgroundColor' ) ||
-		supports.includes( 'background' );
-	const [ backgroundColor ] = useStyle( 'color.background', name );
-	const [ gradientValue ] = useStyle( 'color.gradient', name );
+const {
+	useGlobalStyle,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	ColorPanel: StylesColorPanel,
+} = unlock( blockEditorPrivateApis );
 
-	if ( ! hasSupport ) {
-		return null;
+function ScreenColors( { name, variation = '' } ) {
+	const variationClassName = getVariationClassName( variation );
+
+	let prefixParts = [];
+	if ( variation ) {
+		prefixParts = [ 'variations', variation ].concat( prefixParts );
 	}
+	const prefix = prefixParts.join( '.' );
 
-	return (
-		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/background' }
-			aria-label={ __( 'Colors background styles' ) }
-		>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator
-						colorValue={ gradientValue ?? backgroundColor }
-						data-testid="background-color-indicator"
-					/>
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Background' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function TextColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle( 'color.text', name );
-
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/text' }
-			aria-label={ __( 'Colors text styles' ) }
-		>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator
-						colorValue={ color }
-						data-testid="text-color-indicator"
-					/>
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Text' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function LinkColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'linkColor' );
-	const [ color ] = useStyle( 'elements.link.color.text', name );
-
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/link' }
-			aria-label={ __( 'Colors link styles' ) }
-		>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Links' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function ScreenColors( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+		shouldDecodeEncode: false,
+	} );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
 
 	return (
 		<>
@@ -113,27 +46,18 @@ function ScreenColors( { name } ) {
 				) }
 			/>
 
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
+
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
 					<Palette name={ name } />
 
-					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
-						<ItemGroup isBordered isSeparated>
-							<BackgroundColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-							<TextColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-							<LinkColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-						</ItemGroup>
-					</VStack>
+					<StylesColorPanel
+						inheritedValue={ inheritedStyle }
+						value={ style }
+						onChange={ setStyle }
+						settings={ settings }
+					/>
 				</VStack>
 			</div>
 		</>

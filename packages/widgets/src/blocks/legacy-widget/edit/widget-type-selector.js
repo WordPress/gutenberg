@@ -27,6 +27,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Select a legacy widget to display:' ) }
 			value={ selectedId ?? '' }
 			options={ [

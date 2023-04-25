@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -59,7 +54,7 @@ function getMediaDetails( media, postId ) {
 		media.id,
 		postId
 	);
-	if ( has( media, [ 'media_details', 'sizes', defaultSize ] ) ) {
+	if ( defaultSize in ( media?.media_details?.sizes ?? {} ) ) {
 		return {
 			mediaWidth: media.media_details.sizes[ defaultSize ].width,
 			mediaHeight: media.media_details.sizes[ defaultSize ].height,
@@ -74,7 +69,7 @@ function getMediaDetails( media, postId ) {
 		media.id,
 		postId
 	);
-	if ( has( media, [ 'media_details', 'sizes', fallbackSize ] ) ) {
+	if ( fallbackSize in ( media?.media_details?.sizes ?? {} ) ) {
 		return {
 			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
 			mediaHeight: media.media_details.sizes[ fallbackSize ].height,
@@ -105,7 +100,6 @@ function PostFeaturedImage( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const postLabel = get( postType, [ 'labels' ], {} );
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
@@ -159,7 +153,7 @@ function PostFeaturedImage( {
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
-							postLabel.featured_image ||
+							postType?.labels?.featured_image ||
 							DEFAULT_FEATURE_IMAGE_LABEL
 						}
 						onSelect={ onUpdateImage }
@@ -201,7 +195,8 @@ function PostFeaturedImage( {
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
 										! isLoading &&
-										( postLabel.set_featured_image ||
+										( postType?.labels
+											?.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
 								<DropZone onFilesDrop={ onDropFiles } />
@@ -215,7 +210,7 @@ function PostFeaturedImage( {
 						{ media && (
 							<MediaUpload
 								title={
-									postLabel.featured_image ||
+									postType?.labels?.featured_image ||
 									DEFAULT_FEATURE_IMAGE_LABEL
 								}
 								onSelect={ onUpdateImage }
@@ -237,7 +232,7 @@ function PostFeaturedImage( {
 							variant="link"
 							isDestructive
 						>
-							{ postLabel.remove_featured_image ||
+							{ postType?.labels?.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>
 					</MediaUploadCheck>

@@ -29,7 +29,7 @@ import { requestPreview } from '@wordpress/react-native-bridge';
  */
 import * as paragraph from '../../paragraph';
 import * as embed from '..';
-import { registerBlock } from '../..';
+import { WebView } from 'react-native-webview';
 
 // Override modal mock to prevent unmounting it when is not visible.
 // This is required to be able to trigger onClose and onDismiss events when
@@ -40,8 +40,7 @@ jest.mock( 'react-native-modal', () => {
 } );
 
 // Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;
@@ -123,51 +122,54 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 
 // Return specified mocked responses for the oembed endpoint.
 const mockEmbedResponses = ( mockedResponses ) => {
-	fetchRequest.mockImplementation( ( { path } ) => {
-		if ( path.startsWith( '/wp/v2/themes' ) ) {
-			return Promise.resolve( [
-				{ theme_supports: { 'responsive-embeds': true } },
-			] );
-		}
-
+	fetchRequest.mockImplementation( async ( req ) => {
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
-				path ===
+				req.path ===
 				`/oembed/1.0/proxy?url=${ encodeURIComponent(
 					mockedResponse.url
 				) }`
 		);
-		return Promise.resolve( matchedEmbedResponse || {} );
+
+		return matchedEmbedResponse || mockOtherResponses( req );
 	} );
 };
 
+async function mockOtherResponses( { path } ) {
+	if ( path.startsWith( '/wp/v2/themes' ) ) {
+		return [ { theme_supports: { 'responsive-embeds': true } } ];
+	}
+
+	if ( path.startsWith( '/wp/v2/block-patterns/patterns' ) ) {
+		return [];
+	}
+
+	if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+		return [];
+	}
+
+	return {};
+}
+
 const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
-	const editor = await initializeEditor( {
-		initialHtml: '',
-	} );
-	const { getByA11yLabel, getByText } = editor;
+	const editor = await initializeEditor( { initialHtml: '' } );
 
 	// Open inserter menu.
-	fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+	fireEvent.press( await editor.findByLabelText( 'Add block' ) );
 
 	// Insert embed block.
-	fireEvent.press( await waitFor( () => getByText( blockTitle ) ) );
+	fireEvent.press( await editor.findByText( blockTitle ) );
 
 	// Return the embed block.
-	const block = await waitFor( () =>
-		getByA11yLabel( /Embed Block\. Row 1/ )
-	);
+	const [ block ] = await editor.findAllByLabelText( /Embed Block\. Row 1/ );
 
 	return { ...editor, block };
 };
 
 const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 	const editor = await initializeEditor( { initialHtml } );
-	const { getByA11yLabel } = editor;
 
-	const block = await waitFor( () =>
-		getByA11yLabel( /Embed Block\. Row 1/ )
-	);
+	const [ block ] = await editor.findAllByLabelText( /Embed Block\. Row 1/ );
 
 	if ( selectBlock ) {
 		// Select block.
@@ -180,8 +182,8 @@ const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
-	registerBlock( paragraph );
-	registerBlock( embed );
+	paragraph.init();
+	embed.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
@@ -230,10 +232,12 @@ describe( 'Embed block', () => {
 
 	describe( 'set URL upon block insertion', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
-			const { getByTestId } = await insertEmbedBlock();
+			const editor = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Dismiss the edit URL modal.
@@ -246,15 +250,16 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const { getByPlaceholderText, getByTestId } =
-				await insertEmbedBlock();
+			const editor = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Set an URL.
-			const linkTextInput = getByPlaceholderText( 'Add link' );
+			const linkTextInput = editor.getByPlaceholderText( 'Add link' );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
@@ -262,13 +267,18 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			// Wait until the WebView with the rich preview appears
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			// Wait until responsiveness settings appear, driven by `theme_supports.responsive-embeds`
+			await editor.findByText( 'Media settings' );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -280,28 +290,31 @@ describe( 'Embed block', () => {
 			// Mock clipboard.
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const { getByTestId, getByText } = await insertEmbedBlock();
+			const editor = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Get embed link with auto-pasted URL.
-			const autopastedLinkField = await waitFor( () =>
-				getByText( clipboardURL )
-			);
+			const autopastedLinkField = await editor.findByText( clipboardURL );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
+			).getByLabelText( `Twitter link, ${ clipboardURL }` );
 
 			expect( autopastedLinkField ).toBeDefined();
 			expect( twitterLinkField ).toBeDefined();
@@ -313,15 +326,15 @@ describe( 'Embed block', () => {
 
 	describe( 'set URL when empty block', () => {
 		it( 'sets empty URL when dismissing edit URL modal', async () => {
-			const { getByTestId, getByText } = await initializeWithEmbedBlock(
-				EMPTY_EMBED_HTML
-			);
+			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( await waitFor( () => getByText( 'ADD LINK' ) ) );
+			fireEvent.press( await editor.findByText( 'ADD LINK' ) );
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Dismiss the edit URL modal.
@@ -334,18 +347,19 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const { getByPlaceholderText, getByTestId, getByText } =
-				await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
+			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'ADD LINK' ) );
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Set an URL.
-			const linkTextInput = getByPlaceholderText( 'Add link' );
+			const linkTextInput = editor.getByPlaceholderText( 'Add link' );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
@@ -353,13 +367,16 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -371,31 +388,34 @@ describe( 'Embed block', () => {
 			// Mock clipboard.
 			Clipboard.getString.mockResolvedValue( clipboardURL );
 
-			const { getByTestId, getByText } = await initializeWithEmbedBlock(
-				EMPTY_EMBED_HTML
-			);
+			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'ADD LINK' ) );
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Get embed link.
-			const embedLink = await waitFor( () => getByText( clipboardURL ) );
+			const embedLink = await editor.findByText( clipboardURL );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
+			).getByLabelText( `Twitter link, ${ clipboardURL }` );
 
 			expect( embedLink ).toBeDefined();
 			expect( twitterLinkField ).toBeDefined();
@@ -407,16 +427,17 @@ describe( 'Embed block', () => {
 
 	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const { getByA11yLabel, getByTestId } =
-				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
-
-			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			const editor = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
 			);
 
+			// Open Block Settings.
+			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+
 			// Wait for Block Settings to be visible.
-			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			const blockSettingsModal = editor.getByTestId(
+				'block-settings-modal'
+			);
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Dismiss the Block Settings modal.
@@ -430,27 +451,28 @@ describe( 'Embed block', () => {
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const { getByA11yLabel, getByDisplayValue, getByTestId } =
-				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
-
-			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			const editor = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
 			);
 
+			// Open Block Settings.
+			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+
 			// Wait for Block Settings to be visible.
-			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			const blockSettingsModal = editor.getByTestId(
+				'block-settings-modal'
+			);
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ initialURL }`
 				)
 			);
 
 			// Replace URL.
-			const linkTextInput = getByDisplayValue( initialURL );
+			const linkTextInput = editor.getByDisplayValue( initialURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
@@ -458,12 +480,13 @@ describe( 'Embed block', () => {
 			fireEvent( blockSettingsModal, 'backdropPress' );
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
 			// Get YouTube link field.
-			const youtubeLinkField = await waitFor( () =>
-				within( blockSettingsModal ).getByA11yLabel(
-					`YouTube link, ${ expectedURL }`
-				)
-			);
+			const youtubeLinkField = await within(
+				blockSettingsModal
+			).findByLabelText( `YouTube link, ${ expectedURL }` );
 
 			expect( youtubeLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -473,31 +496,28 @@ describe( 'Embed block', () => {
 			const previousURL = 'https://twitter.com/notnownikki';
 			const invalidURL = 'http://';
 
-			const {
-				getByA11yLabel,
-				getByDisplayValue,
-				getByTestId,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
-
-			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			const editor = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
 			);
 
+			// Open Block Settings.
+			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+
 			// Wait for Block Settings to be visible.
-			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			const blockSettingsModal = editor.getByTestId(
+				'block-settings-modal'
+			);
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ previousURL }`
 				)
 			);
 
 			// Replace URL.
-			const linkTextInput = getByDisplayValue( previousURL );
+			const linkTextInput = editor.getByDisplayValue( previousURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, invalidURL );
 
@@ -505,8 +525,8 @@ describe( 'Embed block', () => {
 			fireEvent( blockSettingsModal, 'backdropPress' );
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
-			const errorNotice = await waitFor( () =>
-				getByText( 'Invalid URL. Please enter a valid URL.' )
+			const errorNotice = await editor.findByText(
+				'Invalid URL. Please enter a valid URL.'
 			);
 
 			expect( errorNotice ).toBeDefined();
@@ -516,30 +536,27 @@ describe( 'Embed block', () => {
 		it( 'sets empty state when setting an empty URL', async () => {
 			const previousURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByA11yLabel,
-				getByDisplayValue,
-				getByTestId,
-				getByPlaceholderText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
-
-			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+			const editor = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
 			);
 
+			// Open Block Settings.
+			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+
 			// Get Block Settings modal.
-			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			const blockSettingsModal = editor.getByTestId(
+				'block-settings-modal'
+			);
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ previousURL }`
 				)
 			);
 
 			// Replace URL with empty value.
-			const linkTextInput = getByDisplayValue( previousURL );
+			const linkTextInput = editor.getByDisplayValue( previousURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, '' );
 
@@ -548,8 +565,8 @@ describe( 'Embed block', () => {
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get empty embed link.
-			const emptyLinkTextInput = await waitFor( () =>
-				getByPlaceholderText( 'Add link' )
+			const emptyLinkTextInput = await editor.findByPlaceholderText(
+				'Add link'
 			);
 
 			expect( emptyLinkTextInput ).toBeDefined();
@@ -558,10 +575,12 @@ describe( 'Embed block', () => {
 
 		// This test case covers the bug fixed in PR #35460.
 		it( 'edits URL after dismissing two times the edit URL bottom sheet with empty value', async () => {
-			const { block, getByTestId, getByText } = await insertEmbedBlock();
+			const editor = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Dismiss the edit URL modal.
@@ -569,10 +588,10 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Select block.
-			fireEvent.press( block );
+			fireEvent.press( editor.block );
 
 			// Edit URL.
-			fireEvent.press( getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'ADD LINK' ) );
 
 			// Wait for edit URL modal to be visible.
 			await waitFor( () => embedEditURLModal.props.isVisible );
@@ -582,7 +601,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Edit URL.
-			fireEvent.press( getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'ADD LINK' ) );
 
 			// Wait for edit URL modal to be visible.
 			const isVisibleThirdTime = await waitFor(
@@ -597,19 +616,16 @@ describe( 'Embed block', () => {
 			const badURL = 'https://youtu.be/BAD_URL';
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByA11yLabel,
-				getByDisplayValue,
-				getByPlaceholderText,
-				getByTestId,
-			} = await insertEmbedBlock();
+			const editor = await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			await waitFor( () => embedEditURLModal.props.isVisible );
 
 			// Set an bad URL.
-			let linkTextInput = getByPlaceholderText( 'Add link' );
+			let linkTextInput = editor.getByPlaceholderText( 'Add link' );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, badURL );
 
@@ -618,23 +634,23 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
-			);
+			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
 
 			// Wait for Block Settings to be visible.
-			const blockSettingsModal = getByTestId( 'block-settings-modal' );
+			const blockSettingsModal = editor.getByTestId(
+				'block-settings-modal'
+			);
 			await waitFor( () => blockSettingsModal.props.isVisible );
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Embed link, ${ badURL }`
 				)
 			);
 
 			// Replace URL.
-			linkTextInput = getByDisplayValue( badURL );
+			linkTextInput = editor.getByDisplayValue( badURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, expectedURL );
 
@@ -643,11 +659,9 @@ describe( 'Embed block', () => {
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get Twitter link field.
-			const twitterLinkField = await waitFor( () =>
-				within( blockSettingsModal ).getByA11yLabel(
-					`Twitter link, ${ expectedURL }`
-				)
-			);
+			const twitterLinkField = await within(
+				blockSettingsModal
+			).findByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -663,18 +677,15 @@ describe( 'Embed block', () => {
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
-				const { getByA11yLabel, getByText } =
-					await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+				const editor = await initializeWithEmbedBlock(
+					RICH_TEXT_EMBED_HTML
+				);
 
 				// Open alignment options.
-				fireEvent.press(
-					await waitFor( () => getByA11yLabel( 'Align' ) )
-				);
+				fireEvent.press( await editor.findByLabelText( 'Align' ) );
 
 				// Select alignment option.
-				fireEvent.press(
-					await waitFor( () => getByText( alignmentOption ) )
-				);
+				fireEvent.press( await editor.findByText( alignmentOption ) );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
@@ -688,35 +699,38 @@ describe( 'Embed block', () => {
 			// Return bad response for the first request to oembed endpoint
 			// and success response for the rest of requests.
 			let isFirstEmbedRequest = true;
-			fetchRequest.mockImplementation( ( { path } ) => {
-				let response = {};
-				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-				if ( isEmbedRequest ) {
+			fetchRequest.mockImplementation( async ( req ) => {
+				if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
 					if ( isFirstEmbedRequest ) {
 						isFirstEmbedRequest = false;
-						response = MOCK_BAD_WORDPRESS_RESPONSE;
-					} else {
-						response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+						return MOCK_BAD_WORDPRESS_RESPONSE;
 					}
+					return RICH_TEXT_EMBED_SUCCESS_RESPONSE;
 				}
-				return Promise.resolve( response );
+
+				return mockOtherResponses( req );
 			} );
 
-			const { getByTestId, getByText } = await initializeWithEmbedBlock(
+			const editor = await initializeWithEmbedBlock(
 				RICH_TEXT_EMBED_HTML
 			);
 
-			// Retry request.
-			fireEvent.press( getByText( 'More options' ) );
-			fireEvent.press( getByText( 'Retry' ) );
+			await editor.findByText( 'Unable to embed media' );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			// Retry request.
+			fireEvent.press( editor.getByText( 'More options' ) );
+			fireEvent.press( editor.getByText( 'Retry' ) );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -724,23 +738,25 @@ describe( 'Embed block', () => {
 
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
-			fetchRequest.mockImplementation( ( { path } ) => {
-				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-				return Promise.resolve(
-					isEmbedRequest ? MOCK_BAD_WORDPRESS_RESPONSE : {}
-				);
+			fetchRequest.mockImplementation( async ( req ) => {
+				if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
+					return MOCK_BAD_WORDPRESS_RESPONSE;
+				}
+
+				return mockOtherResponses( req );
 			} );
 
-			const { getByA11yLabel, getByText } =
-				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const editor = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
+			);
 
 			// Convert embed to link.
-			fireEvent.press( getByText( 'More options' ) );
-			fireEvent.press( getByText( 'Convert to link' ) );
+			fireEvent.press( editor.getByText( 'More options' ) );
+			fireEvent.press( editor.getByText( 'Convert to link' ) );
 
 			// Get paragraph block where the link is created.
-			const paragraphBlock = await waitFor( () =>
-				getByA11yLabel( /Paragraph Block\. Row 1/ )
+			const [ paragraphBlock ] = await editor.findAllByLabelText(
+				/Paragraph Block\. Row 1/
 			);
 
 			expect( paragraphBlock ).toBeDefined();
@@ -752,51 +768,53 @@ describe( 'Embed block', () => {
 			const successURL = 'https://twitter.com/notnownikki';
 
 			// Return bad response for WordPress URL and success for Twitter URL.
-			fetchRequest.mockImplementation( ( { path } ) => {
+			fetchRequest.mockImplementation( async ( req ) => {
 				const matchesPath = ( url ) =>
-					path ===
+					req.path ===
 					`/oembed/1.0/proxy?url=${ encodeURIComponent( url ) }`;
 
-				let response = {};
 				if ( matchesPath( failURL ) ) {
-					response = MOCK_BAD_WORDPRESS_RESPONSE;
-				} else if ( matchesPath( successURL ) ) {
-					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+					return MOCK_BAD_WORDPRESS_RESPONSE;
 				}
 
-				return Promise.resolve( response );
+				if ( matchesPath( successURL ) ) {
+					return RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+
+				return mockOtherResponses( req );
 			} );
 
-			const {
-				getByA11yLabel,
-				getByText,
-				getByTestId,
-				getByDisplayValue,
-			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+			const editor = await initializeWithEmbedBlock( WP_EMBED_HTML );
 
-			fireEvent.press( getByText( 'More options' ) );
-			fireEvent.press( getByText( 'Edit link' ) );
+			fireEvent.press( editor.getByText( 'More options' ) );
+			fireEvent.press( editor.getByText( 'Edit link' ) );
 
 			// Start editing link.
-			fireEvent.press( getByA11yLabel( `WordPress link, ${ failURL }` ) );
+			fireEvent.press(
+				editor.getByLabelText( `WordPress link, ${ failURL }` )
+			);
 
 			// Set an URL.
-			const linkTextInput = getByDisplayValue( failURL );
+			const linkTextInput = editor.getByDisplayValue( failURL );
 			fireEvent( linkTextInput, 'focus' );
 			fireEvent.changeText( linkTextInput, successURL );
 
 			// Dismiss the edit URL modal.
-			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
+			const embedEditURLModal = editor.getByTestId(
+				'embed-edit-url-modal'
+			);
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
-			const blockSettingsModal = await waitFor( () =>
-				getByTestId( 'block-settings-modal' )
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+
+			const blockSettingsModal = await editor.findByTestId(
+				'block-settings-modal'
 			);
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ successURL }` );
+			).getByLabelText( `Twitter link, ${ successURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -852,17 +870,13 @@ describe( 'Embed block', () => {
 		it( 'creates embed block when pasting URL in paragraph block', async () => {
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const {
-				getByA11yLabel,
-				getByPlaceholderText,
-				getByTestId,
-				getByText,
-			} = await initializeEditor( {
+			const editor = await initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block.
-			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			const paragraphText =
+				editor.getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
 			fireEvent( paragraphText, 'paste', {
 				preventDefault: jest.fn(),
@@ -876,36 +890,37 @@ describe( 'Embed block', () => {
 			} );
 
 			// Wait for embed handler picker to be visible.
-			await waitFor(
-				() => getByTestId( 'embed-handler-picker' ).props.isVisible
+			const embedHandlerPicker = editor.getByTestId(
+				'embed-handler-picker'
 			);
+			await waitFor( () => embedHandlerPicker.props.isVisible );
 
 			// Select create embed option.
-			fireEvent.press( getByText( 'Create embed' ) );
+			fireEvent.press( editor.getByText( 'Create embed' ) );
 
 			// Get the created embed block.
-			const embedBlock = await waitFor( () =>
-				getByA11yLabel( /Embed Block\. Row 1/ )
+			const [ embedBlock ] = await editor.findAllByLabelText(
+				/Embed Block\. Row 1/
 			);
 
 			expect( embedBlock ).toBeDefined();
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'creates link when pasting URL in paragraph block', async () => {
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const {
-				getByDisplayValue,
-				getByPlaceholderText,
-				getByTestId,
-				getByText,
-			} = await initializeEditor( {
+			const editor = await initializeEditor( {
 				initialHtml: EMPTY_PARAGRAPH_HTML,
 			} );
 
 			// Paste URL in paragraph block.
-			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			const paragraphText =
+				editor.getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
 			fireEvent( paragraphText, 'paste', {
 				preventDefault: jest.fn(),
@@ -919,16 +934,17 @@ describe( 'Embed block', () => {
 			} );
 
 			// Wait for embed handler picker to be visible.
-			await waitFor(
-				() => getByTestId( 'embed-handler-picker' ).props.isVisible
+			const embedHandlerPicker = editor.getByTestId(
+				'embed-handler-picker'
 			);
+			await waitFor( () => embedHandlerPicker.props.isVisible );
 
 			// Select create link option.
-			fireEvent.press( getByText( 'Create link' ) );
+			fireEvent.press( editor.getByText( 'Create link' ) );
 
 			// Get the link text.
 			const linkText = await waitFor( () =>
-				getByDisplayValue(
+				editor.getByDisplayValue(
 					`<p><a href="${ expectedURL }">${ expectedURL }</a></p>`
 				)
 			);
@@ -941,10 +957,12 @@ describe( 'Embed block', () => {
 	describe( 'insert via slash inserter', () => {
 		it( 'insert generic embed block', async () => {
 			const embedBlockSlashInserter = '/Embed';
-			const { getByPlaceholderText, getByA11yLabel, getByText } =
-				await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+			const editor = await initializeEditor( {
+				initialHtml: EMPTY_PARAGRAPH_HTML,
+			} );
 
-			const paragraphText = getByPlaceholderText( 'Start writing…' );
+			const paragraphText =
+				editor.getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
 			// Trigger onSelectionChange to update both the current text and text selection.
 			// This event is required by the autocompleter, as it only displays the slash inserter
@@ -965,10 +983,10 @@ describe( 'Embed block', () => {
 				}
 			);
 
-			fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
+			fireEvent.press( await editor.findByText( 'Embed' ) );
 
-			const block = await waitFor( () =>
-				getByA11yLabel( /Embed Block\. Row 1/ )
+			const [ block ] = await editor.findAllByLabelText(
+				/Embed Block\. Row 1/
 			);
 
 			const blockName = within( block ).getByText( 'Embed' );
@@ -980,12 +998,12 @@ describe( 'Embed block', () => {
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
 				const embedBlockSlashInserter = `/${ title }`;
-				const { getByPlaceholderText, getByA11yLabel, getByText } =
-					await initializeEditor( {
-						initialHtml: EMPTY_PARAGRAPH_HTML,
-					} );
+				const editor = await initializeEditor( {
+					initialHtml: EMPTY_PARAGRAPH_HTML,
+				} );
 
-				const paragraphText = getByPlaceholderText( 'Start writing…' );
+				const paragraphText =
+					editor.getByPlaceholderText( 'Start writing…' );
 				fireEvent( paragraphText, 'focus' );
 				// Trigger onSelectionChange to update both the current text and text selection.
 				// This event is required by the autocompleter, as it only displays the slash inserter
@@ -1006,10 +1024,10 @@ describe( 'Embed block', () => {
 					}
 				);
 
-				fireEvent.press( await waitFor( () => getByText( title ) ) );
+				fireEvent.press( await editor.findByText( title ) );
 
-				const block = await waitFor( () =>
-					getByA11yLabel( /Embed Block\. Row 1/ )
+				const [ block ] = await editor.findAllByLabelText(
+					/Embed Block\. Row 1/
 				);
 
 				const blockName = within( block ).getByText( title );
@@ -1048,9 +1066,12 @@ describe( 'Embed block', () => {
 
 	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
-		fetchRequest.mockImplementation( ( { path } ) => {
-			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
+		fetchRequest.mockImplementation( async ( req ) => {
+			if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
+				return EMBED_NULL_RESPONSE;
+			}
+
+			return mockOtherResponses( req );
 		} );
 
 		const { getByText } = await initializeWithEmbedBlock(
@@ -1065,12 +1086,12 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const { getByA11yLabel, getByText } =
+			const { getByLabelText, getByText } =
 				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Untoggle resize for smaller devices.
@@ -1082,12 +1103,12 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'does not show media settings panel if responsive is not supported', async () => {
-			const { getByA11yLabel, getByText } =
+			const { getByLabelText, getByText } =
 				await initializeWithEmbedBlock( WP_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for media settings panel.

@@ -3,12 +3,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { menu } from '@wordpress/icons';
 
 /**
@@ -59,13 +57,13 @@ function DropdownMenu( dropdownMenuProps ) {
 		noIcons,
 	} = dropdownMenuProps;
 
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -88,11 +86,14 @@ function DropdownMenu( dropdownMenuProps ) {
 						return;
 					}
 
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
 						onToggle();
 					}
 				};
+				const { as: Toggle = Button, ...restToggleProps } =
+					toggleProps ?? {};
+
 				const mergedToggleProps = mergeProps(
 					{
 						className: classnames(
@@ -102,11 +103,11 @@ function DropdownMenu( dropdownMenuProps ) {
 							}
 						),
 					},
-					toggleProps
+					restToggleProps
 				);
 
 				return (
-					<Button
+					<Toggle
 						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ ( event ) => {
@@ -128,7 +129,7 @@ function DropdownMenu( dropdownMenuProps ) {
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }
-					</Button>
+					</Toggle>
 				);
 			} }
 			renderContent={ ( props ) => {
@@ -146,7 +147,7 @@ function DropdownMenu( dropdownMenuProps ) {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
 									key={ [

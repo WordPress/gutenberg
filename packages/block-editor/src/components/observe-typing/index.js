@@ -115,9 +115,13 @@ export function useMouseMoveTypingReset() {
  *   field, presses ESC or TAB, or moves the mouse in the document.
  */
 export function useTypingObserver() {
-	const isTyping = useSelect( ( select ) =>
-		select( blockEditorStore ).isTyping()
-	);
+	const { isTyping, hasInlineToolbar } = useSelect( ( select ) => {
+		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
+		return {
+			isTyping: _isTyping(),
+			hasInlineToolbar: getSettings().hasInlineToolbar,
+		};
+	}, [] );
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
 	const ref1 = useMouseMoveTypingReset();
@@ -125,6 +129,7 @@ export function useTypingObserver() {
 		( node ) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
+			const selection = defaultView.getSelection();
 
 			// Listeners to stop typing should only be added when typing.
 			// Listeners to start typing should only be added when not typing.
@@ -170,22 +175,20 @@ export function useTypingObserver() {
 				 * uncollapsed (shift) selection.
 				 */
 				function stopTypingOnSelectionUncollapse() {
-					const selection = defaultView.getSelection();
-					const isCollapsed =
-						selection.rangeCount > 0 &&
-						selection.getRangeAt( 0 ).collapsed;
-
-					if ( ! isCollapsed ) {
+					if ( ! selection.isCollapsed ) {
 						stopTyping();
 					}
 				}
 
 				node.addEventListener( 'focus', stopTypingOnNonTextField );
 				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
-				ownerDocument.addEventListener(
-					'selectionchange',
-					stopTypingOnSelectionUncollapse
-				);
+
+				if ( ! hasInlineToolbar ) {
+					ownerDocument.addEventListener(
+						'selectionchange',
+						stopTypingOnSelectionUncollapse
+					);
+				}
 
 				return () => {
 					defaultView.clearTimeout( timerId );
@@ -242,7 +245,7 @@ export function useTypingObserver() {
 				node.removeEventListener( 'keydown', startTypingInTextField );
 			};
 		},
-		[ isTyping, startTyping, stopTyping ]
+		[ isTyping, hasInlineToolbar, startTyping, stopTyping ]
 	);
 
 	return useMergeRefs( [ ref1, ref2 ] );

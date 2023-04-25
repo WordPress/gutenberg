@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * Filters an array based on the predicate, but keeps the reference the same if
  * the array hasn't changed.
  *
@@ -19,6 +14,23 @@ function filterWithReference( collection, predicate ) {
 		? collection
 		: filteredCollection;
 }
+
+/**
+ * Creates a new object with the same keys, but with `callback()` called as
+ * a transformer function on each of the values.
+ *
+ * @param {Object}   obj      The object to transform.
+ * @param {Function} callback The function to transform each object value.
+ * @return {Array} Transformed object.
+ */
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
 /**
  * Verifies whether the given annotations is a valid annotation.

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -28,9 +23,11 @@ addFilter(
 			settings.supports = {
 				...settings.supports,
 				align: Array.isArray( blockAlign )
-					? without(
-							blockAlign,
-							...Object.values( WIDE_ALIGNMENTS.alignments )
+					? blockAlign.filter(
+							( alignment ) =>
+								! Object.values(
+									WIDE_ALIGNMENTS.alignments
+								).includes( alignment )
 					  )
 					: blockAlign,
 				alignWide: false,
