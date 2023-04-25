@@ -48,78 +48,55 @@ describe( 'Config Parsing', () => {
 		delete process.env.WP_ENV_HOME;
 	} );
 
+	it( 'should use default configuration', async () => {
+		readFile.mockImplementation( async () => {
+			throw { code: 'ENOENT' };
+		} );
+
+		const config = await loadConfig( '/test/gutenberg' );
+
+		expect( config ).toMatchSnapshot();
+	} );
+
 	it( 'should load local configuration', async () => {
 		readFile.mockImplementation( async ( fileName ) => {
-			console.log( fileName );
+			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+				return JSON.stringify( {
+					core: 'WordPress/WordPress#trunk',
+					port: 123,
+				} );
+			}
+
 			throw { code: 'ENOENT' };
 		} );
 
 		const config = await loadConfig( path.resolve( '.' ) );
 
-		expect( config ).toMatchObject( {
-			name: 'gutenberg',
-			detectedLocalConfig: true,
-			env: {
-				development: {
-					port: 8888,
-					phpVersion: null,
-					coreSource: {
-						type: 'git',
-						url: 'https://github.com/WordPress/WordPress.git',
-						ref: '100.0.0',
-						path: '/cache/f406b227b400575d350730477365a884/WordPress',
-						clonePath:
-							'/cache/f406b227b400575d350730477365a884/WordPress',
-						basename: 'WordPress',
-						testsPath:
-							'/cache/f406b227b400575d350730477365a884/tests-WordPress',
-					},
-					pluginSources: [],
-					themeSources: [],
-					config: {
-						SCRIPT_DEBUG: true,
-						WP_DEBUG: true,
-						WP_ENVIRONMENT_TYPE: 'local',
-						WP_PHP_BINARY: 'php',
-						WP_TESTS_EMAIL: 'admin@example.org',
-						WP_TESTS_TITLE: 'Test Blog',
-						WP_TESTS_DOMAIN: 'localhost:8888',
-						WP_SITEURL: 'http://localhost:8888',
-						WP_HOME: 'http://localhost:8888',
-					},
-					mappings: {},
-				},
-				tests: {
-					port: 8889,
-					phpVersion: null,
-					coreSource: {
-						type: 'git',
-						url: 'https://github.com/WordPress/WordPress.git',
-						ref: '100.0.0',
-						path: '/cache/f406b227b400575d350730477365a884/WordPress',
-						clonePath:
-							'/cache/f406b227b400575d350730477365a884/WordPress',
-						basename: 'WordPress',
-						testsPath:
-							'/cache/f406b227b400575d350730477365a884/tests-WordPress',
-					},
-					pluginSources: [],
-					themeSources: [],
-					config: {
-						SCRIPT_DEBUG: false,
-						WP_DEBUG: false,
-						WP_ENVIRONMENT_TYPE: 'local',
-						WP_PHP_BINARY: 'php',
-						WP_TESTS_EMAIL: 'admin@example.org',
-						WP_TESTS_TITLE: 'Test Blog',
-						WP_TESTS_DOMAIN: 'localhost:8889',
-						WP_SITEURL: 'http://localhost:8889',
-						WP_HOME: 'http://localhost:8889',
-					},
-					mappings: {},
-				},
-			},
+		expect( config ).toMatchSnapshot();
+	} );
+
+	it( 'should load local and override configurations', async () => {
+		readFile.mockImplementation( async ( fileName ) => {
+			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+				return JSON.stringify( {
+					core: 'WordPress/WordPress#trunk',
+					port: 123,
+					testsPort: 456,
+				} );
+			}
+
+			if ( fileName === '/test/gutenberg/.wp-env.override.json' ) {
+				return JSON.stringify( {
+					port: 999,
+				} );
+			}
+
+			throw { code: 'ENOENT' };
 		} );
+
+		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
+
+		expect( config ).toMatchSnapshot();
 	} );
 } );
 /* eslint-enable jest/no-conditional-expect */

@@ -12,7 +12,6 @@ const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const postProcessConfig = require( './post-process-config' );
-const mergeConfigs = require( './merge-configs' );
 
 /**
  * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
@@ -55,25 +54,6 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	// consumption elsewhere in the tool.
 	config = postProcessConfig( config );
 
-	// Merge the root config and the environment configs together so that
-	// we can ignore the root config and have full environment configs.
-	const environmentConfigs = config.env;
-	delete config.env;
-	for ( const env in environmentConfigs ) {
-		const rootConfig = Object.assign( {
-			...config,
-			config: Object.assign( {}, config.config ),
-			pluginSources: [ ...config.pluginSources ],
-			themeSources: [ ...config.themeSources ],
-			mappings: Object.assign( {}, config.mappings ),
-		} );
-
-		environmentConfigs[ env ] = mergeConfigs(
-			rootConfig,
-			environmentConfigs[ env ]
-		);
-	}
-
 	return {
 		name: path.basename( configDirectoryPath ),
 		dockerComposeConfigPath: path.resolve(
@@ -86,7 +66,7 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
-		env: environmentConfigs,
+		env: config.env,
 	};
 };
 
