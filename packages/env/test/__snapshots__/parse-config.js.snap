@@ -68,35 +68,35 @@ exports[`Config Parsing should load local and override configurations 1`] = `
 
 exports[`Config Parsing should load local configuration 1`] = `
 {
-  "configDirectoryPath": "/Users/obliviousharmony/Code/WordPress/gutenberg",
+  "configDirectoryPath": "/test/gutenberg",
   "detectedLocalConfig": true,
-  "dockerComposeConfigPath": "/cache/f406b227b400575d350730477365a884/docker-compose.yml",
+  "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
     "development": {
       "config": {
         "SCRIPT_DEBUG": true,
         "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
-        "WP_HOME": "http://localhost:8888",
+        "WP_HOME": "http://localhost:123",
         "WP_PHP_BINARY": "php",
-        "WP_SITEURL": "http://localhost:8888",
-        "WP_TESTS_DOMAIN": "localhost:8888",
+        "WP_SITEURL": "http://localhost:123",
+        "WP_TESTS_DOMAIN": "localhost:123",
         "WP_TESTS_EMAIL": "admin@example.org",
         "WP_TESTS_TITLE": "Test Blog",
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/f406b227b400575d350730477365a884/WordPress",
-        "path": "/cache/f406b227b400575d350730477365a884/WordPress",
-        "ref": "100.0.0",
-        "testsPath": "/cache/f406b227b400575d350730477365a884/tests-WordPress",
+        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "ref": "trunk",
+        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
       "mappings": {},
       "phpVersion": null,
       "pluginSources": [],
-      "port": 8888,
+      "port": 123,
       "themeSources": [],
     },
     "tests": {
@@ -113,10 +113,10 @@ exports[`Config Parsing should load local configuration 1`] = `
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/f406b227b400575d350730477365a884/WordPress",
-        "path": "/cache/f406b227b400575d350730477365a884/WordPress",
-        "ref": "100.0.0",
-        "testsPath": "/cache/f406b227b400575d350730477365a884/tests-WordPress",
+        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "ref": "trunk",
+        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -128,7 +128,7 @@ exports[`Config Parsing should load local configuration 1`] = `
     },
   },
   "name": "gutenberg",
-  "workDirectoryPath": "/cache/f406b227b400575d350730477365a884",
+  "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
 `;
 

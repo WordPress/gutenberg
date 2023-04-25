@@ -70,7 +70,7 @@ describe( 'Config Parsing', () => {
 			throw { code: 'ENOENT' };
 		} );
 
-		const config = await loadConfig( path.resolve( '.' ) );
+		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
 
 		expect( config ).toMatchSnapshot();
 	} );
