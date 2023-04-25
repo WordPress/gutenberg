@@ -191,22 +191,25 @@ export function MediaPlaceholder( {
 			return;
 		}
 
-		function recursivelyFindImagesFromBlocks( _blocks ) {
+		function recursivelyFindMediaFromBlocks( _blocks ) {
 			return _blocks.flatMap( ( block ) =>
-				block.name === 'core/image'
+				( block.name === 'core/image' ||
+					block.name === 'core/audio' ||
+					block.name === 'core/video' ) &&
+				block.attributes.src
 					? [ block ]
-					: recursivelyFindImagesFromBlocks( block.innerBlocks )
+					: recursivelyFindMediaFromBlocks( block.innerBlocks )
 			);
 		}
 
-		const imageBlocks = recursivelyFindImagesFromBlocks( blocks );
+		const mediaBlocks = recursivelyFindMediaFromBlocks( blocks );
 
-		if ( ! imageBlocks.length ) {
+		if ( ! mediaBlocks.length ) {
 			return;
 		}
 
 		const uploadedMediaList = await Promise.all(
-			imageBlocks.map( ( block ) =>
+			mediaBlocks.map( ( block ) =>
 				block.attributes.id
 					? block.attributes
 					: new Promise( ( resolve, reject ) => {
