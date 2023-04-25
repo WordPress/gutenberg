@@ -13,6 +13,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import {
+	useInnerBlocksProps,
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -58,6 +59,15 @@ function GroupEdit( {
 		[ align, hasInnerBlocks ]
 	);
 
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			blockWidth,
+			parentWidth: width,
+			renderAppender: isSelected && renderAppender,
+		}
+	);
+
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View
@@ -90,11 +100,7 @@ function GroupEdit( {
 			] }
 		>
 			{ resizeObserver }
-			<InnerBlocks
-				renderAppender={ isSelected && renderAppender }
-				parentWidth={ width }
-				blockWidth={ blockWidth }
-			/>
+			<View { ...innerBlocksProps } />
 		</View>
 	);
 }
