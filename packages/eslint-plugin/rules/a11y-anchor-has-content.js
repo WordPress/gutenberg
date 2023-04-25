@@ -29,8 +29,6 @@ const meta = {
 			'Anchors must have content and the content must be accessible by a screen reader. Check the first parameter to createInterpolateElement.',
 		invalidMarkup:
 			'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
-		anchorHasHrefInterpolated:
-			'The second parameter to createInterpolateElement must have an anchor with an href when using an anchor.',
 	},
 	schema: [], // no options
 };
