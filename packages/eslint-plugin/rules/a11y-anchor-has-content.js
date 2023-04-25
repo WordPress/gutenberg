@@ -43,8 +43,7 @@ const getATagsContent = ( str ) => {
 const rule = function ( context ) {
 	return {
 		JSXOpeningElement: ( node ) => {
-			const isAnchor =
-				node?.key?.name === 'a' || node?.name?.name === 'a';
+			const isAnchor = node?.name?.name === 'a';
 			if ( ! isAnchor ) {
 				// not an anchor, so we don't care
 				return;
