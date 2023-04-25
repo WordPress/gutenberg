@@ -10,6 +10,10 @@ import { BaseControl, Button } from '@wordpress/components';
 import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const TEXT_DECORATIONS = [
 	{
 		name: __( 'None' ),

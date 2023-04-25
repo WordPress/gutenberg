@@ -13,6 +13,10 @@ import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
 
 /**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
+/**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
  * @param {Object} props               Component props.

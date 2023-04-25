@@ -5,6 +5,10 @@ import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const FONT_STYLES = [
 	{
 		name: _x( 'Regular', 'font style' ),

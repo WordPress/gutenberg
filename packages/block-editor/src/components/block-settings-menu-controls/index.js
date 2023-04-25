@@ -18,6 +18,10 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( {

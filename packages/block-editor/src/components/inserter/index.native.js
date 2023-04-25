@@ -30,6 +30,10 @@ import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( {

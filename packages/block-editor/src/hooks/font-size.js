@@ -26,6 +26,10 @@ import {
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
 /**

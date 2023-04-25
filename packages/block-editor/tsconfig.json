@@ -2,7 +2,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
+		"checkJs": false
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -30,8 +32,5 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
 	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [ "src/components/block-context/index.js", "src/utils/dom.js" ]
+	"include": [ "src/**/*" ]
 }

@@ -9,6 +9,10 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 function helpText( selfStretch, parentLayout ) {
 	const { orientation = 'horizontal' } = parentLayout;
 

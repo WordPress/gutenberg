@@ -11,6 +11,8 @@ import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
+/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
+
 /**
  * Internal dependencies
  */

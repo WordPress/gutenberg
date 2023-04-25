@@ -19,6 +19,10 @@ import { __ } from '@wordpress/i18n';
  */
 import useSetting from '../use-setting';
 
+/**
+ * @typedef {import('@wordpress/element').WPComponent} WPComponent
+ */
+
 const RANGE_CONTROL_CUSTOM_SETTINGS = {
 	px: { max: 1000, step: 1 },
 	'%': { max: 100, step: 1 },

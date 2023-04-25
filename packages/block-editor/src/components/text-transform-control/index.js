@@ -15,6 +15,10 @@ import {
 	formatUppercase,
 } from '@wordpress/icons';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 const TEXT_TRANSFORMS = [
 	{
 		name: __( 'None' ),

@@ -24,6 +24,10 @@ import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * @typedef {import('@wordpress/element').WPElement} WPElement
+ */
+
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
