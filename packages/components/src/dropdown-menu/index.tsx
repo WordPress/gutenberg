@@ -16,8 +16,10 @@ import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 import type { DropdownMenuProps } from './types';
 
-function mergeProps( defaultProps = {}, props = {} ) {
-	const mergedProps = {
+function mergeProps<
+	T extends { className?: string; [ key: string ]: unknown }
+>( defaultProps: Partial< T > = {}, props: T = {} as T ) {
+	const mergedProps: T = {
 		...defaultProps,
 		...props,
 	};
@@ -32,13 +34,7 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-/**
- * Whether the argument is a function.
- *
- * @param {*} maybeFunc The argument to check.
- * @return {boolean} True if the argument is a function, false otherwise.
- */
-function isFunction( maybeFunc ) {
+function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
 	return typeof maybeFunc === 'function';
 }
 
