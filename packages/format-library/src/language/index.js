@@ -30,7 +30,7 @@ export const language = {
 
 const Edit = ( props ) => {
 	const { contentRef, isActive, onChange, value } = props;
-	const anchorRef = useAnchor( {
+	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: language,
 	} );
@@ -65,7 +65,7 @@ const Edit = ( props ) => {
 			{ isPopoverVisible && (
 				<Popover
 					className="components-lang-attribute-popover"
-					anchor={ anchorRef }
+					anchor={ popoverAnchor }
 					placement="bottom"
 				>
 					<TextControl
