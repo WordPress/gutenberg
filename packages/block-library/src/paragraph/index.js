@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
 
 /**
@@ -22,8 +22,12 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: __(
-				'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
+			content: sprintf(
+				/* translators: %s: Link href (example link) */
+				__(
+					'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and <a href="%s">a greyhound</a> for coursing.'
+				),
+				'#'
 			),
 		},
 	},
