@@ -26,7 +26,7 @@ import styles from './use-editor-wrapper-styles.scss';
  * @param {number}  width       The width of the screen.
  * @return {Object} An object containing the styles for the wide width alignment.
  */
-export function getWideWidthStyles( align, isLandscape, width ) {
+function getWideWidthStyles( align, isLandscape, width ) {
 	if ( align !== WIDE_ALIGNMENTS.alignments.wide ) {
 		return {};
 	}
@@ -64,12 +64,7 @@ export function getWideWidthStyles( align, isLandscape, width ) {
  * @param {string}  parentBlockName The name of the parent block.
  * @return {Object} An object containing the styles for the full width alignment.
  */
-export function getFullWidthStyles(
-	align,
-	blockName,
-	hasParents,
-	parentBlockName
-) {
+function getFullWidthStyles( align, blockName, hasParents, parentBlockName ) {
 	const { isContainerRelated, isFullWidth } = alignmentHelpers;
 	const fullWidthStyles = isFullWidth( align )
 		? styles[
@@ -106,7 +101,7 @@ export function getFullWidthStyles(
  * @param {number}  width                The width of the screen.
  * @return {number} The calculated block margin.
  */
-export function getBlockMargin(
+function getBlockMargin(
 	align,
 	blockName,
 	blockWidth,
