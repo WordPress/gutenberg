@@ -58,13 +58,18 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets;
+	let controlSets: NonNullable< typeof controls >[];
 	if ( controls?.length ) {
+		// @ts-expect-error The check below is needed because `DropdownMenus`
+		// rendered by `ToolBarGroup` receive controls as a nested array.
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-			controlSets = [ controlSets ];
+			// This is not ideal but was introduced to avoid runtime changes,
+			// see above comment.
+			controlSets = [ controls as unknown as typeof controls ];
 		}
 	}
+
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
