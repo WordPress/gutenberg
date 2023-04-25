@@ -169,7 +169,7 @@ export default function Layout() {
 								ease: 'easeOut',
 							} }
 						>
-							{ canvasMode === 'edit' && <Header /> }
+							<Header />
 						</NavigableRegion>
 					) }
 				</AnimatePresence>
