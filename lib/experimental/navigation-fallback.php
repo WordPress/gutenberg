@@ -1,4 +1,12 @@
 <?php
+/**
+ * Navigation Fallback
+ *
+ * Functions required for managing Navigation fallbacks behavior.
+ *
+ * @package Gutenberg
+ * @since 6.3.0
+ */
 
 /**
  * Expose additional fields in the embeddable links of the
