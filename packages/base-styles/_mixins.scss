@@ -82,6 +82,13 @@
 	outline: 2px solid transparent;
 }
 
+@mixin button-style__focus() {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
 
 /**
  * Applies editor left position to the selector passed as argument
