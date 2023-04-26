@@ -213,10 +213,6 @@
 		opacity: .9;
 	}
 
-	img {
-		opacity: 0;
-	}
-
 	&.initialized {
 		animation: both turn-off-visibility 300ms;
 
