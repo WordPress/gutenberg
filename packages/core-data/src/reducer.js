@@ -163,6 +163,15 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 	return state;
 }
 
+export function currentSiteGlobalStylesId( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_SITE_GLOBAL_STYLES_ID':
+			return action.id;
+	}
+
+	return state;
+}
+
 /**
  * Reducer managing the theme global styles variations.
  *
@@ -647,6 +656,7 @@ export default combineReducers( {
 	users,
 	currentTheme,
 	currentGlobalStylesId,
+	currentSiteGlobalStylesId,
 	currentUser,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,

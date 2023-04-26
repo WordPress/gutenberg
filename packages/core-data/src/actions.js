@@ -149,6 +149,15 @@ export function __experimentalReceiveCurrentGlobalStylesId(
 	};
 }
 
+export function __experimentalReceiveCurrentSiteGlobalStylesId(
+	currentSiteGlobalStylesId
+) {
+	return {
+		type: 'RECEIVE_CURRENT_SITE_GLOBAL_STYLES_ID',
+		id: currentSiteGlobalStylesId,
+	};
+}
+
 /**
  * Returns an action object used in signalling that the theme base global styles have been received
  * Ignored from documentation as it's internal to the data store.

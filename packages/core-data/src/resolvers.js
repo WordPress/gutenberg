@@ -453,6 +453,19 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 	);
 };
 
+export const __experimentalGetCurrentSiteGlobalStylesId =
+	() =>
+	async ( { dispatch } ) => {
+		const siteGlobalStyles = await apiFetch( {
+			path: '/wp/v2/global-styles/',
+		} );
+		if ( siteGlobalStyles ) {
+			dispatch.__experimentalReceiveCurrentSiteGlobalStylesId(
+				siteGlobalStyles.id
+			);
+		}
+	};
+
 export const __experimentalGetCurrentGlobalStylesId =
 	() =>
 	async ( { dispatch, resolveSelect } ) => {

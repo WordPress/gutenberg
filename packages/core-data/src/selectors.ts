@@ -32,6 +32,7 @@ export interface State {
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
+	currentSiteGlobalStylesId: string;
 	currentTheme: string;
 	currentUser: ET.User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
@@ -946,6 +947,12 @@ export function getCurrentTheme( state: State ): any {
  */
 export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
 	return state.currentGlobalStylesId;
+}
+
+export function __experimentalGetCurrentSiteGlobalStylesId(
+	state: State
+): string {
+	return state.currentSiteGlobalStylesId;
 }
 
 /**

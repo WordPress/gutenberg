@@ -151,6 +151,14 @@ export const rootEntitiesConfig = [
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
 	},
 	{
+		label: __( 'Global Styles Site' ),
+		name: 'siteGlobalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
+	},
+	{
 		label: __( 'Themes' ),
 		name: 'theme',
 		kind: 'root',
