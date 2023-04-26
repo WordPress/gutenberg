@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { styles, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -17,25 +18,35 @@ import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../private-apis';
 
 export default function GlobalStylesSidebar() {
-	const { editorMode, editorCanvasView } = useSelect( ( select ) => {
-		return {
-			editorMode: select( editSiteStore ).getEditorMode(),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
-		};
-	}, [] );
+	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
+		( select ) => {
+			const { getActiveComplementaryArea } = select( interfaceStore );
+			const _isVisualEditorMode =
+				'visual' === select( editSiteStore ).getEditorMode();
+
+			return {
+				isStyleBookOpened:
+					'style-book' ===
+					unlock(
+						select( editSiteStore )
+					).getEditorCanvasContainerView(),
+				shouldClearCanvasContainerView:
+					'edit-site/global-styles' !==
+						getActiveComplementaryArea( 'core/edit-site' ) ||
+					! _isVisualEditorMode,
+			};
+		},
+		[]
+	);
+
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-
 	useEffect( () => {
-		if ( editorMode !== 'visual' ) {
+		if ( shouldClearCanvasContainerView ) {
 			setEditorCanvasContainerView( undefined );
 		}
-	}, [ editorMode ] );
-
-	const isStyleBookOpened = editorCanvasView === 'style-book';
+	}, [ shouldClearCanvasContainerView ] );
 
 	return (
 		<DefaultSidebar
@@ -55,7 +66,7 @@ export default function GlobalStylesSidebar() {
 							icon={ seen }
 							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
-							disabled={ editorMode !== 'visual' }
+							disabled={ shouldClearCanvasContainerView }
 							onClick={ () =>
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
