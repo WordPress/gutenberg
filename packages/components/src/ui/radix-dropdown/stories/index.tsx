@@ -18,13 +18,14 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
+	DropdownSubMenuTrigger,
 } from '../';
 
 /**
  * WordPress dependencies
  */
 import { useState, createContext, useContext } from '@wordpress/element';
-import { chevronRightSmall, menu, wordpress } from '@wordpress/icons';
+import { menu, wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,6 +47,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 	subcomponents: {
 		DropdownMenuItem,
 		DropdownSubMenu,
+		DropdownSubMenuTrigger,
 		DropdownMenuSeparator,
 		DropdownMenuCheckboxItem,
 		DropdownMenuGroup,
@@ -208,13 +210,9 @@ Default.args = {
 				</DropdownMenuItem>
 				<DropdownSubMenu
 					trigger={
-						<DropdownMenuItem
-							suffix={
-								<Icon icon={ chevronRightSmall } size={ 28 } />
-							}
-						>
+						<DropdownSubMenuTrigger>
 							More Tools
-						</DropdownMenuItem>
+						</DropdownSubMenuTrigger>
 					}
 				>
 					<DropdownMenuItem

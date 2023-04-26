@@ -8,7 +8,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
  */
 import { forwardRef } from '@wordpress/element';
 import { SVG, Circle } from '@wordpress/primitives';
-import { check, lineSolid } from '@wordpress/icons';
+import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,6 +25,7 @@ import type {
 	DropdownMenuRadioGroupProps,
 	DropdownMenuRadioItemProps,
 	DropdownMenuSeparatorProps,
+	DropdownSubMenuTriggerProps,
 } from './types';
 
 // Observations / Questions:
@@ -89,6 +90,28 @@ export const DropdownMenu = ( {
 	);
 };
 
+export const DropdownSubMenuTrigger = ( {
+	prefix,
+	suffix = <Icon icon={ chevronRightSmall } size={ 28 } />,
+	children,
+}: DropdownSubMenuTriggerProps ) => {
+	return (
+		<>
+			{ prefix && (
+				<DropdownMenuStyled.ItemPrefixWrapper>
+					{ prefix }
+				</DropdownMenuStyled.ItemPrefixWrapper>
+			) }
+			{ children }
+			{ suffix && (
+				<DropdownMenuStyled.ItemSuffixWrapper>
+					{ suffix }
+				</DropdownMenuStyled.ItemSuffixWrapper>
+			) }
+		</>
+	);
+};
+
 export const DropdownSubMenu = ( {
 	// Sub props
 	defaultOpen,
@@ -110,7 +133,6 @@ export const DropdownSubMenu = ( {
 			<DropdownMenuStyled.SubTrigger
 				disabled={ disabled }
 				textValue={ textValue }
-				asChild
 			>
 				{ trigger }
 			</DropdownMenuStyled.SubTrigger>

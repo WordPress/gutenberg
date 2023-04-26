@@ -65,6 +65,23 @@ export type DropdownMenuProps = {
 	// TODO: slot name ?
 };
 
+export type DropdownSubMenuTriggerProps = {
+	/**
+	 * The contents of the item.
+	 */
+	children: React.ReactNode;
+	/**
+	 * The contents of the item's prefix.
+	 */
+	prefix?: React.ReactNode;
+	/**
+	 * The contents of the item's suffix.
+	 *
+	 * By default, it is the standard icon for a submenu trigger.
+	 */
+	suffix?: React.ReactNode;
+};
+
 export type DropdownSubMenuProps = {
 	/**
 	 * The open state of the submenu when it is initially rendered. Use when you
@@ -87,8 +104,8 @@ export type DropdownSubMenuProps = {
 	 */
 	disabled?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'disabled' ];
 	/**
-	 * Optional text used for typeahead purposes. By default the typeahead
-	 * behavior will use the `.textContent` of the item. Use this when the content
+	 * Optional text used for typeahead purposes for the trigger. By default the typeahead
+	 * behavior will use the `.textContent` of the trigger. Use this when the content
 	 * is complex, or you have non-textual content inside.
 	 */
 	textValue?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'textValue' ];
