@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useSetting } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { immutableSet } from '../utils/object';
+import { setImmutably } from '../utils/object';
 
 /**
  * Removed falsy values from nested object.
@@ -82,7 +82,7 @@ export function transformStyles(
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
-						attributes: immutableSet(
+						attributes: setImmutably(
 							returnBlock.attributes,
 							path,
 							styleValue
