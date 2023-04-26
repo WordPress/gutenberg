@@ -18,36 +18,19 @@ class UndoUtils {
 
 	async getSelection() {
 		return await this.page.evaluate( () => {
-			const selectedBlock = document.activeElement.closest( '.wp-block' );
-			const blocks = Array.from(
-				document.querySelectorAll( '.wp-block' )
-			);
-			const blockIndex = blocks.indexOf( selectedBlock );
+			const selectedBlockId = window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId();
+			const blockIndex = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlockIndex( selectedBlockId );
 
 			if ( blockIndex === -1 ) {
 				return {};
 			}
 
-			let editables;
-
-			if ( selectedBlock.getAttribute( 'contenteditable' ) ) {
-				editables = [ selectedBlock ];
-			} else {
-				editables = Array.from(
-					selectedBlock.querySelectorAll( '[contenteditable]' )
-				);
-			}
-
-			const editableIndex = editables.indexOf( document.activeElement );
-			const selection = window.getSelection();
-
-			if ( editableIndex === -1 || ! selection.rangeCount ) {
-				return { blockIndex };
-			}
-
 			return {
 				blockIndex,
-				editableIndex,
 				startOffset: window.wp.data
 					.select( 'core/block-editor' )
 					.getSelectionStart().offset,
@@ -91,8 +74,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before pause'.length,
 			endOffset: 'before pause'.length,
 		} );
@@ -101,8 +83,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -114,8 +95,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before pause'.length,
 			endOffset: 'before pause'.length,
 		} );
@@ -129,8 +109,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before pause after pause'.length,
 			endOffset: 'before pause after pause'.length,
 		} );
@@ -168,8 +147,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before keyboard '.length,
 			endOffset: 'before keyboard '.length,
 		} );
@@ -178,8 +156,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -193,8 +170,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before keyboard '.length,
 			endOffset: 'before keyboard '.length,
 		} );
@@ -210,8 +186,7 @@ test.describe( 'undo', () => {
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'before keyboard after keyboard'.length,
 			endOffset: 'before keyboard after keyboard'.length,
 		} );
@@ -269,16 +244,14 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 3,
-			editableIndex: 0,
+			blockIndex: 2,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 2,
-			editableIndex: 0,
+			blockIndex: 1,
 			startOffset: 'is'.length,
 			endOffset: 'is'.length,
 		} );
@@ -287,16 +260,14 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 2,
-			editableIndex: 0,
+			blockIndex: 1,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'This'.length,
 			endOffset: 'This'.length,
 		} );
@@ -305,8 +276,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
@@ -322,8 +292,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 0,
 			endOffset: 0,
 		} );
@@ -336,8 +305,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 1,
-			editableIndex: 0,
+			blockIndex: 0,
 			startOffset: 'This'.length,
 			endOffset: 'This'.length,
 		} );
@@ -346,8 +314,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 2,
-			editableIndex: 0,
+			blockIndex: 1,
 			startOffset: 0,
 			endOffset: 0,
 		} );
@@ -356,8 +323,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 2,
-			editableIndex: 0,
+			blockIndex: 1,
 			startOffset: 'is'.length,
 			endOffset: 'is'.length,
 		} );
@@ -366,8 +332,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 3,
-			editableIndex: 0,
+			blockIndex: 2,
 			startOffset: 0,
 			endOffset: 0,
 		} );
@@ -376,8 +341,7 @@ test.describe( 'undo', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 3,
-			editableIndex: 0,
+			blockIndex: 2,
 			startOffset: 'test'.length,
 			endOffset: 'test'.length,
 		} );
