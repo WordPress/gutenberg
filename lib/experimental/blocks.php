@@ -109,8 +109,6 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
  */
 function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $parent_block ) {
-	// first or last child
-	// of comment-template
 	if ( isset( $parent_block ) ) {
 		$parsed_block['parentBlock'] = $parent_block->name;
 	}
@@ -131,25 +129,21 @@ function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
 
 	// Can we void infinite loops?
 
-	if ( isset( $block['parentBlock'] ) && 'core/comment-template' === $block['parentBlock'] ) {
-		$inserted_block_markup = <<<END
+	$inserted_block_markup = <<<END
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
 <!-- /wp:social-links -->
 END;
-		$inserted_blocks = parse_blocks( $inserted_block_markup );
+
+	if ( isset( $block['parentBlock'] ) && 'core/comment-template' === $block['parentBlock'] ) {
+		$inserted_blocks  = parse_blocks( $inserted_block_markup );
 		$inserted_content = render_block( $inserted_blocks[0] );
 
 		$block_content = $block_content . $inserted_content; // after!
 	}
 
 	if ( $block['blockName'] === $block_name ) {
-		$inserted_block_markup = <<<END
-<!-- wp:social-links -->
-<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-<!-- /wp:social-links -->
-END;
-		$inserted_blocks = parse_blocks( $inserted_block_markup );
+		$inserted_blocks  = parse_blocks( $inserted_block_markup );
 		$inserted_content = render_block( $inserted_blocks[0] );
 
 		if ( 'before' === $block_position ) {
