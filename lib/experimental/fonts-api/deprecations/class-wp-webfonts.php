@@ -39,13 +39,22 @@ class WP_Webfonts extends WP_Dependencies {
 		$message = is_array( $to_convert )
 			? 'Use WP_Fonts_Utils::get_font_family_from_variation() to get the font family from an array and then WP_Fonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle'
 			: 'Use WP_Fonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle';
-		_deprecated_function( __METHOD__, 'X.X.X', $message );
+		_deprecated_function( __METHOD__, 'GB 14.9.1', $message );
 
 		if ( empty( $to_convert ) ) {
 			return false;
 		}
 
-		return static::_get_font_slug( $to_convert );
+		$font_family_name = is_array( $to_convert )
+			? WP_Fonts_Utils::get_font_family_from_variation( $to_convert )
+			: $to_convert;
+
+		$slug = false;
+		if ( ! empty( $font_family_name ) ) {
+			$slug = WP_Fonts_Utils::convert_font_family_into_handle( $font_family_name );
+		}
+
+		return $slug;
 	}
 
 	/**
@@ -149,22 +158,6 @@ class WP_Webfonts extends WP_Dependencies {
 
 		wp_enqueue_fonts( array( $font_family_name ) );
 		return true;
-	}
-
-	/**
-	 * Gets the font slug.
-	 *
-	 * Helper function for reuse without the deprecation.
-	 *
-	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
-	 *                                 or a font-family as a string.
-	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
-	 */
-	private static function _get_font_slug( $to_convert ) {
-		$font_family_name = is_array( $to_convert ) ? WP_Fonts_Utils::get_font_family_from_variation( $to_convert ) : $to_convert;
-		return ! empty( $font_family_name )
-			? WP_Fonts_Utils::convert_font_family_into_handle( $font_family_name )
-			: false;
 	}
 
 	/**
