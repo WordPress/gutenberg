@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.9.0 (2023-04-26)
+
 ### Internal
 
 -   `BottomSheetCell`: Refactor away from Lodash (mobile) ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
