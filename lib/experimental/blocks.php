@@ -102,6 +102,23 @@ function gutenberg_register_metadata_attribute( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
+ * Filters the block being rendered in render_block(), before it's processed.
+ *
+ * @param array         $parsed_block The block being rendered.
+ * @param array         $source_block An un-modified copy of $parsed_block, as it appeared in the source content.
+ * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
+ */
+function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $parent_block ) {
+	// first or last child
+	// of comment-template
+	if ( isset( $parent_block ) ) {
+		$parsed_block['parentBlock'] = $parent_block->name;
+	}
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 3 );
+
+/**
  * Auto-insert blocks relative to a given block.
  *
  * @param string   $block_content The block content.
@@ -109,10 +126,20 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @param WP_Block $instance      The block instance.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
-	$block_name = 'core/comment-content';
+	$block_name = 'core/post-content';
 	$block_position = 'after'; // Child blocks could be a bit trickier.
 
 	// Can we void infinite loops?
+
+	if ( 'core/comment-template' === $block['parentBlock'] ) {
+		$inserted_block_markup = '<!-- wp:social-links -->
+		<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+		<!-- /wp:social-links -->';
+		$inserted_blocks = parse_blocks( $inserted_block_markup );
+		$inserted_content = render_block( $inserted_blocks[0] );
+
+		$block_content = $block_content . $inserted_content; // after!
+	}
 
 	if ( $block['blockName'] === $block_name ) {
 		$inserted_block_markup = '<!-- wp:social-links -->
