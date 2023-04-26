@@ -537,7 +537,7 @@ export const getNavigationFallbackId =
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallbackId( fallback );
+		dispatch.receiveNavigationFallbackId( fallback?.id );
 
 		if ( record ) {
 			dispatch.receiveEntityRecords(

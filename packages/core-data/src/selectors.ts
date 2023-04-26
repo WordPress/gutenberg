@@ -41,7 +41,7 @@ export interface State {
 	undo: UndoState;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
-	navigationFallback: EntityRecordKey;
+	navigationFallbackId: EntityRecordKey;
 }
 
 type EntityRecordKey = string | number;
@@ -1245,5 +1245,5 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 export function getNavigationFallbackId(
 	state: State
 ): EntityRecordKey | undefined {
-	return state.navigationFallback;
+	return state.navigationFallbackId;
 }

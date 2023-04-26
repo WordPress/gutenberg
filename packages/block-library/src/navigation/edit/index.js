@@ -219,20 +219,18 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const { navigationFallback } = useSelect( ( select ) => {
-		const { getNavigationFallbackId } = select( coreStore );
-		return {
-			navigationFallback:
-				ref || hasUnsavedBlocks ? null : getNavigationFallbackId(),
-		};
-	}, [] );
+	const { getNavigationFallbackId } = useSelect( coreStore );
+
+	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+		? getNavigationFallbackId()
+		: null;
 
 	useEffect( () => {
 		// If:
 		// - there is an existing menu, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks || ! navigationFallback?.id ) {
+		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
 			return;
 		}
 
@@ -241,13 +239,14 @@ function Navigation( {
 		 *  The fallback should not request a save (entity dirty state)
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
+
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationFallback.id );
+		setRef( navigationFallbackId );
 	}, [
 		ref,
 		setRef,
 		hasUnsavedBlocks,
-		navigationFallback,
+		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 

@@ -645,7 +645,7 @@ export function blockPatternCategories( state = [], action ) {
 export function navigationFallbackId( state = null, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
-			return action.fallback;
+			return action.fallbackId;
 	}
 
 	return state;
