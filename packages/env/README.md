@@ -315,20 +315,17 @@ Positionals:
 
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
-<div class="callout callout-alert">
-In some cases, `wp-env` may consume options that you are attempting to pass to
-the container. This happens with options that `wp-env` has already declared,
-such as `--env-cwd`, `--debug`, `--help`, and `--version`. When this happens, you should fall
-back to using quotation marks; `wp-env` considers everything inside the
+<div class="callout callout-alert">In some cases, <code>wp-env</code> may consume options that you are attempting to pass to
+the container. This happens with options that <code>wp-env</code> has already declared,
+such as <code>--env-cwd</code>, <code>--debug</code>, <code>--help</code>, and <code>--version</code>. When this happens, you should fall
+back to using quotation marks; <code>wp-env</code> considers everything inside the
 quotation marks to be command argument.
 
-For example, to ask `WP-CLI` for its help text:
-
-```sh
-wp-env run cli "wp --help"
-```
-
-Without the quotation marks, `wp-env` will print its own help text instead of
+For example, to ask <code>WP-CLI</code> for its help text:
+<pre>sh
+<code class="language-sh">wp-env run cli "wp --help"</code></pre>
+	
+Without the quotation marks, <code>wp-env</code> will print its own help text instead of
 passing it to the container. If you experience any problems where the command
 is not being passed correctly, fall back to using quotation marks.
 
