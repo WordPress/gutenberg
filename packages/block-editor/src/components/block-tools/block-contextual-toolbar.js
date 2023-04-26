@@ -79,7 +79,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				getBlockName,
 				getBlockParents,
 				getSelectedBlockClientIds,
-				__unstableGetContentLockingParent,
+				isContentLockedBlock,
 			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -103,9 +103,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						true
 					) &&
 					selectedBlockClientIds.length <= 1 &&
-					! __unstableGetContentLockingParent(
-						_selectedBlockClientId
-					),
+					! isContentLockedBlock( _selectedBlockClientId ),
 			};
 		}, [] );
 

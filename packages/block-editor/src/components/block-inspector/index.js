@@ -8,16 +8,8 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	FlexItem,
-	PanelBody,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	Button,
-	__unstableMotion as motion,
-} from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,7 +20,6 @@ import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
-import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
@@ -38,102 +29,34 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
+import ContentBlocksList from '../content-blocks-list';
+import { unlock } from '../../lock-unlock';
 
-function useContentBlocks( blockTypes, block ) {
-	const contentBlocksObjectAux = useMemo( () => {
-		return blockTypes.reduce( ( result, blockType ) => {
-			if (
-				blockType.name !== 'core/list-item' &&
-				Object.entries( blockType.attributes ).some(
-					( [ , { __experimentalRole } ] ) =>
-						__experimentalRole === 'content'
-				)
-			) {
-				result[ blockType.name ] = true;
-			}
-			return result;
-		}, {} );
-	}, [ blockTypes ] );
-	const isContentBlock = useCallback(
-		( blockName ) => {
-			return !! contentBlocksObjectAux[ blockName ];
-		},
-		[ contentBlocksObjectAux ]
+function BlockInspectorLockedBlocks( { contentLockingBlock } ) {
+	const selectedBlock = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
 	);
-	return useMemo( () => {
-		return getContentBlocks( [ block ], isContentBlock );
-	}, [ block, isContentBlock ] );
-}
-
-function getContentBlocks( blocks, isContentBlock ) {
-	const result = [];
-	for ( const block of blocks ) {
-		if ( isContentBlock( block.name ) ) {
-			result.push( block );
-		}
-		result.push( ...getContentBlocks( block.innerBlocks, isContentBlock ) );
-	}
-	return result;
-}
-
-function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const blockType = blockTypes.find( ( { name } ) => name === block.name );
-	const isSelected =
-		selectedBlock && selectedBlock.clientId === block.clientId;
-	return (
-		<Button
-			isPressed={ isSelected }
-			onClick={ () => selectBlock( block.clientId ) }
-		>
-			<HStack justify="flex-start">
-				<BlockIcon icon={ blockType.icon } />
-				<FlexItem>{ blockType.title }</FlexItem>
-			</HStack>
-		</Button>
+	const blockInformation = useBlockDisplayInformation(
+		contentLockingBlock ?? selectedBlock
 	);
-}
-
-function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
-	const { blockTypes, block, selectedBlock } = useSelect(
-		( select ) => {
-			return {
-				blockTypes: select( blocksStore ).getBlockTypes(),
-				block: select( blockEditorStore ).getBlock(
-					topLevelLockedBlock
-				),
-				selectedBlock: select( blockEditorStore ).getSelectedBlock(),
-			};
-		},
-		[ topLevelLockedBlock ]
-	);
-	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
-	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
-			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
+			{ contentLockingBlock && (
+				<BlockVariationTransforms
+					blockClientId={ contentLockingBlock }
+				/>
+			) }
 			<BlockInfo.Slot />
-			<VStack
-				spacing={ 1 }
-				padding={ 4 }
-				className="block-editor-block-inspector__block-buttons-container"
-			>
-				<h2 className="block-editor-block-card__title">
-					{ __( 'Content' ) }
-				</h2>
-				{ contentBlocks.map( ( contentBlock ) => (
-					<BlockNavigationButton
-						selectedBlock={ selectedBlock }
-						key={ contentBlock.clientId }
-						block={ contentBlock }
-						blockTypes={ blockTypes }
-					/>
-				) ) }
-			</VStack>
+			{ contentLockingBlock && (
+				<PanelBody title={ __( 'Content' ) }>
+					<ContentBlocksList rootClientId={ contentLockingBlock } />
+				</PanelBody>
+			) }
 		</div>
 	);
 }
@@ -144,15 +67,16 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
-		topLevelLockedBlock,
+		isContentLocked,
+		contentLockingBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-			__unstableGetContentLockingParent,
-			getTemplateLock,
-		} = select( blockEditorStore );
+			isContentLockedBlock,
+			getContentLockingBlock,
+		} = unlock( select( blockEditorStore ) );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
@@ -165,11 +89,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			topLevelLockedBlock:
-				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
-				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
-					? _selectedBlockClientId
-					: undefined ),
+			isContentLocked: isContentLockedBlock( _selectedBlockClientId ),
+			contentLockingBlock: getContentLockingBlock(
+				_selectedBlockClientId
+			),
 		};
 	}, [] );
 
@@ -241,10 +164,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		}
 		return null;
 	}
-	if ( topLevelLockedBlock ) {
+
+	if ( isContentLocked ) {
 		return (
 			<BlockInspectorLockedBlocks
-				topLevelLockedBlock={ topLevelLockedBlock }
+				contentLockingBlock={ contentLockingBlock }
 			/>
 		);
 	}

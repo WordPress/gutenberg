@@ -51,7 +51,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
-			__unstableGetContentLockingParent,
+			isContentLockedBlock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -73,9 +73,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			isContentLocked: !! __unstableGetContentLockingParent(
-				selectedBlockClientId
-			),
+			isContentLocked: isContentLockedBlock( selectedBlockClientId ),
 		};
 	}, [] );
 

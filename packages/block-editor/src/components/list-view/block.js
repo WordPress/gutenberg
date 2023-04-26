@@ -60,31 +60,13 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
-	const { isLocked, isContentLocked, canEdit } = useBlockLock( clientId );
-	const forceSelectionContentLock = useSelect(
-		( select ) => {
-			if ( isSelected ) {
-				return false;
-			}
-			if ( ! isContentLocked ) {
-				return false;
-			}
-			return select( blockEditorStore ).hasSelectedInnerBlock(
-				clientId,
-				true
-			);
-		},
-		[ isContentLocked, clientId, isSelected ]
-	);
+	const { isLocked, canEdit } = useBlockLock( clientId );
 
-	const canExpand = isContentLocked ? false : canEdit;
 	const isFirstSelectedBlock =
-		forceSelectionContentLock ||
-		( isSelected && selectedClientIds[ 0 ] === clientId );
+		isSelected && selectedClientIds[ 0 ] === clientId;
 	const isLastSelectedBlock =
-		forceSelectionContentLock ||
-		( isSelected &&
-			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
+		isSelected &&
+		selectedClientIds[ selectedClientIds.length - 1 ] === clientId;
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
@@ -200,7 +182,7 @@ function ListViewBlock( {
 	}
 
 	const classes = classnames( {
-		'is-selected': isSelected || forceSelectionContentLock,
+		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected': isBranchSelected,
@@ -244,14 +226,14 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canExpand ? isExpanded : undefined }
+			data-expanded={ canEdit ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-selected={ !! isSelected || forceSelectionContentLock }
+				aria-selected={ !! isSelected }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -268,7 +250,7 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canExpand ? isExpanded : undefined }
+							isExpanded={ canEdit ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaLabel={ blockAriaLabel }
 							ariaDescribedBy={ descriptionId }
@@ -317,7 +299,7 @@ function ListViewBlock( {
 			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
-					aria-selected={ !! isSelected || forceSelectionContentLock }
+					aria-selected={ !! isSelected }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu

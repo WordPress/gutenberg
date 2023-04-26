@@ -49,19 +49,18 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetEditorMode } =
+	const { isOutlineMode, isFocusMode, editorMode, isContentLocked } =
+		useSelect( ( select ) => {
+			const { getSettings, __unstableGetEditorMode, getTemplateLock } =
 				select( blockEditorStore );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode,
 				isFocusMode: focusMode,
 				editorMode: __unstableGetEditorMode(),
+				isContentLocked: getTemplateLock() === 'contentOnly',
 			};
-		},
-		[]
-	);
+		}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -111,6 +110,7 @@ function Root( { className, ...settings } ) {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
+				'is-content-locked': isContentLocked,
 			} ),
 		},
 		settings

@@ -66,3 +66,17 @@ export function showBlockInterface() {
 		type: 'SHOW_BLOCK_INTERFACE',
 	};
 }
+
+/**
+ * Marks the given block as temporarily unlocked.
+ *
+ * @param {string} clientId The client ID of the block to unlock.
+ *
+ * @return {Object} Action object.
+ */
+export function setTemporarilyUnlockedBlock( clientId ) {
+	return {
+		type: 'SET_TEMPORARILY_UNLOCKED_BLOCK',
+		clientId,
+	};
+}

@@ -226,11 +226,10 @@ const withDuotoneControls = createHigherOrderComponent(
 		);
 
 		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
+			( select ) =>
+				select( blockEditorStore ).isContentLockedBlock(
+					props.clientId
+				),
 			[ props.clientId ]
 		);
 
