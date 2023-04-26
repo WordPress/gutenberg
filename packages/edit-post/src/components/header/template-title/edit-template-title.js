@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -46,6 +41,7 @@ export default function EditTemplateTitle() {
 	return (
 		<div className="edit-site-template-details__group">
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Title' ) }
 				value={ forceEmpty ? '' : templateTitle }
 				help={ __(
@@ -60,17 +56,15 @@ export default function EditTemplateTitle() {
 					setForceEmpty( false );
 
 					const settings = getEditorSettings();
-					const newAvailableTemplates = mapValues(
-						settings.availableTemplates,
-						( existingTitle, id ) => {
-							if ( id !== template.slug ) {
-								return existingTitle;
-							}
-							return newTitle;
-						}
+					const newAvailableTemplates = Object.fromEntries(
+						Object.entries( settings.availableTemplates ?? {} ).map(
+							( [ id, existingTitle ] ) => [
+								id,
+								id !== template.slug ? existingTitle : newTitle,
+							]
+						)
 					);
 					updateEditorSettings( {
-						...settings,
 						availableTemplates: newAvailableTemplates,
 					} );
 					editEntityRecord( 'postType', 'wp_template', template.id, {

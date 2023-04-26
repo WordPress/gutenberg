@@ -114,6 +114,8 @@ _Note:_
 
 `register_block_pattern_category()` should be called from a handler attached to the init hook.
 
+The category will not show under Patterns unless a pattern has been assigned to that category.
+
 ```php
 function my_plugin_register_my_pattern_categories() {
   register_block_pattern_category( ... );
@@ -191,7 +193,7 @@ register_block_pattern(
 );
 ```
 
-In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaing blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
+In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaining blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
 
 Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
 

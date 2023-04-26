@@ -18,8 +18,8 @@ const PATH_MAPPING = {
 /**
  * Delete all the templates of given type.
  *
- * @param  this
- * @param  type - Template type to delete.
+ * @param this
+ * @param type - Template type to delete.
  */
 async function deleteAllTemplates( this: RequestUtils, type: TemplateType ) {
 	const path = PATH_MAPPING[ type ];

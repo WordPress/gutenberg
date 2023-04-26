@@ -205,6 +205,6 @@ Use this object to modify props available for the `NavigableMenu` component that
 
 In some contexts, the arrow down key used to open the dropdown menu might need to be disabled—for example when that key is used to perform another action.
 
--   Type: `Object`
+-   Type: `boolean`
 -   Required: No
 -   Default: `false`

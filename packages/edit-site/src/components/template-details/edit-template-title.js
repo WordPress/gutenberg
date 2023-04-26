@@ -17,6 +17,7 @@ export default function EditTemplateTitle( { template } ) {
 
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
 			label={ __( 'Title' ) }
 			value={ forceEmpty ? '' : title }
 			help={

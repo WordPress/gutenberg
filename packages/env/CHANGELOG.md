@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+## 6.0.0 (2023-04-26)
+
+### Breaking Change
+
+-   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
+-   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
+-   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
+
+## 5.16.0 (2023-04-12)
+
+## 5.15.0 (2023-03-29)
+
+## 5.14.0 (2023-03-15)
+
+## 5.13.0 (2023-03-01)
+
+## 5.12.0 (2023-02-15)
+
+## 5.11.0 (2023-02-01)
+
+### Bug fix
+
+-   PHP 7.3 and 7.4 must use PHPUnit 9.
+
+### Enhancement
+
+-   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2.
+
+## 5.10.0 (2023-01-11)
+
+## 5.9.0 (2023-01-02)
+
+## 5.8.0 (2022-12-14)
+
 ## 5.7.0 (2022-11-16)
 
 ## 5.6.0 (2022-11-02)

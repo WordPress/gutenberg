@@ -68,6 +68,7 @@ export const withInspectorControl = createHigherOrderComponent(
 				const isWeb = Platform.OS === 'web';
 				const textControl = (
 					<TextControl
+						__nextHasNoMarginBottom
 						className="html-anchor-control"
 						label={ __( 'HTML anchor' ) }
 						help={
@@ -79,7 +80,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								{ isWeb && (
 									<ExternalLink
 										href={ __(
-											'https://wordpress.org/support/article/page-jumps/'
+											'https://wordpress.org/documentation/article/page-jumps/'
 										) }
 									>
 										{ __( 'Learn more about anchors' ) }
@@ -104,7 +105,7 @@ export const withInspectorControl = createHigherOrderComponent(
 					<>
 						<BlockEdit { ...props } />
 						{ isWeb && (
-							<InspectorControls __experimentalGroup="advanced">
+							<InspectorControls group="advanced">
 								{ textControl }
 							</InspectorControls>
 						) }

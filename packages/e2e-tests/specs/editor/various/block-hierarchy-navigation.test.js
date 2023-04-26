@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
 	getListViewBlocks,
+	switchBlockInspectorTab,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -20,6 +21,20 @@ async function tabToColumnsControl() {
 	let isColumnsControl = false;
 	do {
 		await page.keyboard.press( 'Tab' );
+
+		const isBlockInspectorTab = await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			return (
+				activeElement.getAttribute( 'role' ) === 'tab' &&
+				activeElement.attributes.getNamedItem( 'aria-label' ).value ===
+					'Styles'
+			);
+		} );
+
+		if ( isBlockInspectorTab ) {
+			await page.keyboard.press( 'ArrowRight' );
+		}
+
 		isColumnsControl = await page.evaluate( () => {
 			const activeElement = document.activeElement;
 			return (
@@ -43,9 +58,11 @@ describe( 'Navigating the block hierarchy', () => {
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
+		// Wait for inserter results to appear and then insert a paragraph.
+		await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter-results .editor-block-list-item-paragraph'
+		);
+		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
@@ -60,6 +77,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
+		await switchBlockInspectorTab( 'Settings' );
 		await page.focus(
 			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
@@ -83,9 +101,11 @@ describe( 'Navigating the block hierarchy', () => {
 		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
+		// Wait for inserter results to appear and then insert a paragraph.
+		await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter-results .editor-block-list-item-paragraph'
+		);
+		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -99,9 +119,11 @@ describe( 'Navigating the block hierarchy', () => {
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
+		// Wait for inserter results to appear and then insert a paragraph.
+		await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter-results .editor-block-list-item-paragraph'
+		);
+		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks using the keyboard.
@@ -111,16 +133,14 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Move focus to the sidebar area.
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await tabToColumnsControl();
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the third column in the columns block.
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
 		await pressKeyTimes( 'Tab', 4 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.waitForSelector(
@@ -132,9 +152,11 @@ describe( 'Navigating the block hierarchy', () => {
 		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
+		// Wait for inserter results to appear and then insert a paragraph.
+		await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter-results .editor-block-list-item-paragraph'
+		);
+		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -13,6 +13,7 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	switchBlockInspectorTab,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
@@ -39,30 +40,6 @@ async function upload( selector ) {
 describe( 'Cover', () => {
 	beforeEach( async () => {
 		await createNewPost();
-	} );
-
-	it( 'can set overlay color using color picker on block placeholder', async () => {
-		await insertBlock( 'Cover' );
-		// Get the first color option from the block placeholder's color picker.
-		const colorPickerButton = await page.waitForSelector(
-			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
-		);
-		// Get the RGB value of the picked color.
-		const pickedColor = await colorPickerButton.evaluate(
-			( node ) => node.style.backgroundColor
-		);
-		// Create the block by clicking selected color button.
-		await colorPickerButton.click();
-		// Get the block's background dim element.
-		const backgroundDim = await page.waitForSelector(
-			'.wp-block-cover .has-background-dim'
-		);
-		// Get the RGB value of the background dim.
-		const dimColor = await backgroundDim.evaluate(
-			( node ) => node.style.backgroundColor
-		);
-
-		expect( pickedColor ).toEqual( dimColor );
 	} );
 
 	it( 'can set background image using image upload on block placeholder', async () => {
@@ -94,27 +71,6 @@ describe( 'Cover', () => {
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 
-	it( 'can have the title edited', async () => {
-		await insertBlock( 'Cover' );
-		// Click first color option from the block placeholder's color picker.
-		const colorPickerButton = await page.waitForSelector(
-			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
-		);
-		await colorPickerButton.click();
-		// Click the title placeholder to put the cursor inside.
-		const coverTitle = await page.waitForSelector(
-			'.wp-block-cover .wp-block-paragraph'
-		);
-		await coverTitle.click();
-		// Type the title.
-		await page.keyboard.type( 'foo' );
-		const coverTitleText = await coverTitle.evaluate(
-			( el ) => el.innerText
-		);
-
-		expect( coverTitleText ).toEqual( 'foo' );
-	} );
-
 	it( 'can be resized using drag & drop', async () => {
 		await insertBlock( 'Cover' );
 		// Close the inserter.
@@ -126,7 +82,7 @@ describe( 'Cover', () => {
 			'.components-circular-option-picker__option-wrapper:first-child button'
 		);
 
-		// Select the cover block.By default the child paragraph gets selected.
+		// Select the cover block. By default the child paragraph gets selected.
 		await page.click(
 			'.edit-post-header-toolbar__document-overview-toggle'
 		);
@@ -134,16 +90,15 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container a'
 		);
 
-		const heightInput = (
-			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]/following-sibling::div//input'
-			)
-		 )[ 0 ];
+		switchBlockInspectorTab( 'Styles' );
+		const heightInputHandle = await page.waitForSelector(
+			'input[id*="block-cover-height-input"]'
+		);
 
 		// Verify the height of the cover is not defined.
 		expect(
-			await page.evaluate( ( { value } ) => value, heightInput )
-		).toBeFalsy();
+			await page.evaluate( ( { value } ) => value, heightInputHandle )
+		).toBe( '' );
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
@@ -188,7 +143,7 @@ describe( 'Cover', () => {
 		expect(
 			await page.evaluate(
 				( { value } ) => Number.parseInt( value ),
-				heightInput
+				heightInputHandle
 			)
 		).toBeGreaterThan( 100 );
 	} );

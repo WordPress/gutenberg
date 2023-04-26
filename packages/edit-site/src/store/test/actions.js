@@ -14,8 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '..';
 
-jest.useRealTimers();
-
 const ENTITY_TYPES = {
 	wp_template: {
 		description: 'Templates to include in your theme.',

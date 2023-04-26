@@ -119,7 +119,7 @@ export default function WelcomeGuideStyles() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/styles-overview/'
+										'https://wordpress.org/documentation/article/styles-overview/'
 									) }
 								>
 									{ __(

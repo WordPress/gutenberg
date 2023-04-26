@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useScopedBlockVariations } from '../utils';
+import { useScopedBlockVariations, useBlockNameForPatterns } from '../utils';
 
 export default function QueryPlaceholder( {
 	attributes,
@@ -30,26 +30,27 @@ export default function QueryPlaceholder( {
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
+	const blockNameForPatterns = useBlockNameForPatterns(
+		clientId,
+		attributes
+	);
 
 	const { blockType, allVariations, hasPatterns } = useSelect(
 		( select ) => {
 			const { getBlockVariations, getBlockType } = select( blocksStore );
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-
 			return {
 				blockType: getBlockType( name ),
 				allVariations: getBlockVariations( name ),
-				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
-					name,
+				hasPatterns: !! getPatternsByBlockTypes(
+					blockNameForPatterns,
 					rootClientId
 				).length,
 			};
 		},
-		[ name, clientId ]
+		[ name, blockNameForPatterns, clientId ]
 	);
 
 	const matchingVariation = getMatchingVariation( attributes, allVariations );

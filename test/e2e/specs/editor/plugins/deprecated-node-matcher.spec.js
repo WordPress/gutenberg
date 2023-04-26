@@ -49,7 +49,7 @@ test.describe( 'Deprecated Node Matcher', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

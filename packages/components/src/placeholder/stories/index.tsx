@@ -44,6 +44,7 @@ const Template: ComponentStory< typeof Placeholder > = ( args ) => {
 		<Placeholder { ...args }>
 			<div>
 				<TextControl
+					__nextHasNoMarginBottom
 					label="Sample Field"
 					placeholder="Enter something here"
 					value={ value }

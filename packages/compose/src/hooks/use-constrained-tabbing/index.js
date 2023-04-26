@@ -45,14 +45,31 @@ function useConstrainedTabbing() {
 					/** @type {HTMLElement} */ ( target )
 				) || null;
 
-			// If the element that is about to receive focus is outside the
-			// area, move focus to a div and insert it at the start or end of
-			// the area, depending on the direction. Without preventing default
-			// behaviour, the browser will then move focus to the next element.
+			// When the target element contains the element that is about to
+			// receive focus, for example when the target is a tabbable
+			// container, browsers may disagree on where to move focus next.
+			// In this case we can't rely on native browsers behavior. We need
+			// to manage focus instead.
+			// See https://github.com/WordPress/gutenberg/issues/46041.
+			if (
+				/** @type {HTMLElement} */ ( target ).contains( nextElement )
+			) {
+				event.preventDefault();
+				/** @type {HTMLElement} */ ( nextElement )?.focus();
+				return;
+			}
+
+			// If the element that is about to receive focus is inside the
+			// area, rely on native browsers behavior and let tabbing follow
+			// the native tab sequence.
 			if ( node.contains( nextElement ) ) {
 				return;
 			}
 
+			// If the element that is about to receive focus is outside the
+			// area, move focus to a div and insert it at the start or end of
+			// the area, depending on the direction. Without preventing default
+			// behaviour, the browser will then move focus to the next element.
 			const domAction = shiftKey ? 'append' : 'prepend';
 			const { ownerDocument } = node;
 			const trap = ownerDocument.createElement( 'div' );

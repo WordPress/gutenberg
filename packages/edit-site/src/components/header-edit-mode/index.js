@@ -38,7 +38,8 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
+import { unlock } from '../../private-apis';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +57,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		editorCanvasView,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -88,6 +90,9 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editorCanvasView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
 		};
 	}, [] );
 
@@ -100,10 +105,13 @@ export default function HeaderEditMode() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const openInserter = useCallback( () => {
+	const toggleInserter = useCallback( () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover.
+			// Focusing the inserter button should close the inserter popover.
+			// However, there are some cases it won't close when the focus is lost.
+			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
 			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			setIsInserterOpened( true );
 		}
@@ -114,7 +122,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasStyleBook = useHasStyleBook();
+	const hasDefaultEditorCanvasView = ! editorCanvasView;
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -135,7 +143,7 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
+			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
@@ -148,7 +156,7 @@ export default function HeaderEditMode() {
 							variant="primary"
 							isPressed={ isInserterOpen }
 							onMouseDown={ preventDefault }
-							onClick={ openInserter }
+							onClick={ toggleInserter }
 							disabled={ ! isVisualMode }
 							icon={ plus }
 							label={ showIconLabels ? shortLabel : longLabel }
@@ -220,12 +228,16 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ ! hasDefaultEditorCanvasView ? (
+					getEditorCanvasContainerTitle( editorCanvasView )
+				) : (
+					<DocumentActions />
+				) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

@@ -28,6 +28,12 @@ export function useCompatibilityStyles() {
 
 				const { ownerNode, cssRules } = styleSheet;
 
+				// Stylesheet is added by another stylesheet. See
+				// https://developer.mozilla.org/en-US/docs/Web/API/StyleSheet/ownerNode#notes.
+				if ( ownerNode === null ) {
+					return accumulator;
+				}
+
 				if ( ! cssRules ) {
 					return accumulator;
 				}

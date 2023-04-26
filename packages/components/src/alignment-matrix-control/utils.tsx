@@ -19,8 +19,8 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
 	'top center': __( 'Top Center' ),
 	'top right': __( 'Top Right' ),
 	'center left': __( 'Center Left' ),
-	'center center': __( 'Center Center' ),
-	center: __( 'Center Center' ),
+	'center center': __( 'Center' ),
+	center: __( 'Center' ),
 	'center right': __( 'Center Right' ),
 	'bottom left': __( 'Bottom Left' ),
 	'bottom center': __( 'Bottom Center' ),
@@ -33,7 +33,7 @@ export const ALIGNMENTS = GRID.flat();
 /**
  * Parses and transforms an incoming value to better match the alignment values
  *
- * @param  value An alignment value to parse.
+ * @param value An alignment value to parse.
  *
  * @return The parsed value.
  */
@@ -46,8 +46,8 @@ export function transformValue( value: AlignmentMatrixControlValue ) {
 /**
  * Creates an item ID based on a prefix ID and an alignment value.
  *
- * @param  prefixId An ID to prefix.
- * @param  value    An alignment value.
+ * @param prefixId An ID to prefix.
+ * @param value    An alignment value.
  *
  * @return The item id.
  */
@@ -63,7 +63,7 @@ export function getItemId(
 /**
  * Retrieves the alignment index from a value.
  *
- * @param  alignment Value to check.
+ * @param alignment Value to check.
  *
  * @return The index of a matching alignment.
  */

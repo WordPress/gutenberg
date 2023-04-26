@@ -4,6 +4,7 @@
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -40,6 +41,11 @@ export function useInBetweenInserter() {
 
 			function onMouseMove( event ) {
 				if ( openRef.current ) {
+					return;
+				}
+
+				// Ignore text nodes sometimes detected in FireFox.
+				if ( event.target.nodeType === event.target.TEXT_NODE ) {
 					return;
 				}
 
@@ -88,7 +94,9 @@ export function useInBetweenInserter() {
 							blockElRect.top > offsetTop ) ||
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'horizontal' &&
-							blockElRect.left > offsetLeft )
+							( isRTL()
+								? blockElRect.right < offsetLeft
+								: blockElRect.left > offsetLeft ) )
 					);
 				} );
 

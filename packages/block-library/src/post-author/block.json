@@ -35,6 +35,7 @@
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -63,6 +64,5 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-post-author-editor",
 	"style": "wp-block-post-author"
 }

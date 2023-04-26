@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -126,8 +121,11 @@ export function items( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				removeEntitiesById( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 	return state;
@@ -179,8 +177,11 @@ export function itemIsComplete( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				removeEntitiesById( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 
@@ -230,7 +231,7 @@ const receiveQueries = compose( [
 
 	return getMergedItemIds(
 		state || [],
-		map( action.items, key ),
+		action.items.map( ( item ) => item[ key ] ),
 		page,
 		perPage
 	);
@@ -254,13 +255,23 @@ const queries = ( state = {}, action ) => {
 				return result;
 			}, {} );
 
-			return mapValues( state, ( contextQueries ) => {
-				return mapValues( contextQueries, ( queryItems ) => {
-					return queryItems.filter( ( queryId ) => {
-						return ! removedItems[ queryId ];
-					} );
-				} );
-			} );
+			return Object.fromEntries(
+				Object.entries( state ).map(
+					( [ queryGroup, contextQueries ] ) => [
+						queryGroup,
+						Object.fromEntries(
+							Object.entries( contextQueries ).map(
+								( [ query, queryItems ] ) => [
+									query,
+									queryItems.filter(
+										( queryId ) => ! removedItems[ queryId ]
+									),
+								]
+							)
+						),
+					]
+				)
+			);
 		default:
 			return state;
 	}

@@ -119,7 +119,7 @@ export function addAttribute( settings ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const blockEdit = <BlockEdit { ...props } />;
+		const blockEdit = <BlockEdit key="edit" { ...props } />;
 		const { name: blockName } = props;
 		// Compute the block valid alignments by taking into account,
 		// if the theme supports wide alignments or not and the layout's

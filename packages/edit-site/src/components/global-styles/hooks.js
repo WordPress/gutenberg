@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
-import { get, set } from 'lodash';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
 
@@ -16,12 +14,15 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
-
+import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { GlobalStylesContext } from './context';
+import { unlock } from '../../private-apis';
+import { useSelect } from '@wordpress/data';
+
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -490,7 +491,7 @@ export function useFontFamilies() {
 }
 
 export function useColorRandomizer( name ) {
-	const [ themeColors, setThemeColors ] = useSetting(
+	const [ themeColors, setThemeColors ] = useGlobalSetting(
 		'color.palette.theme',
 		name
 	);
@@ -518,4 +519,19 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useSupportedStyles( name, element ) {
+	const { supportedPanels } = useSelect(
+		( select ) => {
+			return {
+				supportedPanels: unlock(
+					select( blocksStore )
+				).getSupportedStyles( name, element ),
+			};
+		},
+		[ name, element ]
+	);
+
+	return supportedPanels;
 }

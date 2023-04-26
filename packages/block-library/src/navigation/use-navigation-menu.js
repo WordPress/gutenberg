@@ -24,7 +24,7 @@ export default function useNavigationMenu( ref ) {
 				navigationMenus,
 				isResolvingNavigationMenus,
 				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select, ref );
+			} = selectNavigationMenus( select );
 
 			const {
 				navigationMenu,

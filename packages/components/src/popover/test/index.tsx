@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
-import type { CSSProperties, ReactElement } from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import type { CSSProperties } from 'react';
 
 /**
  * WordPress dependencies
@@ -91,25 +91,21 @@ const ALL_POSITIONS_TO_EXPECTED_PLACEMENTS: PositionToPlacementTuple[] = [
 
 describe( 'Popover', () => {
 	describe( 'Component', () => {
-		// Render UI and then wait for the `floating-ui` effects inside `Popover` to finish running
-		// See also: https://floating-ui.com/docs/react-dom#testing
-		async function renderAsync( ui: ReactElement ) {
-			const view = render( ui );
-			await act( () => Promise.resolve() );
-			return view;
-		}
-
 		describe( 'basic behavior', () => {
 			it( 'should render content', async () => {
-				await renderAsync( <Popover>Hello</Popover> );
+				render( <Popover>Hello</Popover> );
 
-				expect( screen.getByText( 'Hello' ) ).toBeInTheDocument();
+				await waitFor( () =>
+					expect( screen.getByText( 'Hello' ) ).toBeVisible()
+				);
 			} );
 
 			it( 'should forward additional props to portaled element', async () => {
-				await renderAsync( <Popover role="tooltip">Hello</Popover> );
+				render( <Popover role="tooltip">Hello</Popover> );
 
-				expect( screen.getByRole( 'tooltip' ) ).toBeInTheDocument();
+				await waitFor( () =>
+					expect( screen.getByRole( 'tooltip' ) ).toBeVisible()
+				);
 			} );
 		} );
 
@@ -129,30 +125,45 @@ describe( 'Popover', () => {
 					);
 				};
 
-				await renderAsync(
+				render(
 					<PopoverWithAnchor>Popover content</PopoverWithAnchor>
 				);
 
-				expect(
-					screen.getByText( 'Popover content' )
-				).toBeInTheDocument();
+				await waitFor( () =>
+					expect(
+						screen.getByText( 'Popover content' )
+					).toBeVisible()
+				);
 			} );
 		} );
 
 		describe( 'focus behavior', () => {
-			it( 'should focus the popover by default when opened', async () => {
-				await renderAsync(
-					<Popover data-testid="popover-element">
+			it( 'should focus the popover container when opened', async () => {
+				render(
+					<Popover
+						focusOnMount={ true }
+						data-testid="popover-element"
+					>
 						Popover content
 					</Popover>
 				);
 
-				expect( screen.getByTestId( 'popover-element' ) ).toHaveFocus();
+				const popover = screen.getByTestId( 'popover-element' );
+
+				await waitFor( () => expect( popover ).toBeVisible() );
+
+				expect( popover ).toHaveFocus();
 			} );
 
 			it( 'should allow focus-on-open behavior to be disabled', async () => {
-				await renderAsync(
+				render(
 					<Popover focusOnMount={ false }>Popover content</Popover>
+				);
+
+				await waitFor( () =>
+					expect(
+						screen.getByText( 'Popover content' )
+					).toBeVisible()
 				);
 
 				expect( document.body ).toHaveFocus();

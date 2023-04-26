@@ -4,7 +4,7 @@
 import { useRef, useEffect } from '@wordpress/element';
 import { Spinner, SearchControl } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -38,44 +38,33 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
-	const mediaList = useMediaResults( {
+	const { mediaList, isLoading } = useMediaResults( category, {
 		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
-		media_type: category.mediaType,
 		search: debouncedSearch,
-		orderBy: !! debouncedSearch ? 'relevance' : 'date',
 	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';
+	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
 		<div className={ baseCssClass }>
 			<SearchControl
 				className={ `${ baseCssClass }-search` }
 				onChange={ setSearch }
 				value={ search }
-				label={ sprintf(
-					/* translators: %s: Name of the media category(ex. 'images, videos'). */
-					__( 'Search %s' ),
-					category.label.toLocaleLowerCase()
-				) }
-				placeholder={ sprintf(
-					/* translators: %s: Name of the media category(ex. 'images, videos'). */
-					__( 'Search %s' ),
-					category.label.toLocaleLowerCase()
-				) }
+				label={ searchLabel }
+				placeholder={ searchLabel }
 			/>
-			{ ! mediaList && (
+			{ isLoading && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ Array.isArray( mediaList ) && ! mediaList.length && (
-				<InserterNoResults />
-			) }
-			{ !! mediaList?.length && (
+			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
+			{ ! isLoading && !! mediaList?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
 					onClick={ onInsert }
 					mediaList={ mediaList }
-					mediaType={ category.mediaType }
+					category={ category }
 				/>
 			) }
 		</div>

@@ -31,6 +31,7 @@ const mockPullRequestEventContext = {
 	sha: 'mergeSHA',
 	eventName: 'pull_request',
 	payload: {
+		number: 10,
 		pull_request: {
 			head: {
 				ref: 'headBranch',
@@ -60,7 +61,8 @@ const mockAPI = {
 	findMergeBaseCommit: jest.fn(),
 	updateIssue: jest.fn(),
 	createIssue: jest.fn(),
-	createComment: jest.fn(),
+	createCommentOnPR: jest.fn(),
+	createCommentOnCommit: jest.fn(),
 };
 jest.mock( '../github-api', () => ( {
 	GitHubAPI: jest.fn( () => mockAPI ),
@@ -130,7 +132,7 @@ describe( 'Report flaky tests', () => {
 			html_url: 'html_url',
 		} ) );
 
-		mockAPI.createComment.mockImplementationOnce( () => ( {
+		mockAPI.createCommentOnPR.mockImplementationOnce( () => ( {
 			html_url: 'comment_html_url',
 		} ) );
 
@@ -159,12 +161,12 @@ describe( 'Report flaky tests', () => {
 			'Created new flaky issue'
 		);
 
-		expect( mockAPI.createComment ).toHaveBeenCalledTimes( 1 );
-		expect( mockAPI.createComment.mock.calls[ 0 ][ 0 ] ).toBe( 'headSHA' );
-		expect( mockAPI.createComment.mock.calls[ 0 ][ 1 ] )
+		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
+		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
+		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ] )
 			.toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected.**
+		**Flaky tests detected in headSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
 		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/100
@@ -230,7 +232,7 @@ describe( 'Report flaky tests', () => {
 			html_url: 'html_url',
 		} ) );
 
-		mockAPI.createComment.mockImplementationOnce( () => ( {
+		mockAPI.createCommentOnCommit.mockImplementationOnce( () => ( {
 			html_url: 'comment_html_url',
 		} ) );
 
@@ -259,14 +261,14 @@ describe( 'Report flaky tests', () => {
 			'Created new flaky issue'
 		);
 
-		expect( mockAPI.createComment ).toHaveBeenCalledTimes( 1 );
-		expect( mockAPI.createComment.mock.calls[ 0 ][ 0 ] ).toBe(
+		expect( mockAPI.createCommentOnCommit ).toHaveBeenCalledTimes( 1 );
+		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 0 ] ).toBe(
 			'commitSHA'
 		);
-		expect( mockAPI.createComment.mock.calls[ 0 ][ 1 ] )
+		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 1 ] )
 			.toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected.**
+		**Flaky tests detected in commitSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
 		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/100
@@ -331,6 +333,7 @@ describe( 'Report flaky tests', () => {
 
 		expect( mockAPI.updateIssue ).not.toHaveBeenCalled();
 
-		expect( mockAPI.createComment ).not.toHaveBeenCalled();
+		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
+		expect( mockAPI.createCommentOnCommit ).not.toHaveBeenCalled();
 	} );
 } );

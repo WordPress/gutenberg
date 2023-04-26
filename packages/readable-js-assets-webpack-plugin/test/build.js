@@ -8,8 +8,6 @@ const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
-jest.useRealTimers();
-
 describe( 'ReadableJsAssetsWebpackPlugin', () => {
 	const outputDirectory = path.join( __dirname, 'build' );
 	const testDirectory = path.join( __dirname, 'fixtures' );

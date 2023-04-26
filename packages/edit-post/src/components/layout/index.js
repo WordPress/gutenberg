@@ -117,8 +117,7 @@ function Layout( { styles } ) {
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
-				isLargeViewport,
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -127,13 +126,6 @@ function Layout( { styles } ) {
 		};
 	}, [] );
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
-		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
-		'is-distraction-free': isDistractionFree,
-	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
@@ -164,6 +156,15 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+		'is-sidebar-opened': sidebarIsOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
+		'is-distraction-free': isDistractionFree && isLargeViewport,
+		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+	} );
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
@@ -203,7 +204,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				isDistractionFree={ isDistractionFree }
+				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -249,7 +250,7 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isTemplateMode && (
+						{ ! isDistractionFree && ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
@@ -262,8 +263,8 @@ function Layout( { styles } ) {
 				}
 				footer={
 					! isDistractionFree &&
-					showBlockBreadcrumbs &&
 					! isMobileViewport &&
+					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">

@@ -87,11 +87,11 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation",
 		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"anchor": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
@@ -119,6 +119,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}

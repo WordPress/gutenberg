@@ -63,6 +63,7 @@ export function Draggable( {
 	onDragStart,
 	onDragOver,
 	onDragEnd,
+	appendToOwnerDocument = false,
 	cloneClassname,
 	elementId,
 	transferData,
@@ -75,7 +76,7 @@ export function Draggable( {
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function end( event: DragEvent ) {
 		event.preventDefault();
@@ -94,7 +95,7 @@ export function Draggable( {
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
@@ -173,7 +174,11 @@ export function Draggable( {
 			cloneWrapper.appendChild( clone );
 
 			// Inject the cloneWrapper into the DOM.
-			elementWrapper?.appendChild( cloneWrapper );
+			if ( appendToOwnerDocument ) {
+				ownerDocument.body.appendChild( cloneWrapper );
+			} else {
+				elementWrapper?.appendChild( cloneWrapper );
+			}
 		}
 
 		// Mark the current cursor coordinates.

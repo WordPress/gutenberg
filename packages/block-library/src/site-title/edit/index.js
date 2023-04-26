@@ -111,12 +111,14 @@ export default function SiteTitleEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Make title link to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
 					{ isLink && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {

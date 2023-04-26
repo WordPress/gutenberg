@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -29,6 +30,10 @@ import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import FontUploadModal from './font-upload-modal';
 import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
+import { unlock } from '../../private-apis';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
 	const { goTo } = useNavigator();
@@ -78,17 +83,28 @@ function ElementItem( { name, parentMenu, element, label } ) {
 					textDecoration: 'underline',
 			  }
 			: {};
-
-	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
-	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle(
+	const [ fontFamily ] = useGlobalStyle(
+		prefix + 'typography.fontFamily',
+		name
+	);
+	const [ fontStyle ] = useGlobalStyle(
+		prefix + 'typography.fontStyle',
+		name
+	);
+	const [ fontWeight ] = useGlobalStyle(
+		prefix + 'typography.fontWeight',
+		name
+	);
+	const [ letterSpacing ] = useGlobalStyle(
 		prefix + 'typography.letterSpacing',
 		name
 	);
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
+	const [ backgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
+		name
+	);
+	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient', name );
+	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
@@ -169,9 +185,9 @@ function FontFamiliesDropdown() {
 	);
 }
 
-function ScreenTypography( { name } ) {
+function ScreenTypography( { name, variation = '' } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader
@@ -181,7 +197,7 @@ function ScreenTypography( { name } ) {
 				) }
 			/>
 
-			<BlockPreviewPanel name={ name } />
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
@@ -194,6 +210,7 @@ function ScreenTypography( { name } ) {
 						<FontFamilies />
 
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<ElementItem
 								name={ name }
@@ -216,6 +233,12 @@ function ScreenTypography( { name } ) {
 							<ElementItem
 								name={ name }
 								parentMenu={ parentMenu }
+								element="caption"
+								label={ __( 'Captions' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
 								element="button"
 								label={ __( 'Buttons' ) }
 							/>
@@ -225,7 +248,13 @@ function ScreenTypography( { name } ) {
 			) }
 
 			{ /* No typography elements support yet for blocks. */ }
-			{ !! name && <TypographyPanel name={ name } element="text" /> }
+			{ !! name && (
+				<TypographyPanel
+					name={ name }
+					variation={ variation }
+					element="text"
+				/>
+			) }
 		</>
 	);
 }

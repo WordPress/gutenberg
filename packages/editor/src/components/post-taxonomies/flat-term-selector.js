@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import escapeHtml from 'escape-html';
 
 /**
@@ -37,8 +36,6 @@ const EMPTY_ARRAY = [];
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
-	orderby: 'count',
-	order: 'desc',
 	_fields: 'id,name',
 	context: 'view',
 };
@@ -108,24 +105,14 @@ export function FlatTermSelector( { slug } ) {
 
 			return {
 				hasCreateAction: _taxonomy
-					? get(
-							post,
-							[
-								'_links',
-								'wp:action-create-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-create-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				hasAssignAction: _taxonomy
-					? get(
-							post,
-							[
-								'_links',
-								'wp:action-assign-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-assign-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
@@ -241,30 +228,23 @@ export function FlatTermSelector( { slug } ) {
 		}
 
 		const newTermIds = [ ...termIds, newTerm.id ];
+		const defaultName = slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
 			/* translators: %s: term name. */
 			_x( '%s added', 'term' ),
-			get(
-				taxonomy,
-				[ 'labels', 'singular_name' ],
-				slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
-			)
+			taxonomy?.labels?.singular_name ?? defaultName
 		);
 
 		speak( termAddedMessage, 'assertive' );
 		onUpdateTerms( newTermIds );
 	}
 
-	const newTermLabel = get(
-		taxonomy,
-		[ 'labels', 'add_new_item' ],
-		slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' )
-	);
-	const singularName = get(
-		taxonomy,
-		[ 'labels', 'singular_name' ],
-		slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
-	);
+	const newTermLabel =
+		taxonomy?.labels?.add_new_item ??
+		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+	const singularName =
+		taxonomy?.labels?.singular_name ??
+		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
 	const termAddedLabel = sprintf(
 		/* translators: %s: term name. */
 		_x( '%s added', 'term' ),

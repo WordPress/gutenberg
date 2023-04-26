@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pickBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -58,14 +53,12 @@ export default function DeleteTemplate() {
 			template: '',
 		} );
 		const settings = getEditorSettings();
-		const newAvailableTemplates = pickBy(
-			settings.availableTemplates,
-			( _title, id ) => {
-				return id !== template.slug;
-			}
+		const newAvailableTemplates = Object.fromEntries(
+			Object.entries( settings.availableTemplates ?? {} ).filter(
+				( [ id ] ) => id !== template.slug
+			)
 		);
 		updateEditorSettings( {
-			...settings,
 			availableTemplates: newAvailableTemplates,
 		} );
 		deleteEntityRecord( 'postType', 'wp_template', template.id, {

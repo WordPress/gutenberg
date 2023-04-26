@@ -14,7 +14,6 @@ import CopyContentMenuItem from './copy-content-menu-item';
 import KeyboardShortcutsHelpMenuItem from './keyboard-shortcuts-help-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
-import NavigationListViewMenuItem from './navigation-list-view-menu-item';
 
 registerPlugin( 'edit-post', {
 	render() {
@@ -40,7 +39,7 @@ registerPlugin( 'edit-post', {
 								role="menuitem"
 								icon={ external }
 								href={ __(
-									'https://wordpress.org/support/article/wordpress-editor/'
+									'https://wordpress.org/documentation/article/wordpress-block-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"
@@ -56,7 +55,6 @@ registerPlugin( 'edit-post', {
 						</>
 					) }
 				</ToolsMoreMenuGroup>
-				<NavigationListViewMenuItem />
 			</>
 		);
 	},

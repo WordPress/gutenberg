@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -21,18 +21,24 @@ type Tab = {
 	 * The class name to apply to the tab button.
 	 */
 	className?: string;
+	/**
+	 * The icon used for the tab button.
+	 */
+	icon?: IconType;
+	/**
+	 * Determines if the tab button should be disabled.
+	 */
+	disabled?: boolean;
 } & Record< any, any >;
 
-export type TabButtonProps< IconProps = unknown > = {
+export type TabButtonProps = {
 	children: ReactNode;
-	className?: string;
-	icon?: IconType< IconProps >;
 	label?: string;
 	onClick: ( event: MouseEvent ) => void;
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;
-};
+} & Pick< Tab, 'className' | 'icon' | 'disabled' >;
 
 export type TabPanelProps = {
 	/**
