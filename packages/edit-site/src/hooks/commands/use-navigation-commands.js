@@ -7,15 +7,16 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { post, page, layout, symbolFilled } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
-import { useHistory } from '../../components/routes';
 
 const { useCommandLoader } = unlock( privateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
 	post,

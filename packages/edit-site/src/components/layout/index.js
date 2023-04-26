@@ -24,6 +24,7 @@ import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -33,7 +34,6 @@ import Editor from '../editor';
 import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -45,6 +45,8 @@ import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommands } from '../../hooks/commands';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
