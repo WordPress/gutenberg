@@ -100,3 +100,31 @@ function gutenberg_register_metadata_attribute( $args ) {
 	return $args;
 }
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
+
+/**
+ * Auto-insert blocks relative to a given block.
+ *
+ * @param string   $block_content The block content.
+ * @param array    $block         The full block, including name and attributes.
+ * @param WP_Block $instance      The block instance.
+ */
+function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
+	$block_name = 'core/comment-content';
+	$block_position = 'after'; // Child blocks could be a bit trickier.
+
+	// TODO: Parse actually inserted block.
+	$inserted_content = 'LIKE';
+
+	// Can we void infinite loops?
+
+	if ( $block['blockName'] === $block_name ) {
+		if ( 'before' === $block_position ) {
+			$block_content = $inserted_content . $block_content;
+		} elseif ( 'after' === $block_position ) {
+			$block_content = $block_content . $inserted_content;
+		}
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_auto_insert_blocks', 10, 3 );
