@@ -44,7 +44,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			style: {
 				letterSpacing: '22px',
 				fontSize:
-					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
+					'clamp(1.25rem, 1.25rem + ((1vw - 0.2rem) * 0.938), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );
@@ -70,7 +70,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			style: {
 				textDecoration: 'underline',
 				fontSize:
-					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
+					'clamp(1.25rem, 1.25rem + ((1vw - 0.2rem) * 0.938), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );

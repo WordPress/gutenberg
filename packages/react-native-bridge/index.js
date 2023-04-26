@@ -69,6 +69,13 @@ export function subscribeFeaturedImageIdNativeUpdated( callback ) {
 	);
 }
 
+export function subscribePostSaveEvent( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'postHasBeenJustSaved',
+		callback
+	);
+}
+
 /**
  * Request to subscribe to mediaUpload events
  *

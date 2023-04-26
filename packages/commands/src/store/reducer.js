@@ -23,6 +23,7 @@ function commands( state = {}, action ) {
 						label: action.label,
 						group: action.group,
 						callback: action.callback,
+						icon: action.icon,
 					},
 				},
 			};

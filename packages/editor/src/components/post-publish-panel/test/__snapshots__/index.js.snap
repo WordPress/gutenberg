@@ -595,6 +595,8 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   position: relative;
   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
   overflow: visible;
+  opacity: 1;
+  background-color: transparent;
 }
 
 .emotion-2 {

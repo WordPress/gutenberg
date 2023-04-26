@@ -5,37 +5,50 @@
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
+import type { IconType } from '@wordpress/components';
+import type { WPComponent } from '@wordpress/element';
 
 /**
  * Defined behavior of a plugin type.
- *
- * @typedef {Object} WPPlugin
- *
- * @property {string}                    name    A string identifying the plugin. Must be
- *                                               unique across all registered plugins.
- * @property {string|WPElement|Function} [icon]  An icon to be shown in the UI. It can
- *                                               be a slug of the Dashicon, or an element
- *                                               (or function returning an element) if you
- *                                               choose to render your own SVG.
- * @property {Function}                  render  A component containing the UI elements
- *                                               to be rendered.
- * @property {string}                    [scope] The optional scope to be used when rendering inside
- *                                               a plugin area. No scope by default.
  */
+export interface WPPlugin {
+	/**
+	 * A string identifying the plugin. Must be unique across all registered plugins.
+	 */
+	name: string;
+
+	/**
+	 * An icon to be shown in the UI. It can be a slug of the Dashicon, or an
+	 * element (or function returning an element) if you choose to render your
+	 * own SVG.
+	 */
+	icon?: IconType;
+
+	/**
+	 * A component containing the UI elements to be rendered.
+	 */
+	render: WPComponent;
+
+	/**
+	 * The optional scope to be used when rendering inside a plugin area.
+	 * No scope by default.
+	 */
+	scope?: string;
+}
+
+type PluginSettings = Omit< WPPlugin, 'name' >;
 
 /**
  * Plugin definitions keyed by plugin name.
- *
- * @type {Object.<string,WPPlugin>}
  */
-const plugins = {};
+const plugins = {} as Record< string, WPPlugin >;
 
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}                 name     A string identifying the plugin.Must be
- *                                          unique across all registered plugins.
- * @param {Omit<WPPlugin, 'name'>} settings The settings for this plugin.
+ * @param name     A string identifying the plugin. Must be
+ *                 unique across all registered plugins.
+ * @param settings The settings for this plugin.
  *
  * @example
  * ```js
@@ -105,9 +118,12 @@ const plugins = {};
  * } );
  * ```
  *
- * @return {WPPlugin} The final plugin settings object.
+ * @return The final plugin settings object.
  */
-export function registerPlugin( name, settings ) {
+export function registerPlugin(
+	name: string,
+	settings: PluginSettings
+): PluginSettings | null {
 	if ( typeof settings !== 'object' ) {
 		console.error( 'No settings object provided!' );
 		return null;
@@ -126,7 +142,11 @@ export function registerPlugin( name, settings ) {
 		console.error( `Plugin "${ name }" is already registered.` );
 	}
 
-	settings = applyFilters( 'plugins.registerPlugin', settings, name );
+	settings = applyFilters(
+		'plugins.registerPlugin',
+		settings,
+		name
+	) as PluginSettings;
 
 	const { render, scope } = settings;
 
@@ -165,7 +185,7 @@ export function registerPlugin( name, settings ) {
 /**
  * Unregisters a plugin by name.
  *
- * @param {string} name Plugin name.
+ * @param name Plugin name.
  *
  * @example
  * ```js
@@ -183,10 +203,10 @@ export function registerPlugin( name, settings ) {
  * unregisterPlugin( 'plugin-name' );
  * ```
  *
- * @return {WPPlugin | undefined} The previous plugin settings object, if it has been
- *                     successfully unregistered; otherwise `undefined`.
+ * @return The previous plugin settings object, if it has been
+ *         successfully unregistered; otherwise `undefined`.
  */
-export function unregisterPlugin( name ) {
+export function unregisterPlugin( name: string ): WPPlugin | undefined {
 	if ( ! plugins[ name ] ) {
 		console.error( 'Plugin "' + name + '" is not registered.' );
 		return;
@@ -202,23 +222,23 @@ export function unregisterPlugin( name ) {
 /**
  * Returns a registered plugin settings.
  *
- * @param {string} name Plugin name.
+ * @param name Plugin name.
  *
- * @return {?WPPlugin} Plugin setting.
+ * @return Plugin setting.
  */
-export function getPlugin( name ) {
+export function getPlugin( name: string ): WPPlugin | undefined {
 	return plugins[ name ];
 }
 
 /**
  * Returns all registered plugins without a scope or for a given scope.
  *
- * @param {string} [scope] The scope to be used when rendering inside
- *                         a plugin area. No scope by default.
+ * @param scope The scope to be used when rendering inside
+ *              a plugin area. No scope by default.
  *
- * @return {WPPlugin[]} The list of plugins without a scope or for a given scope.
+ * @return The list of plugins without a scope or for a given scope.
  */
-export function getPlugins( scope ) {
+export function getPlugins( scope?: string ): WPPlugin[] {
 	return Object.values( plugins ).filter(
 		( plugin ) => plugin.scope === scope
 	);

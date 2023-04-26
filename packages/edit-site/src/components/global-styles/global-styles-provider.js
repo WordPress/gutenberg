@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, isEmpty } from 'lodash';
+import { mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,9 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -31,22 +33,6 @@ function mergeTreesCustomizer( _, srcValue ) {
 export function mergeBaseAndUserConfigs( base, user ) {
 	return mergeWith( {}, base, user, mergeTreesCustomizer );
 }
-
-const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
-		return object;
-	}
-	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( object )
-			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
-			.filter( ( [ , value ] ) => Boolean( value ) )
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles } = useSelect(

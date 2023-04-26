@@ -1,18 +1,21 @@
 <?php
 /**
- * API to update a theme.json structure.
+ * WP_Theme_JSON_Data class
  *
  * @package gutenberg
+ * @since 6.1.0
  */
 
 /**
- * Class to update with a theme.json structure.
+ * Class to provide access to update a theme.json structure.
  */
+#[AllowDynamicProperties]
 class WP_Theme_JSON_Data_Gutenberg {
 
 	/**
 	 * Container of the data to update.
 	 *
+	 * @since 6.1.0
 	 * @var WP_Theme_JSON
 	 */
 	private $theme_json = null;
@@ -20,12 +23,17 @@ class WP_Theme_JSON_Data_Gutenberg {
 	/**
 	 * The origin of the data: default, theme, user, etc.
 	 *
+	 * @since 6.1.0
 	 * @var string
 	 */
 	private $origin = '';
 
 	/**
 	 * Constructor.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @link https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/
 	 *
 	 * @param array  $data   Array following the theme.json specification.
 	 * @param string $origin The origin of the data: default, theme, user.
@@ -38,6 +46,8 @@ class WP_Theme_JSON_Data_Gutenberg {
 	/**
 	 * Updates the theme.json with the the given data.
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param array $new_data Array following the theme.json specification.
 	 *
 	 * @return WP_Theme_JSON_Data_Gutenberg The own instance with access to the modified data.
@@ -48,7 +58,10 @@ class WP_Theme_JSON_Data_Gutenberg {
 	}
 
 	/**
-	 * Returns the underlying data.
+	 * Returns an array containing the underlying data
+	 * following the theme.json specification.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @return array
 	 */
