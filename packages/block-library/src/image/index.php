@@ -42,6 +42,8 @@ function has_link_destination( $attributes ) {
  */
 function render_block_core_image( $attributes, $content ) {
 
+	$background_color = wp_get_global_styles(['color', 'background']);
+
 	if( ! has_link_destination( $attributes ) && isset( $attributes['enableLightbox'] ) && $attributes['enableLightbox'] === true ) {
 		$body_content = new WP_HTML_Tag_Processor( $content );
 
@@ -81,6 +83,7 @@ function render_block_core_image( $attributes, $content ) {
 								$toggle_close_button_icon
 							</button>
 							<div class="hide" data-wp-on.click="actions.core.hideLightbox"></div>
+							<div class="scrim" style='background-color: $background_color'></div>
 					</div>
 			</div>
 		HTML;
