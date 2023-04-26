@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	useContext,
 	useEffect,
@@ -209,22 +209,6 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
 
-function useVisualizer() {
-	const [ property, setProperty ] = useState( false );
-	const { hideBlockInterface, showBlockInterface } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	useEffect( () => {
-		if ( ! property ) {
-			showBlockInterface();
-		} else {
-			hideBlockInterface();
-		}
-	}, [ property, showBlockInterface, hideBlockInterface ] );
-
-	return [ property, setProperty ];
-}
-
 export function PositionVisualizer( { clientId, attributes, forceShow } ) {
 	const positionType = attributes?.style?.position?.type;
 
@@ -286,6 +270,7 @@ export function PositionPanel( props ) {
 	const {
 		attributes: { style = {} },
 		clientId,
+		isSelected,
 		name: blockName,
 		setAttributes,
 	} = props;
@@ -351,17 +336,6 @@ export function PositionPanel( props ) {
 		} );
 	};
 
-	const [ isPositionVisualizerActive, setIsPositionVisualizerActive ] =
-		useVisualizer();
-
-	const onMouseOverPosition = () => {
-		setIsPositionVisualizerActive( true );
-	};
-
-	const onMouseLeaveControls = () => {
-		setIsPositionVisualizerActive( false );
-	};
-
 	const selectedOption = value
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
@@ -373,7 +347,7 @@ export function PositionPanel( props ) {
 				<InspectorControls group="position">
 					{ firstParentClientId && value === 'sticky' ? (
 						<PositionVisualizer
-							forceShow={ isPositionVisualizerActive }
+							forceShow={ isSelected }
 							{ ...props }
 							clientId={ firstParentClientId }
 						/>
@@ -396,9 +370,6 @@ export function PositionPanel( props ) {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
-							onFocus={ onMouseOverPosition }
-							onBlur={ onMouseLeaveControls }
-							onMouseOver={ onMouseOverPosition }
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
