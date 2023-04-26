@@ -819,8 +819,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	if ( $is_interactivity_api_enabled ) {
 		$responsive_container_markup = sprintf(
+			// Once directives priorities are supported,
+			// we should be able to move the `wp-on.keydown`
+			// and `wp-on.focusout` to the parent <nav> and
+			// remove it from here and the <div>
 			'<button 
 				data-wp-on.click="actions.core.navigation.openMenu"
+				data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+				data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 				aria-haspopup="true"
 				%3$s
 				class="%6$s""
@@ -832,8 +838,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 				data-wp-class.has-modal-open="context.isMenuOpen"
 				data-wp-class.is-menu-open="context.isMenuOpen"
 				data-wp-bind.aria-hidden="!context.isMenuOpen"
-				data-wp-effect="effects.core.navigation.focusElement"
-				data-wp-on.keydown="effects.core.navigation.focusElement"
+				data-wp-effect="effects.core.navigation.initModal"
+				data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+				data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 				style="%7$s"
 				id="%1$s"
 			>
@@ -843,6 +850,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 						aria-label="%8$s"
 						data-wp-bind.aria-modal="context.isMenuOpen"
 						data-wp-bind.role="context.roleAttribute"
+						data-wp-effect="effects.core.navigation.focusFirstElement"
 					>
 						<button
 							%4$s
@@ -898,7 +906,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return sprintf(
 			'<nav
 				data-wp-island
-				data-wp-context=\'{ "isMenuOpen": false, "focusedElement": null, "menuButton": null, "roleAttribute": "" }\'
+				data-wp-context=\'{ "isMenuOpen": false, "trapFocus": true, "roleAttribute": "" }\'
 				%2$s
 			>
 				%3$s

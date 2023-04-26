@@ -9,9 +9,9 @@ store( {
 			navigation: {
 				openMenu: ( { context, ref } ) => {
 					context.isMenuOpen = true;
+					context.previousFocus = ref;
 					// Review how to move this to a selector or something similar
 					context.roleAttribute = 'dialog';
-					context.menuButton = ref;
 					// It adds a `has-modal-open` class to the <html> root
 					document.documentElement.classList.add( 'has-modal-open' );
 				},
@@ -19,19 +19,59 @@ store( {
 					context.isMenuOpen = false;
 					// Review how to move this to a selector or something similar
 					context.roleAttribute = '';
-					context.focusedElement = null;
-					context.menuButton.focus();
+					context.modal = null;
+					context.previousFocus = null;
 					// It removes the `has-modal-open` class to the <html> root
 					document.documentElement.classList.remove(
 						'has-modal-open'
 					);
 				},
-				openSubmenu: ( { context, ref } ) => {
-					context.isSubmenuOpen = true;
-					context.submenuButton = ref;
+				handleMenuKeydown: ( { actions, context, event } ) => {
+					if ( context.isMenuOpen ) {
+						// If Escape close the menu
+						if (
+							event?.key === 'Escape' ||
+							event?.keyCode === 27
+						) {
+							context.previousFocus.focus();
+							actions.core.navigation.closeMenu( { context } );
+							return;
+						}
+
+						// Trap focus if set to true
+						if (
+							context.trapFocus &&
+							( event.key === 'Tab' || event.keyCode === 9 )
+						) {
+							// If shift + tab it change the direction
+							if (
+								event.shiftKey &&
+								window.document.activeElement ===
+									context.firstFocusableElement
+							) {
+								event.preventDefault();
+								context.lastFocusableElement.focus();
+							} else if (
+								! event.shiftKey &&
+								window.document.activeElement ===
+									context.lastFocusableElement
+							) {
+								event.preventDefault();
+								context.firstFocusableElement.focus();
+							}
+						}
+					}
 				},
-				closeSubmenu: ( { context } ) => {
-					context.isSubmenuOpen = false;
+				handleMenuFocusout: ( { actions, context, event } ) => {
+					if ( context.isMenuOpen ) {
+						// If focus is outside modal (and in the document), close menu
+						if (
+							! context.modal.contains( event.relatedTarget ) &&
+							document.contains( event.relatedTarget )
+						) {
+							actions.core.navigation.closeMenu( { context } );
+						}
+					}
 				},
 			},
 		},
@@ -39,96 +79,24 @@ store( {
 	effects: {
 		core: {
 			navigation: {
-				focusElement: async ( {
-					actions,
-					context,
-					tick,
-					ref,
-					event,
-				} ) => {
+				initModal: async ( { context, ref } ) => {
 					if ( context.isMenuOpen ) {
-						if (
-							event?.key &&
-							event.key !== 'Escape' &&
-							event.key !== 'Tab'
-						) {
-							return;
-						}
-
-						// On ESC, close the menu and focus the hamburger button
-						if ( event?.key === 'Escape' ) {
-							actions.core.navigation.closeMenu( { context } );
-							return;
-						}
-
-						// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-						await tick();
-
-						// Focus the first element when menu is open
-						if ( ! context.focusedElement ) {
-							ref.querySelector(
-								'.wp-block-navigation-item > *:first-child'
-							).focus();
-						}
-
-						// Focus the close button when it gets out of the modal
-						if ( event?.key === 'Tab' ) {
-							if (
-								window.document.activeElement.closest(
-									'.is-menu-open'
-								) !== ref
-							) {
-								ref.querySelector(
-									'button.wp-block-navigation__responsive-container-close'
-								).focus();
-							}
-						}
-
-						context.focusedElement = window.document.activeElement;
+						const focusableElements = ref.querySelectorAll(
+							'a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+						);
+						context.modal = ref;
+						context.firstFocusableElement = focusableElements[ 0 ];
+						context.lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
-				handleSubmenu: async ( { actions, context, ref, tick } ) => {
-					if ( context.isSubmenuOpen ) {
-						async function closeSubmenu( e ) {
-							// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-							await tick();
-							// Only close submenu if it gets outside of it while tabbing
-							if (
-								e.key &&
-								e.key !== 'Escape' &&
-								ref.contains( window.document.activeElement )
-							) {
-								return;
-							}
-
-							if (
-								e.key === 'Escape' ||
-								! ref.contains( window.document.activeElement )
-							) {
-								document.removeEventListener(
-									'click',
-									closeSubmenu
-								);
-								document.removeEventListener(
-									'keydown',
-									closeSubmenu
-								);
-
-								actions.core.navigation.closeSubmenu( {
-									context,
-								} );
-							}
-
-							// Return focus to the button when closing with "Escape"
-							if ( e.key === 'Escape' ) {
-								context.submenuButton.focus();
-							}
-						}
-
+				focusFirstElement: async ( { context, tick, ref } ) => {
+					if ( context.isMenuOpen ) {
 						// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
 						await tick();
-						document.addEventListener( 'click', closeSubmenu );
-						document.addEventListener( 'keydown', closeSubmenu );
+						ref.querySelector(
+							'.wp-block-navigation-item > *:first-child'
+						).focus();
 					}
 				},
 			},

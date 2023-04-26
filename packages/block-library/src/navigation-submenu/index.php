@@ -125,7 +125,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	);
 
 	if ( $is_interactivity_api_enabled ) {
-		$html = '<li data-wp-context=\' { "isSubmenuOpen": false } \'' . $wrapper_attributes . '>';
+		$html = '<li data-wp-context=\' { "isMenuOpen": false, "trapFocus": false } \'' . $wrapper_attributes . '>';
 	} else {
 		$html = '<li ' . $wrapper_attributes . '>';
 	}
@@ -176,7 +176,21 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
 			if ( $is_interactivity_api_enabled ) {
-				$html .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false" data-wp-bind.aria-expanded="context.isSubmenuOpen">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+				// Once directives priorities are supported,
+				// we should be able to move the `wp-on.keydown`
+				// and `wp-on.focusout` to the parent <li> and
+				// remove it from here and the <ul>
+				$html .= '<button
+							data-wp-on.click="actions.core.navigation.openMenu"
+							data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+							data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+							aria-label="' . esc_attr( $aria_label ) . '"
+							class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle"
+							aria-expanded="false"
+							data-wp-bind.aria-expanded="context.isMenuOpen"
+						>'
+					. block_core_navigation_submenu_render_submenu_icon() .
+					'</button>';
 			} else {
 				$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 			}
@@ -184,7 +198,18 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	} else {
 		// If menus open on click, we render the parent as a button.
 		if ( $is_interactivity_api_enabled ) {
-			$html .= '<button data-wp-on.click="actions.core.navigation.openSubmenu" aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false" data-wp-bind.aria-expanded="context.isSubmenuOpen">';
+			// Once directives priorities are supported,
+			// we should be able to move the `wp-on.keydown`
+			// and `wp-on.focusout` to the parent <li> and
+			// remove it from here and the <ul>
+			$html .= '<button
+						data-wp-on.click="actions.core.navigation.openMenu"
+						data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+						aria-label="' . esc_attr( $aria_label ) . '"
+						class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+						aria-expanded="false"
+						data-wp-bind.aria-expanded="context.isMenuOpen"
+					>';
 		} else {
 			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 		}
@@ -253,8 +278,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $is_interactivity_api_enabled ) {
 			$html .= sprintf(
 				'<ul
-					data-wp-effect="effects.core.navigation.handleSubmenu" 
-					data-wp-context=\'{ "submenuButton": null }\'
+					data-wp-effect="effects.core.navigation.initModal"
+					data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+					data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
 					%s
 				>
 					%s
