@@ -29,8 +29,6 @@ import {
 	default as ScreenBlockList,
 } from './screen-block-list';
 import ScreenBlock from './screen-block';
-import ScreenTypography from './screen-typography';
-import ScreenTypographyElement from './screen-typography-element';
 import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
