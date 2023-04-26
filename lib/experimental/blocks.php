@@ -131,10 +131,12 @@ function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
 
 	// Can we void infinite loops?
 
-	if ( 'core/comment-template' === $block['parentBlock'] ) {
-		$inserted_block_markup = '<!-- wp:social-links -->
-		<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-		<!-- /wp:social-links -->';
+	if ( isset( $block['parentBlock'] ) && 'core/comment-template' === $block['parentBlock'] ) {
+		$inserted_block_markup = <<<END
+<!-- wp:social-links -->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+<!-- /wp:social-links -->
+END;
 		$inserted_blocks = parse_blocks( $inserted_block_markup );
 		$inserted_content = render_block( $inserted_blocks[0] );
 
@@ -142,9 +144,11 @@ function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
 	}
 
 	if ( $block['blockName'] === $block_name ) {
-		$inserted_block_markup = '<!-- wp:social-links -->
-		<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-		<!-- /wp:social-links -->';
+		$inserted_block_markup = <<<END
+<!-- wp:social-links -->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+<!-- /wp:social-links -->
+END;
 		$inserted_blocks = parse_blocks( $inserted_block_markup );
 		$inserted_content = render_block( $inserted_blocks[0] );
 
