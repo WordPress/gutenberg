@@ -70,6 +70,44 @@ describe( 'readConfig', () => {
 			}
 		} );
 
+		it( 'should throw a validation error if WP_SITEURL is not a valid URL', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						config: {
+							WP_SITEURL: 'test',
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain( 'must be a valid URL' );
+			}
+		} );
+
+		it( 'should throw a validation error if WP_HOME is not a valid URL', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						config: {
+							WP_SITEURL: 'test',
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain( 'must be a valid URL' );
+			}
+		} );
+
 		it( 'should infer a core config when ran from a core directory', async () => {
 			readFile.mockImplementation( () =>
 				Promise.reject( { code: 'ENOENT' } )
@@ -854,17 +892,17 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:1000/',
+							WP_TESTS_DOMAIN: 'localhost:1000',
+							WP_SITEURL: 'http://localhost:1000',
+							WP_HOME: 'http://localhost:1000',
 						},
 					},
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:2000/',
+							WP_TESTS_DOMAIN: 'localhost:2000',
+							WP_SITEURL: 'http://localhost:2000',
+							WP_HOME: 'http://localhost:2000',
 						},
 					},
 				},
@@ -878,7 +916,7 @@ describe( 'readConfig', () => {
 						port: 1000,
 						testsPort: 2000,
 						config: {
-							WP_HOME: 'http://localhost:3000/',
+							WP_HOME: 'http://localhost:3000',
 						},
 					} )
 				)
@@ -890,17 +928,17 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:3000/',
+							WP_TESTS_DOMAIN: 'localhost:1000',
+							WP_SITEURL: 'http://localhost:1000',
+							WP_HOME: 'http://localhost:3000',
 						},
 					},
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:3000/',
+							WP_TESTS_DOMAIN: 'localhost:2000',
+							WP_SITEURL: 'http://localhost:2000',
+							WP_HOME: 'http://localhost:3000',
 						},
 					},
 				},
@@ -1153,9 +1191,9 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8889/',
-				WP_HOME: 'http://localhost:8889/',
+				WP_TESTS_DOMAIN: 'localhost:8889',
+				WP_SITEURL: 'http://localhost:8889',
+				WP_HOME: 'http://localhost:8889',
 			} );
 
 			expect( config.env.development.config ).toEqual( {
@@ -1167,9 +1205,9 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8888/',
-				WP_HOME: 'http://localhost:8888/',
+				WP_TESTS_DOMAIN: 'localhost:8888',
+				WP_SITEURL: 'http://localhost:8888',
+				WP_HOME: 'http://localhost:8888',
 			} );
 		} );
 	} );

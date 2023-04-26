@@ -102,6 +102,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			<Button
 				className="edit-site-template-details__show-all-button"
 				{ ...browseAllLinkProps }
+				onClick={ () => onClose() }
 			>
 				{ template?.type === 'wp_template'
 					? __( 'Manage all templates' )

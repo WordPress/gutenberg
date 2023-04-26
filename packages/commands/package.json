@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -35,7 +35,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/private-apis": "file:../private-apis",
 		"cmdk": "^0.2.0",
-		"rememo": "^4.0.0"
+		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

@@ -2,8 +2,8 @@
  * External dependencies
  */
 import {
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	selectRangeInRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -79,7 +79,7 @@ describe( 'List block', () => {
 
 		const listItemField =
 			within( listBlock ).getByPlaceholderText( 'List' );
-		changeTextOfRichText( listItemField, 'First list item' );
+		typeInRichText( listItemField, 'First list item' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -347,7 +347,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'Two' );
+		selectRangeInRichText( listItemField, 0 );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -395,7 +395,7 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'One' );
+		selectRangeInRichText( listItemField, 0 );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -406,11 +406,11 @@ describe( 'List block', () => {
 		"<!-- wp:paragraph -->
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:paragraph -->
 		<p>One</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
 		<li>Two</li>

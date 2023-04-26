@@ -226,7 +226,11 @@ export default function DimensionsPanel( {
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'layout', 'contentSize' ], newValue )
+			immutableSet(
+				value,
+				[ 'layout', 'contentSize' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
@@ -237,7 +241,13 @@ export default function DimensionsPanel( {
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
-		onChange( immutableSet( value, [ 'layout', 'wideSize' ], newValue ) );
+		onChange(
+			immutableSet(
+				value,
+				[ 'layout', 'wideSize' ],
+				newValue || undefined
+			)
+		);
 	};
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );

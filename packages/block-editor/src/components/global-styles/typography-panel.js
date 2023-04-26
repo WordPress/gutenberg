@@ -166,7 +166,9 @@ export default function TypographyPanel( {
 			immutableSet(
 				value,
 				[ 'typography', 'fontFamily' ],
-				slug ? `var:preset|font-family|${ slug }` : newValue
+				slug
+					? `var:preset|font-family|${ slug }`
+					: newValue || undefined
 			)
 		);
 	};
@@ -188,7 +190,11 @@ export default function TypographyPanel( {
 			: newValue;
 
 		onChange(
-			immutableSet( value, [ 'typography', 'fontSize' ], actualValue )
+			immutableSet(
+				value,
+				[ 'typography', 'fontSize' ],
+				actualValue || undefined
+			)
 		);
 	};
 	const hasFontSize = () => !! value?.typography?.fontSize;
@@ -209,8 +215,8 @@ export default function TypographyPanel( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontStyle: newFontStyle,
-				fontWeight: newFontWeight,
+				fontStyle: newFontStyle || undefined,
+				fontWeight: newFontWeight || undefined,
 			},
 		} );
 	};
@@ -225,7 +231,11 @@ export default function TypographyPanel( {
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'lineHeight' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'lineHeight' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasLineHeight = () => !! value?.typography?.lineHeight;
@@ -238,7 +248,11 @@ export default function TypographyPanel( {
 	);
 	const setLetterSpacing = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'letterSpacing' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'letterSpacing' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
@@ -249,7 +263,11 @@ export default function TypographyPanel( {
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
 	const setTextColumns = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textColumns' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textColumns' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextColumns = () => !! value?.typography?.textColumns;
@@ -262,7 +280,11 @@ export default function TypographyPanel( {
 	);
 	const setTextTransform = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textTransform' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textTransform' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextTransform = () => !! value?.typography?.textTransform;
@@ -275,7 +297,11 @@ export default function TypographyPanel( {
 	);
 	const setTextDecoration = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textDecoration' ], newValue )
+			immutableSet(
+				value,
+				[ 'typography', 'textDecoration' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;

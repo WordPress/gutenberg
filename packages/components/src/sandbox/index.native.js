@@ -185,6 +185,7 @@ const Sandbox = forwardRef( function Sandbox(
 		type,
 		url,
 		onWindowEvents = {},
+		viewportProps = '',
 	},
 	ref
 ) {
@@ -213,13 +214,19 @@ const Sandbox = forwardRef( function Sandbox(
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
+
+		// Avoid comma issues with props.viewportProps.
+		const addViewportProps = viewportProps
+			.trim()
+			.replace( /(^[^,])/, ', $1' );
+
 		const htmlDoc = (
 			<html lang={ lang }>
 				<head>
 					<title>{ title }</title>
 					<meta
 						name="viewport"
-						content="width=device-width, initial-scale=1"
+						content={ `width=device-width, initial-scale=1${ addViewportProps }` }
 					></meta>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 					{ styles.map( ( rules, i ) => (

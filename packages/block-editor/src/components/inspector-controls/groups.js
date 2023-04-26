@@ -7,6 +7,7 @@ const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
 const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
 const InspectorControlsBorder = createSlotFill( 'InspectorControlsBorder' );
 const InspectorControlsColor = createSlotFill( 'InspectorControlsColor' );
+const InspectorControlsFilter = createSlotFill( 'InspectorControlsFilter' );
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
@@ -22,6 +23,7 @@ const groups = {
 	advanced: InspectorControlsAdvanced,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
+	filter: InspectorControlsFilter,
 	dimensions: InspectorControlsDimensions,
 	list: InspectorControlsListView,
 	settings: InspectorControlsDefault, // Alias for default.

@@ -5,10 +5,11 @@
  *
  * @typedef {Object} WPCommandConfig
  *
- * @property {string}   name     Command name.
- * @property {string}   label    Command label.
- * @property {string=}  group    Command group.
- * @property {Function} callback Command callback.
+ * @property {string}      name     Command name.
+ * @property {string}      label    Command label.
+ * @property {string=}     group    Command group.
+ * @property {JSX.Element} icon     Command icon.
+ * @property {Function}    callback Command callback.
  */
 
 /**
@@ -32,11 +33,12 @@
  *
  * @return {Object} action.
  */
-export function registerCommand( { name, label, callback, group = '' } ) {
+export function registerCommand( { name, label, icon, callback, group = '' } ) {
 	return {
 		type: 'REGISTER_COMMAND',
 		name,
 		label,
+		icon,
 		callback,
 		group,
 	};
