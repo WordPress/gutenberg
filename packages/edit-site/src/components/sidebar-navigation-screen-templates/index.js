@@ -127,6 +127,7 @@ export default function SidebarNavigationScreenTemplates() {
 									children={
 										config[ postType ].labels.manage
 									}
+									withChevron
 								/>
 							) }
 						</ItemGroup>
