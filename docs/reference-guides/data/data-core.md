@@ -327,7 +327,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: The ID for the fallback Navigation post.
+-   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 
