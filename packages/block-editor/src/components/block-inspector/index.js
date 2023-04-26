@@ -314,10 +314,14 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
-			const blockStyles = getBlockStyles( blockName );
-			return blockStyles && blockStyles.length > 0;
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockStyles = getBlockStyles(
+				blockName,
+				getBlockAttributes( clientId )
+			);
+			return blockStyles?.length > 0;
 		},
-		[ blockName ]
+		[ clientId, blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 

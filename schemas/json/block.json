@@ -552,6 +552,12 @@
 					"isDefault": {
 						"type": "boolean",
 						"default": false
+					},
+					"variations": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
 					}
 				},
 				"required": [ "name", "label" ],

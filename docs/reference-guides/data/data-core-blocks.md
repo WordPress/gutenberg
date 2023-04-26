@@ -85,6 +85,7 @@ _Parameters_
 
 -   _state_ `Object`: Data state.
 -   _name_ `string`: Block type name.
+-   _attributes_ `[Object]`: Block attributes. If provided, will try to find and include styles for specific block variations.
 
 _Returns_
 
@@ -245,6 +246,19 @@ _Parameters_
 _Returns_
 
 -   `(WPBlockVariation[]|void)`: Block variations.
+
+### getBlockVariationStyles
+
+Returns block variation styles by block name.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _name_ `string`: Block type name.
+
+_Returns_
+
+-   `Array?`: Block Styles.
 
 ### getCategories
 
