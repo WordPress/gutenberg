@@ -30,11 +30,13 @@
 	}
 
 	// The start blank pattern is the last and we are selecting it.
-	.block-editor-block-patterns-list__list-item:nth-last-child(2) {
+	.block-editor-block-patterns-list__list-item:nth-child(1) {
+		min-height: $grid-unit-50 * 4;
 		.block-editor-block-preview__container {
 			position: absolute;
 			padding: 0;
-			background: #f0f0f0;
+			color: var(--wp-edit-site-start-template-options-start-blank-text);
+			background: var(--wp-edit-site-start-template-options-start-blank-background);
 			min-height: $grid-unit-50 * 4;
 			&::after {
 				width: 100%;
