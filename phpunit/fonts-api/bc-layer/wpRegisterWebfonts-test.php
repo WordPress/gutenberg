@@ -6,16 +6,14 @@
  * @subpackage Fonts API
  */
 
-require_once __DIR__ . '/../wp-fonts-testcase.php';
-require_once __DIR__ . '/bc-layer-tests-dataset.php';
+require_once __DIR__ . '/fonts-bc-layer-testcase.php';
 
 /**
  * @group  fontsapi
  * @group  fontsapi-bclayer
  * @covers ::wp_register_webfonts
  */
-class Tests_Fonts_WpRegisterWebfonts extends WP_Fonts_TestCase {
-	use BC_Layer_Tests_Datasets;
+class Tests_Fonts_WpRegisterWebfonts extends Fonts_BcLayer_TestCase {
 
 	/**
 	 * @dataProvider data_deprecated_structure

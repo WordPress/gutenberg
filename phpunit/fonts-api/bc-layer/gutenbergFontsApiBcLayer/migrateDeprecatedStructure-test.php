@@ -2,20 +2,18 @@
 /**
  * Integration tests for Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure().
  *
- * @package    WordPress
+ * @package    Gutenberg
  * @subpackage Fonts API
  */
 
-require_once __DIR__ . '/../../wp-fonts-testcase.php';
-require_once __DIR__ . '/../bc-layer-tests-dataset.php';
+require_once __DIR__ . '/../fonts-bc-layer-testcase.php';
 
 /**
  * @group  fontsapi
  * @group  fontsapi-bclayer
  * @covers Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure
  */
-class Tests_Fonts_GutenbergFontsApiBcLayer_MigrateDeprecatedStructure extends WP_Fonts_TestCase {
-	use BC_Layer_Tests_Datasets;
+class Tests_Fonts_GutenbergFontsApiBcLayer_MigrateDeprecatedStructure extends Fonts_BcLayer_TestCase {
 
 	/**
 	 * @dataProvider data_deprecated_structure

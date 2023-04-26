@@ -1,21 +1,19 @@
 <?php
 /**
- * Integration tests for Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure().
+ * Integration tests for WP_Webfonts::get_font_slug().
  *
- * @package    WordPress
+ * @package    Gutenberg
  * @subpackage Fonts API
  */
 
-require_once __DIR__ . '/../../wp-fonts-testcase.php';
-require_once __DIR__ . '/../bc-layer-tests-dataset.php';
+require_once __DIR__ . '/../fonts-bc-layer-testcase.php';
 
 /**
  * @group  fontsapi
  * @group  fontsapi-bclayer
  * @covers WP_Webfonts::get_font_slug
  */
-class Tests_Fonts_WpWebfonts_GetFontSlug extends WP_Fonts_TestCase {
-	use BC_Layer_Tests_Datasets;
+class Tests_Fonts_WpWebfonts_GetFontSlug extends Fonts_BcLayer_TestCase {
 
 	/**
 	 * @dataProvider data_should_get_font_slug

@@ -7,8 +7,8 @@
  * using the previous API, it exists to prevent breakages, giving
  * developers time to upgrade their code.
  *
- * @package    WordPress
- * @subpackage Fonts API
+ * @package    Gutenberg
+ * @subpackage Fonts API's BC Layer
  * @since      X.X.X
  */
 
@@ -23,7 +23,23 @@ if ( class_exists( 'WP_Webfonts' ) ) {
  * This class exists to give extenders guidance and time to upgrade their code
  * to use the new Web Fonts API.
  */
-class WP_Webfonts extends WP_Dependencies {
+class WP_Webfonts {
+	/**
+	 * Instance of WP_Fonts.
+	 *
+	 * @var WP_Fonts
+	 */
+	public $wp_fonts;
+
+	/**
+	 * Instantiate an instance of WP_Webfonts.
+	 *
+	 * @param null|WP_Fonts $wp_fonts Optional. Instance of WP_Fonts.
+	 *                                Default uses wp_fonts().
+	 */
+	public function __construct( $wp_fonts = null ) {
+		$this->wp_fonts = ! empty( $wp_fonts ) ? $wp_fonts : wp_fonts();
+	}
 
 	/**
 	 * Gets the font slug.
@@ -92,7 +108,7 @@ class WP_Webfonts extends WP_Dependencies {
 	public function get_enqueued_webfonts() {
 		_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_fonts()->get_enqueued()' );
 
-		return $this->queue;
+		return $this->wp_fonts->queue;
 	}
 
 	/**
@@ -127,21 +143,35 @@ class WP_Webfonts extends WP_Dependencies {
 			_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_register_fonts()' );
 		}
 
-		// When font family's handle is not passed, attempt to get it from the variation.
-		if ( ! WP_Fonts_Utils::is_defined( $font_family_handle ) ) {
-			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
-			if ( $font_family ) {
-				$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
-			}
-		}
-
-		if ( empty( $font_family_handle ) ) {
+		// Bail out if no variation passed as there's not to register.
+		if ( empty( $webfont ) ) {
 			return false;
 		}
 
-		return $this->add_variation( $font_family_handle, $webfont, $variation_handle )
-			? $font_family_handle
-			: false;
+		// Restructure definition: keyed by font-family and array of variations.
+		$font = array( $webfont );
+		if ( WP_Fonts_Utils::is_defined( $font_family_handle ) ) {
+			$font = array( $font_family_handle => $font );
+		} else {
+			$font               = Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure( $font, true );
+			$font_family_handle = array_key_first( $font );
+		}
+
+		if ( empty( $font ) || empty( $font_family_handle ) ) {
+			return false;
+		}
+
+		// If the variation handle was passed, add it as variation key.
+		if ( WP_Fonts_Utils::is_defined( $variation_handle ) ) {
+			$font[ $font_family_handle ] = array( $variation_handle => $font[ $font_family_handle ][0] );
+		}
+
+		// Register with the Fonts API.
+		$handle = wp_register_fonts( $font );
+		if ( empty( $handle ) ) {
+			return false;
+		}
+		return array_pop( $handle );
 	}
 
 	/**
@@ -170,7 +200,7 @@ class WP_Webfonts extends WP_Dependencies {
 		$registered    = array();
 
 		// Find the registered font families.
-		foreach ( $this->registered as $handle => $obj ) {
+		foreach ( $this->wp_fonts->registered as $handle => $obj ) {
 			if ( ! $obj->extra['is_font_family'] ) {
 				continue;
 			}
@@ -185,48 +215,12 @@ class WP_Webfonts extends WP_Dependencies {
 		// Build the return array structure.
 		foreach ( $font_families as $font_family_handle => $variations ) {
 			foreach ( $variations as $variation_handle ) {
-				$variation_obj = $this->registered[ $variation_handle ];
+				$variation_obj = $this->wp_fonts->registered[ $variation_handle ];
 
 				$registered[ $font_family_handle ][ $variation_handle ] = $variation_obj->extra['font-properties'];
 			}
 		}
 
 		return $registered;
-	}
-
-	/**
-	 * Gets the enqueued webfonts in the original web font property structure keyed by each handle.
-	 *
-	 * @return array[]
-	 */
-	private function _get_enqueued_webfonts() {
-		$enqueued = array();
-		foreach ( $this->queue as $handle ) {
-			// Skip if not registered.
-			if ( ! isset( $this->registered[ $handle ] ) ) {
-				continue;
-			}
-
-			// Skip if already found.
-			if ( isset( $enqueued[ $handle ] ) ) {
-				continue;
-			}
-
-			$obj = $this->registered[ $handle ];
-
-			// If a variation, add it.
-			if ( ! $obj->extra['is_font_family'] ) {
-				$enqueued[ $handle ] = $obj->extra['font-properties'];
-				continue;
-			}
-
-			// If font-family, add all of its variations.
-			foreach ( $obj->deps as $variation_handle ) {
-				$obj                           = $this->registered[ $variation_handle ];
-				$enqueued[ $variation_handle ] = $obj->extra['font-properties'];
-			}
-		}
-
-		return $enqueued;
 	}
 }

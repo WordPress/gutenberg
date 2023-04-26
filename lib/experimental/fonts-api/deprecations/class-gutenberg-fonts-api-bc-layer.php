@@ -34,19 +34,23 @@ class Gutenberg_Fonts_API_BC_Layer {
 	 * Migrates deprecated fonts structure into new API data structure,
 	 * i.e. variations grouped by their font-family.
 	 *
-	 * @param array $fonts Array of fonts to migrate.
+	 * @param array $fonts               Array of fonts to migrate.
+	 * @param bool  $silence_deprecation Optional. Silences the deprecation notice. For internal use.
+	 *                                   Default false.
 	 * @return array
 	 */
-	public static function migrate_deprecated_structure( array $fonts ) {
+	public static function migrate_deprecated_structure( array $fonts, $silence_deprecation = false ) {
 		if ( ! self::is_deprecated_structure( $fonts ) ) {
 			return $fonts;
 		}
 
-		_deprecated_argument(
-			__METHOD__,
-			'14.9.1',
-			'A deprecated fonts array structure passed to wp_register_fonts(). Variations must be grouped and keyed by their font family.'
-		);
+		if ( ! $silence_deprecation ) {
+			_deprecated_argument(
+				__METHOD__,
+				'14.9.1',
+				'A deprecated fonts array structure passed to wp_register_fonts(). Variations must be grouped and keyed by their font family.'
+			);
+		}
 
 		$new_fonts = array();
 		foreach ( $fonts as $font ) {
