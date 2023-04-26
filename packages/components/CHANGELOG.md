@@ -7,6 +7,9 @@
 -   `BottomSheetCell`: Refactor away from Lodash (mobile) ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
 -   `parseStylesVariables()`: Refactor away from Lodash (mobile) ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
 -   Remove Lodash dependency from components package ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
+-   Tweak `WordPressComponent` type so `selector` property is optional ([#49960](https://github.com/WordPress/gutenberg/pull/49960)).
+-   Update `Modal` appearance on small screens ([#50039](https://github.com/WordPress/gutenberg/pull/50039)).
+-   Update the framer motion dependency to the latest version `10.11.6` ([#49822](https://github.com/WordPress/gutenberg/pull/49822)).
 
 ### Enhancements
 
@@ -17,6 +20,10 @@
 -   `Modal`: Updated spacing / dimensions of `isFullScreen` ([#49894](https://github.com/WordPress/gutenberg/pull/49894)).
 -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
 -   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
+
+### Bug Fix
+
+-   `CheckboxControl`: Add support custom IDs ([#49977](https://github.com/WordPress/gutenberg/pull/49977)).
 
 ### Documentation
 

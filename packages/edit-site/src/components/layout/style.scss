@@ -15,7 +15,7 @@
 	z-index: z-index(".edit-site-layout__hub");
 
 	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: auto;
+		width: $header-height;
 		padding-right: 0;
 	}
 
@@ -149,13 +149,20 @@
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;
-	height: 100%;
-	width: 100%;
-	border-radius: $radius-block-ui;
+	border-radius: 0;
+	height: $header-height;
+	width: $header-height;
+	overflow: hidden;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border-bottom: 1px solid transparent;
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		border-bottom-color: $gray-200;
+		transition: border-bottom-color 0.15s 0.4s ease-out;
+	}
 
 	&:hover,
 	&:active {
@@ -190,6 +197,10 @@
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
 		border-radius: $radius-block-ui;
+		height: $grid-unit-80;
+		width: $grid-unit-80;
+		justify-content: center;
+		align-items: center;
 	}
 }
 

@@ -12,6 +12,7 @@ import { RawHTML } from '@wordpress/element';
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { isContentBlock } from '../private-selectors';
 
 const {
 	getBlockName,
@@ -72,6 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	isContentLockedBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -4685,5 +4687,153 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
+	} );
+} );
+
+describe( 'isContentLockedBlock', () => {
+	isContentBlock.registry = {
+		select: jest.fn( () => ( {
+			__experimentalHasContentRoleAttribute: jest.fn( () => false ),
+		} ) ),
+	};
+
+	const baseState = {
+		settings: {},
+		blocks: {
+			byClientId: new Map(
+				Object.entries( {
+					'6926a815-c923-4daa-bc3f-7da2133b388d': {
+						clientId: '6926a815-c923-4daa-bc3f-7da2133b388d',
+						name: 'core/group',
+					},
+					'9f88f941-9984-419f-8ae7-e427c5b57513': {
+						clientId: '9f88f941-9984-419f-8ae7-e427c5b57513',
+						name: 'core/post-content',
+					},
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						name: 'core/paragraph',
+					},
+				} )
+			),
+			attributes: new Map(
+				Object.entries( {
+					'6926a815-c923-4daa-bc3f-7da2133b388d': {},
+					'9f88f941-9984-419f-8ae7-e427c5b57513': {},
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {},
+				} )
+			),
+			order: new Map(
+				Object.entries( {
+					'': [ '6926a815-c923-4daa-bc3f-7da2133b388d' ],
+					'6926a815-c923-4daa-bc3f-7da2133b388d': [
+						'9f88f941-9984-419f-8ae7-e427c5b57513',
+					],
+					'9f88f941-9984-419f-8ae7-e427c5b57513': [
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					],
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
+				} )
+			),
+			parents: new Map(
+				Object.entries( {
+					'6926a815-c923-4daa-bc3f-7da2133b388d': '',
+					'9f88f941-9984-419f-8ae7-e427c5b57513':
+						'6926a815-c923-4daa-bc3f-7da2133b388d',
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1':
+						'9f88f941-9984-419f-8ae7-e427c5b57513',
+				} )
+			),
+		},
+		blockListSettings: {
+			'6926a815-c923-4daa-bc3f-7da2133b388d': {},
+			'9f88f941-9984-419f-8ae7-e427c5b57513': {},
+			'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {},
+		},
+	};
+
+	it( 'should return false by default', () => {
+		const state = {
+			...baseState,
+		};
+		expect(
+			isContentLockedBlock(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			)
+		).toBe( false );
+	} );
+
+	it( 'should return true if editor is content locked', () => {
+		const state = {
+			...baseState,
+			settings: {
+				templateLock: 'contentOnly',
+			},
+		};
+		expect(
+			isContentLockedBlock(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			)
+		).toBe( true );
+	} );
+
+	it( 'should return true if block is content locked', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		expect(
+			isContentLockedBlock(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			)
+		).toBe( true );
+	} );
+
+	it( 'should return true if block is nested within a content locked block', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'6926a815-c923-4daa-bc3f-7da2133b388d': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		expect(
+			isContentLockedBlock(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			)
+		).toBe( true );
+	} );
+
+	it( 'should return false if block is nested within a content block', () => {
+		const state = {
+			...baseState,
+			settings: {
+				...baseState.settings,
+				contentBlockTypes: [ 'core/post-content' ],
+			},
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'6926a815-c923-4daa-bc3f-7da2133b388d': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		expect(
+			isContentLockedBlock(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			)
+		).toBe( false );
 	} );
 } );

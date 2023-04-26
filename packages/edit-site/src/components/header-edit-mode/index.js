@@ -38,7 +38,8 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
+import { unlock } from '../../private-apis';
 import PageContentBreadcrumbs from './page-content-breadcrumbs';
 
 const preventDefault = ( event ) => {
@@ -57,6 +58,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		editorCanvasView,
 		isPage,
 	} = useSelect( ( select ) => {
 		const {
@@ -91,6 +93,9 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editorCanvasView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
 			isPage: _isPage(),
 		};
 	}, [] );
@@ -121,7 +126,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasStyleBook = useHasStyleBook();
+	const hasDefaultEditorCanvasView = ! editorCanvasView;
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -142,7 +147,7 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
+			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
@@ -227,14 +232,19 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook && __( 'Style Book' ) }
-				{ ! hasStyleBook && isPage && <PageContentBreadcrumbs /> }
-				{ ! hasStyleBook && ! isPage && <DocumentActions /> }
+				{ hasDefaultEditorCanvasView && isPage && (
+					<PageContentBreadcrumbs />
+				) }
+				{ hasDefaultEditorCanvasView && ! isPage && (
+					<DocumentActions />
+				) }
+				{ ! hasDefaultEditorCanvasView &&
+					getEditorCanvasContainerTitle( editorCanvasView ) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

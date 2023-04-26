@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
 ## 1.93.0
 -   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
 

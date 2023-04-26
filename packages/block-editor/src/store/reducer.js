@@ -1829,7 +1829,7 @@ export function lastBlockInserted( state = {}, action ) {
  */
 export function temporarilyUnlockedBlock( state = null, action ) {
 	if ( action.type === 'SET_TEMPORARILY_UNLOCKED_BLOCK' ) {
-		return action.temporarilyUnlockedBlock;
+		return action.clientId;
 	}
 	return state;
 }

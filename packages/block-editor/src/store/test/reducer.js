@@ -32,6 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	temporarilyUnlockedBlock,
 } from '../reducer';
 
 const noop = () => {};
@@ -3365,6 +3366,21 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+	} );
+
+	describe( 'temporarilyUnlockedBlock', () => {
+		it( 'defaults to null', () => {
+			const state = temporarilyUnlockedBlock( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'is set when SET_TEMPORARILY_UNLOCKED_BLOCK is dispatched', () => {
+			const state = temporarilyUnlockedBlock( null, {
+				type: 'SET_TEMPORARILY_UNLOCKED_BLOCK',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+			} );
+			expect( state ).toBe( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
 		} );
 	} );
 } );
