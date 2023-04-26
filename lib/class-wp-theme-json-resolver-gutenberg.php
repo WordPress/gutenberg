@@ -512,7 +512,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$site_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$stylesheet       = $theme->get_stylesheet();
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
