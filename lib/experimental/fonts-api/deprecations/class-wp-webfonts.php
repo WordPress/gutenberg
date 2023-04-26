@@ -41,6 +41,10 @@ class WP_Webfonts extends WP_Dependencies {
 			: 'Use WP_Fonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle';
 		_deprecated_function( __METHOD__, 'X.X.X', $message );
 
+		if ( empty( $to_convert ) ) {
+			return false;
+		}
+
 		return static::_get_font_slug( $to_convert );
 	}
 
