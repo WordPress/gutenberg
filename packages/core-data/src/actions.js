@@ -835,6 +835,13 @@ export function receiveAutosaves( postId, autosaves ) {
 	};
 }
 
+/**
+ * Returns an action object signalling that the fallback Navigation
+ * Menu id has been received.
+ *
+ * @param {integer} fallback the id of the fallback Navigation Menu
+ * @return {Object} Action object.
+ */
 export function receiveNavigationFallbackId( fallback ) {
 	return {
 		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',

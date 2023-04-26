@@ -621,7 +621,15 @@ _Returns_
 
 ### receiveNavigationFallbackId
 
-Undocumented declaration.
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallback_ `integer`: the id of the fallback Navigation Menu
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### receiveThemeSupports
 
