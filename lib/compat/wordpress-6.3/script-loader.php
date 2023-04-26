@@ -99,6 +99,9 @@ if ( ! wp_is_block_theme() ) {
  * At the same time, this reduces layout shifts by inlining these styles
  * instead of printing them all in the footer.
  *
+ * NOTE: When backported to Core,
+ * this should probably be merged with the `wp_maybe_inline_styles` function.
+ *
  * This function is hooked on `render_block`.
  *
  * @param string $block_content The block content.
