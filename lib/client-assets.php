@@ -255,7 +255,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor-content',
 		gutenberg_url( 'build/block-editor/content.css' ),
-		array(),
+		array( 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
