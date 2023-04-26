@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.3.0 (2023-04-26)
+
 ### Enhancements
 
 -   License check script supports conjunctive (AND) licenses ([46801](https://github.com/WordPress/gutenberg/pull/46801)).

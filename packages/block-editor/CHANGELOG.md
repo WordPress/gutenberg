@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.0.0 (2023-04-26)
+
 ### Breaking Changes
 
 - Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
