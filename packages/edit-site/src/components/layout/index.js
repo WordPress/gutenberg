@@ -23,6 +23,7 @@ import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -68,8 +69,8 @@ export default function Layout() {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
+	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
@@ -82,10 +83,10 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				hasFixedToolbar:
+					select( preferencesStore ).get( 'fixedToolbar' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -139,19 +140,11 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>
-				<SiteHub
-					ref={ hubRef }
-					className="edit-site-layout__hub"
-					style={ {
-						width:
-							isResizingEnabled && forcedWidth
-								? forcedWidth - 48
-								: undefined,
-					} }
-				/>
+				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
 
 				<AnimatePresence initial={ false }>
 					{ isEditorPage && canvasMode === 'edit' && (
@@ -176,7 +169,7 @@ export default function Layout() {
 								ease: 'easeOut',
 							} }
 						>
-							{ canvasMode === 'edit' && <Header /> }
+							<Header />
 						</NavigableRegion>
 					) }
 				</AnimatePresence>

@@ -16,6 +16,41 @@ const {
 	BorderPanel: StylesBorderPanel,
 } = unlock( blockEditorPrivateApis );
 
+function applyFallbackStyle( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	const hasColorOrWidth = border.color || border.width;
+
+	if ( ! border.style && hasColorOrWidth ) {
+		return { ...border, style: 'solid' };
+	}
+
+	if ( border.style && ! hasColorOrWidth ) {
+		return undefined;
+	}
+
+	return border;
+}
+
+function applyAllFallbackStyles( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	if ( hasSplitBorders( border ) ) {
+		return {
+			top: applyFallbackStyle( border.top ),
+			right: applyFallbackStyle( border.right ),
+			bottom: applyFallbackStyle( border.bottom ),
+			left: applyFallbackStyle( border.left ),
+		};
+	}
+
+	return applyFallbackStyle( border );
+}
+
 export default function BorderPanel( { name, variation = '' } ) {
 	let prefixParts = [];
 	if ( variation ) {
@@ -31,6 +66,11 @@ export default function BorderPanel( { name, variation = '' } ) {
 	const settings = useSettingsForBlockElement( rawSettings, name );
 
 	const onChange = ( newStyle ) => {
+		if ( ! newStyle?.border ) {
+			setStyle( newStyle );
+			return;
+		}
+
 		// As Global Styles can't conditionally generate styles based on if
 		// other style properties have been set, we need to force split
 		// border definitions for user set global border styles. Border
@@ -42,7 +82,8 @@ export default function BorderPanel( { name, variation = '' } ) {
 		// the `border` style property. This means if the theme.json defined
 		// split borders and the user condenses them into a flat border or
 		// vice-versa we'd get both sets of styles which would conflict.
-		const { border } = newStyle;
+		const { radius, ...newBorder } = newStyle.border;
+		const border = applyAllFallbackStyles( newBorder );
 		const updatedBorder = ! hasSplitBorders( border )
 			? {
 					top: border,
@@ -57,7 +98,7 @@ export default function BorderPanel( { name, variation = '' } ) {
 					...border,
 			  };
 
-		setStyle( { ...newStyle, border: updatedBorder } );
+		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
 	return (

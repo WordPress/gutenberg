@@ -32,7 +32,7 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 				ignore_empty: true,
 			} ),
 		} ).then( ( { content } ) => setTemplateContent( content.raw ) );
-	}, [ slug ] );
+	}, [ isCustom, slug ] );
 	return templateContent;
 }
 
@@ -121,6 +121,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 			closeLabel={ __( 'Cancel' ) }
 			focusOnMount="firstElement"
 			onRequestClose={ onClose }
+			isFullScreen={ true }
 		>
 			<div className="edit-site-start-template-options__modal-content">
 				<PatternSelection
@@ -146,28 +147,28 @@ export default function StartTemplateOptions() {
 	const [ modalState, setModalState ] = useState(
 		START_TEMPLATE_MODAL_STATES.INITIAL
 	);
-	const { shouldOpenModel, slug, isCustom, postType } = useSelect(
+	const { shouldOpenModal, slug, isCustom, postType } = useSelect(
 		( select ) => {
 			const { getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
 			const _postType = getEditedPostType();
 			const postId = getEditedPostId();
-			const {
-				__experimentalGetDirtyEntityRecords,
-				getEditedEntityRecord,
-			} = select( coreStore );
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
 				_postType,
 				postId
 			);
-
-			const hasDirtyEntityRecords =
-				__experimentalGetDirtyEntityRecords().length > 0;
+			const hasEdits = hasEditsForEntityRecord(
+				'postType',
+				_postType,
+				postId
+			);
 
 			return {
-				shouldOpenModel:
-					! hasDirtyEntityRecords &&
+				shouldOpenModal:
+					! hasEdits &&
 					'' === templateRecord.content &&
 					'wp_template' === _postType &&
 					! select( preferencesStore ).get(
@@ -184,7 +185,7 @@ export default function StartTemplateOptions() {
 
 	if (
 		( modalState === START_TEMPLATE_MODAL_STATES.INITIAL &&
-			! shouldOpenModel ) ||
+			! shouldOpenModal ) ||
 		modalState === START_TEMPLATE_MODAL_STATES.CLOSED
 	) {
 		return null;

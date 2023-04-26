@@ -8,7 +8,7 @@ import {
 	getBlock,
 	within,
 	getEditorHtml,
-	changeTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -71,7 +71,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -132,7 +132,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -179,7 +179,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -228,7 +228,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -275,7 +275,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -322,7 +322,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -368,7 +368,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -405,7 +405,7 @@ describe( 'Block Actions Menu', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );

@@ -42,6 +42,7 @@ import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
 import ScreenEffects from './screen-effects';
+import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -239,7 +240,7 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 	);
 }
 
-function GlobalStylesStyleBook( { onClose } ) {
+function GlobalStylesStyleBook() {
 	const navigator = useNavigator();
 	const { path } = navigator.location;
 	return (
@@ -257,7 +258,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
-			onClose={ onClose }
 		/>
 	);
 }
@@ -296,9 +296,13 @@ function GlobalStylesBlockLink() {
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
-function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+function GlobalStylesUI() {
 	const blocks = getBlockTypes();
-
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -343,8 +347,8 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 					/>
 				);
 			} ) }
-			{ isStyleBookOpened && (
-				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
+			{ 'style-book' === editorCanvasContainerView && (
+				<GlobalStylesStyleBook />
 			) }
 
 			<GlobalStylesActionMenu />

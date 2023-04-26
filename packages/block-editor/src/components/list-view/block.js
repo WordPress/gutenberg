@@ -125,8 +125,13 @@ function ListViewBlock( {
 		blockTitle
 	);
 
-	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
-		useListViewContext();
+	const {
+		isTreeGridMounted,
+		expand,
+		collapse,
+		BlockSettingsMenu,
+		listViewInstanceId,
+	} = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -237,7 +242,7 @@ function ListViewBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
-			id={ `list-view-block-${ clientId }` }
+			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
 			data-expanded={ canExpand ? isExpanded : undefined }
 			ref={ rowRef }

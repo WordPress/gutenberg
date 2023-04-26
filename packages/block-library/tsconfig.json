@@ -26,6 +26,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../url" },
