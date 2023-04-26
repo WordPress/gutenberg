@@ -63,13 +63,13 @@ function render_block_core_image( $attributes, $content ) {
 
 		return <<<HTML
 			<div class="wp-lightbox-container"
+				 data-wp-island=''
 				 data-wp-context='{ "core": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } }'>
 					<button aria-haspopup='dialog' aria-description='opens lightbox' data-wp-on.click='actions.core.showLightbox'>
 						$body_content
 					</button>
 					<div data-wp-portal="body" class="wp-lightbox-overlay"
 						 aria-hidden="true"
-						 data-wp-attribute.aria-hidden="context.core.lightboxEnabled"
 						 data-wp-class.initialized="context.core.initialized"
 						 data-wp-class.active="context.core.lightboxEnabled"
 						 data-wp-init.hideLightboxOnEsc='actions.core.hideLightboxOnEsc'
@@ -103,6 +103,13 @@ function render_block_core_image( $attributes, $content ) {
  * Registers the `core/image` block on server.
  */
 function register_block_core_image() {
+
+	wp_enqueue_script(
+		'interactivity-image',
+		plugins_url('../interactive-blocks/image.min.js', __FILE__ ),
+		array( 'interactivity-runtime' )
+	);
+
 	register_block_type_from_metadata(
 		__DIR__ . '/image',
 		array(
