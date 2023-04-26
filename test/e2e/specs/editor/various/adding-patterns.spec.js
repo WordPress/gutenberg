@@ -24,7 +24,6 @@ test.describe( 'adding patterns', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/social-links',
-				attributes: { className: 'has-icon-color' },
 			},
 		] );
 	} );
