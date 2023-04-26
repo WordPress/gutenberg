@@ -10,15 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-// /**
-//  * Registers the Webfonts REST API routes.
-//  */
-// function gutenberg_register_webfonts_rest_api() {
-// 	$webfonts_rest_api = new WP_Webfonts_Rest_API();
-// 	$webfonts_rest_api->register_routes();
-// }
-// add_action( 'rest_api_init', 'gutenberg_register_webfonts_rest_api' );
-
 /**
  * Registers the customizer nonces REST API routes.
  */

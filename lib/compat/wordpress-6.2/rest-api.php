@@ -6,15 +6,6 @@
  */
 
 /**
- * Registers the gutenberg global styles REST API routes.
- */
-function gutenberg_register_rest_global_styles() {
-	$global_styles = new Gutenberg_REST_Global_Styles_Controller();
-	$global_styles->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_global_styles' );
-
-/**
  * Registers the block pattern categories REST API routes.
  */
 function gutenberg_register_rest_block_pattern_categories() {
