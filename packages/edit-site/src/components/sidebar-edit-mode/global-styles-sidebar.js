@@ -18,20 +18,19 @@ import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../private-apis';
 
 export default function GlobalStylesSidebar() {
-	const { shouldDisableStyleBook, isStyleBookOpened } = useSelect(
+	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea } = select( interfaceStore );
 			const _isVisualEditorMode =
 				'visual' === select( editSiteStore ).getEditorMode();
 
 			return {
-				isVisualEditorMode: _isVisualEditorMode,
 				isStyleBookOpened:
 					'style-book' ===
 					unlock(
 						select( editSiteStore )
 					).getEditorCanvasContainerView(),
-				shouldDisableStyleBook:
+				shouldClearCanvasContainerView:
 					'edit-site/global-styles' !==
 						getActiveComplementaryArea( 'core/edit-site' ) ||
 					! _isVisualEditorMode,
@@ -44,10 +43,10 @@ export default function GlobalStylesSidebar() {
 		useDispatch( editSiteStore )
 	);
 	useEffect( () => {
-		if ( shouldDisableStyleBook ) {
+		if ( shouldClearCanvasContainerView ) {
 			setEditorCanvasContainerView( undefined );
 		}
-	}, [ shouldDisableStyleBook ] );
+	}, [ shouldClearCanvasContainerView ] );
 
 	return (
 		<DefaultSidebar
@@ -67,7 +66,7 @@ export default function GlobalStylesSidebar() {
 							icon={ seen }
 							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
-							disabled={ shouldDisableStyleBook }
+							disabled={ shouldClearCanvasContainerView }
 							onClick={ () =>
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
