@@ -57,13 +57,17 @@ function useSlotRegistry() {
 	}, [] );
 
 	const registerFill = useCallback( ( name, ref ) => {
-		fills.current.set(
-			name,
-			valRef( [ ...( fills.current.get( name ) || [] ), ref ] )
+		const slot = slots.current.get( name );
+		ref.current.order = ref.current.order ?? 10;
+		const newRef = [ ...( fills.current.get( name ) || [] ), ref ].sort(
+			( a, b ) => a.current.order - b.current.order
 		);
+		fills.current.set( name, valRef( newRef ) );
+		slot?.fillProps?.rerenderSlot();
 	}, [] );
 
 	const unregisterFill = useCallback( ( name, ref ) => {
+		const slot = slots.current.get( name );
 		if ( fills.current.get( name ) ) {
 			fills.current.set(
 				name,
@@ -74,6 +78,7 @@ function useSlotRegistry() {
 				)
 			);
 		}
+		// slot?.fillProps?.rerenderSlot();
 	}, [] );
 
 	// Memoizing the return value so it can be directly passed to Provider value

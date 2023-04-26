@@ -28,9 +28,9 @@ function useForceUpdate() {
 	};
 }
 
-export default function Fill( { name, children } ) {
+export default function Fill( { name, children, order } ) {
 	const { registerFill, unregisterFill, ...slot } = useSlot( name );
-	const ref = useRef( { rerender: useForceUpdate() } );
+	const ref = useRef( { order, rerender: useForceUpdate() } );
 
 	useEffect( () => {
 		// We register fills so we can keep track of their existence.

@@ -17,15 +17,73 @@ import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo from '../plugin-post-status-info';
+import {
+	Slot as PluginPostStatusInfoSlot,
+	Fill as PluginPostStatusInfoFill,
+} from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
 import PostTemplate from '../post-template';
 import PostURL from '../post-url';
+
+function One() {
+	return (
+		<PluginPostStatusInfoFill order={ 1 }>
+			<div>One</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Two() {
+	return (
+		<PluginPostStatusInfoFill order={ 2 }>
+			<div>Two</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Three() {
+	return (
+		<PluginPostStatusInfoFill order={ 3 }>
+			<div>Three</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Four() {
+	return (
+		<PluginPostStatusInfoFill order={ 4 }>
+			<div>Four</div>
+		</PluginPostStatusInfoFill>
+	);
+}
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-status';
+
+const PostStatusTrashFill = () => {
+	return (
+		<PluginPostStatusInfoFill order={ 99 }>
+			<PostTrash />
+		</PluginPostStatusInfoFill>
+	);
+};
+const PostStatusInfoFill = () => {
+	return (
+		<PluginPostStatusInfoFill order={ 2 }>
+			<PostVisibility />
+			<PostSchedule />
+			<PostTemplate />
+			<PostURL />
+			<PostSticky />
+			<PostPendingStatus />
+			<PostFormat />
+			<PostSlug />
+			<PostAuthor />
+		</PluginPostStatusInfoFill>
+	);
+};
 
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
@@ -35,23 +93,13 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<PluginPostStatusInfo.Slot>
-				{ ( fills ) => (
-					<>
-						<PostVisibility />
-						<PostSchedule />
-						<PostTemplate />
-						<PostURL />
-						<PostSticky />
-						<PostPendingStatus />
-						<PostFormat />
-						<PostSlug />
-						<PostAuthor />
-						{ fills }
-						<PostTrash />
-					</>
-				) }
-			</PluginPostStatusInfo.Slot>
+			<Four />
+			<One />
+			<Two />
+			<Three />
+			<PostStatusTrashFill />
+			<PostStatusInfoFill />
+			<PluginPostStatusInfoSlot bubblesVirtually />
 		</PanelBody>
 	);
 }
