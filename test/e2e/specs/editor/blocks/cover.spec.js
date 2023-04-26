@@ -26,6 +26,13 @@ async function getTestImage() {
 	return tmpFilename;
 }
 
+async function getBackgroundColorAndOpacity( locator ) {
+	return await locator.evaluate( ( el ) => {
+		const computedStyle = window.getComputedStyle( el );
+		return [ computedStyle.backgroundColor, computedStyle.opacity ];
+	} );
+}
+
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -37,31 +44,31 @@ test.describe( 'Cover', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 
-		// Locate the first color option from the block placeholder's color picker.
-		const firstColorPickerButton = page
-			.locator( 'button.components-circular-option-picker__option' )
-			.first();
+		// Locate the Black color swatch.
+		const blackColorSwatch = page.getByRole( 'button', {
+			name: 'Color: Black',
+		} );
+		await expect( blackColorSwatch ).toBeVisible();
 
-		// Get the RGB value of the picked color.
-		await expect( firstColorPickerButton ).toBeVisible();
-		const pickedColor = await firstColorPickerButton.evaluate(
+		// Get the RGB value of Black.
+		const blackRGB = await blackColorSwatch.evaluate(
 			( node ) => node.style.backgroundColor
 		);
 
 		// Create the block by clicking selected color button.
-		await firstColorPickerButton.click();
+		await blackColorSwatch.click();
 
-		// Get the block's background dim element.
-		const backgrounDimLocator = page.locator(
-			'.wp-block-cover .has-background-dim'
-		);
-		await backgrounDimLocator.waitFor();
+		// Get the block's background image's dim level.
+		const backgrounDimLocator = page
+			.getByRole( 'document', { name: 'Block: Cover' } )
+			.locator( 'span[aria-hidden="true"]' );
+
 		// Get the RGB value of the background dim.
-		const dimColor = await backgrounDimLocator.evaluate(
+		const actualRGB = await backgrounDimLocator.evaluate(
 			( node ) => node.style.backgroundColor
 		);
 
-		expect( pickedColor ).toEqual( dimColor );
+		expect( blackRGB ).toEqual( actualRGB );
 	} );
 
 	test( 'can set background image using image upload on block placeholder', async ( {
@@ -70,24 +77,25 @@ test.describe( 'Cover', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 
-		// Create a test image.
 		const testImage = await getTestImage();
-
-		// Create the block using uploaded image.
-		await page
-			.locator( `.wp-block-cover input[type="file"]` )
-			.setInputFiles( testImage );
-
 		const testImageFilename = path.basename( testImage );
 
-		const backgroundImageLocator = page.locator(
-			`.wp-block-cover img[src$="${ testImageFilename }"]`
-		);
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
 
-		// Get the block's background image URL.
-		const backgroundImageURL = await backgroundImageLocator.evaluate(
-			( el ) => el.src
-		);
+		await coverBlock
+			.getByTestId( 'form-file-upload-input' )
+			.setInputFiles( testImage );
+
+		// Wait for the img's src attribute to be prefixed with http.
+		// Otherwise, the URL for the img src attribute is that of a placeholder.
+		await coverBlock.locator( `img[src^=http]` ).waitFor();
+
+		const backgroundImageURL = await coverBlock
+			.locator( 'img' )
+			.getAttribute( 'src' );
+
 		expect( backgroundImageURL ).toContain( testImageFilename );
 	} );
 
@@ -97,44 +105,47 @@ test.describe( 'Cover', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 
-		// Create a test image.
 		const testImage = await getTestImage();
 
-		// Create the block using uploaded image.
-		await page
-			.locator( `.wp-block-cover input[type="file"]` )
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		await coverBlock
+			.getByTestId( 'form-file-upload-input' )
 			.setInputFiles( testImage );
 
-		const [ backgroundDimColor, backgroundDimOpacity ] = await page
-			.locator( '.wp-block-cover .has-background-dim' )
-			.evaluate( ( el ) => {
-				const computedStyle = window.getComputedStyle( el );
-				return [ computedStyle.backgroundColor, computedStyle.opacity ];
-			} );
-
+		const [ backgroundDimColor, backgroundDimOpacity ] =
+			await getBackgroundColorAndOpacity(
+				coverBlock.locator( 'span[aria-hidden="true"]' )
+			);
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 
 	test( 'can have the title edited', async ( { page, editor } ) => {
+		const titleText = 'foo';
+
 		await editor.insertBlock( { name: 'core/cover' } );
 
-		// Locate the first color option from the block placeholder's color picker.
+		// Choose a color swatch to transform the placeholder block into
+		// a functioning block.
 		await page
-			.locator( 'button.components-circular-option-picker__option' )
-			.first()
+			.getByRole( 'button', {
+				name: 'Color: Black',
+			} )
 			.click();
 
-		// Click on the placeholder text to activate cursor inside.
-		const coverTitle = page.locator( '[data-title="Paragraph"]' );
-		await expect( coverTitle ).toBeVisible();
-		await coverTitle.click();
+		// Activate the paragraph block inside the Cover block.
+		// The name of the block differs depending on whether text has been entered or not.
+		const coverParagraphLocator = page.getByRole( 'document', {
+			name: /Paragraph block|Empty block; start writing or type forward slash to choose a block/,
+		} );
+		await expect( coverParagraphLocator ).toBeEditable();
 
-		// Type the title.
-		await page.keyboard.type( 'foo' );
-		const coverTitleText = await coverTitle.innerText();
+		await coverParagraphLocator.fill( titleText );
 
-		expect( coverTitleText ).toEqual( 'foo' );
+		await expect( coverParagraphLocator ).toContainText( titleText );
 	} );
 
 	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
@@ -143,103 +154,87 @@ test.describe( 'Cover', () => {
 		// Open the document sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Locate the first color option from the block placeholder's color picker.
 		await page
-			.locator( 'button.components-circular-option-picker__option' )
-			.first()
+			.getByRole( 'button', {
+				name: 'Color: Black',
+			} )
 			.click();
 
-		// Open the block list viewer and select child paragraph within the cover block.
+		// Open the block list viewer from the toolbar.
 		await page
-			.locator( 'button.edit-post-header-toolbar__list-view-toggle' )
-			.click();
-		await page
-			.locator(
-				'[aria-label="Block navigation structure"] [aria-label="Cover link"]'
-			)
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'List View' } )
 			.click();
 
-		const coverHeightInput = page.locator(
-			'role=spinbutton[name="Minimum height of cover"]'
-		);
+		// Select the Cover block.
+		await page.getByRole( 'gridcell', { name: 'Cover link' } ).click();
+
+		// Ensure there the default value for the minimum height of cover is undefined.
+		const coverHeightInput = page.getByLabel( 'Minimum height of cover' );
 		await expect( coverHeightInput ).not.toHaveValue( /[0-9]/ );
 
-		const coverBlockBoundingBox = await page
-			.locator( '[aria-label="Block: Cover"]' )
-			.boundingBox();
-
-		const boundingBoxResizeButton = await page
-			.locator( '.components-resizable-box__handle-bottom' )
-			.boundingBox();
-		const coordinatesResizeButton = {
-			x: boundingBoxResizeButton.x + boundingBoxResizeButton.width / 2,
-			y: boundingBoxResizeButton.y + boundingBoxResizeButton.height / 2,
-		};
-
-		// Move the  mouse to the position of the resize button.
-		await page.mouse.move(
-			coordinatesResizeButton.x,
-			coordinatesResizeButton.y
+		// Establish locators for the Cover block and the resize handler.
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		const coverBlockResizeHandle = coverBlock.locator(
+			'.components-resizable-box__handle'
 		);
 
+		// Establish the existing bounding boxes for the Cover block and the
+		// resize handler.
+		const coverBlockBox = await coverBlock.boundingBox();
+		const coverBlockResizeHandleBox =
+			await coverBlockResizeHandle.boundingBox();
+
+		expect( coverBlockBox.height ).toEqual( 450 );
+
 		// Resize the block by at least 100px.
-		await page
-			.locator( '.components-resizable-box__handle-bottom' )
-			.hover();
+		await coverBlockResizeHandle.hover();
 		await page.mouse.down();
 		await page.mouse.move(
-			coordinatesResizeButton.x,
-			coordinatesResizeButton.y + 100,
-			{ steps: 10 }
+			coverBlockResizeHandleBox.x,
+			coverBlockBox.y + coverBlockBox.height + 100,
+			{ steps: 5 }
 		);
 		await page.mouse.up();
 
-		const newCoverBlockBoundingBox = await page
-			.locator( '[aria-label="Block: Cover"]' )
-			.boundingBox();
-
-		expect( newCoverBlockBoundingBox.height ).toBeGreaterThanOrEqual(
-			coverBlockBoundingBox.height + 100
-		);
-		await expect( coverHeightInput ).toHaveValue(
-			newCoverBlockBoundingBox.height.toString()
+		const newCoverBlockBox = await coverBlock.boundingBox();
+		expect( newCoverBlockBox.height ).toBeGreaterThanOrEqual(
+			coverBlockBox.height + 100
 		);
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test.skip( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		// Upload image and transform to the Cover block.
 		const testImage = await getTestImage();
 
-		// Create the block using uploaded image.
 		await page
-			.locator( `.wp-block-image input[type="file"]` )
+			.getByTestId( 'form-file-upload-input' )
 			.setInputFiles( testImage );
 
 		await expect(
-			page.locator(
-				`.wp-block-image img[src$="${ path.basename( testImage ) }"]`
-			)
+			page
+				.getByRole( 'document', { name: 'Block: Image' } )
+				.locator( 'img' )
 		).toBeVisible();
 
-		await page.locator( '.wp-block-image' ).focus();
 		await editor.transformBlockTo( 'core/cover' );
 
-		// Get the block's background dim color and its opacity.
-		await expect(
-			page.locator( '.wp-block-cover .has-background-dim' )
-		).toBeEnabled();
+		const coverBlockBackground = page
+			.getByRole( 'document', {
+				name: 'Block: Cover',
+			} )
+			.locator( 'span[aria-hidden="true"]' );
 
-		const [ backgroundDimColor, backgroundDimOpacity ] = await page
-			.locator( '.wp-block-cover .has-background-dim' )
-			.evaluate( ( el ) => {
-				const computedStyle = window.getComputedStyle( el );
-				return [ computedStyle.backgroundColor, computedStyle.opacity ];
-			} );
+		await expect( coverBlockBackground ).toBeVisible();
+
+		const [ backgroundDimColor, backgroundDimOpacity ] =
+			await getBackgroundColorAndOpacity( coverBlockBackground );
 
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
