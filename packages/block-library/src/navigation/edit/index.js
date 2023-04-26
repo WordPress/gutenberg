@@ -220,10 +220,10 @@ function Navigation( {
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
 	const { navigationFallback } = useSelect( ( select ) => {
-		const { getNavigationFallback } = select( coreStore );
+		const { getNavigationFallbackId } = select( coreStore );
 		return {
 			navigationFallback:
-				ref || hasUnsavedBlocks ? null : getNavigationFallback(),
+				ref || hasUnsavedBlocks ? null : getNavigationFallbackId(),
 		};
 	}, [] );
 

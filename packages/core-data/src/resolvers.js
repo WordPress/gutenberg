@@ -526,16 +526,18 @@ export const getBlockPatternCategories =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 	};
 
-export const getNavigationFallback =
+export const getNavigationFallbackId =
 	() =>
 	async ( { dispatch } ) => {
 		const fallback = await apiFetch( {
-			path: '/wp-block-editor/v1/navigation-fallbacks?_embed',
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
+				_embed: true,
+			} ),
 		} );
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallback( fallback );
+		dispatch.receiveNavigationFallbackId( fallback );
 
 		if ( record ) {
 			dispatch.receiveEntityRecords(

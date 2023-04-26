@@ -835,7 +835,7 @@ export function receiveAutosaves( postId, autosaves ) {
 	};
 }
 
-export function receiveNavigationFallback( fallback ) {
+export function receiveNavigationFallbackId( fallback ) {
 	return {
 		type: 'RECEIVE_NAVIGATION_FALLBACK',
 		fallback,

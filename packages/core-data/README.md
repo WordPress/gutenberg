@@ -106,7 +106,7 @@ _Returns_
 
 -   `Object`: Action object.
 
-### receiveNavigationFallback
+### receiveNavigationFallbackId
 
 Undocumented declaration.
 
@@ -486,7 +486,7 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
-### getNavigationFallback
+### getNavigationFallbackId
 
 Retrieve the fallback Navigation.
 
