@@ -56,6 +56,7 @@ function _gutenberg_get_iframed_editor_assets() {
 
 	ob_start();
 	wp_print_styles();
+	wp_print_fonts();
 	$styles = ob_get_clean();
 
 	ob_start();
