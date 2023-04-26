@@ -196,7 +196,7 @@ export function MediaPlaceholder( {
 				( block.name === 'core/image' ||
 					block.name === 'core/audio' ||
 					block.name === 'core/video' ) &&
-				block.attributes.src
+				block.attributes.url
 					? [ block ]
 					: recursivelyFindMediaFromBlocks( block.innerBlocks )
 			);
