@@ -32,6 +32,8 @@ describe( 'iframed inline styles', () => {
 	} );
 
 	it( 'should load inline styles in iframe', async () => {
+		expect( console ).toHaveWarned();
+
 		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
