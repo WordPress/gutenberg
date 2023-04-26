@@ -82,7 +82,7 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
+				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
 					if ( disableOpenOnArrowDown ) {
 						return;
 					}
@@ -111,18 +111,22 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 					<Toggle
 						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ ( event ) => {
-							onToggle( event );
-							if ( mergedToggleProps.onClick ) {
-								mergedToggleProps.onClick( event );
-							}
-						} }
-						onKeyDown={ ( event ) => {
-							openOnArrowDown( event );
-							if ( mergedToggleProps.onKeyDown ) {
-								mergedToggleProps.onKeyDown( event );
-							}
-						} }
+						onClick={
+							( ( event ) => {
+								onToggle();
+								if ( mergedToggleProps.onClick ) {
+									mergedToggleProps.onClick( event );
+								}
+							} ) as React.MouseEventHandler< HTMLButtonElement >
+						}
+						onKeyDown={
+							( ( event ) => {
+								openOnArrowDown( event );
+								if ( mergedToggleProps.onKeyDown ) {
+									mergedToggleProps.onKeyDown( event );
+								}
+							} ) as React.KeyboardEventHandler< HTMLButtonElement >
+						}
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
