@@ -344,4 +344,140 @@ trait BC_Layer_Tests_Datasets {
 			),
 		);
 	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_return_registered_webfonts() {
+		return array(
+			'Single variation'       => array(
+				'fonts'    => array(
+					'Merriweather' => array(
+						array(
+							'font-family' => 'Merriweather',
+							'font-style'  => 'normal',
+							'font-weight' => '400',
+							'src'         => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+						),
+					),
+				),
+				'expected' => array(
+					'merriweather' => array(
+						'merriweather-400-normal' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Merriweather',
+							'font-style'   => 'normal',
+							'font-weight'  => '400',
+							'font-display' => 'fallback',
+							'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+						),
+					),
+				),
+			),
+			'2 variations'           => array(
+				'fonts'    => array(
+					'Source Serif Pro' => array(
+						'source-serif-pro-200-900-normal' => array(
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'normal',
+							'font-weight'  => '200 900',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+						),
+						'source-serif-pro-200-900-italic' => array(
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'italic',
+							'font-weight'  => '200 900',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+						),
+					),
+				),
+				'expected' => array(
+					'source-serif-pro' => array(
+						'source-serif-pro-200-900-normal' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'normal',
+							'font-weight'  => '200 900',
+							'font-display' => 'fallback',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+						),
+						'source-serif-pro-200-900-italic' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'italic',
+							'font-weight'  => '200 900',
+							'font-display' => 'fallback',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+						),
+					),
+				),
+			),
+			'Multiple font families' => array(
+				'fonts'    => array(
+					'Merriweather'     => array(
+						array(
+							'font-family' => 'Merriweather',
+							'font-style'  => 'normal',
+							'font-weight' => '400',
+							'src'         => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+						),
+					),
+					'Source Serif Pro' => array(
+						'source-serif-pro-200-900-normal' => array(
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'normal',
+							'font-weight'  => '200 900',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+						),
+						'source-serif-pro-200-900-italic' => array(
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'italic',
+							'font-weight'  => '200 900',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+						),
+					),
+				),
+				'expected' => array(
+					'merriweather'     => array(
+						'merriweather-400-normal' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Merriweather',
+							'font-style'   => 'normal',
+							'font-weight'  => '400',
+							'font-display' => 'fallback',
+							'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+						),
+					),
+					'source-serif-pro' => array(
+						'source-serif-pro-200-900-normal' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'normal',
+							'font-weight'  => '200 900',
+							'font-display' => 'fallback',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+						),
+						'source-serif-pro-200-900-italic' => array(
+							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
+							'font-style'   => 'italic',
+							'font-weight'  => '200 900',
+							'font-display' => 'fallback',
+							'font-stretch' => 'normal',
+							'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+						),
+					),
+				),
+			),
+		);
+	}
 }
