@@ -27,7 +27,7 @@ remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
  * }
  */
 function _gutenberg_get_iframed_editor_assets() {
-	global $wp_styles, $wp_scripts;
+	global $wp_styles, $wp_scripts, $pagenow;
 
 	// Keep track of the styles and scripts instance to restore later.
 	$current_wp_styles  = $wp_styles;
@@ -45,8 +45,17 @@ function _gutenberg_get_iframed_editor_assets() {
 	// We do not need reset styles for the iframed editor.
 	$wp_styles->done = array( 'wp-reset-editor-styles' );
 
-	wp_enqueue_style( 'wp-edit-blocks' );
 	wp_enqueue_script( 'wp-polyfill' );
+	// Enqueue the `editorStyle` handles for all core block, and dependencies.
+	wp_enqueue_style( 'wp-edit-blocks' );
+
+	if ( 'site-editor.php' === $pagenow ) {
+		wp_enqueue_style( 'wp-edit-site' );
+	}
+
+	if ( current_theme_supports( 'wp-block-styles' ) ) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
 
 	// We don't want to load EDITOR scripts in the iframe, only enqueue
 	// front-end assets for the content.
