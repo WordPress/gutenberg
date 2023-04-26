@@ -512,6 +512,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$site_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
+		$post_name = 'wp-global-styles-site';
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
@@ -522,7 +523,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
-			'name'                   => 'wp-global-styles-site',
+			'name'                   => $post_name,
 		);
 
 		$global_style_query = new WP_Query();
@@ -536,7 +537,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'post_status'  => 'publish',
 					'post_title'   => 'Custom Styles Site', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'post_type'    => $post_type_filter,
-					'post_name'    => 'wp-global-styles-site',
+					'post_name'    => $post_name,
 				),
 				true
 			);
