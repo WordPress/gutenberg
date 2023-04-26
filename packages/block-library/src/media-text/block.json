@@ -89,6 +89,9 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"allowedBlocks": {
+			"type": "array"
 		}
 	},
 	"supports": {
