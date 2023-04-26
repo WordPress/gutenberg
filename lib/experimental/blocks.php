@@ -112,12 +112,15 @@ function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
 	$block_name = 'core/comment-content';
 	$block_position = 'after'; // Child blocks could be a bit trickier.
 
-	// TODO: Parse actually inserted block.
-	$inserted_content = 'LIKE';
-
 	// Can we void infinite loops?
 
 	if ( $block['blockName'] === $block_name ) {
+		$inserted_block_markup = '<!-- wp:social-links -->
+		<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+		<!-- /wp:social-links -->';
+		$inserted_blocks = parse_blocks( $inserted_block_markup );
+		$inserted_content = render_block( $inserted_blocks[0] );
+
 		if ( 'before' === $block_position ) {
 			$block_content = $inserted_content . $block_content;
 		} elseif ( 'after' === $block_position ) {
