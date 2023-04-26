@@ -142,12 +142,13 @@ function canvasMode( state = 'init', action ) {
 
 /**
  * Reducer used to track the site editor canvas container view.
- * This could be `'init'` (the visual block editor), `'style-book'` (the style book).
+ * Default is `undefined`, denoting the default, visual block editor.
+ * This could be, for example, `'style-book'` (the style book).
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  */
-function editorCanvasContainerView( state = 'init', action ) {
+function editorCanvasContainerView( state = undefined, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
 			return action.view;

@@ -122,7 +122,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasDefaultEditorCanvasView = 'init' === editorCanvasView;
+	const hasDefaultEditorCanvasView = ! editorCanvasView;
 
 	const isFocusMode = templateType === 'wp_template_part';
 

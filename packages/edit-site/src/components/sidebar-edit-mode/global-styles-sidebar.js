@@ -31,7 +31,7 @@ export default function GlobalStylesSidebar() {
 
 	useEffect( () => {
 		if ( editorMode !== 'visual' ) {
-			setEditorCanvasContainerView( 'init' );
+			setEditorCanvasContainerView( undefined );
 		}
 	}, [ editorMode ] );
 
@@ -58,7 +58,7 @@ export default function GlobalStylesSidebar() {
 							disabled={ editorMode !== 'visual' }
 							onClick={ () =>
 								setEditorCanvasContainerView(
-									isStyleBookOpened ? 'init' : 'style-book'
+									isStyleBookOpened ? undefined : 'style-book'
 								)
 							}
 						/>

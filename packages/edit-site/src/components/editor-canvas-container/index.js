@@ -62,7 +62,7 @@ function EditorCanvasContainer( {
 	);
 	function onCloseContainer() {
 		onClose();
-		setEditorCanvasContainerView( 'init' );
+		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
 
