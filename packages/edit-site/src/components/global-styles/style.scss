@@ -176,3 +176,57 @@
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
 }
+
+.edit-site-global-styles-screen-revisions {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-revisions__revisions-list {
+	list-style: none;
+	margin: 0;
+	li {
+		margin-bottom: $grid-unit-20;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__revision-item {
+	width: 100%;
+	height: auto;
+	&.is-current {
+		border: 1px solid $black;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__button {
+	justify-content: center;
+}
+
+.edit-site-global-styles-screen-revisions__description {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	grid-template-rows: 1fr 1fr;
+	gap: $grid-unit-05 $grid-unit-10;
+	grid-auto-flow: row;
+	align-items: start;
+	justify-items: start;
+	grid-template-areas:
+		"edit-site-global-styles-screen-revisions__avatar ."
+		"edit-site-global-styles-screen-revisions__avatar .";
+	.edit-site-global-styles-screen-revisions__avatar {
+		grid-area: edit-site-global-styles-screen-revisions__avatar;
+		width: 24px;
+		height: 24px;
+		position: relative;
+		overflow: hidden;
+		border-radius: 50%;
+		img {
+			display: inline;
+			margin: 0 auto;
+			height: 100%;
+			width: auto;
+		}
+	}
+	.edit-site-global-styles-screen-revisions__date {
+		font-size: 11px;
+	}
+}

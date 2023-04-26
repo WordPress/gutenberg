@@ -180,7 +180,7 @@ export const getEntityRecords =
 
 			let records = Object.values( await apiFetch( { path } ) );
 			// If we request fields but the result doesn't contain the fields,
-			// explicitely set these fields as "undefined"
+			// explicitly set these fields as "undefined"
 			// that way we consider the query "fullfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
@@ -499,6 +499,50 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 			variations
 		);
 	};
+
+export const __experimentalGetCurrentThemeGlobalStylesRevisions =
+	() =>
+	async ( { resolveSelect, dispatch } ) => {
+		const globalStylesId =
+			await resolveSelect.__experimentalGetCurrentGlobalStylesId();
+		const record = globalStylesId
+			? await resolveSelect.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+			  )
+			: undefined;
+		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+
+		if ( revisionsURL ) {
+			const resetRevisions = await apiFetch( {
+				url: revisionsURL,
+			} );
+			const revisions = resetRevisions?.map( ( revision ) =>
+				Object.fromEntries(
+					Object.entries( revision ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
+			);
+			dispatch.__experimentalReceiveThemeGlobalStyleRevisions(
+				globalStylesId,
+				revisions
+			);
+		}
+	};
+
+__experimentalGetCurrentThemeGlobalStylesRevisions.shouldInvalidate = (
+	action
+) => {
+	return (
+		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+		action.kind === 'root' &&
+		! action.error &&
+		action.name === 'globalStyles'
+	);
+};
 
 export const getBlockPatterns =
 	() =>

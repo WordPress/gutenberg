@@ -16,10 +16,6 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-} from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -29,20 +25,13 @@ import { store as coreStore } from '@wordpress/core-data';
 
 import { unlock } from '../../private-apis';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
-import EditorCanvasContainer from '../editor-canvas';
+import EditorCanvasContainer from '../editor-canvas-container';
 
-const {
-	ExperimentalBlockEditorProvider,
-	useGlobalStyle,
-	useGlobalStylesOutput,
-} = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStylesOutput } = unlock(
+	blockEditorPrivateApis
+);
 
 function Revisions( { onClose, userConfig, blocks } ) {
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const sectionFocusReturnRef = useFocusReturn();
-	const [ textColor ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-
 	const { baseConfig } = useSelect(
 		( select ) => ( {
 			baseConfig:
@@ -60,23 +49,10 @@ function Revisions( { onClose, userConfig, blocks } ) {
 		return null;
 	}, [ baseConfig, userConfig ] );
 
-
-	// BLOCKS
-	/*
-		const renderedBlocks = useSelect(
-			( select ) => select( blockEditorStore ).getBlocks(),
-			[]
-		);
-
-		const renderedBlocksArray = useMemo(
-			() =>
-				Array.isArray( renderedBlocks )
-					? renderedBlocks
-					: [ renderedBlocks ],
-			[ renderedBlocks ]
-		);
-
-	*/
+	const renderedBlocksArray = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -89,15 +65,15 @@ function Revisions( { onClose, userConfig, blocks } ) {
 
 	const [ globalStyles ] = useGlobalStylesOutput( mergedConfig );
 	const editorStyles =
-		! isEmpty( globalStyles ) && ! isEmpty( globalStylesRevision )
+		! isEmpty( globalStyles ) && ! isEmpty( userConfig )
 			? globalStyles
 			: settings.styles;
 
 	return (
 		<EditorCanvasContainer title={ __( 'Revisions' ) } onClose={ onClose }>
 			<Iframe
-				className="edit-site-style-book__iframe"
-				name="style-revisions"
+				className="edit-site-revisions__iframe"
+				name="revisions"
 				tabIndex={ 0 }
 			>
 				<EditorStyles styles={ editorStyles } />
@@ -105,13 +81,12 @@ function Revisions( { onClose, userConfig, blocks } ) {
 					{
 						// Forming a "block formatting context" to prevent margin collapsing.
 						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-						`.is-root-container { display: flow-root; }
-											body { position: relative; padding: 32px; }`
+						`.is-root-container { display: flow-root; } body { position: relative; padding: 32px; }`
 					}
 				</style>
-				<Disabled className="edit-site-style-book__example-preview__content">
+				<Disabled className="edit-site-revisions__example-preview__content">
 					<ExperimentalBlockEditorProvider
-						value={ blocks }
+						value={ renderedBlocksArray }
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />

@@ -651,6 +651,26 @@ export function navigationFallbackId( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -659,6 +679,7 @@ export default combineReducers( {
 	currentUser,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
+	themeGlobalStyleRevisions,
 	taxonomies,
 	entities,
 	undo,

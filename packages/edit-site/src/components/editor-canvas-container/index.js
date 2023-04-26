@@ -30,6 +30,8 @@ function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
+		case 'global-styles-revisions':
+			return __( 'Global styles revisions' );
 		default:
 			return '';
 	}

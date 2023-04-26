@@ -211,6 +211,28 @@ export function receiveThemeSupports() {
 }
 
 /**
+ * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {number} currentId The post id.
+ * @param {Array}  revisions The global styles revisions.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeGlobalStyleRevisions(
+	currentId,
+	revisions
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
+		currentId,
+		revisions,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  * Ignored from documentation as it's internal to the data store.
