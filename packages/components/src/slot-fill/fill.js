@@ -3,12 +3,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createPortal,
-	useContext,
-	useLayoutEffect,
-	useRef,
-} from '@wordpress/element';
+import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,14 +52,5 @@ export default function Fill( { name, children } ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ name ] );
 
-	if ( ! slot || ! slot.node ) {
-		return null;
-	}
-
-	// If a function is passed as a child, provide it with the fillProps.
-	if ( typeof children === 'function' ) {
-		children = children( slot.props.fillProps );
-	}
-
-	return createPortal( children, slot.node );
+	return null;
 }
