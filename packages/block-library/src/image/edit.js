@@ -136,7 +136,7 @@ export function ImageEdit( {
 				isContentLocked: isContentLockedBlock( clientId ),
 			};
 		},
-		[]
+		[ clientId ]
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
