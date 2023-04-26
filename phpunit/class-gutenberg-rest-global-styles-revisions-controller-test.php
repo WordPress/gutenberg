@@ -49,7 +49,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
-			// '/wp/v2/global-styles/(?P<parent>[\d]+)/revisions',
 			'/wp/v2/global-styles/(?P<parent>[\d]+)/revisions',
 			$routes,
 			'Global style revisions based on the given parentID route does not exist'

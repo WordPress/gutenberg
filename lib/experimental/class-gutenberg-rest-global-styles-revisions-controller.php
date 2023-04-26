@@ -349,15 +349,4 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 
 		return $parent_post;
 	}
-
-	/**
-	 * Retrieves the query params for the global styles revision collection.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @return array Collection parameters.
-	 */
-	public function get_collection_params() {
-		return array();
-	}
 }
