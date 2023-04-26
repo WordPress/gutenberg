@@ -45,24 +45,15 @@ class UndoUtils {
 				return { blockIndex };
 			}
 
-			const range = selection.getRangeAt( 0 );
-			const cloneStart = range.cloneRange();
-			const cloneEnd = range.cloneRange();
-
-			cloneStart.setStart( document.activeElement, 0 );
-			cloneEnd.setStart( document.activeElement, 0 );
-
-			/**
-			 * Zero width non-breaking space, used as padding in the editable DOM
-			 * tree when it is empty otherwise.
-			 */
-			const ZWNBSP = '\ufeff';
-
 			return {
 				blockIndex,
 				editableIndex,
-				startOffset: cloneStart.toString().replace( ZWNBSP, '' ).length,
-				endOffset: cloneEnd.toString().replace( ZWNBSP, '' ).length,
+				startOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionStart().offset,
+				endOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionEnd().offset,
 			};
 		} );
 	}
