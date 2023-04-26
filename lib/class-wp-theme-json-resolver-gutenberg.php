@@ -29,6 +29,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		'core'   => array(),
 		'blocks' => array(),
 		'theme'  => array(),
+		'site'   => array(),
 		'user'   => array(),
 	);
 
@@ -65,6 +66,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static $user = null;
 
 	/**
+	 * Container for data coming from the site.
+	 *
+	 * @since 6.3.0
+	 * @var WP_Theme_JSON
+	 */
+	protected static $site = null;
+
+	/**
 	 * Stores the ID of the custom post type
 	 * that holds the user data.
 	 *
@@ -72,6 +81,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @var int
 	 */
 	protected static $user_custom_post_type_id = null;
+
+	/**
+	 * Stores the ID of the custom post type
+	 * that holds the site data.
+	 *
+	 * @since 6.3.0
+	 * @var int
+	 */
+	protected static $site_custom_post_type_id = null;
 
 	/**
 	 * Container to keep loaded i18n schema for `theme.json`.
@@ -478,6 +496,60 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $user_cpt;
 	}
 
+	public static function get_site_data_from_wp_global_styles($create_post = false, $post_status_filter = array( 'publish' ) ) {
+		$theme = wp_get_theme();
+
+		/*
+		 * Bail early if the theme does not support a theme.json.
+		 *
+		 * Since wp_theme_has_theme_json only supports the active
+		 * theme, the extra condition for whether $theme is the active theme is
+		 * present here.
+		 */
+		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
+			return array();
+		}
+
+		$site_cpt         = array();
+		$post_type_filter = 'wp_global_styles';
+		$stylesheet       = $theme->get_stylesheet();
+		$args             = array(
+			'posts_per_page'         => 1,
+			'orderby'                => 'date',
+			'order'                  => 'desc',
+			'post_type'              => $post_type_filter,
+			'post_status'            => $post_status_filter,
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'name'                   => 'wp-global-styles-site',
+		);
+
+		$global_style_query = new WP_Query();
+		$recent_posts       = $global_style_query->query( $args );
+		if ( count( $recent_posts ) === 1 ) {
+			$site_cpt = get_object_vars( $recent_posts[0] );
+		} elseif ( $create_post ) {
+			$cpt_post_id = wp_insert_post(
+				array(
+					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_status'  => 'publish',
+					'post_title'   => 'Custom Styles Site', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
+					'post_type'    => $post_type_filter,
+					'post_name'    => 'wp-global-styles-site',
+				),
+				true
+			);
+			if ( ! is_wp_error( $cpt_post_id ) ) {
+				$site_cpt = get_object_vars( get_post( $cpt_post_id ) );
+			}
+		}
+
+		return $site_cpt;
+
+	}
+
 	/**
 	 * Returns the user's origin config.
 	 *
@@ -529,6 +601,52 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return static::$user;
+	}
+
+	public static function get_site_data() {
+		if ( null !== static::$site && static::has_same_registered_blocks( 'site' ) ) {
+			return static::$site;
+		}
+
+		$config   = array();
+		$site_cpt = static::get_site_data_from_wp_global_styles();
+
+		if ( array_key_exists( 'post_content', $site_cpt ) ) {
+			$decoded_data = json_decode( $site_cpt['post_content'], true );
+
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+				trigger_error( 'Error when decoding a theme.json schema for site data. ' . json_last_error_msg() );
+				/**
+				 * Filters the data provided by the user for global styles & settings.
+				 *
+				 * @since 6.1.0
+				 *
+				 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+				 */
+				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
+				$config     = $theme_json->get_data();
+				return new WP_Theme_JSON_Gutenberg( $config, 'site' );
+			}
+
+			// Very important to verify that the flag isGlobalStylesUserThemeJSON is true.
+			// If it's not true then the content was not escaped and is not safe.
+			if (
+				is_array( $decoded_data ) &&
+				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+				$decoded_data['isGlobalStylesUserThemeJSON']
+			) {
+				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+				$config = $decoded_data;
+			}
+		}
+
+		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
+		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
+		$config       = $theme_json->get_data();
+		static::$site = new WP_Theme_JSON_Gutenberg( $config, 'site' );
+
+		return static::$site;
 	}
 
 	/**
@@ -588,7 +706,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$result->set_spacing_sizes();
 			return $result;
 		}
-
+		$result->merge( static::get_site_data() );
 		$result->merge( static::get_user_data() );
 		$result->set_spacing_sizes();
 		return $result;
@@ -607,13 +725,27 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$user_custom_post_type_id;
 		}
 
-		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme() );
 
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
 			static::$user_custom_post_type_id = $user_cpt['ID'];
 		}
 
 		return static::$user_custom_post_type_id;
+	}
+
+	public static function get_site_global_styles_post_id() {
+		if ( null !== static::$site_custom_post_type_id ) {
+			return static::$site_custom_post_type_id;
+		}
+
+		$site_cpt = static::get_site_data_from_wp_global_styles( true );
+
+		if ( array_key_exists( 'ID', $site_cpt ) ) {
+			static::$site_custom_post_type_id = $site_cpt['ID'];
+		}
+
+		return static::$site_custom_post_type_id;
 	}
 
 	/**
@@ -670,6 +802,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		);
 		static::$theme                    = null;
 		static::$user                     = null;
+		static::$site                     = null;
 		static::$user_custom_post_type_id = null;
 		static::$i18n_schema              = null;
 	}
