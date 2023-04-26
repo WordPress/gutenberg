@@ -12,7 +12,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { FONT_WEIGHTS, FONT_STYLES } from './typography-utils';
+import { FONT_WEIGHTS, FONT_STYLES } from '../../../../block-editor/src/components/global-styles/typography-utils';
 
 const DEMO_TEXT = 'The quick brown fox jumps over the lazy dog';
 
