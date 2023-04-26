@@ -9,39 +9,6 @@ test.use( {
 	},
 } );
 
-class UndoUtils {
-	constructor( { page } ) {
-		this.page = page;
-
-		this.getSelection = this.getSelection.bind( this );
-	}
-
-	async getSelection() {
-		return await this.page.evaluate( () => {
-			const selectedBlockId = window.wp.data
-				.select( 'core/block-editor' )
-				.getSelectedBlockClientId();
-			const blockIndex = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlockIndex( selectedBlockId );
-
-			if ( blockIndex === -1 ) {
-				return {};
-			}
-
-			return {
-				blockIndex,
-				startOffset: window.wp.data
-					.select( 'core/block-editor' )
-					.getSelectionStart().offset,
-				endOffset: window.wp.data
-					.select( 'core/block-editor' )
-					.getSelectionEnd().offset,
-			};
-		} );
-	}
-}
-
 test.describe( 'undo', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -489,3 +456,36 @@ test.describe( 'undo', () => {
 		] );
 	} );
 } );
+
+class UndoUtils {
+	constructor( { page } ) {
+		this.page = page;
+
+		this.getSelection = this.getSelection.bind( this );
+	}
+
+	async getSelection() {
+		return await this.page.evaluate( () => {
+			const selectedBlockId = window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId();
+			const blockIndex = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlockIndex( selectedBlockId );
+
+			if ( blockIndex === -1 ) {
+				return {};
+			}
+
+			return {
+				blockIndex,
+				startOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionStart().offset,
+				endOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionEnd().offset,
+			};
+		} );
+	}
+}
