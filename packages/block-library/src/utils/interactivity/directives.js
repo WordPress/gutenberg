@@ -3,6 +3,7 @@
  */
 import { useContext, useMemo, useEffect } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
+import { createPortal } from './portals.js';
 
 /**
  * Internal dependencies
@@ -49,6 +50,28 @@ export default () => {
 			}, [ context, inheritedValue ] );
 
 			return <Provider value={ value }>{ children }</Provider>;
+		}
+	);
+
+	directive(
+		'portal',
+		( {
+			directives: {
+				portal: { default: portal },
+			},
+			props: { children },
+			context: inherited,
+		} ) => {
+			const { Provider } = inherited;
+			const inheritedValue = useContext( inherited );
+			return (
+				<>
+					{ createPortal(
+						<Provider value={inheritedValue}>{children}</Provider>,
+						document.body
+					) }
+				</>
+			);
 		}
 	);
 
