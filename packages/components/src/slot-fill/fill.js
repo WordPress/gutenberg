@@ -3,7 +3,12 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
+import {
+	createPortal,
+	useContext,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,7 +16,8 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 import SlotFillContext from './context';
 import useSlot from './use-slot';
 
-function FillComponent( { name, children, registerFill, unregisterFill } ) {
+export default function Fill( { name, children } ) {
+	const { registerFill, unregisterFill } = useContext( SlotFillContext );
 	const slot = useSlot( name );
 
 	const ref = useRef( {
@@ -62,17 +68,3 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 
 	return createPortal( children, slot.node );
 }
-
-const Fill = ( props ) => (
-	<SlotFillContext.Consumer>
-		{ ( { registerFill, unregisterFill } ) => (
-			<FillComponent
-				{ ...props }
-				registerFill={ registerFill }
-				unregisterFill={ unregisterFill }
-			/>
-		) }
-	</SlotFillContext.Consumer>
-);
-
-export default Fill;
