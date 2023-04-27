@@ -78,9 +78,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.click( 'role=radio[name="Large"i]' );
-		await page.mouse.move( 50, 50 );
-		await page.mouse.move( 75, 75 );
-		await page.mouse.move( 100, 100 );
+		await editor.showBlockToolbar();
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click( 'role=menuitem[name="Group"i]' );
 
