@@ -21,27 +21,29 @@ export default function GlobalStylesSidebar() {
 	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea } = select( interfaceStore );
+			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 			const _isVisualEditorMode =
 				'visual' === select( editSiteStore ).getEditorMode();
+			const _isEditCanvasMode = 'edit' === getCanvasMode();
 
 			return {
 				isStyleBookOpened:
-					'style-book' ===
-					unlock(
-						select( editSiteStore )
-					).getEditorCanvasContainerView(),
+					'style-book' === getEditorCanvasContainerView(),
 				shouldClearCanvasContainerView:
 					'edit-site/global-styles' !==
 						getActiveComplementaryArea( 'core/edit-site' ) ||
-					! _isVisualEditorMode,
+					! _isVisualEditorMode ||
+					! _isEditCanvasMode,
 			};
 		},
 		[]
 	);
-
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+
 	useEffect( () => {
 		if ( shouldClearCanvasContainerView ) {
 			setEditorCanvasContainerView( undefined );
