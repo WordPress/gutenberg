@@ -132,7 +132,7 @@ The preferred format for code examples is JSX, this should be the default view. 
 
 The Block Editor handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the block editor handbook documentation is published (npm, GitHub).
 
-The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
+The recommended way to implement in markdown is to use the raw HTML and`callout callout-LEVEL` classes. For example:
 
 ```html
 <div class="callout callout-info">This is an **info** callout.</div>
@@ -156,6 +156,13 @@ This is an **alert** callout.
 This is a **warning** callout.
 </div>
 
+<div class="callout callout-warning">
+Note: In callout notices, links also need to be HTML `<a href></a>` notations. 
+The usual link transformation is not applied to links in callouts.
+For instance, to reach the Getting started > Create Block page the URL in GitHub is
+https://developer.wordpress.org/docs/getting-started/create-block/README.md
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as <a href="../getting-started/create-block/">../getting-started/create-block/</a> to link correctly in the handbook. 
+</div>
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
