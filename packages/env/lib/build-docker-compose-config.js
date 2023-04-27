@@ -254,7 +254,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: cliUser,
-				command: 'tail -F dne', // Keeps the service alive.
+				command: 'sleep infinity', // Keeps the service alive.
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
@@ -266,7 +266,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: testsWpCliImage,
 				volumes: testsMounts,
 				user: cliUser,
-				command: 'tail -F dne', // Keeps the service alive.
+				command: 'sleep infinity', // Keeps the service alive.
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
