@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Server-side rendering of the `core/navigation` block.
  *
@@ -80,6 +79,9 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * @return array An array of parsed block data.
  */
 function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::parse_blocks_from_menu_items' );
+
 	if ( empty( $menu_items ) ) {
 		return array();
 	}
@@ -255,6 +257,9 @@ function block_core_navigation_render_submenu_icon() {
  * @return object WP_Term The classic navigation.
  */
 function block_core_navigation_get_classic_menu_fallback() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback' );
+
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
@@ -280,7 +285,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			function ( $a, $b ) {
+			function( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);
@@ -295,6 +300,9 @@ function block_core_navigation_get_classic_menu_fallback() {
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback_blocks' );
+
 	// BEGIN: Code that already exists in wp_nav_menu().
 	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
 
@@ -331,6 +339,9 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::create_classic_menu_fallback' );
+
 	// See if we have a classic menu.
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
 
@@ -371,6 +382,9 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
+
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_most_recently_published_navigation' );
+
 	// Default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'              => 'wp_navigation',
@@ -403,7 +417,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		function ( $block ) {
+		function( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -452,14 +466,7 @@ function block_core_navigation_get_fallback_blocks() {
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	// Default to a list of Pages.
-	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
-
-	// If there are no navigation posts then try to find a classic menu
-	// and convert it into a block based navigation menu.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
-	}
+	$navigation_post = WP_Navigation_Fallback_Gutenberg::get_fallback();
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
@@ -530,12 +537,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-	$is_interactivity_api_enabled = false;
-	$gutenberg_experiments        = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
-		$is_interactivity_api_enabled = true;
-	}
-
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
@@ -566,7 +567,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	if ( $is_interactivity_api_enabled ) {
+
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
 		$should_load_interactivity_script = ! wp_script_is( 'wp-block-interactivity-navigation' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 		if ( $should_load_interactivity_script ) {
 			wp_enqueue_script(
@@ -751,7 +754,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_block_content = $inner_block->render();
-
 		if ( ! empty( $inner_block_content ) ) {
 			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
 				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
@@ -819,111 +821,35 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
-	if ( $is_interactivity_api_enabled ) {
-		$responsive_container_markup = sprintf(
-			// Once directives priorities are supported,
-			// we should be able to move the `wp-on.keydown`
-			// and `wp-on.focusout` to the parent <nav> and
-			// remove it from here and the <div>
-			'<button 
-				data-wp-on.click="actions.core.navigation.openMenu"
-				data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-				aria-haspopup="true"
-				%3$s
-				class="%6$s""
-			>
-				%9$s
-			</button>
-			<div 
-				class="%5$s"
-				data-wp-class.has-modal-open="context.isMenuOpen"
-				data-wp-class.is-menu-open="context.isMenuOpen"
-				data-wp-bind.aria-hidden="!context.isMenuOpen"
-				data-wp-effect="effects.core.navigation.initModal"
-				data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-				data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
-				style="%7$s"
-				id="%1$s"
-				tabindex="-1"
-			>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1">
-					<div
-						class="wp-block-navigation__responsive-dialog"
-						aria-label="%8$s"
-						data-wp-bind.aria-modal="context.isMenuOpen"
-						data-wp-bind.role="context.roleAttribute"
-						data-wp-effect="effects.core.navigation.focusFirstElement"
-					>
-						<button
-							%4$s
-							class="wp-block-navigation__responsive-container-close"
-							data-wp-on.click="actions.core.navigation.closeMenu"
-						>
-							%10$s
-						</button>
+	$responsive_container_markup = sprintf(
+		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
+			<div class="%5$s" style="%7$s" id="%1$s">
+				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
+					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
+							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
 					</div>
 				</div>
 			</div>',
-			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
-			$toggle_aria_label_open,
-			$toggle_aria_label_close,
-			esc_attr( implode( ' ', $responsive_container_classes ) ),
-			esc_attr( implode( ' ', $open_button_classes ) ),
-			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
-			__( 'Menu' ),
-			$toggle_button_content,
-			$toggle_close_button_content
-		);
-	} else {
-		$responsive_container_markup = sprintf(
-			'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
-				<div class="%5$s" style="%7$s" id="%1$s">
-					<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-						<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
-								<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
-							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
-								%2$s
-							</div>
-						</div>
-					</div>
-				</div>',
-			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
-			$toggle_aria_label_open,
-			$toggle_aria_label_close,
-			esc_attr( implode( ' ', $responsive_container_classes ) ),
-			esc_attr( implode( ' ', $open_button_classes ) ),
-			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
-			__( 'Menu' ),
-			$toggle_button_content,
-			$toggle_close_button_content
-		);
-	}
+		esc_attr( $modal_unique_id ),
+		$inner_blocks_html,
+		$toggle_aria_label_open,
+		$toggle_aria_label_close,
+		esc_attr( implode( ' ', $responsive_container_classes ) ),
+		esc_attr( implode( ' ', $open_button_classes ) ),
+		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+		__( 'Menu' ),
+		$toggle_button_content,
+		$toggle_close_button_content
+	);
 
-	if ( $is_interactivity_api_enabled ) {
-		return sprintf(
-			'<nav
-				data-wp-island
-				data-wp-context=\'{ "isMenuOpen": false, "overlay": true, "roleAttribute": "" }\'
-				%2$s
-			>
-				%3$s
-			</nav>',
-			$modal_unique_id,
-			$wrapper_attributes,
-			$responsive_container_markup
-		);
-	} else {
-		return sprintf(
-			'<nav %1$s>%2$s</nav>',
-			$wrapper_attributes,
-			$responsive_container_markup
-		);
-	}
+	return sprintf(
+		'<nav %1$s>%2$s</nav>',
+		$wrapper_attributes,
+		$responsive_container_markup
+	);
 }
 
 /**
