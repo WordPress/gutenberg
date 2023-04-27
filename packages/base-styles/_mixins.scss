@@ -90,6 +90,15 @@
 }
 
 
+@mixin button-style-outset__focus() {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) $components-color-accent;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+
+
 /**
  * Applies editor left position to the selector passed as argument
  */
