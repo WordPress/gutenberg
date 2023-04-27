@@ -12,7 +12,12 @@ import { displayShortcut } from '@wordpress/keycodes';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function SaveButton() {
+export default function SaveButton( {
+	className = 'edit-site-save-button__button',
+	variant = 'primary',
+	showTooltip = true,
+	icon,
+} ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 			select( coreStore );
@@ -34,8 +39,8 @@ export default function SaveButton() {
 
 	return (
 		<Button
-			variant="primary"
-			className="edit-site-save-button__button"
+			variant={ variant }
+			className={ className }
 			aria-disabled={ disabled }
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
@@ -52,7 +57,8 @@ export default function SaveButton() {
 			 * of the button that we want to avoid. By setting `showTooltip`,
 			 & the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
-			showTooltip
+			showTooltip={ showTooltip }
+			icon={ icon }
 		>
 			{ label }
 		</Button>
