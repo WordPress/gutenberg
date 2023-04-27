@@ -24,12 +24,17 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import BlockTransformationsMenu from './block-transformations-menu';
+import {
+	useBlockVariationTransforms,
+	default as BlockVariationTransformationsMenu,
+} from './block-variation-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
-	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
+	const { replaceBlocks, multiSelect, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
@@ -43,9 +48,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				getBlockRootClientId,
 				getBlockTransformItems,
 				__experimentalGetPatternTransformItems,
+				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType } = select( blocksStore );
-			const { canRemoveBlocks } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
 				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
@@ -82,6 +87,11 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
 
+	const blockVariationTransformations = useBlockVariationTransforms( {
+		clientIds,
+		blocks,
+	} );
+
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds,
 		maximumLength: 35,
@@ -105,6 +115,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		selectForMultipleBlocks( newBlocks );
 	}
 
+	function onBlockVariationTransform( name ) {
+		updateBlockAttributes( blocks[ 0 ].clientId, {
+			...blockVariationTransformations.find(
+				( { name: variationName } ) => variationName === name
+			).attributes,
+		} );
+	}
+
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks ) {
 		replaceBlocks( clientIds, transformedBlocks );
@@ -118,8 +136,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	 */
 	const hasPossibleBlockTransformations =
 		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
+	const hasPossibleBlockVariationTransformations =
+		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
-	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
+	if (
+		! hasBlockStyles &&
+		! hasPossibleBlockTransformations &&
+		! hasPossibleBlockVariationTransformations
+	) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
@@ -163,6 +187,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const showDropDown =
 		hasBlockStyles ||
 		hasPossibleBlockTransformations ||
+		hasPossibleBlockVariationTransformations ||
 		hasPatternTransformation;
 	return (
 		<ToolbarGroup>
@@ -222,6 +247,20 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											blocks={ blocks }
 											onSelect={ ( name ) => {
 												onBlockTransform( name );
+												onClose();
+											} }
+										/>
+									) }
+									{ hasPossibleBlockVariationTransformations && (
+										<BlockVariationTransformationsMenu
+											transformations={
+												blockVariationTransformations
+											}
+											blocks={ blocks }
+											onSelect={ ( name ) => {
+												onBlockVariationTransform(
+													name
+												);
 												onClose();
 											} }
 										/>
