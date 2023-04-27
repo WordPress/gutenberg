@@ -1,14 +1,23 @@
-// @ts-nocheck
+/**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import type { NavigableContainerProps } from './types';
+
 const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
-function cycleValue( value, total, offset ) {
+function cycleValue( value: number, total: number, offset: number ) {
 	const nextValue = value + offset;
 	if ( nextValue < 0 ) {
 		return total + nextValue;
@@ -19,9 +28,11 @@ function cycleValue( value, total, offset ) {
 	return nextValue;
 }
 
-class NavigableContainer extends Component {
-	constructor() {
-		super( ...arguments );
+class NavigableContainer extends Component< NavigableContainerProps > {
+	container?: HTMLDivElement;
+
+	constructor( args: NavigableContainerProps ) {
+		super( args );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
@@ -30,21 +41,27 @@ class NavigableContainer extends Component {
 	}
 
 	componentDidMount() {
+		if ( ! this.container ) {
+			return;
+		}
+
 		// We use DOM event listeners instead of React event listeners
 		// because we want to catch events from the underlying DOM tree
 		// The React Tree can be different from the DOM tree when using
 		// portals. Block Toolbars for instance are rendered in a separate
 		// React Trees.
 		this.container.addEventListener( 'keydown', this.onKeyDown );
-		this.container.addEventListener( 'focus', this.onFocus );
 	}
 
 	componentWillUnmount() {
+		if ( ! this.container ) {
+			return;
+		}
+
 		this.container.removeEventListener( 'keydown', this.onKeyDown );
-		this.container.removeEventListener( 'focus', this.onFocus );
 	}
 
-	bindContainer( ref ) {
+	bindContainer( ref: HTMLDivElement ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 
@@ -55,10 +72,14 @@ class NavigableContainer extends Component {
 		}
 	}
 
-	getFocusableContext( target ) {
+	getFocusableContext( target: Element ) {
+		if ( ! this.container ) {
+			return null;
+		}
+
 		const { onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
-		const focusables = finder.find( this.container );
+		const focusables = finder.find( this.container ) as HTMLElement[];
 
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {
@@ -67,14 +88,11 @@ class NavigableContainer extends Component {
 		return null;
 	}
 
-	getFocusableIndex( focusables, target ) {
-		const directIndex = focusables.indexOf( target );
-		if ( directIndex !== -1 ) {
-			return directIndex;
-		}
+	getFocusableIndex( focusables: Element[], target: Element ) {
+		return focusables.indexOf( target );
 	}
 
-	onKeyDown( event ) {
+	onKeyDown( event: KeyboardEvent ) {
 		if ( this.props.onKeyDown ) {
 			this.props.onKeyDown( event );
 		}
@@ -98,9 +116,11 @@ class NavigableContainer extends Component {
 			// from scrolling. The preventDefault also prevents Voiceover from
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
-			const targetRole = event.target.getAttribute( 'role' );
+			const targetRole = (
+				event.target as HTMLDivElement | null
+			 )?.getAttribute( 'role' );
 			const targetHasMenuItemRole =
-				MENU_ITEM_ROLES.includes( targetRole );
+				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
 			// `preventDefault()` on tab to avoid having the browser move the focus
 			// after this component has already moved it.
@@ -115,9 +135,13 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const context = getFocusableContext(
-			event.target.ownerDocument.activeElement
-		);
+		const activeElement = ( event.target as HTMLElement | null )
+			?.ownerDocument?.activeElement;
+		if ( ! activeElement ) {
+			return;
+		}
+
+		const context = getFocusableContext( activeElement );
 		if ( ! context ) {
 			return;
 		}
@@ -152,7 +176,10 @@ class NavigableContainer extends Component {
 	}
 }
 
-const forwardedNavigableContainer = ( props, ref ) => {
+const forwardedNavigableContainer = (
+	props: NavigableContainerProps,
+	ref: ForwardedRef< HTMLDivElement >
+) => {
 	return <NavigableContainer { ...props } forwardedRef={ ref } />;
 };
 forwardedNavigableContainer.displayName = 'NavigableContainer';
