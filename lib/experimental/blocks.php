@@ -163,7 +163,7 @@ END;
 		}
 	}
 
-	if ( $block['blockName'] === $block_name ) {
+	if ( $block_name === $block['blockName'] ) {
 		if ( 'before' === $block_position ) {
 			$block_content = $inserted_content . $block_content;
 		} elseif ( 'after' === $block_position ) {
