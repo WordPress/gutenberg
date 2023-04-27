@@ -269,5 +269,8 @@ RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 )
 
 # Switch back now that we're done.
 USER www-data
+
+# Have the container sleep infinitely to keep it alive for us to run commands on it.
+CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
 `;
 }

@@ -263,7 +263,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 				volumes: developmentMounts,
 				user: hostUser.fullUser,
-				command: 'sleep infinity', // Keeps the service alive.
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
@@ -279,7 +278,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 				volumes: testsMounts,
 				user: hostUser.fullUser,
-				command: 'sleep infinity', // Keeps the service alive.
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
