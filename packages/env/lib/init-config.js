@@ -203,6 +203,14 @@ function wordpressDockerFileContents( image, config ) {
 
 	return `FROM ${ image }
 
+# Update apt sources for archived versions of Debian.
+
+# stretch
+RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
+RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+
+# Prepare dependencies
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
 
@@ -215,7 +223,7 @@ RUN groupadd -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Set up sudo so they can have root access when using 'run' commands.
-RUN apt-get update
+RUN apt-get update -qy
 RUN apt-get -qy install sudo
 RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 `;
