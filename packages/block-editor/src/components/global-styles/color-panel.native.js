@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import PanelColorGradientSettings from '../colors-gradients/panel-color-gradient-settings';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';
 import {
@@ -80,7 +80,7 @@ const ColorPanel = ( {
 	const setTextColor = useCallback(
 		( newColor ) => {
 			onChange(
-				immutableSet(
+				setImmutably(
 					value,
 					[ 'color', 'text' ],
 					encodeColorValue( newColor )
@@ -100,7 +100,7 @@ const ColorPanel = ( {
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const setBackgroundColor = useCallback(
 		( newColor ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'color', 'background' ],
 				encodeColorValue( newColor )
@@ -112,7 +112,7 @@ const ColorPanel = ( {
 	);
 	const setGradient = useCallback(
 		( newGradient ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'color', 'gradient' ],
 				encodeGradientValue( newGradient )
@@ -123,7 +123,7 @@ const ColorPanel = ( {
 		[ encodeGradientValue, onChange, value ]
 	);
 	const resetBackground = useCallback( () => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			undefined

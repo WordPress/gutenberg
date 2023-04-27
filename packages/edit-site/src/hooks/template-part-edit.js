@@ -8,12 +8,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../components/routes';
 import { useLink } from '../components/routes/link';
+import { unlock } from '../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function EditTemplatePartMenuItem( { attributes } ) {
 	const { theme, slug } = attributes;

@@ -152,12 +152,15 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 	spinner.text = 'Starting WordPress.';
 
-	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		...dockerComposeConfig,
-		commandOptions: shouldConfigureWp
-			? [ '--build', '--force-recreate' ]
-			: [],
-	} );
+	await dockerCompose.upMany(
+		[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
+		{
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		}
+	);
 
 	// Make sure we've consumed the custom CLI dockerfile.
 	if ( shouldConfigureWp ) {

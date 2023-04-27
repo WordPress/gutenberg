@@ -29,7 +29,7 @@ import { useCallback, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
 function useMultiOriginColorPresets(
@@ -143,7 +143,7 @@ export default function FiltersPanel( {
 		const settedValue = duotonePreset
 			? `var:preset|duotone|${ duotonePreset.slug }`
 			: newValue;
-		onChange( immutableSet( value, [ 'filter', 'duotone' ], settedValue ) );
+		onChange( setImmutably( value, [ 'filter', 'duotone' ], settedValue ) );
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );

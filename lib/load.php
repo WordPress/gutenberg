@@ -51,6 +51,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 
 	// Experimental.
@@ -58,6 +59,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-global-styles-revisions-controller.php';
+	require_once __DIR__ . '/experimental/class-wp-rest-navigation-fallback-controller.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -71,7 +74,6 @@ require __DIR__ . '/compat/wordpress-6.1/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
@@ -134,6 +136,7 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 }
 
 // Plugin specific code.
+require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';

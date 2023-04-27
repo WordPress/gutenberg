@@ -143,6 +143,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		mediaWidth,
 		rel,
 		verticalAlignment,
+		allowedBlocks,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
@@ -315,7 +316,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE }
+		{ template: TEMPLATE, allowedBlocks }
 	);
 
 	return (
