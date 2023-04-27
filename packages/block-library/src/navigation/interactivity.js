@@ -10,21 +10,26 @@ store( {
 				openMenu: ( { context, ref } ) => {
 					context.isMenuOpen = true;
 					context.previousFocus = ref;
-					// Review how to move this to a selector or something similar
-					context.roleAttribute = 'dialog';
-					// It adds a `has-modal-open` class to the <html> root
-					// document.documentElement.classList.add( 'has-modal-open' );
+					if ( context.overlay ) {
+						// Review how to move this to a selector or something similar
+						context.roleAttribute = 'dialog';
+						// It adds a `has-modal-open` class to the <html> root
+						document.documentElement.classList.add(
+							'has-modal-open'
+						);
+					}
 				},
 				closeMenu: ( { context } ) => {
 					context.isMenuOpen = false;
-					// Review how to move this to a selector or something similar
-					context.roleAttribute = '';
 					context.modal = null;
 					context.previousFocus = null;
-					// It removes the `has-modal-open` class to the <html> root
-					// document.documentElement.classList.remove(
-					// 	'has-modal-open'
-					// );
+					if ( context.overlay ) {
+						// Review how to move this to a selector or something similar
+						context.roleAttribute = '';
+						document.documentElement.classList.remove(
+							'has-modal-open'
+						);
+					}
 				},
 				handleMenuKeydown: ( { actions, context, event } ) => {
 					if ( context.isMenuOpen ) {
@@ -38,9 +43,9 @@ store( {
 							return;
 						}
 
-						// Trap focus if set to true
+						// Trap focus if it is an overlay (main menu)
 						if (
-							context.trapFocus &&
+							context.overlay &&
 							( event.key === 'Tab' || event.keyCode === 9 )
 						) {
 							// If shift + tab it change the direction
@@ -64,8 +69,13 @@ store( {
 				},
 				handleMenuFocusout: ( { actions, context, event } ) => {
 					if ( context.isMenuOpen ) {
-						// If focus is outside modal, close menu
-						if ( ! context.modal.contains( event.relatedTarget ) ) {
+						// If focus is outside modal, and in the document, close menu
+						if (
+							! context.modal.contains( event.relatedTarget ) &&
+							! context.modal.parentElement.contains(
+								window.document.activeElement
+							)
+						) {
 							actions.core.navigation.closeMenu( { context } );
 						}
 					}

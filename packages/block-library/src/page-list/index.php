@@ -201,7 +201,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 		);
 
 		if ( $is_interactivity_api_enabled ) {
-			$markup .= '<li data-wp-context=\' { "isMenuOpen": false, "trapFocus": false } \' class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
+			$markup .= '<li data-wp-context=\' { "isMenuOpen": false, "overlay": false } \' class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
 
 			if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
 				$markup .= '<button

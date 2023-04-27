@@ -125,7 +125,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	);
 
 	if ( $is_interactivity_api_enabled ) {
-		$html = '<li data-wp-context=\' { "isMenuOpen": false, "trapFocus": false } \'' . $wrapper_attributes . '>';
+		$html = '<li data-wp-context=\' { "isMenuOpen": false, "overlay": false } \'' . $wrapper_attributes . '>';
 	} else {
 		$html = '<li ' . $wrapper_attributes . '>';
 	}
@@ -205,6 +205,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$html .= '<button
 						data-wp-on.click="actions.core.navigation.openMenu"
 						data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+						data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 						aria-label="' . esc_attr( $aria_label ) . '"
 						class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"

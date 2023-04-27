@@ -908,7 +908,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return sprintf(
 			'<nav
 				data-wp-island
-				data-wp-context=\'{ "isMenuOpen": false, "trapFocus": true, "roleAttribute": "" }\'
+				data-wp-context=\'{ "isMenuOpen": false, "overlay": true, "roleAttribute": "" }\'
 				%2$s
 			>
 				%3$s
