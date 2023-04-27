@@ -205,7 +205,7 @@ function wordpressDockerFileContents( image, config ) {
 
 # Update apt sources for archived versions of Debian.
 
-# stretch
+# stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
 RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
