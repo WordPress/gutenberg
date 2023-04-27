@@ -572,13 +572,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		if ( $is_interactivity_api_enabled ) {
 			wp_enqueue_script(
 				'interactivity-navigation',
-				plugins_url( '../interactive-blocks/navigation.min.js', __FILE__ ),
+				plugins_url( './interactive-blocks/navigation.min.js', __DIR__ ),
 				array( 'interactivity-runtime' )
 			);
 		} else {
 			wp_enqueue_script(
 				'wp-block-navigation-view',
-				plugins_url( '../blocks/navigation/view.min.js', __FILE__ ),
+				plugins_url( './blocks/navigation/view.min.js', __DIR__ ),
 				array()
 			);
 
@@ -586,7 +586,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			if ( $should_load_modal_view_script ) {
 				wp_enqueue_script(
 					'wp-block-navigation-view-modal',
-					plugins_url( '../blocks/navigation/view-modal.min.js', __FILE__ ),
+					plugins_url( './blocks/navigation/view-modal.min.js', __DIR__ ),
 					array()
 				);
 			}
