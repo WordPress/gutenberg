@@ -37,6 +37,7 @@
 		"@wordpress/commands": "file:packages/commands",
 		"@wordpress/components": "file:packages/components",
 		"@wordpress/compose": "file:packages/compose",
+		"@wordpress/core-commands": "file:packages/core-commands",
 		"@wordpress/core-data": "file:packages/core-data",
 		"@wordpress/customize-widgets": "file:packages/customize-widgets",
 		"@wordpress/data": "file:packages/data",

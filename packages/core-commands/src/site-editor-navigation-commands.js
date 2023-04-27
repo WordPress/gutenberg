@@ -8,12 +8,12 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { post, page, layout, symbolFilled } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from './lock-unlock';
 
 const { useCommandLoader } = unlock( privateApis );
 const { useHistory } = unlock( routerPrivateApis );
@@ -27,12 +27,12 @@ const icons = {
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
+		const history = useHistory();
 		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
 			postType
 		);
 		const deps = supportsSearch ? [ search ] : [];
-		const history = useHistory();
-		const { canvasMode, records, isLoading } = useSelect( ( select ) => {
+		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const query = supportsSearch
 				? {
@@ -49,12 +49,20 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					'getEntityRecords',
 					[ 'postType', postType, query ]
 				),
-				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+				// We're using the string literal to check whether we're in the site editor.
+				/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
+				isSiteEditor: !! select( 'edit-site' ),
 			};
 		}, deps );
 
 		const commands = useMemo( () => {
 			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				const extraArgs = isSiteEditor
+					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
+					: {};
 				return {
 					name: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
@@ -62,17 +70,25 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						: __( '(no title)' ),
 					icon: icons[ postType ],
 					callback: ( { close } ) => {
-						history.push( {
+						const args = {
 							postType,
 							postId: record.id,
-							canvas:
-								canvasMode === 'edit' ? canvasMode : undefined,
-						} );
+							...extraArgs,
+						};
+						const targetUrl = addQueryArgs(
+							'site-editor.php',
+							args
+						);
+						if ( isSiteEditor ) {
+							history.push( args );
+						} else {
+							document.location = targetUrl;
+						}
 						close();
 					},
 				};
 			} );
-		}, [ records, history, canvasMode ] );
+		}, [ records, history ] );
 
 		return {
 			commands,
@@ -89,7 +105,7 @@ const useTemplateNavigationCommandLoader =
 const useTemplatePartNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
-export function useNavigationCommands() {
+export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		group: __( 'Pages' ),

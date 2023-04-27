@@ -25,6 +25,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreCmmandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -44,7 +45,8 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
-import { useCommands } from '../../hooks/commands';
+
+const { useCommands } = unlock( coreCmmandsPrivateApis );
 
 const { useLocation } = unlock( routerPrivateApis );
 
