@@ -11,11 +11,8 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 
-const PatternEdit = ( {
-	attributes: { inheritedAlignment, slug },
-	clientId,
-	setAttributes,
-} ) => {
+const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
+	const { forcedAlignment, slug } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -58,7 +55,7 @@ const PatternEdit = ( {
 	] );
 
 	const blockProps = useBlockProps( {
-		className: `align${ inheritedAlignment }`,
+		className: forcedAlignment && `align${ forcedAlignment }`,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 	return (

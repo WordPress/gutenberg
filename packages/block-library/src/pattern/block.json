@@ -15,7 +15,7 @@
 		"slug": {
 			"type": "string"
 		},
-		"inheritedAlignment": {
+		"forcedAlignment": {
 			"type": "string",
 			"default": "full"
 		},
