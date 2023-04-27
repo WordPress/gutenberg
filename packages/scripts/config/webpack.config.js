@@ -246,7 +246,7 @@ const config = {
 	plugins: [
 		new DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-			SCRIPT_DEBUG: mode === 'development',
+			SCRIPT_DEBUG: ! isProduction,
 		} ),
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
