@@ -9,6 +9,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	/**
 	 * @var int
 	 */
+	protected static $second_admin_id;
+
+	/**
+	 * @var int
+	 */
 	protected static $global_styles_id;
 
 	public function set_up() {
@@ -22,7 +27,12 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
+		self::$admin_id        = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		self::$second_admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
@@ -75,8 +85,8 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			'post_content' => wp_json_encode( $config ),
 		);
 
-		$post_id  = wp_update_post( $new_styles_post, true, false );
-		$post     = get_post( $post_id );
+		wp_update_post( $new_styles_post, true, false );
+
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -94,8 +104,8 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$this->assertArrayHasKey( 'modified_gmt', $data[0], 'Check that an modified_gmt key exists' );
 
 		// Author information.
-		$this->assertEquals( $post->post_author, $data[0]['author'], 'Check that author id returns expected value' );
-		$this->assertEquals( get_the_author_meta( 'display_name', $post->post_author ), $data[0]['author_display_name'], 'Check that author display_name returns expected value' );
+		$this->assertEquals( self::$admin_id, $data[0]['author'], 'Check that author id returns expected value' );
+		$this->assertEquals( get_the_author_meta( 'display_name', self::$admin_id ), $data[0]['author_display_name'], 'Check that author display_name returns expected value' );
 		$this->assertIsString(
 			$data[0]['author_avatar_url'],
 			'Check that author avatar_url returns expected value type'
@@ -116,6 +126,23 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 			'Check that the revision styles match the last updated styles.'
 		);
+
+		// Checks that the revisions are returned for all eligible users.
+		wp_set_current_user( self::$second_admin_id );
+		$config['styles']['color']['background'] = 'blue';
+		$new_styles_post                         = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode( $config ),
+		);
+
+		wp_update_post( $new_styles_post, true, false );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertCount( 2, $data, 'Check that two revisions exists' );
+		$this->assertEquals( self::$second_admin_id, $data[0]['author'], 'Check that second author id returns expected value' );
 	}
 
 	/**

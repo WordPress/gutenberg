@@ -135,12 +135,12 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		$fields = $this->get_fields_for_response( $request );
 
 		if ( rest_is_field_included( 'author', $fields ) ) {
-			$data['author'] = (int) $parent->post_author;
+			$data['author'] = (int) $item->post_author;
 		}
 
 		if ( rest_is_field_included( 'author_avatar_url', $fields ) ) {
 			$data['author_avatar_url'] = get_avatar_url(
-				$parent->post_author,
+				$item->post_author,
 				array(
 					'size' => 24,
 				)
@@ -148,11 +148,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		}
 
 		if ( rest_is_field_included( 'author_display_name', $fields ) ) {
-			$data['author_display_name'] = get_the_author_meta( 'display_name', $parent->post_author );
+			$data['author_display_name'] = get_the_author_meta( 'display_name', $item->post_author );
 		}
 
 		if ( rest_is_field_included( 'date', $fields ) ) {
-			$data['date'] = $parent->post_date;
+			$data['date'] = $item->post_date;
 		}
 
 		if ( rest_is_field_included( 'date_display', $fields ) ) {
@@ -161,7 +161,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		}
 
 		if ( rest_is_field_included( 'date_gmt', $fields ) ) {
-			$data['date_gmt'] = $parent->post_date_gmt;
+			$data['date_gmt'] = $item->post_date_gmt;
 		}
 
 		if ( rest_is_field_included( 'id', $fields ) ) {
@@ -169,11 +169,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		}
 
 		if ( rest_is_field_included( 'modified', $fields ) ) {
-			$data['modified'] = $parent->post_modified;
+			$data['modified'] = $item->post_modified;
 		}
 
 		if ( rest_is_field_included( 'modified_gmt', $fields ) ) {
-			$data['modified_gmt'] = $parent->post_modified_gmt;
+			$data['modified_gmt'] = $item->post_modified_gmt;
 		}
 
 		if ( rest_is_field_included( 'parent', $fields ) ) {
