@@ -59,19 +59,19 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
 			>
-				<summary onClick={ ( event ) => event.preventDefault() }>
-					<RichText
-						aria-label={ __( 'Write summary' ) }
-						placeholder={ __( 'Write summary…' ) }
-						allowedFormats={ [] }
-						withoutInteractiveFormatting
-						value={ summary }
-						onChange={ ( newSummary ) =>
-							setAttributes( { summary: newSummary } )
-						}
-						multiline={ false }
-					/>
-				</summary>
+				<RichText
+					tagName="summary"
+					aria-label={ __( 'Write summary' ) }
+					placeholder={ __( 'Write summary…' ) }
+					allowedFormats={ [] }
+					withoutInteractiveFormatting
+					value={ summary }
+					onChange={ ( newSummary ) =>
+						setAttributes( { summary: newSummary } )
+					}
+					onClick={ ( event ) => event.preventDefault() }
+					multiline={ false }
+				/>
 				{ innerBlocksProps.children }
 			</details>
 		</>
