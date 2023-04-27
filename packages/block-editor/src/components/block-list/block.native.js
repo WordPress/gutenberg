@@ -28,12 +28,7 @@ import {
 	withDispatch,
 	withSelect,
 } from '@wordpress/data';
-import {
-	compose,
-	ifCondition,
-	pure,
-	usePreferredColorSchemeStyle,
-} from '@wordpress/compose';
+import { compose, ifCondition, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,53 +37,13 @@ import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import BlockOutline from './block-outline';
 import styles from './block.scss';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
 
 const emptyArray = [];
-
-function BlockOutline( {
-	align,
-	blockWidth,
-	isParentSelected,
-	isSelected,
-	name,
-	screenWidth,
-} ) {
-	const { isFullWidth, isContainerRelated } = alignmentHelpers;
-	const isScreenWidthWider = blockWidth < screenWidth;
-
-	const styleSolidBorder = [
-		styles.solidBorder,
-		isFullWidth( align ) && isScreenWidthWider && styles.borderFullWidth,
-		isFullWidth( align ) &&
-			isContainerRelated( name ) &&
-			isScreenWidthWider &&
-			styles.containerBorderFullWidth,
-		usePreferredColorSchemeStyle(
-			styles.solidBorderColor,
-			styles.solidBorderColorDark
-		),
-	];
-	const styleDashedBorder = [
-		styles.dashedBorder,
-		usePreferredColorSchemeStyle(
-			styles.dashedBorderColor,
-			styles.dashedBorderColorDark
-		),
-	];
-
-	return (
-		<>
-			{ isSelected && (
-				<View pointerEvents="box-none" style={ styleSolidBorder } />
-			) }
-			{ isParentSelected && <View style={ styleDashedBorder } /> }
-		</>
-	);
-}
 
 // Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
 const wrapperPropsCache = new WeakMap();
@@ -115,6 +70,7 @@ function BlockWrapper( {
 	draggingClientId,
 	draggingEnabled,
 	isInnerBlockSelected,
+	isParentSelected,
 	isSelected,
 	isStackedHorizontally,
 	isTouchable,
@@ -145,6 +101,7 @@ function BlockWrapper( {
 			>
 				<BlockOutline
 					isSelected={ isSelected }
+					isParentSelected={ isParentSelected }
 					screenWidth={ screenWidth }
 				/>
 				<BlockDraggable
@@ -215,16 +172,21 @@ function BlockListBlock( {
 				getBlockIndex,
 				getBlockParents,
 				getLowestCommonAncestorWithSelectedBlock,
+				getSelectedBlockClientId,
 				getSettings,
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const blockOrder = getBlockIndex( clientId );
 			const innerBlockSelected = hasSelectedInnerBlock( clientId );
+			const selectedBlockClientId = getSelectedBlockClientId();
 
 			const parents = getBlockParents( clientId, true );
 			const parentSelected =
-				rootClientId === clientId || ( ! rootClientId && ! clientId );
+				// Set false as a default value to prevent re-render when it's changed from null to false.
+				( selectedBlockClientId || false ) &&
+				selectedBlockClientId === rootClientId;
+
 			const selectedParents = clientId ? parents : [];
 			const descendantOfParentSelected =
 				selectedParents.includes( rootClientId );
@@ -346,6 +308,7 @@ function BlockListBlock( {
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
+			isParentSelected={ isParentSelected }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
