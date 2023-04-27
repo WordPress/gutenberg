@@ -21,12 +21,12 @@
 	&__contents {
 		> .components-button {
 			padding: $grid-unit-30;
-			box-shadow: inset 0 0 0 $border-width $gray-600;
 			border-radius: $radius-block-ui;
-			width: 256px;
 			height: auto;
+			min-height: $grid-unit * 16;
 			display: flex;
 			flex-direction: column;
+			justify-content: center;
 			gap: $grid-unit;
 
 			// Show the boundary of the button, in High Contrast Mode.
@@ -42,9 +42,9 @@
 
 			&:hover {
 				color: var(--wp-admin-theme-color-darker-10);
-				box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-				span:first-child {
+				span {
 					color: var(--wp-admin-theme-color);
 				}
 			}
@@ -75,7 +75,7 @@
 	}
 
 	@include break-medium() {
-		width: 456px;
+		width: 800px;
 	}
 }
 
