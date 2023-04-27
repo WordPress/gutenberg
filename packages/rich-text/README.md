@@ -360,7 +360,7 @@ _Returns_
 
 ### RichTextValue
 
-Undocumented declaration.
+An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
 
 ### slice
 
