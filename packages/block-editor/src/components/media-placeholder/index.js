@@ -89,6 +89,7 @@ export function MediaPlaceholder( {
 		} );
 	}
 
+	const { getBlock } = useSelect( blockEditorStore );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -251,11 +252,19 @@ export function MediaPlaceholder( {
 	}
 
 	async function onDrop( event ) {
-		if ( event.dataTransfer.getData( 'wp-blocks' ) );
-		const blocks = JSON.parse(
-			event.dataTransfer.getData( 'wp-blocks' )
-		).blocks;
-		return await handleBlocksDrop( blocks );
+		if ( event.dataTransfer.getData( 'wp-blocks' ) ) {
+			const dragData = JSON.parse(
+				event.dataTransfer.getData( 'wp-blocks' )
+			);
+			if ( dragData.type === 'inserter' ) {
+				return await handleBlocksDrop( dragData.blocks );
+			} else if ( dragData.type === 'block' ) {
+				const blocks = dragData.srcClientIds.map( ( id ) =>
+					getBlock( id )
+				);
+				return await handleBlocksDrop( blocks );
+			}
+		}
 	}
 
 	const onUpload = ( event ) => {
