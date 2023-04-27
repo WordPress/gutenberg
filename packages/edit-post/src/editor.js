@@ -14,8 +14,6 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -26,10 +24,8 @@ import { store as editPostStore } from './store';
 import { unlock } from './private-apis';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
-const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
-	useCommands();
 	const {
 		hasFixedToolbar,
 		focusMode,
@@ -189,7 +185,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 					{ ...props }
 				>
 					<ErrorBoundary>
-						<CommandMenu />
 						<EditorInitialization postId={ postId } />
 						<Layout styles={ styles } />
 					</ErrorBoundary>
