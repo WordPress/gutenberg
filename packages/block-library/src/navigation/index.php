@@ -828,7 +828,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			'<button 
 				data-wp-on.click="actions.core.navigation.openMenu"
 				data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-				data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 				aria-haspopup="true"
 				%3$s
 				class="%6$s""
@@ -845,6 +844,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 				data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 				style="%7$s"
 				id="%1$s"
+				tabindex="-1"
 			>
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div
