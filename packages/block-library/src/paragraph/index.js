@@ -28,9 +28,16 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const { content } = attributes;
+
 		if ( context === 'accessibility' ) {
-			const { content } = attributes;
 			return ! content || content.length === 0 ? __( 'Empty' ) : content;
+		}
+
+		// In the list view, use the block's content as the label.
+		// If the content is empty, fall back to the default label.
+		if ( context === 'list-view' && content ) {
+			return content;
 		}
 	},
 	transforms,
