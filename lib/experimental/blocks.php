@@ -124,28 +124,46 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 3 );
  * @param WP_Block $instance      The block instance.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
-	$block_name = 'core/post-content';
-	$block_position = 'after'; // Child blocks could be a bit trickier.
+	// $block_name = 'core/post-content';
+	// $block_position = 'after'; // Child blocks could be a bit trickier.
+
+	$block_name = 'core/comment-template';
+	$block_position = 'last-child';
 
 	// Can we void infinite loops?
+
+	if (
+		! (
+			$block_name === $block['blockName'] &&
+			( 'before' === $block_position || 'after' === $block_position )
+		) && ! (
+			isset( $block['parentBlock'] ) &&
+			$block_name === $block['parentBlock'] &&
+			( 'first-child' === $block_position || 'last-child' === $block_position )
+		)
+	) {
+		return $block_content;
+	}
+
 
 	$inserted_block_markup = <<<END
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
 <!-- /wp:social-links -->
 END;
+	$inserted_blocks  = parse_blocks( $inserted_block_markup );
+	$inserted_content = render_block( $inserted_blocks[0] );
 
-	if ( isset( $block['parentBlock'] ) && 'core/comment-template' === $block['parentBlock'] ) {
-		$inserted_blocks  = parse_blocks( $inserted_block_markup );
-		$inserted_content = render_block( $inserted_blocks[0] );
-
-		$block_content = $block_content . $inserted_content; // after!
+	if ( isset( $block['parentBlock'] ) && $block_name === $block['parentBlock'] ) {
+		if ( 'last-child' === $block_position ) {
+			// FIXME: This is currently apppending the auto-inserted block
+			// after each child of the parent block, rather than only after
+			// the last one.
+			$block_content = $block_content . $inserted_content;
+		}
 	}
 
 	if ( $block['blockName'] === $block_name ) {
-		$inserted_blocks  = parse_blocks( $inserted_block_markup );
-		$inserted_content = render_block( $inserted_blocks[0] );
-
 		if ( 'before' === $block_position ) {
 			$block_content = $inserted_content . $block_content;
 		} elseif ( 'after' === $block_position ) {
