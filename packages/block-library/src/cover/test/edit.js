@@ -5,12 +5,47 @@ import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { __experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import {
 	initializeEditor,
 	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
+
+jest.mock(
+	'@wordpress/block-editor/src/components/colors-gradients/use-multiple-origin-colors-and-gradients',
+	() => ( {
+		__esModule: true,
+		default: jest.fn( () => ( {
+			disableCustomColors: true,
+			disableCustomGradients: true,
+			colors: [
+				{
+					name: 'Default',
+					colors: [
+						{
+							name: 'Black',
+							slug: 'black',
+							color: '#000000',
+						},
+						{
+							name: 'Cyan bluish gray',
+							slug: 'cyan-bluish-gray',
+							color: '#abb8c3',
+						},
+					],
+				},
+			],
+			gradients: [],
+			hasColorsOrGradients: true,
+		} ) ),
+	} )
+);
 
 async function setup( attributes ) {
 	const testBlock = { name: 'core/cover', attributes };
@@ -295,6 +330,46 @@ describe( 'Cover block', () => {
 				);
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
+			} );
+
+			describe( 'when colors are disabled', () => {
+				beforeEach( () => {
+					useMultipleOriginColorsAndGradients.mockImplementation(
+						() => ( {
+							__esModule: true,
+							default: jest.fn( () => ( {
+								hasColorsOrGradients: false,
+							} ) ),
+						} )
+					);
+				} );
+
+				test( 'does not render overlay control', async () => {
+					await setup();
+					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'tab', { name: 'Styles' } )
+					);
+
+					const overlayControl = screen.queryByRole( 'button', {
+						name: 'Overlay',
+					} );
+
+					expect( overlayControl ).not.toBeInTheDocument();
+				} );
+				test( 'does not render opacity control', async () => {
+					await setup();
+					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'tab', { name: 'Styles' } )
+					);
+
+					const opacityControl = screen.queryByRole( 'slider', {
+						name: 'Overlay opacity',
+					} );
+
+					expect( opacityControl ).not.toBeInTheDocument();
+				} );
 			} );
 		} );
 
