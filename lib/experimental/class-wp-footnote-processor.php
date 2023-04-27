@@ -186,11 +186,11 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 }
 
 add_filter(
-    'block_parser_class',
-    /**
-     * Hack to inject a per-render singleton footnote processor.
-     */
-    function ( $parser_class ) {
+	'block_parser_class',
+	/**
+	 * Hack to inject a per-render singleton footnote processor.
+	 */
+	function ( $parser_class ) {
 		$notes = array();
 
 		add_filter(
@@ -212,7 +212,7 @@ add_filter(
 				$p        = new WP_Footnote_Processor( $html );
 				$p->notes = $notes;
 				$p->replace_footnotes();
-				$notes    = $p->notes;
+				$notes = $p->notes;
 
 				return $p->get_updated_html();
 			},
