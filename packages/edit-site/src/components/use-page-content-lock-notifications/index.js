@@ -12,12 +12,29 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 
+/**
+ * Hook that displays notifications that guide the user towards using the
+ * content vs. template editing modes.
+ *
+ * @return {import('react').RefObject<HTMLElement>} Ref which should be passed
+ *                                                  (using useMergeRefs()) to
+ *                                                  the editor iframe canvas.
+ */
 export default function usePageContentLockNotifications() {
 	const ref = useEditTemplateNotification();
 	useBackToPageNotification();
 	return ref;
 }
 
+/**
+ * Hook that displays a 'Edit your template to edit this block' notification
+ * when the user is focusing on editing page content and clicks on a locked
+ * template block.
+ *
+ * @return {import('react').RefObject<HTMLElement>} Ref which should be passed
+ *                                                  (using useMergeRefs()) to
+ *                                                  the editor iframe canvas.
+ */
 function useEditTemplateNotification() {
 	const hasPageContentLock = useSelect(
 		( select ) => select( editSiteStore ).hasPageContentLock(),
@@ -66,6 +83,10 @@ function useEditTemplateNotification() {
 	);
 }
 
+/**
+ * Hook that displays a 'You are editing a template' notification when the user
+ * switches from focusing on editing page content to editing a template.
+ */
 function useBackToPageNotification() {
 	const hasPageContentLock = useSelect(
 		( select ) => select( editSiteStore ).hasPageContentLock(),
