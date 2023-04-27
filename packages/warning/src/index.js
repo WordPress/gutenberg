@@ -4,7 +4,7 @@
 import { logged } from './utils';
 
 function isDev() {
-	return SCRIPT_DEBUG === true;
+	return typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true;
 }
 
 /**
