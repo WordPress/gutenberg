@@ -163,37 +163,37 @@ test.describe( 'Cover', () => {
 		// Open the block list viewer from the toolbar.
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'List View' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
 			.click();
 
-		// Select the Cover block.
-		await page.getByRole( 'gridcell', { name: 'Cover link' } ).click();
+		// Select the Cover block from the docuemnt overview.
+		await page.getByRole( 'link', { name: 'Cover' } ).click();
 
 		// Ensure there the default value for the minimum height of cover is undefined.
-		const coverHeightInput = page.getByLabel( 'Minimum height of cover' );
-		await expect( coverHeightInput ).not.toHaveValue( /[0-9]/ );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+		const defaultHeightValue = await page
+			.getByLabel( 'Minimum height of cover' )
+			.inputValue();
+		expect( defaultHeightValue ).toBeFalsy();
 
 		// Establish locators for the Cover block and the resize handler.
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
-		const coverBlockResizeHandle = coverBlock.locator(
-			'.components-resizable-box__handle'
+		const coverBlockResizeHandle = page.locator(
+			'.components-resizable-box__handle-bottom'
 		);
 
-		// Establish the existing bounding boxes for the Cover block and the
-		// resize handler.
+		// Establish the existing bounding boxes for the Cover block.
 		const coverBlockBox = await coverBlock.boundingBox();
-		const coverBlockResizeHandleBox =
-			await coverBlockResizeHandle.boundingBox();
 
 		expect( coverBlockBox.height ).toEqual( 450 );
 
-		// Resize the block by at least 100px.
+		// Resize the block by 100px.
 		await coverBlockResizeHandle.hover();
 		await page.mouse.down();
 		await page.mouse.move(
-			coverBlockResizeHandleBox.x,
+			coverBlockBox.x,
 			coverBlockBox.y + coverBlockBox.height + 100,
 			{ steps: 5 }
 		);
@@ -205,7 +205,7 @@ test.describe( 'Cover', () => {
 		);
 	} );
 
-	test.skip( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
 	} ) => {
