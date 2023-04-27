@@ -22,13 +22,18 @@ function register_block_core_pattern() {
 /**
  * Renders the `core/pattern` block on the server.
  *
- * @param array $attributes Block attributes.
+ * @param array  $attributes Block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the output of the pattern.
  */
-function render_block_core_pattern( $attributes ) {
+function render_block_core_pattern( $attributes, $content ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
+	}
+
+	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
+		return $content;
 	}
 
 	$slug     = $attributes['slug'];
