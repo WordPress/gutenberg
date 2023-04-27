@@ -8,7 +8,7 @@ import { TouchableWithoutFeedback } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockInvalidWarning( { clientId } ) {
 	const selector = ( select ) => {
-		const { getBlock, getBlockType } = select( blockEditorStore );
+		const { getBlock } = select( blockEditorStore );
 		const block = getBlock( clientId );
 		const { name } = block || {};
 
