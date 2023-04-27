@@ -3,7 +3,12 @@
 		"name": "core/pattern",
 		"isValid": true,
 		"attributes": {
-			"slug": "core/text-two-columns"
+			"align": "full",
+			"layout": {
+				"type": "constrained"
+			},
+			"slug": "core/text-two-columns",
+			"syncStatus": "synced"
 		},
 		"innerBlocks": []
 	}
