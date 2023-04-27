@@ -6,28 +6,15 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { order } from './edit';
+import { getOrder } from './order';
 
 export default function Save( { attributes, clientId } ) {
-	const footnotes = Object.fromEntries(
-		attributes.footnotes.map( ( { content, id } ) => [ id, content ] )
-	);
-	order.set(
-		clientId,
-		new Set( [
-			...( order.get( clientId ) || [] ),
-			...Object.keys( footnotes ),
-		] )
-	);
 	return (
 		<footer { ...useBlockProps.save() }>
 			<ol>
-				{ Array.from( order.get( clientId ) ).map( ( id ) => (
+				{ getOrder( clientId, attributes ).map( ( { id, content } ) => (
 					<li id={ id } key={ id }>
-						<RichText.Content
-							tagName="span"
-							value={ footnotes[ id ] }
-						/>{ ' ' }
+						<RichText.Content tagName="span" value={ content } />{ ' ' }
 						<a href={ `#${ id }-link` }>↩︎</a>
 					</li>
 				) ) }

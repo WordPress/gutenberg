@@ -12,18 +12,17 @@
 			"type": "array",
 			"default": [],
 			"source": "query",
-			"selector": "ol",
+			"selector": "li",
 			"query": {
 				"content": {
 					"type": "string",
 					"source": "html",
-					"selector": "li span"
+					"selector": "span"
 				},
 				"id": {
 					"type": "string",
 					"source": "attribute",
-					"attribute": "id",
-					"selector": "li"
+					"attribute": "id"
 				}
 			}
 		}
