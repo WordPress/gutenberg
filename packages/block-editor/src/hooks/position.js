@@ -290,7 +290,7 @@ export function PositionPanel( props ) {
 
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
-		allowSticky && value === 'sticky' && blockInformation
+		allowSticky && value === STICKY_OPTION.value && blockInformation
 			? sprintf(
 					/* translators: %s: the name of the parent block. */
 					__(
@@ -302,8 +302,8 @@ export function PositionPanel( props ) {
 
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
-		// Only display sticky option if the block has no parents (is at the root of the document),
-		// or if the block already has a sticky position value set.
+		// Display options if they are allowed, or if a block already has a valid value set.
+		// This allows for a block to be switched off from a position type that is not allowed.
 		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
@@ -345,7 +345,7 @@ export function PositionPanel( props ) {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					{ firstParentClientId && value === 'sticky' ? (
+					{ firstParentClientId && value === STICKY_OPTION.value ? (
 						<PositionVisualizer
 							forceShow={ isSelected }
 							{ ...props }
