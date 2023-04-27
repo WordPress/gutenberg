@@ -28,7 +28,7 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warning from "@wordpress/warning";',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;'
+			'SCRIPT_DEBUG === true ? warning("a") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -44,8 +44,7 @@ describe( 'babel-plugin', () => {
 	it( 'should replace warning calls without import declaration with plugin options', () => {
 		const input = 'warning("a");';
 		const options = { callee: 'warning' };
-		const expected =
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;';
+		const expected = 'SCRIPT_DEBUG === true ? warning("a") : void 0;';
 
 		expect( transformCode( input, options ) ).toEqual( expected );
 	} );
@@ -59,9 +58,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warning from "@wordpress/warning";',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("b") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("c") : void 0;'
+			'SCRIPT_DEBUG === true ? warning("a") : void 0;',
+			'SCRIPT_DEBUG === true ? warning("b") : void 0;',
+			'SCRIPT_DEBUG === true ? warning("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -76,9 +75,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warn from "@wordpress/warning";',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
+			'SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'SCRIPT_DEBUG === true ? warn("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -93,9 +92,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warn from "@wordpress/warning";',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
+			'SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'SCRIPT_DEBUG === true ? warn("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
