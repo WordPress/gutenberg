@@ -317,18 +317,6 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
-
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
@@ -614,18 +602,6 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveNavigationFallbackId
-
-Returns an action object signalling that the fallback Navigation Menu id has been received.
-
-_Parameters_
-
--   _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 

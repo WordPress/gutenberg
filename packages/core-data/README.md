@@ -106,18 +106,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### receiveNavigationFallbackId
-
-Returns an action object signalling that the fallback Navigation Menu id has been received.
-
-_Parameters_
-
--   _fallbackId_ `integer`: the id of the fallback Navigation Menu
-
-_Returns_
-
--   `Object`: Action object.
-
 ### receiveThemeSupports
 
 > **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
@@ -493,18 +481,6 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
-
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 
