@@ -372,7 +372,7 @@ function BlockListBlock( {
 							isSelectionEnabled={ isSelectionEnabled }
 							mergeBlocks={ canRemove ? onMerge : undefined }
 							name={ name }
-							onBlockFocus={ onFocus }
+							onFocus={ onFocus }
 							onRemove={ canRemove ? onRemove : undefined }
 							onReplace={ canRemove ? onReplace : undefined }
 							parentBlockAlignment={ parentBlockAlignment }
