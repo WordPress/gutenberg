@@ -13,7 +13,7 @@ store( {
 					// Review how to move this to a selector or something similar
 					context.roleAttribute = 'dialog';
 					// It adds a `has-modal-open` class to the <html> root
-					document.documentElement.classList.add( 'has-modal-open' );
+					// document.documentElement.classList.add( 'has-modal-open' );
 				},
 				closeMenu: ( { context } ) => {
 					context.isMenuOpen = false;
@@ -22,9 +22,9 @@ store( {
 					context.modal = null;
 					context.previousFocus = null;
 					// It removes the `has-modal-open` class to the <html> root
-					document.documentElement.classList.remove(
-						'has-modal-open'
-					);
+					// document.documentElement.classList.remove(
+					// 	'has-modal-open'
+					// );
 				},
 				handleMenuKeydown: ( { actions, context, event } ) => {
 					if ( context.isMenuOpen ) {
@@ -64,11 +64,8 @@ store( {
 				},
 				handleMenuFocusout: ( { actions, context, event } ) => {
 					if ( context.isMenuOpen ) {
-						// If focus is outside modal (and in the document), close menu
-						if (
-							! context.modal.contains( event.relatedTarget ) &&
-							document.contains( event.relatedTarget )
-						) {
+						// If focus is outside modal, close menu
+						if ( ! context.modal.contains( event.relatedTarget ) ) {
 							actions.core.navigation.closeMenu( { context } );
 						}
 					}
