@@ -8,8 +8,7 @@
 -   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
-between the host, web container, and cli container. You _may_ need to run `npx wp-env destroy` to get everything working as
-expected.
+between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 
 ### Bug fix
 
