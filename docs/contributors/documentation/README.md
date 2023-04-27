@@ -101,11 +101,11 @@ This way they will be properly handled in all three aforementioned contexts.
 
 Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links.
 
+An example, the link to this page is: `/docs/contributors/documentation/README.md`
+
 <div class="callout callout-warning">
 <b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
 </div>
-
-An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
 ### Code examples
 
