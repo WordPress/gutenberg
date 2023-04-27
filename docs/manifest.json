@@ -1824,6 +1824,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
