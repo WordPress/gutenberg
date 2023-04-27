@@ -26,6 +26,7 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * @param {Object}  options.spinner      A CLI spinner which indicates progress.
  * @param {boolean} options.debug        True if debug mode is enabled.
  * @param {string}  options.xdebug       The Xdebug mode to set. Defaults to "off".
+ * @param {string}  options.xhprof       The XHProf mode to set. Defaults to "off".
  * @param {boolean} options.writeChanges If true, writes the parsed config to the
  *                                       required docker files like docker-compose
  *                                       and Dockerfile. By default, this is false
@@ -37,6 +38,7 @@ module.exports = async function initConfig( {
 	spinner,
 	debug,
 	xdebug = 'off',
+	xhprof = 'off',
 	writeChanges = false,
 } ) {
 	const configPath = path.resolve( '.wp-env.json' );
@@ -44,9 +46,10 @@ module.exports = async function initConfig( {
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the
-	// config has changed when only the xdebug param has changed. This is needed
-	// so that Docker will rebuild the image whenever the xdebug flag changes.
+	// config has changed when only the xdebug or xhprof params have changed. This
+	// is needed so that Docker will rebuild the image whenever the either flag changes.
 	config.xdebug = xdebug;
+	config.xhprof = xhprof;
 
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 
@@ -142,8 +145,9 @@ function checkXdebugPhpCompatibility( config ) {
  * @return {string} The dockerfile contents.
  */
 function dockerFileContents( image, config ) {
-	// Don't install XDebug unless it is explicitly required.
+	// Don't install XDebug or XHProf unless they are explicitly required.
 	let shouldInstallXdebug = false;
+	let shouldInstallXhprof = false;
 
 	if ( config.xdebug !== 'off' ) {
 		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
@@ -153,10 +157,16 @@ function dockerFileContents( image, config ) {
 		}
 	}
 
+	// @todo: test compat.
+	if ( config.xhprof !== 'off' ) {
+		shouldInstallXhprof = true;
+	}
+
 	return `FROM ${ image }
 
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
+${ shouldInstallXhprof ? installXhprof() : '' }
 `;
 }
 
@@ -174,5 +184,16 @@ RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
+	`;
+}
+
+function installXhprof() {
+	return `
+#Install XHProf:
+RUN if [ -z "$(pecl list | grep xhprof)" ] ; then pecl install xhprof ; fi
+RUN docker-php-ext-enable xhprof
+RUN echo '[xhprof]' >> /usr/local/etc/php/php.ini
+RUN echo 'extension=xhprof.so' >> /usr/local/etc/php/php.ini
+RUN echo 'xhprof.output_dir="/tmp/xhprof"' >> /usr/local/etc/php/php.ini
 	`;
 }
