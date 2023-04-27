@@ -3,7 +3,7 @@
 		"name": "core/pattern",
 		"isValid": true,
 		"attributes": {
-			"align": "full",
+			"forcedAlignment": "full",
 			"layout": {
 				"type": "constrained"
 			},
