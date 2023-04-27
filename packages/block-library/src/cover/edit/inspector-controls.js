@@ -141,9 +141,6 @@ export default function CoverInspectorControls( {
 	};
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
-	const hasColors =
-		!! colorGradientSettings.colors.length &&
-		!! colorGradientSettings.gradients.length;
 
 	const htmlElementMessages = {
 		header: __(
@@ -252,7 +249,7 @@ export default function CoverInspectorControls( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			{ hasColors && (
+			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
 						__experimentalIsRenderedInSidebar
