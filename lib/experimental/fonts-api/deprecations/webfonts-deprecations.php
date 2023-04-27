@@ -61,6 +61,8 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	function wp_register_webfonts( array $webfonts ) {
 		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_register_fonts()' );
 
+		$webfonts = Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure( $webfonts );
+
 		return wp_register_fonts( $webfonts );
 	}
 }

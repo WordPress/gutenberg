@@ -56,12 +56,6 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 		$registered = array();
 		$wp_fonts   = wp_fonts();
 
-		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( Gutenberg_Fonts_API_BC_Layer::is_deprecated_structure( $fonts ) ) {
-			$fonts = Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure( $fonts );
-		}
-		// BACKPORT NOTE: end of code block.
-
 		foreach ( $fonts as $font_family => $variations ) {
 			$font_family_handle = $wp_fonts->add_font_family( $font_family );
 			if ( ! $font_family_handle ) {

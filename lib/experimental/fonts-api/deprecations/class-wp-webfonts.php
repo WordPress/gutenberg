@@ -19,9 +19,7 @@ if ( class_exists( 'WP_Webfonts' ) ) {
 /**
  * Class WP_Webfonts
  *
- * BACKPORT NOTE: Do not backport this file to Core.
- * This class exists to give extenders guidance and time to upgrade their code
- * to use the new Web Fonts API.
+ * @deprecated GB 15.1 Use WP_Fonts instead.
  */
 class WP_Webfonts {
 	/**
