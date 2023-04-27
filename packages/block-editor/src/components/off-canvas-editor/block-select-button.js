@@ -12,7 +12,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock, chevronRightSmall } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { sprintf, __ } from '@wordpress/i18n';
 
@@ -119,6 +119,11 @@ function ListViewBlockSelectButton(
 							<Icon icon={ lock } />
 						</span>
 					) }
+					<Icon
+						icon={ chevronRightSmall }
+						className="block-editor-list-view-block-select-button__drilldown-indicator"
+						size={ 24 }
+					/>
 				</HStack>
 			</Button>
 		</>
