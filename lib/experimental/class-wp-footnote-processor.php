@@ -116,8 +116,7 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	 */
 	private function find_opener() {
 		while ( $this->next_tag( array( 'tag_name' => 'sup' ) ) ) {
-			$value = $this->get_attribute( 'value' );
-			if ( 'core/footnote' === $value || 'footnote' === $value ) {
+			if ( 'fn' === $this->get_attribute( 'class' ) ) {
 				$this->set_bookmark( 'start' );
 				return true;
 			}
