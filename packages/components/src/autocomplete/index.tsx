@@ -239,7 +239,7 @@ export function useAutocomplete( {
 		if ( isCollapsed( record ) ) {
 			return getTextContent( slice( record, 0 ) );
 		}
-		return null;
+		return '';
 	}, [ record ] );
 
 	useEffect( () => {
