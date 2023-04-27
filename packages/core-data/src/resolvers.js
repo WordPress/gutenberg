@@ -411,6 +411,8 @@ export const __experimentalGetTemplateForLink =
 	async ( { dispatch, resolveSelect } ) => {
 		let template;
 		try {
+			// This is NOT calling a REST endpoint but rather ends up with a response from
+			// an Ajax function which has a different shape from a WP_REST_Response.
 			template = await apiFetch( {
 				url: addQueryArgs( link, {
 					'_wp-find-template': true,
