@@ -29,7 +29,13 @@ import { store as blockEditorStore } from '../../store';
 /**
  * An array representing data for blocks in the DOM used by drag and drop.
  *
- * @typedef {Object} WPListViewDropZoneBlocks
+ * @typedef {WPListViewDropZoneBlock[]} WPListViewDropZoneBlocks
+ */
+
+/**
+ * An object representing data for blocks in the DOM used by drag and drop.
+ *
+ * @typedef {Object} WPListViewDropZoneBlock
  * @property {string}  clientId                        The client id for the block.
  * @property {string}  rootClientId                    The root client id for the block.
  * @property {number}  blockIndex                      The block's index.
@@ -105,6 +111,24 @@ function getCandidateBlockParents( candidateBlockData, blocksData ) {
 	}
 
 	return candidateBlockParents;
+}
+
+/**
+ * Given a list of blocks data and a block index, return the next non-dragged
+ * block. This is used to determine the block that the user is dropping to,
+ * while ignoring the dragged block.
+ *
+ * @param {WPListViewDropZoneBlock} blocksData Data about the blocks in list view.
+ * @param {number}                  index      The index to begin searching from.
+ * @return {WPListViewDropZoneBlocks | undefined} The next non-dragged block.
+ */
+function getNextNonDraggedBlock( blocksData, index ) {
+	const nextBlockData = blocksData[ index + 1 ];
+	if ( nextBlockData && nextBlockData.isDraggedBlock ) {
+		return getNextNonDraggedBlock( blocksData, index + 1 );
+	}
+
+	return nextBlockData;
 }
 
 /**
@@ -198,10 +222,12 @@ export function getListViewDropTarget( blocksData, position ) {
 		candidateBlockData.rootClientId &&
 		isUpGesture( position, candidateRect, candidateBlockParents.length )
 	) {
+		const nextBlock = getNextNonDraggedBlock(
+			blocksData,
+			candidateBlockIndex
+		);
 		const currentLevel = candidateBlockData.nestingLevel;
-		const nextLevel = blocksData[ candidateBlockIndex + 1 ]
-			? blocksData[ candidateBlockIndex + 1 ]?.nestingLevel
-			: 1;
+		const nextLevel = nextBlock ? nextBlock.nestingLevel : 1;
 
 		if ( currentLevel && nextLevel ) {
 			const desiredRelativeLevel = getDesiredRelativeParentLevel(
@@ -215,8 +241,7 @@ export function getListViewDropTarget( blocksData, position ) {
 				0
 			);
 
-			// TODO: This still isn't quite right as the default block index.
-			// It should really be one more than the last block in that level of the tree.
+			// Default to the block index of the candidate block.
 			let newBlockIndex = candidateBlockData.blockIndex;
 
 			// If the next block is at the same level, use that as the default
@@ -224,10 +249,22 @@ export function getListViewDropTarget( blocksData, position ) {
 			// position when dragging to the bottom of a block.
 			if (
 				candidateBlockParents[ targetParentIndex ].nestingLevel ===
-				blocksData[ candidateBlockIndex + 1 ]?.nestingLevel
+				nextBlock?.nestingLevel
 			) {
-				newBlockIndex =
-					blocksData[ candidateBlockIndex + 1 ]?.blockIndex;
+				newBlockIndex = nextBlock?.blockIndex;
+			} else {
+				// Otherwise, search from the end of the block data back
+				// to find the last block index within the same target parent.
+				for ( let i = blocksData.length - 1; i >= 0; i-- ) {
+					const blockData = blocksData[ i ];
+					if (
+						blockData.rootClientId ===
+						candidateBlockParents[ targetParentIndex ].rootClientId
+					) {
+						newBlockIndex = blockData.blockIndex + 1;
+						break;
+					}
+				}
 			}
 
 			if ( candidateBlockParents[ targetParentIndex ] ) {
