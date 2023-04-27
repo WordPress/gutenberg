@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
+
 ## 6.0.0 (2023-04-26)
 
 ### Breaking Change
@@ -9,10 +13,6 @@
 -   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
 -   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
-
-### Enhancement
-
--   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
 
 ## 5.16.0 (2023-04-12)
 
