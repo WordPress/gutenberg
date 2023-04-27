@@ -20,15 +20,24 @@ store( {
 					}
 				},
 				closeMenu: ( { context } ) => {
-					context.isMenuOpen = false;
-					context.modal = null;
-					context.previousFocus = null;
-					if ( context.overlay ) {
-						// Review how to move this to a selector or something similar
-						context.roleAttribute = '';
-						document.documentElement.classList.remove(
-							'has-modal-open'
-						);
+					if ( context.isMenuOpen ) {
+						context.isMenuOpen = false;
+						if (
+							context.modal.contains(
+								window.document.activeElement
+							)
+						) {
+							context.previousFocus.focus();
+						}
+						context.modal = null;
+						context.previousFocus = null;
+						if ( context.overlay ) {
+							// Review how to move this to a selector or something similar
+							context.roleAttribute = '';
+							document.documentElement.classList.remove(
+								'has-modal-open'
+							);
+						}
 					}
 				},
 				handleMenuKeydown: ( { actions, context, event } ) => {
