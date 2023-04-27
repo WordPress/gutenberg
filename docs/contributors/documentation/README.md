@@ -165,7 +165,8 @@ Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notati
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page the URL in GitHub is
 https://developer.wordpress.org/docs/getting-started/create-block/README.md
-and will have to be hardcoded for the endpoint in the Block Editor Handbook as <a href="../getting-started/create-block/">../getting-started/create-block/</a> to link correctly in the handbook. 
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
 </div>
 ### Editor config
 
