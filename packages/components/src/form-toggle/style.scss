@@ -44,7 +44,7 @@ $toggle-border-width: 1px;
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
-		@include button-style-outset__focus();
+		@include button-style-outset__focus($components-color-accent);
 	}
 
 	&.is-checked {

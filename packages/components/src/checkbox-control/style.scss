@@ -27,7 +27,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	@include reduce-motion("transition");
 
 	&:focus {
-		@include button-style-outset__focus();
+		@include button-style-outset__focus(var(--wp-admin-theme-color));
 	}
 
 	&:checked,
