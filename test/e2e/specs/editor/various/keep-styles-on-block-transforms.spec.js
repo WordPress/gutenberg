@@ -14,10 +14,8 @@ test.describe( 'Keep styles on block transforms', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
-
 		await editor.openDocumentSettingsSidebar();
 		await page.click( 'role=button[name="Text"i]' );
-
 		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
@@ -47,25 +45,17 @@ test.describe( 'Keep styles on block transforms', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Paragraph"i]' );
-		await page.click( 'role=menuitem[name="Group"i]' );
+		await page.click( 'role=menuitem[name="Heading"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
-				name: 'core/group',
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Line 1 to be made large' },
-					},
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Line 2 to be made large' },
-					},
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Line 3 to be made large' },
-					},
-				],
+				name: 'core/heading',
+			},
+			{
+				name: 'core/heading',
+			},
+			{
+				name: 'core/heading',
 			},
 		] );
 	} );
