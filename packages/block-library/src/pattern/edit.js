@@ -11,19 +11,24 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 
-const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
+const PatternEdit = ( {
+	attributes: { inheritedAlignment, slug },
+	clientId,
+	setAttributes,
+} ) => {
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
-				selectedPattern: select(
-					blockEditorStore
-				).__experimentalGetParsedPattern( attributes.slug ),
+				selectedPattern:
+					select( blockEditorStore ).__experimentalGetParsedPattern(
+						slug
+					),
 				innerBlocks:
 					select( blockEditorStore ).getBlock( clientId )
 						?.innerBlocks,
 			};
 		},
-		[ attributes.slug, clientId ]
+		[ slug, clientId ]
 	);
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -52,7 +57,9 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		innerBlocks,
 	] );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: `align${ inheritedAlignment }`,
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 	return (
 		<>

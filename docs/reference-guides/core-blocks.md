@@ -482,8 +482,8 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** align (full, wide)
--	**Attributes:** align, layout, slug, syncStatus
+-	**Supports:** 
+-	**Attributes:** inheritedAlignment, layout, slug, syncStatus
 
 ## Post Author
 
