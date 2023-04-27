@@ -108,7 +108,7 @@ export default function PostTemplateEdit( {
 		setAttributes( {
 			layout: {
 				type: updatedLayoutType,
-				__unstableColumns: columns,
+				_unstableColumnCount: columns,
 			},
 		} );
 	}, [ updatedLayoutType, columns, setAttributes ] );

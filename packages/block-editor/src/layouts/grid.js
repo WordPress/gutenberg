@@ -53,7 +53,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { minimumColumnWidth = '12rem', __unstableColumns = null } =
+		const { minimumColumnWidth = '12rem', _unstableColumnCount = null } =
 			layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
@@ -67,9 +67,9 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( __unstableColumns ) {
+		if ( _unstableColumnCount ) {
 			rules.push(
-				`grid-template-columns: repeat(${ __unstableColumns }, 1fr)`
+				`grid-template-columns: repeat(${ _unstableColumnCount }, 1fr)`
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
