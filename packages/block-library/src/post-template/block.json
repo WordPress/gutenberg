@@ -20,9 +20,7 @@
 		"html": false,
 		"align": [ "wide", "full" ],
 		"anchor": true,
-		"__experimentalLayout": {
-			"allowEditing": false
-		},
+		"__experimentalLayout": true,
 		"color": {
 			"gradients": true,
 			"link": true,

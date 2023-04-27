@@ -6,18 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState, useEffect } from '@wordpress/element';
+import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
+	BlockControls,
 	BlockContextProvider,
 	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
+import { Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { list, grid } from '@wordpress/icons';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -96,22 +98,17 @@ export default function PostTemplateEdit( {
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
-		displayLayout: { type: layoutType = 'grid', columns = 3 } = {},
+		displayLayout,
 		previewPostType,
 	},
+	attributes: { layout },
 	__unstableLayoutClassNames,
 } ) {
-	const updatedLayoutType =
+	const { type: layoutType = 'grid' } = displayLayout || {};
+	const legacyLayoutType =
 		layoutType === 'list' || layoutType === 'default' ? 'default' : 'grid';
 
-	useEffect( () => {
-		setAttributes( {
-			layout: {
-				type: updatedLayoutType,
-				_unstableColumnCount: columns,
-			},
-		} );
-	}, [ updatedLayoutType, columns, setAttributes ] );
+	const updatedLayoutType = layout?.type || legacyLayoutType;
 
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
@@ -245,35 +242,67 @@ export default function PostTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
+	const setDisplayLayout = ( newDisplayLayout ) =>
+		setAttributes( {
+			layout: { ...layout, ...newDisplayLayout },
+		} );
+
+	const displayLayoutControls = [
+		{
+			icon: list,
+			title: __( 'List view' ),
+			onClick: () => setDisplayLayout( { type: 'default' } ),
+			isActive:
+				updatedLayoutType === 'default' || updatedLayoutType === 'list',
+		},
+		{
+			icon: grid,
+			title: __( 'Grid view' ),
+			onClick: () =>
+				setDisplayLayout( { type: 'grid', __unstableColumnCount: 3 } ),
+			isActive:
+				updatedLayoutType === 'grid' || updatedLayoutType === 'flex',
+		},
+	];
+
 	// To avoid flicker when switching active block contexts, a preview is rendered
 	// for each block context, but the preview for the active block context is hidden.
 	// This ensures that when it is displayed again, the cached rendering of the
 	// block preview is used, instead of having to re-render the preview from scratch.
 	return (
-		<ul { ...blockProps }>
-			{ blockContexts &&
-				blockContexts.map( ( blockContext ) => (
-					<BlockContextProvider
-						key={ blockContext.postId }
-						value={ blockContext }
-					>
-						{ blockContext.postId ===
-						( activeBlockContextId ||
-							blockContexts[ 0 ]?.postId ) ? (
-							<PostTemplateInnerBlocks />
-						) : null }
-						<MemoizedPostTemplateBlockPreview
-							blocks={ blocks }
-							blockContextId={ blockContext.postId }
-							setActiveBlockContextId={ setActiveBlockContextId }
-							isHidden={
-								blockContext.postId ===
-								( activeBlockContextId ||
-									blockContexts[ 0 ]?.postId )
-							}
-						/>
-					</BlockContextProvider>
-				) ) }
-		</ul>
+		<>
+			<BlockControls>
+				{ ' ' }
+				<ToolbarGroup controls={ displayLayoutControls } />
+			</BlockControls>
+
+			<ul { ...blockProps }>
+				{ blockContexts &&
+					blockContexts.map( ( blockContext ) => (
+						<BlockContextProvider
+							key={ blockContext.postId }
+							value={ blockContext }
+						>
+							{ blockContext.postId ===
+							( activeBlockContextId ||
+								blockContexts[ 0 ]?.postId ) ? (
+								<PostTemplateInnerBlocks />
+							) : null }
+							<MemoizedPostTemplateBlockPreview
+								blocks={ blocks }
+								blockContextId={ blockContext.postId }
+								setActiveBlockContextId={
+									setActiveBlockContextId
+								}
+								isHidden={
+									blockContext.postId ===
+									( activeBlockContextId ||
+										blockContexts[ 0 ]?.postId )
+								}
+							/>
+						</BlockContextProvider>
+					) ) }
+			</ul>
+		</>
 	);
 }

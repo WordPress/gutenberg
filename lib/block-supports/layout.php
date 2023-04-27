@@ -280,10 +280,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['_unstableColumnCount'] ) ) {
+		if ( ! empty( $layout['__unstableColumnCount'] ) ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['_unstableColumnCount'] . ', 1fr)' ),
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['__unstableColumnCount'] . ', 1fr)' ),
 			);
 		} else {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';

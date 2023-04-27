@@ -35,11 +35,23 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
+		const { __unstableColumnCount = null } = layout;
+
 		return (
-			<GridLayoutMinimumWidthControl
-				layout={ layout }
-				onChange={ onChange }
-			/>
+			<>
+				{ __unstableColumnCount && (
+					<GridLayoutColumnsControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
+				{ ! __unstableColumnCount && (
+					<GridLayoutMinimumWidthControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
+			</>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls() {
@@ -53,7 +65,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { minimumColumnWidth = '12rem', _unstableColumnCount = null } =
+		const { minimumColumnWidth = '12rem', __unstableColumnCount = null } =
 			layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
@@ -67,9 +79,9 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( _unstableColumnCount ) {
+		if ( __unstableColumnCount ) {
 			rules.push(
-				`grid-template-columns: repeat(${ _unstableColumnCount }, 1fr)`
+				`grid-template-columns: repeat(${ __unstableColumnCount }, 1fr)`
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
@@ -173,5 +185,25 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 			</Flex>
 		</fieldset>
+	);
+}
+
+// Enables setting number of grid columns
+function GridLayoutColumnsControl( { layout, onChange } ) {
+	const { __unstableColumnCount = 3 } = layout;
+
+	return (
+		<RangeControl
+			label={ __( 'Columns' ) }
+			value={ __unstableColumnCount }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					__unstableColumnCount: value,
+				} );
+			} }
+			min={ 1 }
+			max={ 12 }
+		/>
 	);
 }
