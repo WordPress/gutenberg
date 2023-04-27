@@ -81,6 +81,7 @@ Talks given about Gutenberg, including slides and videos as they are available.
 
 You can access all courses [here](https://learn.wordpress.org/).
 
+-   [Intro to Block Development: Build Your First Custom Block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/), Jonathan Bossenger (2023) 
 -   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/), Daisy Olsen (January 2021)
 -   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/), Jonathan Bossenger (August 2020)
 -   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/), Erica Varlese (August 2020)

@@ -81,6 +81,7 @@ const restrictedImports = [
 			'flowRight',
 			'forEach',
 			'fromPairs',
+			'groupBy',
 			'has',
 			'identity',
 			'includes',

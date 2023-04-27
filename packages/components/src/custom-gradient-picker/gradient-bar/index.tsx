@@ -139,9 +139,15 @@ export default function CustomGradientBar( {
 			) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
-			style={ { background } }
 			onMouseLeave={ onMouseLeave }
 		>
+			<div
+				className="components-custom-gradient-picker__gradient-bar-background"
+				style={ {
+					background,
+					opacity: hasGradient ? 1 : 0.4,
+				} }
+			/>
 			<div
 				ref={ gradientMarkersContainerDomRef }
 				className="components-custom-gradient-picker__markers-container"

@@ -19,7 +19,7 @@ test.describe( 'Block Locking', () => {
 			await page.click( 'role=button[name="Apply"]' );
 
 			await expect(
-				page.locator( 'role=menuitem[name="Remove Paragraph"]' )
+				page.locator( 'role=menuitem[name="Delete"]' )
 			).not.toBeVisible();
 		} );
 

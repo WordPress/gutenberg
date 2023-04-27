@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
+import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,7 +11,8 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 import SlotFillContext from './context';
 import useSlot from './use-slot';
 
-function FillComponent( { name, children, registerFill, unregisterFill } ) {
+export default function Fill( { name, children } ) {
+	const { registerFill, unregisterFill } = useContext( SlotFillContext );
 	const slot = useSlot( name );
 
 	const ref = useRef( {
@@ -51,28 +52,5 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ name ] );
 
-	if ( ! slot || ! slot.node ) {
-		return null;
-	}
-
-	// If a function is passed as a child, provide it with the fillProps.
-	if ( typeof children === 'function' ) {
-		children = children( slot.props.fillProps );
-	}
-
-	return createPortal( children, slot.node );
+	return null;
 }
-
-const Fill = ( props ) => (
-	<SlotFillContext.Consumer>
-		{ ( { registerFill, unregisterFill } ) => (
-			<FillComponent
-				{ ...props }
-				registerFill={ registerFill }
-				unregisterFill={ unregisterFill }
-			/>
-		) }
-	</SlotFillContext.Consumer>
-);
-
-export default Fill;

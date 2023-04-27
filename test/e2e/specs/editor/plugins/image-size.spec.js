@@ -46,7 +46,7 @@ test.describe( 'changing image size', () => {
 
 		// Select the new size updated with the plugin.
 		await editor.openDocumentSettingsSidebar();
-		await page.selectOption( 'role=combobox[name="Image size"i]', {
+		await page.selectOption( 'role=combobox[name="Resolution"i]', {
 			label: 'Custom Size One',
 		} );
 

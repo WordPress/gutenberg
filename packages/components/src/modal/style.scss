@@ -16,31 +16,39 @@
 // The modal window element.
 .components-modal__frame {
 	// Use the entire viewport on smaller screens.
-	margin: 0;
+	margin: $grid-unit-50 0 0 0;
 	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	border-radius: $radius-block-ui;
+	border-radius: $grid-unit-10 $grid-unit-10 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
+	// Animate the modal frame/contents appearing on the page.
+	animation: components-modal__appear-animation 0.1s ease-out;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
+		border-radius: $grid-unit-10;
 		margin: auto;
 		width: auto;
 		min-width: $modal-min-width;
 		max-width: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$header-height * 2});
 
-		// Animate the modal frame/contents appearing on the page.
-		animation: components-modal__appear-animation 0.1s ease-out;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
-
 		&.is-full-screen {
-			width: 90vw;
-			min-height: 90vh;
+			@include break-small() {
+				width: calc(100% - #{ $grid-unit-20 * 2 });
+				height: calc(100% - #{ $grid-unit-20 * 2 });
+				max-height: none;
+			}
+			@include break-medium() {
+				width: calc(100% - #{ $grid-unit-50 * 2 });
+				height: calc(100% - #{ $grid-unit-50 * 2 });
+				max-width: none;
+			}
 		}
 	}
 
@@ -64,12 +72,12 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-20;
+	height: $header-height + $grid-unit-15;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -121,7 +129,7 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-20;
+	margin-top: $header-height + $grid-unit-15;
 	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 

@@ -24,12 +24,14 @@ import {
 	post,
 	postAuthor,
 	postDate,
+	postList,
 	search,
 	tag,
 	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -45,12 +47,14 @@ import {
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
-import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 
+const { useHistory } = unlock( routerPrivateApis );
+
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
+	'home',
 	'single',
 	'page',
 	'index',
@@ -66,6 +70,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
+	home: postList,
 	single: post,
 	page,
 	archive,
@@ -98,9 +103,7 @@ export default function NewTemplate( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate, setCanvasMode } = unlock(
-		useDispatch( editSiteStore )
-	);
+	const { setTemplate } = unlock( useDispatch( editSiteStore ) );
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
@@ -125,20 +128,19 @@ export default function NewTemplate( {
 
 			// Set template before navigating away to avoid initial stale value.
 			setTemplate( newTemplate.id, newTemplate.slug );
-			// Switch to edit mode.
-			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
 			history.push( {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
+				canvas: 'edit',
 			} );
 
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					title
+					newTemplate.title?.rendered || title
 				),
 				{
 					type: 'snackbar',

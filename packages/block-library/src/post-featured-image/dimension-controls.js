@@ -70,6 +70,10 @@ const DimensionControls = ( {
 		} );
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
+
+	const showScaleControl =
+		height || ( aspectRatio && aspectRatio !== 'auto' );
+
 	return (
 		<InspectorControls group="dimensions">
 			<ToolsPanelItem
@@ -170,7 +174,7 @@ const DimensionControls = ( {
 					units={ units }
 				/>
 			</ToolsPanelItem>
-			{ ( height || aspectRatio ) && (
+			{ showScaleControl && (
 				<ToolsPanelItem
 					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
 					label={ scaleLabel }
@@ -204,7 +208,7 @@ const DimensionControls = ( {
 			{ !! imageSizeOptions.length && (
 				<ToolsPanelItem
 					hasValue={ () => !! sizeSlug }
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					onDeselect={ () =>
 						setAttributes( { sizeSlug: undefined } )
 					}
@@ -216,7 +220,7 @@ const DimensionControls = ( {
 				>
 					<SelectControl
 						__nextHasNoMarginBottom
-						label={ __( 'Image size' ) }
+						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }
 						options={ imageSizeOptions }
 						onChange={ ( nextSizeSlug ) =>

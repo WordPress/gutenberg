@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
+import path from 'path';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,8 @@ import {
 import {
 	readFile,
 	deleteFile,
+	saveResultsFile,
+	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
 	sequence,
@@ -56,7 +57,7 @@ describe( 'Site Editor Performance', () => {
 		await deleteAllTemplates( 'wp_template_part' );
 
 		const html = readFile(
-			join( __dirname, '../../assets/large-post.html' )
+			path.join( __dirname, '../../assets/large-post.html' )
 		);
 
 		await createNewPost( { postType: 'page' } );
@@ -83,12 +84,7 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	afterAll( async () => {
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
-
+		saveResultsFile( __filename, results );
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
@@ -159,9 +155,9 @@ describe( 'Site Editor Performance', () => {
 		await insertBlock( 'Paragraph' );
 
 		// Start tracing.
-		const traceFile = __dirname + '/trace.json';
+		const traceFilePath = getTraceFilePath();
 		await page.tracing.start( {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -171,7 +167,7 @@ describe( 'Site Editor Performance', () => {
 
 		// Stop tracing and save results.
 		await page.tracing.stop();
-		const traceResults = JSON.parse( readFile( traceFile ) );
+		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		for ( let i = 0; i < keyDownEvents.length; i++ ) {
@@ -181,7 +177,7 @@ describe( 'Site Editor Performance', () => {
 		}
 
 		// Delete the original trace file.
-		deleteFile( traceFile );
+		deleteFile( traceFilePath );
 
 		expect( true ).toBe( true );
 	} );

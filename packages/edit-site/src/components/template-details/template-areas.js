@@ -7,14 +7,17 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { moreVertical } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { useLocation } from '../routes';
 import { useLink } from '../routes/link';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function TemplatePartItemMore( {
 	onClose,
