@@ -339,7 +339,7 @@ export function isNavigationOpened() {
  * @return {boolean} Whether or not the editor has a page loaded into it.
  */
 export function isPage( state ) {
-	return state.editedPost.context?.postId;
+	return !! state.editedPost.context?.postId;
 }
 
 /**
