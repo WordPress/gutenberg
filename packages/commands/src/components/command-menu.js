@@ -196,11 +196,7 @@ export function CommandMenu() {
 			onRequestClose={ close }
 			__experimentalHideHeader
 		>
-			{ /* the style here is a hack to force safari to repaint to avoid a style glitch */ }
-			<div
-				className="commands-command-menu__container"
-				style={ { transform: 'translateZ(0)' } }
-			>
+			<div className="commands-command-menu__container">
 				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
 						<Command.Input
