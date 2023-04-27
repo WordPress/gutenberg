@@ -58,12 +58,11 @@ test.describe( 'Cover', () => {
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
-		// Get the block's background image's dim level.
+		// Get the RGB value of the background dim.
+		// The span element implements the colored background.
 		const backgrounDimLocator = page
 			.getByRole( 'document', { name: 'Block: Cover' } )
 			.locator( 'span[aria-hidden="true"]' );
-
-		// Get the RGB value of the background dim.
 		const actualRGB = await backgrounDimLocator.evaluate(
 			( node ) => node.style.backgroundColor
 		);
