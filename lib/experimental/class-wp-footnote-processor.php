@@ -196,7 +196,7 @@ add_filter(
 		add_filter(
 			'render_block',
 			function ( $html, $block ) use ( &$notes ) {
-				if ( 'core/footnote-list' === $block['blockName'] ) {
+				if ( 'core/footnotes' === $block['blockName'] ) {
 					if ( 0 === count( $notes ) ) {
 						return $html;
 					}

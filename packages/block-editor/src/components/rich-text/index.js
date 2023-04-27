@@ -415,13 +415,35 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 			/>
-			{ replacementRefs.map( ( ref ) => {
+			{ Object.keys( replacementRefs ).map( ( index ) => {
+				const ref = replacementRefs[ index ];
 				const { render: Render } = formatTypes.find(
 					( { name } ) => name === ref.value
 				);
+				function setAttributes( attributes ) {
+					const newReplacements = value.replacements.slice();
+					const currentObject = newReplacements[ index ];
+					newReplacements[ index ] = {
+						...currentObject,
+						attributes: {
+							...currentObject.attributes,
+							...attributes,
+						},
+					};
+					onChange( {
+						...value,
+						replacements: newReplacements,
+					} );
+				}
 				return (
 					ref &&
-					createPortal( <Render attributes={ ref.dataset } />, ref )
+					createPortal(
+						<Render
+							attributes={ ref.dataset }
+							setAttributes={ setAttributes }
+						/>,
+						ref
+					)
 				);
 			} ) }
 		</>

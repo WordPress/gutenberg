@@ -4,6 +4,7 @@
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import { useSelectObject } from './use-select-object';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useSelectionChangeCompat } from './use-selection-change-compat';
 import { useDelete } from './use-delete';
-import { getFormatType } from '../get-format-type';
 
 export function useRichText( {
 	value = '',
@@ -72,20 +72,26 @@ export function useRichText( {
 			placeholder,
 		} );
 
-		Array.from( ref.current.querySelectorAll( 'data' ) )
-			.filter( ( node ) => !! getFormatType( node.value ) )
-			.forEach( ( node, i ) => {
-				if ( replacementRefs.current[ i ] !== node ) {
-					replacementRefs.current[ i ] = node;
-					forceRender();
-				}
-			} );
+		const newRefs = {};
+		const dataElements = Array.from(
+			ref.current.querySelectorAll( 'data' )
+		);
+		newRecord.replacements.forEach( ( replacement, i ) => {
+			if ( replacement.tagName !== 'data' ) return;
+			newRefs[ i ] = dataElements.shift();
+		} );
+
+		// check if the new refs are different from the old refs
+		if ( ! isShallowEqual( replacementRefs.current, newRefs ) ) {
+			replacementRefs.current = newRefs;
+			forceRender();
+		}
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
-	const replacementRefs = useRef( [] );
+	const replacementRefs = useRef( {} );
 
 	function setRecordFromProps() {
 		_value.current = value;
@@ -169,7 +175,8 @@ export function useRichText( {
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
-			onSelectionChange( start, end );
+			if ( start !== undefined && end !== undefined )
+				onSelectionChange( start, end );
 			onChange( _value.current, {
 				__unstableFormats: formats,
 				__unstableText: text,

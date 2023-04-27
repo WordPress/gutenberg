@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { insertObject, useAnchor } from '@wordpress/rich-text';
+import { insertObject } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { formatListNumbered } from '@wordpress/icons';
-import { Popover, TextControl } from '@wordpress/components';
 
 const name = 'core/footnote';
 const title = __( 'Footnote' );
@@ -30,14 +29,7 @@ export const footnote = {
 	saveFallback( { attributes: { note } } ) {
 		return `[${ note }]`;
 	},
-	edit( {
-		isObjectActive,
-		value,
-		onChange,
-		onFocus,
-		contentRef,
-		activeObjectAttributes,
-	} ) {
+	edit( { isObjectActive, value, onChange, onFocus } ) {
 		function onClick() {
 			const newValue = insertObject( value, {
 				type: name,
@@ -58,55 +50,7 @@ export const footnote = {
 					onClick={ onClick }
 					isActive={ isObjectActive }
 				/>
-				{ isObjectActive && (
-					<InlineUI
-						value={ value }
-						onChange={ onChange }
-						activeObjectAttributes={ activeObjectAttributes }
-						contentRef={ contentRef }
-					/>
-				) }
 			</>
 		);
 	},
 };
-
-function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { note } = activeObjectAttributes;
-	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-		settings: footnote,
-	} );
-
-	return (
-		<Popover
-			placement="bottom"
-			focusOnMount={ true }
-			anchor={ popoverAnchor }
-			className="block-editor-format-toolbar__image-popover"
-		>
-			<TextControl
-				className="block-editor-format-toolbar__image-container-value"
-				label={ __( 'Note' ) }
-				value={ note }
-				onChange={ ( newNote ) => {
-					const newReplacements = value.replacements.slice();
-
-					newReplacements[ value.start ] = {
-						tagName: 'data',
-						type: name,
-						attributes: {
-							...activeObjectAttributes,
-							note: newNote,
-						},
-					};
-
-					onChange( {
-						...value,
-						replacements: newReplacements,
-					} );
-				} }
-			/>
-		</Popover>
-	);
-}

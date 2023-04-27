@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/footnotes",
+	"title": "Footnotes",
+	"category": "text",
+	"description": "",
+	"keywords": [ "references" ],
+	"textdomain": "default",
+	"supports": {
+		"html": false
+	},
+	"editorStyle": "wp-block-footnotes-editor",
+	"style": "wp-block-footnotes"
+}
