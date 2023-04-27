@@ -269,7 +269,7 @@ Check if the selection of a Rich Text value is collapsed or not. Collapsed means
 
 _Parameters_
 
--   _props_ `RichTextValue`: RichTextValue The rich text value to check.
+-   _props_ `RichTextValue`: The rich text value to check.
 -   _props.start_ `RichTextValue[ 'start' ]`:
 -   _props.end_ `RichTextValue[ 'end' ]`:
 

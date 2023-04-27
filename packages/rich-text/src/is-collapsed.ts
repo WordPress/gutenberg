@@ -9,7 +9,7 @@ import type { RichTextValue } from './types';
  * is no selection, `undefined` will be returned. This is similar to
  * `window.getSelection().isCollapsed()`.
  *
- * @param props       RichTextValue The rich text value to check.
+ * @param props       The rich text value to check.
  * @param props.start
  * @param props.end
  * @return True if the selection is collapsed, false if not, undefined if there is no selection.
