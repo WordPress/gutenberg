@@ -11,19 +11,24 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 
-const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
+const PatternEdit = ( {
+	attributes: { slug, inheritedAlignment, syncStatus },
+	clientId,
+	setAttributes,
+} ) => {
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
-				selectedPattern: select(
-					blockEditorStore
-				).__experimentalGetParsedPattern( attributes.slug ),
+				selectedPattern:
+					select( blockEditorStore ).__experimentalGetParsedPattern(
+						slug
+					),
 				innerBlocks:
 					select( blockEditorStore ).getBlock( clientId )
 						?.innerBlocks,
 			};
 		},
-		[ attributes.slug, clientId ]
+		[ slug, clientId ]
 	);
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -52,7 +57,29 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		innerBlocks,
 	] );
 
-	const blockProps = useBlockProps();
+	useEffect( () => {
+		const alignments = [ 'wide', 'full' ];
+		const blocks =
+			syncStatus === 'synced' ? selectedPattern?.blocks : innerBlocks;
+		// Determine the widest setting of all the contained blocks.
+		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
+			const { align } = block.attributes;
+			return alignments.indexOf( align ) >
+				alignments.indexOf( accumulator )
+				? align
+				: accumulator;
+		}, undefined );
+
+		// Set the attribute of the Pattern block to match the widest
+		// alignment.
+		setAttributes( {
+			inheritedAlignment: widestAlignment ?? '',
+		} );
+	}, [ innerBlocks, selectedPattern?.blocks, setAttributes, syncStatus ] );
+
+	const blockProps = useBlockProps( {
+		className: `align${ inheritedAlignment }`,
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 	return (
 		<>
