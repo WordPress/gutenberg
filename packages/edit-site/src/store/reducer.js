@@ -157,6 +157,14 @@ function editorCanvasContainerView( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer used to track whether the page content is locked.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
 export function hasPageContentLock( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITED_POST':
