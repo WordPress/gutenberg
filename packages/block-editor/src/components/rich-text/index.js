@@ -420,10 +420,11 @@ function RichTextWrapper(
 				const { render: Render } = formatTypes.find(
 					( { name } ) => name === ref.value
 				);
+				const i = parseInt( index, 10 );
 				function setAttributes( attributes ) {
 					const newReplacements = value.replacements.slice();
-					const currentObject = newReplacements[ index ];
-					newReplacements[ index ] = {
+					const currentObject = newReplacements[ i ];
+					newReplacements[ i ] = {
 						...currentObject,
 						attributes: {
 							...currentObject.attributes,
@@ -441,6 +442,9 @@ function RichTextWrapper(
 						<Render
 							attributes={ ref.dataset }
 							setAttributes={ setAttributes }
+							isSelected={
+								value.start === i && value.end === i + 1
+							}
 						/>,
 						ref
 					)

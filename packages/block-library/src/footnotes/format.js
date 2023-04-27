@@ -11,6 +11,7 @@ import {
 import { formatListNumbered } from '@wordpress/icons';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { useId, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,20 +29,47 @@ export const format = {
 		note: ( element ) =>
 			element.innerHTML.replace( /^\[/, '' ).replace( /\]$/, '' ),
 	},
-	render( { attributes: { note }, setAttributes } ) {
+	render: function Render( {
+		attributes: { note },
+		setAttributes,
+		isSelected,
+	} ) {
+		const id = useId();
+		const linkRef = useRef();
+		const footnoteRef = useRef();
+
+		function onClickBackLink( event ) {
+			linkRef.current.focus();
+			event.preventDefault();
+		}
+
 		return (
 			<sup>
-				<a className="note-link" href="#placeholder">
+				<a
+					className="note-link"
+					href={ `#${ id }` }
+					id={ `${ id }-link` }
+					ref={ linkRef }
+					onClick={ ( event ) => {
+						footnoteRef.current.focus();
+						event.preventDefault();
+					} }
+				>
 					{ '' }
 				</a>
 				<Fill>
-					<li>
+					<li id={ id } data-is-selected={ isSelected }>
 						<RichText
+							ref={ footnoteRef }
+							tagName="span"
 							value={ note }
 							onChange={ ( value ) =>
 								setAttributes( { note: value } )
 							}
-						/>
+						/>{ ' ' }
+						<a href={ `#${ id }-link` } onClick={ onClickBackLink }>
+							↩︎
+						</a>
 					</li>
 				</Fill>
 			</sup>

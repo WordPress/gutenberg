@@ -11,7 +11,8 @@ export function useSelectObject() {
 			// If the child element has no text content, it must be an object.
 			if (
 				target === element ||
-				( target.textContent && target.isContentEditable )
+				target.textContent ||
+				! target.isContentEditable
 			) {
 				return;
 			}
@@ -24,7 +25,6 @@ export function useSelectObject() {
 			range.selectNode( target );
 			selection.removeAllRanges();
 			selection.addRange( range );
-			event.preventDefault();
 		}
 
 		element.addEventListener( 'click', onClick );
