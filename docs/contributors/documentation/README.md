@@ -157,7 +157,7 @@ This is a **warning** callout.
 </div>
 
 <div class="callout callout-warning">
-Note: In callout notices, links also need to be HTML `<a href></a>` notations. 
+Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page the URL in GitHub is
 https://developer.wordpress.org/docs/getting-started/create-block/README.md
