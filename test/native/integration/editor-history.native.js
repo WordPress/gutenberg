@@ -35,7 +35,7 @@ describe( 'Editor History', () => {
 		<!-- /wp:image -->
 
 		<!-- wp:paragraph -->
-		<p></p>
+		<p class="wp-block-paragraph"></p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -63,7 +63,7 @@ describe( 'Editor History', () => {
 		<!-- /wp:image -->
 
 		<!-- wp:paragraph -->
-		<p></p>
+		<p class="wp-block-paragraph"></p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -88,7 +88,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -98,7 +98,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p></p>
+		<p class="wp-block-paragraph"></p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -108,7 +108,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -138,7 +138,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -148,7 +148,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <strong>quick</strong> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <strong>quick</strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -158,7 +158,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -169,7 +169,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
