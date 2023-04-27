@@ -85,7 +85,14 @@ function BlockWrapper( {
 	const isScreenWidthEqual = blockWidth === screenWidth;
 	const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 	const pointerEvents = isTouchable ? 'auto' : 'box-only';
-	const blockWrapperStyle = { flex: 1, marginVertical, marginHorizontal };
+	const blockWrapperStyles = { flex: 1 };
+	const blockWrapperStyle = [
+		blockWrapperStyles,
+		{
+			marginVertical,
+			marginHorizontal,
+		},
+	];
 	const accessible = ! ( isSelected || isInnerBlockSelected );
 
 	return (
@@ -93,6 +100,7 @@ function BlockWrapper( {
 			accessibilityRole={ 'button' }
 			accessible={ accessible }
 			onPress={ onFocus }
+			style={ blockWrapperStyles }
 		>
 			<View
 				accessibilityLabel={ accessibilityLabel }
