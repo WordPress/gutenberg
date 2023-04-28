@@ -10,7 +10,7 @@ const os = require( 'os' );
 /**
  * Internal dependencies
  */
-const { readConfig } = require( './config' );
+const { loadConfig } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
@@ -39,8 +39,7 @@ module.exports = async function initConfig( {
 	xdebug = 'off',
 	writeChanges = false,
 } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const config = await readConfig( configPath );
+	const config = await loadConfig( path.resolve( '.' ) );
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the

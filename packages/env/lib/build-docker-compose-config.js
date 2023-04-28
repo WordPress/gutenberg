@@ -14,17 +14,17 @@ const getHostUser = require( './get-host-user' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {string}          workDirectoryPath The working directory for wp-env.
- * @param {WPServiceConfig} config            The service config to get the mounts from.
- * @param {string}          hostUsername      The username of the host running wp-env.
- * @param {string}          wordpressDefault  The default internal path for the WordPress
- *                                            source code (such as tests-wordpress).
+ * @param {string}              workDirectoryPath The working directory for wp-env.
+ * @param {WPEnvironmentConfig} config            The service config to get the mounts from.
+ * @param {string}              hostUsername      The username of the host running wp-env.
+ * @param {string}              wordpressDefault  The default internal path for the WordPress
+ *                                                source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */

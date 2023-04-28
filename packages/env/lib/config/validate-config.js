@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
- * @typedef {import('./config').WPSource} WPSource
+ * @typedef {import('./parse-source-string').WPSource} WPSource
  */
 
 /**
@@ -12,105 +11,151 @@
 class ValidationError extends Error {}
 
 /**
- * Validates a config object by throwing a ValidationError if any of its properties
- * do not match the required format.
+ * Validates the port and throws if it isn't valid.
  *
- * @param {Object}  config      A config object to validate.
- * @param {?string} envLocation Identifies if the error occurred in a specific environment property.
- * @return {Object} The passed config object with no modifications.
+ * @param {string} configFile The configuration file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {number} port       The port to check.
  */
-function validateConfig( config, envLocation ) {
-	const envPrefix = envLocation ? `env.${ envLocation }.` : '';
-	if ( config.core !== null && typeof config.core !== 'string' ) {
+function checkPort( configFile, configKey, port ) {
+	if ( port === undefined ) {
+		return;
+	}
+
+	if ( ! Number.isInteger( port ) ) {
 		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }core" must be null or a string.`
+			`Invalid ${ configFile }: "${ configKey }" must be an integer.`
 		);
 	}
 
-	if (
-		! Array.isArray( config.plugins ) ||
-		config.plugins.some( ( plugin ) => typeof plugin !== 'string' )
-	) {
+	port = parseInt( port );
+
+	if ( port < 0 || port > 65535 ) {
 		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }plugins" must be an array of strings.`
+			`Invalid ${ configFile }: "${ configKey }" must be a valid port.`
 		);
 	}
-
-	if (
-		! Array.isArray( config.themes ) ||
-		config.themes.some( ( theme ) => typeof theme !== 'string' )
-	) {
-		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }themes" must be an array of strings.`
-		);
-	}
-
-	if ( ! Number.isInteger( config.port ) ) {
-		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }port" must be an integer.`
-		);
-	}
-
-	if ( typeof config.config !== 'object' ) {
-		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }config" must be an object.`
-		);
-	}
-
-	if ( typeof config.mappings !== 'object' ) {
-		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }mappings" must be an object.`
-		);
-	}
-
-	for ( const [ wpDir, localDir ] of Object.entries( config.mappings ) ) {
-		if ( ! localDir || typeof localDir !== 'string' ) {
-			throw new ValidationError(
-				`Invalid .wp-env.json: "${ envPrefix }mappings.${ wpDir }" should be a string.`
-			);
-		}
-	}
-
-	if (
-		config.phpVersion &&
-		! (
-			typeof config.phpVersion === 'string' &&
-			config.phpVersion.length === 3
-		)
-	) {
-		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be a string of the format "0.0".`
-		);
-	}
-
-	checkValidURL( envPrefix, config.config, 'WP_SITEURL' );
-	checkValidURL( envPrefix, config.config, 'WP_HOME' );
-
-	return config;
 }
 
 /**
- * Validates the input and throws if it isn't a valid URL.
+ * Validates the array and throws if it isn't valid.
  *
- * @param {string} envPrefix The environment we're validating.
- * @param {Object} config    The configuration object we're looking at.
- * @param {string} configKey The configuration key we're validating.
+ * @param {string}   configFile The config file we're validating.
+ * @param {string}   configKey  The configuration key we're validating.
+ * @param {string[]} array      The array that we're checking.
  */
-function checkValidURL( envPrefix, config, configKey ) {
-	if ( config[ configKey ] === undefined ) {
+function checkStringArray( configFile, configKey, array ) {
+	if ( array === undefined ) {
+		return;
+	}
+
+	if ( ! Array.isArray( array ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be an array.`
+		);
+	}
+
+	if ( array.some( ( value ) => typeof value !== 'string' ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be an array of strings.`
+		);
+	}
+}
+
+/**
+ * Validates the object and throws if it isn't valid.
+ *
+ * @param {string}   configFile The config file we're validating.
+ * @param {string}   configKey  The configuration key we're validating.
+ * @param {string[]} obj        The object that we're checking.
+ * @param {string[]} allowTypes The types that are allowed.
+ */
+function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
+	if ( obj === undefined ) {
+		return;
+	}
+
+	if ( allowTypes === undefined ) {
+		allowTypes = [];
+	}
+
+	if ( typeof obj !== 'object' || Array.isArray( obj ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be an object.`
+		);
+	}
+
+	for ( const key in obj ) {
+		if ( ! obj[ key ] && ! allowTypes.includes( 'empty' ) ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "${ configKey }.${ key }" must not be empty.`
+			);
+		}
+
+		// Identify arrays uniquely.
+		const type = Array.isArray( obj[ key ] ) ? 'array' : typeof obj[ key ];
+
+		if ( ! allowTypes.includes( type ) ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "${ configKey }.${ key }" must be a ${ allowTypes.join(
+					' or '
+				) }.`
+			);
+		}
+	}
+}
+
+/**
+ * Validates the version and throws if it isn't valid.
+ *
+ * @param {string} configFile The config file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {string} version    The version that we're checking.
+ */
+function checkVersion( configFile, configKey, version ) {
+	if ( version === undefined || version === null ) {
+		return;
+	}
+
+	if ( typeof version !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string.`
+		);
+	}
+
+	if ( ! version.match( /[0-9]+(?:\.[0-9]+)*/ ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string of the format "X", "X.X", or "X.X.X".`
+		);
+	}
+}
+
+/**
+ * Validates the url and throws if it isn't valid.
+ *
+ * @param {string} configFile The config file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {string} url        The URL that we're checking.
+ */
+function checkValidURL( configFile, configKey, url ) {
+	if ( url === undefined ) {
 		return;
 	}
 
 	try {
-		new URL( config[ configKey ] );
-	} catch {
+		new URL( url );
+	} catch ( e ) {
 		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }config.${ configKey }" must be a valid URL.`
+			`Invalid ${ configFile }: "${ configKey }" must be a valid URL.`
 		);
 	}
 }
 
 module.exports = {
-	validateConfig,
 	ValidationError,
+	checkPort,
+	checkStringArray,
+	checkObjectWithValues,
+	checkVersion,
+	checkValidURL,
 };

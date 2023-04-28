@@ -14,7 +14,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
@@ -154,7 +154,7 @@ async function setupWordPressDirectories( config ) {
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig[]} envs An array of environments to check.
+ * @param {WPEnvironmentConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */
