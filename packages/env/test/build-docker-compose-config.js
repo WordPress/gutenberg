@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 const buildDockerComposeConfig = require( '../lib/build-docker-compose-config' );
+const getHostUser = require( '../lib/get-host-user' );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -11,6 +12,16 @@ const CONFIG = {
 	port: 8888,
 	configDirectoryPath: '/path/to/config',
 };
+
+jest.mock( '../lib/get-host-user', () => jest.fn() );
+getHostUser.mockImplementation( () => {
+	return {
+		name: 'test',
+		uid: 1,
+		gid: 2,
+		fullUser: '1:2',
+	};
+} );
 
 describe( 'buildDockerComposeConfig', () => {
 	it( 'should map directories before individual sources', () => {
@@ -33,6 +44,7 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root.
 			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit', // WordPress test library,
+			'user-home:/home/test',
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root.
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin.
 		] );
@@ -68,6 +80,7 @@ describe( 'buildDockerComposeConfig', () => {
 		let localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
 			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
+			'user-home:/home/test',
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
@@ -76,6 +89,7 @@ describe( 'buildDockerComposeConfig', () => {
 		localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
 			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
+			'tests-user-home:/home/test',
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
@@ -100,6 +114,7 @@ describe( 'buildDockerComposeConfig', () => {
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
 			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
+			'tests-user-home:/home/test',
 			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
@@ -123,6 +138,7 @@ describe( 'buildDockerComposeConfig', () => {
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
 			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
+			'tests-user-home:/home/test',
 			'phpunit-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
