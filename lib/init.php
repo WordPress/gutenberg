@@ -5,9 +5,9 @@
  * @package gutenberg
  */
 
- if($_GET['test'] == 'test') {
- 	die("This is a secret message shipped in try/test-pr-for-playground-preview");
- }
+if ( $_GET['test'] === 'test' ) {
+  die( "<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>" );
+}
 
 /**
  * Gutenberg's Menu.
