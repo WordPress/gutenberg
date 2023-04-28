@@ -86,7 +86,8 @@ export const useGlobalStylesReset = () => {
 };
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
-	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
+	const { setUserConfig, setSiteConfig, ...configs } =
+		useContext( GlobalStylesContext );
 
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
@@ -128,13 +129,14 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 		appendedBlockPath,
 	] );
 
+	const setConfig = source === 'site' ? setSiteConfig : setUserConfig;
 	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
+		setConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, contextualPath, newValue );
+			const newConfig = JSON.parse( JSON.stringify( currentConfig ) );
+			set( newConfig, contextualPath, newValue );
 
-			return newUserConfig;
+			return newConfig;
 		} );
 	};
 
