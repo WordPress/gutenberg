@@ -7,7 +7,7 @@
  */
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-navigation-block', $gutenberg_experiments ) ) {
+if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-block' ) ) {
 	function gutenberg_block_core_navigation_add_directives_to_markup( $block_content ) {
 		$w = new WP_HTML_Tag_Processor( $block_content );
 		// Add directives to the `<nav>` element.
