@@ -27,12 +27,6 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * An array representing data for blocks in the DOM used by drag and drop.
- *
- * @typedef {WPListViewDropZoneBlock[]} WPListViewDropZoneBlocks
- */
-
-/**
  * An object representing data for blocks in the DOM used by drag and drop.
  *
  * @typedef {Object} WPListViewDropZoneBlock
@@ -48,6 +42,12 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
+ * An array representing data for blocks in the DOM used by drag and drop.
+ *
+ * @typedef {WPListViewDropZoneBlock[]} WPListViewDropZoneBlocks
+ */
+
+/**
  * An object containing details of a drop target.
  *
  * @typedef {Object} WPListViewDropZoneTarget
@@ -60,6 +60,17 @@ import { store as blockEditorStore } from '../../store';
 
 const NESTING_LEVEL_INDENTATION = 28;
 
+/**
+ * Determines whether the user is positioning the dragged block to be
+ * moved up to a parent level.
+ *
+ * Determined based on nesting level indentation of the current block.
+ *
+ * @param {WPPoint} point        The point representing the cursor position when dragging.
+ * @param {DOMRect} rect         The rectangle.
+ * @param {number}  nestingLevel The nesting level of the block.
+ * @return {boolean} Whether the gesture is an upward gesture.
+ */
 function isUpGesture( point, rect, nestingLevel = 1 ) {
 	// If the block is nested, and the user is dragging to the bottom
 	// left of the block, then it is an upward gesture.
@@ -78,26 +89,12 @@ function getDesiredRelativeParentLevel( point, rect, nestingLevel = 1 ) {
 }
 
 /**
- * Determines whether the user positioning the dragged block to nest as an
- * inner block.
+ * Returns an array of the parent blocks of the block the user is dropping to.
  *
- * Determined based on nesting level indentation of the current block, plus
- * the indentation of the next level of nesting.
- *
- * @param {WPPoint} point        The point representing the cursor position when dragging.
- * @param {DOMRect} rect         The rectangle.
- * @param {number}  nestingLevel The rectangle.
+ * @param {WPListViewDropZoneBlock}  candidateBlockData The block the user is dropping to.
+ * @param {WPListViewDropZoneBlocks} blocksData         Data about the blocks in list view.
+ * @return {WPListViewDropZoneBlocks} An array of block parents, including the block the user is dropping to.
  */
-function isNestingGesture( point, rect, nestingLevel = 1 ) {
-	const blockIndentPosition =
-		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
-	return point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
-}
-
-// Block navigation is always a vertical list, so only allow dropping
-// to the above or below a block.
-const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
-
 function getCandidateBlockParents( candidateBlockData, blocksData ) {
 	const candidateBlockParents = [];
 	let currentBlockData = candidateBlockData;
@@ -118,9 +115,9 @@ function getCandidateBlockParents( candidateBlockData, blocksData ) {
  * block. This is used to determine the block that the user is dropping to,
  * while ignoring the dragged block.
  *
- * @param {WPListViewDropZoneBlock} blocksData Data about the blocks in list view.
- * @param {number}                  index      The index to begin searching from.
- * @return {WPListViewDropZoneBlocks | undefined} The next non-dragged block.
+ * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
+ * @param {number}                   index      The index to begin searching from.
+ * @return {WPListViewDropZoneBlock | undefined} The next non-dragged block.
  */
 function getNextNonDraggedBlock( blocksData, index ) {
 	const nextBlockData = blocksData[ index + 1 ];
@@ -130,6 +127,27 @@ function getNextNonDraggedBlock( blocksData, index ) {
 
 	return nextBlockData;
 }
+
+/**
+ * Determines whether the user positioning the dragged block to nest as an
+ * inner block.
+ *
+ * Determined based on nesting level indentation of the current block, plus
+ * the indentation of the next level of nesting.
+ *
+ * @param {WPPoint} point        The point representing the cursor position when dragging.
+ * @param {DOMRect} rect         The rectangle.
+ * @param {number}  nestingLevel The nesting level of the block.
+ */
+function isNestingGesture( point, rect, nestingLevel = 1 ) {
+	const blockIndentPosition =
+		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+	return point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
+}
+
+// Block navigation is always a vertical list, so only allow dropping
+// to the above or below a block.
+const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
 
 /**
  * Given blocks data and the cursor position, compute the drop target.
@@ -217,6 +235,8 @@ export function getListViewDropTarget( blocksData, position ) {
 
 	const isDraggingBelow = candidateEdge === 'bottom';
 
+	// If the user is dragging towards the bottom of the block check whether
+	// they might be trying to move the block to be at a parent level.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.rootClientId &&
@@ -230,6 +250,7 @@ export function getListViewDropTarget( blocksData, position ) {
 		const nextLevel = nextBlock ? nextBlock.nestingLevel : 1;
 
 		if ( currentLevel && nextLevel ) {
+			// Determine the desired relative level of the block to be dropped.
 			const desiredRelativeLevel = getDesiredRelativeParentLevel(
 				position,
 				candidateRect,
@@ -241,33 +262,34 @@ export function getListViewDropTarget( blocksData, position ) {
 				0
 			);
 
-			// Default to the block index of the candidate block.
-			let newBlockIndex = candidateBlockData.blockIndex;
+			if ( candidateBlockParents[ targetParentIndex ] ) {
+				// Default to the block index of the candidate block.
+				let newBlockIndex = candidateBlockData.blockIndex;
 
-			// If the next block is at the same level, use that as the default
-			// block index. This ensures that the block is dropped in the correct
-			// position when dragging to the bottom of a block.
-			if (
-				candidateBlockParents[ targetParentIndex ].nestingLevel ===
-				nextBlock?.nestingLevel
-			) {
-				newBlockIndex = nextBlock?.blockIndex;
-			} else {
-				// Otherwise, search from the end of the block data back
-				// to find the last block index within the same target parent.
-				for ( let i = blocksData.length - 1; i >= 0; i-- ) {
-					const blockData = blocksData[ i ];
-					if (
-						blockData.rootClientId ===
-						candidateBlockParents[ targetParentIndex ].rootClientId
-					) {
-						newBlockIndex = blockData.blockIndex + 1;
-						break;
+				// If the next block is at the same level, use that as the default
+				// block index. This ensures that the block is dropped in the correct
+				// position when dragging to the bottom of a block.
+				if (
+					candidateBlockParents[ targetParentIndex ].nestingLevel ===
+					nextBlock?.nestingLevel
+				) {
+					newBlockIndex = nextBlock?.blockIndex;
+				} else {
+					// Otherwise, search from the current block index back
+					// to find the last block index within the same target parent.
+					for ( let i = candidateBlockIndex; i >= 0; i-- ) {
+						const blockData = blocksData[ i ];
+						if (
+							blockData.rootClientId ===
+							candidateBlockParents[ targetParentIndex ]
+								.rootClientId
+						) {
+							newBlockIndex = blockData.blockIndex + 1;
+							break;
+						}
 					}
 				}
-			}
 
-			if ( candidateBlockParents[ targetParentIndex ] ) {
 				return {
 					rootClientId:
 						candidateBlockParents[ targetParentIndex ].rootClientId,
