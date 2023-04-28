@@ -225,9 +225,6 @@ export function getListViewDropTarget( blocksData, position ) {
 		return;
 	}
 
-	// Now that we have a candidate block, we can perform more expensive
-	// checks to determine the drop target.
-
 	const candidateBlockParents = getCandidateBlockParents(
 		candidateBlockData,
 		blocksData
