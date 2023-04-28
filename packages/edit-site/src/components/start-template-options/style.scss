@@ -17,6 +17,7 @@
 			margin-right: - $grid-unit-40;
 			padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
 			border-top: 1px solid $gray-300;
+			z-index: z-index(".edit-site-start-template-options__modal__actions");
 		}
 	}
 
