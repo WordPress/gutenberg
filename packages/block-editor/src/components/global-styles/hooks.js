@@ -74,14 +74,18 @@ const VALID_SETTINGS = [
 ];
 
 export const useGlobalStylesReset = () => {
-	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
+	const {
+		user: config,
+		setUserConfig,
+		setSiteConfig,
+	} = useContext( GlobalStylesContext );
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => {
+			setUserConfig( () => EMPTY_CONFIG );
+			setSiteConfig( () => EMPTY_CONFIG );
+		}, [ setUserConfig ] ),
 	];
 };
 
