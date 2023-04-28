@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const md5 = require( '../lib/md5' );
+const md5 = require( '../md5' );
 
 describe( 'md5', () => {
 	it( 'creates a hash of a string', () => {

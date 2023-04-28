@@ -2,8 +2,8 @@
 /**
  * Internal dependencies
  */
-const cli = require( '../lib/cli' );
-const env = require( '../lib/env' );
+const cli = require( '../cli' );
+const env = require( '../env' );
 
 /**
  * Mocked dependencies
@@ -14,12 +14,12 @@ jest.mock( 'ora', () => () => ( {
 		return { text: '', succeed: jest.fn(), fail: jest.fn() };
 	},
 } ) );
-jest.mock( '../lib/env', () => ( {
+jest.mock( '../env', () => ( {
 	start: jest.fn( Promise.resolve.bind( Promise ) ),
 	stop: jest.fn( Promise.resolve.bind( Promise ) ),
 	clean: jest.fn( Promise.resolve.bind( Promise ) ),
 	run: jest.fn( Promise.resolve.bind( Promise ) ),
-	ValidationError: jest.requireActual( '../lib/env' ).ValidationError,
+	ValidationError: jest.requireActual( '../env' ).ValidationError,
 } ) );
 
 describe( 'env cli', () => {
