@@ -4,7 +4,7 @@
 import { useState, useLayoutEffect } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
-/** @typedef {import('../create').RichTextValue} RichTextValue */
+/** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**
  * Given a range and a format tag name and class name, returns the closest

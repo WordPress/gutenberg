@@ -15,6 +15,8 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+
 function createEmptyValue() {
 	return {
 		formats: [],

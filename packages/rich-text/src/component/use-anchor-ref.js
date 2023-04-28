@@ -14,7 +14,7 @@ import { getActiveFormat } from '../get-active-format';
  * @typedef {import('@wordpress/element').RefObject<T>} RefObject<T>
  */
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
-/** @typedef {import('../create').RichTextValue} RichTextValue */
+/** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**
  * This hook, to be used in a format type's Edit component, returns the active
