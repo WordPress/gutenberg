@@ -20,9 +20,7 @@ const { ValidationError } = require( './validate-config' );
  */
 module.exports = async function readRawConfigFile( configPath ) {
 	try {
-		return withBackCompat(
-			JSON.parse( await fs.readFile( configPath, 'utf8' ) )
-		);
+		return JSON.parse( await fs.readFile( configPath, 'utf8' ) );
 	} catch ( error ) {
 		const fileName = path.basename( configPath );
 
@@ -39,29 +37,3 @@ module.exports = async function readRawConfigFile( configPath ) {
 		}
 	}
 };
-
-/**
- * Used to maintain back compatibility with older versions of the .wp-env.json
- * file. Returns an object in the shape of the currently expected .wp-env.json
- * version.
- *
- * @param {Object} rawConfig config right after being read from a file.
- * @return {Object} Same config with any old-format values converted into the
- *                  shape of the currently expected format.
- */
-function withBackCompat( rawConfig ) {
-	// Convert testsPort into new env.tests format.
-	if ( rawConfig.testsPort !== undefined ) {
-		rawConfig.env = {
-			...( rawConfig.env || {} ),
-			tests: {
-				port: rawConfig.testsPort,
-				...( rawConfig.env && rawConfig.env.tests
-					? rawConfig.env.tests
-					: {} ),
-			},
-		};
-	}
-	delete rawConfig.testsPort;
-	return rawConfig;
-}
