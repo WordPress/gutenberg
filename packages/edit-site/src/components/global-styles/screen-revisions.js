@@ -2,15 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalVStack as VStack,
 	Button,
-	SelectControl,
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -20,163 +19,133 @@ import {
 	useCallback,
 	useState,
 	useEffect,
-	useMemo,
 } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getDate, dateI18n } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import Subtitle from './subtitle';
-import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../private-apis';
 import Revisions from '../revisions';
+import SidebarFixedBottom from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../store';
 
-const SELECTOR_MINIMUM_REVISION_COUNT = 10;
-const { GlobalStylesContext, isGlobalStyleConfigEqual } = unlock(
-	blockEditorPrivateApis
-);
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
-function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
-	const userRevisionsOptions = useMemo( () => {
-		return ( userRevisions ?? [] ).map( ( revision, index ) => {
-			const { id, dateDisplay, authorDisplayName } = revision;
-			const isLatest = 0 === index;
-			const revisionTitle = decodeEntities( dateDisplay );
-			return {
-				value: id,
-				label: isLatest
-					? sprintf(
-							/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
-							__( 'Current revision by %(name)s from %(date)s)' ),
-							{
-								name: authorDisplayName,
-								date: revisionTitle,
-							}
-					  )
-					: sprintf(
-							/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
-							__( 'Revision by %(name)s from %(date)s' ),
-							{
-								name: authorDisplayName,
-								date: revisionTitle,
-							}
-					  ),
-			};
-		} );
-	}, [ userRevisions ] );
-	const setCurrentRevisionId = ( value ) => {
-		const revisionId = Number( value );
-		onChange(
-			userRevisions.find( ( revision ) => revision.id === revisionId )
+function getRevisionLabel( revision, isLatest, isUnsaved ) {
+	if ( isUnsaved ) {
+		return sprintf(
+			/* translators: %(name)s author display name */
+			__( 'Unsaved changes by %(name)s' ),
+			{
+				name: revision?.authorDisplayName,
+			}
 		);
-	};
-	return (
-		<SelectControl
-			className="edit-site-global-styles-screen-revisions__selector"
-			label={ __( 'Styles revisions' ) }
-			options={ userRevisionsOptions }
-			onChange={ setCurrentRevisionId }
-			value={ currentRevisionId }
-		/>
+	}
+	const date = getDate( revision?.modified );
+	const formattedDate = dateI18n(
+		// translators: a compact version of the revision's modified date.
+		_x( 'j M @ H:i', 'formatted version of revision last modified date' ),
+		date
 	);
+
+	return isLatest
+		? sprintf(
+				/* translators: %(name)s author display name, %(date)s: revision creation date */
+				__( 'Revision from %(date)s by %(name)s (current)' ),
+				{
+					name: revision?.authorDisplayName,
+					date: formattedDate,
+				}
+		  )
+		: sprintf(
+				/* translators: %(name)s author display name, %(date)s: revision creation date */
+				__( 'Revision from %(date)s by %(name)s ' ),
+				{
+					name: revision?.authorDisplayName,
+					date: formattedDate,
+				}
+		  );
 }
 
 function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	return (
-		<>
-			<Subtitle>{ __( 'Styles revisions' ) }</Subtitle>
+		<ol
+			className="edit-site-global-styles-screen-revisions__revisions-list"
+			aria-label={ __( 'Global styles revisions' ) }
+			role="group"
+		>
+			{ userRevisions.map( ( revision ) => {
+				const {
+					id,
+					dateHumanTimeDiff,
+					authorAvatarUrl,
+					authorDisplayName,
+					isLatest,
+				} = revision;
+				const isUnsaved = 'unsaved' === id;
+				/*
+				 * If the currentId hasn't been selected yet, the first revision is
+				 * the current one so long as the API returns revisions in descending order.
+				 */
+				const isActive = !! currentRevisionId
+					? id === currentRevisionId
+					: isLatest;
 
-			<ol
-				className="edit-site-global-styles-screen-revisions__revisions-list"
-				aria-label={ __( 'Global styles revisions' ) }
-				role="group"
-			>
-				{ userRevisions.map( ( revision, index ) => {
-					const {
-						id,
-						dateDisplay,
-						authorAvatarUrl,
-						authorDisplayName,
-					} = revision;
-					const isLatest = 0 === index;
-					const isActive = id === currentRevisionId;
-					const revisionTitle = decodeEntities( dateDisplay );
-
-					return (
-						<li key={ `user-styles-revision-${ id }` }>
-							<Button
-								className={ classnames(
-									'edit-site-global-styles-screen-revisions__revision-item',
-									{
-										'is-current': isActive,
-									}
-								) }
-								disabled={ isActive }
-								onClick={ () => {
-									onChange( revision );
-								} }
-								aria-label={
-									isLatest
-										? sprintf(
-												/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
-												__(
-													'Revision by %(name)s from %(date)s (current)'
-												),
-												{
-													name: authorDisplayName,
-													date: revisionTitle,
-												}
-										  )
-										: sprintf(
-												/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
-												__(
-													'Revision by %(name)s from %(date)s'
-												),
-												{
-													name: authorDisplayName,
-													date: revisionTitle,
-												}
-										  )
+				return (
+					<li
+						className="edit-site-global-styles-screen-revisions__revision-item"
+						key={ `user-styles-revision-${ id }` }
+					>
+						<Button
+							className={ classnames(
+								'edit-site-global-styles-screen-revisions__revision-button',
+								{
+									'is-current': isActive,
 								}
-							>
-								<span className="edit-site-global-styles-screen-revisions__description">
-									<span className="edit-site-global-styles-screen-revisions__avatar">
-										<img
-											alt={ authorDisplayName }
-											src={ authorAvatarUrl }
-										/>
-									</span>
+							) }
+							disabled={ isActive }
+							onClick={ () => {
+								onChange( revision );
+							} }
+							aria-label={ getRevisionLabel(
+								revision,
+								isLatest,
+								isUnsaved
+							) }
+						>
+							<span className="edit-site-global-styles-screen-revisions__description">
+								{ isUnsaved ? (
+									<span>{ __( 'Unsaved changes' ) }</span>
+								) : (
 									<span>
 										{ isLatest
-											? sprintf(
-													/* translators: %s: author display name */
-													__(
-														'Current revision by %s'
-													),
-													authorDisplayName
-											  )
-											: sprintf(
-													/* translators: %s: author display name */
-													__( 'Revision by %s' ),
-													authorDisplayName
-											  ) }
+											? __( 'Currently-saved revision' )
+											: __( 'Styles revision' ) }
 									</span>
-									<span className="edit-site-global-styles-screen-revisions__date">
-										{ revisionTitle }
-									</span>
+								) }
+								<span className="edit-site-global-styles-screen-revisions__date">
+									{ isUnsaved
+										? __( 'Just now' )
+										: dateHumanTimeDiff }
 								</span>
-							</Button>
-						</li>
-					);
-				} ) }
-			</ol>
-		</>
+								<span className="edit-site-global-styles-screen-revisions__avatar">
+									<img
+										alt={ authorDisplayName }
+										src={ authorAvatarUrl }
+									/>
+								</span>
+							</span>
+						</Button>
+					</li>
+				);
+			} ) }
+		</ol>
 	);
 }
 
@@ -189,19 +158,45 @@ function ScreenRevisions() {
 			const {
 				__experimentalGetDirtyEntityRecords,
 				isSavingEntityRecord,
+				getCurrentUser,
 			} = select( coreStore );
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const _currentUser = getCurrentUser();
+			const _isDirty = dirtyEntityRecords.length > 0;
+			const _userRevisions =
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
+
+			/*
+			 * Adds a flag to the first revision, which is the latest.
+			 * Then, if there are unsaved changes in the editor, create a
+			 * new "revision" item that represents the unsaved changes.
+			 */
+			if ( _userRevisions.length > 0 ) {
+				_userRevisions[ 0 ].isLatest = true;
+				if (
+					_isDirty &&
+					_userRevisions[ 0 ]?.id !== 'unsaved' &&
+					! isEmpty( userConfig ) &&
+					!! _currentUser
+				) {
+					_userRevisions.unshift( {
+						id: 'unsaved',
+						styles: userConfig?.styles,
+						settings: userConfig?.settings,
+						authorDisplayName: _currentUser?.name,
+						authorAvatarUrl: _currentUser?.avatar_urls?.[ '24' ],
+					} );
+				}
+			}
 
 			return {
-				isDirty: dirtyEntityRecords.length > 0,
+				isDirty: _isDirty,
 				isSaving: dirtyEntityRecords.some( ( record ) =>
 					isSavingEntityRecord( record.kind, record.name, record.key )
 				),
-				userRevisions:
-					select(
-						coreStore
-					).__experimentalGetCurrentThemeGlobalStylesRevisions() ||
-					[],
+				userRevisions: _userRevisions,
 				editorCanvasContainerView: unlock(
 					select( editSiteStore )
 				).getEditorCanvasContainerView(),
@@ -210,23 +205,15 @@ function ScreenRevisions() {
 		}, [] );
 
 	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
-	const [ currentRevisionId, setCurrentRevisionId ] = useState();
-	const [ isRestoringRevision, setIsRestoringRevision ] = useState( false );
-
-	useEffect( () => {
-		let currentRevision = null;
-		for ( let i = 0; i < userRevisions.length; i++ ) {
-			if ( isGlobalStyleConfigEqual( userConfig, userRevisions[ i ] ) ) {
-				currentRevision = userRevisions[ i ];
-				break;
-			}
-		}
-		setCurrentRevisionId( currentRevision?.id );
-	}, [ userRevisions, userConfig ] );
-
+	const [ currentRevisionId, setCurrentRevisionId ] = useState(
+		isDirty ? 'unsaved' : userRevisions[ 0 ]?.id
+	);
+	// @TODO we'll need this state for later
+	const [ , setIsRestoringRevision ] = useState( false );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+
 	useEffect( () => {
 		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
 			goBack();
@@ -258,80 +245,47 @@ function ScreenRevisions() {
 		setCurrentRevisionId( revision?.id );
 	};
 
-	const RevisionsComponent =
-		userRevisions.length >= SELECTOR_MINIMUM_REVISION_COUNT
-			? RevisionsSelect
-			: RevisionsButtons;
+	const isLoadButtonEnabled =
+		!! globalStylesRevision?.id && globalStylesRevision?.id !== 'unsaved';
 
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
-				description={
-					! isRestoringRevision
-						? __(
-								"Select one of your global styles revisions to preview it in the editor. Changes won't take effect until you've saved the template."
-						  )
-						: __(
-								'You have unsaved changes in the editor. Restoring a revision will discard these changes. You can either return to the editor to save your unsaved changes, or overwrite them with the selected revision.'
-						  )
-				}
+				description={ __(
+					'Revisions are added to the timeline when style changes are saved.'
+				) }
 			/>
 			<div className="edit-site-global-styles-screen-revisions">
-				<VStack spacing={ 3 }>
-					{ isRestoringRevision ? (
-						<>
-							<Button
-								variant="primary"
-								className="edit-site-global-styles-screen-revisions__button"
-								aria-label={ __(
-									'Save my changes in the editor'
-								) }
-								onClick={ () => {
-									onCloseRevisions();
-								} }
-							>
-								{ __( 'Save my changes in the editor' ) }
-							</Button>
-							<Button
-								variant="primary"
-								className="edit-site-global-styles-screen-revisions__button"
-								aria-label={ __( 'Overwrite my changes' ) }
-								onClick={ () => {
+				<RevisionsButtons
+					onChange={ selectRevision }
+					currentRevisionId={ currentRevisionId }
+					userRevisions={ userRevisions }
+				/>
+				{ isLoadButtonEnabled && (
+					<SidebarFixedBottom>
+						<Button
+							variant="primary"
+							className="edit-site-global-styles-screen-revisions__button"
+							aria-label={ __(
+								'Restore and save selected revision'
+							) }
+							disabled={
+								! globalStylesRevision?.id ||
+								globalStylesRevision?.id === 'unsaved'
+							}
+							onClick={ () => {
+								if ( isDirty ) {
+									setIsRestoringRevision( true );
+								} else {
 									restoreRevision( globalStylesRevision );
-									setIsRestoringRevision( false );
-								} }
-							>
-								{ __( 'Overwrite my changes' ) }
-							</Button>
-						</>
-					) : (
-						<>
-							<RevisionsComponent
-								onChange={ selectRevision }
-								currentRevisionId={ currentRevisionId }
-								userRevisions={ userRevisions }
-							/>
-							<Button
-								variant="primary"
-								className="edit-site-global-styles-screen-revisions__button"
-								aria-label={ __(
-									'Restore and save selected revision'
-								) }
-								disabled={ ! globalStylesRevision?.id }
-								onClick={ () => {
-									if ( isDirty ) {
-										setIsRestoringRevision( true );
-									} else {
-										restoreRevision( globalStylesRevision );
-									}
-								} }
-							>
-								{ __( 'Use this revision' ) }
-							</Button>
-						</>
-					) }
-				</VStack>
+								}
+							} }
+						>
+							{ __( 'Load revision' ) }
+						</Button>
+					</SidebarFixedBottom>
+				) }
 			</div>
 			<Revisions
 				blocks={ blocks }

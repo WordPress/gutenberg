@@ -185,38 +185,61 @@
 	list-style: none;
 	margin: 0;
 	li {
-		margin-bottom: $grid-unit-20;
+		margin-bottom: 0;
+		border-left: 1px solid $gray-300;
 	}
 }
 
 .edit-site-global-styles-screen-revisions__revision-item {
+	position: relative;
+	padding-left: $grid-unit-15;
+	&::before {
+		background: $gray-300;
+		border-radius: 50%;
+		content: "\a";
+		display: inline-block;
+		height: 6px;
+		width: 6px;
+		position: absolute;
+		top: 50%;
+		left: -3px;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__revision-button {
 	width: 100%;
 	height: auto;
+	display: block;
+	min-height: $grid-unit-80;
 	&.is-current {
-		border: 1px solid $black;
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		opacity: 1;
+		background-color: #f1faff;
 	}
 }
 
 .edit-site-global-styles-screen-revisions__button {
 	justify-content: center;
+	width: 100%;
 }
 
 .edit-site-global-styles-screen-revisions__description {
 	display: grid;
-	grid-template-columns: max-content 1fr;
+	grid-template-columns: 1fr max-content;
 	grid-template-rows: 1fr 1fr;
 	gap: $grid-unit-05 $grid-unit-10;
 	grid-auto-flow: row;
 	align-items: start;
 	justify-items: start;
 	grid-template-areas:
-		"edit-site-global-styles-screen-revisions__avatar ."
-		"edit-site-global-styles-screen-revisions__avatar .";
+		". edit-site-global-styles-screen-revisions__avatar"
+		". edit-site-global-styles-screen-revisions__avatar";
+
 	.edit-site-global-styles-screen-revisions__avatar {
 		grid-area: edit-site-global-styles-screen-revisions__avatar;
 		width: 24px;
 		height: 24px;
-		position: relative;
+		align-self: center;
 		overflow: hidden;
 		border-radius: 50%;
 		img {

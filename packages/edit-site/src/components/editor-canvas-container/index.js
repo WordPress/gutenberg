@@ -48,6 +48,7 @@ const {
 
 function EditorCanvasContainer( {
 	children,
+	showCloseButton = false,
 	closeButtonLabel,
 	onClose = () => {},
 } ) {
@@ -95,22 +96,26 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const shouldShowCloseButton = showCloseButton || !! closeButtonLabel;
+
 	return (
 		<EditorCanvasContainerFill>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<section
 				className="edit-site-editor-canvas-container"
-				ref={ focusOnMountRef }
+				ref={ shouldShowCloseButton ? focusOnMountRef : null }
 				onKeyDown={ closeOnEscape }
 				aria-label={ title }
 			>
-				<Button
-					className="edit-site-editor-canvas-container__close-button"
-					icon={ closeSmall }
-					label={ closeButtonLabel || __( 'Close' ) }
-					onClick={ onCloseContainer }
-					showTooltip={ false }
-				/>
+				{ shouldShowCloseButton && (
+					<Button
+						className="edit-site-editor-canvas-container__close-button"
+						icon={ closeSmall }
+						label={ closeButtonLabel || __( 'Close' ) }
+						onClick={ onCloseContainer }
+						showTooltip={ false }
+					/>
+				) }
 				{ childrenWithProps }
 			</section>
 		</EditorCanvasContainerFill>
