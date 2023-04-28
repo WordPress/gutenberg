@@ -55,7 +55,7 @@ describe( 'Theme color algorithms', () => {
 
 			generateThemeVariables( { background: '#eee' } );
 			expect( console ).toHaveWarnedWith(
-				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#007cba").'
+				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#3858e9").'
 			);
 		} );
 

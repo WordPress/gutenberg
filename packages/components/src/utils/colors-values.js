@@ -31,9 +31,9 @@ const ALERT = {
 
 // Matches @wordpress/base-styles
 const ADMIN = {
-	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba))',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
 	themeDark10:
-		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1))',
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
 };
 
 const UI = {
