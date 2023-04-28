@@ -150,15 +150,15 @@ async function getDefaultConfig(
 ) {
 	// Our default config should try to infer what type of project
 	// this is in order to automatically map the current directory.
-	const type = shouldInferType
+	const detectedType = shouldInferType
 		? await detectDirectoryType( configDirectoryPath )
 		: null;
 
 	const rawConfig = {
-		core: type === 'core' ? '.' : null,
+		core: detectedType === 'core' ? '.' : null,
 		phpVersion: null,
-		plugins: type === 'plugin' ? [ '.' ] : [],
-		themes: type === 'theme' ? [ '.' ] : [],
+		plugins: detectedType === 'plugin' ? [ '.' ] : [],
+		themes: detectedType === 'theme' ? [ '.' ] : [],
 		port: 8888,
 		mappings: {},
 		config: {
