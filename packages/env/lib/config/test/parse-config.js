@@ -330,8 +330,8 @@ describe( 'parseConfig', () => {
 		expect.assertions( 1 );
 		try {
 			await parseConfig( './', '/cache' );
-		} catch ( e ) {
-			expect( e ).toEqual(
+		} catch ( error ) {
+			expect( error ).toEqual(
 				new ValidationError(
 					'Could not find the latest WordPress version. There may be a network issue.'
 				)

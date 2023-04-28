@@ -163,7 +163,7 @@ function checkValidURL( configFile, configKey, url ) {
 
 	try {
 		new URL( url );
-	} catch ( e ) {
+	} catch {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a valid URL.`
 		);
