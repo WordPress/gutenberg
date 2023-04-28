@@ -9,7 +9,7 @@ const {
 
 test.use( {
 	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
+		await use( new Editor( { page } ) );
 	},
 	userGlobalStylesRevisions: async ( { page, requestUtils }, use ) => {
 		await use( new UserGlobalStylesRevisions( { page, requestUtils } ) );
@@ -47,11 +47,14 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		// Navigates to Styles -> Typography -> Text and click on a size.
-		await page.getByRole( 'button', { name: 'Styles' } ).click();
-
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
+
+		// Navigates to Styles -> Typography -> Text and click on a size.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
 
 		/*
 		 * There are not enough revisions to show the revisions UI yet, so let's create some.
@@ -65,16 +68,19 @@ test.describe( 'Global styles revisions', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography Text styles' } )
 				.click();
-			await page.click(
-				'role=radiogroup[name="Font size"i] >> role=radio[name="Large"i]'
-			);
+			await page
+				.getByRole( 'radiogroup', { name: 'Font size' } )
+				.getByRole( 'radio', { name: 'Large' } )
+				.click();
 			await editor.saveSiteEditorEntities();
 
 			// Change a style and save it again just for good luck.
 			// We need more than 2 revisions to show the UI.
-			await page.click(
-				'role=radiogroup[name="Font size"i] >> role=radio[name="Medium"i]'
-			);
+			await page
+				.getByRole( 'radiogroup', { name: 'Font size' } )
+				.getByRole( 'radio', { name: 'Medium' } )
+				.click();
+
 			await editor.saveSiteEditorEntities();
 
 			// Now there should be enough revisions to show the revisions UI.
@@ -82,27 +88,23 @@ test.describe( 'Global styles revisions', () => {
 				.getByRole( 'button', { name: 'Styles actions' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
-			const revisionButtons = page.locator(
-				'role=group[name="Global styles revisions"i] >> role=button[name=/^Revision by /]'
-			);
+
+			const revisionButtons = page
+				.getByRole( 'group', { name: 'Global styles revisions' } )
+				.getByRole( 'button', { name: /^Revision by / } );
 
 			await expect( revisionButtons ).toHaveCount(
 				currentRevisions.length + 2
 			);
-		} else {
-			// There are some revisions. Let's check that the UI looks how we expect it to.
-			await page
-				.getByRole( 'button', { name: 'Styles actions' } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
-			const revisionButtons = page.locator(
-				'role=group[name="Global styles revisions"i] >> role=button[name=/^Revision by /]'
-			);
-
-			await expect( revisionButtons ).toHaveCount(
-				currentRevisions.length
-			);
 		}
+		// There are some revisions. Let's check that the UI looks how we expect it to.
+		await page.getByRole( 'button', { name: 'Styles actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
+		const revisionButtons = page
+			.getByRole( 'group', { name: 'Global styles revisions' } )
+			.getByRole( 'button', { name: /^Revision by / } );
+
+		await expect( revisionButtons ).toHaveCount( currentRevisions.length );
 	} );
 } );
 
