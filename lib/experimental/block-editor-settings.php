@@ -72,7 +72,7 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 		}
 	}
 
-	$current_template = gutenberg_get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
+	$current_template = get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
 
 	if ( ! empty( $current_template ) ) {
 		$template_blocks    = parse_blocks( $current_template[0]->content );

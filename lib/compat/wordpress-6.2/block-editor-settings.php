@@ -22,6 +22,9 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 		);
 	}
 
+	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
+
 	return $settings;
 }
 
