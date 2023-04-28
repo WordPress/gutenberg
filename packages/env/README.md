@@ -175,25 +175,6 @@ $ wp-env destroy
 $ wp-env start
 ```
 
-### 7. Debug mode and inspecting the generated dockerfile.
-
-`wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
-
-Start `wp-env` in debug mode
-
-```sh
-wp-env start --debug
-```
-
-`wp-env` will output its config which includes `dockerComposeConfigPath`.
-
-```sh
-ℹ Config:
-	...
-	"dockerComposeConfigPath": "/Users/$USERNAME/.wp-env/5a619d332a92377cd89feb339c67b833/docker-compose.yml",
-	...
-```
-
 ## Using included WordPress PHPUnit test files
 
 Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
@@ -409,13 +390,6 @@ Success: Installed 1 of 1 plugins.
 ✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
 ```
 
-**NOTE**: Depending on your host OS, you may experience errors when trying to install plugins or themes (e.g. `Warning: Could not create directory.`). This is typically because the user ID used within the container does not have write access to the mounted directories created by `wp-env`. To resolve this, run the `docker-compose` command directly from the directory created by `wp-env` and add `-u $(id -u)` and `-e HOME=/tmp` the `run` command as options:
-
-```sh
-$ cd ~/wp-env/500cd328b649d63e882d5c4695871d04
-$ docker-compose run --rm -u $(id -u) -e HOME=/tmp cli [plugin|theme] install <plugin|theme>
-```
-
 ### `wp-env destroy`
 
 ```sh
@@ -445,7 +419,7 @@ Options:
 
 ### `wp-env install-path`
 
-Outputs the absolute path to the WordPress environment files.
+Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.
 
 Example:
 

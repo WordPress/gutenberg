@@ -215,7 +215,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'install-path',
-		'Get the path where environment files are located.',
+		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
 		() => {},
 		withSpinner( env.installPath )
 	);
