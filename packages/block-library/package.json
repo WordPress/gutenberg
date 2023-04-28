@@ -28,7 +28,7 @@
 		"build-style/**",
 		"src/**/*.scss",
 		"{src,build,build-module}/*/init.js",
-		"src/utils/interactivity/index.js"
+		"{src,build,build-module}/utils/interactivity/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
