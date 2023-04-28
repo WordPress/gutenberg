@@ -82,10 +82,11 @@ function add_live_preview_button() {
 			const livePreviewButton = document.createElement('a');
 			/* translators: %s: theme name */
 			livePreviewButton.setAttribute('aria-label', '
-<?php
-				/* translators: %s: theme name */
-				echo esc_attr_x( 'Live Preview %s', 'theme' );
-?>'.replace('%s', themeName));
+				<?php
+					/* translators: %s: theme name */
+					echo esc_attr_x( 'Live Preview %s', 'theme' );
+				?>
+			'.replace('%s', themeName));
 			livePreviewButton.setAttribute('class', 'button button-primary');
 			livePreviewButton.setAttribute(
 				'href',
