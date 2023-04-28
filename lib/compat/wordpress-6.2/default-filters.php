@@ -38,4 +38,4 @@ add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
  *
  */
 remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
-add_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+add_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles', 1 );
