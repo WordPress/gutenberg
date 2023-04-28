@@ -5,8 +5,8 @@
  * @package gutenberg
  */
 
-if ( $_GET['test'] === 'test' ) {
-  die( "<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>" );
+if ( 'test' === $_GET['test'] ) {
+	die( '<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>' );
 }
 
 /**
