@@ -131,7 +131,9 @@ function validatePortUniqueness( config ) {
 	// overwrite any root-level options if necessary.
 	for ( const env in config.env ) {
 		if ( config.env[ env ].port === undefined ) {
-			throw new ValidationError( `The "${ env }" has an invalid port.` );
+			throw new ValidationError(
+				`The "${ env }" environment has an invalid port.`
+			);
 		}
 
 		environmentPorts[ env ] = config.env[ env ].port;
