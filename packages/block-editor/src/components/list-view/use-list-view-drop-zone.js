@@ -58,7 +58,7 @@ import { store as blockEditorStore } from '../../store';
  *                                                  'inside' refers to nesting as an inner block.
  */
 
-const NESTING_LEVEL_INDENTATION = 28;
+export const NESTING_LEVEL_INDENTATION = 28;
 
 /**
  * Determines whether the user is positioning the dragged block to be
