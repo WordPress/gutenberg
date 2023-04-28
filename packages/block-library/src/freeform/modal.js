@@ -12,7 +12,7 @@ import {
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useEffect, useState, RawHTML } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -62,7 +62,7 @@ export default function ModalEdit( props ) {
 	} = props;
 	const [ isOpen, setOpen ] = useState( false );
 	const id = `editor-${ clientId }`;
-	const label = __( 'Classic Edit' );
+	const label = _x( 'Classic Edit', 'Classic block' );
 	const instanceId = useInstanceId(
 		ModalEdit,
 		'wp-block-freeform-modal-header'
