@@ -24,7 +24,10 @@ test.describe( 'Keep styles on block transforms', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'Heading' },
+				attributes: {
+					content: 'Heading',
+					textColor: 'luminous-vivid-orange',
+				},
 			},
 		] );
 	} );
@@ -50,12 +53,15 @@ test.describe( 'Keep styles on block transforms', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
+				attributes: { fontSize: 'large' },
 			},
 			{
 				name: 'core/heading',
+				attributes: { fontSize: 'large' },
 			},
 			{
 				name: 'core/heading',
+				attributes: { fontSize: 'large' },
 			},
 		] );
 	} );
@@ -75,10 +81,16 @@ test.describe( 'Keep styles on block transforms', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/group',
+				attributes: expect.not.objectContaining( {
+					fontSize: 'large',
+				} ),
 				innerBlocks: [
 					{
 						name: 'core/paragraph',
-						attributes: { content: 'Line 1 to be made large' },
+						attributes: {
+							content: 'Line 1 to be made large',
+							fontSize: 'large',
+						},
 					},
 				],
 			},
