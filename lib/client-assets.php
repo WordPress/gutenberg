@@ -221,9 +221,6 @@ function gutenberg_register_packages_scripts( $scripts ) {
 			case 'wp-edit-site':
 				array_push( $dependencies, 'wp-dom-ready' );
 				break;
-			case 'wp-preferences':
-				array_push( $dependencies, 'wp-preferences-persistence' );
-				break;
 		}
 
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
