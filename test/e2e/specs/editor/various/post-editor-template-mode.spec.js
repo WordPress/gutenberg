@@ -102,6 +102,22 @@ test.describe( 'Post Editor Template mode', () => {
 		).toBeVisible();
 	} );
 
+	test( 'Allow editing the title of a new custom template', async ( {
+		page,
+		requestUtils,
+		postEditorTemplateMode,
+	} ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+
+		await postEditorTemplateMode.createPostAndSaveDraft();
+		await postEditorTemplateMode.createNewTemplate( 'Foobar' );
+		await postEditorTemplateMode.editTemplateTitle( 'Barfoo' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Template Options' } )
+		).toHaveText( 'Barfoo' );
+	} );
+
 	test.describe( 'Delete Post Template Confirmation Dialog', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentyone' );
@@ -377,5 +393,20 @@ class PostEditorTemplateMode {
 			'role=button[name="Cancel"i]'
 		);
 		await cancelButton.click();
+	}
+
+	async editTemplateTitle( newTitle ) {
+		await this.page.click( 'button[aria-label="Template Options"]' );
+
+		const editDialog = this.page.locator(
+			'div.edit-site-template-details__group'
+		);
+
+		await editDialog.waitFor();
+
+		await editDialog.getByLabel( 'Title' ).fill( newTitle );
+
+		const editorContent = await this.page.getByLabel( 'Editor Content' );
+		await editorContent.click();
 	}
 }
