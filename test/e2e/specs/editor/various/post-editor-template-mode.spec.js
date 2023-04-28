@@ -403,7 +403,6 @@ class PostEditorTemplateMode {
 		);
 
 		await editDialog.waitFor();
-
 		await editDialog.getByLabel( 'Title' ).fill( newTitle );
 
 		const editorContent = await this.page.getByLabel( 'Editor Content' );
