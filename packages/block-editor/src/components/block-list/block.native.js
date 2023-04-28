@@ -84,7 +84,6 @@ function BlockWrapper( {
 	const { isFullWidth } = alignmentHelpers;
 	const isScreenWidthEqual = blockWidth === screenWidth;
 	const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
-	const pointerEvents = isTouchable ? 'auto' : 'box-only';
 	const blockWrapperStyles = { flex: 1 };
 	const blockWrapperStyle = [
 		blockWrapperStyles,
@@ -97,42 +96,38 @@ function BlockWrapper( {
 
 	return (
 		<Pressable
+			accessibilityLabel={ accessibilityLabel }
 			accessibilityRole={ 'button' }
 			accessible={ accessible }
+			disabled={ ! isTouchable }
 			onPress={ onFocus }
-			style={ blockWrapperStyles }
+			style={ blockWrapperStyle }
 		>
-			<View
-				accessibilityLabel={ accessibilityLabel }
-				pointerEvents={ pointerEvents }
-				style={ blockWrapperStyle }
+			<BlockOutline
+				isSelected={ isSelected }
+				isParentSelected={ isParentSelected }
+				screenWidth={ screenWidth }
+			/>
+			<BlockDraggable
+				clientId={ clientId }
+				draggingClientId={ draggingClientId }
+				enabled={ draggingEnabled }
+				testID="draggable-trigger-content"
 			>
-				<BlockOutline
-					isSelected={ isSelected }
-					isParentSelected={ isParentSelected }
-					screenWidth={ screenWidth }
-				/>
-				<BlockDraggable
-					clientId={ clientId }
-					draggingClientId={ draggingClientId }
-					enabled={ draggingEnabled }
-					testID="draggable-trigger-content"
-				>
-					{ children }
-				</BlockDraggable>
-				<View style={ styles.neutralToolbar } ref={ anchorNodeRef }>
-					{ isSelected && (
-						<BlockMobileToolbar
-							anchorNodeRef={ anchorNodeRef.current }
-							blockWidth={ blockWidth }
-							clientId={ clientId }
-							draggingClientId={ draggingClientId }
-							isFullWidth={ isFullWidthToolbar }
-							isStackedHorizontally={ isStackedHorizontally }
-							onDelete={ onDeleteBlock }
-						/>
-					) }
-				</View>
+				{ children }
+			</BlockDraggable>
+			<View style={ styles.neutralToolbar } ref={ anchorNodeRef }>
+				{ isSelected && (
+					<BlockMobileToolbar
+						anchorNodeRef={ anchorNodeRef.current }
+						blockWidth={ blockWidth }
+						clientId={ clientId }
+						draggingClientId={ draggingClientId }
+						isFullWidth={ isFullWidthToolbar }
+						isStackedHorizontally={ isStackedHorizontally }
+						onDelete={ onDeleteBlock }
+					/>
+				) }
 			</View>
 		</Pressable>
 	);
