@@ -26,6 +26,7 @@ jest.mock( '../../wordpress', () => ( {
  */
 const DEFAULT_CONFIG = {
 	port: 8888,
+	testsPort: 8889,
 	phpVersion: null,
 	coreSource: {
 		type: 'git',
@@ -53,7 +54,6 @@ const DEFAULT_CONFIG = {
 	env: {
 		development: {},
 		tests: {
-			port: 8889,
 			config: {
 				WP_DEBUG: false,
 				SCRIPT_DEBUG: false,

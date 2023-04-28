@@ -154,12 +154,17 @@ async function getDefaultConfig(
 		? await detectDirectoryType( configDirectoryPath )
 		: null;
 
+	// The default configuration should contain all possible options and
+	// environments whether they're empty or not. This makes using the
+	// config objects easier because once merged we don't need to
+	// verify that a given option exists before using it.
 	const rawConfig = {
 		core: detectedType === 'core' ? '.' : null,
 		phpVersion: null,
 		plugins: detectedType === 'plugin' ? [ '.' ] : [],
 		themes: detectedType === 'theme' ? [ '.' ] : [],
 		port: 8888,
+		testsPort: 8889,
 		mappings: {},
 		config: {
 			WP_DEBUG: true,
@@ -173,10 +178,9 @@ async function getDefaultConfig(
 			WP_HOME: 'http://localhost',
 		},
 		env: {
-			development: {}, // No overrides needed, but it should exist.
+			development: {},
 			tests: {
 				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
-				port: 8889,
 			},
 		},
 	};
@@ -269,6 +273,12 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		rawConfig,
 		options
 	);
+
+	// Parse any root-only options.
+	if ( rawConfig.testsPort !== undefined ) {
+		checkPort( configFile, `testsPort`, rawConfig.testsPort );
+		parsedConfig.testsPort = rawConfig.testsPort;
+	}
 
 	// Parse the environment-specific configs so they're accessible to the root.
 	parsedConfig.env = {};

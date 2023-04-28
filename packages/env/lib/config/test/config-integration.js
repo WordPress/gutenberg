@@ -9,8 +9,8 @@ const { readFile } = require( 'fs' ).promises;
 /**
  * Internal dependencies
  */
-const { loadConfig } = require( '../lib/config' );
-const detectDirectoryType = require( '../lib/config/detect-directory-type' );
+const loadConfig = require( '../load-config' );
+const detectDirectoryType = require( '../detect-directory-type' );
 
 jest.mock( 'fs', () => ( {
 	promises: {
@@ -36,9 +36,9 @@ jest.mock( 'got', () =>
 	} ) )
 );
 
-jest.mock( '../lib/config/detect-directory-type', () => jest.fn() );
+jest.mock( '../detect-directory-type', () => jest.fn() );
 
-describe( 'Config Parsing', () => {
+describe( 'Config Integration', () => {
 	beforeEach( () => {
 		process.env.WP_ENV_HOME = '/cache';
 		detectDirectoryType.mockResolvedValue( null );
@@ -46,6 +46,8 @@ describe( 'Config Parsing', () => {
 
 	afterEach( () => {
 		delete process.env.WP_ENV_HOME;
+		delete process.env.WP_ENV_PORT;
+		delete process.env.WP_ENV_TESTS_PORT;
 	} );
 
 	it( 'should use default configuration', async () => {
@@ -55,10 +57,12 @@ describe( 'Config Parsing', () => {
 
 		const config = await loadConfig( '/test/gutenberg' );
 
+		expect( config.env.development.port ).toEqual( 8888 );
+		expect( config.env.tests.port ).toEqual( 8889 );
 		expect( config ).toMatchSnapshot();
 	} );
 
-	it( 'should load local configuration', async () => {
+	it( 'should load local configuration file', async () => {
 		readFile.mockImplementation( async ( fileName ) => {
 			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
 				return JSON.stringify( {
@@ -72,10 +76,12 @@ describe( 'Config Parsing', () => {
 
 		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
 
+		expect( config.env.development.port ).toEqual( 123 );
+		expect( config.env.tests.port ).toEqual( 8889 );
 		expect( config ).toMatchSnapshot();
 	} );
 
-	it( 'should load local and override configurations', async () => {
+	it( 'should load local and override configuration files', async () => {
 		readFile.mockImplementation( async ( fileName ) => {
 			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
 				return JSON.stringify( {
@@ -96,6 +102,37 @@ describe( 'Config Parsing', () => {
 
 		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
 
+		expect( config.env.development.port ).toEqual( 999 );
+		expect( config.env.tests.port ).toEqual( 456 );
+		expect( config ).toMatchSnapshot();
+	} );
+
+	it( 'should use environment variables over local and override configuration files', async () => {
+		process.env.WP_ENV_PORT = 12345;
+		process.env.WP_ENV_TESTS_PORT = 61234;
+
+		readFile.mockImplementation( async ( fileName ) => {
+			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+				return JSON.stringify( {
+					core: 'WordPress/WordPress#trunk',
+					port: 123,
+					testsPort: 456,
+				} );
+			}
+
+			if ( fileName === '/test/gutenberg/.wp-env.override.json' ) {
+				return JSON.stringify( {
+					port: 999,
+				} );
+			}
+
+			throw { code: 'ENOENT' };
+		} );
+
+		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
+
+		expect( config.env.development.port ).toEqual( 12345 );
+		expect( config.env.tests.port ).toEqual( 61234 );
 		expect( config ).toMatchSnapshot();
 	} );
 } );
