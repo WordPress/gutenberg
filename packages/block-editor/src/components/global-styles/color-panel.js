@@ -28,7 +28,7 @@ import { __ } from '@wordpress/i18n';
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -330,7 +330,7 @@ export default function ColorPanel( {
 	const hasTextColor = () => !! userTextColor;
 	const setTextColor = ( newColor ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'color', 'text' ],
 				encodeColorValue( newColor )
@@ -347,7 +347,7 @@ export default function ColorPanel( {
 	const userGradient = decodeValue( value?.color?.gradient );
 	const hasBackground = () => !! userBackgroundColor || !! userGradient;
 	const setBackgroundColor = ( newColor ) => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			encodeColorValue( newColor )
@@ -356,7 +356,7 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'gradient' ],
 			encodeGradientValue( newGradient )
@@ -365,7 +365,7 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const resetBackground = () => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			undefined
@@ -382,7 +382,7 @@ export default function ColorPanel( {
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
 	const setLinkColor = ( newColor ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
 				encodeColorValue( newColor )
@@ -397,7 +397,7 @@ export default function ColorPanel( {
 	);
 	const setHoverLinkColor = ( newColor ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
 				encodeColorValue( newColor )
@@ -406,12 +406,12 @@ export default function ColorPanel( {
 	};
 	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
 	const resetLink = () => {
-		let newValue = immutableSet(
+		let newValue = setImmutably(
 			value,
 			[ 'elements', 'link', ':hover', 'color', 'text' ],
 			undefined
 		);
-		newValue = immutableSet(
+		newValue = setImmutably(
 			newValue,
 			[ 'elements', 'link', 'color', 'text' ],
 			undefined
@@ -591,7 +591,7 @@ export default function ColorPanel( {
 				elementGradientUserColor
 			);
 		const resetElement = () => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
 				undefined
@@ -603,7 +603,7 @@ export default function ColorPanel( {
 
 		const setElementTextColor = ( newTextColor ) => {
 			onChange(
-				immutableSet(
+				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
 					encodeColorValue( newTextColor )
@@ -611,7 +611,7 @@ export default function ColorPanel( {
 			);
 		};
 		const setElementBackgroundColor = ( newBackgroundColor ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
 				encodeColorValue( newBackgroundColor )
@@ -620,7 +620,7 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 		const setElementGradient = ( newGradient ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'gradient' ],
 				encodeGradientValue( newGradient )

@@ -27,7 +27,7 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 export function useHasEffectsPanel( settings ) {
 	const hasShadowControl = useHasShadowControl( settings );
@@ -81,7 +81,7 @@ export default function EffectsPanel( {
 	const hasShadowEnabled = useHasShadowControl( settings );
 	const shadow = decodeValue( inheritedValue?.shadow );
 	const setShadow = ( newValue ) => {
-		onChange( immutableSet( value, [ 'shadow' ], newValue ) );
+		onChange( setImmutably( value, [ 'shadow' ], newValue ) );
 	};
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );

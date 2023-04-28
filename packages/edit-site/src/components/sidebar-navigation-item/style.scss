@@ -1,6 +1,9 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-600;
-	margin: 0 $grid-unit-05;
+	// 6px right padding to align with + button
+	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
+	border: none;
+	min-height: $grid-unit-50;
 
 	&:hover,
 	&:focus,
@@ -11,6 +14,10 @@
 
 	&[aria-current] {
 		background: var(--wp-admin-theme-color);
+	}
+
+	.edit-site-sidebar-navigation-item__drilldown-indicator {
+		fill: $gray-700;
 	}
 }
 
