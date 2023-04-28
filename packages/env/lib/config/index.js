@@ -7,7 +7,8 @@ const dbEnv = require( './db-env' );
 
 /**
  * @typedef {import('./parse-config').WPConfig} WPConfig
- * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
+ * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./parse-source-string').WPSource} WPSource
  */
 

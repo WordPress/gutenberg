@@ -7,15 +7,16 @@ const addOrReplacePort = require( './add-or-replace-port' );
 const { ValidationError } = require( './validate-config' );
 
 /**
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
+ * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * Performs any additional post-processing on the config object.
  *
- * @param {WPServiceConfig} config The config to process.
+ * @param {WPEnvironmentConfig} config The config to process.
  *
- * @return {WPServiceConfig} The config after post-processing.
+ * @return {WPEnvironmentConfig} The config after post-processing.
  */
 module.exports = function postProcessConfig( config ) {
 	// Make sure that we're operating on a config object that has
@@ -33,9 +34,9 @@ module.exports = function postProcessConfig( config ) {
  * a full config object to work with internally. This makes it easier than having to try and
  * resolve the full config options every time we want to use them for something.
  *
- * @param {WPServiceConfig} config The config to process.
+ * @param {WPEnvironmentConfig} config The config to process.
  *
- * @return {WPServiceConfig} The config object with the root options merged together with the environment-specific options.
+ * @return {WPRootConfig} The config object with the root options merged together with the environment-specific options.
  */
 function mergeRootToEnvironments( config ) {
 	// Some root-level options need to be merged early because they have a special
@@ -79,9 +80,9 @@ function mergeRootToEnvironments( config ) {
 /**
  * Appends the configured port to certain wp-config options.
  *
- * @param {WPServiceConfig} config The config to process.
+ * @param {WPRootConfig} config The config to process.
  *
- * @return {WPServiceConfig} The config after post-processing.
+ * @return {WPRootConfig} The config after post-processing.
  */
 function appendPortToWPConfigs( config ) {
 	const options = [ 'WP_TESTS_DOMAIN', 'WP_SITEURL', 'WP_HOME' ];
@@ -120,7 +121,7 @@ function appendPortToWPConfigs( config ) {
 /**
  * Examines the config to make sure that none of the environments share the same port.
  *
- * @param {WPServiceConfig} config The config to process.
+ * @param {WPRootConfig} config The config to process.
  */
 function validatePortUniqueness( config ) {
 	// We're going to build a map of the environments and their port
@@ -159,7 +160,7 @@ function validatePortUniqueness( config ) {
 /**
  * Perform any validation that can only happen after post-processing has occurred.
  *
- * @param {WPServiceConfig} config The config to validate.
+ * @param {WPRootConfig} config The config to validate.
  */
 function validate( config ) {
 	validatePortUniqueness( config );
@@ -169,9 +170,9 @@ function validate( config ) {
  * Creates a deep copy of the root options in the config object that we can use to avoid
  * accidentally sharing object state between different environments.
  *
- * @param {WPServiceConfig} config The root config object to copy.
+ * @param {WPRootConfig} config The root config object to copy.
  *
- * @return {WPServiceConfig} A deep copy of the root config object.
+ * @return {WPRootConfig} A deep copy of the root config object.
  */
 function deepCopyRootOptions( config ) {
 	// Create a shallow clone of the object first so we can operate on it safetly.

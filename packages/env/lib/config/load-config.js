@@ -14,20 +14,20 @@ const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const postProcessConfig = require( './post-process-config' );
 
 /**
- * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * wp-env configuration.
  *
  * @typedef WPConfig
- * @property {string}                           name                    Name of the environment.
- * @property {string}                           configDirectoryPath     Path to the .wp-env.json file.
- * @property {string}                           workDirectoryPath       Path to the work directory located in ~/.wp-env.
- * @property {string}                           dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
- * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
- * @property {boolean}                          debug                   True if debug mode is enabled.
+ * @property {string}                               name                    Name of the environment.
+ * @property {string}                               configDirectoryPath     Path to the .wp-env.json file.
+ * @property {string}                               workDirectoryPath       Path to the work directory located in ~/.wp-env.
+ * @property {string}                               dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {boolean}                              detectedLocalConfig     If true, wp-env detected local config and used it.
+ * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
+ * @property {boolean}                              debug                   True if debug mode is enabled.
  */
 
 /**

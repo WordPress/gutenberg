@@ -1,7 +1,6 @@
 'use strict';
 
 /**
- * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
  * @typedef {import('./parse-source-string').WPSource} WPSource
  */
 

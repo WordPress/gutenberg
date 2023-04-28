@@ -1,17 +1,16 @@
 'use strict';
 /**
- * @typedef {import('./parse-config').WPServiceConfig} WPServiceConfig
- * @typedef {import('./parse-config').WPService} WPService
+ * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * Deep-merges the values in the given service environment. This allows us to
  * merge the wp-config.php values instead of overwriting them.
  *
- * @param {WPServiceConfig} defaultConfig The default config options.
- * @param {...string}       configs       The config options to merge.
+ * @param {WPEnvironmentConfig} defaultConfig The default config options.
+ * @param {...string}           configs       The config options to merge.
  *
- * @return {WPServiceConfig} The merged config object.
+ * @return {WPEnvironmentConfig} The merged config object.
  */
 module.exports = function mergeConfigs( defaultConfig, ...configs ) {
 	// Start with our default config object. This has all
@@ -30,10 +29,10 @@ module.exports = function mergeConfigs( defaultConfig, ...configs ) {
 /**
  * Merges a config object into another.
  *
- * @param {WPService} config  The config object to be merged into.
- * @param {WPService} toMerge The config object to merge.
+ * @param {WPEnvironmentConfig} config  The config object to be merged into.
+ * @param {WPEnvironmentConfig} toMerge The config object to merge.
  *
- * @return {WPService} The merged config object.
+ * @return {WPEnvironmentConfig} The merged config object.
  */
 function mergeConfig( config, toMerge ) {
 	// Begin by updating any of the config options that the object already has.

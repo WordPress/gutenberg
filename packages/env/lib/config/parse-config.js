@@ -30,9 +30,17 @@ const mergeConfigs = require( './merge-configs' );
  */
 
 /**
- * Base-level config for any particular environment. (development/tests/etc)
+ * The root configuration options.
  *
- * @typedef WPServiceConfig
+ * @typedef WPRootConfigOptions
+ * @property {number} port      The port to use in the development environment.
+ * @property {number} testsPort The port to use in the tests environment.
+ */
+
+/**
+ * The environment-specific configuration options. (development/tests/etc)
+ *
+ * @typedef WPEnvironmentConfig
  * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
@@ -40,6 +48,12 @@ const mergeConfigs = require( './merge-configs' );
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ */
+
+/**
+ * The root configuration options.
+ *
+ * @typedef {WPEnvironmentConfig & WPRootConfigOptions} WPRootConfig
  */
 
 /**
@@ -61,7 +75,7 @@ const mergeConfigs = require( './merge-configs' );
  * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
  * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
  *
- * @return {WPServiceConfig} Parsed config.
+ * @return {WPRootConfig} Parsed config.
  */
 async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 	// The local config will be used to override any defaults.
@@ -142,7 +156,7 @@ function getConfigFilePath( configDirectoryPath, type = 'local' ) {
  * @param {string} options.shouldInferType    Indicates whether or not we should infer the type of project wp-env is being used in.
  * @param {string} options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {Promise<WPServiceConfig>} The default config object.
+ * @return {Promise<WPEnvironmentConfig>} The default config object.
  */
 async function getDefaultConfig(
 	configDirectoryPath,
@@ -195,7 +209,7 @@ async function getDefaultConfig(
  *
  * @param {string} cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {WPServiceConfig} An object containing the environment variable overrides.
+ * @return {WPEnvironmentConfig} An object containing the environment variable overrides.
  */
 function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	const overrides = getConfigFromEnvironmentVars( cacheDirectoryPath );
@@ -245,7 +259,7 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
  * @param {Object} options
  * @param {string} options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {Promise<WPServiceConfig|null>} The config service object.
+ * @return {Promise<WPRootConfig|null>} The parsed root config object.
  */
 async function parseConfigFile( configFile, options ) {
 	const rawConfig = await readRawConfigFile( configFile );
@@ -264,10 +278,10 @@ async function parseConfigFile( configFile, options ) {
  * @param {Object} options
  * @param {string} options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {Promise<WPServiceConfig>} The root config object.
+ * @return {Promise<WPRootConfig>} The root config object.
  */
 async function parseRootConfig( configFile, rawConfig, options ) {
-	const parsedConfig = await parseServiceConfig(
+	const parsedConfig = await parseEnvironmentConfig(
 		configFile,
 		null,
 		rawConfig,
@@ -285,7 +299,7 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.env ) {
 		checkObjectWithValues( configFile, 'env', rawConfig.env, [ 'object' ] );
 		for ( const env in rawConfig.env ) {
-			parsedConfig.env[ env ] = await parseServiceConfig(
+			parsedConfig.env[ env ] = await parseEnvironmentConfig(
 				configFile,
 				env,
 				rawConfig.env[ env ],
@@ -306,9 +320,14 @@ async function parseRootConfig( configFile, rawConfig, options ) {
  * @param {Object}      options
  * @param {string}      options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
  *
- * @return {Promise<WPServiceConfig>} The config service object.
+ * @return {Promise<WPEnvironmentConfig>} The environment config object.
  */
-async function parseServiceConfig( configFile, environment, config, options ) {
+async function parseEnvironmentConfig(
+	configFile,
+	environment,
+	config,
+	options
+) {
 	if ( ! config ) {
 		return {};
 	}
