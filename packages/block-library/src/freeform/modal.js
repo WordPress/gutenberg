@@ -11,6 +11,7 @@ import {
 import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 
 function ClassicEdit( props ) {
 	const styles = useSelect(
@@ -59,6 +60,7 @@ export default function ModalEdit( props ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const id = `editor-${ clientId }`;
 	const label = __( 'Classic Edit' );
+	const instanceId = useInstanceId( ModalEdit, 'components-modal-header' );
 
 	return (
 		<>
@@ -71,12 +73,16 @@ export default function ModalEdit( props ) {
 			</BlockControls>
 			{ content && <RawHTML>{ content }</RawHTML> }
 			{ ( isOpen || ! content ) && (
-				<Modal title={ label } __experimentalHideHeader={ true }>
+				<Modal
+					__experimentalHideHeader={ true }
+					aria={ { labelledby: instanceId } }
+				>
 					<h2
 						style={ {
 							display: 'flex',
 							justifyContent: 'space-between',
 						} }
+						id={ instanceId }
 					>
 						<div>{ label }</div>
 						<div>
