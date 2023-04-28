@@ -9,6 +9,7 @@ const dockerCompose = require( 'docker-compose' );
  */
 const initConfig = require( '../init-config' );
 const { configureWordPress, resetDatabase } = require( '../wordpress' );
+const { executeAfterSetup } = require( '../execute-after-setup' );
 
 /**
  * @typedef {import('../wordpress').WPEnvironment} WPEnvironment
@@ -19,11 +20,17 @@ const { configureWordPress, resetDatabase } = require( '../wordpress' );
  * Wipes the development server's database, the tests server's database, or both.
  *
  * @param {Object}                 options
- * @param {WPEnvironmentSelection} options.environment The environment to clean. Either 'development', 'tests', or 'all'.
- * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
- * @param {boolean}                options.debug       True if debug mode is enabled.
+ * @param {WPEnvironmentSelection} options.environment    The environment to clean. Either 'development', 'tests', or 'all'.
+ * @param {Object}                 options.spinner        A CLI spinner which indicates progress.
+ * @param {boolean}                options.executeScripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}                options.debug          True if debug mode is enabled.
  */
-module.exports = async function clean( { environment, spinner, debug } ) {
+module.exports = async function clean( {
+	environment,
+	spinner,
+	executeScripts,
+	debug,
+} ) {
 	const config = await initConfig( { spinner, debug } );
 
 	const description = `${ environment } environment${
@@ -57,6 +64,11 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	}
 
 	await Promise.all( tasks );
+
+	// Execute any configured command that should run after the environment has finished being set up.
+	if ( executeScripts ) {
+		executeAfterSetup( config, spinner );
+	}
 
 	spinner.text = `Cleaned ${ description }.`;
 };

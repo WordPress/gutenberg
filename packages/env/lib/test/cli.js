@@ -14,13 +14,17 @@ jest.mock( 'ora', () => () => ( {
 		return { text: '', succeed: jest.fn(), fail: jest.fn() };
 	},
 } ) );
-jest.mock( '../env', () => ( {
-	start: jest.fn( Promise.resolve.bind( Promise ) ),
-	stop: jest.fn( Promise.resolve.bind( Promise ) ),
-	clean: jest.fn( Promise.resolve.bind( Promise ) ),
-	run: jest.fn( Promise.resolve.bind( Promise ) ),
-	ValidationError: jest.requireActual( '../env' ).ValidationError,
-} ) );
+jest.mock( '../env', () => {
+	const actual = jest.requireActual( '../env' );
+	return {
+		start: jest.fn( Promise.resolve.bind( Promise ) ),
+		stop: jest.fn( Promise.resolve.bind( Promise ) ),
+		clean: jest.fn( Promise.resolve.bind( Promise ) ),
+		run: jest.fn( Promise.resolve.bind( Promise ) ),
+		ValidationError: actual.ValidationError,
+		AfterSetupError: actual.AfterSetupError,
+	};
+} );
 
 describe( 'env cli', () => {
 	beforeEach( jest.clearAllMocks );
