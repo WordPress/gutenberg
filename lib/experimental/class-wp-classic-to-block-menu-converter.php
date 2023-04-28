@@ -6,6 +6,10 @@
  * @since 6.3.0
  */
 
+if ( class_exists( 'WP_Classic_To_Block_Menu_Converter' ) ) {
+	return;
+}
+
 /**
  * Converts a Classic Menu to Block Menu blocks.
  *

@@ -7,6 +7,10 @@
  * @since 6.2.0
  */
 
+if ( class_exists( 'WP_HTML_Attribute_Token' ) ) {
+	return;
+}
+
 /**
  * Data structure for the attribute token that allows to drastically improve performance.
  *

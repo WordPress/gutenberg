@@ -26,6 +26,10 @@
  * @since 6.2.0
  */
 
+if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
+	return;
+}
+
 /**
  * Modifies attributes in an HTML document for tags matching a query.
  *

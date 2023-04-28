@@ -10,6 +10,7 @@
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
+	<rule ref="Gutenberg"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
 	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
@@ -102,5 +103,20 @@
 	</rule>
 	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
+		<exclude-pattern>./phpunit/*</exclude-pattern>
+		<exclude-pattern>./packages/*</exclude-pattern>
+		<exclude-pattern>./bin/generate-gutenberg-php</exclude-pattern>
+		<properties>
+			<property name="functionsWhiteList" type="array">
+				<element value="/^_?gutenberg.+/"/>
+			</property>
+			<property name="classesWhiteList" type="array">
+				<element value="/^Gutenberg.+/"/>
+				<element value="/^WP_.+_Gutenberg$/"/>
+			</property>
+		</properties>
 	</rule>
 </ruleset>

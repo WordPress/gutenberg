@@ -9,6 +9,10 @@
  * @since 6.3.0
  */
 
+if ( class_exists( 'WP_REST_Navigation_Fallback_Controller' ) ) {
+	return;
+}
+
 /**
  * Import dependencies.
  */
