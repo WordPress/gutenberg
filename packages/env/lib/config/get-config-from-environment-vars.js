@@ -6,7 +6,7 @@ const {
 	parseSourceString,
 	includeTestsPath,
 } = require( './parse-source-string' );
-const { checkPort, checkVersion } = require( './validate-config' );
+const { checkPort, checkVersion, checkString } = require( './validate-config' );
 
 /**
  * @typedef {import('./parse-source-string').WPSource} WPSource
@@ -51,6 +51,15 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 			process.env.WP_ENV_PHP_VERSION
 		);
 		environmentConfig.phpVersion = process.env.WP_ENV_PHP_VERSION;
+	}
+
+	if ( process.env.WP_ENV_AFTER_SETUP ) {
+		checkString(
+			'environment variable',
+			'WP_ENV_AFTER_SETUP',
+			process.env.WP_ENV_AFTER_SETUP
+		);
+		environmentConfig.afterSetup = process.env.WP_ENV_AFTER_SETUP;
 	}
 
 	return environmentConfig;

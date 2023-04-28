@@ -3,6 +3,7 @@
  */
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -11,6 +12,28 @@ const {
 } = require( '../validate-config' );
 
 describe( 'validate-config', () => {
+	describe( 'checkString', () => {
+		it( 'does nothing for undefined values', () => {
+			expect( () =>
+				checkString( 'test.json', 'test', undefined )
+			).not.toThrow();
+		} );
+
+		it( 'throws when not a string', () => {
+			expect( () => checkString( 'test.json', 'test', 1234 ) ).toThrow(
+				new ValidationError(
+					'Invalid test.json: "test" must be a string.'
+				)
+			);
+		} );
+
+		it( 'passes for string', () => {
+			expect( () =>
+				checkString( 'test.json', 'test', 'test' )
+			).not.toThrow();
+		} );
+	} );
+
 	describe( 'checkPort', () => {
 		it( 'does nothing for undefined values', () => {
 			expect( () =>

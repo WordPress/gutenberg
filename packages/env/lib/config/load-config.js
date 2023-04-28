@@ -14,6 +14,7 @@ const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const postProcessConfig = require( './post-process-config' );
 
 /**
+ * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
  * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
@@ -26,6 +27,7 @@ const postProcessConfig = require( './post-process-config' );
  * @property {string}                               workDirectoryPath       Path to the work directory located in ~/.wp-env.
  * @property {string}                               dockerComposeConfigPath Path to the docker-compose.yml file.
  * @property {boolean}                              detectedLocalConfig     If true, wp-env detected local config and used it.
+ * @property {string}                               afterSetup              The command(s) to run after configuring WordPress on start and clean.
  * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
  * @property {boolean}                              debug                   True if debug mode is enabled.
  */
@@ -66,6 +68,7 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
+		afterSetup: config.afterSetup,
 		env: config.env,
 	};
 };

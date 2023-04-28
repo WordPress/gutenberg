@@ -14,6 +14,7 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -33,8 +34,9 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number} port      The port to use in the development environment.
- * @property {number} testsPort The port to use in the tests environment.
+ * @property {number} port       The port to use in the development environment.
+ * @property {number} testsPort  The port to use in the tests environment.
+ * @property {string} afterSetup The command(s) to run after configuring WordPress on start and clean.
  */
 
 /**
@@ -191,6 +193,7 @@ async function getDefaultConfig(
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
+		afterSetup: '',
 		env: {
 			development: {},
 			tests: {
@@ -249,6 +252,10 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.afterSetup ) {
+		overrideConfig.afterSetup = overrides.afterSetup;
+	}
+
 	return overrideConfig;
 }
 
@@ -292,6 +299,10 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.afterSetup !== undefined ) {
+		checkString( configFile, 'afterSetup', rawConfig.afterSetup );
+		parsedConfig.afterSetup = rawConfig.afterSetup;
 	}
 
 	// Parse the environment-specific configs so they're accessible to the root.

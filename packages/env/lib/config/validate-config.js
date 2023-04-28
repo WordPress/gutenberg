@@ -11,6 +11,25 @@
 class ValidationError extends Error {}
 
 /**
+ * Validates that the value is a string.
+ *
+ * @param {string} configFile The configuration file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {number} value      The value to check.
+ */
+function checkString( configFile, configKey, value ) {
+	if ( value === undefined ) {
+		return;
+	}
+
+	if ( typeof value !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string.`
+		);
+	}
+}
+
+/**
  * Validates the port and throws if it isn't valid.
  *
  * @param {string} configFile The configuration file we're validating.
@@ -153,6 +172,7 @@ function checkValidURL( configFile, configKey, url ) {
 
 module.exports = {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,

@@ -7,6 +7,11 @@
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
 between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 
+### New feature
+
+-   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `wp-env start` and `wp-env clean`.
+-   Add a `WP_ENV_AFTER_SETUP` environment variable to override the `afterSetup` option.
+
 ### Bug fix
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
