@@ -159,13 +159,6 @@ export type CancelablePromise< T = void > = Promise< T > & {
 	canceled?: boolean;
 };
 
-/**
- * When `@wordpress/rich-text` is fully typed, the following
- * types should be moved to and imported from there
- *
- * @see /packages/rich-text/src/create.js
- */
-
 export type UseAutocompleteProps = {
 	/**
 	 * The rich text value object the autocompleter is being applied to.
