@@ -15,7 +15,7 @@ test.describe( 'Quote', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'test' );
-		await editor.transformBlockTo('core/quote')
+		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -23,15 +23,14 @@ test.describe( 'Quote', () => {
 			},
 		] );
 
-		await editor.transformBlockTo('core/pullquote');
-		
+		await editor.transformBlockTo( 'core/pullquote' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/pullquote',
 			},
 		] );
-		await editor.transformBlockTo('core/quote')
+		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
