@@ -1,3 +1,15 @@
+.edit-site-start-template-options__modal {
+	.components-modal__children-container {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+
+		.edit-site-start-template-options__modal__actions {
+			margin-top: auto;
+		}
+	}
+}
+
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
 	column-count: 2;
 	column-gap: $grid-unit-30;
@@ -26,28 +38,6 @@
 		// default hover and focus styles.
 		&:not(:focus):not(:hover) .block-editor-block-preview__container {
 			box-shadow: 0 0 0 1px $gray-300;
-		}
-	}
-
-	// The start blank pattern is the last and we are selecting it.
-	.block-editor-block-patterns-list__list-item:nth-child(1) {
-		min-height: $grid-unit-50 * 4;
-		.block-editor-block-preview__container {
-			position: absolute;
-			padding: 0;
-			color: var(--wp-edit-site-start-template-options-start-blank-text);
-			background: var(--wp-edit-site-start-template-options-start-blank-background);
-			min-height: $grid-unit-50 * 4;
-			&::after {
-				width: 100%;
-				top: 50%;
-				margin-top: -1em;
-				content: var(--wp-edit-site-start-template-options-start-blank);
-				text-align: center;
-			}
-		}
-		iframe {
-			display: none;
 		}
 	}
 }

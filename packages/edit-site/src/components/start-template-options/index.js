@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Modal } from '@wordpress/components';
+import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
@@ -21,9 +20,6 @@ import { store as editSiteStore } from '../../store';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { unlock } from '../../private-apis';
-
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
 	const [ templateContent, setTemplateContent ] = useState( '' );
@@ -39,8 +35,6 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 	}, [ isCustom, slug ] );
 	return templateContent;
 }
-
-const START_BLANK_TITLE = __( 'Start blank' );
 
 function useStartPatterns( fallbackContent ) {
 	const { slug, patterns } = useSelect( ( select ) => {
@@ -59,13 +53,6 @@ function useStartPatterns( fallbackContent ) {
 	return useMemo( () => {
 		// filter patterns that are supposed to be used in the current template being edited.
 		return [
-			{
-				name: 'start-blank',
-				blocks: parse(
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->'
-				),
-				title: START_BLANK_TITLE,
-			},
 			{
 				name: 'fallback',
 				blocks: parse( fallbackContent ),
@@ -91,32 +78,15 @@ function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
 	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
 	const blockPatterns = useStartPatterns( fallbackContent );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
-
-	const [ textColor = 'black' ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
-	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 	return (
-		<div
-			className="edit-site-start-template-options__pattern-container"
-			style={ {
-				'--wp-edit-site-start-template-options-start-blank': `"${ START_BLANK_TITLE }"`,
-				'--wp-edit-site-start-template-options-start-blank-text': `${ textColor }`,
-				'--wp-edit-site-start-template-options-start-blank-background': `${
-					gradientValue || backgroundColor
-				}`,
+		<BlockPatternsList
+			blockPatterns={ blockPatterns }
+			shownPatterns={ shownBlockPatterns }
+			onClickPattern={ ( pattern, blocks ) => {
+				onChange( blocks, { selection: undefined } );
+				onChoosePattern();
 			} }
-		>
-			<BlockPatternsList
-				blockPatterns={ blockPatterns }
-				shownPatterns={ shownBlockPatterns }
-				onClickPattern={ ( pattern, blocks ) => {
-					onChange( 'start-blank' === pattern.name ? [] : blocks, {
-						selection: undefined,
-					} );
-					onChoosePattern();
-				} }
-			/>
-		</div>
+		/>
 	);
 }
 
@@ -145,6 +115,17 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 					} }
 				/>
 			</div>
+			<Flex
+				className="edit-site-start-template-options__modal__actions"
+				justify="flex-end"
+				expanded={ false }
+			>
+				<FlexItem>
+					<Button variant="tertiary" onClick={ onClose }>
+						{ __( 'Skip' ) }
+					</Button>
+				</FlexItem>
+			</Flex>
 		</Modal>
 	);
 }
