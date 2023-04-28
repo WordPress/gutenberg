@@ -5,11 +5,6 @@ import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
- * WordPress dependencies
- */
-import { __experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients } from '@wordpress/block-editor';
-
-/**
  * Internal dependencies
  */
 import {
@@ -17,39 +12,34 @@ import {
 	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
 
-jest.mock(
-	'@wordpress/block-editor/src/components/colors-gradients/use-multiple-origin-colors-and-gradients',
-	() => ( {
-		__esModule: true,
-		default: jest.fn( () => ( {
-			disableCustomColors: true,
-			disableCustomGradients: true,
-			colors: [
-				{
-					name: 'Default',
-					colors: [
-						{
-							name: 'Black',
-							slug: 'black',
-							color: '#000000',
-						},
-						{
-							name: 'Cyan bluish gray',
-							slug: 'cyan-bluish-gray',
-							color: '#abb8c3',
-						},
-					],
-				},
-			],
-			gradients: [],
-			hasColorsOrGradients: true,
-		} ) ),
-	} )
-);
+const defaultSettings = {
+	__experimentalFeatures: {
+		color: {
+			defaultPalette: true,
+			defaultGradients: true,
+			palette: {
+				default: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+		},
+	},
+	colors: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+	disableCustomColors: false,
+	disableCustomGradients: false,
+};
 
-async function setup( attributes ) {
+const disabledColorSettings = {
+	color: {
+		defaultPalette: false,
+		defaultGradients: false,
+	},
+	disableCustomColors: true,
+	disableCustomGradients: true,
+};
+
+async function setup( attributes, useCoreBlocks, customSettings ) {
 	const testBlock = { name: 'core/cover', attributes };
-	return initializeEditor( testBlock );
+	const settings = customSettings || defaultSettings;
+	return initializeEditor( testBlock, useCoreBlocks, settings );
 }
 
 async function createAndSelectBlock() {
@@ -333,19 +323,8 @@ describe( 'Cover block', () => {
 			} );
 
 			describe( 'when colors are disabled', () => {
-				beforeEach( () => {
-					useMultipleOriginColorsAndGradients.mockImplementation(
-						() => ( {
-							__esModule: true,
-							default: jest.fn( () => ( {
-								hasColorsOrGradients: false,
-							} ) ),
-						} )
-					);
-				} );
-
 				test( 'does not render overlay control', async () => {
-					await setup();
+					await setup( undefined, true, disabledColorSettings );
 					await createAndSelectBlock();
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
@@ -358,7 +337,7 @@ describe( 'Cover block', () => {
 					expect( overlayControl ).not.toBeInTheDocument();
 				} );
 				test( 'does not render opacity control', async () => {
-					await setup();
+					await setup( undefined, true, disabledColorSettings );
 					await createAndSelectBlock();
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
