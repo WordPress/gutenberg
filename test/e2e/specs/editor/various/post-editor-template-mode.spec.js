@@ -395,6 +395,18 @@ class PostEditorTemplateMode {
 		await cancelButton.click();
 	}
 
+	/**
+	 * Edit the title of a template. The title is saved automatically, no
+	 * need to click anything, though we do click outside of the dialog
+	 * to close it.
+	 *
+	 * This needs to be called only after the template edit mode has been
+	 * activated or it will fail, i.e after creating a new custom template
+	 * or after calling `switchToTemplateMode()`.
+	 *
+	 * @param {string} newTitle the new title to set.
+	 * @return {Promise<void>}
+	 */
 	async editTemplateTitle( newTitle ) {
 		await this.page.click( 'button[aria-label="Template Options"]' );
 
