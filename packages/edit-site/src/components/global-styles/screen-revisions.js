@@ -11,6 +11,10 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalUseNavigator as useNavigator,
+	Modal,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,6 +23,7 @@ import {
 	useCallback,
 	useState,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -35,7 +40,9 @@ import Revisions from '../revisions';
 import SidebarFixedBottom from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../store';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, isGlobalStyleConfigEqual } = unlock(
+	blockEditorPrivateApis
+);
 
 function getRevisionLabel( revision, isLatest, isUnsaved ) {
 	if ( isUnsaved ) {
@@ -130,9 +137,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 									</span>
 								) }
 								<span className="edit-site-global-styles-screen-revisions__date">
-									{ isUnsaved
-										? __( 'Just now' )
-										: dateHumanTimeDiff }
+									{ dateHumanTimeDiff }
 								</span>
 								<span className="edit-site-global-styles-screen-revisions__avatar">
 									<img
@@ -149,67 +154,84 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	);
 }
 
+function RestoreGlobalStylesRevisionModal( { onClose, onSubmit } ) {
+	return (
+		<Modal
+			title={ __( 'You have unsaved changes in the editor' ) }
+			focusOnMount={ true }
+			shouldCloseOnClickOutside={ false }
+			shouldCloseOnEsc={ false }
+			isDismissible={ false }
+			onRequestClose={ onClose }
+		>
+			<form onSubmit={ onSubmit }>
+				<VStack spacing="5">
+					<Text as="p">
+						{ __(
+							'Loading a revision will replace any unsaved changes. Would you like continue?'
+						) }
+					</Text>
+					<HStack justify="right">
+						<Button variant="tertiary" onClick={ onClose }>
+							{ __( 'No' ) }
+						</Button>
+
+						<Button variant="primary" type="submit">
+							{ __( 'Yes' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		</Modal>
+	);
+}
+
 function ScreenRevisions() {
 	const { goBack } = useNavigator();
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { blocks, userRevisions, isDirty, editorCanvasContainerView } =
-		useSelect( ( select ) => {
-			const {
-				__experimentalGetDirtyEntityRecords,
-				isSavingEntityRecord,
-				getCurrentUser,
-			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			const _currentUser = getCurrentUser();
-			const _isDirty = dirtyEntityRecords.length > 0;
-			const _userRevisions =
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
+	const {
+		blocks,
+		currentUser,
+		userRevisions,
+		isDirty,
+		editorCanvasContainerView,
+	} = useSelect( ( select ) => {
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+			getCurrentUser,
+		} = select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		const _currentUser = getCurrentUser();
+		const _isDirty = dirtyEntityRecords.length > 0;
+		const _userRevisions =
+			select(
+				coreStore
+			).__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
 
-			/*
-			 * Adds a flag to the first revision, which is the latest.
-			 * Then, if there are unsaved changes in the editor, create a
-			 * new "revision" item that represents the unsaved changes.
-			 */
-			if ( _userRevisions.length > 0 ) {
-				_userRevisions[ 0 ].isLatest = true;
-				if (
-					_isDirty &&
-					_userRevisions[ 0 ]?.id !== 'unsaved' &&
-					! isEmpty( userConfig ) &&
-					!! _currentUser
-				) {
-					_userRevisions.unshift( {
-						id: 'unsaved',
-						styles: userConfig?.styles,
-						settings: userConfig?.settings,
-						authorDisplayName: _currentUser?.name,
-						authorAvatarUrl: _currentUser?.avatar_urls?.[ '24' ],
-					} );
-				}
-			}
-
-			return {
-				isDirty: _isDirty,
-				isSaving: dirtyEntityRecords.some( ( record ) =>
-					isSavingEntityRecord( record.kind, record.name, record.key )
-				),
-				userRevisions: _userRevisions,
-				editorCanvasContainerView: unlock(
-					select( editSiteStore )
-				).getEditorCanvasContainerView(),
-				blocks: select( blockEditorStore ).getBlocks(),
-			};
-		}, [] );
+		return {
+			currentUser: _currentUser,
+			isDirty: _isDirty,
+			isSaving: dirtyEntityRecords.some( ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
+			),
+			userRevisions: _userRevisions,
+			editorCanvasContainerView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
+			blocks: select( blockEditorStore ).getBlocks(),
+		};
+	}, [] );
 
 	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
 	const [ currentRevisionId, setCurrentRevisionId ] = useState(
 		isDirty ? 'unsaved' : userRevisions[ 0 ]?.id
 	);
-	// @TODO we'll need this state for later
-	const [ , setIsRestoringRevision ] = useState( false );
+	const [
+		isLoadingRevisionWithUnsavedChanges,
+		setIsLoadingRevisionWithUnsavedChanges,
+	] = useState( false );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -221,12 +243,43 @@ function ScreenRevisions() {
 		}
 	}, [ editorCanvasContainerView ] );
 
+	const modifiedUserRevisions = useMemo( () => {
+		if ( ! userRevisions.length ) {
+			return userRevisions;
+		}
+		/*
+		 * Adds a flag to the first revision, which is the latest.
+		 * Then, if there are unsaved changes in the editor, create a
+		 * new "revision" item that represents the unsaved changes.
+		 */
+		const _modified = userRevisions.map( ( revision, index, _array ) => {
+			if ( 0 === index && _array[ index ]?.id !== 'unsaved' ) {
+				revision.isLatest = true;
+			}
+			return revision;
+		} );
+
+		if ( isDirty && ! isEmpty( userConfig ) && !! currentUser ) {
+			const unsavedRevision = {
+				id: 'unsaved',
+				styles: userConfig?.styles,
+				settings: userConfig?.settings,
+				authorDisplayName: currentUser?.name,
+				authorAvatarUrl: currentUser?.avatar_urls?.[ '24' ],
+				dateHumanTimeDiff: __( 'Just now' ),
+			};
+			return [ unsavedRevision ].concat( _modified );
+		}
+		return _modified;
+	}, [ userRevisions.length, isDirty ] );
+
 	const restoreRevision = useCallback(
 		( revision ) => {
 			setUserConfig( () => ( {
 				styles: revision?.styles,
 				settings: revision?.settings,
 			} ) );
+			setIsLoadingRevisionWithUnsavedChanges( false );
 			onCloseRevisions();
 		},
 		[ userConfig ]
@@ -246,7 +299,8 @@ function ScreenRevisions() {
 	};
 
 	const isLoadButtonEnabled =
-		!! globalStylesRevision?.id && globalStylesRevision?.id !== 'unsaved';
+		!! globalStylesRevision?.id &&
+		! isGlobalStyleConfigEqual( globalStylesRevision, userConfig );
 
 	return (
 		<>
@@ -260,7 +314,7 @@ function ScreenRevisions() {
 				<RevisionsButtons
 					onChange={ selectRevision }
 					currentRevisionId={ currentRevisionId }
-					userRevisions={ userRevisions }
+					userRevisions={ modifiedUserRevisions }
 				/>
 				{ isLoadButtonEnabled && (
 					<SidebarFixedBottom>
@@ -276,7 +330,9 @@ function ScreenRevisions() {
 							}
 							onClick={ () => {
 								if ( isDirty ) {
-									setIsRestoringRevision( true );
+									setIsLoadingRevisionWithUnsavedChanges(
+										true
+									);
 								} else {
 									restoreRevision( globalStylesRevision );
 								}
@@ -287,6 +343,14 @@ function ScreenRevisions() {
 					</SidebarFixedBottom>
 				) }
 			</div>
+			{ isLoadingRevisionWithUnsavedChanges && (
+				<RestoreGlobalStylesRevisionModal
+					onClose={ () =>
+						setIsLoadingRevisionWithUnsavedChanges( false )
+					}
+					onSubmit={ () => restoreRevision( globalStylesRevision ) }
+				/>
+			) }
 			<Revisions
 				blocks={ blocks }
 				userConfig={ globalStylesRevision }
