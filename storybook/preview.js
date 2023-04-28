@@ -6,7 +6,6 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
-import './style.scss';
 
 export const globalTypes = {
 	direction: {
