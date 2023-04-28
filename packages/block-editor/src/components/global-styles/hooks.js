@@ -151,7 +151,9 @@ export function useGlobalStyle(
 		merged: mergedConfig,
 		base: baseConfig,
 		user: userConfig,
+		site: siteConfig,
 		setUserConfig,
+		setSiteConfig,
 	} = useContext( GlobalStylesContext );
 	const appendedPath = path ? '.' + path : '';
 	const finalPath = ! blockName
@@ -159,7 +161,8 @@ export function useGlobalStyle(
 		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
+		const setConfig = source === 'site' ? setSiteConfig : setUserConfig;
+		setConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			set(
@@ -192,6 +195,12 @@ export function useGlobalStyle(
 			break;
 		case 'user':
 			rawResult = get( userConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		case 'site':
+			rawResult = get( siteConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
