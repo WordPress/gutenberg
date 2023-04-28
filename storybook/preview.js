@@ -31,7 +31,7 @@ export const globalTypes = {
 				{ value: 'default', title: 'Default' },
 				{ value: 'darkBg', title: 'Dark (background)' },
 				{ value: 'lightGrayBg', title: 'Light gray (background)' },
-				{ value: 'modern', title: 'Modern (accent)' },
+				{ value: 'classic', title: 'Classic (accent)' },
 			],
 		},
 	},
