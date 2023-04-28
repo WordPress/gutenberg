@@ -1,21 +1,30 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
 import { TabbableContainer } from '..';
 
-export default {
+const meta: ComponentMeta< typeof TabbableContainer > = {
 	title: 'Components/TabbableContainer',
 	component: TabbableContainer,
 	argTypes: {
-		children: { type: null },
-		cycle: {
-			type: 'boolean',
+		children: { control: { type: null } },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
 		},
-		onNavigate: { action: 'onNavigate' },
+		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-export const Default = ( args ) => {
+export const Default: ComponentStory< typeof TabbableContainer > = ( args ) => {
 	return (
 		<>
 			<button>Before tabbable container</button>

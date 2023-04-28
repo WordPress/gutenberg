@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import { TabbableContainer } from '../tabbable';
+import type { TabbableContainerProps } from '../types';
 
-const TabbableContainerTestCase = ( props ) => (
+const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
 	<TabbableContainer { ...props }>
 		<button>Item 1</button>
 		<span>
@@ -37,6 +38,7 @@ describe( 'TabbableContainer', () => {
 		// Mocking `getClientRects()` is necessary to pass a check performed by
 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
 		// from the `@wordpress/dom` package.
+		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
 		window.HTMLElement.prototype.getClientRects = function () {
 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
 		};

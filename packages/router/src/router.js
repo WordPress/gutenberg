@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import history from '../../utils/history';
+import history from './history';
 
 const RoutesContext = createContext();
 const HistoryContext = createContext();
@@ -32,7 +32,7 @@ function getLocationWithParams( location ) {
 	};
 }
 
-export function Routes( { children } ) {
+export function RouterProvider( { children } ) {
 	const [ location, setLocation ] = useState( () =>
 		getLocationWithParams( history.location )
 	);

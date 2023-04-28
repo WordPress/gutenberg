@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.94.0
+-   [*] Split pasted content between title and body. [#37169]
+
 ## 1.93.1
 -   [**] Fix regression with the Color hook and ColorPanel. [#49917]
 

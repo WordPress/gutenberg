@@ -3,7 +3,6 @@
  */
 import { privateApis } from '@wordpress/commands';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { useMemo } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
@@ -11,12 +10,11 @@ import { plus } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from './lock-unlock';
 
 const { useCommandLoader } = unlock( privateApis );
 
-const getWPAdminAddCommandLoader = ( postType ) =>
+const getAddPostTypeCommandLoader = ( postType ) =>
 	function useAddCommandLoader( { search } ) {
 		let label;
 		if ( postType === 'post' ) {
@@ -36,11 +34,6 @@ const getWPAdminAddCommandLoader = ( postType ) =>
 			label = sprintf( __( 'Add a new page "%s"' ), search );
 		}
 
-		const newPostLink = useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			return getSettings().newPostLink ?? 'post-new.php';
-		}, [] );
-
 		const commands = useMemo(
 			() => [
 				{
@@ -48,14 +41,14 @@ const getWPAdminAddCommandLoader = ( postType ) =>
 					label,
 					icon: plus,
 					callback: () => {
-						document.location.href = addQueryArgs( newPostLink, {
+						document.location.href = addQueryArgs( 'post-new.php', {
 							post_type: postType,
 							post_title: hasRecordTitle ? search : undefined,
 						} );
 					},
 				},
 			],
-			[ newPostLink, hasRecordTitle, search, label ]
+			[ hasRecordTitle, search, label ]
 		);
 
 		return {
@@ -64,10 +57,10 @@ const getWPAdminAddCommandLoader = ( postType ) =>
 		};
 	};
 
-const useAddPostLoader = getWPAdminAddCommandLoader( 'post' );
-const useAddPageLoader = getWPAdminAddCommandLoader( 'page' );
+const useAddPostLoader = getAddPostTypeCommandLoader( 'post' );
+const useAddPageLoader = getAddPostTypeCommandLoader( 'page' );
 
-export function useWPAdminCommands() {
+export function useAddPostTypeCommands() {
 	useCommandLoader( {
 		name: 'core/wp-admin/add-post-loader',
 		hook: useAddPostLoader,

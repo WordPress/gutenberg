@@ -2,11 +2,14 @@
  * WordPress dependencies
  */
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useHistory } from './index';
+import { unlock } from '../../private-apis';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 export function useLink( params = {}, state, shouldReplace = false ) {
 	const history = useHistory();

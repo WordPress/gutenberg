@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useSetting } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { immutableSet } from '../utils/object';
+import { setImmutably } from '../utils/object';
 
 /**
  * Removed falsy values from nested object.
@@ -33,7 +33,7 @@ export const cleanEmptyObject = ( object ) => {
 	const cleanedNestedObjects = Object.fromEntries(
 		Object.entries( object )
 			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
-			.filter( ( [ , value ] ) => Boolean( value ) )
+			.filter( ( [ , value ] ) => value !== undefined )
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };
@@ -82,7 +82,7 @@ export function transformStyles(
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
-						attributes: immutableSet(
+						attributes: setImmutably(
 							returnBlock.attributes,
 							path,
 							styleValue

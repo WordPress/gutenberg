@@ -1,25 +1,30 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
 import { NavigableMenu } from '..';
 
-export default {
+const meta: ComponentMeta< typeof NavigableMenu > = {
 	title: 'Components/NavigableMenu',
 	component: NavigableMenu,
 	argTypes: {
-		children: { type: null },
-		cycle: {
-			type: 'boolean',
+		children: { control: { type: null } },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
 		},
-		onNavigate: { action: 'onNavigate' },
-		orientation: {
-			options: [ 'horizontal', 'vertical' ],
-			control: { type: 'radio' },
-		},
+		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-export const Default = ( args ) => {
+export const Default: ComponentStory< typeof NavigableMenu > = ( args ) => {
 	return (
 		<>
 			<button>Before navigable menu</button>
