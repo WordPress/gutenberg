@@ -9,6 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -26,6 +27,11 @@ const ALLOWED_BLOCKS = [
 	'core/site-logo',
 	'core/navigation-submenu',
 ];
+
+const additionalAllowedBlocks = applyFilters(
+	'blocks.navigation.additionalAllowedBlocks',
+	[]
+);
 
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
@@ -107,7 +113,7 @@ export default function NavigationInnerBlocks( {
 			value: blocks,
 			onInput,
 			onChange,
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks: [ ...ALLOWED_BLOCKS, ...additionalAllowedBlocks ],
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,
