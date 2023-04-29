@@ -261,7 +261,7 @@ function UnforwardedColorPalette(
 							as={ 'button' }
 							ref={ customColorPaletteCallbackRef }
 							justify="space-between"
-							align="flex-start"
+							align="center"
 							className="components-color-palette__custom-color"
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
