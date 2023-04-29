@@ -5,12 +5,55 @@
  * @package gutenberg
  */
 
+if ( ! function_exists( 'wp_theme_use_persistent_cache' ) ) {
+	/**
+	 * Returns whether theme file-based logic should use persistent caching where applicable.
+	 *
+	 * Using a cache for theme file-based logic is typically a good approach to improve performance, particularly in
+	 * production environments. However, when developing a theme, using a cache can be detrimental as changes to the
+	 * theme files may not immediately be reflected.
+	 *
+	 * The {@see 'wp_theme_use_persistent_cache'} filter can be used to control this behavior, decoupled from the overall
+	 * environment's configuration, as neither `WP_DEBUG` nor `WP_ENVIRONMENT_TYPE` are a reliable indicator for
+	 * whether a theme is being developed or not.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return bool True when a cache should be used for theme file-based logic, false otherwise.
+	 */
+	function wp_theme_use_persistent_cache() {
+		// By default, do not use a persistent cache.
+		// Potentially we can use a more reasonable default later, once persistent caching around the theme file-based
+		// logic has been improved.
+		$use_cache = false;
+
+		/**
+		 * Filters whether theme file-based logic should use persistent caching where applicable.
+		 *
+		 * Using a cache for theme file-based logic is typically a good approach to improve performance, particularly
+		 * in production environments. However, when developing a theme, using a cache can be detrimental as changes to
+		 * the theme files may not immediately be reflected.
+		 *
+		 * WordPress can automatically invalidate the cache for any theme file changes that occur due to updates or
+		 * other modifications through the WP Admin interface, but it cannot monitor direct changes to the files that
+		 * happen outside of WordPress.
+		 *
+		 * Therefore this filter is useful to disable theme-related caching while developing a theme.
+		 *
+		 * @since X.X.X
+		 *
+		 * @param bool $use_cache Whether to use a cache for theme file-based logic. By default this is true unless in
+		 *                        a local or development environment.
+		 */
+		return apply_filters( 'wp_theme_use_persistent_cache', $use_cache );
+	}
+}
+
 if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 	/**
 	 * Whether a theme or its parent have a theme.json file.
 	 *
 	 * The result would be cached via the WP_Object_Cache.
-	 * It can be cleared by calling wp_theme_has_theme_json_clean_cache().
 	 *
 	 * @return boolean
 	 */
@@ -25,10 +68,8 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		 * The reason not to store it as a boolean is to avoid working
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
-		 *
-		 * Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
 		 */
-		if ( ! WP_DEBUG && is_int( $theme_has_support ) ) {
+		if ( is_int( $theme_has_support ) ) {
 			return (bool) $theme_has_support;
 		}
 
@@ -102,8 +143,7 @@ function gutenberg_get_global_styles_custom_css() {
  * @return string Stylesheet.
  */
 function gutenberg_get_global_stylesheet( $types = array() ) {
-	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
-	$can_use_cached = empty( $types ) && ! WP_DEBUG;
+	$can_use_cached = empty( $types );
 	$cache_key      = 'gutenberg_get_global_stylesheet';
 	$cache_group    = 'theme_json';
 	if ( $can_use_cached ) {
@@ -207,7 +247,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
 	$settings    = wp_cache_get( $cache_key, $cache_group );
 
-	if ( false === $settings || WP_DEBUG ) {
+	if ( false === $settings ) {
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 		wp_cache_set( $cache_key, $settings, $cache_group );
 	}
@@ -250,8 +290,15 @@ function _gutenberg_clean_theme_json_caches() {
  * events such as options add/update/delete, user meta, etc.
  * It was judged not enough, hence this approach.
  * See https://github.com/WordPress/gutenberg/pull/45372
+ *
+ * Persistent caching of theme file-based logic can be enabled on demand through the
+ * {@see 'wp_theme_use_persistent_cache'} filter, however at this point doing so is
+ * discouraged except for experiments.
  */
 function _gutenberg_add_non_persistent_theme_json_cache_group() {
+	if ( wp_theme_use_persistent_cache() ) {
+		return;
+	}
 	wp_cache_add_non_persistent_groups( 'theme_json' );
 }
 add_action( 'plugins_loaded', '_gutenberg_add_non_persistent_theme_json_cache_group' );
