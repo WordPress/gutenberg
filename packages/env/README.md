@@ -642,6 +642,16 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 }
 ```
 
+#### Serve the development site over a different URL:
+
+```
+  "config": {
+    "DOCKER_REQUEST_URL": "http://my-test-plugin.test",
+    "WP_SITEURL": "http://my-test-plugin.test",
+    "WP_HOME": "http://my-test-plugin.test"
+  }
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
