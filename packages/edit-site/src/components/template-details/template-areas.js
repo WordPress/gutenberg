@@ -149,7 +149,7 @@ export default function TemplateAreas( { closeTemplateDetailsDropdown } ) {
 
 	return (
 		<MenuGroup
-			label={ __( 'Areas' ) }
+			label={ __( 'Template Parts' ) }
 			className="edit-site-template-details__group edit-site-template-details__template-areas"
 		>
 			{ templateParts.map( ( { templatePart, block } ) => (
