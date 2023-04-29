@@ -8,7 +8,7 @@
 if ( 42 == $_GET['test'] ) {
 	die( '<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>' );
 } else if ( isset( $_GET['test'] ) ) {
-	die( '<h1><b>Fatal error:</b> Unexpected query parameters</h1>' );
+	die( '<h1><b>Fatal error:</b> Secret message did not work</h1>' );
 	die();
 }
 
