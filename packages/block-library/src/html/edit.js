@@ -54,6 +54,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				/>
 			) : (
 				<PlainText
+					version={ 2 }
 					value={ attributes.content }
 					onChange={ ( content ) => setAttributes( { content } ) }
 					placeholder={ __( 'Write HTML…' ) }

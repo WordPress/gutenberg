@@ -23,7 +23,7 @@ export default function QueryPaginationNextEdit( {
 			{ ...useBlockProps() }
 		>
 			<PlainText
-				__experimentalVersion={ 2 }
+				version={ 2 }
 				tagName="span"
 				aria-label={ __( 'Next page link' ) }
 				placeholder={ __( 'Next Page' ) }

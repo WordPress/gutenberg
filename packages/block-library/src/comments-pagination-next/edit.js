@@ -23,7 +23,7 @@ export default function CommentsPaginationNextEdit( {
 			{ ...useBlockProps() }
 		>
 			<PlainText
-				__experimentalVersion={ 2 }
+				version={ 2 }
 				tagName="span"
 				aria-label={ __( 'Newer comments page link' ) }
 				placeholder={ __( 'Newer Comments' ) }

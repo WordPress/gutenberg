@@ -35,6 +35,7 @@ wp.blocks.registerBlockType( /* ... */, {
 
 	edit: function( props ) {
 		return wp.element.createElement( wp.editor.PlainText, {
+			version: 2,
 			className: props.className,
 			value: props.attributes.content,
 			onChange: function( content ) {
@@ -63,6 +64,7 @@ registerBlockType( /* ... */, {
 	edit( { className, attributes, setAttributes } ) {
 		return (
 			<PlainText
+				version={ 2 }
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }

@@ -20,6 +20,7 @@ export default function ShortcodeEdit( { attributes, setAttributes } ) {
 				{ __( 'Shortcode' ) }
 			</label>
 			<PlainText
+				version={ 2 }
 				className="blocks-shortcode__textarea"
 				id={ inputId }
 				value={ attributes.text }
