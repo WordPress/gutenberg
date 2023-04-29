@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( '42test' == $_GET['test'] ) {
+if ( 42 == $_GET['test'] ) {
 	die( '<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>' );
 } else {
 	trigger_error( 'Unexpected query parameters' );
