@@ -79,6 +79,51 @@ class WP_Style_Engine_Processor {
 	}
 
 	/**
+	 * Adds rules from a plain CSS string.
+	 *
+	 * @param string $css_string The CSS string to add.
+	 */
+	public function add_css_string( $css_string ) {
+		$css_array = array();
+		// Split CSS by rules.
+		$css_rules = explode( '}', $css_string );
+
+		foreach ( $css_rules as $css_rule ) {
+			$rule_parts = explode( '{', $css_rule );
+			if ( 2 !== count( $rule_parts ) ) {
+				continue;
+			}
+			// Get the selector.
+			$selector = trim( $rule_parts[0] );
+			if ( empty( $selector ) ) {
+				continue;
+			}
+
+			// Create the rule object.
+			if ( ! isset( $css_array[ $selector ] ) ) {
+				$css_array[ $selector ] = new WP_Style_Engine_CSS_Rule( $selector );
+			}
+
+			// Get the declarations.
+			$declarations       = explode( ';', $rule_parts[1] );
+			$declarations_array = array();
+			foreach ( $declarations as $declaration ) {
+				$declaration_parts = explode( ':', $declaration );
+				if ( 2 !== count( $declaration_parts ) ) {
+					continue;
+				}
+				$declarations_array[ $declaration_parts[0] ] = $declaration_parts[1];
+			}
+
+			// Add the declarations to the rule.
+			$css_array[ $selector ]->add_declarations( $declarations_array );
+		}
+
+		// Add the rules to the processor.
+		$this->add_rules( $css_array );
+	}
+
+	/**
 	 * Get the CSS rules as a string.
 	 *
 	 * @param array $options   {

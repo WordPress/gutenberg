@@ -165,7 +165,15 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	if ( $can_use_cached ) {
 		wp_cache_set( $cache_key, $stylesheet, $cache_group );
 	}
-	return $stylesheet;
+
+	$processor = new WP_Style_Engine_Processor_Gutenberg();
+	$processor->add_css_string( $stylesheet );
+
+	return $processor->get_css(
+		array(
+			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+		)
+	);
 }
 
 /**
