@@ -870,10 +870,10 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
-				'--wp--style--root--padding-top: 33px',
-				'--wp--style--root--padding-right: 33px',
-				'--wp--style--root--padding-bottom: 33px',
-				'--wp--style--root--padding-left: 33px',
+				'--wp--style--root--padding--top: 33px',
+				'--wp--style--root--padding--right: 33px',
+				'--wp--style--root--padding--bottom: 33px',
+				'--wp--style--root--padding--left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'font-family: sans-serif',
 				'font-size: 15px',
