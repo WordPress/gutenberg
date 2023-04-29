@@ -12,11 +12,16 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 	 * The result would be cached via the WP_Object_Cache.
 	 * It can be cleared by calling wp_theme_has_theme_json_clean_cache().
 	 *
+	 * @param string $stylesheet Directory name for the theme. Optional. Defaults to current theme.
+	 *
 	 * @return boolean
 	 */
-	function wp_theme_has_theme_json() {
+	function wp_theme_has_theme_json( $stylesheet = '' ) {
 		$cache_group       = 'theme_json';
-		$cache_key         = 'wp_theme_has_theme_json';
+		if ( empty( $stylesheet ) ) {
+			$stylesheet = get_stylesheet();
+		}
+		$cache_key         = sprintf( 'wp_theme_has_theme_json_%s', $stylesheet );
 		$theme_has_support = wp_cache_get( $cache_key, $cache_group );
 
 		/**
@@ -32,15 +37,13 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 			return (bool) $theme_has_support;
 		}
 
-		// Has the own theme a theme.json?
-		$theme_has_support = is_readable( get_stylesheet_directory() . '/theme.json' );
-
-		// Look up the parent if the child does not have a theme.json.
-		if ( ! $theme_has_support ) {
-			$theme_has_support = is_readable( get_template_directory() . '/theme.json' );
+		$wp_theme = wp_get_theme( $stylesheet );
+		if ( ! $wp_theme->exists() ) {
+			return false;
 		}
 
-		$theme_has_support = $theme_has_support ? 1 : 0;
+		// Has the own theme a theme.json?
+		$theme_has_support = is_readable( $wp_theme->get_file_path( 'theme.json' ) ) ? 1 : 0;
 
 		wp_cache_set( $cache_key, $theme_has_support, $cache_group );
 
@@ -53,9 +56,15 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	 * Function to clean the cache used by wp_theme_has_theme_json method.
 	 *
 	 * Not to backport to core. Delete it instead.
+	 *
+	 * @param string $stylesheet Directory name for the theme. Optional. Defaults to current theme.
 	 */
-	function wp_theme_has_theme_json_clean_cache() {
-		_deprecated_function( __METHOD__, '14.7' );
+	function wp_theme_has_theme_json_clean_cache( $stylesheet = '' ) {
+		if ( empty( $stylesheet ) ) {
+			$stylesheet = get_stylesheet();
+		}
+		$cache_key = sprintf( 'wp_theme_has_theme_json_%s', $stylesheet );
+		wp_cache_delete( $cache_key, 'theme_json' );
 	}
 }
 
@@ -221,7 +230,12 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
  * @access private
  */
 function _gutenberg_clean_theme_json_caches() {
-	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
+	$stylesheet = get_stylesheet();
+	$template   = get_template();
+	wp_theme_has_theme_json_clean_cache( $stylesheet );
+	if( $stylesheet !== $template ){
+		wp_theme_has_theme_json_clean_cache( $template );
+	}
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
