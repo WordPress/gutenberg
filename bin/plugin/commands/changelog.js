@@ -153,7 +153,6 @@ const GROUP_TITLE_ORDER = [
 	'Enhancements',
 	'New APIs',
 	'Bug Fixes',
-	'Accessibility',
 	'Performance',
 	'Experiments',
 	'Documentation',
