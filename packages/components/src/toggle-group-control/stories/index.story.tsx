@@ -2,6 +2,8 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -12,6 +14,8 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import Button from '../../button';
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -139,4 +143,112 @@ export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
+};
+
+// TODO: remove before merging
+export const DoubleToggles: StoryFn<
+	typeof ToggleGroupControl
+> = () => {
+	const aligns = [ 'Left', 'Center', 'Right' ];
+	const quantities = [ 'One', 'Two', 'Three', 'Four' ];
+
+	const [ alignState, setAlignState ] = useState< string | undefined >();
+	const [ quantityState, setQuantityState ] = useState<
+		string | undefined
+	>();
+
+	return (
+		<div>
+			<ToggleGroupControl
+				onChange={ ( value ) => setAlignState( value as string ) }
+				value={ alignState }
+				label={ 'Pick an alignment option' }
+			>
+				{ aligns.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button
+				onClick={ () => setAlignState( undefined ) }
+				variant="tertiary"
+			>
+				Reset
+			</Button>
+
+			<ToggleGroupControl
+				onChange={ ( value ) => setQuantityState( value as string ) }
+				value={ quantityState }
+				label={ 'Pick a quantity' }
+			>
+				{ quantities.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button
+				onClick={ () => setQuantityState( undefined ) }
+				variant="tertiary"
+			>
+				Reset
+			</Button>
+		</div>
+	);
+};
+
+// TODO: Remove before merging as well.
+const { Fill: InspectorControls, Slot } = createSlotFill( 'InspectorControls' );
+// @ts-expect-error
+InspectorControls.Slot = Slot;
+
+export const RenderViaSlot: StoryFn<
+	typeof ToggleGroupControl
+> = () => {
+	const [ alignState, setAlignState ] = useState< string | undefined >();
+	const aligns = [ 'Left', 'Center', 'Right' ];
+
+	return (
+		<SlotFillProvider>
+			{ /* This motion.div element breaks the `ToggleGroupControl` backdrop,
+			 * because motion registers it as the "motion parent" of the backdrop
+			 * (even if the `ToggleGroupControl` gets rendered in another part of the
+			 * tree via Slot/Fill)
+			 */ }
+			<motion.div>
+				<InspectorControls>
+					<ToggleGroupControl
+						onChange={ ( value ) =>
+							setAlignState( value as string )
+						}
+						value={ alignState }
+						label={ 'Pick an alignment option' }
+					>
+						{ aligns.map( ( key ) => (
+							<ToggleGroupControlOption
+								key={ key }
+								value={ key }
+								label={ key }
+							/>
+						) ) }
+					</ToggleGroupControl>
+				</InspectorControls>
+			</motion.div>
+			<div>
+				{ /* @ts-expect-error */ }
+				<InspectorControls.Slot bubblesVirtually />
+				<Button
+					onClick={ () => setAlignState( undefined ) }
+					variant="tertiary"
+				>
+					Reset
+				</Button>
+			</div>
+		</SlotFillProvider>
+	);
 };

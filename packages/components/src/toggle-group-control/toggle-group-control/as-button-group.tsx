@@ -2,23 +2,19 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
-import { forwardRef, useRef, useState } from '@wordpress/element';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { forwardRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
@@ -40,8 +36,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
 	const baseId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
@@ -82,17 +76,15 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			<View
 				aria-label={ label }
 				{ ...otherProps }
-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+				ref={ forwardedRef }
 				role="group"
 			>
-				{ resizeListener }
-				<ToggleGroupControlBackdrop
-					state={ groupContext.state }
-					containerRef={ containerRef }
-					containerWidth={ sizes.width }
-					isAdaptiveWidth={ isAdaptiveWidth }
-				/>
-				{ children }
+				{ /* `LayoutGroup` acts as a "namespace" for the backdrop's shared
+							layout animation (defined in `ToggleGroupControlOptionBase`), and
+							thus it allows multiple instances of `ToggleGroupControl` in the
+							same page, each with their independent backdrop animation.
+					 */ }
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
 			</View>
 		</ToggleGroupControlContext.Provider>
 	);

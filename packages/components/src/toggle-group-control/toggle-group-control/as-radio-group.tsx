@@ -4,23 +4,19 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
+// eslint-disable-next-line no-restricted-imports
+import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
-import { forwardRef, useRef } from '@wordpress/element';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
@@ -42,8 +38,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
 	const baseId = useInstanceId(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
@@ -79,16 +73,14 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				aria-label={ label }
 				as={ View }
 				{ ...otherProps }
-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+				ref={ forwardedRef }
 			>
-				{ resizeListener }
-				<ToggleGroupControlBackdrop
-					state={ radio.state }
-					containerRef={ containerRef }
-					containerWidth={ sizes.width }
-					isAdaptiveWidth={ isAdaptiveWidth }
-				/>
-				{ children }
+				{ /* `LayoutGroup` acts as a "namespace" for the backdrop's shared
+							layout animation (defined in `ToggleGroupControlOptionBase`), and
+							thus it allows multiple instances of `ToggleGroupControl` in the
+							same page, each with their independent backdrop animation.
+					 */ }
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
 			</RadioGroup>
 		</ToggleGroupControlContext.Provider>
 	);
