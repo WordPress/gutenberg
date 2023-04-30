@@ -286,6 +286,15 @@ function entity( entityConfig ) {
 							...state,
 							[ action.recordId ]: nextEdits,
 						};
+					case 'REMOVE_ITEMS':
+						// Remove edits for deleted items.
+						const updatedEdits = {
+							...state,
+						};
+						for ( const recordId of action.itemIds ) {
+							delete updatedEdits[ recordId ];
+						}
+						return updatedEdits;
 				}
 
 				return state;
@@ -556,6 +565,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				} );
 			}
 			return nextState;
+		case 'REMOVE_ITEMS':
+			// Remove undo records for a deleted entity.
+			return state.filter(
+				( undoRecord ) => undoRecord.recordId !== action.recordId
+			);
 	}
 
 	return state;

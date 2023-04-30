@@ -186,6 +186,8 @@ describe( 'undo', () => {
 			};
 		} else if ( args[ 0 ] === 'isCreate' ) {
 			action = { type: 'CREATE_UNDO_LEVEL' };
+		} else if ( args[ 0 ] === 'isRemoveItems' ) {
+			action = { type: 'REMOVE_ITEMS', ...createEditActionPart() };
 		} else if ( args.length ) {
 			action = createNextEditAction( ...args );
 		}
@@ -343,6 +345,15 @@ describe( 'undo', () => {
 		undoState = createNextUndoState( { value: () => {} } );
 		expectedUndoState.push( createEditActionPart( { value } ) );
 		expect( undoState ).toEqual( expectedUndoState );
+	} );
+
+	it( 'removes undo records when an entity is deleted', () => {
+		undoState = createNextUndoState();
+		undoState = createNextUndoState( { value: 1 } );
+		undoState = createNextUndoState( { value: 2 } );
+		undoState = createNextUndoState( { value: 3 } );
+		undoState = createNextUndoState( 'isRemoveItems' );
+		expect( undoState ).toEqual( [] );
 	} );
 } );
 
