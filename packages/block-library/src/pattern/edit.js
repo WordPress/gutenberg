@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import {
@@ -43,7 +44,12 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceInnerBlocks( clientId, selectedPattern.blocks );
+				replaceInnerBlocks(
+					clientId,
+					selectedPattern.blocks.map( ( block ) =>
+						cloneBlock( block )
+					)
+				);
 			} );
 		}
 	}, [
