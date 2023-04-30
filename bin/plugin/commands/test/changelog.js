@@ -188,6 +188,17 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Enhancements' );
 	} );
+
+	it( 'prioritizes meta categories', () => {
+		const result = getIssueType( {
+			labels: [
+				{ name: '[Type] Bug' },
+				{ name: '[Type] Build Tooling' },
+			],
+		} );
+
+		expect( result ).toBe( 'Tools' );
+	} );
 } );
 
 describe( 'getIssueFeature', () => {
