@@ -34,9 +34,9 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number} port       The port to use in the development environment.
- * @property {number} testsPort  The port to use in the tests environment.
- * @property {string} afterSetup The command(s) to run after configuring WordPress on start and clean.
+ * @property {number}      port       The port to use in the development environment.
+ * @property {number}      testsPort  The port to use in the tests environment.
+ * @property {string|null} afterSetup The command(s) to run after configuring WordPress on start and clean.
  */
 
 /**
@@ -49,7 +49,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -193,7 +193,7 @@ async function getDefaultConfig(
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
-		afterSetup: '',
+		afterSetup: null,
 		env: {
 			development: {},
 			tests: {
@@ -301,7 +301,10 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
 	if ( rawConfig.afterSetup !== undefined ) {
-		checkString( configFile, 'afterSetup', rawConfig.afterSetup );
+		// Support null as a valid input.
+		if ( rawConfig.afterSetup !== null ) {
+			checkString( configFile, 'afterSetup', rawConfig.afterSetup );
+		}
 		parsedConfig.afterSetup = rawConfig.afterSetup;
 	}
 
@@ -353,11 +356,14 @@ async function parseEnvironmentConfig(
 	}
 
 	if ( config.phpVersion !== undefined ) {
-		checkVersion(
-			configFile,
-			`${ environmentPrefix }phpVersion`,
-			config.phpVersion
-		);
+		// Support null as a valid input.
+		if ( config.phpVersion !== null ) {
+			checkVersion(
+				configFile,
+				`${ environmentPrefix }phpVersion`,
+				config.phpVersion
+			);
+		}
 		parsedConfig.phpVersion = config.phpVersion;
 	}
 
@@ -407,7 +413,7 @@ async function parseEnvironmentConfig(
 					checkValidURL(
 						configFile,
 						`${ environmentPrefix }config.${ key }`,
-						parsedConfig[ key ]
+						parsedConfig.config[ key ]
 					);
 					break;
 				}

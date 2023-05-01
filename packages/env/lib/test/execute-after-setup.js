@@ -26,7 +26,7 @@ describe( 'executeAfterSetup', () => {
 	} );
 
 	it( 'should do nothing without afterSetup option', () => {
-		executeAfterSetup( { afterSetup: '' }, spinner );
+		executeAfterSetup( { afterSetup: null }, spinner );
 
 		expect( spinner.info ).not.toHaveBeenCalled();
 	} );

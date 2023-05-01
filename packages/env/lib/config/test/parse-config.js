@@ -51,7 +51,7 @@ const DEFAULT_CONFIG = {
 		WP_HOME: 'http://localhost',
 	},
 	mappings: {},
-	afterSetup: '',
+	afterSetup: null,
 	env: {
 		development: {},
 		tests: {
