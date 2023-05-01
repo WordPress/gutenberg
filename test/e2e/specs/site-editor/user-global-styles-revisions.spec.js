@@ -29,13 +29,6 @@ test.describe( 'Global styles revisions', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			canvas: 'edit',
@@ -110,7 +103,63 @@ test.describe( 'Global styles revisions', () => {
 		await expect( revisionButtons ).toHaveCount(
 			updatedCurrentRevisions.length
 		);
+
+		await expect( revisionButtons.first() ).toHaveText(
+			/^Currently-saved revision/
+		);
 	} );
+
+	test( 'should warn of unsaved changes before loading revision', async ( {
+		page,
+	} ) => {
+		// Navigates to Styles -> Typography -> Text and click on a size.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+
+		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Color Background styles' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Color: Black' } ).click();
+		await page.getByRole( 'button', { name: 'Styles actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
+		const unSavedButton = page
+			.getByRole( 'group', { name: 'Global styles revisions' } )
+			.getByRole( 'button', { name: /^Unsaved changes/ } );
+
+		await expect( unSavedButton ).toBeVisible();
+
+		// await expect( image ).toHaveCSS( 'height', '3px' );
+
+		await page
+			.getByRole( 'group', { name: 'Global styles revisions' } )
+			.getByRole( 'button', { name: /^Revision from / } )
+			.first()
+			.click();
+
+		await page
+			.getByRole( 'button', { name: 'Load revision' } )
+			.first()
+			.click();
+
+		const modal = page.getByRole( 'dialog', {
+			name: 'You have unsaved changes in the editor',
+		} );
+		await expect( modal ).toBeVisible();
+
+		// @TODO do the entire flow
+	} );
+
+	/*
+		test( 'should warn of unsaved changes before loading revision', async ( {
+			   page,
+			   editor,
+			   userGlobalStylesRevisions,
+		   } ) => {
+			// @TODO finish this test
+		} );*/
 } );
 
 class UserGlobalStylesRevisions {
