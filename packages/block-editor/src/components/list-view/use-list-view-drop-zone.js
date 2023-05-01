@@ -79,6 +79,23 @@ function isUpGesture( point, rect, nestingLevel = 1 ) {
 	return point.x < blockIndentPosition;
 }
 
+/**
+ * Returns how many nesting levels up the user is attempting to drag to.
+ *
+ * The relative parent level is calculated based on how far
+ * the cursor is from the provided nesting level (e.g. of a candidate block
+ * that the user is hovering over). The nesting level is considered "desired"
+ * because it is not guaranteed that the user will be able to drag to the desired level.
+ *
+ * The returned integer can be used to access an ascending array
+ * of parent blocks, where the first item is the block the user
+ * is hovering over, and the last item is the root block.
+ *
+ * @param {WPPoint} point        The point representing the cursor position when dragging.
+ * @param {DOMRect} rect         The rectangle.
+ * @param {number}  nestingLevel The nesting level of the block.
+ * @return {number} The desired relative parent level.
+ */
 function getDesiredRelativeParentLevel( point, rect, nestingLevel = 1 ) {
 	const blockIndentPosition =
 		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
