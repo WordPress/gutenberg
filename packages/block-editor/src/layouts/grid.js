@@ -203,7 +203,7 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 				} );
 			} }
 			min={ 1 }
-			max={ 12 }
+			max={ 6 }
 		/>
 	);
 }
