@@ -60,7 +60,6 @@ Once the team has discussed and approved the change, it's time to start implemen
 2. **Draft documentation**: New components need development, design, and accessibility guidelines. Additionally, if your change adds additional behavior or expands a component’s features, those changes will need to be fully documented as well. Read through existing component documentation for examples. Start with a rough draft, and reviewers will help polish documentation.
 3. **Provide working code**: The component or enhancement must be built in React. See the [developer contribution guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/README.md).
 4. **Create a design spec**: Create sizing and styling annotations for all aspects of the component. This spec should provide a developer with everything they need to create the design in code. [Figma automatically does this for you](https://help.figma.com/article/32-developer-handoff).
-5. **Create a Figma component**: Any new components or changes to existing components will be mirrored in the [WordPress Components Figma library](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=735%3A0), so we’ll need to update the Figma library and publish the changes. Please follow the [guidelines](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=746%3A38) for contributing to the Figma libraries.
 
 Remember, it’s unlikely that all parts will be done by one person. Contribute where you can, and others will help.
 
