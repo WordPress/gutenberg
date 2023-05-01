@@ -370,6 +370,9 @@ export default function useListViewDropZone() {
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
 					const isExpanded = blockElement.dataset.expanded === 'true';
+					const nestingLevel = blockElement.dataset.level
+						? parseInt( blockElement.dataset.level, 10 )
+						: undefined;
 					const rootClientId = getBlockRootClientId( clientId );
 
 					return {
@@ -378,7 +381,7 @@ export default function useListViewDropZone() {
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
-						nestingLevel: blockElement.ariaLevel,
+						nestingLevel,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )
 							: false,
