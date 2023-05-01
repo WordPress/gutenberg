@@ -176,13 +176,15 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
-	 *                                       single item (string), or multiple items (array of strings).
-	 *                                       Default false.
+	 * @param string|string[]|false $handles            Optional. Items to be processed: queue (false),
+	 *                                                  single item (string), or multiple items (array of strings).
+	 *                                                  Default false.
+	 * @param bool                  $for_iframed_editor Optional. Whether the fonts are for iframed editor.
+	 *                                                  Default false.
 	 * @return array|string[] Array of font handles that have been processed.
 	 *                        An empty array if none were processed.
 	 */
-	function wp_print_fonts( $handles = false ) {
+	function wp_print_fonts( $handles = false, $for_iframed_editor = false ) {
 		$wp_fonts   = wp_fonts();
 		$registered = $wp_fonts->get_registered_font_families();
 
@@ -197,7 +199,24 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		return $wp_fonts->do_items( $handles );
+		// Print all registered fonts for the iframed editor.
+		if ( $for_iframed_editor ) {
+			$queue = $wp_fonts->queue;
+			$done  = $wp_fonts->done;
+
+			$wp_fonts->done  = array();
+			$wp_fonts->queue = $registered;
+		}
+
+		$printed_fonts = $wp_fonts->do_items( $handles );
+
+		// Reset after printing.
+		if ( $for_iframed_editor ) {
+			$wp_fonts->done  = $done;
+			$wp_fonts->queue = $queue;
+		}
+
+		return $printed_fonts;
 	}
 }
 
