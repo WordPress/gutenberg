@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback, useRef } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
@@ -186,7 +186,6 @@ export function getListViewDropTarget( blocksData, position ) {
  * @return {WPListViewDropZoneTarget} The drop target.
  */
 export default function useListViewDropZone() {
-	const blocksData = useRef( null );
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -200,69 +199,51 @@ export default function useListViewDropZone() {
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
+	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
 			( event, currentTarget ) => {
 				const position = { x: event.clientX, y: event.clientY };
-				const draggedBlockClientIds = getDraggedBlockClientIds();
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 
 				const blockElements = Array.from(
 					currentTarget.querySelectorAll( '[data-block]' )
 				);
 
-				if ( ! blocksData.current ) {
-					blocksData.current = blockElements.map(
-						( blockElement ) => {
-							const clientId = blockElement.dataset.block;
-							const isExpanded =
-								blockElement.dataset.expanded === 'true';
-							const rootClientId =
-								getBlockRootClientId( clientId );
+				const blocksData = blockElements.map( ( blockElement ) => {
+					const clientId = blockElement.dataset.block;
+					const isExpanded = blockElement.dataset.expanded === 'true';
+					const rootClientId = getBlockRootClientId( clientId );
 
-							return {
-								clientId,
-								isExpanded,
-								rootClientId,
-								blockIndex: getBlockIndex( clientId ),
-								element: blockElement,
-								isDraggedBlock: isBlockDrag
-									? draggedBlockClientIds.includes( clientId )
-									: false,
-								innerBlockCount: getBlockCount( clientId ),
-								canInsertDraggedBlocksAsSibling: isBlockDrag
-									? canInsertBlocks(
-											draggedBlockClientIds,
-											rootClientId
-									  )
-									: true,
-								canInsertDraggedBlocksAsChild: isBlockDrag
-									? canInsertBlocks(
-											draggedBlockClientIds,
-											clientId
-									  )
-									: true,
-							};
-						}
-					);
-				}
+					return {
+						clientId,
+						isExpanded,
+						rootClientId,
+						blockIndex: getBlockIndex( clientId ),
+						element: blockElement,
+						isDraggedBlock: isBlockDrag
+							? draggedBlockClientIds.includes( clientId )
+							: false,
+						innerBlockCount: getBlockCount( clientId ),
+						canInsertDraggedBlocksAsSibling: isBlockDrag
+							? canInsertBlocks(
+									draggedBlockClientIds,
+									rootClientId
+							  )
+							: true,
+						canInsertDraggedBlocksAsChild: isBlockDrag
+							? canInsertBlocks( draggedBlockClientIds, clientId )
+							: true,
+					};
+				} );
 
-				const newTarget = getListViewDropTarget(
-					blocksData.current,
-					position
-				);
+				const newTarget = getListViewDropTarget( blocksData, position );
 
 				if ( newTarget ) {
 					setTarget( newTarget );
 				}
 			},
-			[
-				canInsertBlocks,
-				getBlockCount,
-				getBlockIndex,
-				getBlockRootClientId,
-				getDraggedBlockClientIds,
-			]
+			[ draggedBlockClientIds ]
 		),
 		200
 	);
@@ -278,7 +259,6 @@ export default function useListViewDropZone() {
 		onDragEnd() {
 			throttled.cancel();
 			setTarget( null );
-			blocksData.current = null;
 		},
 	} );
 
