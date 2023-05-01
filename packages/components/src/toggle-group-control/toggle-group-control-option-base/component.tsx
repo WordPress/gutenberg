@@ -11,7 +11,7 @@ import { motion, useReducedMotion } from 'framer-motion';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-// import { useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -81,12 +81,24 @@ function ToggleGroupControlOptionBase(
 
 	const isPressed = otherContextProps.state === value;
 	const cx = useCx();
-	const labelViewClasses = cx( isBlock && styles.labelBlock );
-	const itemClasses = cx(
-		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
-		className
+	const labelViewClasses = useMemo(
+		() => cx( isBlock && styles.labelBlock ),
+		[ cx, isBlock ]
 	);
-	const backdropClasses = cx( styles.backdropView );
+	const itemClasses = useMemo(
+		() =>
+			cx(
+				styles.buttonView( {
+					isDeselectable,
+					isIcon,
+					isPressed,
+					size,
+				} ),
+				className
+			),
+		[ cx, isDeselectable, isIcon, isPressed, size, className ]
+	);
+	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
 
 	const buttonOnClick = () => {
 		if ( isDeselectable && isPressed ) {
