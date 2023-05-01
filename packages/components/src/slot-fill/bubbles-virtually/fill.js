@@ -1,4 +1,11 @@
 // @ts-nocheck
+
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { MotionContext } from 'framer-motion';
+
 /**
  * WordPress dependencies
  */
@@ -56,9 +63,13 @@ export default function Fill( { name, children } ) {
 	// to make sure we're referencing the right document/iframe (instead of the
 	// context of the `Fill`'s parent).
 	const wrappedChildren = (
-		<StyleProvider document={ slot.ref.current.ownerDocument }>
-			{ children }
-		</StyleProvider>
+		// Resetting framer-motion's context as a way to fix an issue with portals
+		// (see https://github.com/framer/motion/issues/1524)
+		<MotionContext.Provider value={ {} }>
+			<StyleProvider document={ slot.ref.current.ownerDocument }>
+				{ children }
+			</StyleProvider>
+		</MotionContext.Provider>
 	);
 
 	return createPortal( wrappedChildren, slot.ref.current );
