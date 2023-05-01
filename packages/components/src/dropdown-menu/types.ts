@@ -9,6 +9,7 @@ import type { ButtonAsButtonProps } from '../button/types';
 import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from '../dropdown/types';
 import type { Props as IconProps } from '../icon';
+import type { NavigableMenuProps } from '../navigable-container/types';
 
 type DropdownOption = {
 	/**
@@ -60,15 +61,6 @@ type ToggleProps = Partial<
 	as?: React.ElementType | keyof JSX.IntrinsicElements;
 };
 
-type MenuProps = {
-	onNavigate?: ( index: number, child: HTMLElement ) => void;
-	cycle?: boolean;
-	orientation?: 'horizontal' | 'vertical' | 'both';
-	role?: string;
-	'aria-label'?: string;
-	className?: string;
-};
-
 export type DropdownMenuProps = {
 	/**
 	 * The Dashicon icon slug to be shown in the collapsed menu button.
@@ -111,8 +103,7 @@ export type DropdownMenuProps = {
 	 * component that are not already exposed in the `DropdownMenu` component,
 	 * e.g.: the orientation of the menu set with `orientation` prop.
 	 */
-	// TODO: NavigableContainer is currently being typed. Just import these props from it when they're available.
-	menuProps?: Omit< MenuProps, 'children' >;
+	menuProps?: Omit< Partial< NavigableMenuProps >, 'children' >;
 	/**
 	 * In some contexts, the arrow down key used to open the dropdown menu might
 	 * need to be disabled—for example when that key is used to perform another

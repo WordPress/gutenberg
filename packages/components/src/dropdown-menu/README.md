@@ -185,8 +185,7 @@ Use this object to modify props available for the `Button` component that are no
 
 -   Required: No
 
-// TODO: Update this when `NavigableMenu` is typed and `menuProps` is imported from there
-#### `menuProps`: `Object`
+#### `menuProps`: `NavigableContainerProps`
 
 Properties of `menuProps` object will be passed as props to the nested `NavigableMenu` component in the `renderContent` implementation of the `Dropdown` component used internally.
 Use this object to modify props available for the `NavigableMenu` component that are not already exposed in the `DropdownMenu` component, e.g.: the orientation of the menu set with `orientation` prop.
