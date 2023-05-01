@@ -1,4 +1,4 @@
-// Include modern WP admin color scheme variables.
+// Include the default WP Components color variables.
 // TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
 :root {
 	@include admin-scheme(#3858e9);
