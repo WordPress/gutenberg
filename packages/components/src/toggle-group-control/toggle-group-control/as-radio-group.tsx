@@ -4,8 +4,6 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
-import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -75,12 +73,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				ref={ forwardedRef }
 			>
-				{ /* `LayoutGroup` acts as a "namespace" for the backdrop's shared
-							layout animation (defined in `ToggleGroupControlOptionBase`), and
-							thus it allows multiple instances of `ToggleGroupControl` in the
-							same page, each with their independent backdrop animation.
-					 */ }
-				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+				{ children }
 			</RadioGroup>
 		</ToggleGroupControlContext.Provider>
 	);

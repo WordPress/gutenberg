@@ -2,9 +2,13 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { LayoutGroup } from 'framer-motion';
+
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
@@ -42,6 +46,12 @@ function UnconnectedToggleGroupControl(
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const baseId = useInstanceId(
+		ToggleGroupControl,
+		'toggle-group-control'
+	).toString();
+
 	const cx = useCx();
 
 	const classes = useMemo(
@@ -70,7 +80,6 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				children={ children }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
@@ -78,7 +87,9 @@ function UnconnectedToggleGroupControl(
 				ref={ forwardedRef }
 				size={ size }
 				value={ value }
-			/>
+			>
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+			</MainControl>
 		</BaseControl>
 	);
 }
