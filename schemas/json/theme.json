@@ -266,7 +266,7 @@
 							"type": "string"
 						},
 						"wideSize": {
-							"description": "Sets the max-width of wide (`.alignwide`) content.",
+							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
 						}
 					},
