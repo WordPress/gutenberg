@@ -38,4 +38,4 @@ export { default as __unstableFormatEdit } from './component/format-edit';
  * An object which represents a formatted string. See main `@wordpress/rich-text`
  * documentation for more information.
  */
-export { RichTextValue } from './types';
+export type { RichTextValue } from './types';
