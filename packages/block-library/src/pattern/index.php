@@ -32,8 +32,10 @@ function render_block_core_pattern( $attributes, $content ) {
 		return '';
 	}
 
+	$wrapper = '<div class="align' . $attributes['forcedAlignment'] . '" data-pattern-slug="' . $attributes['slug'] . '">%s</div>';
+
 	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
-		return $content;
+		return sprintf( $wrapper, $content );
 	}
 
 	$slug     = $attributes['slug'];
@@ -43,7 +45,7 @@ function render_block_core_pattern( $attributes, $content ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	return do_blocks( $pattern['content'] );
+	return sprintf( $wrapper, do_blocks( $pattern['content'] ) );
 }
 
 add_action( 'init', 'register_block_core_pattern' );
