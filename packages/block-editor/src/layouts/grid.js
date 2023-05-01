@@ -80,7 +80,7 @@ export default {
 
 		if ( columnCount ) {
 			rules.push(
-				`grid-template-columns: repeat(${ columnCount }, 1fr)`
+				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
