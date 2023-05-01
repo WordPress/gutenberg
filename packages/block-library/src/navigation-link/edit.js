@@ -469,7 +469,7 @@ export default function NavigationLinkEdit( {
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
-						label={ __( 'Link title' ) }
+						label={ __( 'Title attribute' ) }
 						autoComplete="off"
 					/>
 					<TextControl
@@ -478,7 +478,7 @@ export default function NavigationLinkEdit( {
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
 						} }
-						label={ __( 'Link rel' ) }
+						label={ __( 'Rel attribute' ) }
 						autoComplete="off"
 					/>
 				</PanelBody>
