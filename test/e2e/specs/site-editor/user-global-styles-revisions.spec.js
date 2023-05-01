@@ -151,15 +151,6 @@ test.describe( 'Global styles revisions', () => {
 
 		// @TODO do the entire flow
 	} );
-
-	/*
-		test( 'should warn of unsaved changes before loading revision', async ( {
-			   page,
-			   editor,
-			   userGlobalStylesRevisions,
-		   } ) => {
-			// @TODO finish this test
-		} );*/
 } );
 
 class UserGlobalStylesRevisions {

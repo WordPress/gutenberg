@@ -204,6 +204,9 @@
 		top: 50%;
 		left: -3px;
 	}
+	&.is-current::before {
+		background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	}
 }
 
 .edit-site-global-styles-screen-revisions__revision-button {
@@ -211,11 +214,12 @@
 	height: auto;
 	display: block;
 	min-height: $grid-unit-80;
-	&.is-current {
-		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-		opacity: 1;
-		background-color: #f1faff;
-	}
+}
+
+.is-current > .edit-site-global-styles-screen-revisions__revision-button {
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	opacity: 1;
+	background-color: #f1faff;
 }
 
 .edit-site-global-styles-screen-revisions__button {

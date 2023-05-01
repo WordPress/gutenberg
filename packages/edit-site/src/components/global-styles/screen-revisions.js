@@ -29,7 +29,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { getDate, dateI18n } from '@wordpress/date';
+import { dateI18n, getDate, humanTimeDiff } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -90,10 +90,10 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 			{ userRevisions.map( ( revision ) => {
 				const {
 					id,
-					dateHumanTimeDiff,
 					authorAvatarUrl,
 					authorDisplayName,
 					isLatest,
+					modified,
 				} = revision;
 				const isUnsaved = 'unsaved' === id;
 				/*
@@ -104,18 +104,20 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 					? id === currentRevisionId
 					: isLatest;
 
+				const dateHumanTimeDiff = humanTimeDiff( modified );
+
 				return (
 					<li
-						className="edit-site-global-styles-screen-revisions__revision-item"
+						className={ classnames(
+							'edit-site-global-styles-screen-revisions__revision-item',
+							{
+								'is-current': isActive,
+							}
+						) }
 						key={ `user-styles-revision-${ id }` }
 					>
 						<Button
-							className={ classnames(
-								'edit-site-global-styles-screen-revisions__revision-button',
-								{
-									'is-current': isActive,
-								}
-							) }
+							className="edit-site-global-styles-screen-revisions__revision-button"
 							disabled={ isActive }
 							onClick={ () => {
 								onChange( revision );
@@ -266,7 +268,7 @@ function ScreenRevisions() {
 				settings: userConfig?.settings,
 				authorDisplayName: currentUser?.name,
 				authorAvatarUrl: currentUser?.avatar_urls?.[ '24' ],
-				dateHumanTimeDiff: __( 'Just now' ),
+				modified: new Date(),
 			};
 			return [ unsavedRevision ].concat( _modified );
 		}
