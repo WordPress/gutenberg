@@ -35,17 +35,17 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		const { __unstableColumnCount = null } = layout;
+		const { columnCount = null } = layout;
 
 		return (
 			<>
-				{ __unstableColumnCount && (
+				{ columnCount && (
 					<GridLayoutColumnsControl
 						layout={ layout }
 						onChange={ onChange }
 					/>
 				) }
-				{ ! __unstableColumnCount && (
+				{ ! columnCount && (
 					<GridLayoutMinimumWidthControl
 						layout={ layout }
 						onChange={ onChange }
@@ -65,8 +65,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { minimumColumnWidth = '12rem', __unstableColumnCount = null } =
-			layout;
+		const { minimumColumnWidth = '12rem', columnCount = null } = layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -79,9 +78,9 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( __unstableColumnCount ) {
+		if ( columnCount ) {
 			rules.push(
-				`grid-template-columns: repeat(${ __unstableColumnCount }, 1fr)`
+				`grid-template-columns: repeat(${ columnCount }, 1fr)`
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
@@ -190,16 +189,16 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 
 // Enables setting number of grid columns
 function GridLayoutColumnsControl( { layout, onChange } ) {
-	const { __unstableColumnCount = 3 } = layout;
+	const { columnCount = 3 } = layout;
 
 	return (
 		<RangeControl
 			label={ __( 'Columns' ) }
-			value={ __unstableColumnCount }
+			value={ columnCount }
 			onChange={ ( value ) => {
 				onChange( {
 					...layout,
-					__unstableColumnCount: value,
+					columnCount: value,
 				} );
 			} }
 			min={ 1 }

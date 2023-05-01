@@ -258,8 +258,7 @@ export default function PostTemplateEdit( {
 		{
 			icon: grid,
 			title: __( 'Grid view' ),
-			onClick: () =>
-				setDisplayLayout( { type: 'grid', __unstableColumnCount: 3 } ),
+			onClick: () => setDisplayLayout( { type: 'grid', columnCount: 3 } ),
 			isActive:
 				updatedLayoutType === 'grid' || updatedLayoutType === 'flex',
 		},
