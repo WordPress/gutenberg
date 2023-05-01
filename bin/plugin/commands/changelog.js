@@ -61,7 +61,6 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	'[Type] Code Quality': 'Code Quality',
 	'[Type] Developer Documentation': 'Documentation',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
@@ -75,6 +74,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Build Tooling': 'Tools',
 	'Automated Testing': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Code Quality': 'Code Quality',
 	'[Type] Performance': 'Performance',
 	'[Type] Security': 'Security',
 	'[Feature] Navigation Screen': 'Experiments',
