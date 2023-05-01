@@ -58,6 +58,8 @@ import { store as blockEditorStore } from '../../store';
  *                                                  'inside' refers to nesting as an inner block.
  */
 
+// When the indentation level, the corresponding left margin in `style.scss`
+// must be updated as well to ensure the drop zone is aligned with the indentation.
 export const NESTING_LEVEL_INDENTATION = 28;
 
 /**
