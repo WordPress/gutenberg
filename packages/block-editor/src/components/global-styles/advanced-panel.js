@@ -64,15 +64,15 @@ export default function AdvancedPanel( {
 				value={ customCSS }
 				onChange={ ( newValue ) => handleOnChange( newValue ) }
 				onBlur={ handleOnBlur }
-				className="edit-site-global-styles__custom-css-input"
+				className="block-editor-global-styles-advanced-panel__custom-css-input"
 				spellCheck={ false }
 			/>
 			{ cssError && (
 				<Tooltip text={ cssError }>
-					<div className="edit-site-global-styles__custom-css-validation-wrapper">
+					<div className="block-editor-global-styles-advanced-panel__custom-css-validation-wrapper">
 						<Icon
 							icon={ info }
-							className="edit-site-global-styles__custom-css-validation-icon"
+							className="block-editor-global-styles-advanced-panel__custom-css-validation-icon"
 						/>
 					</div>
 				</Tooltip>
