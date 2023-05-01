@@ -35,7 +35,6 @@ add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
  * Hence, why we remove it first and then re-add it.
  *
  * This way we make sure it still works the same in WordPress trunk, 6.1 and 6.2.
- *
  */
 remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles', 1 );
