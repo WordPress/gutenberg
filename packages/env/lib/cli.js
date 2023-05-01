@@ -127,7 +127,7 @@ module.exports = function cli() {
 				coerce: parseXdebugMode,
 				type: 'string',
 			} );
-			args.option( 'execute-scripts', {
+			args.option( 'scripts', {
 				type: 'boolean',
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
@@ -153,7 +153,7 @@ module.exports = function cli() {
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
 			} );
-			args.option( 'execute-scripts', {
+			args.option( 'scripts', {
 				type: 'boolean',
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,

@@ -261,17 +261,15 @@ first install, use the '--update' flag to download updates to mapped sources and
 to re-apply WordPress configuration options.
 
 Options:
-  --debug            Enable debug output.             [boolean] [default: false]
-  --update           Download source updates and apply WordPress configuration.
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
-  --xdebug           Enables Xdebug. If not passed, Xdebug is turned off. If no
-                     modes are set, uses "debug". You may set multiple Xdebug
-                     modes by passing them in a comma-separated list:
-                     `--xdebug=develop,coverage`. See
-                     https://xdebug.org/docs/all_settings#mode for information
-                     about Xdebug modes.                                [string]
-  --execute-scripts  Execute any configured lifecycle scripts.
-                                                       [boolean] [default: true]
+  --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
+             are set, uses "debug". You may set multiple Xdebug modes by passing
+             them in a comma-separated list: `--xdebug=develop,coverage`. See
+             https://xdebug.org/docs/all_settings#mode for information about
+             Xdebug modes.                                              [string]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env stop`
@@ -297,9 +295,8 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 
 Options:
-  --debug            Enable debug output.             [boolean] [default: false]
-  --execute-scripts  Execute any configured lifecycle scripts.
-                                                       [boolean] [default: true]
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env run [container] [command]`

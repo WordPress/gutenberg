@@ -20,15 +20,15 @@ const { executeAfterSetup } = require( '../execute-after-setup' );
  * Wipes the development server's database, the tests server's database, or both.
  *
  * @param {Object}                 options
- * @param {WPEnvironmentSelection} options.environment    The environment to clean. Either 'development', 'tests', or 'all'.
- * @param {Object}                 options.spinner        A CLI spinner which indicates progress.
- * @param {boolean}                options.executeScripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean}                options.debug          True if debug mode is enabled.
+ * @param {WPEnvironmentSelection} options.environment The environment to clean. Either 'development', 'tests', or 'all'.
+ * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
+ * @param {boolean}                options.scripts     Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}                options.debug       True if debug mode is enabled.
  */
 module.exports = async function clean( {
 	environment,
 	spinner,
-	executeScripts,
+	scripts,
 	debug,
 } ) {
 	const config = await initConfig( { spinner, debug } );
@@ -66,7 +66,7 @@ module.exports = async function clean( {
 	await Promise.all( tasks );
 
 	// Execute any configured command that should run after the environment has finished being set up.
-	if ( executeScripts ) {
+	if ( scripts ) {
 		executeAfterSetup( config, spinner );
 	}
 
