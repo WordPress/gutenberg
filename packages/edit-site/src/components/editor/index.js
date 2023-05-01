@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
@@ -58,6 +58,12 @@ export default function Editor() {
 	} = useEditedEntityRecord();
 
 	const { id: editedPostId, type: editedPostType } = editedPost;
+
+	const { hasResolvingSelectors } = useSelect( ( select ) => {
+		return {
+			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
+		};
+	} );
 
 	const {
 		context,
@@ -153,7 +159,7 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
+	if ( ! hasLoadedPost || hasResolvingSelectors ) {
 		return <CanvasSpinner />;
 	}
 
