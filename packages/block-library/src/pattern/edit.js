@@ -13,7 +13,7 @@ import {
 import { ToolbarButton } from '@wordpress/components';
 
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { forcedAlignment, slug } = attributes;
+	const { forcedAlignment, slug, syncStatus } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -58,6 +58,35 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		innerBlocks,
+	] );
+
+	useEffect( () => {
+		const alignments = [ 'wide', 'full' ];
+		const blocks =
+			syncStatus === 'synced' ? selectedPattern?.blocks : innerBlocks;
+		if ( ! blocks || blocks.length === 0 ) {
+			return;
+		}
+		// Determine the widest setting of all the contained blocks.
+		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
+			const { align } = block.attributes;
+			return alignments.indexOf( align ) >
+				alignments.indexOf( accumulator )
+				? align
+				: accumulator;
+		}, undefined );
+
+		// Set the attribute of the Pattern block to match the widest
+		// alignment.
+		setAttributes( {
+			forcedAlignment: widestAlignment ?? '',
+		} );
+	}, [
+		innerBlocks,
+		selectedPattern?.blocks,
+		setAttributes,
+		syncStatus,
+		forcedAlignment,
 	] );
 
 	const blockProps = useBlockProps( {
