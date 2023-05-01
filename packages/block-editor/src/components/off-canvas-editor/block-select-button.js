@@ -70,6 +70,10 @@ function ListViewBlockSelectButton(
 		  )
 		: __( 'Edit' );
 
+	const hasChevron = [ 'core/navigation-submenu', 'post', 'page' ].includes(
+		blockInformation.name
+	);
+
 	return (
 		<>
 			<Button
@@ -119,11 +123,13 @@ function ListViewBlockSelectButton(
 							<Icon icon={ lock } />
 						</span>
 					) }
-					<Icon
-						icon={ chevronRightSmall }
-						className="block-editor-list-view-block-select-button__drilldown-indicator"
-						size={ 24 }
-					/>
+					{ hasChevron && (
+						<Icon
+							icon={ chevronRightSmall }
+							className="block-editor-list-view-block-select-button__drilldown-indicator"
+							size={ 24 }
+						/>
+					) }
 				</HStack>
 			</Button>
 		</>

@@ -57,12 +57,14 @@ export default function useBlockDisplayInformation( clientId ) {
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
+
 			const blockTypeInfo = {
 				isSynced,
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
+				name: blockType.name,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -72,6 +74,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
+				name: match.name || blockType.name,
 			};
 		},
 		[ clientId ]
