@@ -66,7 +66,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 	return (
 		<>
-			<div { ...innerBlocksProps } />
+			<div { ...innerBlocksProps } data-pattern-slug={ slug } />
 			<BlockControls group="other">
 				<ToolbarButton
 					onClick={ () =>
