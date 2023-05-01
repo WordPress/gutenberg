@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
@@ -186,6 +186,7 @@ export function getListViewDropTarget( blocksData, position ) {
  * @return {WPListViewDropZoneTarget} The drop target.
  */
 export default function useListViewDropZone() {
+	const blocksData = useRef( null );
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -199,64 +200,76 @@ export default function useListViewDropZone() {
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
-	const draggedBlockClientIds = getDraggedBlockClientIds();
+	const getBlocksData = useCallback(
+		( eventTarget ) => {
+			const blockElements = Array.from(
+				eventTarget.querySelectorAll( '[data-block]' )
+			);
+
+			const draggedBlockClientIds = getDraggedBlockClientIds();
+			const isBlockDrag = !! draggedBlockClientIds?.length;
+
+			return blockElements.map( ( blockElement ) => {
+				const clientId = blockElement.dataset.block;
+				const isExpanded = blockElement.dataset.expanded === 'true';
+				const rootClientId = getBlockRootClientId( clientId );
+
+				return {
+					clientId,
+					isExpanded,
+					rootClientId,
+					blockIndex: getBlockIndex( clientId ),
+					element: blockElement,
+					isDraggedBlock: isBlockDrag
+						? draggedBlockClientIds.includes( clientId )
+						: false,
+					innerBlockCount: getBlockCount( clientId ),
+					canInsertDraggedBlocksAsSibling: isBlockDrag
+						? canInsertBlocks( draggedBlockClientIds, rootClientId )
+						: true,
+					canInsertDraggedBlocksAsChild: isBlockDrag
+						? canInsertBlocks( draggedBlockClientIds, clientId )
+						: true,
+				};
+			} );
+		},
+		[
+			canInsertBlocks,
+			getBlockCount,
+			getBlockIndex,
+			getBlockRootClientId,
+			getDraggedBlockClientIds,
+		]
+	);
+
 	const throttled = useThrottle(
-		useCallback(
-			( event, currentTarget ) => {
-				const position = { x: event.clientX, y: event.clientY };
-				const isBlockDrag = !! draggedBlockClientIds?.length;
+		useCallback( ( event ) => {
+			const position = { x: event.clientX, y: event.clientY };
+			const newTarget = getListViewDropTarget(
+				blocksData.current,
+				position
+			);
 
-				const blockElements = Array.from(
-					currentTarget.querySelectorAll( '[data-block]' )
-				);
-
-				const blocksData = blockElements.map( ( blockElement ) => {
-					const clientId = blockElement.dataset.block;
-					const isExpanded = blockElement.dataset.expanded === 'true';
-					const rootClientId = getBlockRootClientId( clientId );
-
-					return {
-						clientId,
-						isExpanded,
-						rootClientId,
-						blockIndex: getBlockIndex( clientId ),
-						element: blockElement,
-						isDraggedBlock: isBlockDrag
-							? draggedBlockClientIds.includes( clientId )
-							: false,
-						innerBlockCount: getBlockCount( clientId ),
-						canInsertDraggedBlocksAsSibling: isBlockDrag
-							? canInsertBlocks(
-									draggedBlockClientIds,
-									rootClientId
-							  )
-							: true,
-						canInsertDraggedBlocksAsChild: isBlockDrag
-							? canInsertBlocks( draggedBlockClientIds, clientId )
-							: true,
-					};
-				} );
-
-				const newTarget = getListViewDropTarget( blocksData, position );
-
-				if ( newTarget ) {
-					setTarget( newTarget );
-				}
-			},
-			[ draggedBlockClientIds ]
-		),
+			if ( newTarget ) {
+				setTarget( newTarget );
+			}
+		}, [] ),
 		200
 	);
 
 	const ref = useDropZone( {
 		onDrop: onBlockDrop,
+		onDragStart( event ) {
+			blocksData.current = getBlocksData( event.currentTarget );
+		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			throttled( event );
 		},
 		onDragEnd() {
+			blocksData.current = null;
 			throttled.cancel();
 			setTarget( null );
 		},
