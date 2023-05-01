@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
@@ -49,16 +49,6 @@ const interfaceLabels = {
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 };
-
-function useIsEditorLoading() {
-	const { hasResolvingSelectors } = useSelect( ( select ) => {
-		return {
-			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
-		};
-	} );
-
-	return hasResolvingSelectors;
-}
 
 export default function Editor() {
 	const {
@@ -163,12 +153,36 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( useIsEditorLoading() || ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
+	const { hasResolvingSelectors } = useSelect( ( select ) => {
+		return {
+			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
+		};
+	} );
+	const [ loaded, setLoaded ] = useState( false );
+	const timeoutRef = useRef( null );
+
+	useEffect( () => {
+		if ( ! hasResolvingSelectors && ! loaded ) {
+			clearTimeout( timeoutRef.current );
+			timeoutRef.current = setTimeout( () => {
+				setLoaded( true );
+			}, 1000 );
+		}
+
+		if ( hasResolvingSelectors && timeoutRef.current ) {
+			clearTimeout( timeoutRef.current );
+		}
+
+		return () => {
+			clearTimeout( timeoutRef.current );
+		};
+	}, [ loaded, hasResolvingSelectors ] );
+
+	const isLoading = ! loaded || ! hasLoadedPost;
 
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
