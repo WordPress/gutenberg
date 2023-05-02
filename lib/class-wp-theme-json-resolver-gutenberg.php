@@ -603,6 +603,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return static::$user;
 	}
 
+	/**
+	 * Returns the site's origin config.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return WP_Theme_JSON Entity that holds styles for site level data.
+	 */
 	public static function get_site_data() {
 		if ( null !== static::$site && static::has_same_registered_blocks( 'site' ) ) {
 			return static::$site;
@@ -734,6 +741,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return static::$user_custom_post_type_id;
 	}
 
+	/**
+	 * Returns the ID of the custom post type
+	 * that stores site data.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return integer|null
+	 */
 	public static function get_site_global_styles_post_id() {
 		if ( null !== static::$site_custom_post_type_id ) {
 			return static::$site_custom_post_type_id;
