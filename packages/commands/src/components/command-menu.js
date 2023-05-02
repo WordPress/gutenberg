@@ -147,6 +147,7 @@ export function CommandMenu() {
 		};
 	}, [] );
 	const [ loaders, setLoaders ] = useState( {} );
+	const commandMenuInput = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -184,6 +185,13 @@ export function CommandMenu() {
 		setOpen( false );
 	};
 
+	useEffect( () => {
+		// Focus the command menu input when mounting the modal.
+		if ( open ) {
+			commandMenuInput.current.focus();
+		}
+	}, [ open ] );
+
 	if ( ! open ) {
 		return false;
 	}
@@ -200,9 +208,7 @@ export function CommandMenu() {
 				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
 						<Command.Input
-							// The input should be focused when the modal is opened.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus
+							ref={ commandMenuInput }
 							value={ search }
 							onValueChange={ setSearch }
 							placeholder={ __( 'Type a command or search' ) }

@@ -1,7 +1,8 @@
+'use strict';
 /**
  * Internal dependencies
  */
-const parseXdebugMode = require( '../lib/parse-xdebug-mode' );
+const parseXdebugMode = require( '../parse-xdebug-mode' );
 
 describe( 'parseXdebugMode', () => {
 	it( 'throws an error if the passed value is neither a string nor undefined', () => {

@@ -131,7 +131,7 @@
 	.components-v-stack {
 		flex: 1 1 auto;
 
-		.edit-site-global-styles__custom-css-input {
+		.block-editor-global-styles-advanced-panel__custom-css-input {
 			flex: 1 1 auto;
 			display: flex;
 			flex-direction: column;
@@ -147,28 +147,6 @@
 			}
 		}
 	}
-}
-
-.edit-site-global-styles__custom-css-input textarea {
-	font-family: $editor_html_font;
-}
-
-.edit-site-global-styles__custom-css-validation-wrapper {
-	position: absolute;
-	bottom: $grid-unit-20;
-	right: $grid-unit * 3;
-}
-
-.edit-site-global-styles__custom-css-validation-icon {
-	fill: $alert-red;
-}
-
-.edit-site-global-styles__custom-css-theme-css {
-	width: 100%;
-	line-break: anywhere;
-	white-space: break-spaces;
-	max-height: 200px;
-	overflow-y: scroll;
 }
 
 .edit-site-global-styles-screen-css-help-link {
