@@ -205,6 +205,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 					>
 						<ScreenColors />
 					</GlobalStylesNavigationScreen>
+
+					<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
+						<ScreenCSS />
+					</GlobalStylesNavigationScreen>
 				</>
 			) }
 
@@ -216,10 +220,6 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
-				<ScreenCSS name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (

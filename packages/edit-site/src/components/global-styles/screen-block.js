@@ -4,6 +4,10 @@
 import { getBlockType } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { PanelBody } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,6 +32,7 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -52,6 +57,20 @@ function ScreenBlock( { name, variation } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
@@ -140,6 +159,24 @@ function ScreenBlock( { name, variation } ) {
 					} }
 					includeLayoutControls
 				/>
+			) }
+			{ canEditCSS && (
+				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
+					<p>
+						{ sprintf(
+							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+							__(
+								'Add your own CSS to customize the appearance of the %s block.'
+							),
+							blockType?.title
+						) }
+					</p>
+					<StylesAdvancedPanel
+						value={ style }
+						onChange={ setStyle }
+						inheritedValue={ inheritedStyle }
+					/>
+				</PanelBody>
 			) }
 		</>
 	);
