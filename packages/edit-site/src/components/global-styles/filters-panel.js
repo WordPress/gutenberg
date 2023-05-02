@@ -27,7 +27,13 @@ export default function FiltersPanel( { name } ) {
 			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
-			settings={ settings }
+			settings={ {
+				...settings,
+				color: {
+					...settings.color,
+					customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
+				},
+			} }
 		/>
 	);
 }

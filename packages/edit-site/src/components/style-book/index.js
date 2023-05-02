@@ -7,14 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Button,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Disabled,
 	TabPanel,
-	createSlotFill,
-	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -31,28 +28,18 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
-import {
-	useResizeObserver,
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import EditorCanvasContainer from '../editor-canvas-container';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
-
-const SLOT_FILL_NAME = 'EditSiteStyleBook';
-const { Slot: StyleBookSlot, Fill: StyleBookFill } =
-	createSlotFill( SLOT_FILL_NAME );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -174,11 +161,8 @@ function getExamples() {
 	return [ headingsExample, ...otherExamples ];
 }
 
-function StyleBook( { isSelected, onSelect, onClose } ) {
+function StyleBook( { isSelected, onSelect } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const sectionFocusReturnRef = useFocusReturn();
-
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const examples = useMemo( getExamples, [] );
@@ -207,17 +191,9 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 		[ originalSettings ]
 	);
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			onClose();
-		}
-	}
-
 	return (
-		<StyleBookFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
+		<EditorCanvasContainer closeButtonLabel={ __( 'Close Style Book' ) }>
+			<div
 				className={ classnames( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
 				} ) }
@@ -225,21 +201,8 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 					color: textColor,
 					background: backgroundColor,
 				} }
-				aria-label={ __( 'Style Book' ) }
-				onKeyDown={ closeOnEscape }
-				ref={ useMergeRefs( [
-					sectionFocusReturnRef,
-					focusOnMountRef,
-				] ) }
 			>
 				{ resizeObserver }
-				<Button
-					className="edit-site-style-book__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close Style Book' ) }
-					onClick={ onClose }
-					showTooltip={ false }
-				/>
 				<TabPanel
 					className="edit-site-style-book__tab-panel"
 					tabs={ tabs }
@@ -282,8 +245,8 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 						</Iframe>
 					) }
 				</TabPanel>
-			</section>
-		</StyleBookFill>
+			</div>
+		</EditorCanvasContainer>
 	);
 }
 
@@ -365,11 +328,4 @@ const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
 	);
 };
 
-function useHasStyleBook() {
-	const fills = useSlotFills( SLOT_FILL_NAME );
-	return !! fills?.length;
-}
-
-StyleBook.Slot = StyleBookSlot;
 export default StyleBook;
-export { useHasStyleBook };

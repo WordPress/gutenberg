@@ -7,8 +7,9 @@ import {
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -17,6 +18,10 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 import SidebarButton from '../sidebar-button';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SidebarNavigationScreen( {
 	isRoot,
@@ -31,6 +36,8 @@ export default function SidebarNavigationScreen( {
 			dashboardLink: getSettings().__experimentalDashboardLink,
 		};
 	}, [] );
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
 
 	return (
 		<VStack spacing={ 2 }>
@@ -48,8 +55,16 @@ export default function SidebarNavigationScreen( {
 				) : (
 					<SidebarButton
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						label={ __( 'Go back to the Dashboard' ) }
-						href={ dashboardLink || 'index.php' }
+						label={
+							! isPreviewingTheme()
+								? __( 'Go back to the Dashboard' )
+								: __( 'Go back to the theme showcase' )
+						}
+						href={
+							! isPreviewingTheme()
+								? dashboardLink || 'index.php'
+								: 'themes.php'
+						}
 					/>
 				) }
 				<Heading
@@ -58,7 +73,13 @@ export default function SidebarNavigationScreen( {
 					level={ 2 }
 					size={ 20 }
 				>
-					{ title }
+					{ ! isPreviewingTheme()
+						? title
+						: sprintf(
+								'Previewing %1$s: %2$s',
+								theme?.name?.rendered,
+								title
+						  ) }
 				</Heading>
 				{ actions }
 			</HStack>
