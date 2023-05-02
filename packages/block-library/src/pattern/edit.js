@@ -3,7 +3,7 @@
  */
 import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
@@ -17,6 +17,7 @@ import { store as noticesStore } from '@wordpress/notices';
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 	const { forcedAlignment, slug, syncStatus } = attributes;
 	const [ syncNoticeDisplayed, setSyncNoticeDisplayed ] = useState( false );
+	const hasReplacedInnerBlocksRef = useRef( false );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { selectedPattern, innerBlocks } = useSelect(
@@ -34,15 +35,14 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		[ slug, clientId ]
 	);
 
-	const innerBlocksUpdated = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId );
-		},
-		[ clientId ]
-	);
-
 	useEffect( () => {
-		if ( syncStatus === 'synced' && ! syncNoticeDisplayed ) {
+		if ( ! hasReplacedInnerBlocksRef.current && innerBlocks.length ) {
+			hasReplacedInnerBlocksRef.current = true;
+		} else if (
+			hasReplacedInnerBlocksRef.current &&
+			syncStatus === 'synced' &&
+			! syncNoticeDisplayed
+		) {
 			createSuccessNotice(
 				__(
 					'You need to Desync this pattern for your changes to be saved.'
@@ -51,12 +51,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			);
 			setSyncNoticeDisplayed( true );
 		}
-	}, [
-		createSuccessNotice,
-		innerBlocksUpdated,
-		syncNoticeDisplayed,
-		syncStatus,
-	] );
+	}, [ createSuccessNotice, innerBlocks, syncNoticeDisplayed, syncStatus ] );
 
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -87,7 +82,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		selectedPattern?.blocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-		innerBlocks,
+		innerBlocks?.length,
 	] );
 
 	const blockProps = useBlockProps( {
