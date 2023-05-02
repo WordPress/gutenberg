@@ -305,7 +305,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -331,6 +331,7 @@ export class BlockList extends Component {
 		};
 		return (
 			<BlockListItem
+				index={ index }
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
