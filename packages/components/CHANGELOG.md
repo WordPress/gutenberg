@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Change the default color scheme to be based on the new WP Blueberry color ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
+-   Change the default color scheme to use the new WP Blueberry color. See PR description for instructions on how to restore the previous color scheme when using in a non-WordPress context ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
 
 ### Internal
 
