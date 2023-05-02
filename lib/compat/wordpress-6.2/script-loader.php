@@ -132,7 +132,7 @@ function gutenberg_resolve_assets_override() {
 	// Generate font @font-face styles.
 	if ( function_exists( 'wp_print_fonts' ) ) {
 		ob_start();
-		wp_print_fonts( false, true );
+		wp_print_fonts( true );
 		$styles .= ob_get_clean();
 	}
 

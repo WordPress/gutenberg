@@ -134,7 +134,7 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 		wp_register_fonts( $fonts );
 
 		$this->expectOutputString( $expected['output'] );
-		$actual_done = wp_print_fonts( false, true );
+		$actual_done = wp_print_fonts( true );
 		$this->assertSameSets( $expected['done'], $actual_done, 'All registered font-family handles should be returned' );
 	}
 
