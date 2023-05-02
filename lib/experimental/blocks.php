@@ -121,13 +121,12 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 3 );
  *
  * @param string   $block_content The block content.
  * @param array    $block         The full block, including name and attributes.
- * @param WP_Block $instance      The block instance.
  */
-function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
-	// $block_name = 'core/post-content';
+function gutenberg_auto_insert_blocks( $block_content, $block ) {
+	// $block_name     = 'core/post-content';
 	// $block_position = 'after'; // Child blocks could be a bit trickier.
 
-	$block_name = 'core/comment-template';
+	$block_name     = 'core/comment-template';
 	$block_position = 'last-child';
 
 	// Can we void infinite loops?
@@ -145,12 +144,12 @@ function gutenberg_auto_insert_blocks( $block_content, $block, $instance ) {
 		return $block_content;
 	}
 
-
 	$inserted_block_markup = <<<END
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
 <!-- /wp:social-links -->
 END;
+
 	$inserted_blocks  = parse_blocks( $inserted_block_markup );
 	$inserted_content = render_block( $inserted_blocks[0] );
 
@@ -173,4 +172,4 @@ END;
 
 	return $block_content;
 }
-add_filter( 'render_block', 'gutenberg_auto_insert_blocks', 10, 3 );
+add_filter( 'render_block', 'gutenberg_auto_insert_blocks', 10, 2 );
