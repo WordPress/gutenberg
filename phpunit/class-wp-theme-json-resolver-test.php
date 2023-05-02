@@ -608,4 +608,16 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_site_data_from_wp_global_styles
+	 */
+	public function test_get_site_data_from_wp_global_styles_create_post() {
+		$empty_array = WP_Theme_JSON_Resolver_Gutenberg::get_site_data_from_wp_global_styles();
+		$this->assertIsArray( $empty_array );
+		$this->assertSameSets( array(), $empty_array );
+		$post_data = WP_Theme_JSON_Resolver_Gutenberg::get_site_data_from_wp_global_styles( true );
+		$this->assertIsArray( $post_data );
+		$this->assertArrayHasKey( 'ID', $post_data );
+	}
+
 }
