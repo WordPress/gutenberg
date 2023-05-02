@@ -5,7 +5,6 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
-	Flex,
 	FlexItem,
 	Modal,
 	SearchControl,
@@ -207,10 +206,9 @@ function AddCustomTemplateModal( {
 							'Select whether to create a single template for all items or a specific one.'
 						) }
 					</Text>
-					<Flex
+					<VStack
 						className={ `${ baseCssClass }__contents` }
-						gap="4"
-						align="initial"
+						spacing={ 0 }
 					>
 						<FlexItem
 							isBlock
@@ -271,7 +269,7 @@ function AddCustomTemplateModal( {
 								}
 							</Text>
 						</FlexItem>
-					</Flex>
+					</VStack>
 				</VStack>
 			) }
 			{ showSearchEntities && (
