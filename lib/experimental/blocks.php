@@ -144,11 +144,7 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$inserted_block_markup = <<<END
-<!-- wp:social-links -->
-<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-<!-- /wp:social-links -->
-END;
+	$inserted_block_markup = '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->';
 
 	$inserted_blocks  = parse_blocks( $inserted_block_markup );
 	$inserted_content = render_block( $inserted_blocks[0] );
