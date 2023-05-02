@@ -116,6 +116,7 @@ export function getInnerBlocksProps( props = {} ) {
  * @param {string|Object} blockTypeOrName Block type or name.
  * @param {Object}        attributes      Block attributes.
  * @param {?Array}        innerBlocks     Nested blocks.
+ *
  * @return {Object|string} Save element or raw HTML string.
  */
 export function getSaveElement(
@@ -187,6 +188,7 @@ export function getSaveElement(
  * @param {string|Object} blockTypeOrName Block type or name.
  * @param {Object}        attributes      Block attributes.
  * @param {?Array}        innerBlocks     Nested blocks.
+ *
  * @return {string} Save content.
  */
 export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
