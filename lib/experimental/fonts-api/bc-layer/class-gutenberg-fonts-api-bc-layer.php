@@ -25,9 +25,7 @@ class Gutenberg_Fonts_API_BC_Layer {
 	 */
 	public static function is_deprecated_structure( array $fonts ) {
 		// Checks the first key to determine if it's empty or non-string.
-		foreach ( array_keys( $fonts ) as $font_family ) {
-			return ! WP_Fonts_Utils::is_defined( $font_family );
-		}
+		return ! WP_Fonts_Utils::is_defined( array_key_first ( $fonts ) );
 	}
 
 	/**
