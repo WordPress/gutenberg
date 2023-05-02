@@ -725,7 +725,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$user_custom_post_type_id;
 		}
 
-		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme() );
+		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme(), true );
 
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
 			static::$user_custom_post_type_id = $user_cpt['ID'];
