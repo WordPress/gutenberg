@@ -105,3 +105,4 @@ export function reinitializeEditor() {
 export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
 export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
+export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
