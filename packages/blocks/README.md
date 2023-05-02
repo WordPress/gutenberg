@@ -234,6 +234,14 @@ _Returns_
 
 -   `?string`: Block name.
 
+### getGroupingBlockNameLabel
+
+Retrieves label of the menu item used for handling grouping interactions.
+
+_Returns_
+
+-   `?string`: Block name.
+
 ### getPhrasingContentSchema
 
 Undocumented declaration.
@@ -277,6 +285,14 @@ _Parameters_
 _Returns_
 
 -   `Object|string`: Save element or raw HTML string.
+
+### getUngroupingBlockNameLabel
+
+Retrieves label of the menu item used for handling ungrouping interactions.
+
+_Returns_
+
+-   `?string`: Block name.
 
 ### getUnregisteredTypeHandlerName
 
@@ -728,6 +744,14 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### setGroupingBlockNameLabel
+
+Undocumented declaration.
+
+### setUngroupingBlockNameLabel
+
+Undocumented declaration.
 
 ### setUnregisteredTypeHandlerName
 

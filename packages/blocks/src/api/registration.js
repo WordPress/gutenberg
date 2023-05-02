@@ -480,6 +480,24 @@ export function getGroupingBlockName() {
 }
 
 /**
+ * Retrieves label of the menu item used for handling grouping interactions.
+ *
+ * @return {?string} Block name.
+ */
+export function getGroupingBlockNameLabel() {
+	return select( blocksStore ).getGroupingBlockNameLabel();
+}
+
+/**
+ * Retrieves label of the menu item used for handling ungrouping interactions.
+ *
+ * @return {?string} Block name.
+ */
+export function getUngroupingBlockNameLabel() {
+	return select( blocksStore ).getUngroupingBlockNameLabel();
+}
+
+/**
  * Assigns name of block handling unregistered block types.
  *
  * @param {string} blockName Block name.
@@ -546,6 +564,14 @@ export function setDefaultBlockName( name ) {
  */
 export function setGroupingBlockName( name ) {
 	dispatch( blocksStore ).setGroupingBlockName( name );
+}
+
+export function setGroupingBlockNameLabel( label ) {
+	dispatch( blocksStore ).setGroupingBlockNameLabel( label );
+}
+
+export function setUngroupingBlockNameLabel( label ) {
+	dispatch( blocksStore ).setUngroupingBlockNameLabel( label );
 }
 
 /**

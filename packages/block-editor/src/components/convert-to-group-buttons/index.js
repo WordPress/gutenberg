@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -19,6 +19,8 @@ function ConvertToGroupButton( {
 	isUngroupable,
 	blocksSelection,
 	groupingBlockName,
+	groupingBlockNameLabel,
+	ungroupingBlockNameLabel,
 	onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -54,7 +56,14 @@ function ConvertToGroupButton( {
 						onClose();
 					} }
 				>
-					{ _x( 'Group', 'verb' ) }
+					{ sprintf(
+						/* translators: %s: Label for the block grouping action. */
+						_x(
+							'%s ',
+							'Grouping blocks into a Group block within the Editor'
+						),
+						groupingBlockNameLabel
+					) }
 				</MenuItem>
 			) }
 			{ isUngroupable && (
@@ -64,9 +73,13 @@ function ConvertToGroupButton( {
 						onClose();
 					} }
 				>
-					{ _x(
-						'Ungroup',
-						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+					{ sprintf(
+						/* translators: %s: Label for the block grouping action. */
+						_x(
+							'%s ',
+							'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+						),
+						ungroupingBlockNameLabel
 					) }
 				</MenuItem>
 			) }
