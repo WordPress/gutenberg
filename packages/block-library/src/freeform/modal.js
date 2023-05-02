@@ -9,12 +9,10 @@ import {
 	Button,
 	Flex,
 	FlexItem,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
 
 function ClassicEdit( props ) {
 	const styles = useSelect(
@@ -31,7 +29,6 @@ function ClassicEdit( props ) {
 		window.wp.oldEditor.initialize( props.id, {
 			tinymce: {
 				...settings,
-				height: 500,
 				setup( editor ) {
 					editor.on( 'init', () => {
 						const doc = editor.getDoc();
@@ -63,10 +60,8 @@ export default function ModalEdit( props ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const id = `editor-${ clientId }`;
 	const label = _x( 'Classic Edit', 'Classic block' );
-	const instanceId = useInstanceId(
-		ModalEdit,
-		'wp-block-freeform-modal-header'
-	);
+
+	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
 
 	return (
 		<>
@@ -80,50 +75,42 @@ export default function ModalEdit( props ) {
 			{ content && <RawHTML>{ content }</RawHTML> }
 			{ ( isOpen || ! content ) && (
 				<Modal
-					__experimentalHideHeader={ true }
-					aria={ { labelledby: instanceId } }
+					title={ label }
+					onRequestClose={ onClose }
+					shouldCloseOnClickOutside={ false }
 				>
+					<ClassicEdit
+						id={ id }
+						defaultValue={ content }
+						className="block-editor-freeform-modal__textarea"
+					/>
 					<Flex
-						justify="space-between"
-						expanded={ true }
-						style={ { marginBottom: 8 } }
+						className="block-editor-freeform-modal__actions"
+						justify="flex-end"
+						expanded={ false }
 					>
 						<FlexItem>
-							<Heading level={ 1 } size="16" id={ instanceId }>
-								{ label }
-							</Heading>
+							<Button variant="tertiary" onClick={ onClose }>
+								{ __( 'Cancel' ) }
+							</Button>
 						</FlexItem>
-						<Flex justify="flex-end" expanded={ false }>
-							<FlexItem>
-								<Button
-									onClick={ () =>
-										content
-											? setOpen( false )
-											: onReplace( [] )
-									}
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							</FlexItem>
-							<FlexItem>
-								<Button
-									variant="primary"
-									onClick={ () => {
-										setAttributes( {
-											content:
-												window.wp.oldEditor.getContent(
-													id
-												),
-										} );
-										setOpen( false );
-									} }
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</FlexItem>
-						</Flex>
+						<FlexItem>
+							<Button
+								variant="primary"
+								onClick={ () => {
+									setAttributes( {
+										content:
+											window.wp.oldEditor.getContent(
+												id
+											),
+									} );
+									setOpen( false );
+								} }
+							>
+								{ __( 'Save' ) }
+							</Button>
+						</FlexItem>
 					</Flex>
-					<ClassicEdit id={ id } defaultValue={ content } />
 				</Modal>
 			) }
 		</>

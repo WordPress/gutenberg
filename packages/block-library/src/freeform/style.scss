@@ -1,0 +1,9 @@
+// The default value of TinyMCE height is set to the height of the HTML element
+// TinyMCE replaces. For example, the pixel height of a textarea.
+.block-editor-freeform-modal__textarea {
+	height: 500px;
+}
+
+.block-editor-freeform-modal__actions {
+	margin-top: $grid-unit-30;
+}
