@@ -122,14 +122,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		$raw_revision_config = json_decode( $item->post_content, true );
 		$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
 
-		// Builds human-friendly date.
-		$now_gmt      = time();
-		$modified     = strtotime( $item->post_modified );
-		$modified_gmt = strtotime( $item->post_modified_gmt . ' +0000' );
-		/* translators: %s: Human-readable time difference. */
-		$time_ago   = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( $modified_gmt, $now_gmt ) );
-		$date_short = date_i18n( _x( 'j M @ H:i', 'revision date short format', 'gutenberg' ), $modified );
-
 		// Prepares item data.
 		$data   = array();
 		$fields = $this->get_fields_for_response( $request );
@@ -153,11 +145,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 
 		if ( rest_is_field_included( 'date', $fields ) ) {
 			$data['date'] = $item->post_date;
-		}
-
-		if ( rest_is_field_included( 'date_display', $fields ) ) {
-			/* translators: 1: Human-readable time difference, 2: short date combined to show rendered revision date. */
-			$data['date_display'] = sprintf( __( '%1$s (%2$s)', 'gutenberg' ), $time_ago, $date_short );
 		}
 
 		if ( rest_is_field_included( 'date_gmt', $fields ) ) {
@@ -271,11 +258,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 					'context'     => array( 'view', 'edit' ),
 				),
 
-				'date_display'        => array(
-					'description' => __( 'A human-friendly rendering of the date', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit' ),
-				),
 				// Adds settings and styles from the WP_REST_Global_Styles_Controller parent schema.
 				'styles'              => array(
 					'description' => __( 'Global styles.', 'gutenberg' ),
