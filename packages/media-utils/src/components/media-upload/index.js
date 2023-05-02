@@ -5,6 +5,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const DEFAULT_EMPTY_GALLERY = [];
+const DEFAULT_EMPTY_PLAYLIST = [];
 
 /**
  * Prepares the Featured Image toolbars and frames.
@@ -188,9 +189,135 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-// The media library image object contains numerous attributes
-// we only need this set to display the image in the library.
-const slimImageObject = ( img ) => {
+/**
+ * Prepares the Playlist toolbars and frames.
+ *
+ * @return {window.wp.media.view.MediaFrame.Post} The default media workflow.
+ */
+const getPlaylistDetailsMediaFrame = () => {
+	const { wp } = window;
+
+	/**
+	 * Custom playlist details frame.
+	 *
+	 * @class PlaylistDetailsMediaFrame
+	 * @class
+	 */
+	return wp.media.view.MediaFrame.Post.extend( {
+		/**
+		 * Set up toolbar.
+		 *
+		 * @return {void}
+		 */
+		PlaylistToolbar() {
+			const editing = this.state().get( 'editing' );
+			this.toolbar.set(
+				new wp.media.view.Toolbar( {
+					controller: this,
+					items: {
+						insert: {
+							style: 'primary',
+							text: editing
+								? wp.media.view.l10n.updatePlaylist
+								: wp.media.view.l10n.insertPlaylist,
+							priority: 80,
+							requires: { library: true },
+
+							/**
+							 * @fires wp.media.controller.State#update
+							 */
+							click() {
+								const controller = this.controller,
+									state = controller.state();
+
+								controller.close();
+								state.trigger(
+									'update',
+									state.get( 'library' )
+								);
+
+								// Restore and reset the default state.
+								controller.setState( controller.options.state );
+								controller.reset();
+							},
+						},
+					},
+				} )
+			);
+		},
+
+		/**
+		 * Handle the edit state requirements of selected media item.
+		 *
+		 * @return {void}
+		 */
+		editState() {
+			const selection = this.state( 'playlist' ).get( 'selection' );
+			const view = new wp.media.view.EditImage( {
+				model: selection.single(),
+				controller: this,
+			} ).render();
+
+			// Set the view to the EditImage frame using the selected image.
+			this.content.set( view );
+
+			// After bringing in the frame, load the actual editor via an ajax call.
+			view.loadEditor();
+		},
+
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.on(
+				'toolbar:create:main-playlist',
+				this.playlistToolbar,
+				this
+			);
+			this.on( 'content:render:edit-audio', this.editState, this );
+
+			this.states.add( [
+				new wp.media.controller.Library( {
+					id: 'playlist',
+					title: wp.media.view.l10n.createPlaylistTitle,
+					priority: 40,
+					toolbar: 'main-playlist',
+					filterable: 'uploaded',
+					multiple: 'add',
+					editable: false,
+
+					library: wp.media.query( {
+						type: 'audio',
+						...this.options.library,
+					} ),
+				} ),
+
+				new wp.media.controller.CollectionEdit( {
+					type: 'audio',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.editPlaylistTitle,
+					SettingsView: wp.media.view.Settings.Playlist,
+					library: this.options.selection,
+					editing: this.options.editing,
+					menu: 'playlist',
+					dragInfoText: wp.media.view.l10n.playlistDragInfo,
+					dragInfo: false,
+				} ),
+
+				new wp.media.controller.CollectionAdd( {
+					type: 'audio',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.addToPlaylistTitle,
+				} ),
+			] );
+		},
+	} );
+};
+
+// The media library object contains numerous attributes.
+const slimMediaObject = ( media ) => {
 	const attrSet = [
 		'sizes',
 		'mime',
@@ -201,10 +328,15 @@ const slimImageObject = ( img ) => {
 		'alt',
 		'link',
 		'caption',
+		'title',
+		'artist',
+		'album',
+		'fileLength',
+		'image',
 	];
 	return attrSet.reduce( ( result, key ) => {
-		if ( img?.hasOwnProperty( key ) ) {
-			result[ key ] = img[ key ];
+		if ( media?.hasOwnProperty( key ) ) {
+			result[ key ] = media[ key ];
 		}
 		return result;
 	}, {} );
@@ -227,6 +359,7 @@ class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
 		gallery = false,
+		playlist = false,
 		unstableFeaturedImageFlow = false,
 		modalClass,
 		multiple = false,
@@ -243,6 +376,8 @@ class MediaUpload extends Component {
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
+		} else if ( playlist ) {
+			this.buildAndSetPlaylistFrame();
 		} else {
 			const frameConfig = {
 				title,
@@ -326,6 +461,56 @@ class MediaUpload extends Component {
 	}
 
 	/**
+	 * Sets the Playlist frame and initializes listeners.
+	 *
+	 * @return {void}
+	 */
+	buildAndSetPlaylistFrame() {
+		const {
+			addToPlaylist = false,
+			allowedTypes,
+			multiple = false,
+			value = DEFAULT_EMPTY_PLAYLIST,
+		} = this.props;
+		// If the value did not changed there is no need to rebuild the frame,
+		// we can continue to use the existing one.
+		if ( value === this.lastPlaylistValue ) {
+			return;
+		}
+		const { wp } = window;
+
+		this.lastPlaylistValue = value;
+
+		// If a frame already existed remove it.
+		if ( this.frame ) {
+			this.frame.remove();
+		}
+		let currentState;
+		if ( addToPlaylist ) {
+			currentState = 'playlist-library';
+		} else {
+			currentState = value && value.length ? 'playlist-edit' : 'playlist';
+		}
+		if ( ! this.PlaylistDetailsMediaFrame ) {
+			this.PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
+		}
+		const attachments = getAttachmentsCollection( value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+			multiple,
+		} );
+		this.frame = new this.PlaylistDetailsMediaFrame( {
+			mimeType: allowedTypes,
+			state: currentState,
+			multiple,
+			selection,
+			editing: value && value.length ? true : false,
+		} );
+		wp.media.frame = this.frame;
+		this.initializeListeners();
+	}
+
+	/**
 	 * Initializes the Media Library requirements for the featured image flow.
 	 *
 	 * @return {void}
@@ -354,20 +539,20 @@ class MediaUpload extends Component {
 	onUpdate( selections ) {
 		const { onSelect, multiple = false } = this.props;
 		const state = this.frame.state();
-		const selectedImages = selections || state.get( 'selection' );
+		const selectedMedia = selections || state.get( 'selection' );
 
-		if ( ! selectedImages || ! selectedImages.models.length ) {
+		if ( ! selectedMedia || ! selectedMedia.models.length ) {
 			return;
 		}
 
 		if ( multiple ) {
 			onSelect(
-				selectedImages.models.map( ( model ) =>
-					slimImageObject( model.toJSON() )
+				selectedMedia.models.map( ( model ) =>
+					slimMediaObject( model.toJSON() )
 				)
 			);
 		} else {
-			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
+			onSelect( slimMediaObject( selectedMedia.models[ 0 ].toJSON() ) );
 		}
 	}
 
@@ -446,6 +631,8 @@ class MediaUpload extends Component {
 	openModal() {
 		if ( this.props.gallery ) {
 			this.buildAndSetGalleryFrame();
+		} else if ( this.props.playlist ) {
+			this.buildAndSetPlaylistFrame();
 		}
 		this.frame.open();
 	}

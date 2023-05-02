@@ -1,0 +1,67 @@
+.wp-block-playlist {
+	border: 1px solid #ccc;
+	padding: 10px;
+	font-size: 14px;
+
+	.wp-block-playlist__current-item {
+		margin-bottom: 10px;
+		audio {
+			width: 100%;
+		}
+		img {
+			float: left;
+			margin-right: 10px;
+		}
+		ul {
+			display: block;
+			margin-bottom: 10px;
+			padding: 0;
+			li {
+				list-style: none;
+			}
+		}
+		.wp-block-playlist__item-album {
+			font-style: italic;
+		}
+	}
+
+	.wp-block-playlist__item {
+		border-bottom: 1px solid #ccc;
+	}
+
+	ol.wp-block-playlist__tracks {
+		padding-left: 20px;
+	}
+	ul.wp-block-playlist__tracks {
+		padding-left: 0;
+		li {
+			list-style: none;
+		}
+	}
+
+	.wp-block-playlist__tracks button {
+		display: flex;
+		min-width: 100%;
+		padding: 0;
+		font-size: 14px;
+		line-height: 1.5;
+		background-color: transparent;
+		border: 0;
+
+		span {
+			margin-right: $grid-unit-10;
+		}
+		.wp-block-playlist__item-length {
+			margin-left: auto;
+		}
+		&[aria-current="true"] {
+			font-weight: bold;
+		}
+	}
+
+	// Variation, WIP
+	&.is-style-dark,
+	.is-style-dark {
+		background-color: #111;
+	}
+}

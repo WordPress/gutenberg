@@ -63,6 +63,7 @@ export function MediaPlaceholder( {
 	isAppender,
 	accept,
 	addToGallery,
+	addToPlaylist,
 	multiple = false,
 	handleUpload = true,
 	disableDropZone,
@@ -99,6 +100,17 @@ export function MediaPlaceholder( {
 		return allowedTypes.every(
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
+		);
+	};
+
+	const onlyAllowsAudio = () => {
+		if ( ! allowedTypes || allowedTypes.length === 0 ) {
+			return false;
+		}
+
+		return allowedTypes.every(
+			( allowedType ) =>
+				allowedType === 'audio' || allowedType.startsWith( 'audio/' )
 		);
 	};
 
@@ -342,6 +354,8 @@ export function MediaPlaceholder( {
 			<MediaUpload
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
+				addToPlaylist={ addToPlaylist }
+				playlist={ multiple && onlyAllowsAudio() }
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }

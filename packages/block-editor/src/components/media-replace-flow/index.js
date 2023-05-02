@@ -58,6 +58,7 @@ const MediaReplaceFlow = ( {
 	children,
 	multiple = false,
 	addToGallery,
+	addToPlaylist,
 	handleUpload = true,
 	popoverProps = {
 		variant: 'toolbar',
@@ -137,7 +138,19 @@ const MediaReplaceFlow = ( {
 		);
 	};
 
+	const onlyAllowsAudio = () => {
+		if ( ! allowedTypes || allowedTypes.length === 0 ) {
+			return false;
+		}
+
+		return allowedTypes.every(
+			( allowedType ) =>
+				allowedType === 'audio' || allowedType.startsWith( 'audio/' )
+		);
+	};
+
 	const gallery = multiple && onlyAllowsImages();
+	const playlist = multiple && onlyAllowsAudio();
 
 	return (
 		<Dropdown
@@ -161,6 +174,8 @@ const MediaReplaceFlow = ( {
 							<MediaUpload
 								gallery={ gallery }
 								addToGallery={ addToGallery }
+								playlist={ playlist }
+								addToPlaylist={ addToPlaylist }
 								multiple={ multiple }
 								value={ multiple ? mediaIds : mediaId }
 								onSelect={ ( media ) =>
