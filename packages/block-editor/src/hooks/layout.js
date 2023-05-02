@@ -69,33 +69,6 @@ import {
 
 const innerWidthOptions = [
 	{
-		value: 'fill',
-		icon: (
-			<SVG
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<Rect
-					x="19"
-					y="5"
-					width="1.5"
-					height="14"
-					fill="currentColor"
-				/>
-				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
-				<Path
-					d="M13.0005 9L16.0005 12L13.0005 15"
-					stroke="currentColor"
-				/>
-				<Path d="M11 15L8 12L11 9" stroke="currentColor" />
-			</SVG>
-		),
-		label: __( 'Fill' ),
-	},
-	{
 		value: 'fit',
 		icon: (
 			<SVG
@@ -177,6 +150,33 @@ const innerWidthOptions = [
 			</SVG>
 		),
 		label: __( 'Fixed' ),
+	},
+	{
+		value: 'fill',
+		icon: (
+			<SVG
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<Rect
+					x="19"
+					y="5"
+					width="1.5"
+					height="14"
+					fill="currentColor"
+				/>
+				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
+				<Path
+					d="M13.0005 9L16.0005 12L13.0005 15"
+					stroke="currentColor"
+				/>
+				<Path d="M11 15L8 12L11 9" stroke="currentColor" />
+			</SVG>
+		),
+		label: __( 'Fill' ),
 	},
 ];
 
@@ -460,6 +460,13 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	};
 
 	const defaultHorizontalAlign = type === 'constrained' ? 'center' : 'left';
+	let contentWidthValue = 'fit';
+
+	if ( type === 'constrained' ) {
+		contentWidthValue = 'theme';
+	} else if ( type === 'default' ) {
+		contentWidthValue = 'fill';
+	}
 
 	return (
 		<>
@@ -516,7 +523,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								__nextHasNoMarginBottom
 								style={ { marginBottom: 0, marginTop: 0 } }
 								label={ __( 'Content width' ) }
-								value={ usedLayout?.verticalAlignment || 'top' }
+								value={ contentWidthValue }
 								onChange={ onChangeInnerWidth }
 								isBlock={ true }
 								className="components-toggle-group-control__full-width"
@@ -606,31 +613,29 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						</HStack>
 
 						{ type === 'flex' && orientation === 'horizontal' && (
-							<div style={ { marginTop: '24px' } }>
-								<ToggleGroupControl
-									__nextHasNoMarginBottom
-									style={ {
-										marginBottom: 0,
-										marginTop: 0,
-									} }
-									size={ '__unstable-large' }
-									label={ __( 'Wrap' ) }
-									value={ flexWrap }
-									onChange={ onChangeWrap }
-									isBlock={ true }
-								>
-									<ToggleGroupControlOption
-										key={ 'wrap' }
-										value="wrap"
-										label={ __( 'Yes' ) }
-									/>
-									<ToggleGroupControlOption
-										key={ 'nowrap' }
-										value="nowrap"
-										label={ __( 'No' ) }
-									/>
-								</ToggleGroupControl>
-							</div>
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								style={ {
+									marginBottom: 0,
+									marginTop: 0,
+								} }
+								size={ '__unstable-large' }
+								label={ __( 'Wrap' ) }
+								value={ flexWrap }
+								onChange={ onChangeWrap }
+								isBlock={ true }
+							>
+								<ToggleGroupControlOption
+									key={ 'wrap' }
+									value="wrap"
+									label={ __( 'Yes' ) }
+								/>
+								<ToggleGroupControlOption
+									key={ 'nowrap' }
+									value="nowrap"
+									label={ __( 'No' ) }
+								/>
+							</ToggleGroupControl>
 						) }
 						{ constrainedType &&
 							displayControlsForLegacyLayouts && (
