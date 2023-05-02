@@ -130,19 +130,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 			$data['author'] = (int) $item->post_author;
 		}
 
-		if ( rest_is_field_included( 'author_avatar_url', $fields ) ) {
-			$data['author_avatar_url'] = get_avatar_url(
-				$item->post_author,
-				array(
-					'size' => 24,
-				)
-			);
-		}
-
-		if ( rest_is_field_included( 'author_display_name', $fields ) ) {
-			$data['author_display_name'] = get_the_author_meta( 'display_name', $item->post_author );
-		}
-
 		if ( rest_is_field_included( 'date', $fields ) ) {
 			$data['date'] = $item->post_date;
 		}
@@ -243,19 +230,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 					'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-
-				// Adds custom global styles revisions schema.
-				'author_display_name' => array(
-					'description' => __( 'The display name of the author.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit' ),
-				),
-
-				'author_avatar_url'   => array(
-					'description' => __( 'A URL to the avatar image of the author', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit' ),
 				),
 
 				// Adds settings and styles from the WP_REST_Global_Styles_Controller parent schema.

@@ -104,11 +104,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 
 		// Author information.
 		$this->assertEquals( self::$admin_id, $data[0]['author'], 'Check that author id returns expected value' );
-		$this->assertEquals( get_the_author_meta( 'display_name', self::$admin_id ), $data[0]['author_display_name'], 'Check that author display_name returns expected value' );
-		$this->assertIsString(
-			$data[0]['author_avatar_url'],
-			'Check that author avatar_url returns expected value type'
-		);
 
 		// Global styles.
 		$this->assertEquals(
@@ -153,14 +148,12 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 11, $properties, 'Schema properties array does not have exactly 11 elements' );
+		$this->assertCount( 9, $properties, 'Schema properties array does not have exactly 9 elements' );
 		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array does not have "id" key' );
 		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "styles" key' );
 		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array does not have "settings" key' );
 		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array does not have "parent" key' );
 		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array does not have "author" key' );
-		$this->assertArrayHasKey( 'author_display_name', $properties, 'Schema properties array does not have "author_display_name" key' );
-		$this->assertArrayHasKey( 'author_avatar_url', $properties, 'Schema properties array does not have "author_avatar_url" key' );
 		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array does not have "date" key' );
 		$this->assertArrayHasKey( 'date_gmt', $properties, 'Schema properties array does not have "date_gmt" key' );
 		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array does not have "modified" key' );
