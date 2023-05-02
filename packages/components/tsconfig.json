@@ -34,6 +34,7 @@
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
+		{ "path": "../rich-text" },
 		{ "path": "../warning" }
 	],
 	"include": [ "src/**/*" ],

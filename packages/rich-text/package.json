@@ -28,6 +28,7 @@
 		"src/**/*.scss",
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",

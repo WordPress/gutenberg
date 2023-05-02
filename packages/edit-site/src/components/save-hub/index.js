@@ -11,6 +11,7 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import SaveButton from '../save-button';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 export default function SaveHub() {
 	const { countUnsavedChanges, isDirty, isSaving } = useSelect(
@@ -31,7 +32,7 @@ export default function SaveHub() {
 		[]
 	);
 
-	const disabled = ! isDirty || isSaving;
+	const disabled = isSaving || ( ! isDirty && ! isPreviewingTheme() );
 
 	return (
 		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>

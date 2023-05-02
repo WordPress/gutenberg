@@ -1,9 +1,8 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
 import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,14 @@ import warning from '@wordpress/warning';
  */
 import ToolbarContext from '../toolbar-context';
 
-function ToolbarItem( { children, as: Component, ...props }, ref ) {
+function ToolbarItem(
+	{
+		children,
+		as: Component,
+		...props
+	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
+	ref: ForwardedRef< any >
+) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( typeof children !== 'function' && ! Component ) {
@@ -32,6 +38,9 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 	if ( ! accessibleToolbarState ) {
 		if ( Component ) {
 			return <Component { ...allProps }>{ children }</Component>;
+		}
+		if ( typeof children !== 'function' ) {
+			return null;
 		}
 		return children( allProps );
 	}

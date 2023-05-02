@@ -7,6 +7,7 @@ import {
 	ToolbarGroup,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -15,11 +16,14 @@ import groups from './groups';
 
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = groups[ group ].Slot;
-	const fills = useSlotFills( Slot.__unstableName );
-	const hasFills = Boolean( fills && fills.length );
+	const Slot = groups[ group ]?.Slot;
+	const fills = useSlotFills( Slot?.__unstableName );
+	if ( ! Slot ) {
+		warning( `Unknown BlockControls group "${ group }" provided.` );
+		return null;
+	}
 
-	if ( ! hasFills ) {
+	if ( ! fills?.length ) {
 		return null;
 	}
 
