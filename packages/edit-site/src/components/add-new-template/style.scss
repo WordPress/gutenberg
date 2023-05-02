@@ -18,22 +18,14 @@
 }
 
 .edit-site-custom-template-modal {
-	&__suggestions_list {
-		margin-left: - $grid-unit-15;
-		margin-right: - $grid-unit-15;
-	}
-
 	&__contents {
-		margin-left: - $grid-unit-15;
-		margin-right: - $grid-unit-15;
-
 		> .components-button {
-			padding: $grid-unit-10 $grid-unit-15;
+			padding: $grid-unit-30;
 			border-radius: $radius-block-ui;
 			height: auto;
 			display: flex;
 			flex-direction: column;
-			align-items: flex-start;
+			justify-content: center;
 
 			// Show the boundary of the button, in High Contrast Mode.
 			outline: 1px solid transparent;
