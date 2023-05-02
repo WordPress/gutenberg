@@ -1,8 +1,10 @@
+'use strict';
 /**
  * Internal dependencies
  */
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -11,13 +13,23 @@ const {
 } = require( '../validate-config' );
 
 describe( 'validate-config', () => {
-	describe( 'checkPort', () => {
-		it( 'does nothing for undefined values', () => {
-			expect( () =>
-				checkPort( 'test.json', 'test', undefined )
-			).not.toThrow();
+	describe( 'checkString', () => {
+		it( 'throws when not a string', () => {
+			expect( () => checkString( 'test.json', 'test', 1234 ) ).toThrow(
+				new ValidationError(
+					'Invalid test.json: "test" must be a string.'
+				)
+			);
 		} );
 
+		it( 'passes for string', () => {
+			expect( () =>
+				checkString( 'test.json', 'test', 'test' )
+			).not.toThrow();
+		} );
+	} );
+
+	describe( 'checkPort', () => {
 		it( 'throws when not a number', () => {
 			expect( () => checkPort( 'test.json', 'test', 'test' ) ).toThrow(
 				new ValidationError(
@@ -56,12 +68,6 @@ describe( 'validate-config', () => {
 	} );
 
 	describe( 'checkStringArray', () => {
-		it( 'does nothing for undefined values', () => {
-			expect( () =>
-				checkStringArray( 'test.json', 'test', undefined )
-			).not.toThrow();
-		} );
-
 		it( 'throws when not an array', () => {
 			expect( () =>
 				checkStringArray( 'test.json', 'test', 'test' )
@@ -109,14 +115,6 @@ describe( 'validate-config', () => {
 	} );
 
 	describe( 'checkObjectWithValues', () => {
-		it( 'does nothing for undefined values', () => {
-			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', undefined, [
-					'string',
-				] )
-			).not.toThrow();
-		} );
-
 		it( 'throws when not an object', () => {
 			expect( () =>
 				checkObjectWithValues( 'test.json', 'test', 'test', [] )
@@ -216,12 +214,6 @@ describe( 'validate-config', () => {
 	} );
 
 	describe( 'checkVersion', () => {
-		it( 'does nothing for undefined values', () => {
-			expect( () =>
-				checkVersion( 'test.json', 'test', undefined )
-			).not.toThrow();
-		} );
-
 		it( 'throws for invalid input', () => {
 			expect( () => checkVersion( 'test.json', 'test', 'test' ) ).toThrow(
 				new ValidationError(
@@ -256,12 +248,6 @@ describe( 'validate-config', () => {
 	} );
 
 	describe( 'checkValidURL', () => {
-		it( 'does nothing for undefined values', () => {
-			expect( () =>
-				checkValidURL( 'test.json', 'test', undefined )
-			).not.toThrow();
-		} );
-
 		it( 'throws for invaid URLs', () => {
 			expect( () =>
 				checkValidURL( 'test.json', 'test', 'localhost' )

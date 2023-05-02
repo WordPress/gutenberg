@@ -61,8 +61,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	'[Feature] Navigation Screen': 'Experiments',
-	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
 	'[Package] E2E Test Utils': 'Tools',
@@ -74,16 +73,17 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'Automated Testing': 'Tools',
+	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Code Quality': 'Code Quality',
+	'[Type] Performance': 'Performance',
+	'[Type] Security': 'Security',
+	'[Feature] Navigation Screen': 'Experiments',
 	'[Type] Experimental': 'Experiments',
 	'[Type] Bug': 'Bug Fixes',
 	'[Type] Regression': 'Bug Fixes',
-	'[Type] Feature': 'Features',
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
-	'[Type] Performance': 'Performance',
-	'[Type] Developer Documentation': 'Documentation',
-	'[Type] Code Quality': 'Code Quality',
-	'[Type] Security': 'Security',
+	'[Type] Feature': 'Features',
 };
 
 /**
@@ -303,12 +303,6 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
-	// Force all tasks identified as Documentation tasks
-	// to appear under the main "Documentation" section.
-	if ( candidates.includes( 'Documentation' ) ) {
-		return 'Documentation';
-	}
-
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
@@ -377,7 +371,7 @@ function getIssueFeature( issue ) {
  */
 function sortType( a, b ) {
 	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
+		return Object.values( LABEL_TYPE_MAPPING ).indexOf( title );
 	} );
 
 	return aIndex - bIndex;
