@@ -811,20 +811,46 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 6.1.0 Added append position.
+	 * @since 6.3.0 Deprecated append position parameter.
 	 *
-	 * @param string $selector  Original selector.
-	 * @param string $to_append Selector to append.
-	 * @param string $position  A position sub-selector should be appended. Default 'right'.
+	 * @param string $selector   Original selector.
+	 * @param string $to_append  Selector to append.
+	 * @param string $deprecated Deprecated parameter.
 	 * @return string The new selector.
 	 */
-	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
+	protected static function append_to_selector( $selector, $to_append, $deprecated = 'right' ) {
 		if ( ! str_contains( $selector, ',' ) ) {
-			return 'right' === $position ? $selector . $to_append : $to_append . $selector;
+			return $selector . $to_append;
 		}
 		$new_selectors = array();
 		$selectors     = explode( ',', $selector );
 		foreach ( $selectors as $sel ) {
-			$new_selectors[] = 'right' === $position ? $sel . $to_append : $to_append . $sel;
+			$new_selectors[] = $sel . $to_append;
+		}
+		return implode( ',', $new_selectors );
+	}
+
+	/**
+	 * Prepends a sub-selector to an existing one.
+	 *
+	 * Given the compounded $selector "h1, h2, h3"
+	 * and the $to_prepend selector ".some-class " the result will be
+	 * ".some-class h1, .some-class h2, .some-class h3".
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $selector   Original selector.
+	 * @param string $to_prepend Selector to prepend.
+	 * @return string The new selector.
+	 */
+	protected static function prepend_to_selector( $selector, $to_prepend ) {
+		if ( ! str_contains( $selector, ',' ) ) {
+			return $to_prepend . $selector;
+		}
+		$new_selectors = array();
+		$selectors     = explode( ',', $selector );
+		foreach ( $selectors as $sel ) {
+			$new_selectors[] = $to_prepend . $sel;
 		}
 		return implode( ',', $new_selectors );
 	}
@@ -3476,7 +3502,7 @@ class WP_Theme_JSON_Gutenberg {
 					$element_selector = array( $el_selector );
 					break;
 				}
-				$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+				$element_selector[] = static::prepend_to_selector( $el_selector, $selector . ' ' );
 			}
 			$element_selectors[ $el_name ] = implode( ',', $element_selector );
 		}
