@@ -5,14 +5,21 @@
 ### Enhancements
 
 -   Change the default color scheme to use the new WP Blueberry color. See PR description for instructions on how to restore the previous color scheme when using in a non-WordPress context ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
+-   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
 
 ### Internal
 
 -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
+-   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
+-   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133))
 
 ### Documentation
 
 -   `TreeGrid`: Update docs with `data-expanded` attribute usage ([#50026](https://github.com/WordPress/gutenberg/pull/50026)).
+
+### Enhancements
+
+-   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
 
 ## 23.9.0 (2023-04-26)
 
@@ -42,6 +49,7 @@
 ### Documentation
 
 -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
+-   `Autocomplete`: Update `Usage` section in README. ([#49965](https://github.com/WordPress/gutenberg/pull/49965)).
 
 ## 23.8.0 (2023-04-12)
 

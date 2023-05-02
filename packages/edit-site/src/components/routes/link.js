@@ -8,6 +8,10 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -29,6 +33,14 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 		window.location.href,
 		...Object.keys( currentArgs )
 	);
+
+	if ( isPreviewingTheme() ) {
+		params = {
+			...params,
+			theme_preview: currentlyPreviewingTheme(),
+		};
+	}
+
 	const newUrl = addQueryArgs( currentUrlWithoutArgs, params );
 
 	return {
