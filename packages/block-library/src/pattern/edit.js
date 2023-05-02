@@ -65,23 +65,27 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		className: forcedAlignment && `align${ forcedAlignment }`,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
+
+	const handleSync = () => {
+		if ( syncStatus === 'synced' ) {
+			setAttributes( { syncStatus: 'unsynced' } );
+		} else {
+			setAttributes( { syncStatus: 'synced' } );
+			replaceInnerBlocks(
+				clientId,
+				selectedPattern.blocks.map( ( block ) => cloneBlock( block ) )
+			);
+		}
+	};
+
 	return (
 		<>
 			<div { ...innerBlocksProps } data-pattern-slug={ slug } />
 			<BlockControls group="other">
-				<ToolbarButton
-					onClick={ () =>
-						setAttributes( {
-							syncStatus:
-								syncStatus === 'unsynced'
-									? 'synced'
-									: 'unsynced',
-						} )
-					}
-				>
+				<ToolbarButton onClick={ handleSync }>
 					{ syncStatus === 'unsynced'
 						? __( 'Sync' )
-						: __( 'Unsync' ) }
+						: __( 'Desync' ) }
 				</ToolbarButton>
 			</BlockControls>
 		</>
