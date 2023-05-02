@@ -51,6 +51,7 @@ const DEFAULT_CONFIG = {
 		WP_HOME: 'http://localhost',
 	},
 	mappings: {},
+	afterSetup: null,
 	env: {
 		development: {},
 		tests: {
@@ -75,6 +76,7 @@ describe( 'parseConfig', () => {
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
 		delete process.env.WP_ENV_PHP_VERSION;
+		delete process.env.WP_ENV_AFTER_SETUP;
 	} );
 
 	it( 'should return default config', async () => {
@@ -139,6 +141,7 @@ describe( 'parseConfig', () => {
 				return {
 					core: 'WordPress/WordPress#Test',
 					phpVersion: '1.0',
+					afterSetup: 'test',
 					env: {
 						development: {
 							port: 1234,
@@ -178,6 +181,7 @@ describe( 'parseConfig', () => {
 				type: 'git',
 			},
 			phpVersion: '2.0',
+			afterSetup: 'test',
 			env: {
 				development: {
 					...DEFAULT_CONFIG.env.development,
@@ -266,6 +270,7 @@ describe( 'parseConfig', () => {
 		process.env.WP_ENV_TESTS_PORT = 456;
 		process.env.WP_ENV_CORE = 'WordPress/WordPress#test';
 		process.env.WP_ENV_PHP_VERSION = '3.0';
+		process.env.WP_ENV_AFTER_SETUP = 'test after';
 
 		const parsed = await parseConfig( './', '/cache' );
 
@@ -283,6 +288,7 @@ describe( 'parseConfig', () => {
 				type: 'git',
 			},
 			phpVersion: '3.0',
+			afterSetup: 'test after',
 			env: {
 				development: {
 					port: 123,
@@ -324,8 +330,8 @@ describe( 'parseConfig', () => {
 		expect.assertions( 1 );
 		try {
 			await parseConfig( './', '/cache' );
-		} catch ( e ) {
-			expect( e ).toEqual(
+		} catch ( error ) {
+			expect( error ).toEqual(
 				new ValidationError(
 					'Could not find the latest WordPress version. There may be a network issue.'
 				)

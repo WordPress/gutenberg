@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -11,7 +12,7 @@ const {
 	setCache,
 	getCache,
 	getCacheFile,
-} = require( '../lib/cache' );
+} = require( '../cache' );
 
 jest.mock( 'fs', () => ( {
 	promises: {

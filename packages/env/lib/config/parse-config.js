@@ -14,6 +14,7 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -33,8 +34,9 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number} port      The port to use in the development environment.
- * @property {number} testsPort The port to use in the tests environment.
+ * @property {number}      port       The port to use in the development environment.
+ * @property {number}      testsPort  The port to use in the tests environment.
+ * @property {string|null} afterSetup The command(s) to run after configuring WordPress on start and clean.
  */
 
 /**
@@ -47,7 +49,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -191,6 +193,7 @@ async function getDefaultConfig(
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
+		afterSetup: null,
 		env: {
 			development: {},
 			tests: {
@@ -249,6 +252,10 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.afterSetup ) {
+		overrideConfig.afterSetup = overrides.afterSetup;
+	}
+
 	return overrideConfig;
 }
 
@@ -292,6 +299,13 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.afterSetup !== undefined ) {
+		// Support null as a valid input.
+		if ( rawConfig.afterSetup !== null ) {
+			checkString( configFile, 'afterSetup', rawConfig.afterSetup );
+		}
+		parsedConfig.afterSetup = rawConfig.afterSetup;
 	}
 
 	// Parse the environment-specific configs so they're accessible to the root.
@@ -342,11 +356,14 @@ async function parseEnvironmentConfig(
 	}
 
 	if ( config.phpVersion !== undefined ) {
-		checkVersion(
-			configFile,
-			`${ environmentPrefix }phpVersion`,
-			config.phpVersion
-		);
+		// Support null as a valid input.
+		if ( config.phpVersion !== null ) {
+			checkVersion(
+				configFile,
+				`${ environmentPrefix }phpVersion`,
+				config.phpVersion
+			);
+		}
 		parsedConfig.phpVersion = config.phpVersion;
 	}
 
@@ -396,7 +413,7 @@ async function parseEnvironmentConfig(
 					checkValidURL(
 						configFile,
 						`${ environmentPrefix }config.${ key }`,
-						parsedConfig[ key ]
+						parsedConfig.config[ key ]
 					);
 					break;
 				}
