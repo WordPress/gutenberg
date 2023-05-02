@@ -3,6 +3,7 @@
 ## Unreleased
 
 -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
+-   `Button`: Reduce the gap between icon and label in icon+text buttons, to make them seem contextual ([#50241](https://github.com/WordPress/gutenberg/pull/50241)).
 
 ### Internal
 
