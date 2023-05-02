@@ -24,8 +24,13 @@ class Gutenberg_Fonts_API_BC_Layer {
 	 * @return bool True when deprecated structure, else false.
 	 */
 	public static function is_deprecated_structure( array $fonts ) {
-		// Checks the first key to determine if it's empty or non-string.
-		return ! WP_Fonts_Utils::is_defined( array_key_first ( $fonts ) );
+		// Checks if a first dimension key is empty or non-string.
+		foreach ( array_keys( $fonts ) as $font_family ) {
+			if ( ! WP_Fonts_Utils::is_defined( $font_family ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
