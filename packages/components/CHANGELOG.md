@@ -10,6 +10,7 @@
 -   `ToolbarItem`: Convert to TypeScript ([#49190](https://github.com/WordPress/gutenberg/pull/49190)).
 -   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
 -   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133))
+-   Remove the no-op `event.persist()` in `Draggable` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
 
 ### Documentation
 
@@ -29,7 +30,6 @@
 -   Tweak `WordPressComponent` type so `selector` property is optional ([#49960](https://github.com/WordPress/gutenberg/pull/49960)).
 -   Update `Modal` appearance on small screens ([#50039](https://github.com/WordPress/gutenberg/pull/50039)).
 -   Update the framer motion dependency to the latest version `10.11.6` ([#49822](https://github.com/WordPress/gutenberg/pull/49822)).
--   Remove the no-op `event.persist()` in `Draggable` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
 
 ### Enhancements
 
