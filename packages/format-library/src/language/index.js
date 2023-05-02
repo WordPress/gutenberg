@@ -64,11 +64,12 @@ function Edit( props ) {
 
 			{ isPopoverVisible && (
 				<Popover
-					className="components-lang-attribute-popover"
+					className="block-editor-format-toolbar__language-popover"
 					anchor={ popoverAnchor }
 					placement="bottom"
 				>
 					<form
+						className="block-editor-format-toolbar__language-container-content"
 						onSubmit={ () => {
 							onChange(
 								applyFormat( value, {
