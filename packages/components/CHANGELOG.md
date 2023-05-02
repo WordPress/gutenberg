@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### Bug Fix
+
 -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
 
 ### Internal
@@ -18,6 +20,7 @@
 ### Enhancements
 
 -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
+-   `Button`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#50254](https://github.com/WordPress/gutenberg/pull/50254)).
 
 ## 23.9.0 (2023-04-26)
 
