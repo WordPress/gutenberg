@@ -20,6 +20,13 @@ test.describe( 'Quote', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/quote',
+				attributes: { value: '' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'test' },
+					},
+				],
 			},
 		] );
 
@@ -28,6 +35,8 @@ test.describe( 'Quote', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/pullquote',
+				attributes: { value: 'test' },
+				innerBlocks: [],
 			},
 		] );
 		await editor.transformBlockTo( 'core/quote' );
@@ -35,6 +44,13 @@ test.describe( 'Quote', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/quote',
+				attributes: { value: '' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'test' },
+					},
+				],
 			},
 		] );
 	} );
