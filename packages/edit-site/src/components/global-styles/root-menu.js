@@ -47,7 +47,7 @@ function RootMenu() {
 				{ hasTypographyPanel && (
 					<NavigationButtonAsItem
 						icon={ typography }
-						path={ '/typography' }
+						path="/typography"
 						aria-label={ __( 'Typography styles' ) }
 					>
 						{ __( 'Typography' ) }
@@ -56,7 +56,7 @@ function RootMenu() {
 				{ hasColorPanel && (
 					<NavigationButtonAsItem
 						icon={ color }
-						path={ '/colors' }
+						path="/colors"
 						aria-label={ __( 'Colors styles' ) }
 					>
 						{ __( 'Colors' ) }
@@ -65,7 +65,7 @@ function RootMenu() {
 				{ hasBorderPanel && (
 					<NavigationButtonAsItem
 						icon={ border }
-						path={ '/border' }
+						path="/border"
 						aria-label={ __( 'Border' ) }
 					>
 						{ __( 'Border' ) }
@@ -74,7 +74,7 @@ function RootMenu() {
 				{ hasEffectsPanel && (
 					<NavigationButtonAsItem
 						icon={ shadow }
-						path={ '/effects' }
+						path="/effects"
 						aria-label={ __( 'Effects' ) }
 					>
 						{ __( 'Effects' ) }
@@ -83,7 +83,7 @@ function RootMenu() {
 				{ hasFilterPanel && (
 					<NavigationButtonAsItem
 						icon={ filter }
-						path={ '/filters' }
+						path="/filters"
 						aria-label={ __( 'Filters styles' ) }
 					>
 						{ __( 'Filters' ) }
@@ -92,7 +92,7 @@ function RootMenu() {
 				{ hasLayoutPanel && (
 					<NavigationButtonAsItem
 						icon={ layout }
-						path={ '/layout' }
+						path="/layout"
 						aria-label={ __( 'Layout styles' ) }
 					>
 						{ __( 'Layout' ) }
