@@ -419,7 +419,12 @@ function RichTextWrapper(
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-function Content( { value, tagName: Tag, multiline, ...props } ) {
+ForwardedRichTextContainer.Content = ( {
+	value,
+	tagName: Tag,
+	multiline,
+	...props
+} ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
@@ -446,11 +451,9 @@ function Content( { value, tagName: Tag, multiline, ...props } ) {
 	}
 
 	return content;
-}
+};
 
-Content.__unstableIsRichTextContent = {};
-
-ForwardedRichTextContainer.Content = Content;
+ForwardedRichTextContainer.Content.__unstableIsRichTextContent = {};
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
@@ -463,7 +466,7 @@ function findContent( blocks, richTextValues = [] ) {
 	for ( const block of blocks ) {
 		if (
 			block.type?.__unstableIsRichTextContent ===
-			Content.__unstableIsRichTextContent
+			ForwardedRichTextContainer.Content.__unstableIsRichTextContent
 		) {
 			richTextValues.push( block.props.value );
 			continue;
