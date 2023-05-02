@@ -27,7 +27,9 @@ const DEFAULT_CONTROLS = {
 };
 
 export default function DimensionsPanel() {
-	const [ style ] = useGlobalStyle( '', undefined, 'user', false );
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
+		shouldDecodeEncode: false,
+	} );
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );

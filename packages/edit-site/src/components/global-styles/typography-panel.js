@@ -24,7 +24,9 @@ export default function TypographyPanel( { element, headingLevel } ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useGlobalStyle( prefix, undefined, 'user', false );
+	const [ style ] = useGlobalStyle( prefix, undefined, 'user', {
+		shouldDecodeEncode: false,
+	} );
 	const [ inheritedStyle, setStyle ] = useGlobalStyle(
 		prefix,
 		undefined,
