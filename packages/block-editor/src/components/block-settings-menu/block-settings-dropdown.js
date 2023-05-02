@@ -44,7 +44,7 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return <MenuItem 
-		ref={ ref }
+		ref={ ref } 
 		className="block-action-copy"
 	>{ copyMenuItemLabel }</MenuItem>;
 }
