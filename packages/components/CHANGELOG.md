@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Change the default color scheme to be based on the new WP Blueberry color ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
+
 ### Internal
 
 -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
