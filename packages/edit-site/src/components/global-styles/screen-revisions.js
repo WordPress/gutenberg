@@ -15,6 +15,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -44,13 +45,22 @@ const { GlobalStylesContext, isGlobalStyleConfigEqual } = unlock(
 	blockEditorPrivateApis
 );
 
+const SITE_EDITOR_AUTHORS_QUERY = {
+	per_page: -1,
+	_fields: 'id,name,avatar_urls',
+	context: 'view',
+	capabilities: [ 'edit_theme_options' ],
+};
+
 function getRevisionLabel( revision, isLatest, isUnsaved ) {
+	const authorDisplayName = revision?.author?.name;
+
 	if ( isUnsaved ) {
 		return sprintf(
 			/* translators: %(name)s author display name */
 			__( 'Unsaved changes by %(name)s' ),
 			{
-				name: revision?.authorDisplayName,
+				name: authorDisplayName,
 			}
 		);
 	}
@@ -66,7 +76,7 @@ function getRevisionLabel( revision, isLatest, isUnsaved ) {
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
 				__( 'Revision from %(date)s by %(name)s (current)' ),
 				{
-					name: revision?.authorDisplayName,
+					name: authorDisplayName,
 					date: formattedDate,
 				}
 		  )
@@ -74,7 +84,7 @@ function getRevisionLabel( revision, isLatest, isUnsaved ) {
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
 				__( 'Revision from %(date)s by %(name)s ' ),
 				{
-					name: revision?.authorDisplayName,
+					name: authorDisplayName,
 					date: formattedDate,
 				}
 		  );
@@ -88,13 +98,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 			role="group"
 		>
 			{ userRevisions.map( ( revision ) => {
-				const {
-					id,
-					authorAvatarUrl,
-					authorDisplayName,
-					isLatest,
-					modified,
-				} = revision;
+				const { id, author, isLatest, modified } = revision;
 				const isUnsaved = 'unsaved' === id;
 				/*
 				 * If the currentId hasn't been selected yet, the first revision is
@@ -143,8 +147,8 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 								</span>
 								<span className="edit-site-global-styles-screen-revisions__avatar">
 									<img
-										alt={ authorDisplayName }
-										src={ authorAvatarUrl }
+										alt={ author?.name }
+										src={ author?.avatar_urls?.[ '24' ] }
 									/>
 								</span>
 							</span>
@@ -193,36 +197,42 @@ function ScreenRevisions() {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const {
+		authors,
 		blocks,
 		currentUser,
 		userRevisions,
 		isDirty,
 		editorCanvasContainerView,
+		isLoading,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
 			getCurrentUser,
+			getUsers,
+			__experimentalGetCurrentThemeGlobalStylesRevisions,
+			isResolving,
 		} = select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		const _currentUser = getCurrentUser();
 		const _isDirty = dirtyEntityRecords.length > 0;
 		const _userRevisions =
-			select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
+			__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
+		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY );
 
 		return {
+			authors: _authors,
 			currentUser: _currentUser,
 			isDirty: _isDirty,
-			isSaving: dirtyEntityRecords.some( ( record ) =>
-				isSavingEntityRecord( record.kind, record.name, record.key )
-			),
 			userRevisions: _userRevisions,
 			editorCanvasContainerView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			blocks: select( blockEditorStore ).getBlocks(),
+			isLoading:
+				isResolving( 'getUsers', [ SITE_EDITOR_AUTHORS_QUERY ] ) ||
+				isResolving(
+					'__experimentalGetCurrentThemeGlobalStylesRevisions'
+				),
 		};
 	}, [] );
 
@@ -246,11 +256,12 @@ function ScreenRevisions() {
 	}, [ editorCanvasContainerView ] );
 
 	const modifiedUserRevisions = useMemo( () => {
-		if ( ! userRevisions.length ) {
+		if ( isLoading ) {
 			return userRevisions;
 		}
 		/*
 		 * Adds a flag to the first revision, which is the latest.
+		 * Also adds author information to the revision.
 		 * Then, if there are unsaved changes in the editor, create a
 		 * new "revision" item that represents the unsaved changes.
 		 */
@@ -258,7 +269,15 @@ function ScreenRevisions() {
 			if ( 0 === index && _array[ index ]?.id !== 'unsaved' ) {
 				revision.isLatest = true;
 			}
-			return revision;
+
+			return {
+				...revision,
+				author: {
+					...authors.find(
+						( author ) => author.id === revision.author
+					),
+				},
+			};
 		} );
 
 		if ( isDirty && ! isEmpty( userConfig ) && !! currentUser ) {
@@ -266,14 +285,17 @@ function ScreenRevisions() {
 				id: 'unsaved',
 				styles: userConfig?.styles,
 				settings: userConfig?.settings,
-				authorDisplayName: currentUser?.name,
-				authorAvatarUrl: currentUser?.avatar_urls?.[ '24' ],
+				author: {
+					name: currentUser?.name,
+					avatar_urls: currentUser?.avatar_urls,
+				},
 				modified: new Date(),
 			};
+
 			return [ unsavedRevision ].concat( _modified );
 		}
 		return _modified;
-	}, [ userRevisions.length, isDirty ] );
+	}, [ isDirty, isLoading ] );
 
 	const restoreRevision = useCallback(
 		( revision ) => {
@@ -312,6 +334,16 @@ function ScreenRevisions() {
 					'Revisions are added to the timeline when style changes are saved.'
 				) }
 			/>
+			{ isLoading && (
+				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
+			) }
+			{ ! isLoading && (
+				<Revisions
+					blocks={ blocks }
+					userConfig={ globalStylesRevision }
+					onClose={ onCloseRevisions }
+				/>
+			) }
 			<div className="edit-site-global-styles-screen-revisions">
 				<RevisionsButtons
 					onChange={ selectRevision }
@@ -351,11 +383,6 @@ function ScreenRevisions() {
 					onSubmit={ () => restoreRevision( globalStylesRevision ) }
 				/>
 			) }
-			<Revisions
-				blocks={ blocks }
-				userConfig={ globalStylesRevision }
-				onClose={ onCloseRevisions }
-			/>
 		</>
 	);
 }
