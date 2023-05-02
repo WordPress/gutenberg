@@ -56,6 +56,7 @@ class WP_Theme_JSON_Gutenberg {
 		'default',
 		'blocks',
 		'theme',
+		'site',
 		'custom',
 	);
 

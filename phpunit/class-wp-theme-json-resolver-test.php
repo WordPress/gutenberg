@@ -388,10 +388,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param string $block_styles_text Message.
 	 * @param bool   $theme_palette      Whether the theme palette is present.
 	 * @param string $theme_palette_text Message.
+	 * @param bool   $site_palette      Whether the site palette is present.
+	 * @param string $site_palette_text Message.
 	 * @param bool   $user_palette      Whether the user palette is present.
 	 * @param string $user_palette_text Message.
 	 */
-	public function test_get_merged_data_returns_origin( $origin, $core_palette, $core_palette_text, $block_styles, $block_styles_text, $theme_palette, $theme_palette_text, $user_palette, $user_palette_text ) {
+	public function test_get_merged_data_returns_origin( $origin, $core_palette, $core_palette_text, $block_styles, $block_styles_text, $theme_palette, $theme_palette_text, $site_palette, $site_palette_text, $user_palette, $user_palette_text ) {
 		// Make sure there is data from the blocks origin.
 		register_block_type(
 			'my/block-with-styles',
@@ -418,18 +420,32 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
+		// Make sure there is data from the site origin.
+		wp_set_current_user( self::$administrator_id );
+		$site_cpt    = WP_Theme_JSON_Resolver_Gutenberg::get_site_data_from_wp_global_styles( true );
+		$site_config = json_decode( $site_cpt['post_content'], true );
+		$site_config['settings']['color']['palette']['site'] = array(
+			array(
+				'color' => 'olive',
+				'name'  => 'Olive green',
+				'slug'  => 'olive-green',
+			),
+		);
+		$site_cpt['post_content']                            = wp_json_encode( $site_config );
+		wp_update_post( $site_cpt, true, false );
+
 		// Make sure there is data from the user origin.
 		wp_set_current_user( self::$administrator_id );
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
-		$config   = json_decode( $user_cpt['post_content'], true );
-		$config['settings']['color']['palette']['custom'] = array(
+		$user_cpt    = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$user_config = json_decode( $user_cpt['post_content'], true );
+		$user_config['settings']['color']['palette']['custom'] = array(
 			array(
 				'color' => 'hotpink',
 				'name'  => 'My color',
 				'slug'  => 'my-color',
 			),
 		);
-		$user_cpt['post_content']                         = wp_json_encode( $config );
+		$user_cpt['post_content']                              = wp_json_encode( $user_config );
 		wp_update_post( $user_cpt, true, false );
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
@@ -444,6 +460,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame( $block_styles, count( $styles ) === 1, $block_styles_text );
 		$this->assertSame( $theme_palette, isset( $settings['color']['palette']['theme'] ), $theme_palette_text );
+		$this->assertSame( $site_palette, isset( $settings['color']['palette']['site'] ), $site_palette_text );
 		$this->assertSame( $user_palette, isset( $settings['color']['palette']['custom'] ), $user_palette_text );
 
 		unregister_block_type( 'my/block-with-styles' );
@@ -464,6 +481,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'block_styles_text'  => 'Block styles should not be present',
 				'theme_palette'      => false,
 				'theme_palette_text' => 'Theme palette should not be present',
+				'site_palette'       => false,
+				'site_palette_text'  => 'Site palette should not be present',
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 			),
@@ -475,6 +494,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'block_styles_text'  => 'Block styles must be present',
 				'theme_palette'      => false,
 				'theme_palette_text' => 'Theme palette should not be present',
+				'site_palette'       => false,
+				'site_palette_text'  => 'Site palette should not be present',
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 			),
@@ -486,8 +507,24 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'block_styles_text'  => 'Block styles must be present',
 				'theme_palette'      => true,
 				'theme_palette_text' => 'Theme palette must be present',
+				'site_palette'       => false,
+				'site_palette_text'  => 'Site palette should not be present',
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
+			),
+			'origin_site'    => array(
+				'origin'             => 'site',
+				'core_palette'       => true,
+				'core_palette_text'  => 'Core palette must be present',
+				'block_styles'       => true,
+				'block_styles_text'  => 'Block styles must be present',
+				'theme_palette'      => true,
+				'theme_palette_text' => 'Theme palette must be present',
+				'site_palette'       => true,
+				'site_palette_text'  => 'Site palette should be present',
+				'user_palette'       => true,
+				'user_palette_text'  => 'User palette should not be present',
+
 			),
 			'origin_custom'  => array(
 				'origin'             => 'custom',
@@ -497,6 +534,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'block_styles_text'  => 'Block styles must be present',
 				'theme_palette'      => true,
 				'theme_palette_text' => 'Theme palette must be present',
+				'site_palette'       => true,
+				'site_palette_text'  => 'Site palette must be present',
 				'user_palette'       => true,
 				'user_palette_text'  => 'User palette must be present',
 			),
