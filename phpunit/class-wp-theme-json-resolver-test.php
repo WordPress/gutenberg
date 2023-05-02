@@ -522,7 +522,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'theme_palette_text' => 'Theme palette must be present',
 				'site_palette'       => true,
 				'site_palette_text'  => 'Site palette should be present',
-				'user_palette'       => true,
+				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 
 			),

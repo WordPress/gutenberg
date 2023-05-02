@@ -686,7 +686,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              added the `$origin` parameter.
 	 * @since 6.1.0 Added block data and generation of spacingSizes array.
 	 *
-	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
+	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme', 'site', or 'custom'.
 	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
 	 *
 	 * @return WP_Theme_JSON
@@ -713,7 +713,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$result->set_spacing_sizes();
 			return $result;
 		}
+
 		$result->merge( static::get_site_data() );
+		if ( 'site' === $origin ) {
+			$result->set_spacing_sizes();
+			return $result;
+		}
+
 		$result->merge( static::get_user_data() );
 		$result->set_spacing_sizes();
 		return $result;
