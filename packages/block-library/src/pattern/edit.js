@@ -11,9 +11,10 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { forcedAlignment, slug } = attributes;
+	const { forcedAlignment, slug, syncStatus } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -70,10 +71,17 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			<BlockControls group="other">
 				<ToolbarButton
 					onClick={ () =>
-						setAttributes( { syncStatus: 'unsynced' } )
+						setAttributes( {
+							syncStatus:
+								syncStatus === 'unsynced'
+									? 'synced'
+									: 'unsynced',
+						} )
 					}
 				>
-					Unsync
+					{ syncStatus === 'unsynced'
+						? __( 'Sync' )
+						: __( 'Unsync' ) }
 				</ToolbarButton>
 			</BlockControls>
 		</>
