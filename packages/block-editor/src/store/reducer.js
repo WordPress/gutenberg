@@ -9,6 +9,8 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
+
 /**
  * Internal dependencies
  */
@@ -743,6 +745,17 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+const withBlockFilters = ( reducer ) => ( state, action ) => {
+	const newState = reducer( state, action );
+	const filteredState = applyFilters(
+		'blockEditor.higherOrderReducer',
+		newState,
+		reducer
+	);
+
+	return filteredState;
+};
+
 /**
  * Reducer returning the blocks state.
  *
@@ -760,7 +773,8 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withResetControlledBlocks,
+	withBlockFilters
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact

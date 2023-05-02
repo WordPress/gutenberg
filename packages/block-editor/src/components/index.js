@@ -83,6 +83,7 @@ export {
 	RichTextShortcut,
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
+	getRichTextValues,
 } from './rich-text';
 export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';

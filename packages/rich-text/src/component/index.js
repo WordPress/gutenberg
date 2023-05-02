@@ -99,6 +99,7 @@ export function useRichText( {
 	const hadSelectionUpdate = useRef( false );
 
 	if ( ! record.current ) {
+		hadSelectionUpdate.current = isSelected;
 		setRecordFromProps();
 		// Sometimes formats are added programmatically and we need to make
 		// sure it's persisted to the block store / markup. If these formats
@@ -215,6 +216,7 @@ export function useRichText( {
 
 		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			ref.current.focus();
+			ref.current.scrollIntoView();
 		}
 
 		applyFromProps();
