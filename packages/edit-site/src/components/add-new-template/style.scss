@@ -26,6 +26,7 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
+			border: $border-width solid $gray-300;
 
 			// Show the boundary of the button, in High Contrast Mode.
 			outline: 1px solid transparent;
@@ -41,6 +42,7 @@
 			&:hover {
 				color: var(--wp-admin-theme-color-darker-10);
 				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				border-color: transparent;
 
 				span {
 					color: var(--wp-admin-theme-color);
@@ -49,6 +51,7 @@
 
 			&:focus {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				border-color: transparent;
 
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 3px solid transparent;
