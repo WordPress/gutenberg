@@ -27,7 +27,7 @@ class WP_Webfonts {
 	 *
 	 * @var WP_Fonts
 	 */
-	public $wp_fonts;
+	private $wp_fonts;
 
 	/**
 	 * Instantiate an instance of WP_Webfonts.
