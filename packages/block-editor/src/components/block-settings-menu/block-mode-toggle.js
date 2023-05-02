@@ -34,7 +34,7 @@ export function BlockModeToggle( {
 
 	return <MenuItem 
 		onClick={ onToggleMode }
-		className={ 'block-action-edit-mode' }
+		className='block-action-edit-mode'
 	>{ ! small && label }</MenuItem>;
 }
 
