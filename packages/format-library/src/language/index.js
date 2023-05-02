@@ -20,7 +20,15 @@ import { translation } from '@wordpress/icons';
 const name = 'core/language';
 const title = __( 'Language' );
 
-const Edit = ( props ) => {
+export const language = {
+	name,
+	tagName: 'span',
+	className: 'lang-attribute',
+	edit: Edit,
+	title,
+};
+
+function Edit( props ) {
 	const { contentRef, isActive, onChange, value } = props;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -103,12 +111,4 @@ const Edit = ( props ) => {
 			) }
 		</>
 	);
-};
-
-export const language = {
-	name,
-	tagName: 'span',
-	className: 'lang-attribute',
-	edit: Edit,
-	title,
-};
+}
