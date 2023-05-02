@@ -59,6 +59,10 @@ export type BasePaletteEdit = {
 	 * @default ''
 	 */
 	slugPrefix?: string;
+	/**
+	 * Props to pass through to the underlying Popover component.
+	 */
+	popoverProps?: Omit< PopoverProps, 'children' >;
 };
 
 type PaletteEditColors = {
@@ -86,9 +90,7 @@ type PaletteEditGradients = {
 };
 
 export type PaletteEditProps = BasePaletteEdit &
-	( PaletteEditColors | PaletteEditGradients ) & {
-		popoverProps?: Omit< PopoverProps, 'children' >;
-	};
+	( PaletteEditColors | PaletteEditGradients );
 
 type EditingElement = number | null;
 
@@ -97,7 +99,7 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	onChange: ( newElement: T ) => void;
 	isGradient?: T extends Gradient ? true : false;
 	onClose?: () => void;
-	popoverProps?: Omit< PopoverProps, 'children' >;
+	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 };
 
 export type NameInputProps = {
@@ -116,7 +118,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
 	onStopEditing: () => void;
-	popoverProps?: Omit< PopoverProps, 'children' >;
+	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	slugPrefix: string;
 };
 
@@ -126,7 +128,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
-	popoverProps?: Omit< PopoverProps, 'children' >;
+	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: string;
 };
