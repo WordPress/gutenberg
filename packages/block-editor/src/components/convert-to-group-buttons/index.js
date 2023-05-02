@@ -49,7 +49,7 @@ function ConvertToGroupButton( {
 		<>
 			{ isGroupable && (
 				<MenuItem
-					className='block-action-group'
+					className="block-action-group"
 					onClick={ () => {
 						onConvertToGroup();
 						onClose();
@@ -60,7 +60,7 @@ function ConvertToGroupButton( {
 			) }
 			{ isUngroupable && (
 				<MenuItem
-					className='block-action-ungroup'
+					className="block-action-ungroup"
 					onClick={ () => {
 						onConvertFromGroup();
 						onClose();

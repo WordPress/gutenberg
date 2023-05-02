@@ -30,7 +30,7 @@ export default function BlockLockMenuItem( { clientId } ) {
 		<>
 			<MenuItem
 				icon={ isLocked ? unlock : lockOutline }
-				className='block-action-lock'
+				className="block-action-lock"
 				onClick={ toggleModal }
 			>
 				{ label }
