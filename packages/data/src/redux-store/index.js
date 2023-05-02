@@ -129,18 +129,6 @@ function createResolversCache() {
  * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
-	const privateActions = {};
-	const privateSelectors = {};
-	const privateRegistrationFunctions = {
-		privateActions,
-		registerPrivateActions: ( actions ) => {
-			Object.assign( privateActions, actions );
-		},
-		privateSelectors,
-		registerPrivateSelectors: ( selectors ) => {
-			Object.assign( privateSelectors, selectors );
-		},
-	};
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
@@ -171,6 +159,23 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+
+			const privateActions = {};
+			const privateSelectors = {};
+			const privateRegistrationFunctions = {
+				privateActions,
+				registerPrivateActions: ( actions ) => {
+					Object.assign(
+						privateActions,
+						mapActions( actions, store )
+					);
+				},
+				privateSelectors,
+				registerPrivateSelectors: ( selectors ) => {
+					Object.assign( privateSelectors, selectors );
+				},
+			};
+
 			// Expose the private registration functions on the store
 			// so they can be copied to a sub registry in registry.js.
 			lock( store, privateRegistrationFunctions );
@@ -188,10 +193,7 @@ export default function createReduxStore( key, options ) {
 				actions,
 				new Proxy( privateActions, {
 					get: ( target, prop ) => {
-						return (
-							mapActions( privateActions, store )[ prop ] ||
-							actions[ prop ]
-						);
+						return target[ prop ] || actions[ prop ];
 					},
 				} )
 			);
@@ -276,6 +278,11 @@ export default function createReduxStore( key, options ) {
 					} );
 				} );
 
+			// Expose the private registration functions on the store
+			// descriptor. That's a natural choice since that's where the
+			// public actions and selectors are stored .
+			lock( storeDescriptor, privateRegistrationFunctions );
+
 			// This can be simplified to just { subscribe, getSelectors, getActions }
 			// Once we remove the use function.
 			return {
@@ -292,11 +299,6 @@ export default function createReduxStore( key, options ) {
 			};
 		},
 	};
-
-	// Expose the private registration functions on the store
-	// descriptor. That's a natural choice since that's where the
-	// public actions and selectors are stored .
-	lock( storeDescriptor, privateRegistrationFunctions );
 
 	return storeDescriptor;
 }
