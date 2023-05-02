@@ -36,7 +36,6 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
-	justifyStretch,
 } from '@wordpress/icons';
 
 /**
@@ -65,6 +64,7 @@ import {
 	alignCenter,
 	alignBottom,
 	spaceBetween,
+	alignStretch,
 } from '../components/block-vertical-alignment-control/icons';
 
 const innerWidthOptions = [
@@ -369,7 +369,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	if ( orientation === 'horizontal' ) {
 		verticalAlignmentOptions.push( {
 			value: 'stretch',
-			icon: justifyStretch,
+			icon: alignStretch,
 			label: __( 'Stretch' ),
 		} );
 	} else {
