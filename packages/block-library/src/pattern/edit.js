@@ -3,7 +3,7 @@
  */
 import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
@@ -12,9 +12,13 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 	const { forcedAlignment, slug, syncStatus } = attributes;
+	const [ syncNoticeDisplayed, setSyncNoticeDisplayed ] = useState( false );
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -29,6 +33,31 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		},
 		[ slug, clientId ]
 	);
+
+	const innerBlocksUpdated = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlock( clientId );
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		if ( syncStatus === 'synced' && ! syncNoticeDisplayed ) {
+			createSuccessNotice(
+				__(
+					'You need to Desync this pattern for your changes to be saved.'
+				),
+				{ id: 'pattern-desync-notice', type: 'snackbar' }
+			);
+			setSyncNoticeDisplayed( true );
+		}
+	}, [
+		createSuccessNotice,
+		innerBlocksUpdated,
+		syncNoticeDisplayed,
+		syncStatus,
+	] );
+
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
