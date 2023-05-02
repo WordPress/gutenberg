@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Internal dependencies
  */
@@ -9,7 +10,7 @@ describe( 'postProcessConfig', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should merge root options into environment options', () => {
+	it( 'should merge relevant root options into environment options', () => {
 		const processed = postProcessConfig( {
 			port: 123,
 			testsPort: 456,
@@ -146,6 +147,32 @@ describe( 'postProcessConfig', () => {
 							type: 'root-mapping',
 						},
 					},
+				},
+			},
+		} );
+	} );
+
+	it( 'should not merge some root options into environment options', () => {
+		const processed = postProcessConfig( {
+			port: 8888,
+			testsPort: 8889,
+			afterSetup: 'test',
+			env: {
+				development: {},
+				tests: {},
+			},
+		} );
+
+		expect( processed ).toEqual( {
+			port: 8888,
+			testsPort: 8889,
+			afterSetup: 'test',
+			env: {
+				development: {
+					port: 8888,
+				},
+				tests: {
+					port: 8889,
 				},
 			},
 		} );
