@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -16,7 +17,7 @@ const exec = util.promisify( require( 'child_process' ).exec );
 /**
  * Internal dependencies
  */
-const { readConfig } = require( '../../lib/config' );
+const { loadConfig } = require( '../config' );
 
 /**
  * Destroy the development server.
@@ -26,9 +27,8 @@ const { readConfig } = require( '../../lib/config' );
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
 module.exports = async function destroy( { spinner, debug } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
-		configPath
+	const { dockerComposeConfigPath, workDirectoryPath } = await loadConfig(
+		path.resolve( '.' )
 	);
 
 	try {
@@ -39,7 +39,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	}
 
 	spinner.info(
-		'WARNING! This will remove Docker containers, volumes, and networks associated with the WordPress instance.'
+		'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
 	);
 
 	const { yesDelete } = await inquirer.prompt( [
@@ -69,10 +69,13 @@ module.exports = async function destroy( { spinner, debug } ) {
 	const directoryHash = path.basename( workDirectoryPath );
 
 	spinner.text = 'Removing docker volumes.';
-	await removeDockerItems( 'volume', directoryHash );
+	await removeDockerItems( 'volume', 'name', directoryHash );
 
 	spinner.text = 'Removing docker networks.';
-	await removeDockerItems( 'network', directoryHash );
+	await removeDockerItems( 'network', 'name', directoryHash );
+
+	spinner.text = 'Removing docker images.';
+	await removeDockerItems( 'image', 'reference', directoryHash + '*' );
 
 	spinner.text = 'Removing local files.';
 
@@ -84,12 +87,13 @@ module.exports = async function destroy( { spinner, debug } ) {
 /**
  * Removes docker items, like networks or volumes, matching the given name.
  *
- * @param {string} itemType The item type, like "network" or "volume"
- * @param {string} name     Remove items whose name match this string.
+ * @param {string} itemType    The item type, like "volume", or "network".
+ * @param {string} filter      The filtering to search using.
+ * @param {string} filterValue The filtering value that we're looking for.
  */
-async function removeDockerItems( itemType, name ) {
+async function removeDockerItems( itemType, filter, filterValue ) {
 	const { stdout: items } = await exec(
-		`docker ${ itemType } ls -q --filter name=${ name }`
+		`docker ${ itemType } ls -q --filter ${ filter }='${ filterValue }'`
 	);
 	if ( items ) {
 		await exec(

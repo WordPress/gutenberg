@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -10,7 +11,7 @@ const os = require( 'os' );
 /**
  * Internal dependencies
  */
-const { readConfig } = require( './config' );
+const { loadConfig } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
@@ -39,8 +40,7 @@ module.exports = async function initConfig( {
 	xdebug = 'off',
 	writeChanges = false,
 } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const config = await readConfig( configPath );
+	const config = await loadConfig( path.resolve( '.' ) );
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the
@@ -82,9 +82,34 @@ module.exports = async function initConfig( {
 		);
 
 		await writeFile(
-			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
-			dockerFileContents(
-				dockerComposeConfig.services.wordpress.image,
+			path.resolve( config.workDirectoryPath, 'WordPress.Dockerfile' ),
+			wordpressDockerFileContents(
+				getBaseDockerImage( config.env.development.phpVersion, false ),
+				config
+			)
+		);
+		await writeFile(
+			path.resolve(
+				config.workDirectoryPath,
+				'Tests-WordPress.Dockerfile'
+			),
+			wordpressDockerFileContents(
+				getBaseDockerImage( config.env.tests.phpVersion, false ),
+				config
+			)
+		);
+
+		await writeFile(
+			path.resolve( config.workDirectoryPath, 'CLI.Dockerfile' ),
+			cliDockerFileContents(
+				getBaseDockerImage( config.env.development.phpVersion, true ),
+				config
+			)
+		);
+		await writeFile(
+			path.resolve( config.workDirectoryPath, 'Tests-CLI.Dockerfile' ),
+			cliDockerFileContents(
+				getBaseDockerImage( config.env.tests.phpVersion, true ),
 				config
 			)
 		);
@@ -97,6 +122,29 @@ module.exports = async function initConfig( {
 
 	return config;
 };
+
+/**
+ * Gets the base docker image to use based on our input.
+ *
+ * @param {string}  phpVersion The version of PHP to get an image for.
+ * @param {boolean} isCLI      Indicates whether or not the image is for a CLI.
+ * @return {string} The Docker image to use.
+ */
+function getBaseDockerImage( phpVersion, isCLI ) {
+	// We can rely on a consistent format for PHP versions.
+	if ( phpVersion ) {
+		phpVersion = ( isCLI ? '-' : ':' ) + 'php' + phpVersion;
+	} else {
+		phpVersion = '';
+	}
+
+	let wordpressImage = 'wordpress';
+	if ( isCLI ) {
+		wordpressImage += ':cli';
+	}
+
+	return wordpressImage + phpVersion;
+}
 
 /**
  * Checks the configured PHP version
@@ -134,14 +182,14 @@ function checkXdebugPhpCompatibility( config ) {
 }
 
 /**
- * Generates the Dockerfile used by wp-env's development instance.
+ * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
  *
  * @param {string}   image  The base docker image to use.
  * @param {WPConfig} config The configuration object.
  *
  * @return {string} The dockerfile contents.
  */
-function dockerFileContents( image, config ) {
+function wordpressDockerFileContents( image, config ) {
 	// Don't install XDebug unless it is explicitly required.
 	let shouldInstallXdebug = false;
 
@@ -155,8 +203,29 @@ function dockerFileContents( image, config ) {
 
 	return `FROM ${ image }
 
+# Update apt sources for archived versions of Debian.
+
+# stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
+RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
+RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+
+# Prepare dependencies
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN groupadd -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
+
+# Set up sudo so they can have root access when using 'run' commands.
+RUN apt-get update -qy
+RUN apt-get -qy install sudo
+RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 `;
 }
 
@@ -175,4 +244,33 @@ RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
 	`;
+}
+
+/**
+ * Generates the Dockerfile used by wp-env's `cli` and `tests-cli` instances.
+ *
+ * @param {string} image The base docker image to use.
+ *
+ * @return {string} The dockerfile contents.
+ */
+function cliDockerFileContents( image ) {
+	return `FROM ${ image }
+
+# Switch to root so we can create users.
+USER root
+	
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN addgroup -g $HOST_GID $HOST_USERNAME || true
+RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
+
+# Switch back now that we're done.
+USER www-data
+
+# Have the container sleep infinitely to keep it alive for us to run commands on it.
+CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
+`;
 }

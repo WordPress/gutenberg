@@ -36,6 +36,9 @@
 }
 
 .commands-command-menu__container {
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
+
 	[cmdk-input] {
 		border: none;
 		width: 100%;
