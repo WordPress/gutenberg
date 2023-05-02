@@ -395,6 +395,23 @@ Success: Installed 1 of 1 plugins.
 ✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
 ```
 
+#### Changing the permalink structure
+You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
+
+**Examples**
+
+To set the permalink to just the post name:
+
+```
+wp-env run cli "wp rewrite structure /%postname%/"
+```
+
+To set the permalink to the year, month, and post name:
+
+```
+wp-env run cli "wp rewrite structure /%year%/%monthnum%/%postname%/"
+```
+
 ### `wp-env destroy`
 
 ```sh
