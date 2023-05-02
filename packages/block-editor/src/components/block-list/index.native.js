@@ -7,7 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -106,7 +106,7 @@ export class BlockList extends Component {
 
 	renderEmptyList() {
 		return (
-			<EmptyListComponentCompose
+			<EmptyList
 				rootClientId={ this.props.rootClientId }
 				renderAppender={ this.props.renderAppender }
 				renderFooterAppender={ this.props.renderFooterAppender }
@@ -447,41 +447,13 @@ export default compose( [
 	withPreferredColorScheme,
 ] )( BlockList );
 
-class EmptyListComponent extends Component {
-	render() {
-		const {
-			shouldShowInsertionPoint,
-			rootClientId,
-			renderAppender,
-			renderFooterAppender,
-		} = this.props;
-
-		if ( renderFooterAppender || renderAppender === false ) {
-			return null;
-		}
-
-		return (
-			<View style={ styles.defaultAppender }>
-				<ReadableContentView
-					align={
-						renderAppender
-							? WIDE_ALIGNMENTS.alignments.full
-							: undefined
-					}
-				>
-					<BlockListAppender
-						rootClientId={ rootClientId }
-						renderAppender={ renderAppender }
-						showSeparator={ shouldShowInsertionPoint }
-					/>
-				</ReadableContentView>
-			</View>
-		);
-	}
-}
-
-const EmptyListComponentCompose = compose( [
-	withSelect( ( select, { rootClientId, orientation } ) => {
+function EmptyList( {
+	orientation,
+	renderAppender,
+	renderFooterAppender,
+	rootClientId,
+} ) {
+	const { shouldShowInsertionPoint } = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
 			getBlockInsertionPoint,
@@ -492,17 +464,36 @@ const EmptyListComponentCompose = compose( [
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-		const shouldShowInsertionPoint =
-			! isStackedHorizontally &&
-			blockInsertionPointIsVisible &&
-			insertionPoint.rootClientId === rootClientId &&
-			// If list is empty, show the insertion point (via the default appender)
-			( blockClientIds.length === 0 ||
-				// Or if the insertion point is right before the denoted block.
-				! blockClientIds[ insertionPoint.index ] );
 
 		return {
-			shouldShowInsertionPoint,
+			shouldShowInsertionPoint:
+				! isStackedHorizontally &&
+				blockInsertionPointIsVisible &&
+				insertionPoint.rootClientId === rootClientId &&
+				// If list is empty, show the insertion point (via the default appender)
+				( blockClientIds.length === 0 ||
+					// Or if the insertion point is right before the denoted block.
+					! blockClientIds[ insertionPoint.index ] ),
 		};
-	} ),
-] )( EmptyListComponent );
+	} );
+
+	if ( renderFooterAppender || renderAppender === false ) {
+		return null;
+	}
+
+	return (
+		<View style={ styles.defaultAppender }>
+			<ReadableContentView
+				align={
+					renderAppender ? WIDE_ALIGNMENTS.alignments.full : undefined
+				}
+			>
+				<BlockListAppender
+					rootClientId={ rootClientId }
+					renderAppender={ renderAppender }
+					showSeparator={ shouldShowInsertionPoint }
+				/>
+			</ReadableContentView>
+		</View>
+	);
+}
