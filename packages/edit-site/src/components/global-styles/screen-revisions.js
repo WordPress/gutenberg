@@ -136,11 +136,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 								{ isUnsaved ? (
 									<span>{ __( 'Unsaved changes' ) }</span>
 								) : (
-									<span>
-										{ isLatest
-											? __( 'Currently-saved revision' )
-											: __( 'Styles revision' ) }
-									</span>
+									<span>{ __( 'Changes saved' ) }</span>
 								) }
 								<span className="edit-site-global-styles-screen-revisions__date">
 									{ dateHumanTimeDiff }
