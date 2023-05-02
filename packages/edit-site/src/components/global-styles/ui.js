@@ -35,7 +35,6 @@ import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import { ScreenVariation } from './screen-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
@@ -146,7 +145,7 @@ function BlockStylesNavigationScreens( {
 			key={ index }
 			path={ parentMenu + '/variations/' + style.name }
 		>
-			<ScreenVariation blockName={ blockName } style={ style } />
+			<ScreenBlock name={ blockName } variation={ style.name } />
 		</GlobalStylesNavigationScreen>
 	) );
 }

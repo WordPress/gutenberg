@@ -6,7 +6,10 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,6 +18,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../private-apis';
+import Subtitle from './subtitle';
+import { useBlockVariations, VariationsPanel } from './variations-panel';
 
 const {
 	useHasDimensionsPanel,
@@ -51,12 +56,14 @@ function ScreenBlock( { name, variation } ) {
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
+	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasVariationsPanel = blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
@@ -71,6 +78,9 @@ function ScreenBlock( { name, variation } ) {
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
+	const currentBlockStyle = variation
+		? blockVariations.find( ( s ) => s.name === variation )
+		: null;
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
@@ -101,8 +111,18 @@ function ScreenBlock( { name, variation } ) {
 
 	return (
 		<>
-			<ScreenHeader title={ blockType.title } />
+			<ScreenHeader
+				title={ variation ? currentBlockStyle.label : blockType.title }
+			/>
 			<BlockPreviewPanel name={ name } variation={ variation } />
+			{ hasVariationsPanel && (
+				<div className="edit-site-global-styles-screen-variations">
+					<VStack spacing={ 3 }>
+						<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
+						<VariationsPanel name={ name } />
+					</VStack>
+				</div>
+			) }
 			{ hasColorPanel && (
 				<StylesColorPanel
 					inheritedValue={ inheritedStyle }
