@@ -23,7 +23,7 @@ const title = __( 'Language' );
 export const language = {
 	name,
 	tagName: 'span',
-	className: 'lang-attribute',
+	className: 'has-language',
 	edit: Edit,
 	title,
 };
