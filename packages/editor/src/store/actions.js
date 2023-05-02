@@ -528,7 +528,7 @@ const getBlockEditorAction =
 			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
-			version: '6.2',
+			version: '6.4',
 		} );
 		registry.dispatch( blockEditorStore )[ name ]( ...args );
 	};
