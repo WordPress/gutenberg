@@ -201,22 +201,10 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		// Print all registered fonts for the iframed editor.
 		if ( $for_iframed_editor ) {
-			$queue = $wp_fonts->queue;
-			$done  = $wp_fonts->done;
-
-			$wp_fonts->done  = array();
-			$wp_fonts->queue = $registered;
+			$handles = $registered;
 		}
 
-		$printed_fonts = $wp_fonts->do_items( $handles );
-
-		// Reset after printing.
-		if ( $for_iframed_editor ) {
-			$wp_fonts->done  = $done;
-			$wp_fonts->queue = $queue;
-		}
-
-		return $printed_fonts;
+		return $wp_fonts->do_items( $handles );
 	}
 }
 
