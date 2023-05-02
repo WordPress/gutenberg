@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { paramCase as kebabCase } from 'change-case';
 
 /**
@@ -115,19 +116,23 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
-	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] = {
-		shift: true,
-		offset: 20,
-		placement: 'left-start',
-		...receivedPopoverProps,
-	};
+	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
+		useMemo(
+			() => ( {
+				shift: true,
+				offset: 20,
+				placement: 'left-start',
+				...receivedPopoverProps,
+				className: classnames(
+					'components-palette-edit__popover',
+					receivedPopoverProps?.className
+				),
+			} ),
+			[ receivedPopoverProps ]
+		);
 
 	return (
-		<Popover
-			className="components-palette-edit__popover"
-			{ ...popoverProps }
-			onClose={ onClose }
-		>
+		<Popover { ...popoverProps } onClose={ onClose }>
 			{ ! isGradient && (
 				<ColorPicker
 					color={ element.color }
