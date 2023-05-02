@@ -68,33 +68,8 @@ function Edit( props ) {
 					anchor={ popoverAnchor }
 					placement="bottom"
 				>
-					<TextControl
-						label={ title }
-						value={ lang }
-						onChange={ ( val ) => setLang( val ) }
-						help={ __(
-							'A valid language attribute, like "en" or "fr".'
-						) }
-					/>
-					<SelectControl
-						label={ __( 'Text direction' ) }
-						value={ dir }
-						options={ [
-							{
-								label: __( 'Left to right' ),
-								value: 'ltr',
-							},
-							{
-								label: __( 'Right to left' ),
-								value: 'rtl',
-							},
-						] }
-						onChange={ ( val ) => setDir( val ) }
-					/>
-					<Button
-						isPrimary
-						text={ __( 'Apply' ) }
-						onClick={ () => {
+					<form
+						onSubmit={ () => {
 							onChange(
 								applyFormat( value, {
 									type: name,
@@ -106,7 +81,36 @@ function Edit( props ) {
 							);
 							togglePopover();
 						} }
-					/>
+					>
+						<TextControl
+							label={ title }
+							value={ lang }
+							onChange={ ( val ) => setLang( val ) }
+							help={ __(
+								'A valid language attribute, like "en" or "fr".'
+							) }
+						/>
+						<SelectControl
+							label={ __( 'Text direction' ) }
+							value={ dir }
+							options={ [
+								{
+									label: __( 'Left to right' ),
+									value: 'ltr',
+								},
+								{
+									label: __( 'Right to left' ),
+									value: 'rtl',
+								},
+							] }
+							onChange={ ( val ) => setDir( val ) }
+						/>
+						<Button
+							isPrimary
+							type="submit"
+							text={ __( 'Apply' ) }
+						/>
+					</form>
 				</Popover>
 			) }
 		</>
