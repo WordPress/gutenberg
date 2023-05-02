@@ -15,6 +15,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
 
 export default function ColorPalettePanel( { name } ) {
 	const [ themeColors, setThemeColors ] = useGlobalSetting(
@@ -46,12 +47,7 @@ export default function ColorPalettePanel( { name } ) {
 	);
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const popoverProps = isMobileViewport
-		? {
-				placement: 'bottom-start',
-				offset: 8,
-		  }
-		: undefined;
+	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
 	return (
 		<VStack
