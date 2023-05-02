@@ -259,7 +259,6 @@ _Parameters_
 -   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
--   _clientId_ `string`:
 
 _Returns_
 
@@ -274,7 +273,6 @@ _Parameters_
 -   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
--   _clientId_ `string`:
 
 _Returns_
 

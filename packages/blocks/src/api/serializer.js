@@ -116,14 +116,12 @@ export function getInnerBlocksProps( props = {} ) {
  * @param {string|Object} blockTypeOrName Block type or name.
  * @param {Object}        attributes      Block attributes.
  * @param {?Array}        innerBlocks     Nested blocks.
- * @param {string}        clientId
  * @return {Object|string} Save element or raw HTML string.
  */
 export function getSaveElement(
 	blockTypeOrName,
 	attributes,
-	innerBlocks = [],
-	clientId
+	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let { save } = blockType;
@@ -140,7 +138,7 @@ export function getSaveElement(
 	blockPropsProvider.attributes = attributes;
 	innerBlocksPropsProvider.innerBlocks = innerBlocks;
 
-	let element = save( { attributes, innerBlocks, clientId } );
+	let element = save( { attributes, innerBlocks } );
 
 	if (
 		element !== null &&
@@ -189,19 +187,13 @@ export function getSaveElement(
  * @param {string|Object} blockTypeOrName Block type or name.
  * @param {Object}        attributes      Block attributes.
  * @param {?Array}        innerBlocks     Nested blocks.
- * @param {string}        clientId
  * @return {string} Save content.
  */
-export function getSaveContent(
-	blockTypeOrName,
-	attributes,
-	innerBlocks,
-	clientId
-) {
+export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	return renderToString(
-		getSaveElement( blockType, attributes, innerBlocks, clientId )
+		getSaveElement( blockType, attributes, innerBlocks )
 	);
 }
 
@@ -298,8 +290,7 @@ export function getBlockInnerHTML( block ) {
 			saveContent = getSaveContent(
 				block.name,
 				block.attributes,
-				block.innerBlocks,
-				block.clientId
+				block.innerBlocks
 			);
 		} catch ( error ) {}
 	}
