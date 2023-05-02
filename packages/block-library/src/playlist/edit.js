@@ -120,7 +120,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					name={ __( 'Edit Tracks' ) }
+					name={ __( 'Edit' ) }
 					accept="audio/*"
 					playlist={ true }
 					multiple={ true }
