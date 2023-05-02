@@ -50,7 +50,7 @@ To update an existing page:
 2. Create a branch to work, for example `docs/update-contrib-guide`.
 3. Make the necessary changes to the existing document.
 4. Commit your changes.
-5. Create a pull request using "\[Type\] Documentation" label.
+5. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
 
 ### Create a new document
 
