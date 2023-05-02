@@ -647,7 +647,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 *
 				 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
 				 */
-				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
+				$theme_json = apply_filters( 'wp_theme_json_data_site', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
 				$config     = $theme_json->get_data();
 				return new WP_Theme_JSON_Gutenberg( $config, 'site' );
 			}
@@ -665,7 +665,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
+		$theme_json   = apply_filters( 'wp_theme_json_data_site', new WP_Theme_JSON_Data_Gutenberg( $config, 'site' ) );
 		$config       = $theme_json->get_data();
 		static::$site = new WP_Theme_JSON_Gutenberg( $config, 'site' );
 
