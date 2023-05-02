@@ -389,9 +389,12 @@ export default function useListViewDropZone() {
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
 					const isExpanded = blockElement.dataset.expanded === 'true';
-					const nestingLevel = blockElement.dataset.level
-						? parseInt( blockElement.dataset.level, 10 )
-						: undefined;
+
+					// Get nesting level from `aria-level` attribute because Firefox does not support `element.ariaLevel`.
+					const nestingLevel = parseInt(
+						blockElement.getAttribute( 'aria-level' ),
+						10
+					);
 					const rootClientId = getBlockRootClientId( clientId );
 
 					return {
@@ -400,7 +403,7 @@ export default function useListViewDropZone() {
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
-						nestingLevel,
+						nestingLevel: nestingLevel || undefined,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )
 							: false,

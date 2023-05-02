@@ -245,7 +245,6 @@ function ListViewBlock( {
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
 			data-expanded={ canExpand ? isExpanded : undefined }
-			data-level={ level }
 			ref={ rowRef }
 		>
 			<TreeGridCell
