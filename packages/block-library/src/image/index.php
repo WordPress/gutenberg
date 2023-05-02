@@ -58,6 +58,10 @@ function render_block_core_image( $attributes, $content ) {
 
 		$modal_content = new WP_HTML_Tag_Processor( $content );
 		$modal_content->next_tag( 'img' );
+
+		$alttext = $modal_content->get_attribute( 'alt' );
+		$aria_label = $alttext ? 'Open image lightbox - ' . $alttext : 'Open image lightbox';
+
 		$modal_content = process_img_data_id($modal_content, $attributes);
 		$modal_content = $modal_content->get_updated_html();
 
@@ -67,7 +71,7 @@ function render_block_core_image( $attributes, $content ) {
 			<div class="wp-lightbox-container"
 				 data-wp-island=''
 				 data-wp-context='{ "core": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } }'>
-					<button aria-haspopup='dialog' aria-description='opens lightbox' data-wp-on.click='actions.core.showLightbox'>
+					<button aria-haspopup='dialog' aria-label='$aria_label' data-wp-on.click='actions.core.showLightbox'>
 						$body_content
 					</button>
 					<div data-wp-portal="body" class="wp-lightbox-overlay"
