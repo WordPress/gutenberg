@@ -192,53 +192,53 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 				 * Adds settings and styles from the WP_REST_Revisions_Controller item fields.
 				 * Leaves out GUID as global styles shouldn't be accessible via URL.
 				 */
-				'author'              => array(
+				'author'       => array(
 					'description' => __( 'The ID for the author of the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'date'                => array(
+				'date'         => array(
 					'description' => __( "The date the revision was published, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'date_gmt'            => array(
+				'date_gmt'     => array(
 					'description' => __( 'The date the revision was published, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'id'                  => array(
+				'id'           => array(
 					'description' => __( 'Unique identifier for the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'modified'            => array(
+				'modified'     => array(
 					'description' => __( "The date the revision was last modified, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'modified_gmt'        => array(
+				'modified_gmt' => array(
 					'description' => __( 'The date the revision was last modified, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'parent'              => array(
+				'parent'       => array(
 					'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 
 				// Adds settings and styles from the WP_REST_Global_Styles_Controller parent schema.
-				'styles'              => array(
+				'styles'       => array(
 					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				'settings'            => array(
+				'settings'     => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
