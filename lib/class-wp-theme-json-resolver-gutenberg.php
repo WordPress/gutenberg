@@ -496,7 +496,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $user_cpt;
 	}
 
-	public static function get_site_data_from_wp_global_styles($create_post = false, $post_status_filter = array( 'publish' ) ) {
+	public static function get_site_data_from_wp_global_styles( $create_post = false, $post_status_filter = array( 'publish' ) ) {
 		$theme = wp_get_theme();
 
 		/*
@@ -512,7 +512,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$site_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$post_name = 'wp-global-styles-site';
+		$post_name        = 'wp-global-styles-site';
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',

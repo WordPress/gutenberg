@@ -33,10 +33,10 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 
 	}
 
-	public function get_site_item () {
+	public function get_site_item() {
 		$active_global_styles_site_id = WP_Theme_JSON_Resolver_Gutenberg::get_site_global_styles_post_id();
-		$active_global_styles_site = get_post( $active_global_styles_site_id );
-		$active_global_styles_site = $this->prepare_item_for_response( $active_global_styles_site, new WP_REST_Request() );
+		$active_global_styles_site    = get_post( $active_global_styles_site_id );
+		$active_global_styles_site    = $this->prepare_item_for_response( $active_global_styles_site, new WP_REST_Request() );
 		return $active_global_styles_site;
 	}
 
