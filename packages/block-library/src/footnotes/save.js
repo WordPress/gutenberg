@@ -3,16 +3,11 @@
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import { getOrder } from './order';
-
-export default function Save( { attributes, clientId } ) {
+export default function Save( { attributes } ) {
 	return (
 		<footer { ...useBlockProps.save() }>
 			<ol>
-				{ getOrder( clientId, attributes ).map( ( { id, content } ) => (
+				{ attributes.footnotes.map( ( { id, content } ) => (
 					<li id={ id } key={ id }>
 						<RichText.Content tagName="span" value={ content } />{ ' ' }
 						<a href={ `#${ id }-link` }>↩︎</a>

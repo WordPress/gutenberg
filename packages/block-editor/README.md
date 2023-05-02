@@ -520,6 +520,10 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getRichTextValues
+
+Undocumented declaration.
+
 ### getSpacingPresetCssVar
 
 Converts a spacing preset into a custom value.
