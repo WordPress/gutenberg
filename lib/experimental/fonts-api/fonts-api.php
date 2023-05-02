@@ -183,7 +183,13 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_fonts( $handles = false ) {
-		global $wp_fonts;
+		$wp_fonts   = wp_fonts();
+		$registered = $wp_fonts->get_registered_font_families();
+
+		// Nothing to print, as no fonts are registered.
+		if ( empty( $registered ) ) {
+			return array();
+		}
 
 		if ( empty( $handles ) ) {
 			$handles = false;
@@ -191,13 +197,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
-			if ( ! $handles ) {
-				return array(); // No need to instantiate if nothing is there.
-			}
-		}
-
-		return wp_fonts()->do_items( $handles );
+		return $wp_fonts->do_items( $handles );
 	}
 }
 
