@@ -142,7 +142,7 @@ export function getCachedResolvers( state ) {
 export function hasResolvingSelectors( state ) {
 	return [ ...Object.values( state ) ].some( ( selectorState ) =>
 		[ ...selectorState._map.values() ].some(
-			( resolution ) => resolution[ 1 ].status === 'resolving'
+			( resolution ) => resolution[ 1 ]?.status === 'resolving'
 		)
 	);
 }
