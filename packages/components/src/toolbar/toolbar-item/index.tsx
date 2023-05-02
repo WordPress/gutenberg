@@ -15,12 +15,16 @@ import warning from '@wordpress/warning';
  */
 import ToolbarContext from '../toolbar-context';
 
+type ToolBarItemProps = React.ComponentPropsWithoutRef<
+	typeof BaseToolbarItem
+> & {
+	children:
+		| React.ReactNode
+		| ( ( internalToggleProps?: Record< string, any > ) => JSX.Element );
+};
+
 function ToolbarItem(
-	{
-		children,
-		as: Component,
-		...props
-	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
+	{ children, as: Component, ...props }: ToolBarItemProps,
 	ref: ForwardedRef< any >
 ) {
 	const accessibleToolbarState = useContext( ToolbarContext );

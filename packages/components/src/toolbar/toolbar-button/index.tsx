@@ -19,6 +19,7 @@ import ToolbarButtonContainer from './toolbar-button-container';
 import type { ToolbarButtonProps } from './types';
 import type { WordPressComponentProps } from '../../ui/context';
 import type React from 'react';
+import type { ButtonAsButtonProps } from '../../button/types';
 
 function UnforwardedToolbarButton(
 	{
@@ -82,7 +83,7 @@ function UnforwardedToolbarButton(
 			{ ...props }
 			ref={ ref }
 		>
-			{ ( toolbarItemProps ) => (
+			{ ( toolbarItemProps: ButtonAsButtonProps ) => (
 				<Button
 					label={ title }
 					isPressed={ isActive }
