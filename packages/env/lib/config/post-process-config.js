@@ -39,7 +39,7 @@ module.exports = function postProcessConfig( config ) {
  * @return {WPRootConfig} The config object with the root options merged together with the environment-specific options.
  */
 function mergeRootToEnvironments( config ) {
-	// Some root-level options need to be merged early because they have a special
+	// Some root-level options need to be handled early because they have a special
 	// cascade behavior that would break the normal merge. After merging we then
 	// delete them to avoid that breakage and add them back before we return.
 	const removedRootOptions = {};
@@ -58,6 +58,10 @@ function mergeRootToEnvironments( config ) {
 		removedRootOptions.testsPort = config.testsPort;
 		config.env.tests.port = config.testsPort;
 		delete config.testsPort;
+	}
+	if ( config.afterSetup !== undefined ) {
+		removedRootOptions.afterSetup = config.afterSetup;
+		delete config.afterSetup;
 	}
 
 	// Merge the root config and the environment configs together so that

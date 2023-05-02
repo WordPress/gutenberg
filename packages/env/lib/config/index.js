@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Internal dependencies
  */
@@ -6,7 +7,7 @@ const { ValidationError } = require( './validate-config' );
 const dbEnv = require( './db-env' );
 
 /**
- * @typedef {import('./parse-config').WPConfig} WPConfig
+ * @typedef {import('./load-config').WPConfig} WPConfig
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
  * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./parse-source-string').WPSource} WPSource

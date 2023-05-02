@@ -11,6 +11,21 @@
 class ValidationError extends Error {}
 
 /**
+ * Validates that the value is a string.
+ *
+ * @param {string} configFile The configuration file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {number} value      The value to check.
+ */
+function checkString( configFile, configKey, value ) {
+	if ( typeof value !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string.`
+		);
+	}
+}
+
+/**
  * Validates the port and throws if it isn't valid.
  *
  * @param {string} configFile The configuration file we're validating.
@@ -18,10 +33,6 @@ class ValidationError extends Error {}
  * @param {number} port       The port to check.
  */
 function checkPort( configFile, configKey, port ) {
-	if ( port === undefined ) {
-		return;
-	}
-
 	if ( ! Number.isInteger( port ) ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be an integer.`
@@ -45,10 +56,6 @@ function checkPort( configFile, configKey, port ) {
  * @param {string[]} array      The array that we're checking.
  */
 function checkStringArray( configFile, configKey, array ) {
-	if ( array === undefined ) {
-		return;
-	}
-
 	if ( ! Array.isArray( array ) ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be an array.`
@@ -71,10 +78,6 @@ function checkStringArray( configFile, configKey, array ) {
  * @param {string[]} allowTypes The types that are allowed.
  */
 function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
-	if ( obj === undefined ) {
-		return;
-	}
-
 	if ( allowTypes === undefined ) {
 		allowTypes = [];
 	}
@@ -113,10 +116,6 @@ function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
  * @param {string} version    The version that we're checking.
  */
 function checkVersion( configFile, configKey, version ) {
-	if ( version === undefined || version === null ) {
-		return;
-	}
-
 	if ( typeof version !== 'string' ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a string.`
@@ -138,13 +137,9 @@ function checkVersion( configFile, configKey, version ) {
  * @param {string} url        The URL that we're checking.
  */
 function checkValidURL( configFile, configKey, url ) {
-	if ( url === undefined ) {
-		return;
-	}
-
 	try {
 		new URL( url );
-	} catch ( e ) {
+	} catch {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a valid URL.`
 		);
@@ -153,6 +148,7 @@ function checkValidURL( configFile, configKey, url ) {
 
 module.exports = {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
