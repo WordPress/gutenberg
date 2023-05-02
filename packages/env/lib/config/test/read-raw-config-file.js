@@ -36,8 +36,8 @@ describe( 'readRawConfigFile', () => {
 
 		try {
 			await readRawConfigFile( '/.wp-env.json' );
-		} catch ( e ) {
-			expect( e ).toEqual(
+		} catch ( error ) {
+			expect( error ).toEqual(
 				new ValidationError( 'Could not read .wp-env.json: Test' )
 			);
 		}

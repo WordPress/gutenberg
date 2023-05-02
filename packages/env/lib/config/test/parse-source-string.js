@@ -33,8 +33,8 @@ describe( 'parseSourceString', () => {
 		expect.assertions( 1 );
 		try {
 			parseSourceString( 'test://test', options );
-		} catch ( e ) {
-			expect( e ).toEqual(
+		} catch ( error ) {
+			expect( error ).toEqual(
 				new ValidationError(
 					'Invalid or unrecognized source: "test://test".'
 				)
