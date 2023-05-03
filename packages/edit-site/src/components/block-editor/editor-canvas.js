@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,8 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { ENTER, SPACE } from '@wordpress/keycodes';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,6 +38,13 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const mouseMoveTypingRef = useMouseMoveTypingReset();
+	const [ isFocused, setIsFocused ] = useState( false );
+
+	useEffect( () => {
+		if ( canvasMode === 'edit' ) {
+			setIsFocused( false );
+		}
+	}, [ canvasMode ] );
 
 	return (
 		<Iframe
@@ -40,9 +54,30 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			style={ enableResizing ? {} : deviceStyles }
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
-			className="edit-site-visual-editor__editor-canvas"
+			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
+				'is-focused': isFocused && canvasMode === 'view',
+			} ) }
 			{ ...props }
 			role={ canvasMode === 'view' ? 'button' : undefined }
+			tabIndex={ canvasMode === 'view' ? 0 : undefined }
+			aria-label={ canvasMode === 'view' ? 'Editor Canvas' : undefined }
+			onFocus={
+				canvasMode === 'view' ? () => setIsFocused( true ) : undefined
+			}
+			onBlur={
+				canvasMode === 'view' ? () => setIsFocused( false ) : undefined
+			}
+			onKeyDown={
+				canvasMode === 'view'
+					? ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								event.preventDefault();
+								setCanvasMode( 'edit' );
+							}
+					  }
+					: undefined
+			}
 			onClick={
 				canvasMode === 'view'
 					? () => setCanvasMode( 'edit' )
