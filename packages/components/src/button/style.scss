@@ -295,10 +295,7 @@
 			justify-content: start;
 			padding-right: $grid-unit-15;
 			padding-left: $grid-unit-15;
-		}
-
-		&.has-text svg {
-			margin-right: $grid-unit-10;
+			gap: $grid-unit-05;
 		}
 
 		&.has-text .dashicon {
