@@ -51,4 +51,13 @@ describe( 'addOrReplacePort', () => {
 			expect( result ).toEqual( test.expect );
 		}
 	} );
+
+	it( 'should do nothing if port is 80 or 443', () => {
+		const testMap = [ { in: 'test', expect: 'test' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, '80' );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
 } );
