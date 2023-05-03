@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { createBlock, cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -35,10 +35,25 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert(
-			( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
-			pattern.name
-		);
+		if ( window?.__experimentalEnablePatternEnhancements ) {
+			onInsert(
+				blocks
+					? [
+							createBlock(
+								'core/pattern',
+								{ slug: pattern.name },
+								blocks.map( ( block ) => cloneBlock( block ) )
+							),
+					  ]
+					: [],
+				pattern.name
+			);
+		} else {
+			onInsert(
+				( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
+				pattern.name
+			);
+		}
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
