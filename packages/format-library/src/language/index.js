@@ -71,7 +71,7 @@ function Edit( props ) {
 				>
 					<form
 						className="block-editor-format-toolbar__language-container-content"
-						onSubmit={ () => {
+						onSubmit={ ( event ) => {
 							onChange(
 								applyFormat( value, {
 									type: name,
@@ -82,6 +82,7 @@ function Edit( props ) {
 								} )
 							);
 							togglePopover();
+							event.preventDefault();
 						} }
 					>
 						<TextControl
