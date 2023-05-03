@@ -45,6 +45,9 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	// !important used to forcibly prevent undesired application of
 	// text-decoration styles on the input field.
 	text-decoration: unset !important;
+
+	// Hides a redundant extra search icon on Mobile Safari.
+	appearance: initial;
 }
 
 .wp-block-search.wp-block-search__button-only {

@@ -10,6 +10,8 @@ import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
+import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
+import { cleanEmptyObject } from './hooks/utils';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -24,4 +26,6 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
+	useShouldContextualToolbarShow,
+	cleanEmptyObject,
 } );

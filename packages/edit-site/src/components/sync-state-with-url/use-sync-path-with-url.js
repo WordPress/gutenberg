@@ -3,11 +3,14 @@
  */
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation, useHistory } from '../routes';
+import { unlock } from '../../private-apis';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export function getPathFromURL( urlParams ) {
 	let path = urlParams?.path ?? '/';

@@ -221,6 +221,9 @@ function gutenberg_register_packages_scripts( $scripts ) {
 			case 'wp-edit-site':
 				array_push( $dependencies, 'wp-dom-ready' );
 				break;
+			case 'wp-preferences':
+				array_push( $dependencies, 'wp-preferences-persistence' );
+				break;
 		}
 
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
@@ -255,7 +258,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor-content',
 		gutenberg_url( 'build/block-editor/content.css' ),
-		array(),
+		array( 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
@@ -283,7 +286,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );

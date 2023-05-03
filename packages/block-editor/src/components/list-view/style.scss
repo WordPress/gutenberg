@@ -15,7 +15,7 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	.components-button {
+	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
 			color: $gray-900;
@@ -376,6 +376,9 @@ $block-navigation-max-indent: 8;
 	}
 }
 
+// When updating the margin for each indentation level, the corresponding
+// indentation in `use-list-view-drop-zone.js` must be updated as well
+// to ensure the drop zone is aligned with the indentation.
 @for $i from 0 to $block-navigation-max-indent {
 	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"] .block-editor-list-view__expander {
 		@if $i - 1 >= 0 {

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.6.0-rc.2",
+	"version": "15.7.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -37,6 +37,7 @@
 		"@wordpress/commands": "file:packages/commands",
 		"@wordpress/components": "file:packages/components",
 		"@wordpress/compose": "file:packages/compose",
+		"@wordpress/core-commands": "file:packages/core-commands",
 		"@wordpress/core-data": "file:packages/core-data",
 		"@wordpress/customize-widgets": "file:packages/customize-widgets",
 		"@wordpress/data": "file:packages/data",
@@ -76,6 +77,7 @@
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/reusable-blocks": "file:packages/reusable-blocks",
 		"@wordpress/rich-text": "file:packages/rich-text",
+		"@wordpress/router": "file:packages/router",
 		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/style-engine": "file:packages/style-engine",

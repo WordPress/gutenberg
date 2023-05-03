@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	useInstanceId,
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
@@ -90,6 +91,7 @@ function ListViewComponent(
 		);
 	}
 
+	const instanceId = useInstanceId( ListViewComponent );
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( { blocks, rootClientId } );
 
@@ -200,14 +202,15 @@ function ListViewComponent(
 			expand,
 			collapse,
 			BlockSettingsMenu,
+			listViewInstanceId: instanceId,
 		} ),
 		[
-			isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
 			collapse,
 			BlockSettingsMenu,
+			instanceId,
 		]
 	);
 

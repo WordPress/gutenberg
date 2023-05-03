@@ -7,16 +7,22 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = {
@@ -84,12 +90,18 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: attributes.type,
 					postId: attributes.id,
+					...( isPreviewingTheme() && {
+						theme_preview: currentlyPreviewingTheme(),
+					} ),
 				} );
 			}
 			if ( name === 'core/page-list-item' && attributes.id && history ) {
 				history.push( {
 					postType: 'page',
 					postId: attributes.id,
+					...( isPreviewingTheme() && {
+						theme_preview: currentlyPreviewingTheme(),
+					} ),
 				} );
 			}
 		},

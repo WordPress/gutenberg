@@ -5,7 +5,7 @@
 import { insert } from './insert';
 import { LINE_SEPARATOR } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Insert a line break character into a Rich Text value at the given

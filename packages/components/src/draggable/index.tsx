@@ -63,6 +63,7 @@ export function Draggable( {
 	onDragStart,
 	onDragOver,
 	onDragEnd,
+	appendToOwnerDocument = false,
 	cloneClassname,
 	elementId,
 	transferData,
@@ -173,7 +174,11 @@ export function Draggable( {
 			cloneWrapper.appendChild( clone );
 
 			// Inject the cloneWrapper into the DOM.
-			elementWrapper?.appendChild( cloneWrapper );
+			if ( appendToOwnerDocument ) {
+				ownerDocument.body.appendChild( cloneWrapper );
+			} else {
+				elementWrapper?.appendChild( cloneWrapper );
+			}
 		}
 
 		// Mark the current cursor coordinates.

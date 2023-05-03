@@ -933,7 +933,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px)',
+				'font-size: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.078), 15px)',
 			] );
 		} );
 
