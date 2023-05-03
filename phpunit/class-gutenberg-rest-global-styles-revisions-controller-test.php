@@ -14,6 +14,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	/**
 	 * @var int
 	 */
+	protected static $author_id;
+
+	/**
+	 * @var int
+	 */
 	protected static $global_styles_id;
 
 	public function set_up() {
@@ -35,6 +40,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		self::$second_admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
+			)
+		);
+		self::$author_id       = $factory->user->create(
+			array(
+				'role' => 'author',
 			)
 		);
 		// This creates the global styles for the current theme.
@@ -158,6 +168,17 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$this->assertArrayHasKey( 'date_gmt', $properties, 'Schema properties array does not have "date_gmt" key' );
 		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array does not have "modified" key' );
 		$this->assertArrayHasKey( 'modified_gmt', $properties, 'Schema properties array does not have "modified_gmt" key' );
+	}
+
+	/**
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_item_permissions_check
+	 */
+	public function test_get_item_permissions_check() {
+		wp_set_current_user( self::$author_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
 	/**
