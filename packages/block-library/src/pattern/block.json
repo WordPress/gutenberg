@@ -28,7 +28,7 @@
 		"syncStatus": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "synced", "unsynced" ],
-			"default": "synced"
+			"default": "unsynced"
 		}
 	}
 }
