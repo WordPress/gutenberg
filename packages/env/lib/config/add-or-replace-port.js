@@ -28,6 +28,14 @@ module.exports = function addOrReplacePort( input, port, replace = true ) {
 		return input;
 	}
 
+	// If the port is '80' or '443' we will not add it to the output.
+	// This is because these are the default ports for HTTP and HTTPS and
+	// browsers will not display them in the address bar. Adding them would
+	// result in a redirect loop.
+	if ( port === '80' || port === '443' ) {
+		return input;
+	}
+
 	// Place the port in the correct location in the input.
 	return matches[ 1 ] + ':' + port + matches[ 3 ];
 };
