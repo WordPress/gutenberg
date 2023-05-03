@@ -182,6 +182,7 @@ function PostFeaturedImage( {
 											className="editor-post-featured-image__dropdown"
 											popoverProps={ {
 												placement: 'left-start',
+												shift: true,
 											} }
 											renderToggle={ ( {
 												isOpen,
