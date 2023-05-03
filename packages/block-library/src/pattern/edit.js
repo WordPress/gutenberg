@@ -103,7 +103,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 
 	return (
 		<>
-			<div { ...innerBlocksProps } data-pattern-slug={ slug } />
+			<div { ...innerBlocksProps } />
 			<BlockControls group="other">
 				<ToolbarButton onClick={ handleSync }>
 					{ templateLock === false

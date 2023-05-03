@@ -3,8 +3,10 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default function save() {
-	const blockProps = useBlockProps.save();
+export default function save( { attributes: { inheritedAlignment } } ) {
+	const blockProps = useBlockProps.save( {
+		className: inheritedAlignment && `align${ inheritedAlignment }`,
+	} );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
-	return <>{ innerBlocksProps.children }</>;
+	return <div { ...innerBlocksProps }>{ innerBlocksProps.children }</div>;
 }
