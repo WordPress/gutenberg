@@ -78,7 +78,7 @@ describe( 'BlockList', () => {
 				} );
 				fireEvent.press( paragraphBlock );
 				fireEvent( screen.getByLabelText( 'Add block' ), 'longPress' );
-				fireEvent.press( screen.getByText( 'Add Block Before ' ) );
+				fireEvent.press( screen.getByText( 'Add Block Before' ) );
 
 				// Assert
 				expect( screen.getByText( 'ADD BLOCK HERE' ) ).toBeTruthy();
@@ -94,7 +94,7 @@ describe( 'BlockList', () => {
 				} );
 				fireEvent.press( paragraphBlock );
 				fireEvent( screen.getByLabelText( 'Add block' ), 'longPress' );
-				fireEvent.press( screen.getByText( 'Add Block After ' ) );
+				fireEvent.press( screen.getByText( 'Add Block After' ) );
 
 				// Assert
 				expect( screen.getByText( 'ADD BLOCK HERE' ) ).toBeTruthy();
@@ -126,7 +126,7 @@ describe( 'BlockList', () => {
 				} );
 				fireEvent.press( paragraphBlock );
 				fireEvent( screen.getByLabelText( 'Add block' ), 'longPress' );
-				fireEvent.press( screen.getByText( 'Add Block Before ' ) );
+				fireEvent.press( screen.getByText( 'Add Block Before' ) );
 
 				// Assert
 				expect( screen.getByText( 'ADD BLOCK HERE' ) ).toBeTruthy();
@@ -156,7 +156,7 @@ describe( 'BlockList', () => {
 				} );
 				fireEvent.press( paragraphBlock );
 				fireEvent( screen.getByLabelText( 'Add block' ), 'longPress' );
-				fireEvent.press( screen.getByText( 'Add Block After ' ) );
+				fireEvent.press( screen.getByText( 'Add Block After' ) );
 
 				// Assert
 				expect( screen.getByText( 'ADD BLOCK HERE' ) ).toBeTruthy();
