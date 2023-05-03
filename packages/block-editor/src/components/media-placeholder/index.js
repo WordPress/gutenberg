@@ -85,7 +85,7 @@ export function MediaPlaceholder( {
 	if ( deprecatedOnHTMLDrop ) {
 		deprecated( 'wp.blockEditor.MediaPlaceholder onHTMLDrop prop', {
 			since: '6.2',
-			version: '6.3',
+			version: '6.4',
 		} );
 	}
 
