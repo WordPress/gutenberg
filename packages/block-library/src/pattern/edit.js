@@ -14,7 +14,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { forcedAlignment, slug, syncStatus } = attributes;
+	const { inheritedAlignment, slug, templateLock } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -34,8 +34,6 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
-	// This change won't be saved.
-	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
 		if ( selectedPattern?.blocks && ! innerBlocks?.length ) {
 			// We batch updates to block list settings to avoid triggering cascading renders
@@ -63,8 +61,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 
 	useEffect( () => {
 		const alignments = [ 'wide', 'full' ];
-		const blocks =
-			syncStatus === 'synced' ? selectedPattern?.blocks : innerBlocks;
+		const blocks = innerBlocks;
 		if ( ! blocks || blocks.length === 0 ) {
 			return;
 		}
@@ -80,30 +77,27 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		// Set the attribute of the Pattern block to match the widest
 		// alignment.
 		setAttributes( {
-			forcedAlignment: widestAlignment ?? '',
+			inheritedAlignment: widestAlignment ?? '',
 		} );
 	}, [
 		innerBlocks,
 		selectedPattern?.blocks,
 		setAttributes,
-		syncStatus,
-		forcedAlignment,
+		inheritedAlignment,
 	] );
 
 	const blockProps = useBlockProps( {
-		className: forcedAlignment && `align${ forcedAlignment }`,
+		className: inheritedAlignment && `align${ inheritedAlignment }`,
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: templateLock === 'contentOnly' ? 'contentOnly' : false,
+	} );
 
 	const handleSync = () => {
-		if ( syncStatus === 'synced' ) {
-			setAttributes( { syncStatus: 'unsynced' } );
+		if ( templateLock === false ) {
+			setAttributes( { templateLock: 'contentOnly' } );
 		} else {
-			setAttributes( { syncStatus: 'synced' } );
-			replaceInnerBlocks(
-				clientId,
-				selectedPattern.blocks.map( ( block ) => cloneBlock( block ) )
-			);
+			setAttributes( { templateLock: false } );
 		}
 	};
 
@@ -112,9 +106,9 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			<div { ...innerBlocksProps } data-pattern-slug={ slug } />
 			<BlockControls group="other">
 				<ToolbarButton onClick={ handleSync }>
-					{ syncStatus === 'unsynced'
-						? __( 'Sync' )
-						: __( 'Desync' ) }
+					{ templateLock === false
+						? __( 'Edit content only' )
+						: __( 'Edit all' ) }
 				</ToolbarButton>
 			</BlockControls>
 		</>
