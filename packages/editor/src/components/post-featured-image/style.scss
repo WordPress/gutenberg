@@ -34,19 +34,24 @@
 
 .editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
-	display: block;
 	width: 100%;
 	padding: 0;
 	transition: all 0.1s ease-out;
 	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
+
+	// Apply a max-height.
+	display: flex;
+	justify-content: center;
+	max-height: 150px;
 }
 
 .editor-post-featured-image__preview {
 	height: auto;
 
 	.components-responsive-wrapper {
+		width: 100%;
 		background: $gray-100;
 	}
 
@@ -81,7 +86,7 @@
 	padding: $grid-unit-05;
 	position: absolute;
 	right: $grid-unit-10;
-	top: $grid-unit-10;
+	bottom: $grid-unit-10;
 	visibility: hidden;
 	width: $grid-unit-40;
 }
