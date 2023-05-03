@@ -15,7 +15,7 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	.components-button {
+	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
 			color: $gray-900;

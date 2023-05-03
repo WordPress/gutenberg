@@ -1,32 +1,20 @@
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $grid-unit-30;
-	width: 100%;
-	margin-top: $grid-unit-05;
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	// Small top padding required to avoid cutting off the visible outline when hovering items
+	padding-top: $border-width-focus;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
-		margin-bottom: 0;
-		aspect-ratio: 3/4;
-		width: calc(50% - #{ $grid-unit-30 * 1 } / 2);
-
-		@include break-medium() {
-			width: calc(33.333% - #{ $grid-unit-30 * 2 } / 3);
-		}
-
-		@include break-wide() {
-			width: calc(25% - #{ $grid-unit-30 * 3 } / 4);
-		}
-
-		.block-editor-block-preview__container {
-			height: 100%;
-		}
-
-		.block-editor-block-preview__content {
-			width: 100%;
-			position: absolute;
-		}
 
 		.block-editor-block-patterns-list__item-title {
 			display: none;
@@ -47,6 +35,7 @@
 			position: absolute;
 			padding: 0;
 			background: #f0f0f0;
+			min-height: $grid-unit-50 * 4;
 			&::after {
 				width: 100%;
 				top: 50%;

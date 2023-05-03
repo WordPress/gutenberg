@@ -38,7 +38,11 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import {
+	getEditorCanvasContainerTitle,
+	useHasEditorCanvasContainer,
+} from '../editor-canvas-container';
+import { unlock } from '../../private-apis';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +60,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		editorCanvasView,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -88,6 +93,9 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editorCanvasView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
 		};
 	}, [] );
 
@@ -117,7 +125,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasStyleBook = useHasStyleBook();
+	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -138,7 +146,7 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
+			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
@@ -223,12 +231,16 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ ! hasDefaultEditorCanvasView ? (
+					getEditorCanvasContainerTitle( editorCanvasView )
+				) : (
+					<DocumentActions />
+				) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

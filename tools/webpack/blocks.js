@@ -223,6 +223,7 @@ module.exports = [
 		entry: {
 			navigation:
 				'./packages/block-library/src/navigation/interactivity.js',
+			// blockname: './packages/block-library/src/blockname/interactivity.js',
 		},
 		output: {
 			devtoolNamespace: 'wp',

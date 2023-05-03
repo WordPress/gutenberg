@@ -1494,6 +1494,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-commands",
+		"slug": "packages-core-commands",
+		"markdown_source": "../packages/core-commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
@@ -1821,6 +1827,12 @@
 		"title": "@wordpress/rich-text",
 		"slug": "packages-rich-text",
 		"markdown_source": "../packages/rich-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
 		"parent": "packages"
 	},
 	{

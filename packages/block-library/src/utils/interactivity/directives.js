@@ -9,10 +9,6 @@ import { deepSignal, peek } from 'deepsignal';
  */
 import { directive } from './hooks';
 
-const raf = window.requestAnimationFrame;
-// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
-
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
@@ -60,7 +56,7 @@ export default () => {
 		const contextValue = useContext( context );
 		Object.values( effect ).forEach( ( path ) => {
 			useSignalEffect( () => {
-				return evaluate( path, { context: contextValue, tick } );
+				return evaluate( path, { context: contextValue } );
 			} );
 		} );
 	} );
@@ -80,7 +76,7 @@ export default () => {
 		const contextValue = useContext( context );
 		Object.entries( on ).forEach( ( [ name, path ] ) => {
 			element.props[ `on${ name }` ] = ( event ) => {
-				return evaluate( path, { event, context: contextValue, tick } );
+				return evaluate( path, { event, context: contextValue } );
 			};
 		} );
 	} );

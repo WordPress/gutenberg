@@ -40,8 +40,8 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -118,8 +118,7 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus, hasResolvedMenus: hasResolvedClassicMenus } =
-		useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -178,7 +177,6 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
-		navigationMenus,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -200,12 +198,6 @@ function Navigation( {
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
-	// Only auto-fallback to the latest published menu.
-	// The REST API already returns items sorted by publishing date.
-	const fallbackNavigationMenuId = navigationMenus?.find(
-		( menu ) => menu.status === 'publish'
-	)?.id;
-
 	const handleUpdateMenu = useCallback(
 		( menuId, options = { focusNavigationBlock: false } ) => {
 			const { focusNavigationBlock } = options;
@@ -216,41 +208,6 @@ function Navigation( {
 		},
 		[ selectBlock, clientId, setRef ]
 	);
-
-	// Attempt to retrieve and prioritize any existing navigation menu unless:
-	// - the are uncontrolled inner blocks already present in the block.
-	// - the user is creating a new menu.
-	// - there are no menus to choose from.
-	// This attempts to pick the first menu if there is a single Navigation Post. If more
-	// than 1 exists then use the most recent.
-	// The aim is for the block to "just work" from a user perspective using existing data.
-	useEffect( () => {
-		if (
-			hasUncontrolledInnerBlocks ||
-			isCreatingNavigationMenu ||
-			ref ||
-			! fallbackNavigationMenuId
-		) {
-			return;
-		}
-
-		/**
-		 *  This fallback displays (both in editor and on front)
-		 *  a list of pages only if no menu (user assigned or
-		 *  automatically picked) is available.
-		 *  The fallback should not request a save (entity dirty state)
-		 *  nor to be undoable, hence why it is marked as non persistent
-		 */
-		__unstableMarkNextChangeAsNotPersistent();
-		setRef( fallbackNavigationMenuId );
-	}, [
-		ref,
-		setRef,
-		isCreatingNavigationMenu,
-		fallbackNavigationMenuId,
-		hasUncontrolledInnerBlocks,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
@@ -264,54 +221,42 @@ function Navigation( {
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
 	useEffect( () => {
-		if (
-			ref ||
-			! hasResolvedClassicMenus ||
-			! hasResolvedNavigationMenus ||
-			isConvertingClassicMenu ||
-			fallbackNavigationMenuId ||
-			hasUnsavedBlocks ||
-			! classicMenus?.length
-		) {
+		// If:
+		// - there is an existing menu, OR
+		// - there are existing (uncontrolled) inner blocks
+		// ...then don't request a fallback menu.
+		if ( ref || hasUnsavedBlocks ) {
 			return;
 		}
 
-		// If there's non fallback navigation menus and
-		// a classic menu with a `primary` location or slug,
-		// then create a new navigation menu based on it.
-		// Otherwise, use the most recently created classic menu.
-		const primaryMenus = classicMenus.filter(
-			( classicMenu ) =>
-				classicMenu.locations.includes( 'primary' ) ||
-				classicMenu.slug === 'primary'
-		);
+		apiFetch( { path: '/wp-block-editor/v1/navigation-fallback' } )
+			.then( ( fallbackNavigationMenu ) => {
+				if ( ! fallbackNavigationMenu?.id ) {
+					showNavigationMenuStatusNotice(
+						__( 'Unable to fetch a fallback Navigation Menu.' )
+					);
+					return;
+				}
 
-		if ( primaryMenus.length ) {
-			convertClassicMenu(
-				primaryMenus[ 0 ].id,
-				primaryMenus[ 0 ].name,
-				'publish'
-			);
-		} else {
-			classicMenus.sort( ( a, b ) => {
-				return b.id - a.id;
+				/**
+				 *  This fallback displays (both in editor and on front)
+				 *  The fallback should not request a save (entity dirty state)
+				 *  nor to be undoable, hence why it is marked as non persistent
+				 */
+				__unstableMarkNextChangeAsNotPersistent();
+				setRef( fallbackNavigationMenu.id );
+			} )
+			.catch( () => {
+				showNavigationMenuStatusNotice(
+					__( 'Unable to fetch a fallback Navigation Menu.' )
+				);
 			} );
-			convertClassicMenu(
-				classicMenus[ 0 ].id,
-				classicMenus[ 0 ].name,
-				'publish'
-			);
-		}
 	}, [
-		hasResolvedClassicMenus,
-		hasResolvedNavigationMenus,
-		hasUnsavedBlocks,
-		classicMenus,
-		convertClassicMenu,
-		createNavigationMenu,
-		fallbackNavigationMenuId,
-		isConvertingClassicMenu,
 		ref,
+		hasUnsavedBlocks,
+		setRef,
+		showNavigationMenuStatusNotice,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	const navRef = useRef();
@@ -331,25 +276,6 @@ function Navigation( {
 		hasResolvedNavigationMenus &&
 		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
-
-	useEffect( () => {
-		if ( isPlaceholder ) {
-			/**
-			 *  this fallback only displays (both in editor and on front)
-			 *  the list of pages block if no menu is available as a fallback.
-			 *  We don't want the fallback to request a save,
-			 *  nor to be undoable, hence we mark it non persistent.
-			 */
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-		}
-	}, [
-		clientId,
-		isPlaceholder,
-		ref,
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceInnerBlocks,
-	] );
 
 	// "loading" state:
 	// - there is a menu creation process in progress.

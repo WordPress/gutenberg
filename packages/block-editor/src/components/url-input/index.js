@@ -309,11 +309,10 @@ class URLInput extends Component {
 
 				// Submitting while loading should trigger onSubmit.
 				case ENTER: {
-					event.preventDefault();
 					if ( this.props.onSubmit ) {
+						event.preventDefault();
 						this.props.onSubmit( null, event );
 					}
-
 					break;
 				}
 			}

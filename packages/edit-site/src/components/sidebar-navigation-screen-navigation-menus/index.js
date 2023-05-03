@@ -7,16 +7,18 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = {
