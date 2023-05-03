@@ -318,7 +318,6 @@ function BlockListBlock( {
 			isTouchable={ isTouchable }
 			marginHorizontal={ marginHorizontal }
 			marginVertical={ marginVertical }
-			mergedStyle={ mergedStyle }
 			onDeleteBlock={ onDeleteBlock }
 			onFocus={ onFocus }
 		>
