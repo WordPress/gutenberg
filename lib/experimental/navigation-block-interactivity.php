@@ -120,7 +120,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 				wp_enqueue_script(
 					'wp-block-navigation-view',
 					gutenberg_url( 'build/block-library/interactive-blocks/navigation.min.js' ),
-					array( 'interactivity-runtime' ),
+					array( 'wp-interactivity-runtime' ),
 				);
 			}
 			return $metadata;

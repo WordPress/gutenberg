@@ -106,10 +106,8 @@ store( {
 							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
-				focusFirstElement: async ( { context, tick, ref } ) => {
+				focusFirstElement: async ( { context, ref } ) => {
 					if ( context.isMenuOpen ) {
-						// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-						await tick();
 						ref.querySelector(
 							'.wp-block-navigation-item > *:first-child'
 						).focus();
