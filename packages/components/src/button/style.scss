@@ -293,7 +293,8 @@
 
 		&.has-text {
 			justify-content: start;
-			padding-right: 12px;
+			padding-right: $grid-unit-15;
+			padding-left: $grid-unit-15;
 		}
 
 		&.has-text svg {
