@@ -181,7 +181,7 @@ function BlockListBlock( {
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const blockOrder = getBlockIndex( clientId );
-			const innerBlockSelected = hasSelectedInnerBlock( clientId );
+			const innerBlockSelected = hasSelectedInnerBlock( clientId, true );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			const parents = getBlockParents( clientId, true );
