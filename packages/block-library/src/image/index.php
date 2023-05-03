@@ -83,9 +83,9 @@ HTML;
 function register_block_core_image() {
 
 	wp_enqueue_script(
-		'interactivity-image',
+		'wp-interactivity-image',
 		plugins_url( '../interactive-blocks/image.min.js', __FILE__ ),
-		array( 'interactivity-runtime' )
+		array( 'wp-interactivity-runtime' )
 	);
 
 	register_block_type_from_metadata(
