@@ -8,92 +8,55 @@ const raf = window.requestAnimationFrame;
 const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
 
 store( {
-	effects: {
-		alert: ( { context } ) => {
-			// eslint-disable-next-line no-console
-			console.log( context.text );
-		},
-	},
 	actions: {
 		core: {
-			showLightbox: ( { context, event } ) => {
+			showLightbox: ( { context } ) => {
 				context.core.initialized = true;
-				context.core.lightboxEnabled = ! context.core.lightboxEnabled;
-				context.core.lastFocusedElement =
-					event.target.ownerDocument.activeElement;
-
-				context.core.handleScroll = () => {
-					context.core.lightboxEnabled = false;
-					window.removeEventListener(
-						'scroll',
-						context.core.handleScroll
-					);
-				};
-
-				if ( context.core.lightboxEnabled ) {
-					window.addEventListener(
-						'scroll',
-						context.core.handleScroll
-					);
-				} else if ( context.core.handleScroll ) {
-					window.removeEventListener(
-						'scroll',
-						context.core.handleScroll
-					);
-				}
+				context.core.lightboxEnabled = true;
+				context.core.lastFocusedElement = window.document.activeElement;
 			},
 			hideLightbox: ( { context, event } ) => {
-				context.core.lightboxEnabled = false;
-				if ( event.pointerType === '' ) {
-					context.core.lastFocusedElement.focus();
-				}
-			},
-			hideLightboxOnEsc: ( { context } ) => {
-				function handleEscKey( event ) {
-					if (
-						context.core.lightboxEnabled &&
-						( event.key === 'Escape' || event.keyCode === 27 )
-					) {
-						context.core.lightboxEnabled = false;
-						context.core.lastFocusedElement.focus();
-					}
-				}
-				// Add the event listener for the 'keydown' event on the document
-				document.addEventListener( 'keydown', handleEscKey );
-				return () => {
-					document.removeEventListener( 'keydown', handleEscKey );
-				};
-			},
-			hideLightboxOnTab: ( { context } ) => {
-				async function handleTab( event ) {
-					if (
-						context.core.lightboxEnabled &&
-						( event.key === 'Tab' || event.keyCode === 9 )
-					) {
-						event.preventDefault();
-						context.core.lightboxEnabled = false;
-						context.core.lastFocusedElement.focus();
-					}
-				}
-				// Add the event listener for the 'keydown' event on the document
-				document.addEventListener( 'keydown', handleTab );
-				return () => {
-					document.removeEventListener( 'keydown', handleTab );
-				};
-			},
-			toggleAriaHidden: ( { context, ref } ) => {
-				ref.setAttribute(
-					'aria-hidden',
-					! context.core.lightboxEnabled
-				);
-			},
-			focusOnClose: async ( { context, ref } ) => {
 				if ( context.core.lightboxEnabled ) {
-					// We need to wait until the DOM is updated and able
+					context.core.lightboxEnabled = false;
+
+					// We only want to focus the last focused element
+					// if the lightbox was closed by the keyboard.
+					// Note: Pressing enter on a button will trigger
+					// a click event with a blank pointerType.
+					if (
+						( event.key && event.type === 'keydown' ) ||
+						( event.type === 'click' && event.pointerType === '' )
+					) {
+						context.core.lastFocusedElement.focus();
+					}
+				}
+			},
+			handleKeydown: ( { context, actions, event } ) => {
+				if ( context.core.lightboxEnabled ) {
+					const isTabKeyPressed =
+						event.key === 'Tab' || event.keyCode === 9;
+					const escapeKeyPressed =
+						event.key === 'Escape' || event.keyCode === 27;
+
+					if ( isTabKeyPressed ) {
+						event.preventDefault();
+					}
+
+					if ( escapeKeyPressed || isTabKeyPressed ) {
+						actions.core.hideLightbox( { context, event } );
+					}
+				}
+			},
+		},
+	},
+	effects: {
+		core: {
+			initLightbox: async ( { context, ref } ) => {
+				if ( context.core.lightboxEnabled ) {
+					// We need to wait until the DOM is able
 					// to receive focus updates for accessibility
 					await tick();
-					await tick();
-					ref.focus();
+					ref.querySelector( '.close-button' ).focus();
 				}
 			},
 		},

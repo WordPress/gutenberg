@@ -57,15 +57,16 @@ function render_block_core_image( $attributes, $content ) {
 						 aria-hidden="true"
 						 data-wp-class.initialized="context.core.initialized"
 						 data-wp-class.active="context.core.lightboxEnabled"
-						 data-wp-init.hideLightboxOnEsc="actions.core.hideLightboxOnEsc"
-						 data-wp-init.hideLightboxOnTab="actions.core.hideLightboxOnTab"
-						 data-wp-effect="actions.core.toggleAriaHidden"
+						 data-wp-bind.aria-hidden="!context.core.lightboxEnabled"
+						 data-wp-effect="effects.core.initLightbox"
+						 data-wp-on.keydown="actions.core.handleKeydown"
+						 data-wp-on.mousewheel="actions.core.hideLightbox"
+						 data-wp-on.click="actions.core.hideLightbox"
 						 >
 							$content
-							<button aria-label="Close lightbox" class="close-button" data-wp-on.click="actions.core.hideLightbox" data-wp-effect="actions.core.focusOnClose">
+							<button aria-label="Close lightbox" class="close-button" data-wp-on.click="actions.core.hideLightbox">
 								$close_button_icon
 							</button>
-							<div class="hide" data-wp-on.click="actions.core.hideLightbox"></div>
 							<div class="scrim" style="background-color: $background_color"></div>
 					</div>
 			</div>
@@ -83,7 +84,7 @@ function register_block_core_image() {
 
 	wp_enqueue_script(
 		'interactivity-image',
-		plugins_url('../interactive-blocks/image.min.js', __FILE__ ),
+		plugins_url( '../interactive-blocks/image.min.js', __FILE__ ),
 		array( 'interactivity-runtime' )
 	);
 
