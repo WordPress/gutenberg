@@ -155,7 +155,7 @@
 .wp-lightbox-container {
 	button {
 		border: none;
-    	background: none;
+		background: none;
 		cursor: zoom-in;
 	}
 }
@@ -206,22 +206,21 @@
 	.scrim {
 		width: 100%;
 		height: 100%;
-		opacity: 0;
 		position: absolute;
 		z-index: 2000000;
-		background-color:rgb(255, 255, 255);
-		opacity: .9;
+		background-color: rgb(255, 255, 255);
+		opacity: 0.9;
 	}
 
 	&.initialized {
 		animation: both turn-off-visibility 300ms;
 
 		img {
-		  animation: both turn-off-visibility 250ms;
+			animation: both turn-off-visibility 250ms;
 		}
 
 		&.active {
-		  animation: both turn-on-visibility 250ms;
+			animation: both turn-on-visibility 250ms;
 
 			img {
 				animation: both turn-on-visibility 300ms;
