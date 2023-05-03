@@ -19,6 +19,8 @@ window.addEventListener( 'load', () => {
 
 		// Find the audio element inside the playlist.
 		const audio = playlist.querySelector( 'audio' );
+		// Get the url from the button data attribute and change the current track.
+		audio.src = button.getAttribute( 'data-playlist-track-url' );
 
 		/*
 		 * Since we are changing the track, we need to remove aria-current from the buttons,
@@ -32,17 +34,26 @@ window.addEventListener( 'load', () => {
 		} );
 		button.setAttribute( 'aria-current', 'true' );
 
-		// Get the url from the button data attribute and change the current track.
-		audio.src = button.getAttribute( 'data-playlist-track-url' );
+		const image = playlist.querySelector( 'img' );
+		/* The image is optional, check if it exists before changing it. */
+		if ( image ) {
+			image.src = button.getAttribute( 'data-playlist-track-image-src' );
+		}
 
-		/*
-		 * TODO:
-		 * Get and set the image of the track. Remember that this feature can be disabled.
-		 * Get and set the title of the track.
-		 * Get and set the artist of the track.
-		 * Get and set the album of the track.
-		 * - Decide if these shold all be data attributes.
-		 */
+		const title = playlist.querySelector(
+			'.wp-block-playlist__item-title'
+		);
+		title.innerHTML = button.getAttribute( 'data-playlist-track-title' );
+
+		const artist = playlist.querySelector(
+			'.wp-block-playlist__item-artist'
+		);
+		artist.innerHTML = button.getAttribute( 'data-playlist-track-artist' );
+
+		const album = playlist.querySelector(
+			'.wp-block-playlist__item-album'
+		);
+		album.innerHTML = button.getAttribute( 'data-playlist-track-album' );
 
 		// Finally, play the selected track.
 		audio.play();
@@ -56,7 +67,6 @@ window.addEventListener( 'load', () => {
 		}
 
 		// Find the next track button.
-		// TODO: This will not work if the block hides the track list.
 		const nextTrackButton = playlist
 			.querySelector(
 				'.wp-block-playlist__item button[aria-current="true"]'

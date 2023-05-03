@@ -34,8 +34,8 @@ export default function save( { attributes } ) {
 					{ images && (
 						<img
 							src={ currentTrack?.image.src }
-							width={ currentTrack?.image.width }
-							height={ currentTrack?.image.height }
+							width="48px"
+							height="64px"
 							alt=""
 						/>
 					) }
@@ -56,41 +56,46 @@ export default function save( { attributes } ) {
 						autoPlay={ true }
 					/>
 				</div>
-				{ tracklist && (
-					<TagName className="wp-block-playlist__tracks">
-						{ sortedIds.map( ( track ) => (
-							<li
-								key={ track.id }
-								className="wp-block-playlist__item"
+				<TagName
+					className="wp-block-playlist__tracks"
+					hidden={ ! tracklist ? true : false }
+				>
+					{ sortedIds.map( ( track ) => (
+						<li
+							key={ track.id }
+							className="wp-block-playlist__item"
+						>
+							<button
+								aria-current={ track.id === currentTrack?.id }
+								data-playlist-track-url={ track.url }
+								data-playlist-track-title={ track.title }
+								data-playlist-track-artist={ track.artist }
+								data-playlist-track-album={ track.album }
+								data-playlist-track-image-src={
+									track.image.src
+								}
 							>
-								<button
-									aria-current={
-										track.id === currentTrack?.id
-									}
-									data-playlist-track-url={ track.url }
-								>
-									<span className="wp-block-playlist__item-title">
-										{ /* Only use quotation marks for titles when they are
-										 * combined with the artist name,
-										 * @see https://core.trac.wordpress.org/changeset/55251
-										 */ }
-										{ artists
-											? '\u201c' + track?.title + '\u201d'
-											: track?.title }
+								<span className="wp-block-playlist__item-title">
+									{ /* Only use quotation marks for titles when they are
+									 * combined with the artist name,
+									 * @see https://core.trac.wordpress.org/changeset/55251
+									 */ }
+									{ artists
+										? '\u201c' + track?.title + '\u201d'
+										: track?.title }
+								</span>
+								{ artists && track.artist && (
+									<span className="wp-block-playlist__item-artist">
+										{ '\u2014 ' + track.artist }
 									</span>
-									{ artists && track.artist && (
-										<span className="wp-block-playlist__item-artist">
-											{ '\u2014 ' + track.artist }
-										</span>
-									) }
-									<span className="wp-block-playlist__item-length">
-										{ track?.length }
-									</span>
-								</button>
-							</li>
-						) ) }
-					</TagName>
-				) }
+								) }
+								<span className="wp-block-playlist__item-length">
+									{ track?.length }
+								</span>
+							</button>
+						</li>
+					) ) }
+				</TagName>
 			</figure>
 		</>
 	);

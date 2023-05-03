@@ -177,10 +177,8 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 							{ images && (
 								<img
 									src={ ids[ trackListIndex ]?.image.src }
-									width={ ids[ trackListIndex ]?.image.width }
-									height={
-										ids[ trackListIndex ]?.image.height
-									}
+									width="48px"
+									height="64px"
 									alt=""
 								/>
 							) }
@@ -205,45 +203,49 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 							/>
 						</div>
 					) }
-					{ tracklist && (
-						<TagName className="wp-block-playlist__tracks">
-							{ ids.map( ( track, index ) => (
-								<li
-									key={ track.id }
-									className="wp-block-playlist__item"
+					<TagName
+						className="wp-block-playlist__tracks"
+						hidden={ ! tracklist ? true : false }
+					>
+						{ ids.map( ( track, index ) => (
+							<li
+								key={ track.id }
+								className="wp-block-playlist__item"
+							>
+								<Button
+									aria-current={
+										track.id === ids[ trackListIndex ]?.id
+									}
+									data-playlist-track-url={ track.url }
+									data-playlist-track-title={ track.title }
+									data-playlist-track-artist={ track.artist }
+									data-playlist-track-album={ track.album }
+									data-playlist-track-image-src={
+										track.image.src
+									}
+									onClick={ () => onChangeTrack( index ) }
 								>
-									<Button
-										aria-current={
-											track.id ===
-											ids[ trackListIndex ]?.id
-										}
-										data-playlist-track-url={ track.url }
-										onClick={ () => onChangeTrack( index ) }
-									>
-										<span className="wp-block-playlist__item-title">
-											{ /* Only use quotation marks for titles when they are
-											 * combined with the artist name,
-											 * @see https://core.trac.wordpress.org/changeset/55251
-											 */ }
-											{ artists
-												? '\u201c' +
-												  track?.title +
-												  '\u201d'
-												: track?.title }
+									<span className="wp-block-playlist__item-title">
+										{ /* Only use quotation marks for titles when they are
+										 * combined with the artist name,
+										 * @see https://core.trac.wordpress.org/changeset/55251
+										 */ }
+										{ artists
+											? '\u201c' + track?.title + '\u201d'
+											: track?.title }
+									</span>
+									{ artists && track.artist && (
+										<span className="wp-block-playlist__item-artist">
+											{ '\u2014 ' + track.artist }
 										</span>
-										{ artists && track.artist && (
-											<span className="wp-block-playlist__item-artist">
-												{ '\u2014 ' + track.artist }
-											</span>
-										) }
-										<span className="wp-block-playlist__item-length">
-											{ track?.length }
-										</span>
-									</Button>
-								</li>
-							) ) }
-						</TagName>
-					) }
+									) }
+									<span className="wp-block-playlist__item-length">
+										{ track?.length }
+									</span>
+								</Button>
+							</li>
+						) ) }
+					</TagName>
 				</Disabled>
 			</figure>
 		</>
