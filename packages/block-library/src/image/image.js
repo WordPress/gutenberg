@@ -10,7 +10,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
-	CheckboxControl,
+	ToggleControl,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -465,13 +465,12 @@ export default function Image( {
 				>
 					Behaviors
 				</Heading>
-				<CheckboxControl
+				<ToggleControl
 					label="Lightbox"
-					multiple="true"
 					checked={ enableLightbox }
-					onChange={ ( value ) => {
+					onChange={ () => {
 						setAttributes( {
-							enableLightbox: value,
+							enableLightbox: ! enableLightbox,
 						} );
 					} }
 				/>
