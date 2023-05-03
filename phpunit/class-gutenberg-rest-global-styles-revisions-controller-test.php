@@ -178,7 +178,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_cannot_manage_global_styles', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
 	/**
