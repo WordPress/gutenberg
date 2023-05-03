@@ -15,31 +15,29 @@ require_once __DIR__ . '/../fixtures/mock-provider.php';
  */
 class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 
-	public function test_should_return_empty_array_when_global_not_instance() {
-		global $wp_fonts;
-		wp_fonts();
-		$wp_fonts = null;
-
+	public function test_should_return_empty_array_when_no_fonts_registered() {
 		$this->assertSame( array(), wp_print_fonts() );
-		$this->assertNotInstanceOf( WP_Webfonts::class, $wp_fonts );
 	}
 
 	/**
-	 * Unit test to mock WP_Webfonts::do_items().
+	 * Unit test which mocks WP_Fonts methods.
 	 *
 	 * @dataProvider data_mocked_handles
 	 *
-	 * @param string|string[]|false $handles  Handles to test.
-	 * @param array|string[]        $expected Expected array of processed handles.
+	 * @param string|string[] $handles Handles to test.
 	 */
-	public function test_should_return_mocked_handles( $handles, $expected ) {
-		$mock = $this->set_up_mock( 'do_items' );
+	public function test_should_return_mocked_handles( $handles ) {
+		$mock = $this->set_up_mock( array( 'get_registered_font_families', 'do_items' ) );
+		$mock->expects( $this->once() )
+			->method( 'get_registered_font_families' )
+			->will( $this->returnValue( $handles ) );
+
 		$mock->expects( $this->once() )
 			->method( 'do_items' )
 			->with(
 				$this->identicalTo( $handles )
 			)
-			->will( $this->returnValue( $expected ) );
+			->will( $this->returnValue( $handles ) );
 
 		wp_print_fonts( $handles );
 	}
@@ -51,13 +49,14 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	 */
 	public function data_mocked_handles() {
 		return array(
-			'no handles'          => array(
-				'handles'  => false,
-				'expected' => array(),
+			'font family'            => array(
+				array( 'my-custom-font' ),
 			),
-			'font family handles' => array(
-				'handles'  => array( 'my-custom-font' ),
-				'expected' => array( 'my-custom-font' ),
+			'multiple font families' => array(
+				array(
+					'font1',
+					'font2',
+				),
 			),
 		);
 	}
