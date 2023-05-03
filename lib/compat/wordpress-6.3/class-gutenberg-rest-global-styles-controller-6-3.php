@@ -78,4 +78,76 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 
 		return $links;
 	}
+
+	/**
+	 * Prepare a global styles config output for response.
+	 *
+	 * @since 5.9.0
+	 * @since 6.2 Handling of style.css was added to WP_Theme_JSON.
+	 * @since 6.3 Added support for site origin in global styles.
+	 *
+	 * @param WP_Post         $post Global Styles post object.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function prepare_item_for_response( $post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$raw_config                       = json_decode( $post->post_content, true );
+		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
+		$config                           = array();
+		if ( $is_global_styles_user_theme_json ) {
+			$origin = ( isset ( $post->post_name ) && 'wp-global-styles-site' === $post->post_name ) ? 'site' : 'custom';
+			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, $origin ) )->get_raw_data();
+		}
+
+		// Base fields for every post.
+		$data   = array();
+		$fields = $this->get_fields_for_response( $request );
+
+		if ( rest_is_field_included( 'id', $fields ) ) {
+			$data['id'] = $post->ID;
+		}
+
+		if ( rest_is_field_included( 'title', $fields ) ) {
+			$data['title'] = array();
+		}
+		if ( rest_is_field_included( 'title.raw', $fields ) ) {
+			$data['title']['raw'] = $post->post_title;
+		}
+		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
+			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+
+			$data['title']['rendered'] = get_the_title( $post->ID );
+
+			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+		}
+
+		if ( rest_is_field_included( 'settings', $fields ) ) {
+			$data['settings'] = ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass();
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		// Wrap the data in a response object.
+		$response = rest_ensure_response( $data );
+
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			$links = $this->prepare_links( $post->ID );
+			$response->add_links( $links );
+			if ( ! empty( $links['self']['href'] ) ) {
+				$actions = $this->get_available_actions();
+				$self    = $links['self']['href'];
+				foreach ( $actions as $rel ) {
+					$response->add_link( $rel, $self );
+				}
+			}
+		}
+
+		return $response;
+	}
 }
