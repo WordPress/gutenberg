@@ -102,6 +102,7 @@ export class BlockListItem extends Component {
 		const {
 			blockAlignment,
 			clientId,
+			index,
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
@@ -134,7 +135,11 @@ export class BlockListItem extends Component {
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 				>
 					{ shouldShowInsertionPointBefore && (
-						<BlockInsertionPoint />
+						<BlockInsertionPoint
+							testID={ `block-insertion-point-before-row-${
+								index + 1
+							}` }
+						/>
 					) }
 					<BlockListBlock
 						key={ clientId }
@@ -147,7 +152,11 @@ export class BlockListItem extends Component {
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
-							<BlockInsertionPoint />
+							<BlockInsertionPoint
+								testID={ `block-insertion-point-after-row-${
+									index + 1
+								}` }
+							/>
 						) }
 				</View>
 			</ReadableContentView>
