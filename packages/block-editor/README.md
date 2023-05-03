@@ -398,7 +398,7 @@ _Returns_
 
 Computes a fluid font-size value that uses clamp(). A minimum and maximum font size OR a single font size can be specified.
 
-If a single font size is specified, it is scaled up and down using a logarithmic scale.
+If a single font size is specified, it is scaled up and down by minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and maximum sizes.
 
 _Usage_
 
@@ -423,24 +423,12 @@ _Parameters_
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
+-   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
 -   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
 
 _Returns_
 
 -   `string|null`: A font-size value using clamp().
-
-### getCustomValueFromPreset
-
-Converts a spacing preset into a custom value.
-
-_Parameters_
-
--   _value_ `string`: Value to convert
--   _spacingSizes_ `Array`: Array of the current spacing preset objects
-
-_Returns_
-
--   `string`: Mapping of the spacing preset to its equivalent custom value.
 
 ### getFontSize
 
@@ -519,6 +507,10 @@ _Parameters_
 _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
+
+### getRichTextValues
+
+Undocumented declaration.
 
 ### getSpacingPresetCssVar
 
@@ -747,7 +739,7 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
+-   _styles_ `Array`: CSS rules.
 -   _wrapperClassName_ `string`: Wrapper Class Name.
 
 _Returns_
