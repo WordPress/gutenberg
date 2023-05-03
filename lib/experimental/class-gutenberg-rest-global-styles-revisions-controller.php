@@ -265,11 +265,16 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 			return $post;
 		}
 
-		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+		/*
+		 * The same check as WP_REST_Global_Styles_Controller->get_theme_items_permissions_check.
+		 */
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
-				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view revisions for this global style.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
+				'rest_cannot_manage_global_styles',
+				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
 			);
 		}
 
