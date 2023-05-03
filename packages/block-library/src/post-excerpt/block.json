@@ -16,6 +16,10 @@
 		"showMoreOnNewLine": {
 			"type": "boolean",
 			"default": true
+		},
+		"excerptLength": {
+			"type": "number",
+			"default": 55
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

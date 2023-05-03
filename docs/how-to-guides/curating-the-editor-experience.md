@@ -12,11 +12,15 @@ Users have the ability to lock and unlock blocks via the editor. The locking UI 
 
 ![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
 
-Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
+Keep in mind that you can apply locking options to blocks nested inside of a containing block by turning on the "Apply to all blocks inside" option. However, you cannot mass lock blocks otherwise.
+
+**Lock the ability to edit certain blocks**
+
+Alongside the ability to lock moving or removing blocks, the [Navigation Block](https://github.com/WordPress/gutenberg/pull/44739) and [Reusable block](https://github.com/WordPress/gutenberg/pull/39950) have an additional capability: lock the ability to edit the contents of the block. This locks the ability to make changes to any blocks inside of either block type. 
 
 **Apply block locking to patterns or templates**
 
-When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
+When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](/docs/reference-guides/block-api/block-patterns.md).
 
 **Apply content only editing in patterns or templates**
 
@@ -29,7 +33,7 @@ This functionality was introduced in WordPress 6.1. In contrast to block locking
 - Additional child blocks cannot be inserted, further preserving the design and layout.
 - There is a link in the block toolbar to ‘Modify’ that a user can toggle on/off to have access to the broader design tools. Currently, it's not possibly to programmatically remove this option.
 
-This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-templates/#locking). 
+This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](/docs/reference-guides/block-api/block-templates.md#locking). 
 
 Note: There is no UI in place to manage content locking and it must be managed at the code level. 
 
@@ -126,31 +130,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue", 
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue", 
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": true,
-                          		"custom": true
+					"customDuotone": true,
+					"custom": true
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
@@ -161,31 +165,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-},	
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},	
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue",
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue",
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": false,
-                          		"custom": false
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		} 
+	}
 }
 ```
 
@@ -204,31 +208,31 @@ Continuing the examples with duotone, this means you could allow full access to 
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-            		"custom": true,
-      			"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-           	"core/image": {
-           		"color": {
-                      	"duotone": [],
-                      	"customDuotone": true,
-                 		"custom": true
+			"core/image": {
+				"color": {
+					"duotone": [],
+					"customDuotone": true,
+					"custom": true
 				}
 			},
 			"core/post-featured-image": {
-                 	"color": {
-                      	"duotone": [],
-                      	"customDuotone": false,
-                      	"custom": false
+				"color": {
+					"duotone": [],
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
-You can read more about how best to [turn on/off options with theme.json here](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/). 
+You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/theme-json.md). 
 
 **Disable inherit default layout**
 
@@ -278,6 +282,107 @@ When using theme.json in a block or classic theme, these settings will stop the 
 
 To enable something from the above, just set whatever value you want to change to `true` for more granularity.
 
+## Limiting interface options with theme.json filters
+
+The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
+
+For instance, in the previous section, color and typography controls were disabled globally using theme.json. But let's say you want to enable color settings for users who are Administrators. 
+
+To provide more flexibility, WordPress 6.1 introduced server-side filters allowing you to customize theme.json data at four different data layers.
+
+- [`wp_theme_json_data_default`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_default/) - Hooks into the default data provided by WordPress
+- [`wp_theme_json_data_blocks`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_blocks/) - Hooks into the data provided by blocks.
+- [`wp_theme_json_data_theme`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_theme/) - Hooks into the data provided by the current theme.
+- [`wp_theme_json_data_user`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_user/) - Hooks into the data provided by the user.
+
+In the following example, the data from the current theme's theme.json file is updated using the `wp_theme_json_data_theme` filter. Color controls are restored if the current user is an Administrator.
+
+```
+// Disable color controls for all users except Administrators.
+function example_filter_theme_json_data_theme( $theme_json ){
+    $is_administrator = current_user_can( 'edit_theme_options' );
+
+    if ( $is_administrator ) {
+        $new_data = array(
+            'version'  => 2,
+            'settings' => array(
+                'color' => array(
+                    'background'       => true,
+                    'custom'           => true,
+                    'customDuotone'    => true,
+                    'customGradient'   => true,
+                    'defaultGradients' => true,
+                    'defaultPalette'   => true,
+                    'text'             => true,
+                ),
+            ),
+        );
+    }
+
+	return $theme_json->update_with( $new_data );
+}
+add_filter( 'wp_theme_json_data_theme', 'example_filter_theme_json_data_theme' );
+```
+
+The filter receives an instance of the `WP_Theme_JSON_Data class` with the data for the respective layer. Then, you pass new data in a valid theme.json-like structure to the `update_with( $new_data )` method. A theme.json version number is required in `$new_data`. 
+
+
+## Limiting interface options with client-side filters
+
+WordPress 6.2 introduced a new client-side filter allowing you to modify block-level [theme.json settings](/docs/reference-guides/theme-json-reference/theme-json-living.md#settings) before the editor is rendered.
+
+The filter is called `blockEditor.useSetting.before` and can be used in the JavaScript code as follows:
+
+```
+import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Limit the Column block's spacing options to pixels.
+ */
+addFilter(
+	'blockEditor.useSetting.before',
+	'example/useSetting.before',
+	( settingValue, settingName, clientId, blockName ) => {
+		if ( blockName === Media & Text block'core/column' && settingName === 'spacing.units' ) {
+			return [ 'px' ];
+		}
+		return settingValue;
+	}
+);
+```
+
+This example will restrict the available spacing units for the Column block to just pixels. As discussed above, a similar restriction could be applied using theme.json filters or directly in a theme’s theme.json file using block-level settings.
+
+However, the `blockEditor.useSetting.before` filter is unique because it allows you to modify settings according to the block’s location, neighboring blocks, the current user’s role, and more. The possibilities for customization are extensive.
+
+In the following example, text color controls are disabled for the Heading block whenever the block is placed inside of a Media & Text block.
+
+```
+import { select } from  '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Disable text color controls on Heading blocks when placed inside of Media & Text blocks.
+ */
+addFilter(
+	'blockEditor.useSetting.before',
+	'example/useSetting.before',
+	( settingValue, settingName, clientId, blockName ) => {
+		if ( blockName === 'core/heading' ) {
+			const { getBlockParents, getBlockName } = select( 'core/block-editor' );
+			const blockParents = getBlockParents( clientId, true );
+			const inMediaText = blockParents.some( ( ancestorId ) => getBlockName( ancestorId ) === 'core/media-text' );
+
+			if ( inMediaText && settingName === 'color.text' ) {
+			    return false;
+			}
+		}
+
+		return settingValue;
+	}
+);
+```
+
 ## Remove access to functionality
 
 **Remove access to the template editor**
@@ -290,7 +395,7 @@ This prevents both the ability to both create new block templates or edit them f
 
 **Create an allow or disallow list to limit block options**
 
-There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#using-a-deny-list). 
+There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](/docs/reference-guides/filters/block-filters.md#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](/docs/reference-guides/filters/block-filters.md#using-a-deny-list). 
 
 **Disable pattern directory**
 
@@ -300,15 +405,17 @@ To fully remove patterns bundled with WordPress core from being accessed in the 
 
 ## Utilizing patterns
 
-**Prioritize post content patterns for new pages**
+**Prioritize starter patterns for any post type**
 
-When a user creates a page, they are met with an empty page. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon page creation in a modal. The modal appears each time the user creates a new page when there are patterns on their website that declare support for the core/post-content block types. By default, WordPress 6.0  does not include any of these patterns, so the modal will not appear without some of these post content patterns being added.
+When a user creates new content, regardless of post type, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the `core/post-content` block types. By default, WordPress does not include any of these patterns, so the modal will not appear without at least two of these post content patterns being added. 
 
-Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/).
+To opt into this, include `core/post-content` in the Block Types for your pattern. From there you can control which post types the pattern should show up for via the Post Types option. [Here's an example of a pattern](https://gist.github.com/annezazu/ead4c4965345251ec999b716c0c84f32) that would appear when creating a new post. 
+
+Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/) and [note that WordPress 6.1 brought this functionality to all post types](https://make.wordpress.org/core/2022/10/10/miscellaneous-editor-changes-for-wordpress-6-1/#start-content-patterns-for-all-post-types).  
 
 **Lock patterns**
 
-As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/). 
+As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](/docs/reference-guides/block-api/block-patterns.md). 
 
 **Prioritize specific patterns from the Pattern Directory**
 
@@ -320,7 +427,7 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 }
 ```
 
-Note that this field requires using [version 2 of theme.json](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
+Note that this field requires using [version 2 of theme.json](/docs/reference-guides/theme-json-reference/theme-json-living.md). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
 
 ## Combining approaches
 
@@ -330,3 +437,4 @@ Keep in mind that the above approaches can be combined as you see fit. For examp
 
 - [Builder Basics – Working with Templates in Full Site Editing (Part 3)](https://wordpress.tv/2022/05/24/nick-diego-builder-basics-working-with-templates-in-full-site-editing-part-3/)
 - [Core Editor Improvement: Curated experiences with locking APIs & theme.json](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/)
+- [Learn WordPress session on Curating the Editor Experience](https://wordpress.tv/2022/07/22/nick-diego-curating-the-editor-experience/)

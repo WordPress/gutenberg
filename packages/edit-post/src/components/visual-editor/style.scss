@@ -2,6 +2,7 @@
 	position: relative;
 	display: flex;
 	flex-flow: column;
+	overflow: hidden;
 
 	// Gray preview overlay (desktop/tablet/mobile) is intentionally not set on an element with scrolling content like
 	// interface-interface-skeleton__content. This causes graphical glitches (flashes of the background color)

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, isEmpty, mapValues } from 'lodash';
+import { mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,15 +9,17 @@ import { mergeWith, isEmpty, mapValues } from 'lodash';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorExperiments );
+const { GlobalStylesContext, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -31,22 +33,6 @@ function mergeTreesCustomizer( _, srcValue ) {
 export function mergeBaseAndUserConfigs( base, user ) {
 	return mergeWith( {}, base, user, mergeTreesCustomizer );
 }
-
-const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
-		return object;
-	}
-	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
-			( [ , value ] ) => Boolean( value )
-		)
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles } = useSelect(

@@ -6,7 +6,7 @@ import {
 	LINE_SEPARATOR,
 } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 const pattern = new RegExp(
 	`[${ OBJECT_REPLACEMENT_CHARACTER }${ LINE_SEPARATOR }]`,

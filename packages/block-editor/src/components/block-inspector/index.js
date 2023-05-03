@@ -36,6 +36,8 @@ import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
+import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
+import BlockInfo from '../block-info-slot-fill';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -56,7 +58,7 @@ function useContentBlocks( blockTypes, block ) {
 		( blockName ) => {
 			return !! contentBlocksObjectAux[ blockName ];
 		},
-		[ blockTypes ]
+		[ contentBlocksObjectAux ]
 	);
 	return useMemo( () => {
 		return getContentBlocks( [ block ], isContentBlock );
@@ -114,6 +116,7 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
+			<BlockInfo.Slot />
 			<VStack
 				spacing={ 1 }
 				padding={ 4 }
@@ -173,19 +176,15 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
 	const showTabs = availableTabs?.length > 1;
 
-	const blockInspectorAnimationSettings = useSelect(
-		( select ) => {
-			if ( blockType ) {
-				const globalBlockInspectorAnimationSettings =
-					select( blockEditorStore ).getSettings()
-						.__experimentalBlockInspectorAnimation;
-				return globalBlockInspectorAnimationSettings?.[
-					blockType.name
-				];
-			}
-			return null;
-		},
-		[ selectedBlockClientId, blockType ]
+	// The block inspector animation settings will be completely
+	// removed in the future to create an API which allows the block
+	// inspector to transition between what it
+	// displays based on the relationship between the selected block
+	// and its parent, and only enable it if the parent is controlling
+	// its children blocks.
+	const blockInspectorAnimationSettings = useBlockInspectorAnimationSettings(
+		blockType,
+		selectedBlockClientId
 	);
 
 	if ( count > 1 ) {
@@ -329,6 +328,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
+			<BlockInfo.Slot />
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }

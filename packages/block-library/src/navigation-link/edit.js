@@ -225,15 +225,6 @@ export default function NavigationLinkEdit( {
 		[ clientId ]
 	);
 
-	useEffect( () => {
-		// This side-effect should not create an undo level as those should
-		// only be created via user interactions. Mark this change as
-		// not persistent to avoid undo level creation.
-		// See https://github.com/WordPress/gutenberg/issues/34564.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelLink } );
-	}, [ isTopLevelLink ] );
-
 	/**
 	 * Transform to submenu block.
 	 */
@@ -261,6 +252,9 @@ export default function NavigationLinkEdit( {
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );

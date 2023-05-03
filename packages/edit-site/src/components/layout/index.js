@@ -19,9 +19,13 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreCmmandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -31,13 +35,20 @@ import Editor from '../editor';
 import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
+import { unlock } from '../../private-apis';
+import SavePanel from '../save-panel';
+import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
+import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+
+const { useCommands } = unlock( coreCmmandsPrivateApis );
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -56,50 +67,50 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
+	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
-			const { __unstableGetCanvasMode } = select( editSiteStore );
+			const { getCanvasMode } = unlock( select( editSiteStore ) );
 			return {
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 				previousShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/previous-region'
 				),
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				hasFixedToolbar:
+					select( preferencesStore ).get( 'fixedToolbar' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ isMobileCanvasVisible, setIsMobileCanvasVisible ] =
-		useState( false );
 	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
-		( isMobileViewport && ! isMobileCanvasVisible ) ||
+		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
-		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
+		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
+		! isMobileViewport ||
+		! isEditorPage;
 	const showFrame =
-		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
-
+		( ! isEditorPage && ! isMobileViewport ) ||
+		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
-		( isEditorPage && canvasMode === 'edit' && ! isMobileViewport ) ||
-		isMobileCanvasVisible;
-	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
+		( isMobileViewport && isListPage ) ||
+		( isEditorPage && canvasMode === 'edit' );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
 	const [ forcedWidth, setForcedWidth ] = useState( null );
@@ -110,15 +121,6 @@ export default function Layout() {
 	if ( showFrame && ! isResizing ) {
 		canvasWidth = canvasSize.width - canvasPadding;
 	}
-	useEffect( () => {
-		if ( canvasMode === 'view' && isMobileViewport ) {
-			setIsMobileCanvasVisible( false );
-		}
-
-		if ( canvasMode === 'edit' && isMobileViewport ) {
-			setIsMobileCanvasVisible( true );
-		}
-	}, [ canvasMode, isMobileViewport ] );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -129,6 +131,9 @@ export default function Layout() {
 
 	return (
 		<>
+			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
+			<KeyboardShortcutsRegister />
+			<KeyboardShortcutsGlobal />
 			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
@@ -139,49 +144,38 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>
-				<SiteHub
-					ref={ hubRef }
-					className="edit-site-layout__hub"
-					style={ {
-						width:
-							isResizingEnabled && forcedWidth
-								? forcedWidth - 48
-								: undefined,
-					} }
-					isMobileCanvasVisible={ isMobileCanvasVisible }
-					setIsMobileCanvasVisible={ setIsMobileCanvasVisible }
-				/>
+				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
 
 				<AnimatePresence initial={ false }>
-					{ isEditorPage &&
-						( canvasMode === 'edit' || isMobileCanvasVisible ) && (
-							<NavigableRegion
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								animate={ {
-									y: 0,
-								} }
-								initial={ {
-									y: '-100%',
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
-								{ canvasMode === 'edit' && <Header /> }
-							</NavigableRegion>
-						) }
+					{ isEditorPage && canvasMode === 'edit' && (
+						<NavigableRegion
+							className="edit-site-layout__header"
+							ariaLabel={ __( 'Editor top bar' ) }
+							as={ motion.div }
+							animate={ {
+								y: 0,
+							} }
+							initial={ {
+								y: '-100%',
+							} }
+							exit={ {
+								y: '-100%',
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion
+									? 0
+									: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+						>
+							<Header />
+						</NavigableRegion>
+					) }
 				</AnimatePresence>
 
 				<div className="edit-site-layout__content">
@@ -266,6 +260,8 @@ export default function Layout() {
 						) }
 					</AnimatePresence>
 
+					<SavePanel />
+
 					{ showCanvas && (
 						<div
 							className={ classnames(
@@ -282,6 +278,21 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										isEditorPage && canvasMode === 'view'
+											? {
+													scale: 1.005,
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: 0.5,
+														ease: 'easeOut',
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"

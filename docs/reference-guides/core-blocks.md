@@ -59,7 +59,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
 ## Calendar
@@ -105,7 +105,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 -	**Name:** core/columns
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isStackedOnMobile, verticalAlignment
+-	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
 
@@ -230,8 +230,35 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (text, ~~background~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
+
+## Details
+
+A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+
+-	**Name:** core/details
+-	**Category:** text
+-	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** showContent
+
+## Details Content
+
+Add content that may be shown or hidden via a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
+
+-	**Name:** core/details-content
+-	**Category:** text
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
+## Details Summary
+
+Provide summary text used to toggle the display of content inside a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
+
+-	**Name:** core/details-summary
+-	**Category:** text
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** summary
 
 ## Embed
 
@@ -239,7 +266,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 -	**Name:** core/embed
 -	**Category:** embed
--	**Supports:** align
+-	**Supports:** align, spacing (margin)
 -	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
 ## File
@@ -248,7 +275,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/file
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Classic
@@ -276,7 +303,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/group
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, ariaLabel, color (background, gradients, link, text), dimensions (minHeight), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** tagName, templateLock
+-	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
 
@@ -311,7 +338,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~)
+-	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
 -	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
 
 ## Latest Comments
@@ -320,7 +347,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 
 -	**Name:** core/latest-comments
 -	**Category:** widgets
--	**Supports:** align, anchor, spacing (margin, padding), ~~html~~
+-	**Supports:** align, anchor, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** commentsToShow, displayAvatar, displayDate, displayExcerpt
 
 ## Latest Posts
@@ -366,7 +393,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 -	**Name:** core/media-text
 -	**Category:** media
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
+-	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
 
 ## Unsupported
 
@@ -546,7 +573,7 @@ Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/
 -	**Name:** core/post-excerpt
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** moreText, showMoreOnNewLine, textAlign
+-	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
 
 ## Post Featured Image
 
@@ -555,7 +582,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
+-	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
 
 ## Post Navigation Link
 
@@ -572,7 +599,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 -	**Name:** core/post-template
 -	**Category:** theme
--	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Post Terms
@@ -583,6 +610,15 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
+
+## Time To Read
+
+Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+
+-	**Name:** core/post-time-to-read
+-	**Category:** theme
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** textAlign
 
 ## Post Title
 
@@ -680,7 +716,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, citation, value
 
 ## Read More
@@ -730,7 +766,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 ## Site Logo
 
-Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
+Display an image to represent this site. Update this block and the changes apply everywhere. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
 
 -	**Name:** core/site-logo
 -	**Category:** theme

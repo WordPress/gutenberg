@@ -6,7 +6,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -33,7 +33,6 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
-export const OnCaretVerticalPositionChange = createContext();
 const identity = ( x ) => x;
 
 const stylesMemo = {};
@@ -70,8 +69,6 @@ export class BlockList extends Component {
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
-		this.onCaretVerticalPositionChange =
-			this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll =
@@ -92,15 +89,6 @@ export class BlockList extends Component {
 
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
-	}
-
-	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
-		KeyboardAwareFlatList.handleCaretVerticalPositionChange(
-			this.scrollViewRef,
-			targetId,
-			caretY,
-			previousCaretY
-		);
 	}
 
 	scrollViewInnerRef( ref ) {
@@ -209,13 +197,7 @@ export class BlockList extends Component {
 			</BlockListConsumer>
 		);
 
-		return (
-			<OnCaretVerticalPositionChange.Provider
-				value={ this.onCaretVerticalPositionChange }
-			>
-				{ blockList }
-			</OnCaretVerticalPositionChange.Provider>
-		);
+		return blockList;
 	}
 
 	renderList( extraProps = {} ) {
@@ -237,8 +219,7 @@ export class BlockList extends Component {
 		} = this.props;
 		const { parentScrollRef, onScroll } = extraProps;
 
-		const { blockToolbar, blockBorder, headerToolbar, floatingToolbar } =
-			styles;
+		const { blockToolbar, headerToolbar, floatingToolbar } = styles;
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
@@ -250,6 +231,15 @@ export class BlockList extends Component {
 		const isContentStretch = contentResizeMode === 'stretch';
 		const isMultiBlocks = blockClientIds.length > 1;
 		const { isWider } = alignmentHelpers;
+		const extraScrollHeight =
+			headerToolbar.height +
+			blockToolbar.height +
+			( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
+
+		const scrollViewStyle = [
+			{ flex: isRootList ? 1 : 0 },
+			! isRootList && styles.overflowVisible,
+		];
 
 		return (
 			<View
@@ -263,24 +253,12 @@ export class BlockList extends Component {
 						? { removeClippedSubviews: false }
 						: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
-					autoScroll={ this.props.autoScroll }
 					innerRef={ ( ref ) => {
 						this.scrollViewInnerRef( parentScrollRef || ref );
 					} }
-					extraScrollHeight={
-						blockToolbar.height + blockBorder.width
-					}
-					inputAccessoryViewHeight={
-						headerToolbar.height +
-						( isFloatingToolbarVisible
-							? floatingToolbar.height
-							: 0 )
-					}
+					extraScrollHeight={ extraScrollHeight }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ [
-						{ flex: isRootList ? 1 : 0 },
-						! isRootList && styles.overflowVisible,
-					] }
+					scrollViewStyle={ scrollViewStyle }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
@@ -407,6 +385,7 @@ export default compose( [
 		( select, { rootClientId, orientation, filterInnerBlocks } ) => {
 			const {
 				getBlockCount,
+				getBlockHierarchyRootClientId,
 				getBlockOrder,
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
@@ -427,10 +406,12 @@ export default compose( [
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount();
-			const hasRootInnerBlocks = !! blockCount;
+			const rootBlockId = getBlockHierarchyRootClientId(
+				selectedBlockClientId
+			);
 
 			const isFloatingToolbarVisible =
-				!! selectedBlockClientId && hasRootInnerBlocks;
+				!! selectedBlockClientId && !! getBlockCount( rootBlockId );
 			const isRTL = getSettings().isRTL;
 
 			return {

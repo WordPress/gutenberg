@@ -131,8 +131,8 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 					'type' => 'sticky',
 					'top'  => '0px',
 				),
-				'expected_wrapper'  => '/^<div class="wp-container-\d+">Content<\/div>$/',
-				'expected_styles'   => '/^.wp-container-\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--height, 0px));position:sticky;z-index:10;}' ) . '$/',
+				'expected_wrapper'  => '/^<div class="wp-container-\d+ is-position-sticky">Content<\/div>$/',
+				'expected_styles'   => '/^.wp-container-\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . '$/',
 			),
 			'sticky position style is not applied if theme does not support it' => array(
 				'theme_name'        => 'default',

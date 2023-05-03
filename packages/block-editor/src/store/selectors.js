@@ -56,6 +56,17 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 const EMPTY_ARRAY = [];
 
 /**
+ * Shared reference to an empty Set for cases where it is important to avoid
+ * returning a new Set reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Set}
+ */
+const EMPTY_SET = new Set();
+
+/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -497,6 +508,10 @@ export const getBlockParents = createSelector(
 		while ( !! state.blocks.parents.get( current ) ) {
 			current = state.blocks.parents.get( current );
 			parents.push( current );
+		}
+
+		if ( ! parents.length ) {
+			return EMPTY_ARRAY;
 		}
 
 		return ascending ? parents : parents.reverse();
@@ -1184,7 +1199,7 @@ export function isBlockSelected( state, clientId ) {
  * @param {string}  clientId Block client ID.
  * @param {boolean} deep     Perform a deep check.
  *
- * @return {boolean} Whether the block as an inner block selected
+ * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return getBlockOrder( state, clientId ).some(
@@ -1192,6 +1207,23 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
 			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+	);
+}
+
+/**
+ * Returns true if one of the block's inner blocks is dragged.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
+ *
+ * @return {boolean} Whether the block has an inner block dragged
+ */
+export function hasDraggedInnerBlock( state, clientId, deep = false ) {
+	return getBlockOrder( state, clientId ).some(
+		( innerClientId ) =>
+			isBlockBeingDragged( state, innerClientId ) ||
+			( deep && hasDraggedInnerBlock( state, innerClientId, deep ) )
 	);
 }
 
@@ -2722,11 +2754,15 @@ export function isBlockVisible( state, clientId ) {
  */
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
-		return new Set(
+		const visibleBlocks = new Set(
 			Object.keys( state.blockVisibility ).filter(
 				( key ) => state.blockVisibility[ key ]
 			)
 		);
+		if ( visibleBlocks.size === 0 ) {
+			return EMPTY_SET;
+		}
+		return visibleBlocks;
 	},
 	( state ) => [ state.blockVisibility ]
 );
@@ -2742,7 +2778,10 @@ export const __unstableGetContentLockingParent = createSelector(
 		let result;
 		while ( state.blocks.parents.has( current ) ) {
 			current = state.blocks.parents.get( current );
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			if (
+				current &&
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
 				result = current;
 			}
 		}
@@ -2803,12 +2842,12 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 }
 
 export function __unstableIsWithinBlockOverlay( state, clientId ) {
-	let parent = state.blocks.parents[ clientId ];
+	let parent = state.blocks.parents.get( clientId );
 	while ( !! parent ) {
 		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
 			return true;
 		}
-		parent = state.blocks.parents[ parent ];
+		parent = state.blocks.parents.get( parent );
 	}
 	return false;
 }

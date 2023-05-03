@@ -75,7 +75,7 @@ export const resetBlocks =
 /**
  * Block validity is a function of blocks state (at the point of a
  * reset) and the template setting. As a compromise to its placement
- * across distinct parts of state, it is implemented here as a side-
+ * across distinct parts of state, it is implemented here as a side
  * effect of the block reset action.
  *
  * @param {Array} blocks Array of blocks.
@@ -232,17 +232,24 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId should be selected.
+ * clientId (or optionally, its first parent from bottom to top)
+ * should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}  clientId         Block client ID.
+ * @param {boolean} fallbackToParent If true, select the first parent if there is no previous block.
  */
 export const selectPreviousBlock =
-	( clientId ) =>
+	( clientId, fallbackToParent = false ) =>
 	( { select, dispatch } ) => {
 		const previousBlockClientId =
 			select.getPreviousBlockClientId( clientId );
 		if ( previousBlockClientId ) {
 			dispatch.selectBlock( previousBlockClientId, -1 );
+		} else if ( fallbackToParent ) {
+			const firstParentClientId = select.getBlockRootClientId( clientId );
+			if ( firstParentClientId ) {
+				dispatch.selectBlock( firstParentClientId, -1 );
+			}
 		}
 	};
 
@@ -536,6 +543,9 @@ export function moveBlockToPosition(
 /**
  * Action that inserts a single block, optionally at a specific index respective a root block list.
  *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
+ *
  * @param {Object}   block           Block object to insert.
  * @param {?number}  index           Index at which block should be inserted.
  * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
@@ -565,12 +575,16 @@ export function insertBlock(
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
+ *
  * @param {Object[]}  blocks          Block objects to insert.
  * @param {?number}   index           Index at which block should be inserted.
  * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean}  updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
  * @param {?Object}   meta            Optional Meta values to be passed to the action object.
+ *
  * @return {Object} Action object.
  */
 export const insertBlocks =
@@ -1175,8 +1189,11 @@ export const mergeBlocks =
  * the set of specified client IDs are to be removed.
  *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block should be
- *                                         selected when a block is removed.
+ * @param {boolean}         selectPrevious True if the previous block
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
+ *                                         should be selected
+ *                                         when a block is removed.
  */
 export const removeBlocks =
 	( clientIds, selectPrevious = true ) =>
@@ -1197,7 +1214,7 @@ export const removeBlocks =
 		}
 
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ] );
+			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
 		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );

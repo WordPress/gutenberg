@@ -8,6 +8,8 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { useDispatchWithMap } from '../use-dispatch';
 
+/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+
 /**
  * Higher-order component used to add dispatch props using registered action
  * creators.

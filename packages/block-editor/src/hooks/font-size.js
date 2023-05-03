@@ -158,41 +158,6 @@ export function FontSizeEdit( props ) {
 }
 
 /**
- * Checks if there is a current value set for the font size block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a font size value set.
- */
-export function hasFontSizeValue( props ) {
-	const { fontSize, style } = props.attributes;
-	return !! fontSize || !! style?.typography?.fontSize;
-}
-
-/**
- * Resets the font size block support attribute. This can be used when
- * disabling the font size support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetFontSize( { attributes = {}, setAttributes } ) {
-	const { style } = attributes;
-
-	setAttributes( {
-		fontSize: undefined,
-		style: cleanEmptyObject( {
-			...style,
-			typography: {
-				...style?.typography,
-				fontSize: undefined,
-			},
-		} ),
-	} );
-}
-
-/**
  * Custom hook that checks if font-size settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -268,7 +233,7 @@ const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
 };
 
-export function addTransforms( result, source, index, results ) {
+function addTransforms( result, source, index, results ) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		fontSize: hasBlockSupport(

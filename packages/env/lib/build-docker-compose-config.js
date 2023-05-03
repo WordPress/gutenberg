@@ -10,25 +10,28 @@ const path = require( 'path' );
  */
 const { hasSameCoreSource } = require( './wordpress' );
 const { dbEnv } = require( './config' );
+const getHostUser = require( './get-host-user' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {string}          workDirectoryPath The working directory for wp-env.
- * @param {WPServiceConfig} config            The service config to get the mounts from.
- * @param {string}          wordpressDefault  The default internal path for the WordPress
- *                                            source code (such as tests-wordpress).
+ * @param {string}              workDirectoryPath The working directory for wp-env.
+ * @param {WPEnvironmentConfig} config            The service config to get the mounts from.
+ * @param {string}              hostUsername      The username of the host running wp-env.
+ * @param {string}              wordpressDefault  The default internal path for the WordPress
+ *                                                source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
 function getMounts(
 	workDirectoryPath,
 	config,
+	hostUsername,
 	wordpressDefault = 'wordpress'
 ) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
@@ -46,9 +49,10 @@ function getMounts(
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
-	const coreMount = `${
-		config.coreSource ? config.coreSource.path : wordpressDefault
-	}:/var/www/html`;
+	const userHomeMount =
+		wordpressDefault === 'wordpress'
+			? `user-home:/home/${ hostUsername }`
+			: `tests-user-home:/home/${ hostUsername }`;
 
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
@@ -59,10 +63,15 @@ function getMounts(
 		'phpunit'
 	) }:/wordpress-phpunit`;
 
+	const coreMount = `${
+		config.coreSource ? config.coreSource.path : wordpressDefault
+	}:/var/www/html`;
+
 	return [
 		...new Set( [
-			coreMount,
+			coreMount, // Must be first because of some operations later that expect it to be!
 			corePHPUnitMount,
+			userHomeMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
@@ -79,15 +88,31 @@ function getMounts(
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
+	// Since we are mounting files from the host operating system
+	// we want to create the host user in some of our containers.
+	// This ensures ownership parity and lets us access files
+	// and folders between the containers and the host.
+	const hostUser = getHostUser();
+
 	const developmentMounts = getMounts(
 		config.workDirectoryPath,
-		config.env.development
+		config.env.development,
+		hostUser.name
 	);
 	const testsMounts = getMounts(
 		config.workDirectoryPath,
 		config.env.tests,
+		hostUser.name,
 		'tests-wordpress'
 	);
+
+	// We use a custom Dockerfile in order to make sure that
+	// the current host user exists inside the container.
+	const imageBuildArgs = {
+		HOST_USERNAME: hostUser.name,
+		HOST_UID: hostUser.uid,
+		HOST_GID: hostUser.gid,
+	};
 
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains
@@ -143,58 +168,27 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	const developmentPhpVersion = config.env.development.phpVersion
-		? config.env.development.phpVersion
-		: '';
-	const testsPhpVersion = config.env.tests.phpVersion
-		? config.env.tests.phpVersion
-		: '';
-
-	// Set the WordPress images with the PHP version tag.
-	const developmentWpImage = `wordpress${
-		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
-	}`;
-	const testsWpImage = `wordpress${
-		testsPhpVersion ? ':php' + testsPhpVersion : ''
-	}`;
-	// Set the WordPress CLI images with the PHP version tag.
-	const developmentWpCliImage = `wordpress:cli${
-		! developmentPhpVersion || developmentPhpVersion.length === 0
-			? ''
-			: '-php' + developmentPhpVersion
-	}`;
-	const testsWpCliImage = `wordpress:cli${
-		! testsPhpVersion || testsPhpVersion.length === 0
-			? ''
-			: '-php' + testsPhpVersion
-	}`;
-
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.
 	// PHP Unit is assumed to be for Tests so use the testsPhpVersion.
 	let phpunitTag = 'latest';
-	const phpunitPhpVersion = '-php-' + testsPhpVersion + '-fpm';
-	if ( testsPhpVersion === '5.6' ) {
+	const phpunitPhpVersion = '-php-' + config.env.tests.phpVersion + '-fpm';
+	if ( config.env.tests.phpVersion === '5.6' ) {
 		phpunitTag = '5' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.0' ) {
+	} else if ( config.env.tests.phpVersion === '7.0' ) {
 		phpunitTag = '6' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.1' ) {
+	} else if ( config.env.tests.phpVersion === '7.1' ) {
 		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.2' ) {
+	} else if ( config.env.tests.phpVersion === '7.2' ) {
 		phpunitTag = '8' + phpunitPhpVersion;
 	} else if (
-		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf( testsPhpVersion ) >= 0
+		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf(
+			config.env.tests.phpVersion
+		) >= 0
 	) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
-
-	// The www-data user in wordpress:cli has a different UID (82) to the
-	// www-data user in wordpress (33). Ensure we use the wordpress www-data
-	// user for CLI commands.
-	// https://github.com/docker-library/wordpress/issues/256
-	const cliUser = '33:33';
 
 	// If the user mounted their own uploads folder, we should not override it in the phpunit service.
 	const isMappingTestUploads = testsMounts.some( ( mount ) =>
@@ -227,11 +221,16 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
-				build: '.',
 				depends_on: [ 'mysql' ],
-				image: developmentWpImage,
+				build: {
+					context: '.',
+					dockerfile: 'WordPress.Dockerfile',
+					args: imageBuildArgs,
+				},
 				ports: [ developmentPorts ],
 				environment: {
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
 					...dbEnv.credentials,
 					...dbEnv.development,
 					WP_TESTS_DIR: '/wordpress-phpunit',
@@ -240,9 +239,15 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-wordpress': {
 				depends_on: [ 'tests-mysql' ],
-				image: testsWpImage,
+				build: {
+					context: '.',
+					dockerfile: 'Tests-WordPress.Dockerfile',
+					args: imageBuildArgs,
+				},
 				ports: [ testsPorts ],
 				environment: {
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
 					...dbEnv.credentials,
 					...dbEnv.tests,
 					WP_TESTS_DIR: '/wordpress-phpunit',
@@ -251,9 +256,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
-				image: developmentWpCliImage,
+				build: {
+					context: '.',
+					dockerfile: 'CLI.Dockerfile',
+					args: imageBuildArgs,
+				},
 				volumes: developmentMounts,
-				user: cliUser,
+				user: hostUser.fullUser,
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
@@ -262,9 +271,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: testsWpCliImage,
+				build: {
+					context: '.',
+					dockerfile: 'Tests-CLI.Dockerfile',
+					args: imageBuildArgs,
+				},
 				volumes: testsMounts,
-				user: cliUser,
+				user: hostUser.fullUser,
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
@@ -298,6 +311,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 			mysql: {},
 			'mysql-test': {},
 			'phpunit-uploads': {},
+			'user-home': {},
+			'tests-user-home': {},
 		},
 	};
 };

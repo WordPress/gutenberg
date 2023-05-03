@@ -18,7 +18,7 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
  * Given a component returns the enhanced component augmented with a component
  * only re-rendering when its props/state change
  */
-const pure = createHigherOrderComponent( function < Props >(
+const pure = createHigherOrderComponent( function < Props extends {} >(
 	WrappedComponent: ComponentType< Props >
 ): ComponentType< Props > {
 	if ( WrappedComponent.prototype instanceof Component ) {

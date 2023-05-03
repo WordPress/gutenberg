@@ -3,7 +3,7 @@
  */
 import {
 	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
@@ -33,7 +33,9 @@ function NavigationButtonAsItem( props ) {
 }
 
 function NavigationBackButtonAsItem( props ) {
-	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
+	return (
+		<NavigatorToParentButton as={ GenericNavigationButton } { ...props } />
+	);
 }
 
 export { NavigationButtonAsItem, NavigationBackButtonAsItem };

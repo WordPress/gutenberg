@@ -319,11 +319,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 
+			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
+			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
+			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
+			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
-
 			// Allow themes to enable link colors via theme_support.
 			if ( current_theme_supports( 'link-color' ) ) {
 				$theme_support_data['settings']['color']['link'] = true;
@@ -343,6 +346,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_support_data['settings']['border']['style']  = true;
 				$theme_support_data['settings']['border']['width']  = true;
 			}
+			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -586,7 +590,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
-		$result = static::get_core_data();
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
 			$result->set_spacing_sizes();
 			return $result;
