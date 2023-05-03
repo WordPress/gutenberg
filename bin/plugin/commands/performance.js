@@ -3,7 +3,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues } = require( 'lodash' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -475,10 +474,26 @@ async function runPerformanceTests( branches, options ) {
 					( r ) => r[ branch ][ dataPoint ]
 				);
 			} );
-			const medians = mapValues( resultsByDataPoint, median );
+			// @ts-ignore
+			const medians = Object.fromEntries(
+				Object.entries( resultsByDataPoint ).map(
+					( [ dataPoint, dataPointResults ] ) => [
+						dataPoint,
+						median( dataPointResults ),
+					]
+				)
+			);
 
 			// Format results as times.
-			results[ testSuite ][ branch ] = mapValues( medians, formatTime );
+			// @ts-ignore
+			results[ testSuite ][ branch ] = Object.fromEntries(
+				Object.entries( medians ).map(
+					( [ dataPoint, dataPointMedian ] ) => [
+						dataPoint,
+						formatTime( dataPointMedian ),
+					]
+				)
+			);
 		}
 	}
 
