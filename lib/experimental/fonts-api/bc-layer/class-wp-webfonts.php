@@ -82,6 +82,20 @@ class WP_Webfonts {
 	}
 
 	/**
+	 * Get the list of all registered font family handles.
+	 *
+	 * @since X.X.X
+	 * @deprecated GB 15.8.0 Use wp_fonts()->get_registered_font_families().
+	 *
+	 * @return string[]
+	 */
+	public function get_registered_font_families() {
+		_deprecated_function( __METHOD__, 'GB 15.8.0', 'wp_fonts()->get_registered_font_families()' );
+
+		return $this->wp_fonts->get_registered_font_families();
+	}
+
+	/**
 	 * Gets the list of registered fonts.
 	 *
 	 * @since 6.0.0
