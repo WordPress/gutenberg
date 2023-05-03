@@ -13,10 +13,6 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
-/**
- * External dependencies
- */
-import classnames from 'classnames';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -156,15 +152,7 @@ export const withBlockControls = createHigherOrderComponent(
 						) }
 					</BlockSettingsMenuControls>
 				) }
-				<BlockEdit
-					key="edit"
-					{ ...props }
-					className={ classnames(
-						props.className,
-						isEditingAsBlocks &&
-							'is-content-locked-editing-as-blocks'
-					) }
-				/>
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
