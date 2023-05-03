@@ -834,7 +834,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Given the compounded $selector "h1, h2, h3"
 	 * and the $to_prepend selector ".some-class " the result will be
-	 * ".some-class h1, .some-class h2, .some-class h3".
+	 * ".some-class h1, .some-class  h2, .some-class  h3".
 	 *
 	 * @since 6.3.0
 	 *
