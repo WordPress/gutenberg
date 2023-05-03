@@ -94,6 +94,7 @@ export function useSpecificEditorSettings() {
 	const {
 		templateSlug,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
@@ -126,6 +127,10 @@ export function useSpecificEditorSettings() {
 					'core/edit-site',
 					'distractionFree'
 				),
+				allowRightClickOverrides: !! getPreference(
+					'core/edit-site',
+					'allowRightClickOverrides'
+				),
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
@@ -149,6 +154,7 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			allowRightClickOverrides,
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
@@ -162,6 +168,7 @@ export function useSpecificEditorSettings() {
 		settings,
 		setIsInserterOpened,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
