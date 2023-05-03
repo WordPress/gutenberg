@@ -4,8 +4,6 @@ This package includes a library of generic WordPress components to be used for c
 
 ## Installation
 
-Install the module
-
 ```bash
 npm install @wordpress/components --save
 ```
