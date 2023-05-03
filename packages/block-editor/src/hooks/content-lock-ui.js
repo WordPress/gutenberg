@@ -101,7 +101,7 @@ export const withBlockControls = createHigherOrderComponent(
 		] );
 
 		if ( ! isContentLocked && ! isEditingAsBlocks ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
@@ -157,6 +157,7 @@ export const withBlockControls = createHigherOrderComponent(
 					</BlockSettingsMenuControls>
 				) }
 				<BlockEdit
+					key="edit"
 					{ ...props }
 					className={ classnames(
 						props.className,
