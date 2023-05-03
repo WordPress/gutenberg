@@ -87,7 +87,6 @@ export const withBlockControls = createHigherOrderComponent(
 			__unstableSetTemporarilyEditingAsBlocks();
 		}, [
 			props.clientId,
-			focusModeToRevert,
 			updateSettings,
 			updateBlockListSettings,
 			getBlockListSettings,
