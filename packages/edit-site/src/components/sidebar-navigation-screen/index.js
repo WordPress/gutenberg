@@ -50,7 +50,7 @@ export default function SidebarNavigationScreen( {
 					<NavigatorToParentButton
 						as={ SidebarButton }
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Back' ) }
+						label={ __( 'Back' ) }
 					/>
 				) : (
 					<SidebarButton
