@@ -70,7 +70,11 @@ function Revisions( { onClose, userConfig, blocks } ) {
 			: settings.styles;
 
 	return (
-		<EditorCanvasContainer title={ __( 'Revisions' ) } onClose={ onClose }>
+		<EditorCanvasContainer
+			title={ __( 'Revisions' ) }
+			onClose={ onClose }
+			closeButtonLabel={ __( 'Close revisions' ) }
+		>
 			<Iframe
 				className="edit-site-revisions__iframe"
 				name="revisions"

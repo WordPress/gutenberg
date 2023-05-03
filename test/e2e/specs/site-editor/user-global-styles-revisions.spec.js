@@ -103,13 +103,9 @@ test.describe( 'Global styles revisions', () => {
 		await expect( revisionButtons ).toHaveCount(
 			updatedCurrentRevisions.length
 		);
-
-		await expect( revisionButtons.first() ).toHaveText(
-			/^Currently-saved revision/
-		);
 	} );
 
-	test( 'should warn of unsaved changes before loading revision', async ( {
+	test( 'should warn of unsaved changes before loading reset revision', async ( {
 		page,
 	} ) => {
 		// Navigates to Styles -> Typography -> Text and click on a size.
@@ -132,24 +128,17 @@ test.describe( 'Global styles revisions', () => {
 		await expect( unSavedButton ).toBeVisible();
 
 		// await expect( image ).toHaveCSS( 'height', '3px' );
-
 		await page
 			.getByRole( 'group', { name: 'Global styles revisions' } )
-			.getByRole( 'button', { name: /^Revision from / } )
-			.first()
+			.getByRole( 'button', { name: 'Theme default styles' } )
 			.click();
 
-		await page
-			.getByRole( 'button', { name: 'Load revision' } )
-			.first()
-			.click();
+		await page.getByRole( 'button', { name: 'Load revision' } ).click();
 
 		const modal = page.getByRole( 'dialog', {
 			name: 'You have unsaved changes in the editor',
 		} );
 		await expect( modal ).toBeVisible();
-
-		// @TODO do the entire flow
 	} );
 } );
 

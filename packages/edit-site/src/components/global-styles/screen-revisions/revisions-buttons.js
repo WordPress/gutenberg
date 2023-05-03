@@ -97,6 +97,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 		>
 			{ userRevisions.map( ( revision ) => {
 				const { id, author, isLatest, modified } = revision;
+				const authorAvatar = author?.avatar_urls?.[ '24' ];
 				/*
 				 * If the currentId hasn't been selected yet, the first revision is
 				 * the current one so long as the API returns revisions in descending order.
@@ -125,21 +126,21 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 						>
 							<span className="edit-site-global-styles-screen-revisions__description">
 								<span>{ getRevisionsTitle( id ) }</span>
-								<span className="edit-site-global-styles-screen-revisions__date">
-									{ !! modified && (
-										<time dateTime={ modified }>
-											{ humanTimeDiff( modified ) }
-										</time>
-									) }
-									{ !! author && (
-										<img
-											alt={ author?.name }
-											src={
-												author?.avatar_urls?.[ '24' ]
-											}
-										/>
-									) }
-								</span>
+								{ ( !! modified || !! authorAvatar ) && (
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ !! modified && (
+											<time dateTime={ modified }>
+												{ humanTimeDiff( modified ) }
+											</time>
+										) }
+										{ !! authorAvatar && (
+											<img
+												alt={ author?.name }
+												src={ authorAvatar }
+											/>
+										) }
+									</span>
+								) }
 							</span>
 						</Button>
 					</li>
