@@ -107,7 +107,7 @@ function Edit( props ) {
 							onChange={ ( val ) => setDir( val ) }
 						/>
 						<Button
-							isPrimary
+							variant="primary"
 							type="submit"
 							text={ __( 'Apply' ) }
 						/>
