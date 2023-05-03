@@ -7,7 +7,7 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-export const { Fill, Slot } = createSlotFill( 'PluginTemplateSettingPanel' );
+const { Fill, Slot } = createSlotFill( 'PluginTemplateSettingPanel' );
 
 const PluginTemplateSettingPanel = Fill;
 PluginTemplateSettingPanel.Slot = Slot;
@@ -19,7 +19,7 @@ PluginTemplateSettingPanel.Slot = Slot;
  * @example
  * ```jsx
  * // Using ESNext syntax
- * import { MyTemplateSettingTest } from '@wordpress/edit-site';
+ * import { PluginTemplateSettingPanel } from '@wordpress/edit-site';
  *
  * const MyTemplateSettingTest = () => (
  * 		<PluginTemplateSettingPanel>
