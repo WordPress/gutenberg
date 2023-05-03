@@ -311,6 +311,7 @@ function BlockListBlock( {
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
+			isInnerBlockSelected={ isInnerBlockSelected }
 			isParentSelected={ isParentSelected }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
