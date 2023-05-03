@@ -15,6 +15,7 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
@@ -88,6 +89,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
+				<ViewLink />
 				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
