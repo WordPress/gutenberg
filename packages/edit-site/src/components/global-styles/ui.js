@@ -257,7 +257,6 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/colors">
 				<ScreenColors />
-				``
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/layout">
