@@ -38,15 +38,15 @@ const POPOVER_PROPS = {
 	variant: 'toolbar',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
+function CopyMenuItem( { blocks, onCopy, label, className } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
-	return <MenuItem 
+	return ( <MenuItem 
 		ref={ ref } 
-		className="block-action-copy"
-	>{ copyMenuItemLabel }</MenuItem>;
+		className={ className }
+	>{ copyMenuItemLabel }</MenuItem> );
 }
 
 export function BlockSettingsDropdown( {
@@ -260,6 +260,7 @@ export function BlockSettingsDropdown( {
 								<CopyMenuItem
 									blocks={ blocks }
 									onCopy={ onCopy }
+									className = "block-action-copy"
 								/>
 								{ canDuplicate && (
 									<MenuItem
@@ -318,6 +319,7 @@ export function BlockSettingsDropdown( {
 									blocks={ blocks }
 									onCopy={ onCopy }
 									label={ __( 'Copy styles' ) }
+									className = "block-action-copy-styles"
 								/>
 								<MenuItem 
 									className="block-action-paste-styles"
