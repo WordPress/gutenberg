@@ -62,10 +62,14 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 		setStyle( updatedStyle );
 
 		if ( newStyle.layout !== settings.layout ) {
-			setSettings( {
-				...rawSettings,
-				layout: newStyle.layout,
-			} );
+			const updatedSettings = { ...rawSettings, layout: newStyle.layout };
+
+			// Ensure any changes to layout definitions are not persisted.
+			if ( updatedSettings.layout?.definitions ) {
+				delete updatedSettings.layout.definitions;
+			}
+
+			setSettings( updatedSettings );
 		}
 	};
 
