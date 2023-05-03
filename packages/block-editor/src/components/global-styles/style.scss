@@ -41,3 +41,17 @@
 	height: 24px;
 	width: 24px;
 }
+
+.block-editor-global-styles-advanced-panel__custom-css-input textarea {
+	font-family: $editor_html_font;
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-validation-wrapper {
+	position: absolute;
+	bottom: $grid-unit-20;
+	right: $grid-unit * 3;
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-validation-icon {
+	fill: $alert-red;
+}

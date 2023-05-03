@@ -1,10 +1,11 @@
+'use strict';
 /**
  * Internal dependencies
  */
 const addOrReplacePort = require( '../add-or-replace-port.js' );
 
 describe( 'addOrReplacePort', () => {
-	beforeEach( () => {
+	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 

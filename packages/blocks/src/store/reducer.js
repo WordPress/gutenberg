@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, mapValues } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -117,9 +117,11 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) =>
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => [
+						name,
 						getUniqueItemsByName( [
 							...get( blockType, [ 'styles' ], [] ).map(
 								( style ) => ( {
@@ -130,7 +132,8 @@ export function blockStyles( state = {}, action ) {
 							...get( state, [ blockType.name ], [] ).filter(
 								( { source } ) => 'block' !== source
 							),
-						] )
+						] ),
+					] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
@@ -170,21 +173,25 @@ export function blockVariations( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) => {
-						return getUniqueItemsByName( [
-							...get( blockType, [ 'variations' ], [] ).map(
-								( variation ) => ( {
-									...variation,
-									source: 'block',
-								} )
-							),
-							...get( state, [ blockType.name ], [] ).filter(
-								( { source } ) => 'block' !== source
-							),
-						] );
-					}
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => {
+						return [
+							name,
+							getUniqueItemsByName( [
+								...get( blockType, [ 'variations' ], [] ).map(
+									( variation ) => ( {
+										...variation,
+										source: 'block',
+									} )
+								),
+								...get( state, [ blockType.name ], [] ).filter(
+									( { source } ) => 'block' !== source
+								),
+							] ),
+						];
+					} )
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':

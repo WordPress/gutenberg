@@ -212,44 +212,6 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 }
 
 /**
- * This method is no longer used and has been deprecated in Core since 6.1.0.
- *
- * It can be deleted once Gutenberg's minimum supported WordPress version is >= 6.1
- *
- * Generates an inline style for a typography feature e.g. text decoration,
- * text transform, and font style.
- *
- * @since 5.8.0
- * @deprecated 6.1.0
- *
- * @param array  $attributes   Block's attributes.
- * @param string $feature      Key for the feature within the typography styles.
- * @param string $css_property Slug for the CSS property the inline style sets.
- *
- * @return string              CSS inline style.
- */
-function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
-	// Retrieve current attribute value or skip if not found.
-	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
-	if ( ! $style_value ) {
-		return;
-	}
-
-	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
-		return sprintf( '%s:%s;', $css_property, $style_value );
-	}
-
-	// We have a preset CSS variable as the style.
-	// Get the style value from the string and return CSS style.
-	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	$slug            = substr( $style_value, $index_to_splice );
-
-	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
-	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
-}
-
-/**
  * Renders typography styles/content to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
