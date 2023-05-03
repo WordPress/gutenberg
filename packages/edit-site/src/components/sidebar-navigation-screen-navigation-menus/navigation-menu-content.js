@@ -144,7 +144,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		};
 	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
 
-	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+	const { PrivateListView, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 	const offCanvasOnselect = useCallback(
 		( block ) => {
@@ -181,14 +181,14 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		<>
 			{ isLoading && <NavigationMenuLoader /> }
 			{ ! isLoading && (
-				<OffCanvasEditor
+				<PrivateListView
 					blocks={
 						isSinglePageList
 							? clientIdsTree[ 0 ].innerBlocks
 							: clientIdsTree
 					}
 					onSelect={ offCanvasOnselect }
-					LeafMoreMenu={ LeafMoreMenu }
+					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
 					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
