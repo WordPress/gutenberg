@@ -67,7 +67,7 @@ function Edit( props ) {
 					className="block-editor-format-toolbar__language-popover"
 					anchor={ popoverAnchor }
 					placement="bottom"
-					onClose={  togglePopover } 
+					onClose={ togglePopover }
 				>
 					<form
 						className="block-editor-format-toolbar__language-container-content"
