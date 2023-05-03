@@ -39,7 +39,9 @@ import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, DisableBlockEditing } = unlock(
+	blockEditorPrivateApis
+);
 
 const LAYOUT = {
 	type: 'default',
@@ -201,11 +203,13 @@ export default function BlockEditor() {
 									readonly={ canvasMode === 'view' }
 								>
 									{ resizeObserver }
-									<BlockList
-										className="edit-site-block-editor__block-list wp-site-blocks"
-										__experimentalLayout={ LAYOUT }
-										renderAppender={ showBlockAppender }
-									/>
+									<DisableBlockEditing>
+										<BlockList
+											className="edit-site-block-editor__block-list wp-site-blocks"
+											__experimentalLayout={ LAYOUT }
+											renderAppender={ showBlockAppender }
+										/>
+									</DisableBlockEditing>
 								</EditorCanvas>
 							</ResizableEditor>
 						</BlockTools>

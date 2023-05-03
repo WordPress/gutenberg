@@ -36,6 +36,7 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 import useBlockOverlayActive from '../../block-content-overlay';
+import { useIsBlockEditingDisabled } from '../../disable-block-editing';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -75,6 +76,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		isEditingDisabledByLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -88,8 +90,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
+				__unstableGetContentLockingParent,
 			} = select( blockEditorStore );
-			const { getActiveBlockVariation } = select( blocksStore );
+			const {
+				getActiveBlockVariation,
+				__experimentalHasContentRoleAttribute,
+			} = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
@@ -111,16 +117,22 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				isEditingDisabledByLock:
+					!! __unstableGetContentLockingParent( clientId ) &&
+					! __experimentalHasContentRoleAttribute( blockName ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const hasOverlay = useBlockOverlayActive( clientId );
-
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
+	const hasOverlay = useBlockOverlayActive( clientId );
+	const isEditingDisabledByComponent = useIsBlockEditingDisabled();
+	const isEditingDisabled =
+		isEditingDisabledByLock || isEditingDisabledByComponent;
+
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( clientId ),
@@ -148,7 +160,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	}
 
 	return {
-		tabIndex: 0,
+		tabIndex: isEditingDisabled ? -1 : 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
@@ -163,6 +175,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
 				'has-block-overlay': hasOverlay,
+				'is-editing-disabled': isEditingDisabled,
 			} ),
 			className,
 			props.className,

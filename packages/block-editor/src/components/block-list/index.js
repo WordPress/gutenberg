@@ -40,6 +40,7 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
+import { useIsBlockEditingDisabled } from '../disable-block-editing';
 
 const elementContext = createContext();
 
@@ -111,6 +112,7 @@ function Root( { className, ...settings } ) {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
+				'is-editing-disabled': useIsBlockEditingDisabled(),
 			} ),
 		},
 		settings

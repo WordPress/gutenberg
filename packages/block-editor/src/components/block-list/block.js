@@ -18,7 +18,6 @@ import {
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
 	switchToBlockType,
-	store as blocksStore,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
 } from '@wordpress/blocks';
@@ -97,37 +96,17 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
-	const {
-		themeSupportsLayout,
-		hasContentLockedParent,
-		isContentBlock,
-		isContentLocking,
-		isTemporarilyEditingAsBlocks,
-	} = useSelect(
+	const { themeSupportsLayout, isTemporarilyEditingAsBlocks } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				__unstableGetContentLockingParent,
-				getTemplateLock,
-				__unstableGetTemporarilyEditingAsBlocks,
-			} = select( blockEditorStore );
-			const _hasContentLockedParent =
-				!! __unstableGetContentLockingParent( clientId );
+			const { getSettings, __unstableGetTemporarilyEditingAsBlocks } =
+				select( blockEditorStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock:
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					),
-				hasContentLockedParent: _hasContentLockedParent,
-				isContentLocking:
-					getTemplateLock( clientId ) === 'contentOnly' &&
-					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 			};
 		},
-		[ name, clientId ]
+		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
@@ -160,12 +139,6 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( hasContentLockedParent && ! isContentBlock ) {
-		wrapperProps = {
-			...wrapperProps,
-			tabIndex: -1,
-		};
-	}
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
@@ -234,10 +207,9 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-content-locked': isContentLocking,
+				// TODO: Can we remove this and have content-lock-ui.js set it?
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
-				'is-content-block': hasContentLockedParent && isContentBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className

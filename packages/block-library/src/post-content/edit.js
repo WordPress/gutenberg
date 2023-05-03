@@ -8,6 +8,7 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 
@@ -15,6 +16,9 @@ import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
+import { unlock } from '../private-apis';
+
+const { DisableBlockEditing } = unlock( blockEditorPrivateApis );
 
 function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	const [ , , content ] = useEntityProp(
@@ -127,7 +131,9 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
-				<Content context={ context } layout={ layout } />
+				<DisableBlockEditing isDisabled={ false }>
+					<Content context={ context } layout={ layout } />
+				</DisableBlockEditing>
 			) : (
 				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }

@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -22,10 +23,27 @@ import { useEntityProp } from '@wordpress/core-data';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
+import { unlock } from '../private-apis';
 
-export default function PostTitleEdit( {
+const { useIsBlockEditingDisabled, DisableBlockEditing } = unlock(
+	blockEditorPrivateApis
+);
+
+export default function PostTitleEdit( props ) {
+	return useIsBlockEditingDisabled() ? (
+		<DisableBlockEditing isDisabled={ false }>
+			<TitleElement { ...props } />
+		</DisableBlockEditing>
+	) : (
+		<>
+			<TitleElement { ...props } />
+			<Controls { ...props } />
+		</>
+	);
+}
+
+function TitleElement( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
-	setAttributes,
 	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
@@ -99,6 +117,13 @@ export default function PostTitleEdit( {
 			);
 	}
 
+	return <>{ titleElement }</>;
+}
+
+function Controls( {
+	attributes: { level, textAlign, isLink, rel, linkTarget },
+	setAttributes,
+} ) {
 	return (
 		<>
 			<BlockControls group="block">
@@ -147,7 +172,6 @@ export default function PostTitleEdit( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ titleElement }
 		</>
 	);
 }
