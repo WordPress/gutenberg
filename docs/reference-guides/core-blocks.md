@@ -656,7 +656,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Name:** core/query
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, ~~html~~
--	**Attributes:** displayLayout, namespace, query, queryId, tagName
+-	**Attributes:** namespace, query, queryId, tagName
 
 ## No results
 

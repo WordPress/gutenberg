@@ -98,17 +98,12 @@ export default function PostTemplateEdit( {
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
-		displayLayout,
 		previewPostType,
 	},
 	attributes: { layout },
 	__unstableLayoutClassNames,
 } ) {
-	const { type: layoutType = 'grid' } = displayLayout || {};
-	const legacyLayoutType =
-		layoutType === 'list' || layoutType === 'default' ? 'default' : 'grid';
-
-	const updatedLayoutType = layout?.type || legacyLayoutType;
+	const { type: layoutType, columnCount = 3 } = layout || {};
 
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
@@ -252,15 +247,17 @@ export default function PostTemplateEdit( {
 			icon: list,
 			title: __( 'List view' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
-			isActive:
-				updatedLayoutType === 'default' || updatedLayoutType === 'list',
+			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
 			icon: grid,
 			title: __( 'Grid view' ),
-			onClick: () => setDisplayLayout( { type: 'grid', columnCount: 3 } ),
-			isActive:
-				updatedLayoutType === 'grid' || updatedLayoutType === 'flex',
+			onClick: () =>
+				setDisplayLayout( {
+					type: 'grid',
+					columnCount,
+				} ),
+			isActive: layoutType === 'grid',
 		},
 	];
 
