@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -10,6 +15,9 @@ import {
 	ResponsiveWrapper,
 	withNotices,
 	withFilters,
+	FormFileUpload,
+	Dropdown,
+	Icon,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState } from '@wordpress/element';
@@ -21,12 +29,14 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { pencil as pencilIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import PostFeaturedImageCheck from './check';
 import { store as editorStore } from '../../store';
+import PostFeaturedImageMenu from './menu';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -160,83 +170,110 @@ function PostFeaturedImage( {
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } ) => (
-							<div className="editor-post-featured-image__container">
-								<Button
-									className={
-										! featuredImageId
-											? 'editor-post-featured-image__toggle'
-											: 'editor-post-featured-image__preview'
-									}
-									onClick={ open }
-									aria-label={
-										! featuredImageId
-											? null
-											: __( 'Edit or update the image' )
-									}
-									aria-describedby={
-										! featuredImageId
-											? null
-											: `editor-post-featured-image-${ featuredImageId }-describedby`
-									}
-								>
-									{ !! featuredImageId && media && (
-										<ResponsiveWrapper
-											naturalWidth={ mediaWidth }
-											naturalHeight={ mediaHeight }
-											isInline
-										>
-											<img
-												src={ mediaSourceUrl }
-												alt=""
-											/>
-										</ResponsiveWrapper>
-									) }
-									{ isLoading && <Spinner /> }
-									{ ! featuredImageId &&
-										! isLoading &&
-										( postType?.labels
-											?.set_featured_image ||
-											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-								</Button>
-								<DropZone onFilesDrop={ onDropFiles } />
-							</div>
+						render={ ( { open: openMediaLibrary } ) => (
+							<FormFileUpload
+								accept="image/*"
+								onChange={ ( event ) =>
+									onDropFiles( event.target.files )
+								}
+								render={ ( { openFileDialog } ) => (
+									<div className="editor-post-featured-image__container">
+										<Dropdown
+											className="editor-post-featured-image__dropdown"
+											popoverProps={ {
+												placement: 'left-start',
+											} }
+											renderToggle={ ( {
+												isOpen,
+												onToggle,
+											} ) => (
+												<Button
+													className={ classnames(
+														! featuredImageId
+															? 'editor-post-featured-image__toggle'
+															: 'editor-post-featured-image__preview',
+														{
+															'is-menu-open':
+																isOpen,
+														}
+													) }
+													onClick={ onToggle }
+													aria-label={
+														! featuredImageId
+															? null
+															: __(
+																	'Edit or update the image'
+															  )
+													}
+													aria-describedby={
+														! featuredImageId
+															? null
+															: `editor-post-featured-image-${ featuredImageId }-describedby`
+													}
+												>
+													{ !! featuredImageId &&
+														media && (
+															<ResponsiveWrapper
+																naturalWidth={
+																	mediaWidth
+																}
+																naturalHeight={
+																	mediaHeight
+																}
+																isInline
+															>
+																<img
+																	src={
+																		mediaSourceUrl
+																	}
+																	alt=""
+																/>
+															</ResponsiveWrapper>
+														) }
+													{ isLoading && <Spinner /> }
+													{ !! featuredImageId && (
+														<Icon
+															className="editor-post-featured-image__preview-icon"
+															icon={ pencilIcon }
+														/>
+													) }
+													{ ! featuredImageId &&
+														! isLoading &&
+														( postType?.labels
+															?.set_featured_image ||
+															DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
+												</Button>
+											) }
+											renderContent={ ( { onClose } ) => (
+												<PostFeaturedImageMenu
+													removeImageLabel={
+														postType?.labels
+															?.remove_featured_image ||
+														DEFAULT_REMOVE_FEATURE_IMAGE_LABEL
+													}
+													onClose={ onClose }
+													onOpenMediaLibrary={
+														openMediaLibrary
+													}
+													onOpenFileDialog={
+														openFileDialog
+													}
+													onRemoveImage={
+														featuredImageId
+															? onRemoveImage
+															: null
+													}
+												/>
+											) }
+										/>
+										<DropZone onFilesDrop={ onDropFiles } />
+									</div>
+								) }
+							/>
 						) }
 						value={ featuredImageId }
 					/>
 				</MediaUploadCheck>
-				{ !! featuredImageId && (
-					<MediaUploadCheck>
-						{ media && (
-							<MediaUpload
-								title={
-									postType?.labels?.featured_image ||
-									DEFAULT_FEATURE_IMAGE_LABEL
-								}
-								onSelect={ onUpdateImage }
-								unstableFeaturedImageFlow
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								modalClass="editor-post-featured-image__media-modal"
-								render={ ( { open } ) => (
-									<Button
-										onClick={ open }
-										variant="secondary"
-									>
-										{ __( 'Replace Image' ) }
-									</Button>
-								) }
-							/>
-						) }
-						<Button
-							onClick={ onRemoveImage }
-							variant="link"
-							isDestructive
-						>
-							{ postType?.labels?.remove_featured_image ||
-								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
-						</Button>
-					</MediaUploadCheck>
-				) }
 			</div>
 		</PostFeaturedImageCheck>
 	);
