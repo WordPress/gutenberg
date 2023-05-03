@@ -17,6 +17,6 @@ export async function saveSiteEditorEntities( this: Editor ) {
 		'role=region[name="Save panel"i] >> role=button[name="Save"i]'
 	);
 	await this.page.waitForSelector(
-		'role=region[name="Editor top bar"i] >> role=button[name="Save"i][disabled]'
+		'role=region[name="Editor top bar"i] >> role=button[name="Saved"i][disabled]'
 	);
 }
