@@ -66,7 +66,7 @@ export default function SavePanel() {
 			className={ classnames( 'edit-site-layout__actions', {
 				'is-entity-save-view-open': isSaveViewOpen,
 			} ) }
-			ariaLabel={ __( 'Save sidebar' ) }
+			ariaLabel={ __( 'Save panel' ) }
 		>
 			{ isSaveViewOpen ? (
 				entitySavedStates

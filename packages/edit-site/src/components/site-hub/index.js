@@ -43,7 +43,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const siteIconButtonProps = {
-		label: __( 'Open Admin Sidebar' ),
+		label: __( 'Open Navigation' ),
 		onClick: () => {
 			if ( canvasMode === 'edit' ) {
 				clearSelectedBlock();
