@@ -89,7 +89,6 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const { getBlock } = useSelect( blockEditorStore );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -251,22 +250,6 @@ export function MediaPlaceholder( {
 		return await handleBlocksDrop( blocks );
 	}
 
-	async function onDrop( event ) {
-		if ( event.dataTransfer.getData( 'wp-blocks' ) ) {
-			const dragData = JSON.parse(
-				event.dataTransfer.getData( 'wp-blocks' )
-			);
-			if ( dragData.type === 'inserter' ) {
-				return await handleBlocksDrop( dragData.blocks );
-			} else if ( dragData.type === 'block' ) {
-				const blocks = dragData.srcClientIds.map( ( id ) =>
-					getBlock( id )
-				);
-				return await handleBlocksDrop( blocks );
-			}
-		}
-	}
-
 	const onUpload = ( event ) => {
 		onFilesUpload( event.target.files );
 	};
@@ -354,11 +337,7 @@ export function MediaPlaceholder( {
 		}
 
 		return (
-			<DropZone
-				onFilesDrop={ onFilesUpload }
-				onHTMLDrop={ onHTMLDrop }
-				onDrop={ onDrop }
-			/>
+			<DropZone onFilesDrop={ onFilesUpload } onHTMLDrop={ onHTMLDrop } />
 		);
 	};
 
