@@ -811,14 +811,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 6.1.0 Added append position.
-	 * @since 6.3.0 Deprecated append position parameter.
+	 * @since 6.3.0 Removed append position parameter.
 	 *
-	 * @param string $selector   Original selector.
-	 * @param string $to_append  Selector to append.
-	 * @param string $deprecated Deprecated parameter.
+	 * @param string $selector  Original selector.
+	 * @param string $to_append Selector to append.
 	 * @return string The new selector.
 	 */
-	protected static function append_to_selector( $selector, $to_append, $deprecated = 'right' ) {
+	protected static function append_to_selector( $selector, $to_append ) {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $selector . $to_append;
 		}
