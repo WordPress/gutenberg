@@ -260,7 +260,7 @@ export function BlockSettingsDropdown( {
 								<CopyMenuItem
 									blocks={ blocks }
 									onCopy={ onCopy }
-									className = "block-action-copy"
+									className="block-action-copy"
 								/>
 								{ canDuplicate && (
 									<MenuItem
@@ -319,7 +319,7 @@ export function BlockSettingsDropdown( {
 									blocks={ blocks }
 									onCopy={ onCopy }
 									label={ __( 'Copy styles' ) }
-									className = "block-action-copy-styles"
+									className="block-action-copy-styles"
 								/>
 								<MenuItem 
 									className="block-action-paste-styles"
