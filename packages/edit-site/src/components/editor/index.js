@@ -167,15 +167,11 @@ export default function Editor() {
 			timeoutRef.current = setTimeout( () => {
 				setLoaded( true );
 			}, 1000 );
-		}
 
-		if ( hasResolvingSelectors && timeoutRef.current ) {
-			clearTimeout( timeoutRef.current );
+			return () => {
+				clearTimeout( timeoutRef.current );
+			};
 		}
-
-		return () => {
-			clearTimeout( timeoutRef.current );
-		};
 	}, [ loaded, hasResolvingSelectors ] );
 
 	const isLoading = ! loaded || ! hasLoadedPost;
