@@ -30,27 +30,41 @@ import { unlock } from '../../private-apis';
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
-	const { canvasMode } = useSelect( ( select ) => {
+	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);
+
 		return {
 			canvasMode: getCanvasMode(),
-			dashboardLink: getSettings().__experimentalDashboardLink,
+			dashboardLink:
+				getSettings().__experimentalDashboardLink || 'index.php',
 		};
 	}, [] );
+
 	const disableMotion = useReducedMotion();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const siteIconButtonProps = {
-		label: __( 'Open Navigation' ),
-		onClick: () => {
-			if ( canvasMode === 'edit' ) {
-				clearSelectedBlock();
-				setCanvasMode( 'view' );
-			}
-		},
-	};
+	
+	const isBackToDashboardButton = canvasMode === 'view';
+	const siteIconButtonProps = isBackToDashboardButton
+		? {
+				href: dashboardLink,
+				label: __( 'Go back to the Dashboard' ),
+		  }
+		: {
+				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
+				role: 'button',
+				label: __( 'Open Navigation' ),
+				onClick: ( event ) => {
+					event.preventDefault();
+					if ( canvasMode === 'edit' ) {
+						clearSelectedBlock();
+						setCanvasMode( 'view' );
+					}
+				},
+		  };
+		  
 	const siteTitle = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
