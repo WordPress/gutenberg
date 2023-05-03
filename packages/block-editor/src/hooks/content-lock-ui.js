@@ -33,7 +33,7 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		if ( ! isBlockOrDescendantSelected ) {
 			stopEditingAsBlock();
 		}
-	}, [ isBlockOrDescendantSelected ] );
+	}, [ isBlockOrDescendantSelected, stopEditingAsBlock ] );
 	return null;
 }
 
