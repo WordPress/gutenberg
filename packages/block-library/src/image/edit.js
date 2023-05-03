@@ -111,6 +111,7 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		enableLightbox = true,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -237,11 +238,6 @@ export function ImageEdit( {
 				break;
 		}
 		mediaAttributes.href = href;
-
-		let enableLightbox = attributes.enableLightbox;
-		if ( ! enableLightbox ) {
-			enableLightbox = true;
-		}
 
 		setAttributes( {
 			...mediaAttributes,

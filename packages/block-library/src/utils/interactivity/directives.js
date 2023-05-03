@@ -64,13 +64,9 @@ export default () => {
 		} ) => {
 			const { Provider } = inherited;
 			const inheritedValue = useContext( inherited );
-			return (
-				<>
-					{ createPortal(
-						<Provider value={inheritedValue}>{children}</Provider>,
-						document.body
-					) }
-				</>
+			return createPortal(
+				<Provider value={ inheritedValue }>{ children }</Provider>,
+				document.body
 			);
 		}
 	);
