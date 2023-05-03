@@ -104,18 +104,21 @@ require __DIR__ . '/experimental/l10n.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
+	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-utils.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider-local.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-web-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
 	require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
 	require __DIR__ . '/experimental/fonts-api/fonts-api.php';
+	// BC Layer files, which will not be backported to WP Core.
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/webfonts-deprecations.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-utils.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-provider.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-provider-local.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-web-fonts.php';
 }
 
 // Plugin specific code.
