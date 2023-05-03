@@ -18,6 +18,11 @@
 }
 
 .edit-site-custom-template-modal {
+	&__suggestions_list {
+		margin-left: - $grid-unit-15;
+		margin-right: - $grid-unit-15;
+	}
+
 	&__contents {
 		> .components-button {
 			padding: $grid-unit-30;
