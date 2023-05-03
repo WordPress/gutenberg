@@ -59,7 +59,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
 			>
-				<summary>
+				<summary onClick={ ( event ) => event.preventDefault() }>
 					<RichText
 						aria-label={ __( 'Write summary' ) }
 						placeholder={ __( 'Write summary…' ) }
@@ -69,7 +69,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}
-						onClick={ ( event ) => event.preventDefault() }
 						multiline={ false }
 					/>
 				</summary>
