@@ -271,7 +271,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		if ( ! current_user_can( 'read_post', $post->ID ) ) {
 			return new WP_Error(
 				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view this global style.' ),
+				__( 'Sorry, you are not allowed to view this global style.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
