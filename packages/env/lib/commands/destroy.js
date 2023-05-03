@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -16,7 +17,7 @@ const exec = util.promisify( require( 'child_process' ).exec );
 /**
  * Internal dependencies
  */
-const { readConfig } = require( '../../lib/config' );
+const { loadConfig } = require( '../config' );
 
 /**
  * Destroy the development server.
@@ -26,9 +27,8 @@ const { readConfig } = require( '../../lib/config' );
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
 module.exports = async function destroy( { spinner, debug } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
-		configPath
+	const { dockerComposeConfigPath, workDirectoryPath } = await loadConfig(
+		path.resolve( '.' )
 	);
 
 	try {

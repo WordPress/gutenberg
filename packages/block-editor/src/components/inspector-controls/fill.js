@@ -41,7 +41,7 @@ export default function InspectorControlsFill( {
 	const isDisplayed = useDisplayBlockControls();
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
+		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
 	if ( ! isDisplayed ) {

@@ -39,8 +39,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if ( error instanceof env.ValidationError ) {
-					// Error is a validation error. That means the user did something wrong.
+				if (
+					error instanceof env.ValidationError ||
+					error instanceof env.AfterSetupError
+				) {
+					// Error is a configuration error. That means the user did something wrong.
 					spinner.fail( error.message );
 					process.exit( 1 );
 				} else if (
@@ -124,6 +127,11 @@ module.exports = function cli() {
 				coerce: parseXdebugMode,
 				type: 'string',
 			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
 		},
 		withSpinner( env.start )
 	);
@@ -144,6 +152,11 @@ module.exports = function cli() {
 				describe: "Which environments' databases to clean.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
+			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
 			} );
 		},
 		withSpinner( env.clean )

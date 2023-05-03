@@ -4,7 +4,7 @@
 
 import { replace } from './replace';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or

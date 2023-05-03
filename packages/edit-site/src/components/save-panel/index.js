@@ -17,6 +17,7 @@ import { NavigableRegion } from '@wordpress/interface';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
+import { useActivateTheme } from '../../utils/use-activate-theme';
 
 export default function SavePanel() {
 	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {
@@ -32,7 +33,18 @@ export default function SavePanel() {
 		};
 	}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const activateTheme = useActivateTheme();
 	const onClose = () => setIsSaveViewOpened( false );
+	const onSave = async ( values ) => {
+		await activateTheme();
+		return values;
+	};
+
+	const entitySavedStates = window?.__experimentalEnableThemePreviews ? (
+		<EntitiesSavedStates close={ onClose } onSave={ onSave } />
+	) : (
+		<EntitiesSavedStates close={ onClose } />
+	);
 
 	if ( canvasMode === 'view' ) {
 		return isSaveViewOpen ? (
@@ -44,7 +56,7 @@ export default function SavePanel() {
 					'Save site, content, and template changes'
 				) }
 			>
-				<EntitiesSavedStates close={ onClose } />
+				{ entitySavedStates }
 			</Modal>
 		) : null;
 	}
@@ -57,7 +69,7 @@ export default function SavePanel() {
 			ariaLabel={ __( 'Save sidebar' ) }
 		>
 			{ isSaveViewOpen ? (
-				<EntitiesSavedStates close={ onClose } />
+				entitySavedStates
 			) : (
 				<div className="edit-site-editor__toggle-save-panel">
 					<Button
