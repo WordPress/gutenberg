@@ -65,7 +65,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.closeMenu' );
 		};
 
-		// Submenus
+		// Submenus.
 		gutenberg_block_core_navigation_add_directives_to_submenu( $w );
 
 		return (string) $w;
@@ -111,4 +111,21 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 	};
 
 	add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 1 );
+
+	// Enqueue the `interactivity.js` file with the store.
+	add_filter(
+		'block_type_metadata',
+		function ( $metadata ) {
+			if ( 'core/navigation' === $metadata['name'] ) {
+				wp_enqueue_script(
+					'wp-block-navigation-view',
+					gutenberg_url( 'build/block-library/interactive-blocks/navigation.min.js' ),
+					array( 'interactivity-runtime' ),
+				);
+			}
+			return $metadata;
+		},
+		10,
+		1
+	);
 }
