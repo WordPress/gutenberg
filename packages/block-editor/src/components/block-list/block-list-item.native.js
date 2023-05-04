@@ -29,7 +29,7 @@ import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.
- * @param {Function} props.onAddBlock                   On Add block callback.
+ * @param {Function} props.onAddBlock                   On add block callback.
  * @param {Function} props.onDeleteBlock                On delete block callback.
  * @param {number}   props.parentWidth                  The width of the parent block.
  * @param {string}   props.rootClientId                 The root client ID.
@@ -175,7 +175,7 @@ function BlockListItemContent( {
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.
- * @param {Function} props.onAddBlock                   On Add block callback.
+ * @param {Function} props.onAddBlock                   On add block callback.
  * @param {Function} props.onDeleteBlock                On delete block callback.
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
