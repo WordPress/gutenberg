@@ -184,12 +184,12 @@ function DimensionsToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	contentSize: false,
-	wideSize: false,
-	padding: false,
-	margin: false,
-	blockGap: false,
-	minHeight: false,
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
 	childLayout: true,
 };
 
