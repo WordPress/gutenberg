@@ -6,32 +6,27 @@
  */
 
 /**
- * Filters the blog option to return the directory for the previewed theme.
+ * Filters the blog option to return the path for the previewed theme.
  *
- * @param string $current_stylesheet The current theme directory.
- * @return string The previewed theme directory.
+ * @param string $current_stylesheet The current theme's stylesheet or template path.
+ * @return string The previewed theme's stylesheet or template path.
  */
-function gutenberg_theme_preview_stylesheet( $current_stylesheet = null ) {
-	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
-	$wp_theme           = wp_get_theme( $preview_stylesheet );
-	if ( ! is_wp_error( $wp_theme->errors() ) ) {
-		return sanitize_text_field( $preview_stylesheet );
+function gutenberg_get_theme_preview_path( $current_stylesheet = null ) {
+	// Don't allow non-admins to preview themes.
+	if ( ! current_user_can( 'switch_themes' ) ) {
+		return;
 	}
 
-	return $current_stylesheet;
-}
-
-/**
- * Filters the blog option to return the parent theme directory for the previewed theme.
- *
- * @param string $current_stylesheet The current theme directory.
- * @return string The previewed theme directory.
- */
-function gutenberg_theme_preview_template( $current_stylesheet = null ) {
 	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
 	if ( ! is_wp_error( $wp_theme->errors() ) ) {
-		return sanitize_text_field( $wp_theme->get_template() );
+		if ( current_filter() === 'stylesheet' ) {
+			$theme_path = $wp_theme->get_stylesheet();
+		} elseif ( current_filter() === 'template' ) {
+			$theme_path = $wp_theme->get_template();
+		}
+
+		return sanitize_text_field( $theme_path );
 	}
 
 	return $current_stylesheet;
@@ -41,6 +36,11 @@ function gutenberg_theme_preview_template( $current_stylesheet = null ) {
  * Adds a middleware to the REST API to set the theme for the preview.
  */
 function gutenberg_attach_theme_preview_middleware() {
+	// Don't allow non-admins to preview themes.
+	if ( ! current_user_can( 'switch_themes' ) ) {
+		return;
+	}
+
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
@@ -119,8 +119,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gu
 	 * Attaches filters to enable theme previews in the Site Editor.
 	 */
 	if ( ! empty( $_GET['theme_preview'] ) ) {
-		add_filter( 'stylesheet', 'gutenberg_theme_preview_stylesheet' );
-		add_filter( 'template', 'gutenberg_theme_preview_template' );
+		add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
+		add_filter( 'template', 'gutenberg_get_theme_preview_path' );
 		add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
 	}
 

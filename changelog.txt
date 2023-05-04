@@ -1,8 +1,6 @@
 == Changelog ==
 
-= 15.7.0-rc.1 =
-
-
+= 15.7.0 =
 
 ## Changelog
 
@@ -57,6 +55,8 @@
 - Adjust copy of Site Logo Block. ([49540](https://github.com/WordPress/gutenberg/pull/49540))
 - Adapt flex child controls for Spacer. ([49362](https://github.com/WordPress/gutenberg/pull/49362))
 - Social Icon: Update the `link` and `mail` block variation's icons. ([49952](https://github.com/WordPress/gutenberg/pull/49952))
+- Cover: Re-instate overflow:Hidden rule to fix issue with border radius. ([50209](https://github.com/WordPress/gutenberg/pull/50209))
+- Fix site logo preview image size with long filenames. ([50242](https://github.com/WordPress/gutenberg/pull/50242))
 
 #### Components
 - CheckboxControl: Add support custom IDs. ([49977](https://github.com/WordPress/gutenberg/pull/49977))
@@ -76,6 +76,7 @@
 - Do not add unregistered style variations to the theme.json schema. ([49807](https://github.com/WordPress/gutenberg/pull/49807))
 - Update preset styles to use Selectors API. ([49427](https://github.com/WordPress/gutenberg/pull/49427))
 - Change the 'WP_Theme_JSON_Data_Gutenberg' class directory. ([50062](https://github.com/WordPress/gutenberg/pull/50062))
+- Layout: Fix issue where saving user global styles included layout definitions in layout settings. ([50268](https://github.com/WordPress/gutenberg/pull/50268))
 
 #### Site Editor
 - Fix screen flash when deleting templates in templates list. ([48449](https://github.com/WordPress/gutenberg/pull/48449))
@@ -88,7 +89,7 @@
 - Correctly return 'isResolving' from 'useAlternativeTemplateParts' hook. ([49921](https://github.com/WordPress/gutenberg/pull/49921))
 
 #### Patterns
-- Increase dimensions of the pattern modal that appears when creating a new page. ([49859](https://github.com/WordPress/gutenberg/pull/49859))
+- Increase the dimensions of the pattern modal that appears when creating a new page. ([49859](https://github.com/WordPress/gutenberg/pull/49859))
 - Update full screen modal dimensions, and pattern grids. ([49894](https://github.com/WordPress/gutenberg/pull/49894))
 - Increase pattern modal dimensions when creating a new template. ([49722](https://github.com/WordPress/gutenberg/pull/49722))
 
@@ -204,6 +205,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamziel @ajlende @alexstine @andrewserong @annziel @aurooba @bdurette @bph @carolinan @chad1008 @chintu51 @courtneyr-dev @dcalhoun @derekblank @draganescu @ellatrix @fluiddot @gaambo @geriux @getdave @gigitux @guarani @gvgvgvijayan @gziolo @hellofromtonya @jameskoster @jasmussen @jeryj @jhnstn @jsnajdr @juanmaguitar @kevin940726 @m0hanraj @MaggieCabrera @MahendraBishnoi29 @Mamaduka @masteradhoc @mburridge @mcsf @mikachan @mirka @mokagio @mtias @ndiego @noahtallen @ntsekouras @oandregal @ObliviousHarmony @priethor @ramonjd @scruffian @SiobhyB @Soean @sque89 @t-hamano @talldan @tellthemachines @tyrann0us @tyxla @Wtower @youknowriad @zzap
+
+
 
 
 = 15.6.2 =
