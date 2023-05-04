@@ -12,6 +12,14 @@
 class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_Styles_Controller_6_2 {
 
 	/**
+	 * Revision controller.
+	 *
+	 * @since 6.3.0
+	 * @var WP_REST_Revisions_Controller
+	 */
+	private $revisions_controller;
+
+	/**
 	 * Registers the controllers routes.
 	 *
 	 * @return void
@@ -46,14 +54,6 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 		$active_global_styles_site    = $this->prepare_item_for_response( $active_global_styles_site, new WP_REST_Request() );
 		return $active_global_styles_site;
 	}
-
-	/**
-	 * Revision controller.
-	 *
-	 * @since 6.3.0
-	 * @var WP_REST_Revisions_Controller
-	 */
-	private $revisions_controller;
 
 	/**
 	 * Prepares links for the request.
