@@ -31,10 +31,11 @@
 		height: 100%;
 
 		&.is-focused {
-			outline: ( $border-width-focus * 2 ) solid var(--wp-admin-theme-color);
-			outline-offset: -2 * $border-width-focus;
+			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+			outline-offset: calc(2 * var(--wp-admin-border-width-focus));
 		}
 	}
+
 
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {
