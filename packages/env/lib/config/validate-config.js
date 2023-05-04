@@ -39,8 +39,6 @@ function checkPort( configFile, configKey, port ) {
 		);
 	}
 
-	port = parseInt( port );
-
 	if ( port < 0 || port > 65535 ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a valid port.`
