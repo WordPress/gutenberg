@@ -12,6 +12,7 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import { areBlocksDirty } from './are-blocks-dirty';
+import { ALLOWED_BLOCKS } from './allowed-blocks';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
@@ -23,18 +24,6 @@ const DRAFT_MENU_PARAMS = [
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
 };
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
 
 export default function UnsavedInnerBlocks( {
 	blocks,
