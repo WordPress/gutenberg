@@ -1989,21 +1989,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $value;
 		}
 
-		// Convert custom CSS properties.
-		$prefix     = 'var:';
-		$prefix_len = strlen( $prefix );
-		$token_in   = '|';
-		$token_out  = '--';
-		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
-			$unwrapped_name = str_replace(
-				$token_in,
-				$token_out,
-				substr( $value, $prefix_len )
-			);
-			$value          = "var(--wp--$unwrapped_name)";
-		}
-
-		return $value;
+    return self::convert_custom_properties( $value );
 	}
 
 	/**
@@ -3578,4 +3564,29 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $declarations;
 	}
+
+  /**
+   * This is used to convert the internal representation of variables to the CSS representation.
+   * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
+	 * 
+   * @since 6.3.0
+   * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
+   * @return string The converted variable.
+   */
+  private static function convert_custom_properties($value) {
+    $prefix     = 'var:';
+    $prefix_len = strlen( $prefix );
+    $token_in   = '|';
+    $token_out  = '--';
+    if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+      $unwrapped_name = str_replace(
+        $token_in,
+        $token_out,
+        substr( $value, $prefix_len )
+      );
+      $value          = "var(--wp--$unwrapped_name)";
+    }
+
+    return $value;
+  }
 }
