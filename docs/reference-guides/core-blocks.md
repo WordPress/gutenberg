@@ -338,7 +338,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity
+-	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
 -	**Attributes:** align, alt, caption, enableLightbox, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
 
 ## Latest Comments

@@ -86,7 +86,6 @@
 		}
 	},
 	"supports": {
-		"interactivity": true,
 		"anchor": true,
 		"color": {
 			"text": false,
