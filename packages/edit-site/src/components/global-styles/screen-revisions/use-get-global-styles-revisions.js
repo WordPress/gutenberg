@@ -82,12 +82,6 @@ export default function useGetGlobalStylesRevisions() {
 			};
 		} );
 
-		_modifiedRevisions.push( {
-			id: 'parent',
-			styles: {},
-			settings: {},
-		} );
-
 		if ( isDirty && ! isEmpty( userConfig ) && !! currentUser ) {
 			const unsavedRevision = {
 				id: 'unsaved',

@@ -86,13 +86,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Background"i] >> .component-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Text"i] >> .component-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
@@ -127,13 +127,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Background"i] >> .component-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Text"i] >> .component-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 

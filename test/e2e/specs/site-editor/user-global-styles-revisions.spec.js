@@ -84,7 +84,7 @@ test.describe( 'Global styles revisions', () => {
 
 			const revisionButtons = page
 				.getByRole( 'group', { name: 'Global styles revisions' } )
-				.getByRole( 'button', { name: /^Revision from / } );
+				.getByRole( 'button', { name: /^Changes saved on / } );
 
 			await expect( revisionButtons ).toHaveCount(
 				currentRevisions.length + 2
@@ -98,7 +98,7 @@ test.describe( 'Global styles revisions', () => {
 		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 		const revisionButtons = page
 			.getByRole( 'group', { name: 'Global styles revisions' } )
-			.getByRole( 'button', { name: /^Revision from / } );
+			.getByRole( 'button', { name: /^Changes saved on / } );
 
 		await expect( revisionButtons ).toHaveCount(
 			updatedCurrentRevisions.length
@@ -130,7 +130,8 @@ test.describe( 'Global styles revisions', () => {
 		// await expect( image ).toHaveCSS( 'height', '3px' );
 		await page
 			.getByRole( 'group', { name: 'Global styles revisions' } )
-			.getByRole( 'button', { name: 'Theme default styles' } )
+			.getByRole( 'button', { name: /^Changes saved on / } )
+			.last()
 			.click();
 
 		await page.getByRole( 'button', { name: 'Load revision' } ).click();

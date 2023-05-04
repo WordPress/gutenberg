@@ -135,9 +135,7 @@ function ScreenRevisions() {
 								}
 							} }
 						>
-							{ globalStylesRevision?.id === 'parent'
-								? __( 'Reset to defaults' )
-								: __( 'Load revision' ) }
+							{ __( 'Load revision' ) }
 						</Button>
 					</SidebarFixedBottom>
 				) }

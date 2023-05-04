@@ -19,11 +19,6 @@ import { dateI18n, getDate, humanTimeDiff } from '@wordpress/date';
 function getRevisionLabel( revision ) {
 	const authorDisplayName = revision?.author?.name;
 	const isUnsaved = 'unsaved' === revision?.id;
-	const isReset = 'parent' === revision?.id;
-
-	if ( isReset ) {
-		return __( 'Theme default styles' );
-	}
 
 	if ( isUnsaved ) {
 		return sprintf(
@@ -44,7 +39,7 @@ function getRevisionLabel( revision ) {
 	return revision?.isLatest
 		? sprintf(
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Revision from %(date)s by %(name)s (current)' ),
+				__( 'Changes saved on %(date)s by %(name)s (current)' ),
 				{
 					name: authorDisplayName,
 					date: formattedDate,
@@ -52,29 +47,12 @@ function getRevisionLabel( revision ) {
 		  )
 		: sprintf(
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Revision from %(date)s by %(name)s ' ),
+				__( 'Changes saved on %(date)s by %(name)s ' ),
 				{
 					name: authorDisplayName,
 					date: formattedDate,
 				}
 		  );
-}
-
-/**
- * Returns a title for the revision.
- *
- * @param {number|string} revisionId The id of a revision.
- * @return {string} Translated title.
- */
-function getRevisionsTitle( revisionId ) {
-	const isUnsaved = 'unsaved' === revisionId;
-	const isReset = 'parent' === revisionId;
-
-	if ( isReset ) {
-		return __( 'Theme default styles' );
-	}
-
-	return isUnsaved ? __( 'Unsaved changes' ) : __( 'Changes saved' );
 }
 
 /**
@@ -97,7 +75,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 		>
 			{ userRevisions.map( ( revision ) => {
 				const { id, author, isLatest, modified } = revision;
-				const authorAvatar = author?.avatar_urls?.[ '24' ];
+				const authorAvatar = author?.avatar_urls?.[ '48' ];
 				/*
 				 * If the currentId hasn't been selected yet, the first revision is
 				 * the current one so long as the API returns revisions in descending order.
@@ -125,22 +103,20 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 							aria-label={ getRevisionLabel( revision ) }
 						>
 							<span className="edit-site-global-styles-screen-revisions__description">
-								<span>{ getRevisionsTitle( id ) }</span>
-								{ ( !! modified || !! authorAvatar ) && (
-									<span className="edit-site-global-styles-screen-revisions__meta">
-										{ !! modified && (
-											<time dateTime={ modified }>
-												{ humanTimeDiff( modified ) }
-											</time>
-										) }
-										{ !! authorAvatar && (
-											<img
-												alt={ author?.name }
-												src={ authorAvatar }
-											/>
-										) }
-									</span>
-								) }
+								<span>
+									{ 'unsaved' === id
+										? __( 'Unsaved changes' )
+										: __( 'Changes saved' ) }
+								</span>
+								<span className="edit-site-global-styles-screen-revisions__meta">
+									<time dateTime={ modified }>
+										{ humanTimeDiff( modified ) }
+									</time>
+									<img
+										alt={ author?.name }
+										src={ authorAvatar }
+									/>
+								</span>
 							</span>
 						</Button>
 					</li>

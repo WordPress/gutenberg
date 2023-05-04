@@ -75,11 +75,6 @@ describe( 'useGetGlobalStylesRevisions', () => {
 				settings: {},
 				styles: {},
 			},
-			{
-				id: 'parent',
-				settings: {},
-				styles: {},
-			},
 		] );
 	} );
 
@@ -112,11 +107,6 @@ describe( 'useGetGlobalStylesRevisions', () => {
 				},
 				id: 1,
 				isLatest: true,
-				settings: {},
-				styles: {},
-			},
-			{
-				id: 'parent',
 				settings: {},
 				styles: {},
 			},
