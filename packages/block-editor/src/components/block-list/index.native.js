@@ -268,7 +268,14 @@ export default function BlockList( {
 							/>
 						)
 					}
-					ListFooterComponent={ renderBlockListFooter }
+					ListFooterComponent={
+						<Footer
+							isReadOnly={ isReadOnly }
+							onAddBlockToEndOfPost={ addBlockToEndOfPost }
+							renderFooterAppender={ renderFooterAppender }
+							withFooter={ withFooter }
+						/>
+					}
 					onScroll={ onScroll }
 				/>
 				{ shouldShowInnerBlockAppender() && (
@@ -320,29 +327,6 @@ export default function BlockList( {
 		);
 	};
 
-	const renderBlockListFooter = () => {
-		const paragraphBlock = createBlock( 'core/paragraph' );
-
-		if ( ! isReadOnly && withFooter ) {
-			return (
-				<>
-					<TouchableWithoutFeedback
-						accessibilityLabel={ __( 'Add paragraph block' ) }
-						testID={ __( 'Add paragraph block' ) }
-						onPress={ () => {
-							addBlockToEndOfPost( paragraphBlock );
-						} }
-					>
-						<View style={ styles.blockListFooter } />
-					</TouchableWithoutFeedback>
-				</>
-			);
-		} else if ( renderFooterAppender ) {
-			return renderFooterAppender();
-		}
-		return null;
-	};
-
 	// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 	const blockList = isRootList ? (
 		<BlockListProvider
@@ -366,6 +350,34 @@ export default function BlockList( {
 	);
 
 	return blockList;
+}
+
+function Footer( {
+	addBlockToEndOfPost,
+	isReadOnly,
+	renderFooterAppender,
+	withFooter,
+} ) {
+	if ( ! isReadOnly && withFooter ) {
+		return (
+			<>
+				<TouchableWithoutFeedback
+					accessibilityLabel={ __( 'Add paragraph block' ) }
+					testID={ __( 'Add paragraph block' ) }
+					onPress={ () => {
+						const paragraphBlock = createBlock( 'core/paragraph' );
+						addBlockToEndOfPost( paragraphBlock );
+					} }
+				>
+					<View style={ styles.blockListFooter } />
+				</TouchableWithoutFeedback>
+			</>
+		);
+	} else if ( renderFooterAppender ) {
+		return renderFooterAppender();
+	}
+
+	return null;
 }
 
 function EmptyList( {
