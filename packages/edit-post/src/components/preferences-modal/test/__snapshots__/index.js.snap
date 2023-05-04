@@ -102,7 +102,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div>
+    <div
+      class="components-modal__children-container"
+    >
       <div
         class="interface-preferences__tabs"
       >
@@ -723,7 +725,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div>
+    <div
+      class="components-modal__children-container"
+    >
       <div
         class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
         data-wp-c16t="true"

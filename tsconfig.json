@@ -40,6 +40,7 @@
 		{ "path": "packages/react-i18n" },
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
+		{ "path": "packages/rich-text" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },

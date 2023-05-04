@@ -56,12 +56,6 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 		$registered = array();
 		$wp_fonts   = wp_fonts();
 
-		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( $wp_fonts->is_deprecated_structure( $fonts ) ) {
-			$fonts = $wp_fonts->migrate_deprecated_structure( $fonts );
-		}
-		// BACKPORT NOTE: end of code block.
-
 		foreach ( $fonts as $font_family => $variations ) {
 			$font_family_handle = $wp_fonts->add_font_family( $font_family );
 			if ( ! $font_family_handle ) {
@@ -183,7 +177,13 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_fonts( $handles = false ) {
-		global $wp_fonts;
+		$wp_fonts   = wp_fonts();
+		$registered = $wp_fonts->get_registered_font_families();
+
+		// Nothing to print, as no fonts are registered.
+		if ( empty( $registered ) ) {
+			return array();
+		}
 
 		if ( empty( $handles ) ) {
 			$handles = false;
@@ -191,13 +191,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
-			if ( ! $handles ) {
-				return array(); // No need to instantiate if nothing is there.
-			}
-		}
-
-		return wp_fonts()->do_items( $handles );
+		return $wp_fonts->do_items( $handles );
 	}
 }
 

@@ -14,9 +14,9 @@ export async function saveSiteEditorEntities( this: Editor ) {
 	);
 	// Second Save button in the entities panel.
 	await this.page.click(
-		'role=region[name="Save sidebar"i] >> role=button[name="Save"i]'
+		'role=region[name="Save panel"i] >> role=button[name="Save"i]'
 	);
 	await this.page.waitForSelector(
-		'role=region[name="Editor top bar"i] >> role=button[name="Save"i][disabled]'
+		'role=region[name="Editor top bar"i] >> role=button[name="Saved"i][disabled]'
 	);
 }

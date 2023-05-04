@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
+between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+
+### New feature
+
+-   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `wp-env start` and `wp-env clean`.
+-   Add a `WP_ENV_AFTER_SETUP` environment variable to override the `afterSetup` option.
+-   Execute the `afterSetup` command on `wp-env start` after the environment is set up. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
+-   Execute the `afterSetup` command on `wp-env clean`.
+
+### Bug fix
+
+-   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
+
+### Enhancement
+
+-   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
+
 ## 6.0.0 (2023-04-26)
 
 ### Breaking Change
@@ -49,52 +69,63 @@
 ## 5.2.0 (2022-08-16)
 
 ### Enhancement
+
 -   Query parameters can now be used in .zip source URLs.
 
 ## 5.1.1 (2022-08-16)
 
 ### Bug Fix
+
 -   Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the latest stable WordPress version.
 
 ## 5.1.0 (2022-08-10)
 
 ### Enhancement
+
 -   Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
 
 ### Bug Fix
+
 -   Downloading a default WordPress version also resolves a bug where the wrong WordPress test files were used if no core source was specified in wp-env.json. The current trunk test files were downloaded rather than the stable version. Now, the test files will match the default stable version.
 
 ## 5.0.0 (2022-07-27)
 
 ### Breaking Changes
+
 -   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for the `wp-phpunit/wp-phpunit` Composer package. To continue using the package, set the following two environment variables in your `phpunit.xml` file or similar: `WP_TESTS_DIR=""` and `WP_PHPUNIT__TESTS_CONFIG="/wordpress-phpunit/wp-tests-config.php"`.**
 -   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
 
 ### Enhancement
+
 -   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
 -   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
 
 ### Bug Fix
+
 -   Restrict `WP_TESTS_DOMAIN` constant to just hostname rather than an entire URL (e.g. it now excludes scheme, port, etc.) ([#41039](https://github.com/WordPress/gutenberg/pull/41039)).
 
 ## 4.8.0 (2022-06-01)
 
 ### Enhancement
+
 -   Removed the need for quotation marks when passing options to `wp-env run`.
 -   Setting a `config` key to `null` will prevent adding the constant to `wp-config.php` even if a default value is defined by `wp-env`.
 
 ## 4.7.0 (2022-05-18)
 
 ### Enhancement
+
 -   Added SSH protocol support for git sources
 
 ## 4.2.0 (2022-01-27)
 
 ### Enhancement
+
 -   Added command `wp-env install-path` to list the directory used for the environment.
 -   The help entry is now shown when no subcommand is passed to `wp-env`.
 
 ### Bug Fix
+
 -   Updated `yargs` to fix [CVE-2021-3807](https://nvd.nist.gov/vuln/detail/CVE-2021-3807).
 
 ## 4.1.3 (2021-11-07)

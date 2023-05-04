@@ -100,7 +100,7 @@ describe( 'Annotations', () => {
 	it( 'allows a block to be annotated', async () => {
 		await page.keyboard.type( 'Title' + '\n' + 'Paragraph to annotate' );
 
-		await clickOnMoreMenuItem( 'Annotations Sidebar' );
+		await clickOnMoreMenuItem( 'Annotations' );
 
 		let annotations = await page.$$( ANNOTATIONS_SELECTOR );
 		expect( annotations ).toHaveLength( 0 );
@@ -130,7 +130,7 @@ describe( 'Annotations', () => {
 
 	it( 'keeps the cursor in the same location when applying annotation', async () => {
 		await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-		await clickOnMoreMenuItem( 'Annotations Sidebar' );
+		await clickOnMoreMenuItem( 'Annotations' );
 
 		await annotateFirstBlock( 1, 2 );
 
@@ -148,7 +148,7 @@ describe( 'Annotations', () => {
 
 	it( 'moves when typing before it', async () => {
 		await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-		await clickOnMoreMenuItem( 'Annotations Sidebar' );
+		await clickOnMoreMenuItem( 'Annotations' );
 
 		await annotateFirstBlock( 1, 2 );
 
@@ -170,7 +170,7 @@ describe( 'Annotations', () => {
 
 	it( 'grows when typing inside it', async () => {
 		await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-		await clickOnMoreMenuItem( 'Annotations Sidebar' );
+		await clickOnMoreMenuItem( 'Annotations' );
 
 		await annotateFirstBlock( 1, 2 );
 

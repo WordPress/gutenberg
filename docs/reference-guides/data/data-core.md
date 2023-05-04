@@ -234,7 +234,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `EntityRecordKey`: Record's key
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
@@ -281,7 +281,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -316,6 +316,18 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
+
+### getNavigationFallbackId
+
+Retrieve the fallback Navigation.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 
@@ -424,7 +436,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -602,6 +614,18 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveNavigationFallbackId
+
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 

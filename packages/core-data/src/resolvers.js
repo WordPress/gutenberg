@@ -409,15 +409,15 @@ export const getAutosave =
 export const __experimentalGetTemplateForLink =
 	( link ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		// Ideally this should be using an apiFetch call
-		// We could potentially do so by adding a "filter" to the `wp_template` end point.
-		// Also it seems the returned object is not a regular REST API post type.
 		let template;
 		try {
-			template = await window
-				.fetch( addQueryArgs( link, { '_wp-find-template': true } ) )
-				.then( ( res ) => res.json() )
-				.then( ( { data } ) => data );
+			// This is NOT calling a REST endpoint but rather ends up with a response from
+			// an Ajax function which has a different shape from a WP_REST_Response.
+			template = await apiFetch( {
+				url: addQueryArgs( link, {
+					'_wp-find-template': true,
+				} ),
+			} ).then( ( { data } ) => data );
 		} catch ( e ) {
 			// For non-FSE themes, it is possible that this request returns an error.
 		}
@@ -524,4 +524,26 @@ export const getBlockPatternCategories =
 			path: '/wp/v2/block-patterns/categories',
 		} );
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
+	};
+
+export const getNavigationFallbackId =
+	() =>
+	async ( { dispatch } ) => {
+		const fallback = await apiFetch( {
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
+				_embed: true,
+			} ),
+		} );
+
+		const record = fallback?._embedded?.self;
+
+		dispatch.receiveNavigationFallbackId( fallback?.id );
+
+		if ( record ) {
+			dispatch.receiveEntityRecords(
+				'postType',
+				'wp_navigation',
+				record
+			);
+		}
 	};
