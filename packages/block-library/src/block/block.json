@@ -7,8 +7,16 @@
 	"description": "Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used.",
 	"textdomain": "default",
 	"attributes": {
+		"type": {
+			"type": "string",
+			"enum": [ "reusable", "pattern" ],
+			"default": "reusable"
+		},
 		"ref": {
 			"type": "number"
+		},
+		"slug": {
+			"type": "string"
 		}
 	},
 	"supports": {

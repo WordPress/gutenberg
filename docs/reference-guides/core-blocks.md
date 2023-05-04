@@ -42,7 +42,7 @@ Create and save content to reuse across your site. Update the block, and the cha
 -	**Name:** core/block
 -	**Category:** reusable
 -	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~
--	**Attributes:** ref
+-	**Attributes:** ref, slug, type
 
 ## Button
 
