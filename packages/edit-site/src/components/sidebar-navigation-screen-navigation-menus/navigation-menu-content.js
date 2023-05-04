@@ -19,7 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-import { NavigationMenuLoader } from './loader';
 
 function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -179,7 +178,6 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
-			{ isLoading && <NavigationMenuLoader /> }
 			{ ! isLoading && (
 				<OffCanvasEditor
 					blocks={
