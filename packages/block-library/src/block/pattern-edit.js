@@ -8,13 +8,10 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 	useInnerBlocksProps,
-	BlockControls,
 } from '@wordpress/block-editor';
-import { ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 const PatternEdit = ( { attributes, clientId } ) => {
-	const { slug, templateLock } = attributes;
+	const { slug } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -64,18 +61,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		templateLock: 'contentOnly',
 	} );
 
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-			<BlockControls group="other">
-				<ToolbarButton>
-					{ templateLock === false
-						? __( 'Edit content only' )
-						: __( 'Edit all' ) }
-				</ToolbarButton>
-			</BlockControls>
-		</>
-	);
+	return <div { ...innerBlocksProps } />;
 };
 
 export default PatternEdit;
