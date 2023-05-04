@@ -198,8 +198,10 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 			return array();
 		}
 
-		// Skip this reassignment decision-making when using the default of `false`.
-		if ( false !== $handles ) {
+		if ( false === $handles ) {
+			// Automatically enqueue all user-selected fonts.
+			WP_Fonts_Resolver::enqueue_user_selected_fonts();
+		} else {
 			// When `true`, print all registered fonts for the iframed editor.
 			if ( $in_iframed_editor ) {
 				$queue           = $wp_fonts->queue;
