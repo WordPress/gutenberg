@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,9 +10,7 @@ import {
 	ResponsiveWrapper,
 	withNotices,
 	withFilters,
-	FormFileUpload,
-	Dropdown,
-	Icon,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState } from '@wordpress/element';
@@ -29,21 +22,19 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { pencil as pencilIcon } from '@wordpress/icons';
+import { pencil as pencilIcon, trash as trashIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import PostFeaturedImageCheck from './check';
 import { store as editorStore } from '../../store';
-import PostFeaturedImageMenu from './menu';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 // Used when labels from post type were not yet loaded or when they are not present.
 const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 const instructions = (
 	<p>
@@ -170,107 +161,68 @@ function PostFeaturedImage( {
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open: openMediaLibrary } ) => (
-							<FormFileUpload
-								accept="image/*"
-								onChange={ ( event ) =>
-									onDropFiles( event.target.files )
-								}
-								render={ ( { openFileDialog } ) => (
-									<div className="editor-post-featured-image__container">
-										<Dropdown
-											className="editor-post-featured-image__dropdown"
-											popoverProps={ {
-												placement: 'left-start',
-												shift: true,
-											} }
-											renderToggle={ ( {
-												isOpen,
-												onToggle,
-											} ) => (
-												<Button
-													className={ classnames(
-														! featuredImageId
-															? 'editor-post-featured-image__toggle'
-															: 'editor-post-featured-image__preview',
-														{
-															'is-menu-open':
-																isOpen,
-														}
-													) }
-													onClick={ onToggle }
-													aria-label={
-														! featuredImageId
-															? null
-															: __(
-																	'Edit or update the image'
-															  )
-													}
-													aria-describedby={
-														! featuredImageId
-															? null
-															: `editor-post-featured-image-${ featuredImageId }-describedby`
-													}
-												>
-													{ !! featuredImageId &&
-														media && (
-															<ResponsiveWrapper
-																naturalWidth={
-																	mediaWidth
-																}
-																naturalHeight={
-																	mediaHeight
-																}
-																isInline
-															>
-																<img
-																	src={
-																		mediaSourceUrl
-																	}
-																	alt=""
-																/>
-															</ResponsiveWrapper>
-														) }
-													{ isLoading && <Spinner /> }
-													{ !! featuredImageId && (
-														<Icon
-															className="editor-post-featured-image__preview-icon"
-															icon={ pencilIcon }
-														/>
-													) }
-													{ ! featuredImageId &&
-														! isLoading &&
-														( postType?.labels
-															?.set_featured_image ||
-															DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-												</Button>
-											) }
-											renderContent={ ( { onClose } ) => (
-												<PostFeaturedImageMenu
-													removeImageLabel={
-														postType?.labels
-															?.remove_featured_image ||
-														DEFAULT_REMOVE_FEATURE_IMAGE_LABEL
-													}
-													onClose={ onClose }
-													onOpenMediaLibrary={
-														openMediaLibrary
-													}
-													onOpenFileDialog={
-														openFileDialog
-													}
-													onRemoveImage={
-														featuredImageId
-															? onRemoveImage
-															: null
-													}
-												/>
-											) }
+						render={ ( { open } ) => (
+							<div className="editor-post-featured-image__container">
+								<Button
+									className={
+										! featuredImageId
+											? 'editor-post-featured-image__toggle'
+											: 'editor-post-featured-image__preview'
+									}
+									onClick={ open }
+									aria-label={
+										! featuredImageId
+											? null
+											: __( 'Edit or update the image' )
+									}
+									aria-describedby={
+										! featuredImageId
+											? null
+											: `editor-post-featured-image-${ featuredImageId }-describedby`
+									}
+								>
+									{ !! featuredImageId && media && (
+										<ResponsiveWrapper
+											naturalWidth={ mediaWidth }
+											naturalHeight={ mediaHeight }
+											isInline
+										>
+											<img
+												src={ mediaSourceUrl }
+												alt=""
+											/>
+										</ResponsiveWrapper>
+									) }
+									{ isLoading && <Spinner /> }
+									{ ! featuredImageId &&
+										! isLoading &&
+										( postType?.labels
+											?.set_featured_image ||
+											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
+								</Button>
+								{ !! featuredImageId && (
+									<HStack
+										className="editor-post-featured-image__actions"
+										expanded={ false }
+									>
+										<Button
+											className="editor-post-featured-image__action"
+											onClick={ onRemoveImage }
+											icon={ trashIcon }
+											label={ __( 'Remove' ) }
 										/>
-										<DropZone onFilesDrop={ onDropFiles } />
-									</div>
+										<Button
+											className="editor-post-featured-image__action"
+											onClick={ open }
+											icon={ pencilIcon }
+											label={ __( 'Edit' ) }
+											// No need to have two edit buttons for screen readers.
+											aria-hidden="true"
+										/>
+									</HStack>
 								) }
-							/>
+								<DropZone onFilesDrop={ onDropFiles } />
+							</div>
 						) }
 						value={ featuredImageId }
 					/>

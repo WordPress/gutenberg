@@ -1,10 +1,6 @@
 .editor-post-featured-image {
 	padding: 0;
 
-	&__container {
-		margin-bottom: 1em;
-		position: relative;
-	}
 
 	.components-spinner {
 		position: absolute;
@@ -12,12 +8,6 @@
 		left: 50%;
 		margin-top: -9px;
 		margin-left: -9px;
-	}
-
-	// Stack consecutive buttons.
-	.components-button + .components-button {
-		display: block;
-		margin-top: 1em;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
@@ -28,8 +18,16 @@
 	}
 }
 
-.editor-post-featured-image__dropdown {
-	display: block;
+.editor-post-featured-image__container {
+	position: relative;
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		.editor-post-featured-image__actions {
+			visibility: visible;
+		}
+	}
 }
 
 .editor-post-featured-image__toggle,
@@ -54,14 +52,6 @@
 		width: 100%;
 		background: $gray-100;
 	}
-
-	&:hover,
-	&:focus,
-	&.is-menu-open {
-		.editor-post-featured-image__preview-icon {
-			visibility: visible;
-		}
-	}
 }
 
 .editor-post-featured-image__toggle {
@@ -78,19 +68,16 @@
 	}
 }
 
-.editor-post-featured-image__preview-icon {
-	background: $white;
-	border-radius: $radius-block-ui;
-	display: block;
-	height: $grid-unit-40;
-	padding: $grid-unit-05;
+.editor-post-featured-image__actions {
+	bottom: $grid-unit-10;
 	position: absolute;
 	right: $grid-unit-10;
-	bottom: $grid-unit-10;
 	visibility: hidden;
-	width: $grid-unit-40;
 }
 
-.editor-post-featured-image__menu {
-	margin: $grid-unit-10 0;
+.editor-post-featured-image__action {
+	background: $white;
+	height: $grid-unit-40;
+	padding: $grid-unit-05;
+	width: $grid-unit-40;
 }
