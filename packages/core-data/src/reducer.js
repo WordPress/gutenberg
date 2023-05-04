@@ -642,6 +642,15 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function navigationFallbackId( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
+			return action.fallbackId;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -658,4 +667,5 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	navigationFallbackId,
 } );
