@@ -229,7 +229,7 @@ function BlockListBlock( {
 				order: blockOrder,
 			};
 		},
-		[ clientId, name, rootClientId ]
+		[ clientId, isSelected, name, rootClientId ]
 	);
 	const { removeBlock, selectBlock } = useDispatch( blockEditorStore );
 	const parentLayout = useLayout() || {};
