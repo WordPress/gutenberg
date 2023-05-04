@@ -14,7 +14,7 @@
 function gutenberg_theme_preview_stylesheet( $current_stylesheet = null ) {
 	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
-	if ( ! is_wp_error( $wp_theme->errors() ) ) {
+	if ( ! is_wp_error( $wp_theme->errors() ) && current_user_can( 'switch_themes' ) ) {
 		return sanitize_text_field( $preview_stylesheet );
 	}
 
@@ -30,7 +30,7 @@ function gutenberg_theme_preview_stylesheet( $current_stylesheet = null ) {
 function gutenberg_theme_preview_template( $current_stylesheet = null ) {
 	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
-	if ( ! is_wp_error( $wp_theme->errors() ) ) {
+	if ( ! is_wp_error( $wp_theme->errors() ) && current_user_can( 'switch_themes' ) ) {
 		return sanitize_text_field( $wp_theme->get_template() );
 	}
 
@@ -41,6 +41,11 @@ function gutenberg_theme_preview_template( $current_stylesheet = null ) {
  * Adds a middleware to the REST API to set the theme for the preview.
  */
 function gutenberg_attach_theme_preview_middleware() {
+	// Don't allow non-admins to preview themes.
+	if ( ! current_user_can( 'switch_themes' ) ) {
+		return;
+	}
+
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
