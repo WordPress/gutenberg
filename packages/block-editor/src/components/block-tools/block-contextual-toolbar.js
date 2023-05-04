@@ -55,7 +55,7 @@ const ExpandFixedToolbarButton = forwardRef( ( { onClick, icon }, ref ) => {
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
 	const [ isCollapsed, setIsCollapsed ] = useState( false );
-	const [ isNewBlockSelected, setIsNewBlockSelected ] = useState( true );
+	const [ isNewBlockSelected, setIsNewBlockSelected ] = useState( false );
 	const expandFixedToolbarButtonRef = useRef();
 	const collapseFixedToolbarButtonRef = useRef();
 
@@ -107,7 +107,6 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			setIsNewBlockSelected( true );
 			return;
 		}
-		setIsNewBlockSelected( false );
 		if ( initialRender.current ) {
 			initialRender.current = false;
 			return;
