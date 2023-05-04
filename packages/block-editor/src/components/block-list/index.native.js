@@ -262,6 +262,7 @@ export default function BlockList( {
 					ListEmptyComponent={
 						! isReadOnly && (
 							<EmptyList
+								orientation={ orientation }
 								rootClientId={ rootClientId }
 								renderAppender={ renderAppender }
 								renderFooterAppender={ renderFooterAppender }
