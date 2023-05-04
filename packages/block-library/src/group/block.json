@@ -18,6 +18,9 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
+		},
+		"slug": {
+			"type": "string"
 		}
 	},
 	"supports": {

@@ -13,6 +13,8 @@ import {
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
+import { useEffect } from '@wordpress/element';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -78,24 +80,61 @@ function GroupEdit( {
 	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		allowedBlocks,
+		layout = {},
+		slug,
+	} = attributes;
+
+	const { hasInnerBlocks, themeSupportsLayout, selectedPattern } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
 			return {
 				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 				themeSupportsLayout: getSettings()?.supportsLayout,
+				selectedPattern:
+					select( blockEditorStore ).__experimentalGetParsedPattern(
+						slug
+					),
 			};
 		},
-		[ clientId ]
+		[ clientId, slug ]
 	);
 
-	const {
-		tagName: TagName = 'div',
-		templateLock,
-		allowedBlocks,
-		layout = {},
-	} = attributes;
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	// Run this effect when the component loads.
+	// This adds the Pattern's contents to the post.
+	// This change won't be saved.
+	// It will continue to pull from the pattern file unless changes are made to its respective template part.
+	useEffect( () => {
+		if ( slug && selectedPattern?.blocks && ! hasInnerBlocks ) {
+			// We batch updates to block list settings to avoid triggering cascading renders
+			// for each container block included in a tree and optimize initial render.
+			// Since the above uses microtasks, we need to use a microtask here as well,
+			// because nested pattern blocks cannot be inserted if the parent block supports
+			// inner blocks but doesn't have blockSettings in the state.
+			window.queueMicrotask( () => {
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceInnerBlocks(
+					clientId,
+					selectedPattern.blocks.map( ( block ) =>
+						cloneBlock( block )
+					)
+				);
+			} );
+		}
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		clientId,
+		hasInnerBlocks,
+		replaceInnerBlocks,
+		selectedPattern?.blocks,
+		slug,
+	] );
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
