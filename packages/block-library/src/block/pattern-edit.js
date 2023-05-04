@@ -13,8 +13,8 @@ import {
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { inheritedAlignment, slug, templateLock } = attributes;
+const PatternEdit = ( { attributes, clientId } ) => {
+	const { slug, templateLock } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -59,53 +59,16 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		innerBlocks,
 	] );
 
-	useEffect( () => {
-		const alignments = [ 'wide', 'full' ];
-		const blocks = innerBlocks;
-		if ( ! blocks || blocks.length === 0 ) {
-			return;
-		}
-		// Determine the widest setting of all the contained blocks.
-		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
-			const { align } = block.attributes;
-			return alignments.indexOf( align ) >
-				alignments.indexOf( accumulator )
-				? align
-				: accumulator;
-		}, undefined );
-
-		// Set the attribute of the Pattern block to match the widest
-		// alignment.
-		setAttributes( {
-			inheritedAlignment: widestAlignment ?? '',
-		} );
-	}, [
-		innerBlocks,
-		selectedPattern?.blocks,
-		setAttributes,
-		inheritedAlignment,
-	] );
-
-	const blockProps = useBlockProps( {
-		className: inheritedAlignment && `align${ inheritedAlignment }`,
-	} );
+	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: templateLock === 'contentOnly' ? 'contentOnly' : false,
+		templateLock: 'contentOnly',
 	} );
-
-	const handleSync = () => {
-		if ( templateLock === false ) {
-			setAttributes( { templateLock: 'contentOnly' } );
-		} else {
-			setAttributes( { templateLock: false } );
-		}
-	};
 
 	return (
 		<>
 			<div { ...innerBlocksProps } />
 			<BlockControls group="other">
-				<ToolbarButton onClick={ handleSync }>
+				<ToolbarButton>
 					{ templateLock === false
 						? __( 'Edit content only' )
 						: __( 'Edit all' ) }
