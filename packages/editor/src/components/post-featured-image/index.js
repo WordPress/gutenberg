@@ -207,17 +207,17 @@ function PostFeaturedImage( {
 									>
 										<Button
 											className="editor-post-featured-image__action"
-											onClick={ onRemoveImage }
-											icon={ trashIcon }
-											label={ __( 'Remove' ) }
+											onClick={ open }
+											icon={ pencilIcon }
+											label={ __( 'Replace' ) }
+											// No need to have two edit buttons for screen readers.
+											aria-hidden="true"
 										/>
 										<Button
 											className="editor-post-featured-image__action"
-											onClick={ open }
-											icon={ pencilIcon }
-											label={ __( 'Edit' ) }
-											// No need to have two edit buttons for screen readers.
-											aria-hidden="true"
+											onClick={ onRemoveImage }
+											icon={ trashIcon }
+											label={ __( 'Remove' ) }
 										/>
 									</HStack>
 								) }

@@ -49,15 +49,6 @@
 			opacity: 0.3;
 		}
 	}
-
-	// Override the button component's destructive background and border.
-	&.is-destructive:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
-		box-shadow: none;
-
-		&:active:not(:disabled) {
-			background: none;
-		}
-	}
 }
 
 .components-menu-item__info-wrapper {
