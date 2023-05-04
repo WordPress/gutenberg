@@ -173,7 +173,7 @@ function PostFeaturedImage( {
 									aria-label={
 										! featuredImageId
 											? null
-											: __( 'Edit or update the image' )
+											: __( 'Edit or replace the image' )
 									}
 									aria-describedby={
 										! featuredImageId
@@ -210,7 +210,7 @@ function PostFeaturedImage( {
 											onClick={ open }
 											icon={ pencilIcon }
 											label={ __( 'Replace' ) }
-											// No need to have two edit buttons for screen readers.
+											// Prefer that screen readers use the .editor-post-featured-image__preview button.
 											aria-hidden="true"
 										/>
 										<Button
@@ -218,6 +218,9 @@ function PostFeaturedImage( {
 											onClick={ onRemoveImage }
 											icon={ trashIcon }
 											label={ __( 'Remove' ) }
+											aria-label={ __(
+												'Remove the image'
+											) }
 										/>
 									</HStack>
 								) }
