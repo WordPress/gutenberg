@@ -7,8 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { useRef, useState } from '@wordpress/element';
-import { withDispatch, withSelect, useSelect } from '@wordpress/data';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
@@ -57,29 +56,20 @@ const getStyles = (
 	return computedStyles;
 };
 
-export function BlockList( {
-	blockClientIds,
-	blockCount,
+export default function BlockList( {
 	blockWidth: initialBlockWidth,
-	clearSelectedBlock,
 	contentResizeMode,
 	contentStyle,
+	filterInnerBlocks,
 	gridProperties,
 	header,
 	horizontal,
 	horizontalAlignment,
-	insertBlock,
-	isBlockInsertionPointVisible,
-	isFloatingToolbarVisible,
-	isRTL,
-	isReadOnly,
-	isRootList,
-	isStackedHorizontally,
 	marginHorizontal = styles.defaultBlock.marginLeft,
 	marginVertical = styles.defaultBlock.marginTop,
-	maxWidth,
 	onAddBlock,
 	onDeleteBlock,
+	orientation,
 	parentWidth,
 	renderAppender,
 	renderFooterAppender,
@@ -87,6 +77,63 @@ export function BlockList( {
 	title,
 	withFooter = true,
 } ) {
+	const {
+		blockClientIds,
+		blockCount,
+		blockInsertionPointIsVisible,
+		isReadOnly,
+		isRootList,
+		isFloatingToolbarVisible,
+		isStackedHorizontally,
+		maxWidth,
+		isRTL,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				getBlockHierarchyRootClientId,
+				getBlockOrder,
+				getSelectedBlockClientId,
+				isBlockInsertionPointVisible,
+				getSettings,
+			} = select( blockEditorStore );
+
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const rootBlockId = getBlockHierarchyRootClientId(
+				selectedBlockClientId
+			);
+
+			let blockOrder = getBlockOrder( rootClientId );
+			// Display only block which fulfill the condition in passed `filterInnerBlocks` function.
+			if ( filterInnerBlocks ) {
+				blockOrder = filterInnerBlocks( blockOrder );
+			}
+
+			const {
+				isRTL: isRTLSetting,
+				maxWidth: maxWidthSetting,
+				readOnly,
+			} = getSettings();
+
+			return {
+				blockClientIds: blockOrder,
+				blockCount: getBlockCount(),
+				blockInsertionPointIsVisible:
+					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
+				isReadOnly: readOnly,
+				isRootList: rootClientId === undefined,
+				isFloatingToolbarVisible:
+					!! selectedBlockClientId && !! getBlockCount( rootBlockId ),
+				isStackedHorizontally: orientation === 'horizontal',
+				maxWidth: maxWidthSetting,
+				isRTL: isRTLSetting,
+			};
+		},
+		[ filterInnerBlocks, orientation, rootClientId ]
+	);
+
+	const { insertBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
+
 	const extraData = useRef( {
 		parentWidth,
 		renderFooterAppender,
@@ -104,7 +151,7 @@ export function BlockList( {
 	const scrollViewRef = useRef( null );
 
 	const shouldFlatListPreventAutomaticScroll = () =>
-		isBlockInsertionPointVisible;
+		blockInsertionPointIsVisible;
 
 	const shouldShowInnerBlockAppender = () =>
 		renderAppender && blockClientIds.length > 0;
@@ -320,68 +367,6 @@ export function BlockList( {
 
 	return blockList;
 }
-
-export default compose( [
-	withSelect(
-		( select, { rootClientId, orientation, filterInnerBlocks } ) => {
-			const {
-				getBlockCount,
-				getBlockHierarchyRootClientId,
-				getBlockOrder,
-				getSelectedBlockClientId,
-				isBlockInsertionPointVisible,
-				getSettings,
-			} = select( blockEditorStore );
-
-			const isStackedHorizontally = orientation === 'horizontal';
-
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			let blockClientIds = getBlockOrder( rootClientId );
-			// Display only block which fulfill the condition in passed `filterInnerBlocks` function.
-			if ( filterInnerBlocks ) {
-				blockClientIds = filterInnerBlocks( blockClientIds );
-			}
-
-			const { maxWidth } = getSettings();
-			const isReadOnly = getSettings().readOnly;
-
-			const blockCount = getBlockCount();
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
-
-			const isFloatingToolbarVisible =
-				!! selectedBlockClientId && !! getBlockCount( rootBlockId );
-			const isRTL = getSettings().isRTL;
-
-			return {
-				blockClientIds,
-				blockCount,
-				isBlockInsertionPointVisible:
-					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
-				isReadOnly,
-				isRootList: rootClientId === undefined,
-				rootClientId,
-				isFloatingToolbarVisible,
-				isStackedHorizontally,
-				maxWidth,
-				isRTL,
-			};
-		}
-	),
-	withDispatch( ( dispatch ) => {
-		const { insertBlock, replaceBlock, clearSelectedBlock } =
-			dispatch( blockEditorStore );
-
-		return {
-			clearSelectedBlock,
-			insertBlock,
-			replaceBlock,
-		};
-	} ),
-	withPreferredColorScheme,
-] )( BlockList );
 
 function EmptyList( {
 	orientation,
