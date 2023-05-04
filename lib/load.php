@@ -127,6 +127,8 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 }
 
 // Plugin specific code.
+require __DIR__ . '/script-loader.php';
+require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
