@@ -19,6 +19,7 @@
 ### Enhancements
 
 -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
+-   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
 
 ## 23.9.0 (2023-04-26)
 
