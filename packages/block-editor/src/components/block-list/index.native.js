@@ -270,8 +270,8 @@ export default function BlockList( {
 					}
 					ListFooterComponent={
 						<Footer
+							addBlockToEndOfPost={ addBlockToEndOfPost }
 							isReadOnly={ isReadOnly }
-							onAddBlockToEndOfPost={ addBlockToEndOfPost }
 							renderFooterAppender={ renderFooterAppender }
 							withFooter={ withFooter }
 						/>
