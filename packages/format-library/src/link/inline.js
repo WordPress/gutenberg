@@ -70,6 +70,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		markAsNoFollow: activeAttributes.rel?.includes( 'nofollow' ),
 		title: richTextText,
 		...nextLinkValue,
 	};
@@ -118,6 +119,7 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
+			markAsNoFollow: nextValue.markAsNoFollow,
 		} );
 
 		const newText = nextValue.title || newUrl;

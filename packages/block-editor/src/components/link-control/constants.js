@@ -24,4 +24,10 @@ export const DEFAULT_LINK_SETTINGS = [
 		id: 'opensInNewTab',
 		title: __( 'Open in new tab' ),
 	},
+	{
+		id: 'markAsNoFollow',
+		title: __(
+			'Search engines should ignore this link (mark as nofollow)'
+		),
+	},
 ];
