@@ -557,4 +557,198 @@ test.describe( 'List View', () => {
 			} )
 		).toBeFocused();
 	} );
+
+	test( 'should delete blocks using keyboard', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert some blocks of different types.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [ { name: 'core/pullquote' } ],
+		} );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{ name: 'core/heading' },
+						{ name: 'core/paragraph' },
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [ { name: 'core/verse' } ],
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/file' } );
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		async function getBlocksWithA11yAttributes() {
+			const selectedRows = await listView
+				.getByRole( 'row' )
+				.filter( {
+					has: page.getByRole( 'gridcell', { selected: true } ),
+				} )
+				.all();
+			const selectedClientIds = await Promise.all(
+				selectedRows.map( ( row ) => row.getAttribute( 'data-block' ) )
+			);
+			const focusedClientId = await listView
+				.getByRole( 'row' )
+				.filter( { has: page.locator( ':focus' ) } )
+				.last()
+				.getAttribute( 'data-block' );
+			// Don't use the util to get the unmodified default block when it's empty.
+			const blocks = await page.evaluate( () =>
+				window.wp.data.select( 'core/block-editor' ).getBlocks()
+			);
+			function recursivelyApplyAttributes( _blocks ) {
+				return _blocks.map( ( block ) => ( {
+					name: block.name,
+					selected: selectedClientIds.includes( block.clientId ),
+					focused: block.clientId === focusedClientId,
+					innerBlocks: recursivelyApplyAttributes(
+						block.innerBlocks
+					),
+				} ) );
+			}
+			return recursivelyApplyAttributes( blocks );
+		}
+
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'The last inserted block should be selected and focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: true, focused: true },
+			] );
+
+		await page.keyboard.press( 'Delete' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Deleting a block should move focus to the previous block'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns', selected: true, focused: true },
+			] );
+
+		// Expand the current column.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Move focus but do not select the second column'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					selected: true,
+					innerBlocks: [
+						{ name: 'core/column' },
+						{ name: 'core/column', focused: true },
+					],
+				},
+			] );
+
+		await page.keyboard.press( 'Delete' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Deleting a inner block moves focus to the previous inner block'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					selected: false,
+					innerBlocks: [
+						{
+							name: 'core/column',
+							selected: true,
+							focused: true,
+						},
+					],
+				},
+			] );
+
+		// Expand the current column.
+		await page.keyboard.press( 'ArrowRight' );
+		// Move focus and select the Heading block.
+		await listView
+			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.dblclick();
+		// Select both inner blocks in the column.
+		await page.keyboard.press( 'Shift+ArrowDown' );
+
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Deleting multiple blocks moves focus to the parent block'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{
+							name: 'core/column',
+							selected: true,
+							focused: true,
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+
+		// Move focus and select the first block.
+		await listView
+			.getByRole( 'gridcell', { name: 'Group', exact: true } )
+			.dblclick();
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Deleting the first block moves focus to the second block'
+			)
+			.toMatchObject( [
+				{
+					name: 'core/columns',
+					selected: true,
+					focused: true,
+				},
+			] );
+
+		// Keyboard shortcut should also work.
+		await pageUtils.pressKeys( 'access+z' );
+		await expect
+			.poll(
+				getBlocksWithA11yAttributes,
+				'Deleting the only block left will create a default block and focus/select it'
+			)
+			.toMatchObject( [
+				{
+					name: 'core/paragraph',
+					selected: true,
+					focused: true,
+				},
+			] );
+	} );
 } );

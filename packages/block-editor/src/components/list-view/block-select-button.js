@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock } from '@wordpress/icons';
-import { SPACE, ENTER } from '@wordpress/keycodes';
+import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -23,6 +23,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
+import { useListViewContext } from './context';
 
 function ListViewBlockSelectButton(
 	{
@@ -47,6 +48,7 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { removeRow } = useListViewContext();
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -57,9 +59,14 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	/**
+	 * @param {KeyboardEvent} event
+	 */
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
+		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
+			removeRow( clientId );
 		}
 	}
 
