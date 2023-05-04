@@ -125,12 +125,16 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		const { height } = await coverBlock.getSize();
 		// Height is set to 20rem, where 1rem is 16.
-		// There is also block's vertical padding equal 32.
-		// Finally, the total height should be 20 * 16 + 32 = 352.
-		expect( height ).toBe( 352 );
+		// The total height should be 20 * 16 = 320.
+		expect( height ).toBe( 320 );
 
 		await coverBlock.click();
 		expect( coverBlock ).toBeTruthy();
+
+		// Navigate upwards to select parent block
+		const navigateUpElement =
+			await editorPage.waitForElementToBeDisplayedById( 'Navigate Up' );
+		await navigateUpElement.click();
 		await editorPage.removeBlockAtPosition( blockNames.cover );
 	} );
 
@@ -144,6 +148,10 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 			blockNames.cover
 		);
 		await coverBlock.click();
+		// Navigate upwards to select parent block
+		const navigateUpElement =
+			await editorPage.waitForElementToBeDisplayedById( 'Navigate Up' );
+		await navigateUpElement.click();
 
 		await editorPage.openBlockSettings();
 		await editorPage.clickAddMediaFromCoverBlock();
