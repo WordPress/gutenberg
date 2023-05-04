@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { useContext, useMemo, useEffect } from 'preact/hooks';
-import { useSignalEffect } from '@preact/signals';
 import { deepSignal, peek } from 'deepsignal';
+
 /**
  * Internal dependencies
  */
+import { useSignalEffect } from './utils';
 import { directive } from './hooks';
 
 const isObject = ( item ) =>
@@ -76,7 +77,7 @@ export default () => {
 		const contextValue = useContext( context );
 		Object.entries( on ).forEach( ( [ name, path ] ) => {
 			element.props[ `on${ name }` ] = ( event ) => {
-				return evaluate( path, { event, context: contextValue } );
+				evaluate( path, { event, context: contextValue } );
 			};
 		} );
 	} );
