@@ -107,11 +107,24 @@ test.describe( 'Post Editor Template mode', () => {
 		requestUtils,
 		postEditorTemplateMode,
 	} ) => {
+		async function editTemplateTitle( newTitle ) {
+			await page
+				.getByRole( 'button', { name: 'Template Options' } )
+				.click();
+
+			await page
+				.getByRole( 'textbox', { name: 'Title' } )
+				.fill( newTitle );
+
+			const editorContent = page.getByLabel( 'Editor Content' );
+			await editorContent.click();
+		}
+
 		await requestUtils.activateTheme( 'emptytheme' );
 
 		await postEditorTemplateMode.createPostAndSaveDraft();
 		await postEditorTemplateMode.createNewTemplate( 'Foobar' );
-		await postEditorTemplateMode.editTemplateTitle( 'Barfoo' );
+		await editTemplateTitle( 'Barfoo' );
 
 		await expect(
 			page.getByRole( 'button', { name: 'Template Options' } )
@@ -393,31 +406,5 @@ class PostEditorTemplateMode {
 			'role=button[name="Cancel"i]'
 		);
 		await cancelButton.click();
-	}
-
-	/**
-	 * Edit the title of a template. The title is saved automatically, no
-	 * need to click anything, though we do click outside of the dialog
-	 * to close it.
-	 *
-	 * This needs to be called only after the template edit mode has been
-	 * activated or it will fail, i.e after creating a new custom template
-	 * or after calling `switchToTemplateMode()`.
-	 *
-	 * @param {string} newTitle the new title to set.
-	 * @return {Promise<void>}
-	 */
-	async editTemplateTitle( newTitle ) {
-		await this.page.click( 'button[aria-label="Template Options"]' );
-
-		const editDialog = this.page.locator(
-			'div.edit-site-template-details__group'
-		);
-
-		await editDialog.waitFor();
-		await editDialog.getByLabel( 'Title' ).fill( newTitle );
-
-		const editorContent = await this.page.getByLabel( 'Editor Content' );
-		await editorContent.click();
 	}
 }
