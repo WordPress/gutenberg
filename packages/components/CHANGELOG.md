@@ -19,6 +19,7 @@
 ### Enhancements
 
 -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
+-   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
 
 ## 23.9.0 (2023-04-26)
 
@@ -40,7 +41,6 @@
 -   `Modal`: Updated spacing / dimensions of `isFullScreen` ([#49894](https://github.com/WordPress/gutenberg/pull/49894)).
 -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
 -   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
--   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
 
 ### Bug Fix
 
