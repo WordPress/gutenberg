@@ -144,13 +144,14 @@ const migrateToConstrainedLayout = ( attributes ) => {
 
 const findPostTemplateBlock = ( innerBlocks = [] ) => {
 	let foundBlock = null;
-	innerBlocks.forEach( ( block ) => {
+	for ( const block of innerBlocks ) {
 		if ( block.name === 'core/post-template' ) {
 			foundBlock = block;
+			break;
 		} else if ( block.innerBlocks.length ) {
 			foundBlock = findPostTemplateBlock( block.innerBlocks );
 		}
-	} );
+	}
 	return foundBlock;
 };
 
@@ -511,7 +512,9 @@ const v5 = {
 		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 		return <Tag { ...innerBlocksProps } />;
 	},
-	isEligible: ( { displayLayout } ) => !! displayLayout,
+	isEligible: ( { displayLayout } ) => {
+		return !! displayLayout;
+	},
 	migrate: migrateDisplayLayout,
 };
 
