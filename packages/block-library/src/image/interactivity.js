@@ -34,7 +34,7 @@ store( {
 
 						// We only want to focus the last focused element
 						// if the lightbox was closed by the keyboard.
-						// Note: Pressing enter on a button will trigger
+						// Note: Pressing Enter on a button will trigger
 						// a click event with a blank pointerType.
 						if (
 							( event.key && event.type === 'keydown' ) ||
