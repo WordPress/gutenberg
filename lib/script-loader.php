@@ -12,8 +12,7 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 /**
  * Enqueues the global styles defined via theme.json.
  *
- * Copy of the core `wp_enqueue_global_styles`.
- * Uses `WP_Theme_JSON` classes and helper methods bundled with the plugin.
+ * Copy of the core `wp_enqueue_global_styles`. Uses helper methods bundled with the plugin.
  *
  * @return void
  */
