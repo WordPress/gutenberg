@@ -6,9 +6,8 @@ import type { Key, MouseEventHandler } from 'react';
 /**
  * Internal dependencies
  */
+import type Popover from '../popover';
 import type { HeadingSize } from '../heading/types';
-import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context';
 
 export type Color = {
 	color: string;
@@ -64,7 +63,7 @@ export type BasePaletteEdit = {
 	 * Props to pass through to the underlying Popover component.
 	 */
 	popoverProps?: Omit<
-		WordPressComponentProps< PopoverProps, 'div', false >,
+		React.ComponentPropsWithoutRef< typeof Popover >,
 		'children'
 	>;
 };
