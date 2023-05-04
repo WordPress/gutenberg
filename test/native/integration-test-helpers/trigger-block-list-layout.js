@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, within } from '@testing-library/react-native';
+import { fireEvent, within, screen } from '@testing-library/react-native';
 
 /**
  * Internal dependencies
@@ -23,12 +23,11 @@ import { waitForStoreResolvers } from './wait-for-store-resolvers';
 export const triggerBlockListLayout = async (
 	block,
 	{ width = 320, blockListIndex = 0 } = {}
-) =>
+) => {
+	const subject = block ? within( block ) : screen;
 	waitForStoreResolvers( () =>
 		fireEvent(
-			within( block ).getAllByTestId( 'block-list-wrapper' )[
-				blockListIndex
-			],
+			subject.getAllByTestId( 'block-list-wrapper' )[ blockListIndex ],
 			'layout',
 			{
 				nativeEvent: {
@@ -39,3 +38,4 @@ export const triggerBlockListLayout = async (
 			}
 		)
 	);
+};

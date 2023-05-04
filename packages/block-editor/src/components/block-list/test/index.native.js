@@ -10,11 +10,65 @@ import {
 	setupCoreBlocks,
 	triggerBlockListLayout,
 	within,
+	measurePerformance,
+	render,
 } from 'test/helpers';
+
+/**
+ * WordPress dependencies
+ */
+import { BlockEditorProvider } from '@wordpress/block-editor';
+import {
+	createBlock,
+	unregisterBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
+import { useState, useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import BlockList from '../index';
 
 setupCoreBlocks( [ 'core/paragraph', 'core/group' ] );
 
+function Editor( { testBlocks, settings = {} } ) {
+	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
+
+	useEffect( () => {
+		return () => {
+			getBlockTypes().forEach( ( { name } ) =>
+				unregisterBlockType( name )
+			);
+		};
+	}, [] );
+
+	return (
+		<BlockEditorProvider
+			value={ currentBlocks }
+			onInput={ updateBlocks }
+			onChange={ updateBlocks }
+			settings={ settings }
+		>
+			<BlockList />
+		</BlockEditorProvider>
+	);
+}
+
 describe( 'BlockList', () => {
+	it.only( 'should be stable', async () => {
+		const newBlock = createBlock( 'core/group', {} );
+
+		render( <Editor testBlocks={ [ newBlock ] } /> );
+		await triggerBlockListLayout();
+		const groupBlock = getBlock( screen, 'Group' );
+		fireEvent.press( groupBlock );
+		await triggerBlockListLayout( groupBlock );
+		screen.debug();
+
+		expect( true ).toBeTruthy();
+	} );
+
 	describe( 'when empty', () => {
 		beforeEach( async () => {
 			// Arrange

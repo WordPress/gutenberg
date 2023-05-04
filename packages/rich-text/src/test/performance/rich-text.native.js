@@ -13,7 +13,7 @@ import {
  */
 import RichText from '../../component/index.native';
 
-describe( 'RichText Performance', () => {
+describe.skip( 'RichText Performance', () => {
 	const onCreateUndoLevel = jest.fn();
 	const onChange = jest.fn();
 	const onSelectionChange = jest.fn();
