@@ -504,12 +504,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @param bool     $create_post        Optional. Whether a new custom post
-	 *                                     type should be created if none are
-	 *                                     found. Default false.
-	 * @param array    $post_status_filter Optional. Filter custom post type by
-	 *                                     post status. Default `array( 'publish' )`,
-	 *                                     so it only fetches published posts.
+	 * @param bool  $create_post        Optional. Whether a new custom post
+	 *                                  type should be created if none are
+	 *                                  found. Default false.
+	 * @param array $post_status_filter Optional. Filter custom post type by
+	 *                                  post status. Default `array( 'publish' )`,
+	 *                                  so it only fetches published posts.
 	 * @return array Custom Post Type for the user's origin config.
 	 */
 	public static function get_site_data_from_wp_global_styles( $create_post = false, $post_status_filter = array( 'publish' ) ) {
