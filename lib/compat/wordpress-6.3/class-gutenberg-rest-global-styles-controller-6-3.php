@@ -95,7 +95,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
 		if ( $is_global_styles_user_theme_json ) {
-			$origin = ( isset ( $post->post_name ) && 'wp-global-styles-site' === $post->post_name ) ? 'site' : 'custom';
+			$origin = ( isset( $post->post_name ) && 'wp-global-styles-site' === $post->post_name ) ? 'site' : 'custom';
 			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, $origin ) )->get_raw_data();
 		}
 
