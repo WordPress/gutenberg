@@ -46,13 +46,18 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 	 *
 	 * @since 6.3.0
 	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function get_site_item() {
-		$active_global_styles_site_id = WP_Theme_JSON_Resolver_Gutenberg::get_site_global_styles_post_id();
-		$active_global_styles_site    = get_post( $active_global_styles_site_id );
-		$active_global_styles_site    = $this->prepare_item_for_response( $active_global_styles_site, new WP_REST_Request() );
-		return $active_global_styles_site;
+	public function get_site_item( $request ) {
+		$post_id = WP_Theme_JSON_Resolver_Gutenberg::get_site_global_styles_post_id();
+		$post    = $this->get_post( $post_id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		return $this->prepare_item_for_response( $post, $request );
 	}
 
 	/**
