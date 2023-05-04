@@ -25,6 +25,7 @@ import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
  * @param {string}   props.clientId                     The block client ID.
  * @param {string}   props.contentResizeMode            The content resize mode, e.g "stretch".
  * @param {Object}   props.contentStyle                 Styles for the block content
+ * @param {Object}   props.index                        Block item index
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.
@@ -41,6 +42,7 @@ function BlockListItemContent( {
 	clientId,
 	contentResizeMode,
 	contentStyle,
+	index,
 	isStackedHorizontally,
 	marginHorizontal,
 	marginVertical,
@@ -129,7 +131,11 @@ function BlockListItemContent( {
 
 	return (
 		<View style={ wrapperStyles }>
-			{ shouldShowInsertionPointBefore && <BlockInsertionPoint /> }
+			{ shouldShowInsertionPointBefore && (
+				<BlockInsertionPoint
+					testID={ `block-insertion-point-before-row-${ index + 1 }` }
+				/>
+			) }
 			<Block
 				blockWidth={ blockWidth }
 				clientId={ clientId }
@@ -143,7 +149,11 @@ function BlockListItemContent( {
 				parentWidth={ parentWidth }
 				rootClientId={ rootClientId }
 			/>
-			{ shouldShowBlockInsertionPointAfter && <BlockInsertionPoint /> }
+			{ shouldShowBlockInsertionPointAfter && (
+				<BlockInsertionPoint
+					testID={ `block-insertion-point-after-row-${ index + 1 }` }
+				/>
+			) }
 		</View>
 	);
 }
@@ -161,6 +171,7 @@ function BlockListItemContent( {
  * @param {string}   props.clientId                     The block client ID.
  * @param {string}   props.contentResizeMode            The content resize mode, e.g "stretch".
  * @param {Object}   props.contentStyle                 Styles for the block content
+ * @param {Object}   props.index                        Block item index
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.

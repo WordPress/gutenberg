@@ -17,16 +17,18 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 	 * @since X.X.X
 	 * @deprecated GB 15.1 Use wp_fonts() instead.
 	 *
-	 * @global WP_Web_Fonts $wp_webfonts
+	 * @global WP_Webfonts $wp_webfonts
 	 *
-	 * @return WP_Web_Fonts WP_Web_Fonts instance.
+	 * @return WP_Webfonts WP_Webfonts instance.
 	 */
 	function wp_webfonts() {
 		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_fonts()' );
 
 		global $wp_webfonts;
 
-		$wp_webfonts = wp_fonts();
+		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
+			$wp_webfonts = new WP_Webfonts( wp_fonts() );
+		}
 
 		return $wp_webfonts;
 	}
@@ -58,6 +60,8 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 */
 	function wp_register_webfonts( array $webfonts ) {
 		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_register_fonts()' );
+
+		$webfonts = Gutenberg_Fonts_API_BC_Layer::migrate_deprecated_structure( $webfonts );
 
 		return wp_register_fonts( $webfonts );
 	}
@@ -249,6 +253,8 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_webfonts( $handles = false ) {
+		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_print_fonts' );
+
 		return wp_print_fonts( $handles );
 	}
 }

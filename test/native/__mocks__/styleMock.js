@@ -178,4 +178,7 @@ module.exports = {
 	mediaAreaPadding: {
 		width: 12,
 	},
+	defaultAppender: {
+		marginLeft: 16,
+	},
 };
