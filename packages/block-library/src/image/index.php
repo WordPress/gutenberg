@@ -53,7 +53,7 @@ function render_block_core_image( $attributes, $content ) {
 					<button aria-haspopup="dialog" aria-label="$aria_label" data-wp-on.click="actions.core.image.showLightbox">
 						$content
 					</button>
-					<div data-wp-portal="body" class="wp-lightbox-overlay"
+					<div data-wp-body="" class="wp-lightbox-overlay"
 						 aria-hidden="true"
 						 data-wp-class.initialized="context.core.image.initialized"
 						 data-wp-class.active="context.core.image.lightboxEnabled"
