@@ -16,9 +16,20 @@ store( {
 					context.core.image.lightboxEnabled = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
+					context.core.image.scrollPosition = window.scrollY;
 				},
 				hideLightbox: ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
+						// If scrolling, wait a moment before closing the lightbox.
+						if (
+							event.type === 'mousewheel' &&
+							Math.abs(
+								window.scrollY -
+									context.core.image.scrollPosition
+							) < 5
+						) {
+							return;
+						}
 						context.core.image.lightboxEnabled = false;
 
 						// We only want to focus the last focused element
