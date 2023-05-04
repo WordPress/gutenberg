@@ -104,7 +104,6 @@ test.describe( 'Post Editor Template mode', () => {
 
 	test( 'Allow editing the title of a new custom template', async ( {
 		page,
-		requestUtils,
 		postEditorTemplateMode,
 	} ) => {
 		async function editTemplateTitle( newTitle ) {
@@ -119,8 +118,6 @@ test.describe( 'Post Editor Template mode', () => {
 			const editorContent = page.getByLabel( 'Editor Content' );
 			await editorContent.click();
 		}
-
-		await requestUtils.activateTheme( 'emptytheme' );
 
 		await postEditorTemplateMode.createPostAndSaveDraft();
 		await postEditorTemplateMode.createNewTemplate( 'Foobar' );
