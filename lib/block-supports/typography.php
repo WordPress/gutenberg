@@ -265,12 +265,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
 
-	// Converts numbers to pixel values by default.
+	// Converts numeric values to pixel values by default.
 	if ( is_numeric( $raw_value ) ) {
 		$raw_value = $raw_value . 'px';
 	}
