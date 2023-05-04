@@ -31,16 +31,16 @@ function render_block_core_image( $attributes, $content ) {
 	}
 
 	$link_destination = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
-	$enable_lightbox = isset( $attributes['enableLightbox'] ) ? $attributes['enableLightbox'] : false;
+	$enable_lightbox  = isset( $attributes['enableLightbox'] ) ? $attributes['enableLightbox'] : false;
 
-	if ( $link_destination === 'none' && $enable_lightbox ) {
+	if ( 'none' === $link_destination && $enable_lightbox ) {
 
 		$aria_label = 'Open image lightbox';
-		if($processor->get_attribute( 'alt' )) {
+		if ( $processor->get_attribute( 'alt' ) ) {
 			$aria_label .= ' - ' . $processor->get_attribute( 'alt' );
 		}
 
-		$background_color = wp_get_global_styles(['color', 'background']);
+		$background_color  = wp_get_global_styles( array( 'color', 'background' ) );
 		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 
 		$content = $processor->get_updated_html();
