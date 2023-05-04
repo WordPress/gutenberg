@@ -20,10 +20,10 @@ function gutenberg_get_theme_preview_path( $current_stylesheet = null ) {
 	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
 	if ( ! is_wp_error( $wp_theme->errors() ) ) {
-		if ( current_filter() === 'stylesheet' ) {
-			$theme_path = $wp_theme->get_stylesheet();
-		} elseif ( current_filter() === 'template' ) {
+		if ( current_filter() === 'template' ) {
 			$theme_path = $wp_theme->get_template();
+		} else {
+			$theme_path = $wp_theme->get_stylesheet();
 		}
 
 		return sanitize_text_field( $theme_path );
@@ -104,7 +104,7 @@ function add_live_preview_button() {
  * Adds a nonce for the theme activation link.
  */
 function block_theme_activate_nonce() {
-	$nonce_handle = 'switch-theme_' . gutenberg_theme_preview_stylesheet();
+	$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
 	?>
 <script type="text/javascript">
 	window.BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
