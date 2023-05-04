@@ -15,7 +15,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
-		await page.click( 'role=button[name="Text"i]' );
+		await page.click( 'role=button[name="Color Text styles"i]' );
 		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
