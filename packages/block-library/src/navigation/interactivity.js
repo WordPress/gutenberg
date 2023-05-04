@@ -4,6 +4,42 @@
 import { store } from '../utils/interactivity';
 
 store( {
+	effects: {
+		core: {
+			navigation: {
+				initModal: async ( { context, ref } ) => {
+					if ( context.isMenuOpen ) {
+						const focusableElements = ref.querySelectorAll(
+							'a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+						);
+						context.modal = ref;
+						context.firstFocusableElement = focusableElements[ 0 ];
+						context.lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
+					}
+				},
+				focusFirstElement: async ( { context, ref } ) => {
+					if ( context.isMenuOpen ) {
+						ref.querySelector(
+							'.wp-block-navigation-item > *:first-child'
+						).focus();
+					}
+				},
+			},
+		},
+	},
+	selectors: {
+		core: {
+			navigation: {
+				roleAttribute: ( { context } ) => {
+					console.log( context.overlay && context.isMenuOpen );
+					return context.overlay && context.isMenuOpen
+						? 'dialog'
+						: '';
+				},
+			},
+		},
+	},
 	actions: {
 		core: {
 			navigation: {
@@ -11,8 +47,6 @@ store( {
 					context.isMenuOpen = true;
 					context.previousFocus = ref;
 					if ( context.overlay ) {
-						// Review how to move this to a selector or something similar
-						context.roleAttribute = 'dialog';
 						// It adds a `has-modal-open` class to the <html> root
 						document.documentElement.classList.add(
 							'has-modal-open'
@@ -32,8 +66,6 @@ store( {
 						context.modal = null;
 						context.previousFocus = null;
 						if ( context.overlay ) {
-							// Review how to move this to a selector or something similar
-							context.roleAttribute = '';
 							document.documentElement.classList.remove(
 								'has-modal-open'
 							);
@@ -47,7 +79,6 @@ store( {
 							event?.key === 'Escape' ||
 							event?.keyCode === 27
 						) {
-							context.previousFocus.focus();
 							actions.core.navigation.closeMenu( { context } );
 							return;
 						}
@@ -79,38 +110,15 @@ store( {
 				handleMenuFocusout: ( { actions, context, event } ) => {
 					if ( context.isMenuOpen ) {
 						// If focus is outside modal, and in the document, close menu
+						// event.target === The element losing focus
+						// event.relatedTarget === The element receiving focus (if any)
+						// When focusout is outsite the document, `window.document.activeElement` doesn't change
 						if (
 							! context.modal.contains( event.relatedTarget ) &&
-							! context.modal.parentElement.contains(
-								window.document.activeElement
-							)
+							event.target !== window.document.activeElement
 						) {
 							actions.core.navigation.closeMenu( { context } );
 						}
-					}
-				},
-			},
-		},
-	},
-	effects: {
-		core: {
-			navigation: {
-				initModal: async ( { context, ref } ) => {
-					if ( context.isMenuOpen ) {
-						const focusableElements = ref.querySelectorAll(
-							'a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
-						);
-						context.modal = ref;
-						context.firstFocusableElement = focusableElements[ 0 ];
-						context.lastFocusableElement =
-							focusableElements[ focusableElements.length - 1 ];
-					}
-				},
-				focusFirstElement: async ( { context, ref } ) => {
-					if ( context.isMenuOpen ) {
-						ref.querySelector(
-							'.wp-block-navigation-item > *:first-child'
-						).focus();
 					}
 				},
 			},

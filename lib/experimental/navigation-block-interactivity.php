@@ -51,7 +51,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 			)
 		) ) {
 			$w->set_attribute( 'data-wp-bind.aria-modal', 'context.isMenuOpen' );
-			$w->set_attribute( 'data-wp-bind.role', 'context.roleAttribute' );
+			$w->set_attribute( 'data-wp-bind.role', 'selectors.core.navigation.roleAttribute' );
 			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.focusFirstElement' );
 		};
 
