@@ -795,7 +795,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
 			} else {
-				$output[ $subtree ] = $result;
+				$output[ $subtree ] = static::sanitize_variables( $result, $schema[ $subtree ] );
 			}
 		}
 
@@ -1989,7 +1989,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $value;
 		}
 
-    return self::convert_custom_properties( $value );
+		return self::convert_custom_properties( $value );
 	}
 
 	/**
@@ -3565,28 +3565,73 @@ class WP_Theme_JSON_Gutenberg {
 		return $declarations;
 	}
 
-  /**
-   * This is used to convert the internal representation of variables to the CSS representation.
-   * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
-	 * 
-   * @since 6.3.0
-   * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
-   * @return string The converted variable.
-   */
-  private static function convert_custom_properties($value) {
-    $prefix     = 'var:';
-    $prefix_len = strlen( $prefix );
-    $token_in   = '|';
-    $token_out  = '--';
-    if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
-      $unwrapped_name = str_replace(
-        $token_in,
-        $token_out,
-        substr( $value, $prefix_len )
-      );
-      $value          = "var(--wp--$unwrapped_name)";
-    }
+	/**
+	 * This is used to convert the internal representation of variables to the CSS representation.
+	 * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
+	 *
+	 * @since 6.3.0
+	 * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
+	 * @return string The converted variable.
+	 */
+	private static function convert_custom_properties( $value ) {
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
 
-    return $value;
-  }
+		return $value;
+	}
+
+	/**
+	 * Given a tree, converts the internal representation of variables to the CSS representation.
+	 * It is recursive and modifies the input in-place.
+	 *
+	 * @since 6.3.0
+	 * @param array $tree   Input to process.
+	 * @param array $schema Schema to adhere to.
+	 * @return array The modified $tree.
+	 */
+	private static function sanitize_variables( $tree, $schema ) {
+		$tree   = array_intersect_key( $tree, $schema );
+		$prefix = 'var:';
+
+		foreach ( $schema as $key => $data ) {
+			if ( ! isset( $tree[ $key ] ) ) {
+				continue;
+			}
+			$values = $tree[ $key ];
+			if ( is_array( $values ) ) {
+				foreach ( $values as $name => $value ) {
+					// if value is an array, do recursion.
+					if ( is_array( $value ) ) {
+						$values[ $name ] = array_merge( $value, self::sanitize_variables( $value, $schema ) );
+						continue;
+					}
+					if ( ! is_string( $value ) || 0 !== strpos( $value, $prefix ) ) {
+						continue;
+					}
+
+					$values[ $name ] = self::convert_custom_properties( $value );
+				}
+			} else {
+				if ( ! is_string( $values ) || 0 !== strpos( $values, $prefix ) ) {
+					continue;
+				}
+
+				$values = self::convert_custom_properties( $values );
+			}
+
+			$tree[ $key ] = $values;
+		}
+
+		return $tree;
+	}
 }
