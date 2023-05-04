@@ -3,6 +3,9 @@
  */
 import { useContext, useMemo, useEffect } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
+/**
+ * Internal dependencies
+ */
 import { createPortal } from './portals.js';
 
 /**
