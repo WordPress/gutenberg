@@ -64,8 +64,10 @@ $canvas-padding: $grid-unit-30;
  * Shadows.
  */
 
-$shadow-popover: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
-$shadow-modal: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
+// Depths 1-3
+$shadow-popover: 0 0.1px 0.4px rgba($black, 0.036), 0 0.4px 1.3px rgba($black, 0.054), 0 2px 6px rgba($black, 0.09);
+$shadow-confirm: 0 0.4px 0.8px rgba($black, 0.036), 0 1.3px 2.7px rgba($black, 0.054), 0 6px 12px rgba($black, 0.09);
+$shadow-modal: 0 0.8px 2.5px rgba($black, 0.036), 0 2.7px 8.5px rgba($black, 0.054), 0 12px 38px rgba($black, 0.09);
 
 /**
  * Editor widths.

@@ -5,7 +5,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.35);
+	background-color: rgba($white, 0.75);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// backdrop-filter: blur($grid-unit);
@@ -54,6 +54,11 @@
 
 	@include break-large() {
 		max-height: 70%;
+	}
+
+	// Lower depth for "confirm" dialogs.
+	&.components-confirm-dialog {
+		box-shadow: $shadow-confirm;
 	}
 }
 
