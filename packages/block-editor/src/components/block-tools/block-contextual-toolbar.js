@@ -16,7 +16,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { levelUp } from '@wordpress/icons';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -55,23 +55,12 @@ const ExpandFixedToolbarButton = forwardRef( ( { onClick, icon }, ref ) => {
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
 	const [ isCollapsed, setIsCollapsed ] = useState( false );
+	const [ isNewBlockSelected, setIsNewBlockSelected ] = useState( true );
 	const expandFixedToolbarButtonRef = useRef();
 	const collapseFixedToolbarButtonRef = useRef();
 
 	// Don't focus the block toolbar just because it mounts
 	const initialRender = useRef( true );
-	useEffect( () => {
-		if ( initialRender.current ) {
-			initialRender.current = false;
-			return;
-		}
-		if ( isCollapsed && expandFixedToolbarButtonRef.current ) {
-			expandFixedToolbarButtonRef.current.focus();
-		}
-		if ( ! isCollapsed && collapseFixedToolbarButtonRef.current ) {
-			collapseFixedToolbarButtonRef.current.focus();
-		}
-	}, [ isCollapsed ] );
 
 	const { blockType, hasParents, showParentSelector, selectedBlockClientId } =
 		useSelect( ( select ) => {
@@ -109,9 +98,40 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			};
 		}, [] );
 
+	const previousSelectedBlockClientId = usePrevious( selectedBlockClientId );
+	const blockSelectionChanged =
+		previousSelectedBlockClientId !== selectedBlockClientId;
 	useEffect( () => {
-		setIsCollapsed( false );
-	}, [ selectedBlockClientId ] );
+		if ( blockSelectionChanged ) {
+			setIsCollapsed( false );
+			setIsNewBlockSelected( true );
+			return;
+		}
+		setIsNewBlockSelected( false );
+		if ( initialRender.current ) {
+			initialRender.current = false;
+			return;
+		}
+		if (
+			! isNewBlockSelected &&
+			isCollapsed &&
+			expandFixedToolbarButtonRef.current
+		) {
+			expandFixedToolbarButtonRef.current.focus();
+		}
+		if (
+			! isNewBlockSelected &&
+			! isCollapsed &&
+			collapseFixedToolbarButtonRef.current
+		) {
+			collapseFixedToolbarButtonRef.current.focus();
+		}
+	}, [
+		blockSelectionChanged,
+		isCollapsed,
+		selectedBlockClientId,
+		isNewBlockSelected,
+	] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -146,13 +166,19 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				>
 					{ isCollapsed ? (
 						<ExpandFixedToolbarButton
-							onClick={ () => setIsCollapsed( false ) }
+							onClick={ () => {
+								setIsNewBlockSelected( false );
+								setIsCollapsed( false );
+							} }
 							icon={ blockType.icon }
 							ref={ expandFixedToolbarButtonRef }
 						/>
 					) : (
 						<CollapseFixedToolbarButton
-							onClick={ () => setIsCollapsed( true ) }
+							onClick={ () => {
+								setIsNewBlockSelected( false );
+								setIsCollapsed( true );
+							} }
 							ref={ collapseFixedToolbarButtonRef }
 						/>
 					) }
