@@ -167,7 +167,7 @@ function gutenberg_enqueue_global_styles_custom_css() {
 	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
 
 	$custom_css  = wp_get_custom_css();
-	$custom_css .= gutenberg_get_global_styles_custom_css();
+	$custom_css .= wp_get_global_styles_custom_css();
 
 	if ( ! empty( $custom_css ) ) {
 		wp_add_inline_style( 'global-styles', $custom_css );

@@ -59,35 +59,37 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	}
 }
 
-/**
- * Gets the global styles custom css from theme.json.
- *
- * @return string
- */
-function gutenberg_get_global_styles_custom_css() {
-	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
-	$can_use_cached = ! WP_DEBUG;
-	$cache_key      = 'gutenberg_get_global_custom_css';
-	$cache_group    = 'theme_json';
-	if ( $can_use_cached ) {
-		$cached = wp_cache_get( $cache_key, $cache_group );
-		if ( $cached ) {
-			return $cached;
+if ( ! function_exists( 'wp_get_global_styles_custom_css' ) ) {
+	/**
+	 * Gets the global styles custom css from theme.json.
+	 *
+	 * @return string
+	 */
+	function wp_get_global_styles_custom_css() {
+		// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
+		$can_use_cached = ! WP_DEBUG;
+		$cache_key      = 'gutenberg_get_global_custom_css';
+		$cache_group    = 'theme_json';
+		if ( $can_use_cached ) {
+			$cached = wp_cache_get( $cache_key, $cache_group );
+			if ( $cached ) {
+				return $cached;
+			}
 		}
+
+		if ( ! wp_theme_has_theme_json() ) {
+			return '';
+		}
+
+		$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$stylesheet = $tree->get_custom_css();
+
+		if ( $can_use_cached ) {
+			wp_cache_set( $cache_key, $stylesheet, $cache_group );
+		}
+
+		return $stylesheet;
 	}
-
-	if ( ! wp_theme_has_theme_json() ) {
-		return '';
-	}
-
-	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$stylesheet = $tree->get_custom_css();
-
-	if ( $can_use_cached ) {
-		wp_cache_set( $cache_key, $stylesheet, $cache_group );
-	}
-
-	return $stylesheet;
 }
 
 /**
