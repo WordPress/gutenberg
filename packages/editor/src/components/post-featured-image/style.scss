@@ -25,7 +25,7 @@
 	&:focus,
 	&:focus-within {
 		.editor-post-featured-image__actions {
-			visibility: visible;
+			opacity: 1;
 		}
 	}
 }
@@ -70,9 +70,9 @@
 
 .editor-post-featured-image__actions {
 	bottom: 0;
+	opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
 	padding: $grid-unit-10;
 	position: absolute;
-	visibility: hidden;
 }
 
 .editor-post-featured-image__action {

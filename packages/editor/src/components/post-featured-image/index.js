@@ -13,7 +13,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import {
@@ -96,6 +96,7 @@ function PostFeaturedImage( {
 	noticeUI,
 	noticeOperations,
 } ) {
+	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
@@ -163,6 +164,7 @@ function PostFeaturedImage( {
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
+									ref={ toggleRef }
 									className={
 										! featuredImageId
 											? 'editor-post-featured-image__toggle'
@@ -211,7 +213,10 @@ function PostFeaturedImage( {
 										</Button>
 										<Button
 											className="editor-post-featured-image__action"
-											onClick={ onRemoveImage }
+											onClick={ () => {
+												onRemoveImage();
+												toggleRef.current.focus();
+											} }
 										>
 											{ __( 'Remove' ) }
 										</Button>
