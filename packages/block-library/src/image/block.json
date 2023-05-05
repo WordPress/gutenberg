@@ -85,7 +85,8 @@
 			"type": "object"
 		},
 		"enableLightbox": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

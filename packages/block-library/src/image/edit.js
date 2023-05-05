@@ -110,7 +110,7 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		enableLightbox = true,
+		enableLightbox,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
