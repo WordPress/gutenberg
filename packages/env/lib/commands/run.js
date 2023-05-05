@@ -81,7 +81,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		hostUser.fullUser,
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
-	].filter( Boolean );
+	];
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
