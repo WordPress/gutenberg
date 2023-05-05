@@ -58,7 +58,9 @@ export default function BorderPanel( { name, variation = '' } ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
+	const [ style ] = useGlobalStyle( prefix, name, 'user', {
+		shouldDecodeEncode: false,
+	} );
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
