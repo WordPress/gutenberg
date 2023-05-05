@@ -45,7 +45,6 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const disableMotion = useReducedMotion();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
@@ -64,7 +63,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					}
 				},
 		  };
-		  
+
 	const siteTitle = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
