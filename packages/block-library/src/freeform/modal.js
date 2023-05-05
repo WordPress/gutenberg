@@ -11,7 +11,7 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { useEffect, useState, RawHTML } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 function ClassicEdit( props ) {
@@ -59,7 +59,6 @@ export default function ModalEdit( props ) {
 	} = props;
 	const [ isOpen, setOpen ] = useState( false );
 	const id = `editor-${ clientId }`;
-	const label = _x( 'Classic Edit', 'Classic block' );
 
 	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
 
@@ -68,14 +67,14 @@ export default function ModalEdit( props ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ () => setOpen( true ) }>
-						{ label }
+						{ __( 'Edit' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
 			{ content && <RawHTML>{ content }</RawHTML> }
 			{ ( isOpen || ! content ) && (
 				<Modal
-					title={ label }
+					title={ __( 'Classic Editor' ) }
 					onRequestClose={ onClose }
 					shouldCloseOnClickOutside={ false }
 					overlayClassName="block-editor-freeform-modal"
