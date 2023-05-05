@@ -545,5 +545,12 @@ export const getNavigationFallbackId =
 				'wp_navigation',
 				record
 			);
+
+			// Resolve to avoid further network requests.
+			dispatch.finishResolution( 'getEntityRecord', [
+				'postType',
+				'wp_navigation',
+				fallback?.id,
+			] );
 		}
 	};

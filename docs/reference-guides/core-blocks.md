@@ -226,7 +226,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 
 ## Cover
 
-Add an image or video with a text overlay — great for headers. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
+Add an image or video with a text overlay. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
 
 -	**Name:** core/cover
 -	**Category:** media
