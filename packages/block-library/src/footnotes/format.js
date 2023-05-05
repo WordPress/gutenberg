@@ -12,6 +12,7 @@ import { formatListNumbered } from '@wordpress/icons';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { useId, useRef } from '@wordpress/element';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -60,7 +61,22 @@ export const format = {
 				<Fill>
 					<li id={ id } data-is-selected={ isSelected }>
 						<RichText
-							ref={ footnoteRef }
+							ref={ useMergeRefs( [
+								footnoteRef,
+								useRefEffect(
+									( element ) => {
+										if (
+											element.ownerDocument
+												.activeElement ===
+												element.ownerDocument.body &&
+											isSelected
+										) {
+											element.focus();
+										}
+									},
+									[ isSelected ]
+								),
+							] ) }
 							tagName="span"
 							value={ note }
 							onChange={ ( value ) =>
@@ -86,11 +102,12 @@ export const format = {
 			getBlockName,
 			getBlocks,
 		} = useSelect( blockEditorStore );
-		const { insertBlock, selectBlock } = useDispatch( blockEditorStore );
+		const { insertBlock } = useDispatch( blockEditorStore );
 
 		function onClick() {
 			registry.batch( () => {
 				const newValue = insertObject( value, {
+					tagName: 'data',
 					type: name,
 					attributes: {
 						note: '',
@@ -129,7 +146,6 @@ export const format = {
 				}
 
 				onChange( newValue );
-				selectBlock( fnBlock.clientId, -1 );
 			} );
 		}
 
