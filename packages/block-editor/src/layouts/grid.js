@@ -35,23 +35,13 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		const { columnCount = null } = layout;
-
-		return (
-			<>
-				{ columnCount && (
-					<GridLayoutColumnsControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				) }
-				{ ! columnCount && (
-					<GridLayoutMinimumWidthControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				) }
-			</>
+		return layout?.columnCount ? (
+			<GridLayoutColumnsControl layout={ layout } onChange={ onChange } />
+		) : (
+			<GridLayoutMinimumWidthControl
+				layout={ layout }
+				onChange={ onChange }
+			/>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls() {
@@ -195,12 +185,12 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 		<RangeControl
 			label={ __( 'Columns' ) }
 			value={ columnCount }
-			onChange={ ( value ) => {
+			onChange={ ( value ) =>
 				onChange( {
 					...layout,
 					columnCount: value,
-				} );
-			} }
+				} )
+			}
 			min={ 1 }
 			max={ 6 }
 		/>

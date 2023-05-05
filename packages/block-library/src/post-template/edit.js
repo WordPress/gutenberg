@@ -268,7 +268,6 @@ export default function PostTemplateEdit( {
 	return (
 		<>
 			<BlockControls>
-				{ ' ' }
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
 
