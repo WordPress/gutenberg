@@ -7,6 +7,7 @@ import { Button, ToolbarItem, VisuallyHidden } from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { listView, plus } from '@wordpress/icons';
@@ -22,6 +23,7 @@ import RedoButton from './undo-redo/redo';
 import MoreMenu from '../more-menu';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
+import { unlock } from '../../private-apis';
 
 function Header() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -70,6 +72,19 @@ function Header() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		fixedToolbarCanBeFocused;
+
 	return (
 		<>
 			<div className="edit-widgets-header">
@@ -90,6 +105,9 @@ function Header() {
 					<NavigableToolbar
 						className="edit-widgets-header-toolbar"
 						aria-label={ __( 'Document tools' ) }
+						shouldUseKeyboardFocusShortcut={
+							! blockToolbarCanBeFocused
+						}
 					>
 						<ToolbarItem
 							ref={ inserterButton }

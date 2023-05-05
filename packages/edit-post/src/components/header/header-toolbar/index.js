@@ -41,27 +41,15 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		selectedBlockId,
-		hasFixedToolbar,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSelectedBlockClientId,
-			getFirstMultiSelectedBlockClientId,
-			getSettings,
-		} = select( blockEditorStore );
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
-			hasFixedToolbar: getSettings().hasFixedToolbar,
-			selectedBlockId:
-				getSelectedBlockClientId() ||
-				getFirstMultiSelectedBlockClientId(),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -83,14 +71,17 @@ function HeaderToolbar() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
-		useShouldContextualToolbarShow( selectedBlockId );
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
 	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
 	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
 	const blockToolbarCanBeFocused =
 		shouldShowContextualToolbar ||
 		canFocusHiddenToolbar ||
-		( ( hasFixedToolbar || ! isLargeViewport ) && selectedBlockId );
+		fixedToolbarCanBeFocused;
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
