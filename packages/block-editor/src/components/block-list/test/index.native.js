@@ -27,17 +27,21 @@ describe( 'BlockList', () => {
 		} );
 
 		it( 'renders a block appender as a content placeholder', async () => {
+			// Act
+			const appender = screen.getByPlaceholderText( /Start writing/ );
+			fireEvent.press( appender );
+
 			// Assert
-			expect(
-				screen.getByPlaceholderText( /Start writing/ )
-			).toBeTruthy();
+			expect( await getBlock( screen, 'Paragraph' ) ).toBeVisible();
 		} );
 
 		it( 'renders an end-of-list paragraph appender', async () => {
+			// Act
+			const appender = screen.getByLabelText( 'Add paragraph block' );
+			fireEvent.press( appender );
+
 			// Assert
-			expect(
-				screen.getByLabelText( 'Add paragraph block' )
-			).toBeTruthy();
+			expect( await getBlock( screen, 'Paragraph' ) ).toBeVisible();
 		} );
 	} );
 
