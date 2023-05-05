@@ -3,15 +3,28 @@
  */
 import { store } from '../utils/interactivity';
 
+const focusableSelectors = [
+	'a[href]',
+	'area[href]',
+	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
+	'select:not([disabled]):not([aria-hidden])',
+	'textarea:not([disabled]):not([aria-hidden])',
+	'button:not([disabled]):not([aria-hidden])',
+	'iframe',
+	'object',
+	'embed',
+	'[contenteditable]',
+	'[tabindex]:not([tabindex^="-"])',
+];
+
 store( {
 	effects: {
 		core: {
 			navigation: {
 				initModal: async ( { context, ref } ) => {
 					if ( context.isMenuOpen ) {
-						const focusableElements = ref.querySelectorAll(
-							'a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
-						);
+						const focusableElements =
+							ref.querySelectorAll( focusableSelectors );
 						context.modal = ref;
 						context.firstFocusableElement = focusableElements[ 0 ];
 						context.lastFocusableElement =
@@ -32,7 +45,6 @@ store( {
 		core: {
 			navigation: {
 				roleAttribute: ( { context } ) => {
-					console.log( context.overlay && context.isMenuOpen );
 					return context.overlay && context.isMenuOpen
 						? 'dialog'
 						: '';
