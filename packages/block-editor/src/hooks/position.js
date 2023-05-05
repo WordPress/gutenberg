@@ -15,6 +15,7 @@ import {
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
+	createInterpolateElement,
 	useContext,
 	useEffect,
 	useMemo,
@@ -278,6 +279,8 @@ export function PositionPanel( props ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
+	const [ isPositionVisualizerActive, setIsPositionVisualizerActive ] =
+		useState();
 
 	const { firstParentClientId } = useSelect(
 		( select ) => {
@@ -288,15 +291,36 @@ export function PositionPanel( props ) {
 		[ clientId ]
 	);
 
+	const onMouseOverPosition = () => {
+		setIsPositionVisualizerActive( true );
+	};
+
+	const onMouseLeavePosition = () => {
+		setIsPositionVisualizerActive( false );
+	};
+
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
 		allowSticky && value === STICKY_OPTION.value && blockInformation
-			? sprintf(
-					/* translators: %s: the name of the parent block. */
-					__(
-						'The block will stick to the scrollable area of the parent %s block.'
+			? createInterpolateElement(
+					sprintf(
+						/* translators: %s: the name of the parent block. */
+						__(
+							'The block will stick to the scrollable area of the parent <span>%s</span> block.'
+						),
+						blockInformation.title
 					),
-					blockInformation.title
+					{
+						span: (
+							<span
+								className="block-editor-hooks__position-helptext__block-title"
+								onMouseEnter={ onMouseOverPosition }
+								onMouseLeave={ onMouseLeavePosition }
+								onFocus={ onMouseOverPosition }
+								onBlur={ onMouseLeavePosition }
+							/>
+						),
+					}
 			  )
 			: null;
 
@@ -347,7 +371,9 @@ export function PositionPanel( props ) {
 				<InspectorControls group="position">
 					{ firstParentClientId && value === STICKY_OPTION.value ? (
 						<PositionVisualizer
-							forceShow={ isSelected }
+							forceShow={
+								isSelected && isPositionVisualizerActive
+							}
 							{ ...props }
 							clientId={ firstParentClientId }
 						/>
@@ -370,6 +396,8 @@ export function PositionPanel( props ) {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
+							onFocus={ onMouseOverPosition }
+							onBlur={ onMouseLeavePosition }
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
