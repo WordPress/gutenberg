@@ -23,7 +23,7 @@ function MultiSelectionInspector( { blocks } ) {
 				<div className="block-editor-multi-selection-inspector__card-title">
 					{ sprintf(
 						/* translators: %d: number of blocks */
-						_n( '%d block', '%d blocks', blocks.length ),
+						_n( '%d Block', '%d Blocks', blocks.length ),
 						blocks.length
 					) }
 				</div>
