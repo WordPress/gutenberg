@@ -230,10 +230,10 @@ function installDependencies( environment, config ) {
 	if ( environment === 'wordpress' ) {
 		dockerFileContent += `
 # Make sure we're working with the latest packages.
-RUN apt-get update -qy
+RUN apt-get -qy update
 
 # Install some basic PHP dependencies.
-RUN apt-get install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+RUN apt-get -qy install$PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
