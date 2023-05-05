@@ -100,10 +100,12 @@ require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/interactivity-api/script-loader.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
-require __DIR__ . '/experimental/interactivity-api/navigation-block-interactivity.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/navigation-fallback.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-block' ) ) {
+	require __DIR__ . '/experimental/interactivity-api/navigation-block-interactivity.php';
+}
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
