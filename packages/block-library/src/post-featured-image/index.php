@@ -92,7 +92,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( ! $height && ! $width && ! $aspect_ratio ) {
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $aspect_ratio . $width . $height . 'max-width:100%;' ) );
+		$max_width = '';
+		if ( empty( $attributes['align'] ) ) {
+			$max_width = 'max-width:min(100%, var(--wp--style--global--content-size));';
+		} elseif ( 'wide' === $attributes['align'] ) {
+			$max_width = 'max-width:min(100%, var(--wp--style--global--wide-size));';
+		}
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $aspect_ratio . $width . $height . $max_width ) );
 	}
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }

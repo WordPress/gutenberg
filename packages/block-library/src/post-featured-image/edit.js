@@ -59,6 +59,7 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		align,
 	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -96,9 +97,19 @@ export default function PostFeaturedImageEdit( {
 			label: name,
 		} ) );
 
-	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio, maxWidth: '100%' },
-	} );
+	const style = {
+		width,
+		height,
+		aspectRatio,
+	};
+	// Depending on the `align` value we need to set a different max-width
+	// to restrict properly the image size.
+	if ( ! align ) {
+		style.maxWidth = 'min(100%, var(--wp--style--global--content-size))';
+	} else if ( align === 'wide' ) {
+		style.maxWidth = 'min(100%, var(--wp--style--global--wide-size))';
+	}
+	const blockProps = useBlockProps( { style } );
 	const borderProps = useBorderProps( attributes );
 
 	const placeholder = ( content ) => {
