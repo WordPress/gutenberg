@@ -125,8 +125,9 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		const { height } = await coverBlock.getSize();
 		// Height is set to 20rem, where 1rem is 16.
-		// The total height should be 20 * 16 = 320.
-		expect( height ).toBe( 320 );
+		// There is also block's vertical padding equal 32.
+		// Finally, the total height should be 20 * 16 + 32 = 352.
+		expect( height ).toBe( 352 );
 
 		await coverBlock.click();
 		expect( coverBlock ).toBeTruthy();
