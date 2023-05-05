@@ -919,6 +919,10 @@ function getContributorProps( pullRequests ) {
 		getContributorPropsMarkdownList,
 	] )( pullRequests );
 
+	if ( ! contributorsList ) {
+		return '';
+	}
+
 	return (
 		'## First time contributors' +
 		'\n\n' +

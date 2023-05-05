@@ -678,7 +678,7 @@ test.describe( 'Navigation block', () => {
 						name: 'Settings',
 					} )
 					.getByRole( 'heading', {
-						name: 'Link Settings',
+						name: 'Settings',
 					} )
 			).toBeVisible();
 

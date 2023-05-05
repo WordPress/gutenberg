@@ -6,7 +6,6 @@ import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
-	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
@@ -32,13 +31,10 @@ export default function ListViewSidebar() {
 		}
 	}
 
-	const instanceId = useInstanceId( ListViewSidebar );
-	const labelId = `edit-site-editor__list-view-panel-label-${ instanceId }`;
 	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			aria-labelledby={ labelId }
 			className="edit-site-editor__list-view-panel"
 			onKeyDown={ closeOnEscape }
 		>
@@ -46,10 +42,10 @@ export default function ListViewSidebar() {
 				className="edit-site-editor__list-view-panel-header"
 				ref={ headerFocusReturnRef }
 			>
-				<strong id={ labelId }>{ __( 'List View' ) }</strong>
+				<strong>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close List View Sidebar' ) }
+					label={ __( 'Close' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 			</div>

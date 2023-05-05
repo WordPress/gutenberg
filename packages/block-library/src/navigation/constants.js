@@ -12,4 +12,5 @@ export const ALLOWED_BLOCKS = [
 	'core/site-title',
 	'core/site-logo',
 	'core/navigation-submenu',
+	'core/loginout',
 ];

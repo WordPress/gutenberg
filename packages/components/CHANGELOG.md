@@ -3,21 +3,32 @@
 ## Unreleased
 
 -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
+-   `Button`, update spacing values in `has-text has-icon` buttons. ([#50277](https://github.com/WordPress/gutenberg/pull/50277)).
+-   `Button`, remove custom padding applied to `tertiary` variant. ([#50276](https://github.com/WordPress/gutenberg/pull/50276)).
+-   `Modal`: Correct padding for title less confirm variant. ([#50283](https://github.com/WordPress/gutenberg/pull/50283)).
+
+### Breaking Changes
+
+-   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+
 
 ### Internal
 
 -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
 -   `ToolbarItem`: Convert to TypeScript ([#49190](https://github.com/WordPress/gutenberg/pull/49190)).
 -   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
--   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133))
+-   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133)).
 
 ### Documentation
 
 -   `TreeGrid`: Update docs with `data-expanded` attribute usage ([#50026](https://github.com/WordPress/gutenberg/pull/50026)).
+-   Consolidate multiple versions of `README` and `CONTRIBUTING` docs, and add them to Storybook ([#50226](https://github.com/WordPress/gutenberg/pull/50226)).
 
 ### Enhancements
 
+-   `FormTokenField`, `ComboboxControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size, superseding the `__next36pxDefaultSize` prop ([#50261](https://github.com/WordPress/gutenberg/pull/50261)).
 -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
+-   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
 
 ## 23.9.0 (2023-04-26)
 

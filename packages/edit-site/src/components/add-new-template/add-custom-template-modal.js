@@ -51,16 +51,25 @@ function SuggestionListItem( {
 				)
 			}
 		>
-			<span className={ `${ baseCssClass }__title` }>
+			<Text
+				size="body"
+				lineHeight={ 1.53846153846 } // 20px
+				weight={ 500 }
+				className={ `${ baseCssClass }__title` }
+			>
 				<TextHighlight
 					text={ decodeEntities( suggestion.name ) }
 					highlight={ search }
 				/>
-			</span>
+			</Text>
 			{ suggestion.link && (
-				<span className={ `${ baseCssClass }__info` }>
+				<Text
+					size="body"
+					lineHeight={ 1.53846153846 } // 20px
+					className={ `${ baseCssClass }__info` }
+				>
 					{ suggestion.link }
-				</span>
+				</Text>
 			) }
 		</CompositeItem>
 	);
@@ -221,10 +230,17 @@ function AddCustomTemplateModal( {
 								} );
 							} }
 						>
-							<Text as="span" weight={ 600 }>
+							<Text
+								as="span"
+								weight={ 500 }
+								lineHeight={ 1.53846153846 } // 20px
+							>
 								{ entityForSuggestions.labels.all_items }
 							</Text>
-							<Text as="span">
+							<Text
+								as="span"
+								lineHeight={ 1.53846153846 } // 20px
+							>
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For all items' )
@@ -238,10 +254,17 @@ function AddCustomTemplateModal( {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Text as="span" weight={ 600 }>
+							<Text
+								as="span"
+								weight={ 500 }
+								lineHeight={ 1.53846153846 } // 20px
+							>
 								{ entityForSuggestions.labels.singular_name }
 							</Text>
-							<Text as="span">
+							<Text
+								as="span"
+								lineHeight={ 1.53846153846 } // 20px
+							>
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For a specific item' )
