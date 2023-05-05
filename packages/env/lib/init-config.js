@@ -266,9 +266,10 @@ RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
 
 	// Make sure Composer is available for use in the container.
 	dockerFileContent += `
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-RUN php -r "unlink('composer-setup.php');";`;
+RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+RUN export COMPOSER_HASH=\`curl -sS https://composer.github.io/installer.sig\` && php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$COMPOSER_HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('/tmp/composer-setup.php'); } echo PHP_EOL;"
+RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+RUN rm /tmp/composer-setup.php`;
 
 	// Install any Composer packages we might need globally.
 	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
