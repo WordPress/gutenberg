@@ -19,6 +19,15 @@ const BASE_QUERY = {
 	context: 'view',
 };
 
+const replaceAmpInTermName = ( name ) => name.replace( '&amp;', '&' );
+const decodeTermName = ( term ) => {
+	const { name, ...rest } = term;
+	return {
+		name: replaceAmpInTermName( name ),
+		...rest,
+	};
+};
+
 // Helper function to get the term id based on user input in terms `FormTokenField`.
 const getTermIdByTermValue = ( terms, termValue ) => {
 	// First we check for exact match by `term.id` or case sensitive `term.name` match.
@@ -109,7 +118,9 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				},
 			];
 			return {
-				searchResults: getEntityRecords( ...selectorArgs ),
+				searchResults: (
+					getEntityRecords( ...selectorArgs ) || []
+				).map( decodeTermName ),
 				searchHasResolved: hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
@@ -125,11 +136,13 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 		( select ) => {
 			if ( ! termIds?.length ) return EMPTY_ARRAY;
 			const { getEntityRecords } = select( coreStore );
-			return getEntityRecords( 'taxonomy', taxonomy.slug, {
-				...BASE_QUERY,
-				include: termIds,
-				per_page: termIds.length,
-			} );
+			return (
+				getEntityRecords( 'taxonomy', taxonomy.slug, {
+					...BASE_QUERY,
+					include: termIds,
+					per_page: termIds.length,
+				} ) || []
+			).map( decodeTermName );
 		},
 		[ termIds ]
 	);
