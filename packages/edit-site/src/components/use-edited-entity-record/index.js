@@ -12,7 +12,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../store';
 
 export default function useEditedEntityRecord( postType, postId ) {
-	const { record, title, description, isLoaded } = useSelect(
+	const { record, title, description, isLoaded, icon } = useSelect(
 		( select ) => {
 			const { getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
@@ -34,6 +34,7 @@ export default function useEditedEntityRecord( postType, postId ) {
 				title: templateInfo.title,
 				description: templateInfo.description,
 				isLoaded: _isLoaded,
+				icon: templateInfo.icon,
 			};
 		},
 		[ postType, postId ]
@@ -41,6 +42,7 @@ export default function useEditedEntityRecord( postType, postId ) {
 
 	return {
 		isLoaded,
+		icon,
 		record,
 		getTitle: () => ( title ? decodeEntities( title ) : null ),
 		getDescription: () =>
