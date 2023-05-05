@@ -116,13 +116,6 @@ function ResizableFrame( { isFull, children } ) {
 		// Trigger full screen if the frame is resized far enough to the left.
 		if ( event.clientX < 200 ) {
 			setCanvasMode( 'edit' );
-			// Wait for the frame to animate to full screen before resetting its size.
-			const timeoutId = setTimeout( () => {
-				setFrameSize( { width: '100%', height: '100%' } );
-			}, 500 );
-
-			// Clean up the timeout when the effect is no longer needed.
-			return () => clearTimeout( timeoutId );
 		}
 
 		setIsResizing( false );
@@ -135,6 +128,11 @@ function ResizableFrame( { isFull, children } ) {
 			animate={ {
 				flexGrow: isFull ? 1 : 0,
 				height: frameSize.height,
+			} }
+			onAnimationComplete={ ( { flexGrow } ) => {
+				if ( flexGrow === 1 )
+					// `isFull` is true
+					setFrameSize( { width: '100%', height: '100%' } );
 			} }
 			transition={ FRAME_TRANSITION }
 			size={ frameSize }
