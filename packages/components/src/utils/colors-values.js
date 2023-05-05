@@ -29,7 +29,7 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches @wordpress/base-styles
+// Matches the Modern admin scheme in @wordpress/base-styles
 const ADMIN = {
 	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
 	themeDark10:
