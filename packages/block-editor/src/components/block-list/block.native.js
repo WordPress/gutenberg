@@ -6,7 +6,7 @@ import { Pressable, useWindowDimensions, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
@@ -97,7 +97,7 @@ function BlockWrapper( {
 	return (
 		<Pressable
 			accessibilityLabel={ accessibilityLabel }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessible={ accessible }
 			disabled={ ! isTouchable }
 			onPress={ onFocus }
@@ -135,7 +135,7 @@ function BlockWrapper( {
 
 function BlockListBlock( {
 	attributes,
-	blockWidth,
+	blockWidth: blockWrapperWidth,
 	canRemove,
 	clientId,
 	contentStyle,
@@ -232,6 +232,8 @@ function BlockListBlock( {
 		[ clientId, isSelected, name, rootClientId ]
 	);
 	const { removeBlock, selectBlock } = useDispatch( blockEditorStore );
+	const initialBlockWidth = blockWrapperWidth - 2 * marginHorizontal;
+	const [ blockWidth, setBlockWidth ] = useState( initialBlockWidth );
 	const parentLayout = useLayout() || {};
 	const defaultColors = useMobileGlobalStylesColors();
 	const globalStyle = useGlobalStyles();
@@ -247,6 +249,21 @@ function BlockListBlock( {
 			selectBlock( blockId );
 		}
 	}, [ selectBlock, clientId, firstToSelectId, isSelected ] );
+
+	const onLayout = useCallback(
+		( { nativeEvent } ) => {
+			const layoutWidth = Math.floor( nativeEvent.layout.width );
+
+			if ( ! blockWidth || ! layoutWidth ) {
+				return;
+			}
+
+			if ( blockWidth !== layoutWidth ) {
+				setBlockWidth( layoutWidth );
+			}
+		},
+		[ blockWidth, setBlockWidth ]
+	);
 
 	// Block level styles.
 	const wrapperProps = getWrapperProps(
@@ -353,6 +370,7 @@ function BlockListBlock( {
 							}
 							wrapperProps={ wrapperProps }
 						/>
+						<View onLayout={ onLayout } />
 					</GlobalStylesContext.Provider>
 				)
 			}
