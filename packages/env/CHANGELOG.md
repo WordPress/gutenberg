@@ -6,7 +6,7 @@
 
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
 between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
--   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively.
+-   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
 
 ### New feature
 
