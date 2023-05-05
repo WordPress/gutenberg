@@ -67,119 +67,6 @@ import {
 	alignStretch,
 } from '../components/block-vertical-alignment-control/icons';
 
-const innerWidthOptions = [
-	{
-		value: 'fit',
-		icon: (
-			<SVG
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<Rect
-					x="13.0002"
-					y="5"
-					width="1.5"
-					height="14"
-					fill="currentColor"
-				/>
-				<Rect
-					x="8.00024"
-					y="5"
-					width="1.5"
-					height="14"
-					fill="currentColor"
-				/>
-				<Path
-					d="M21.0002 15L18.0002 12L21.0002 9"
-					stroke="currentColor"
-				/>
-				<Path d="M2 9L5 12L2 15" stroke="currentColor" />
-			</SVG>
-		),
-		label: __( 'Fit' ),
-	},
-	{
-		value: 'theme',
-		icon: (
-			<SVG
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<Rect
-					x="7"
-					y="11"
-					width="1.5"
-					height="1.5"
-					fill="currentColor"
-				/>
-				<Rect
-					x="10"
-					y="11"
-					width="1.5"
-					height="1.5"
-					fill="currentColor"
-				/>
-				<Rect
-					x="13"
-					y="11"
-					width="1.5"
-					height="1.5"
-					fill="currentColor"
-				/>
-				<Rect
-					x="16"
-					y="11"
-					width="1.5"
-					height="1.5"
-					fill="currentColor"
-				/>
-				<Rect
-					x="19"
-					y="5"
-					width="1.5"
-					height="14"
-					fill="currentColor"
-				/>
-				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
-			</SVG>
-		),
-		label: __( 'Fixed' ),
-	},
-	{
-		value: 'fill',
-		icon: (
-			<SVG
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<Rect
-					x="19"
-					y="5"
-					width="1.5"
-					height="14"
-					fill="currentColor"
-				/>
-				<Rect x="4" y="5" width="1.5" height="14" fill="currentColor" />
-				<Path
-					d="M13.0005 9L16.0005 12L13.0005 15"
-					stroke="currentColor"
-				/>
-				<Path d="M11 15L8 12L11 9" stroke="currentColor" />
-			</SVG>
-		),
-		label: __( 'Fill' ),
-	},
-];
-
 /**
  * Generates the utility classnames for the given block's layout attributes.
  *
@@ -288,10 +175,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		{}
 	);
 	const {
-		// allowSwitching,
+		allowSwitching = false,
 		allowEditing = true,
 		// allowInheriting = true,
-		default: defaultBlockLayout,
+		default: defaultBlockLayout = { type: 'default' },
 	} = layoutBlockSupport;
 
 	if ( ! allowEditing ) {
@@ -306,6 +193,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		orientation = 'horizontal',
 		flexWrap = 'nowrap',
 	} = usedLayout;
+	const { type: defaultBlockLayoutType } = defaultBlockLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `constrained` layouts and it should not be taken into account when other
@@ -322,6 +210,133 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
 
+	const innerWidthOptions = [
+		{
+			value: 'theme',
+			icon: (
+				<SVG
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<Rect
+						x="7"
+						y="11"
+						width="1.5"
+						height="1.5"
+						fill="currentColor"
+					/>
+					<Rect
+						x="10"
+						y="11"
+						width="1.5"
+						height="1.5"
+						fill="currentColor"
+					/>
+					<Rect
+						x="13"
+						y="11"
+						width="1.5"
+						height="1.5"
+						fill="currentColor"
+					/>
+					<Rect
+						x="16"
+						y="11"
+						width="1.5"
+						height="1.5"
+						fill="currentColor"
+					/>
+					<Rect
+						x="19"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+					<Rect
+						x="4"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+				</SVG>
+			),
+			label: __( 'Fixed' ),
+		},
+		{
+			value: 'fill',
+			icon: (
+				<SVG
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<Rect
+						x="19"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+					<Rect
+						x="4"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+					<Path
+						d="M13.0005 9L16.0005 12L13.0005 15"
+						stroke="currentColor"
+					/>
+					<Path d="M11 15L8 12L11 9" stroke="currentColor" />
+				</SVG>
+			),
+			label: __( 'Fill' ),
+		},
+	];
+
+	if ( allowSwitching || defaultBlockLayoutType === 'flex' ) {
+		innerWidthOptions.unshift( {
+			value: 'fit',
+			icon: (
+				<SVG
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<Rect
+						x="13.0002"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+					<Rect
+						x="8.00024"
+						y="5"
+						width="1.5"
+						height="14"
+						fill="currentColor"
+					/>
+					<Path
+						d="M21.0002 15L18.0002 12L21.0002 9"
+						stroke="currentColor"
+					/>
+					<Path d="M2 9L5 12L2 15" stroke="currentColor" />
+				</SVG>
+			),
+			label: __( 'Fit' ),
+		} );
+	}
 	const horizontalAlignmentOptions = [
 		{
 			value: 'left',
@@ -382,19 +397,13 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const onChangeType = ( newType ) => {
 		if ( newType === 'stack' ) {
-			const { innerWidth } = usedLayout;
-			if ( innerWidth === 'fit' ) {
+			const { type: previousLayoutType } = usedLayout;
+			if ( previousLayoutType === 'flex' ) {
 				setAttributes( {
 					layout: {
 						...usedLayout,
 						type: 'flex',
 						orientation: 'vertical',
-					},
-				} );
-			} else if ( innerWidth === 'theme' ) {
-				setAttributes( {
-					layout: {
-						type: 'constrained',
 					},
 				} );
 			} else {
@@ -414,29 +423,19 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const onChangeInnerWidth = ( key ) => {
 		if ( key === 'theme' ) {
 			setAttributes( {
-				layout: { ...usedLayout, type: 'constrained', innerWidth: key },
+				layout: { ...usedLayout, type: 'constrained' },
 			} );
 		} else if ( key === 'fit' ) {
-			if (
-				usedLayout.type === 'constrained' ||
-				usedLayout.type === 'default'
-			) {
-				setAttributes( {
-					layout: {
-						...usedLayout,
-						type: 'flex',
-						orientation: 'vertical',
-						innerWidth: key,
-					},
-				} );
-			} else {
-				setAttributes( {
-					layout: { ...usedLayout, type: 'flex', innerWidth: key },
-				} );
-			}
+			setAttributes( {
+				layout: {
+					...usedLayout,
+					type: 'flex',
+					orientation: 'vertical',
+				},
+			} );
 		} else {
 			setAttributes( {
-				layout: { ...usedLayout, type: 'default', innerWidth: key },
+				layout: { ...usedLayout, type: 'default' },
 			} );
 		}
 	};
@@ -466,12 +465,19 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	};
 
 	const defaultHorizontalAlign = type === 'constrained' ? 'center' : 'left';
-	let contentWidthValue = 'fit';
 
+	let defaultContentWidthValue = 'fill';
+	if ( defaultBlockLayoutType === 'constrained' ) {
+		defaultContentWidthValue = 'theme';
+	} else if ( defaultBlockLayoutType === 'flex' ) {
+		defaultContentWidthValue = 'fit';
+	}
+
+	let usedContentWidthValue = 'fill';
 	if ( type === 'constrained' ) {
-		contentWidthValue = 'theme';
-	} else if ( type === 'default' ) {
-		contentWidthValue = 'fill';
+		usedContentWidthValue = 'theme';
+	} else if ( type === 'flex' ) {
+		usedContentWidthValue = 'fit';
 	}
 
 	return (
@@ -479,42 +485,49 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout' ) }>
 					<VStack spacing={ 3 } className="components-wrapper-vstack">
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							style={ { marginBottom: 0, marginTop: 0 } }
-							size={ '__unstable-large' }
-							label={ __( 'Layout direction' ) }
-							value={
-								type === 'default' ||
-								type === 'constrained' ||
-								( type === 'flex' &&
-									orientation === 'vertical' )
-									? 'stack'
-									: type
-							}
-							onChange={ onChangeType }
-							isBlock={ true }
-							className="components-toggle-group-control__full-width"
-						>
-							<ToggleGroupControlOptionIcon
-								key={ 'stack' }
-								icon={ arrowDown }
-								value="stack"
-								label={ __( 'Stack' ) }
-							/>
-							<ToggleGroupControlOptionIcon
-								key={ 'row' }
-								icon={ arrowRight }
-								value="flex"
-								label={ __( 'Row' ) }
-							/>
-							<ToggleGroupControlOptionIcon
-								key={ 'grid' }
-								icon={ grid }
-								value="grid"
-								label={ __( 'Grid' ) }
-							/>
-						</ToggleGroupControl>
+						{ ( allowSwitching ||
+							defaultBlockLayoutType === 'flex' ) && (
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								style={ { marginBottom: 0, marginTop: 0 } }
+								size={ '__unstable-large' }
+								label={ __( 'Layout direction' ) }
+								value={
+									type === 'default' ||
+									type === 'constrained' ||
+									( type === 'flex' &&
+										orientation === 'vertical' )
+										? 'stack'
+										: type
+								}
+								onChange={ onChangeType }
+								isBlock={ true }
+								className="components-toggle-group-control__full-width"
+							>
+								<ToggleGroupControlOptionIcon
+									key={ 'stack' }
+									icon={ arrowDown }
+									value="stack"
+									label={ __( 'Stack' ) }
+								/>
+
+								<ToggleGroupControlOptionIcon
+									key={ 'row' }
+									icon={ arrowRight }
+									value="flex"
+									label={ __( 'Row' ) }
+								/>
+
+								{ allowSwitching && (
+									<ToggleGroupControlOptionIcon
+										key={ 'grid' }
+										icon={ grid }
+										value="grid"
+										label={ __( 'Grid' ) }
+									/>
+								) }
+							</ToggleGroupControl>
+						) }
 						{ type === 'grid' && (
 							<layoutType.inspectorControls
 								layout={ usedLayout }
@@ -529,7 +542,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								__nextHasNoMarginBottom
 								style={ { marginBottom: 0, marginTop: 0 } }
 								label={ __( 'Content width' ) }
-								value={ contentWidthValue }
+								value={
+									usedContentWidthValue ||
+									defaultContentWidthValue
+								}
 								onChange={ onChangeInnerWidth }
 								isBlock={ true }
 								className="components-toggle-group-control__full-width"
