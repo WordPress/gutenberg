@@ -5,66 +5,66 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSettings } from '@wordpress/block-editor';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { store as blockEditorStore } from '../store';
 
 /**
- * Override the default edit UI to include a new block inspector control for
- * assigning the custom class name, if block supports custom class name.
- * The control is displayed within the Advanced panel in the block inspector.
+ * TODO: Add description.
  *
  * @param {WPComponent} BlockEdit Original component.
  *
  * @return {WPComponent} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const { behaviors } = props.attributes;
-			const { behaviors: behaviorsSupport } = props.blockType.attributes;
+export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const { behaviors: blockBehaviors } = props.attributes;
+		const settings = select( blockEditorStore ).getSettings();
+		const themeBehaviors =
+			settings?.__experimentalFeatures?.blocks?.[ 'core/image' ]
+				.behaviors;
 
-			const settings = useSettings();
+		if ( ! blockBehaviors && ! themeBehaviors ) {
+			return <BlockEdit { ...props } />;
+		}
 
-			// eslint-disable-next-line no-console
-			console.log( 'behaviors', behaviors );
-			// eslint-disable-next-line no-console
-			console.log( 'behaviorsSupport', behaviorsSupport );
-			// eslint-disable-next-line no-console
-			console.log( settings );
+		if ( ! blockBehaviors && themeBehaviors ) {
+			props.attributes.behaviors = themeBehaviors;
+		}
 
-			return (
-				<>
-					<BlockEdit { ...props } />
-					<InspectorControls group="advanced">
-						<TextControl
-							__nextHasNoMarginBottom
-							autoComplete="on"
-							label={ __( 'Behaviors' ) }
-							value={ props.attributes.behaviors || '' }
-							onChange={ ( nextValue ) => {
-								props.setAttributes( {
-									behaviors:
-										nextValue !== ''
-											? nextValue
-											: undefined,
-								} );
-							} }
-							help={ __( 'Add behaviors' ) }
-						/>
-					</InspectorControls>
-				</>
-			);
-		};
-	},
-	'withInspectorControl'
-);
+		return (
+			<>
+				<BlockEdit { ...props } />
+				<InspectorControls group="advanced">
+					<TextControl
+						__nextHasNoMarginBottom
+						autoComplete="on"
+						label={ __( 'Behaviors' ) }
+						value={
+							props.attributes?.behaviors?.lightbox
+								? 'LIGHTBOX'
+								: ''
+						}
+						onChange={ ( nextValue ) => {
+							props.setAttributes( {
+								behaviors:
+									nextValue !== '' ? nextValue : undefined,
+							} );
+						} }
+						help={ __( 'Add behaviors' ) }
+					/>
+				</InspectorControls>
+			</>
+		);
+	};
+}, 'withBehaviors' );
 
 addFilter(
 	'editor.BlockEdit',
 	'core/behaviors/with-inspector-control',
-	withInspectorControl
+	withBehaviors
 );
