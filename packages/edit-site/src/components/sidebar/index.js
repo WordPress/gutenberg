@@ -19,6 +19,7 @@ import useSyncPathWithURL, {
 } from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
+import SidebarNavigationScreenThemes from '../sidebar-navigation-screen-themes';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
@@ -51,6 +52,9 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
 				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
+			<NavigatorScreen path="/themes">
+				<SidebarNavigationScreenThemes />
 			</NavigatorScreen>
 		</>
 	);

@@ -131,6 +131,23 @@ export function receiveCurrentTheme( currentTheme ) {
 }
 
 /**
+ * Returns an action object used in signalling that all themes have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {Object} allThemes The list of all instaled theme.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveAllThemes( allThemes ) {
+	return {
+		type: 'RECEIVE_All_THEMES',
+		allThemes,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the current global styles id has been received.
  * Ignored from documentation as it's internal to the data store.
  *

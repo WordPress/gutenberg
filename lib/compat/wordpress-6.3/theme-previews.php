@@ -112,6 +112,11 @@ function block_theme_activate_nonce() {
 	<?php
 }
 
+function gutenberg_theme_preview_add_block_theme_flag( $response, $theme, $request ) {
+	$response->data['block_theme'] = $theme->is_block_theme();
+	return $response;
+}
+
 // Hide this feature behind an experiment.
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gutenberg_experiments ) ) {
@@ -126,4 +131,5 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gu
 
 	add_action( 'admin_head', 'block_theme_activate_nonce' );
 	add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
+	add_filter( 'rest_prepare_theme', 'gutenberg_theme_preview_add_block_theme_flag', 10, 3 );
 }

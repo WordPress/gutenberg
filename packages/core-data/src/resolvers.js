@@ -246,6 +246,21 @@ export const getCurrentTheme =
 	};
 
 /**
+ * Requests all themes.
+ */
+export const getAllThemes =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const allThemes = await resolveSelect.getEntityRecords(
+			'root',
+			'theme',
+			{ per_page: -1 }
+		);
+
+		dispatch.receiveAllThemes( allThemes );
+	};
+
+/**
  * Requests theme supports data from the index.
  */
 export const getThemeSupports = forwardResolver( 'getCurrentTheme' );

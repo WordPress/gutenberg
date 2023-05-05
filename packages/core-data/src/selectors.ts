@@ -939,6 +939,17 @@ export function getCurrentTheme( state: State ): any {
 }
 
 /**
+ * Return all themes.
+ *
+ * @param state Data state.
+ *
+ * @return All themes.
+ */
+export function getAllThemes( state: State ): any {
+	return getEntityRecords( state, 'root', 'theme', { per_page: -1 } );
+}
+
+/**
  * Return the ID of the current global styles object.
  *
  * @param state Data state.

@@ -127,6 +127,23 @@ export function currentTheme( state = undefined, action ) {
 }
 
 /**
+ * Reducer managing all themes.
+ *
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
+ *
+ * @return {string|undefined} Updated state.
+ */
+export function allThemes( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ALL_THEMES':
+			return action.allThemes;
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing the current global styles id.
  *
  * @param {string|undefined} state  Current state.

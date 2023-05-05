@@ -221,6 +221,18 @@ _Returns_
 
 -   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
+### getAllThemes
+
+Return all themes.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `any`: All themes.
+
 ### getAuthors
 
 > **Deprecated** since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
