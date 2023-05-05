@@ -186,6 +186,7 @@ const Sandbox = forwardRef( function Sandbox(
 		url,
 		onWindowEvents = {},
 		viewportProps = '',
+		testID,
 	},
 	ref
 ) {
@@ -372,6 +373,7 @@ const Sandbox = forwardRef( function Sandbox(
 			showsHorizontalScrollIndicator={ false }
 			showsVerticalScrollIndicator={ false }
 			mediaPlaybackRequiresUserAction={ false }
+			testID={ testID }
 		/>
 	);
 } );
