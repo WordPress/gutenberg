@@ -162,10 +162,12 @@
 		background: transparent;
 
 		&:hover:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
