@@ -74,6 +74,7 @@ describe( 'BlockList', () => {
 
 	describe( 'for inner blocks', () => {
 		it( 'renders an inner block appender', async () => {
+			// Arrange
 			await initializeEditor();
 			await addBlock( screen, 'Group' );
 			const groupBlock = await getBlock( screen, 'Group' );
