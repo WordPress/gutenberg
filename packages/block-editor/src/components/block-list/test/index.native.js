@@ -12,7 +12,7 @@ import {
 	within,
 } from 'test/helpers';
 
-setupCoreBlocks( [ 'core/paragraph', 'core/group' ] );
+setupCoreBlocks();
 
 describe( 'BlockList', () => {
 	describe( 'when empty', () => {
@@ -38,6 +38,37 @@ describe( 'BlockList', () => {
 			expect(
 				screen.getByLabelText( 'Add paragraph block' )
 			).toBeTruthy();
+		} );
+	} );
+
+	describe( 'when not empty', () => {
+		it( 'renders a footer appender', async () => {
+			// Arrange
+			await initializeEditor();
+			await addBlock( screen, 'Social Icons' );
+			const socialLinksBlock = await getBlock( screen, 'Social Icons' );
+			fireEvent.press( socialLinksBlock );
+			triggerBlockListLayout( socialLinksBlock );
+
+			// Act
+			fireEvent.press(
+				within( socialLinksBlock ).getByTestId( 'appender-button' )
+			);
+			const blockList = screen.getByTestId( 'InserterUI-Blocks' );
+			fireEvent.scroll( blockList, {
+				nativeEvent: {
+					contentOffset: { y: 0, x: 0 },
+					contentSize: { width: 100, height: 100 },
+					layoutMeasurement: { width: 100, height: 100 },
+				},
+			} );
+			fireEvent.press( await screen.findByText( 'Amazon' ) );
+
+			// Assert
+			const amazonSettings = await screen.findByTestId(
+				'navigation-screen-LinkSettingsScreen'
+			);
+			expect( amazonSettings ).toBeVisible();
 		} );
 	} );
 
