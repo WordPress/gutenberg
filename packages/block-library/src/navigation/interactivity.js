@@ -22,17 +22,18 @@ store( {
 		core: {
 			navigation: {
 				initModal: async ( { context, ref } ) => {
-					if ( context.isMenuOpen ) {
+					if ( context.core.navigation.isMenuOpen ) {
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
-						context.modal = ref;
-						context.firstFocusableElement = focusableElements[ 0 ];
-						context.lastFocusableElement =
+						context.core.navigation.modal = ref;
+						context.core.navigation.firstFocusableElement =
+							focusableElements[ 0 ];
+						context.core.navigation.lastFocusableElement =
 							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
 				focusFirstElement: async ( { context, ref } ) => {
-					if ( context.isMenuOpen ) {
+					if ( context.core.navigation.isMenuOpen ) {
 						ref.querySelector(
 							'.wp-block-navigation-item > *:first-child'
 						).focus();
@@ -45,7 +46,8 @@ store( {
 		core: {
 			navigation: {
 				roleAttribute: ( { context } ) => {
-					return context.overlay && context.isMenuOpen
+					return context.core.navigation.overlay &&
+						context.core.navigation.isMenuOpen
 						? 'dialog'
 						: '';
 				},
@@ -56,9 +58,9 @@ store( {
 		core: {
 			navigation: {
 				openMenu: ( { context, ref } ) => {
-					context.isMenuOpen = true;
-					context.previousFocus = ref;
-					if ( context.overlay ) {
+					context.core.navigation.isMenuOpen = true;
+					context.core.navigation.previousFocus = ref;
+					if ( context.core.navigation.overlay ) {
 						// It adds a `has-modal-open` class to the <html> root
 						document.documentElement.classList.add(
 							'has-modal-open'
@@ -66,18 +68,18 @@ store( {
 					}
 				},
 				closeMenu: ( { context } ) => {
-					if ( context.isMenuOpen ) {
-						context.isMenuOpen = false;
+					if ( context.core.navigation.isMenuOpen ) {
+						context.core.navigation.isMenuOpen = false;
 						if (
-							context.modal.contains(
+							context.core.navigation.modal.contains(
 								window.document.activeElement
 							)
 						) {
-							context.previousFocus.focus();
+							context.core.navigation.previousFocus.focus();
 						}
-						context.modal = null;
-						context.previousFocus = null;
-						if ( context.overlay ) {
+						context.core.navigation.modal = null;
+						context.core.navigation.previousFocus = null;
+						if ( context.core.navigation.overlay ) {
 							document.documentElement.classList.remove(
 								'has-modal-open'
 							);
@@ -85,7 +87,7 @@ store( {
 					}
 				},
 				handleMenuKeydown: ( { actions, context, event } ) => {
-					if ( context.isMenuOpen ) {
+					if ( context.core.navigation.isMenuOpen ) {
 						// If Escape close the menu
 						if (
 							event?.key === 'Escape' ||
@@ -97,36 +99,39 @@ store( {
 
 						// Trap focus if it is an overlay (main menu)
 						if (
-							context.overlay &&
+							context.core.navigation.overlay &&
 							( event.key === 'Tab' || event.keyCode === 9 )
 						) {
 							// If shift + tab it change the direction
 							if (
 								event.shiftKey &&
 								window.document.activeElement ===
-									context.firstFocusableElement
+									context.core.navigation
+										.firstFocusableElement
 							) {
 								event.preventDefault();
-								context.lastFocusableElement.focus();
+								context.core.navigation.lastFocusableElement.focus();
 							} else if (
 								! event.shiftKey &&
 								window.document.activeElement ===
-									context.lastFocusableElement
+									context.core.navigation.lastFocusableElement
 							) {
 								event.preventDefault();
-								context.firstFocusableElement.focus();
+								context.core.navigation.firstFocusableElement.focus();
 							}
 						}
 					}
 				},
 				handleMenuFocusout: ( { actions, context, event } ) => {
-					if ( context.isMenuOpen ) {
+					if ( context.core.navigation.isMenuOpen ) {
 						// If focus is outside modal, and in the document, close menu
 						// event.target === The element losing focus
 						// event.relatedTarget === The element receiving focus (if any)
 						// When focusout is outsite the document, `window.document.activeElement` doesn't change
 						if (
-							! context.modal.contains( event.relatedTarget ) &&
+							! context.core.navigation.modal.contains(
+								event.relatedTarget
+							) &&
 							event.target !== window.document.activeElement
 						) {
 							actions.core.navigation.closeMenu( { context } );

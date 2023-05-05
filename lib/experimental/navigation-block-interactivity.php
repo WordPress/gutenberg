@@ -13,7 +13,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 		// Add directives to the `<nav>` element.
 		if ( $w->next_tag( 'nav' ) ) {
 			$w->set_attribute( 'data-wp-island', '' );
-			$w->set_attribute( 'data-wp-context', '{ "isMenuOpen": false, "overlay": true, "roleAttribute": "" }' );
+			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }' );
 		};
 
 		// Add directives to the open menu button.
@@ -34,9 +34,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 				'class_name' => 'wp-block-navigation__responsive-container',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-class.has-modal-open', 'context.isMenuOpen' );
-			$w->set_attribute( 'data-wp-class.is-menu-open', 'context.isMenuOpen' );
-			$w->set_attribute( 'data-wp-bind.aria-hidden', '!context.isMenuOpen' );
+			$w->set_attribute( 'data-wp-class.has-modal-open', 'context.core.navigation.isMenuOpen' );
+			$w->set_attribute( 'data-wp-class.is-menu-open', 'context.core.navigation.isMenuOpen' );
+			$w->set_attribute( 'data-wp-bind.aria-hidden', '!context.core.navigation.isMenuOpen' );
 			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initModal' );
 			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 			$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
@@ -50,7 +50,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 				'class_name' => 'wp-block-navigation__responsive-dialog',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-bind.aria-modal', 'context.isMenuOpen' );
+			$w->set_attribute( 'data-wp-bind.aria-modal', 'context.core.navigation.isMenuOpen' );
 			$w->set_attribute( 'data-wp-bind.role', 'selectors.core.navigation.roleAttribute' );
 			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.focusFirstElement' );
 		};
@@ -79,7 +79,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 			)
 		) ) {
 			// Add directives to the parent `<li>`.
-			$w->set_attribute( 'data-wp-context', '{ "isMenuOpen": false, "overlay": false }' );
+			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }' );
 
 			// Add directives to the toggle submenu button.
 			if ( $w->next_tag(
@@ -89,7 +89,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 				)
 			) ) {
 				$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.openMenu' );
-				$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.isMenuOpen' );
+				$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.core.navigation.isMenuOpen' );
 				$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 				$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 			};
