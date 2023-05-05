@@ -14,6 +14,7 @@ import {
 	setupMediaUpload,
 	triggerBlockListLayout,
 	within,
+	setupPicker,
 } from 'test/helpers';
 
 /**
@@ -35,6 +36,12 @@ import {
 	getGalleryItem,
 	generateGalleryBlock,
 } from './helpers';
+
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'WordPress Media Library',
+];
 
 const media = [
 	{
@@ -213,11 +220,13 @@ describe( 'Gallery block', () => {
 			setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
+		const screen = await initializeWithGalleryBlock();
+		const { galleryBlock, getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		fireEvent.press( getByText( 'Choose from device' ) );
+		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
