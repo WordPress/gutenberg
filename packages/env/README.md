@@ -253,15 +253,14 @@ The start command installs and initializes the WordPress environment, which incl
 ```sh
 wp-env start
 
-Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
-tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
-directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first install, use the '--update' flag to download
-updates to mapped sources and to re-apply WordPress configuration options.
+Starts WordPress for development on port 8888 (​http://localhost:8888​)
+(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
+(override with WP_ENV_TESTS_PORT). The current working directory must be a
+WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After
+first install, use the '--update' flag to download updates to mapped sources and
+to re-apply WordPress configuration options.
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
@@ -270,6 +269,7 @@ Options:
              them in a comma-separated list: `--xdebug=develop,coverage`. See
              https://xdebug.org/docs/all_settings#mode for information about
              Xdebug modes.                                              [string]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env stop`
@@ -278,6 +278,9 @@ Options:
 wp-env stop
 
 Stops running WordPress for development and tests and frees the ports.
+
+Options:
+  --debug            Enable debug output.             [boolean] [default: false]
 ```
 
 ### `wp-env clean [environment]`
@@ -290,6 +293,10 @@ Cleans the WordPress databases.
 Positionals:
   environment  Which environments' databases to clean.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env run [container] [command]`
@@ -327,8 +334,6 @@ Positionals:
   command    The command to run.                           [array] [default: []]
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --env-cwd  The command's working directory inside of the container. Paths
              without a leading slash are relative to the WordPress root.
@@ -390,6 +395,23 @@ Success: Installed 1 of 1 plugins.
 ✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
 ```
 
+#### Changing the permalink structure
+You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
+
+**Examples**
+
+To set the permalink to just the post name:
+
+```
+wp-env run cli "wp rewrite structure /%postname%/"
+```
+
+To set the permalink to the year, month, and post name:
+
+```
+wp-env run cli "wp rewrite structure /%year%/%monthnum%/%postname%/"
+```
+
 ### `wp-env destroy`
 
 ```sh
@@ -397,6 +419,9 @@ wp-env destroy
 
 Destroy the WordPress environment. Deletes docker containers, volumes, and
 networks associated with the WordPress environment and removes local files.
+
+Options:
+  --debug            Enable debug output.             [boolean] [default: false]
 ```
 
 ### `wp-env logs [environment]`
@@ -411,8 +436,6 @@ Positionals:
       [string] [choices: "development", "tests", "all"] [default: "development"]
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
@@ -514,9 +537,23 @@ These can be overridden by setting a value within the `config` configuration. Se
 
 Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 
-### Examples
+## Lifecycle Hooks
 
-#### Latest stable WordPress + current directory as a plugin
+These hooks are executed at certain points during the lifecycle of a command's execution. Keep in mind that these will be executed on both fresh and existing
+environments, so, ensure any commands you build won't break on subsequent executions. 
+
+### After Setup
+
+Using the `afterSetup` option in `.wp-env.json` files will allow you to configure an arbitrary command to execute after the environment's setup is complete:
+
+- `wp-env start`: Runs when the config changes, WordPress updates, or you pass the `--update` flag.
+- `wp-env clean`: Runs after the selected environments have been cleaned.
+
+You can override the `afterSetup` option using the `WP_ENV_AFTER_SETUP` environment variable.
+
+## Examples
+
+### Latest stable WordPress + current directory as a plugin
 
 This is useful for plugin development.
 
@@ -538,7 +575,7 @@ This is useful for plugin development when upstream Core changes need to be test
 }
 ```
 
-#### Local `wordpress-develop` + current directory as a plugin
+### Local `wordpress-develop` + current directory as a plugin
 
 This is useful for working on plugins and WordPress Core at the same time.
 
@@ -560,7 +597,7 @@ If you are running `wordpress-develop` in a dev mode (e.g. the watch command `de
 }
 ```
 
-#### A complete testing environment
+### A complete testing environment
 
 This is useful for integration testing: that is, testing how old versions of WordPress and different combinations of plugins and themes impact each other.
 
@@ -572,7 +609,7 @@ This is useful for integration testing: that is, testing how old versions of Wor
 }
 ```
 
-#### Add mu-plugins and other mapped directories
+### Add mu-plugins and other mapped directories
 
 You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated.
 
@@ -587,7 +624,7 @@ You can add mu-plugins via the mapping config. The mapping config also allows yo
 }
 ```
 
-#### Avoid activating plugins or themes on the instance
+### Avoid activating plugins or themes on the instance
 
 Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time.
 
@@ -600,7 +637,7 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 }
 ```
 
-#### Map a plugin only in the tests environment
+### Map a plugin only in the tests environment
 
 If you need a plugin active in one environment but not the other, you can use `env.<envName>` to set options specific to one environment. Here, we activate cwd and a test plugin on the tests instance. This plugin is not activated on any other instances.
 
@@ -615,7 +652,7 @@ If you need a plugin active in one environment but not the other, you can use `e
 }
 ```
 
-#### Custom Port Numbers
+### Custom Port Numbers
 
 You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
 
@@ -631,7 +668,7 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 }
 ```
 
-#### Specific PHP Version
+### Specific PHP Version
 
 You can tell `wp-env` to use a specific PHP version for compatibility and testing. This can also be set via the environment variable `WP_ENV_PHP_VERSION`.
 
@@ -639,6 +676,16 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 {
 	"phpVersion": "7.2",
 	"plugins": [ "." ]
+}
+```
+
+### Node Lifecycle Script
+
+This is useful for performing some actions after setting up the environment, such as bootstrapping an E2E test environment.
+
+```json
+{
+	"afterSetup": "node tests/e2e/bin/setup-env.js"
 }
 ```
 

@@ -23,7 +23,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
-import ContextMenu from './context-menu';
+import RootMenu from './root-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
@@ -78,7 +78,7 @@ function ScreenRoot() {
 							</NavigationButtonAsItem>
 						</ItemGroup>
 					) }
-					<ContextMenu />
+					<RootMenu />
 				</VStack>
 			</CardBody>
 

@@ -171,7 +171,12 @@ export default function Editor() {
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
 							className={ showIconLabels && 'show-icon-labels' }
-							notices={ isEditMode && <EditorSnackbars /> }
+							notices={
+								( isEditMode ||
+									window?.__experimentalEnableThemePreviews ) && (
+									<EditorSnackbars />
+								)
+							}
 							content={
 								<>
 									<GlobalStylesRenderer />

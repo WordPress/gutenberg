@@ -9,14 +9,12 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  */
 
 import { NavigationButtonAsItem } from './navigation-button';
-import ContextMenu from './context-menu';
 
 function getCoreBlockStyles( blockStyles ) {
 	return blockStyles?.filter( ( style ) => style.source === 'block' );
 }
 
-export function useHasVariationsPanel( name, parentMenu = '' ) {
-	const isInsideVariationsPanel = parentMenu.includes( 'variations' );
+export function useBlockVariations( name ) {
 	const blockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -25,18 +23,11 @@ export function useHasVariationsPanel( name, parentMenu = '' ) {
 		[ name ]
 	);
 	const coreBlockStyles = getCoreBlockStyles( blockStyles );
-	return !! coreBlockStyles?.length && ! isInsideVariationsPanel;
+	return coreBlockStyles;
 }
 
 export function VariationsPanel( { name } ) {
-	const blockStyles = useSelect(
-		( select ) => {
-			const { getBlockStyles } = select( blocksStore );
-			return getBlockStyles( name );
-		},
-		[ name ]
-	);
-	const coreBlockStyles = getCoreBlockStyles( blockStyles );
+	const coreBlockStyles = useBlockVariations( name );
 
 	return (
 		<ItemGroup isBordered isSeparated>
@@ -60,19 +51,5 @@ export function VariationsPanel( { name } ) {
 				);
 			} ) }
 		</ItemGroup>
-	);
-}
-
-export function VariationPanel( { blockName, styleName } ) {
-	return (
-		<ContextMenu
-			parentMenu={
-				'/blocks/' +
-				encodeURIComponent( blockName ) +
-				'/variations/' +
-				encodeURIComponent( styleName )
-			}
-			name={ blockName }
-		/>
 	);
 }

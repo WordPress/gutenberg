@@ -11,6 +11,7 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -33,9 +34,23 @@ export default function SaveButton( {
 	}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
-	const disabled = ! isDirty || isSaving;
+	const activateSaveEnabled = isPreviewingTheme() || isDirty;
+	const disabled = isSaving || ! activateSaveEnabled;
 
-	const label = __( 'Save' );
+	const getLabel = () => {
+		if ( disabled ) {
+			return __( 'Saved' );
+		}
+
+		if ( isPreviewingTheme() && isDirty ) {
+			return __( 'Activate & Save' );
+		} else if ( isPreviewingTheme() ) {
+			return __( 'Activate' );
+		}
+
+		return __( 'Save' );
+	};
+	const label = getLabel();
 
 	return (
 		<Button
