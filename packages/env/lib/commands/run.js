@@ -61,21 +61,27 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 	const hostUser = getHostUser();
 
 	// We need to pass absolute paths to the container.
-	envCwd = path.resolve( '/var/www/html', envCwd );
+	envCwd = path.resolve(
+		container === 'composer' ? '/app' : '/var/www/html',
+		envCwd
+	);
 
+	const useRun = container === 'phpunit' || container === 'composer';
 	const isTTY = process.stdout.isTTY;
+
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
-		'exec',
+		useRun ? 'run' : 'exec',
 		! isTTY ? '--no-TTY' : '',
 		'-w',
 		envCwd,
+		useRun ? '--rm' : '',
 		'--user',
 		hostUser.fullUser,
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
-	];
+	].filter( Boolean );
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
