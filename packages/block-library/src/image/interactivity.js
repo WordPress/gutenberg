@@ -57,7 +57,10 @@ store( {
 						}
 
 						if ( escapeKeyPressed || isTabKeyPressed ) {
-							actions.core.hideLightbox( { context, event } );
+							actions.core.image.hideLightbox( {
+								context,
+								event,
+							} );
 						}
 					}
 				},

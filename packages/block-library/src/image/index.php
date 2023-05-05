@@ -58,7 +58,7 @@ function render_block_core_image( $attributes, $content ) {
 						 data-wp-class.initialized="context.core.image.initialized"
 						 data-wp-class.active="context.core.image.lightboxEnabled"
 						 data-wp-bind.aria-hidden="!context.core.image.lightboxEnabled"
-						 data-wp-effect="effects.core.initLightbox"
+						 data-wp-effect="effects.core.image.initLightbox"
 						 data-wp-on.keydown="actions.core.image.handleKeydown"
 						 data-wp-on.mousewheel="actions.core.image.hideLightbox"
 						 data-wp-on.click="actions.core.image.hideLightbox"
