@@ -39,7 +39,7 @@ function gutenberg_find_first_block( $block_name, $blocks ) {
 function gutenberg_get_block_editor_settings_experimental( $settings ) {
 	$is_block_theme = wp_is_block_theme();
 
-	global $post_ID, $wp_version;
+	global $post_ID;
 
 	if ( ! $is_block_theme || ! $post_ID ) {
 		return $settings;
@@ -82,39 +82,6 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 			$settings['postContentAttributes'] = $post_content_block['attrs'];
 		}
 	}
-
-	// Add languages to the settings.
-	if ( ! function_exists( 'translations_api' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-	}
-	$api           = translations_api( 'core', array( 'version' => $wp_version ) );
-	$all_languages = array();
-	foreach ( $api['translations'] as $translation ) {
-		$all_languages[] = array(
-			'label' => $translation['native_name'],
-			'value' => str_replace( '_', '-', $translation['language'] ),
-		);
-	}
-	// Add US English option.
-	$all_languages[] = array(
-		'label' => __( 'English (United States)', 'gutenberg' ),
-		'value' => 'en-US',
-	);
-	// Sort languages by value.
-	usort(
-		$all_languages,
-		function( $a, $b ) {
-			return strnatcasecmp( $a['value'], $b['value'] );
-		}
-	);
-	// Add "Other" option.
-	$all_languages[] = array(
-		'label' => __( 'Other', 'gutenberg' ),
-		'value' => '',
-	);
-
-	$settings['languages']  = $all_languages;
-	$settings['userLocale'] = get_user_locale();
 
 	return $settings;
 }
