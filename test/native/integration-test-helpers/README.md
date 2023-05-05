@@ -66,6 +66,10 @@ Sets up Media Picker mock functions.
 
 Sets up the media upload mock functions for testing.
 
+### [`setupPicker`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-picker.js)
+
+Sets up the Picker component for testing.
+
 ### [`changeTextOfTextInput`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/text-input-change-text.js)
 
 Changes the text of a TextInput component.
