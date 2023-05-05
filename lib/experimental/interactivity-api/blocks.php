@@ -20,6 +20,7 @@ function gutenberg_block_core_file_add_directives_to_content( $block_content, $b
 	}
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$processor->next_tag();
+	$processor->set_attribute( 'data-wp-island', '' );
 	$processor->set_attribute( 'data-wp-init', 'effects.core.file.init' );
 	return $processor->get_updated_html();
 }
