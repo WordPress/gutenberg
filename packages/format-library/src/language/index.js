@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
-import { translation } from '@wordpress/icons';
+import { language as languageIcon } from '@wordpress/icons';
 
 const name = 'core/language';
 const title = __( 'Language' );
@@ -48,7 +48,7 @@ function Edit( props ) {
 	return (
 		<>
 			<RichTextToolbarButton
-				icon={ translation }
+				icon={ languageIcon }
 				label={ title }
 				title={ title }
 				onClick={ () => {
