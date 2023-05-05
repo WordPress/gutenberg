@@ -46,12 +46,7 @@ const {
 	Fill: EditorCanvasContainerFill,
 } = createPrivateSlotFill( SLOT_FILL_NAME );
 
-function EditorCanvasContainer( {
-	children,
-	showCloseButton = false,
-	closeButtonLabel,
-	onClose = () => {},
-} ) {
+function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
@@ -68,7 +63,9 @@ function EditorCanvasContainer( {
 		[ editorCanvasContainerView ]
 	);
 	function onCloseContainer() {
-		onClose();
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
@@ -96,7 +93,7 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
-	const shouldShowCloseButton = showCloseButton || !! closeButtonLabel;
+	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (
 		<EditorCanvasContainerFill>

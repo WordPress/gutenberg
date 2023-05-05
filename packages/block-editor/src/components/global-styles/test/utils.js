@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import {
-	isGlobalStyleConfigEqual,
+	areGlobalStyleConfigsEqual,
 	getPresetVariableFromValue,
 	getValueFromVariable,
 } from '../utils';
@@ -208,9 +208,10 @@ describe( 'editor utils', () => {
 		} );
 	} );
 
-	describe( 'isGlobalStyleConfigEqual', () => {
+	describe( 'areGlobalStyleConfigsEqual', () => {
 		test.each( [
-			{ original: null, variation: null, expected: false },
+			{ original: null, variation: null, expected: true },
+			{ original: {}, variation: {}, expected: true },
 			{ original: {}, variation: undefined, expected: false },
 			{
 				original: {
@@ -250,11 +251,11 @@ describe( 'editor utils', () => {
 				expected: true,
 			},
 		] )(
-			'.isGlobalStyleConfigEqual( $original, $variation )',
+			'.areGlobalStyleConfigsEqual( $original, $variation )',
 			( { original, variation, expected } ) => {
-				expect( isGlobalStyleConfigEqual( original, variation ) ).toBe(
-					expected
-				);
+				expect(
+					areGlobalStyleConfigsEqual( original, variation )
+				).toBe( expected );
 			}
 		);
 	} );

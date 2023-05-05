@@ -11,13 +11,9 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import useGetGlobalStylesRevisions from '../use-get-global-styles-revisions';
+import useGlobalStylesRevisions from '../use-global-styles-revisions';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
 jest.mock( '@wordpress/element', () => {
 	return {
@@ -32,7 +28,7 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
-describe( 'useGetGlobalStylesRevisions', () => {
+describe( 'useGlobalStylesRevisions', () => {
 	const selectValue = {
 		authors: [
 			{
@@ -59,7 +55,7 @@ describe( 'useGetGlobalStylesRevisions', () => {
 	it( 'returns loaded revisions with no unsaved changes', () => {
 		useSelect.mockImplementation( () => selectValue );
 
-		const { result } = renderHook( () => useGetGlobalStylesRevisions() );
+		const { result } = renderHook( () => useGlobalStylesRevisions() );
 		const { revisions, isLoading, hasUnsavedChanges } = result.current;
 
 		expect( isLoading ).toBe( false );
@@ -84,7 +80,7 @@ describe( 'useGetGlobalStylesRevisions', () => {
 			isDirty: true,
 		} ) );
 
-		const { result } = renderHook( () => useGetGlobalStylesRevisions() );
+		const { result } = renderHook( () => useGlobalStylesRevisions() );
 		const { revisions, isLoading, hasUnsavedChanges } = result.current;
 
 		expect( isLoading ).toBe( false );
@@ -119,7 +115,7 @@ describe( 'useGetGlobalStylesRevisions', () => {
 			isLoading: true,
 		} ) );
 
-		const { result } = renderHook( () => useGetGlobalStylesRevisions() );
+		const { result } = renderHook( () => useGlobalStylesRevisions() );
 		const { revisions, isLoading, hasUnsavedChanges } = result.current;
 
 		expect( isLoading ).toBe( true );

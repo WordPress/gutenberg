@@ -21,7 +21,7 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext, isGlobalStyleConfigEqual } = unlock(
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -57,7 +57,7 @@ function Variation( { variation } ) {
 	};
 
 	const isActive = useMemo( () => {
-		return isGlobalStyleConfigEqual( user, variation );
+		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
 
 	return (

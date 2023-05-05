@@ -22,7 +22,7 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 };
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-export default function useGetGlobalStylesRevisions() {
+export default function useGlobalStylesRevisions() {
 	const { user: userConfig } = useContext( GlobalStylesContext );
 	const { authors, currentUser, isDirty, revisions, isLoading } = useSelect(
 		( select ) => {
@@ -30,14 +30,14 @@ export default function useGetGlobalStylesRevisions() {
 				__experimentalGetDirtyEntityRecords,
 				getCurrentUser,
 				getUsers,
-				__experimentalGetCurrentThemeGlobalStylesRevisions,
+				getCurrentThemeGlobalStylesRevisions,
 				isResolving,
 			} = select( coreStore );
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const _currentUser = getCurrentUser();
 			const _isDirty = dirtyEntityRecords.length > 0;
 			const globalStylesRevisions =
-				__experimentalGetCurrentThemeGlobalStylesRevisions() || [];
+				getCurrentThemeGlobalStylesRevisions() || [];
 			const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY );
 
 			return {
@@ -67,22 +67,20 @@ export default function useGetGlobalStylesRevisions() {
 		 * Then, if there are unsaved changes in the editor, create a
 		 * new "revision" item that represents the unsaved changes.
 		 */
-		_modifiedRevisions = revisions.map( ( revision, index, _array ) => {
-			if ( 0 === index && _array[ index ]?.id !== 'unsaved' ) {
-				revision.isLatest = true;
-			}
-
+		_modifiedRevisions = revisions.map( ( revision ) => {
 			return {
 				...revision,
-				author: {
-					...authors.find(
-						( author ) => author.id === revision.author
-					),
-				},
+				author: authors.find(
+					( author ) => author.id === revision.author
+				),
 			};
 		} );
 
-		if ( isDirty && ! isEmpty( userConfig ) && !! currentUser ) {
+		if ( _modifiedRevisions[ 0 ]?.id !== 'unsaved' ) {
+			_modifiedRevisions[ 0 ].isLatest = true;
+		}
+
+		if ( isDirty && ! isEmpty( userConfig ) && currentUser ) {
 			const unsavedRevision = {
 				id: 'unsaved',
 				styles: userConfig?.styles,
@@ -94,9 +92,7 @@ export default function useGetGlobalStylesRevisions() {
 				modified: new Date(),
 			};
 
-			_modifiedRevisions = [ unsavedRevision ].concat(
-				_modifiedRevisions
-			);
+			_modifiedRevisions.unshift( unsavedRevision );
 		}
 		return {
 			revisions: _modifiedRevisions,

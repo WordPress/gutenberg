@@ -1256,7 +1256,7 @@ export function getNavigationFallbackId(
  *
  * @return The current global styles.
  */
-export function __experimentalGetCurrentThemeGlobalStylesRevisions(
+export function getCurrentThemeGlobalStylesRevisions(
 	state: State
 ): Object | null {
 	const currentGlobalStylesId =

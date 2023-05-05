@@ -385,7 +385,7 @@ export function scopeSelector( scope, selector ) {
  * ```js
  * const globalStyles = { styles: { typography: { fontSize: '10px' } }, settings: {} };
  * const variation = { styles: { typography: { fontSize: '10000px' } }, settings: {} };
- * const isEqual = isGlobalStyleConfigEqual( globalStyles, variation );
+ * const isEqual = areGlobalStyleConfigsEqual( globalStyles, variation );
  * // false
  * ```
  *
@@ -394,9 +394,9 @@ export function scopeSelector( scope, selector ) {
  *
  * @return {boolean} Whether `original` and `variation` match.
  */
-export function isGlobalStyleConfigEqual( original, variation ) {
-	if ( ! original || ! variation ) {
-		return false;
+export function areGlobalStyleConfigsEqual( original, variation ) {
+	if ( typeof original !== 'object' || typeof variation !== 'object' ) {
+		return original === variation;
 	}
 	return (
 		fastDeepEqual( original?.styles, variation?.styles ) &&

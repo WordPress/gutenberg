@@ -27,9 +27,8 @@ import { unlock } from '../../private-apis';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStylesOutput } = unlock(
-	blockEditorPrivateApis
-);
+const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
+	unlock( blockEditorPrivateApis );
 
 function Revisions( { onClose, userConfig, blocks } ) {
 	const { baseConfig } = useSelect(
@@ -46,7 +45,7 @@ function Revisions( { onClose, userConfig, blocks } ) {
 		if ( ! isEmpty( userConfig ) && ! isEmpty( baseConfig ) ) {
 			return mergeBaseAndUserConfigs( baseConfig, userConfig );
 		}
-		return null;
+		return {};
 	}, [ baseConfig, userConfig ] );
 
 	const renderedBlocksArray = useMemo(
@@ -63,7 +62,8 @@ function Revisions( { onClose, userConfig, blocks } ) {
 		[ originalSettings ]
 	);
 
-	const [ globalStyles ] = useGlobalStylesOutput( mergedConfig );
+	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+
 	const editorStyles =
 		! isEmpty( globalStyles ) && ! isEmpty( userConfig )
 			? globalStyles

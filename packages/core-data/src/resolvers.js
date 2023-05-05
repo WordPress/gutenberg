@@ -500,7 +500,10 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		);
 	};
 
-export const __experimentalGetCurrentThemeGlobalStylesRevisions =
+/**
+ * Fetches and returns the revisions of the current global styles theme.
+ */
+export const getCurrentThemeGlobalStylesRevisions =
 	() =>
 	async ( { resolveSelect, dispatch } ) => {
 		const globalStylesId =
@@ -526,16 +529,14 @@ export const __experimentalGetCurrentThemeGlobalStylesRevisions =
 					] )
 				)
 			);
-			dispatch.__experimentalReceiveThemeGlobalStyleRevisions(
+			dispatch.receiveThemeGlobalStyleRevisions(
 				globalStylesId,
 				revisions
 			);
 		}
 	};
 
-__experimentalGetCurrentThemeGlobalStylesRevisions.shouldInvalidate = (
-	action
-) => {
+getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 	return (
 		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
 		action.kind === 'root' &&

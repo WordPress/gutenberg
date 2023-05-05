@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { dateI18n, getDate, humanTimeDiff } from '@wordpress/date';
+import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 
 /**
  * Returns a button label for the revision.
@@ -29,11 +29,9 @@ function getRevisionLabel( revision ) {
 			}
 		);
 	}
-	const date = getDate( revision?.modified );
 	const formattedDate = dateI18n(
-		// translators: a compact version of the revision's modified date.
-		_x( 'j M @ H:i', 'formatted version of revision last modified date' ),
-		date
+		getSettings().formats.datetimeAbbreviated,
+		getDate( revision?.modified )
 	);
 
 	return revision?.isLatest
@@ -92,7 +90,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 								'is-current': isActive,
 							}
 						) }
-						key={ `user-styles-revision-${ id }` }
+						key={ id }
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
@@ -100,7 +98,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 							onClick={ () => {
 								onChange( revision );
 							} }
-							aria-label={ getRevisionLabel( revision ) }
+							label={ getRevisionLabel( revision ) }
 						>
 							<span className="edit-site-global-styles-screen-revisions__description">
 								<span>

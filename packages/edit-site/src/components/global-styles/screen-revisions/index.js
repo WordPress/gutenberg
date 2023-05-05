@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalUseNavigator as useNavigator,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -22,11 +23,10 @@ import { unlock } from '../../../private-apis';
 import Revisions from '../../revisions';
 import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
-import useGetGlobalStylesRevisions from './use-get-global-styles-revisions';
-import RestoreGlobalStylesRevisionModal from './restore-global-styles-revision-modal';
+import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
 
-const { GlobalStylesContext, isGlobalStyleConfigEqual } = unlock(
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -44,11 +44,16 @@ function ScreenRevisions() {
 	}, [] );
 
 	const { revisions, isLoading, hasUnsavedChanges } =
-		useGetGlobalStylesRevisions();
-	const [ globalStylesRevision, setGlobalStylesRevision ] = useState( {} );
+		useGlobalStylesRevisions();
+	const [ globalStylesRevision, setGlobalStylesRevision ] =
+		useState( userConfig );
 
 	const [ currentRevisionId, setCurrentRevisionId ] = useState(
-		revisions?.[ 0 ]?.id
+		/*
+		 * We need this for the first render,
+		 * otherwise the unsaved changes haven't been merged into the revisions array yet.
+		 */
+		hasUnsavedChanges ? 'unsaved' : revisions?.[ 0 ]?.id
 	);
 	const [
 		isLoadingRevisionWithUnsavedChanges,
@@ -89,7 +94,7 @@ function ScreenRevisions() {
 
 	const isLoadButtonEnabled =
 		!! globalStylesRevision?.id &&
-		! isGlobalStyleConfigEqual( globalStylesRevision, userConfig );
+		! areGlobalStyleConfigsEqual( globalStylesRevision, userConfig );
 
 	return (
 		<>
@@ -135,18 +140,36 @@ function ScreenRevisions() {
 								}
 							} }
 						>
-							{ __( 'Load revision' ) }
+							{ __( 'Apply' ) }
 						</Button>
 					</SidebarFixedBottom>
 				) }
 			</div>
 			{ isLoadingRevisionWithUnsavedChanges && (
-				<RestoreGlobalStylesRevisionModal
-					onClose={ () =>
+				<ConfirmDialog
+					title={ __(
+						'Loading this revision will discard all unsaved changes.'
+					) }
+					isOpen={ isLoadingRevisionWithUnsavedChanges }
+					confirmButtonText={ __( ' Discard unsaved changes' ) }
+					onConfirm={ () => restoreRevision( globalStylesRevision ) }
+					onCancel={ () =>
 						setIsLoadingRevisionWithUnsavedChanges( false )
 					}
-					onSubmit={ () => restoreRevision( globalStylesRevision ) }
-				/>
+				>
+					<>
+						<h2>
+							{ __(
+								'Loading this revision will discard all unsaved changes.'
+							) }
+						</h2>
+						<p>
+							{ __(
+								'Do you want to replace your unsaved changes in the editor?'
+							) }
+						</p>
+					</>
+				</ConfirmDialog>
 			) }
 		</>
 	);

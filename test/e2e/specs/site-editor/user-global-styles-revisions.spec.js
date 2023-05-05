@@ -82,9 +82,9 @@ test.describe( 'Global styles revisions', () => {
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 
-			const revisionButtons = page
-				.getByRole( 'group', { name: 'Global styles revisions' } )
-				.getByRole( 'button', { name: /^Changes saved on / } );
+			const revisionButtons = page.getByRole( 'button', {
+				name: /^Changes saved on /,
+			} );
 
 			await expect( revisionButtons ).toHaveCount(
 				currentRevisions.length + 2
@@ -96,9 +96,9 @@ test.describe( 'Global styles revisions', () => {
 		// There are some revisions. Let's check that the UI looks how we expect it to.
 		await page.getByRole( 'button', { name: 'Styles actions' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
-		const revisionButtons = page
-			.getByRole( 'group', { name: 'Global styles revisions' } )
-			.getByRole( 'button', { name: /^Changes saved on / } );
+		const revisionButtons = page.getByRole( 'button', {
+			name: /^Changes saved on /,
+		} );
 
 		await expect( revisionButtons ).toHaveCount(
 			updatedCurrentRevisions.length
@@ -121,25 +121,25 @@ test.describe( 'Global styles revisions', () => {
 		await page.getByRole( 'button', { name: 'Color: Black' } ).click();
 		await page.getByRole( 'button', { name: 'Styles actions' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
-		const unSavedButton = page
-			.getByRole( 'group', { name: 'Global styles revisions' } )
-			.getByRole( 'button', { name: /^Unsaved changes/ } );
+		const unSavedButton = page.getByRole( 'button', {
+			name: /^Unsaved changes/,
+		} );
 
 		await expect( unSavedButton ).toBeVisible();
 
 		// await expect( image ).toHaveCSS( 'height', '3px' );
 		await page
-			.getByRole( 'group', { name: 'Global styles revisions' } )
 			.getByRole( 'button', { name: /^Changes saved on / } )
 			.last()
 			.click();
 
 		await page.getByRole( 'button', { name: 'Load revision' } ).click();
 
-		const modal = page.getByRole( 'dialog', {
-			name: 'You have unsaved changes in the editor',
-		} );
-		await expect( modal ).toBeVisible();
+		const confirm = page.getByRole( 'dialog' );
+		await expect( confirm ).toBeVisible();
+		await expect( confirm ).toHaveText(
+			/^Loading this revision will discard all unsaved changes/
+		);
 	} );
 } );
 

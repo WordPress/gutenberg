@@ -221,10 +221,7 @@ export function receiveThemeSupports() {
  *
  * @return {Object} Action object.
  */
-export function __experimentalReceiveThemeGlobalStyleRevisions(
-	currentId,
-	revisions
-) {
+export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
 	return {
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
 		currentId,
