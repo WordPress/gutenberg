@@ -68,6 +68,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 		) ) {
 			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.openMenu' );
 			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
+			$w->remove_attribute( 'data-micromodal-trigger' );
 		}
 
 		// Add directives to the menu container.
@@ -84,6 +85,16 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 			$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 			$w->set_attribute( 'tabindex', '-1' );
+		};
+
+		// Remove micromodal attribute
+		if ( $w->next_tag(
+			array(
+				'tag_name'   => 'DIV',
+				'class_name' => 'wp-block-navigation__responsive-close',
+			)
+		) ) {
+			$w->remove_attribute( 'data-micromodal-close' );
 		};
 
 		// Add directives to the dialog container.
@@ -106,6 +117,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-bl
 			)
 		) ) {
 			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.closeMenu' );
+			$w->remove_attribute( 'data-micromodal-close' );
 		};
 
 		// Submenus.
