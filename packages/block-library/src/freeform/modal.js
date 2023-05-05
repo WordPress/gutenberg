@@ -78,6 +78,7 @@ export default function ModalEdit( props ) {
 					title={ label }
 					onRequestClose={ onClose }
 					shouldCloseOnClickOutside={ false }
+					overlayClassName="block-editor-freeform-modal"
 				>
 					<ClassicEdit
 						id={ id }
