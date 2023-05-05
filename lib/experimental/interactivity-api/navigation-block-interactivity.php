@@ -228,7 +228,7 @@ add_filter(
 		if ( 'core/navigation' === $metadata['name'] ) {
 			wp_register_script(
 				'wp-block-navigation-view',
-				gutenberg_url( 'build/block-library/interactive-blocks/navigation.min.js' ),
+				gutenberg_url( 'build/block-library/navigation/interactivity.min.js' ),
 				array( 'wp-interactivity-runtime' )
 			);
 			$metadata['viewScript'] = array( 'wp-block-navigation-view' );
