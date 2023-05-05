@@ -47,44 +47,37 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	const getIframeProps = () => {
-		const iframeProps = {
-			expand: isZoomOutMode,
-			scale: ( isZoomOutMode && 0.45 ) || undefined,
-			frameSize: isZoomOutMode ? 100 : undefined,
-			style: enableResizing ? {} : deviceStyles,
-			ref: mouseMoveTypingRef,
-			name: 'editor-canvas',
-			className: classnames( 'edit-site-visual-editor__editor-canvas', {
-				'is-focused': isFocused && canvasMode === 'view',
-			} ),
-			...props,
-		};
-
-		if ( canvasMode === 'view' ) {
-			iframeProps[ 'aria-label' ] = __( 'Editor Canvas' );
-			return Object.assign( {}, iframeProps, {
-				role: 'button',
-				tabIndex: 0,
-				onFocus: () => setIsFocused( true ),
-				onBlur: () => setIsFocused( false ),
-				onKeyDown: ( event ) => {
-					const { keyCode } = event;
-					if ( keyCode === ENTER || keyCode === SPACE ) {
-						event.preventDefault();
-						setCanvasMode( 'edit' );
-					}
-				},
-				onClick: () => setCanvasMode( 'edit' ),
-				readonly: true,
-			} );
-		}
-
-		return iframeProps;
+	const viewModeProps = {
+		'aria-label': __( 'Editor Canvas' ),
+		role: 'button',
+		tabIndex: 0,
+		onFocus: () => setIsFocused( true ),
+		onBlur: () => setIsFocused( false ),
+		onKeyDown: ( event ) => {
+			const { keyCode } = event;
+			if ( keyCode === ENTER || keyCode === SPACE ) {
+				event.preventDefault();
+				setCanvasMode( 'edit' );
+			}
+		},
+		onClick: () => setCanvasMode( 'edit' ),
+		readonly: true,
 	};
 
 	return (
-		<Iframe { ...getIframeProps() }>
+		<Iframe
+			expand={ isZoomOutMode }
+			scale={ ( isZoomOutMode && 0.45 ) || undefined }
+			frameSize={ isZoomOutMode ? 100 : undefined }
+			style={ enableResizing ? {} : deviceStyles }
+			ref={ mouseMoveTypingRef }
+			name="editor-canvas"
+			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
+				'is-focused': isFocused && canvasMode === 'view',
+			} ) }
+			{ ...props }
+			{ ...( canvasMode === 'view' ? viewModeProps : {} ) }
+		>
 			<EditorStyles styles={ settings.styles } />
 			<style>{
 				// Forming a "block formatting context" to prevent margin collapsing.
