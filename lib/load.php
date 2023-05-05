@@ -99,7 +99,7 @@ require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/interactivity-api/script-loader.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
-require __DIR__ . '/experimental/navigation-block-interactivity.php';
+require __DIR__ . '/experimental/interactivity-api/navigation-block-interactivity.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 
