@@ -14,6 +14,7 @@ export { openBlockSettings } from './open-block-settings';
 export { selectRangeInRichText } from './rich-text-select-range';
 export { typeInRichText } from './rich-text-type';
 export { pasteIntoRichText } from './rich-text-paste';
+export { setupApiFetch } from './setup-api-fetch';
 export { setupCoreBlocks } from './setup-core-blocks';
 export { setupMediaPicker } from './setup-media-picker';
 export { setupMediaUpload } from './setup-media-upload';
