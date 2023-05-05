@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Extend WordPress core navigation block to use the Interactivity API.
  * Interactivity API directives are added using the Tag Processor while it is experimental.
