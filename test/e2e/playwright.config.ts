@@ -11,9 +11,7 @@ const STORAGE_STATE_PATH =
 	path.join( process.cwd(), 'artifacts/storage-states/admin.json' );
 
 const config = defineConfig( {
-	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
-		: 'list',
+	reporter: 'list',
 	forbidOnly: !! process.env.CI,
 	workers: 1,
 	retries: process.env.CI ? 2 : 0,
