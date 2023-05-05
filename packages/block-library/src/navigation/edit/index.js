@@ -86,7 +86,6 @@ function Navigation( {
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
 	const {
@@ -579,60 +578,58 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls group="color">
-				{ hasColorSettings && (
-					<>
-						<ColorGradientSettingsDropdown
-							__experimentalIsRenderedInSidebar
-							settings={ [
-								{
-									colorValue: textColor.color,
-									label: __( 'Text' ),
-									onColorChange: setTextColor,
-									resetAllFilter: () => setTextColor(),
-								},
-								{
-									colorValue: backgroundColor.color,
-									label: __( 'Background' ),
-									onColorChange: setBackgroundColor,
-									resetAllFilter: () => setBackgroundColor(),
-								},
-								{
-									colorValue: overlayTextColor.color,
-									label: __( 'Submenu & overlay text' ),
-									onColorChange: setOverlayTextColor,
-									resetAllFilter: () => setOverlayTextColor(),
-								},
-								{
-									colorValue: overlayBackgroundColor.color,
-									label: __( 'Submenu & overlay background' ),
-									onColorChange: setOverlayBackgroundColor,
-									resetAllFilter: () =>
-										setOverlayBackgroundColor(),
-								},
-							] }
-							panelId={ clientId }
-							{ ...colorGradientSettings }
-							gradients={ [] }
-							disableCustomGradients={ true }
-						/>
-						{ enableContrastChecking && (
-							<>
-								<ContrastChecker
-									backgroundColor={ detectedBackgroundColor }
-									textColor={ detectedColor }
-								/>
-								<ContrastChecker
-									backgroundColor={
-										detectedOverlayBackgroundColor
-									}
-									textColor={ detectedOverlayColor }
-								/>
-							</>
-						) }
-					</>
-				) }
-			</InspectorControls>
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					<ColorGradientSettingsDropdown
+						__experimentalIsRenderedInSidebar
+						settings={ [
+							{
+								colorValue: textColor.color,
+								label: __( 'Text' ),
+								onColorChange: setTextColor,
+								resetAllFilter: () => setTextColor(),
+							},
+							{
+								colorValue: backgroundColor.color,
+								label: __( 'Background' ),
+								onColorChange: setBackgroundColor,
+								resetAllFilter: () => setBackgroundColor(),
+							},
+							{
+								colorValue: overlayTextColor.color,
+								label: __( 'Submenu & overlay text' ),
+								onColorChange: setOverlayTextColor,
+								resetAllFilter: () => setOverlayTextColor(),
+							},
+							{
+								colorValue: overlayBackgroundColor.color,
+								label: __( 'Submenu & overlay background' ),
+								onColorChange: setOverlayBackgroundColor,
+								resetAllFilter: () =>
+									setOverlayBackgroundColor(),
+							},
+						] }
+						panelId={ clientId }
+						{ ...colorGradientSettings }
+						gradients={ [] }
+						disableCustomGradients={ true }
+					/>
+					{ enableContrastChecking && (
+						<>
+							<ContrastChecker
+								backgroundColor={ detectedBackgroundColor }
+								textColor={ detectedColor }
+							/>
+							<ContrastChecker
+								backgroundColor={
+									detectedOverlayBackgroundColor
+								}
+								textColor={ detectedOverlayColor }
+							/>
+						</>
+					) }
+				</InspectorControls>
+			) }
 		</>
 	);
 
