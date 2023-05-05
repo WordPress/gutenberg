@@ -69,15 +69,15 @@
 }
 
 .editor-post-featured-image__actions {
-	bottom: $grid-unit-10;
+	bottom: 0;
+	padding: $grid-unit-10;
 	position: absolute;
-	right: $grid-unit-10;
 	visibility: hidden;
 }
 
 .editor-post-featured-image__action {
-	background: $white;
-	height: $grid-unit-40;
-	padding: $grid-unit-05;
-	width: $grid-unit-40;
+	backdrop-filter: blur(16px) saturate(180%);
+	background: rgba(255, 255, 255, 0.75);
+	flex-grow: 1;
+	justify-content: center;
 }

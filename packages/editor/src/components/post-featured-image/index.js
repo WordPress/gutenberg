@@ -22,7 +22,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { pencil as pencilIcon, trash as trashIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -201,27 +200,21 @@ function PostFeaturedImage( {
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
 								{ !! featuredImageId && (
-									<HStack
-										className="editor-post-featured-image__actions"
-										expanded={ false }
-									>
+									<HStack className="editor-post-featured-image__actions">
 										<Button
 											className="editor-post-featured-image__action"
 											onClick={ open }
-											icon={ pencilIcon }
-											label={ __( 'Replace' ) }
 											// Prefer that screen readers use the .editor-post-featured-image__preview button.
 											aria-hidden="true"
-										/>
+										>
+											{ __( 'Replace' ) }
+										</Button>
 										<Button
 											className="editor-post-featured-image__action"
 											onClick={ onRemoveImage }
-											icon={ trashIcon }
-											label={ __( 'Remove' ) }
-											aria-label={ __(
-												'Remove the image'
-											) }
-										/>
+										>
+											{ __( 'Remove' ) }
+										</Button>
 									</HStack>
 								) }
 								<DropZone onFilesDrop={ onDropFiles } />
