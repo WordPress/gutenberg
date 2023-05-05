@@ -39,7 +39,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_interactivity_scripts', 10
  * @return string The modified script tag.
  */
 function gutenberg_interactivity_scripts_add_defer_attribute( $tag, $handle ) {
-	if ( 0 === strpos( $handle, 'wp-interactivity-' ) ) {
+	if ( str_starts_with( $handle, 'wp-interactivity-' ) ) {
 		$p = new WP_HTML_Tag_Processor( $tag );
 		$p->next_tag( array( 'tag' => 'script' ) );
 		$p->set_attribute( 'defer', true );
