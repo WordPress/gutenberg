@@ -16,6 +16,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -46,45 +47,44 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	return (
-		<Iframe
-			expand={ isZoomOutMode }
-			scale={ ( isZoomOutMode && 0.45 ) || undefined }
-			frameSize={ isZoomOutMode ? 100 : undefined }
-			style={ enableResizing ? {} : deviceStyles }
-			ref={ mouseMoveTypingRef }
-			name="editor-canvas"
-			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
+	const getIframeProps = () => {
+		const iframeProps = {
+			expand: isZoomOutMode,
+			scale: ( isZoomOutMode && 0.45 ) || undefined,
+			frameSize: isZoomOutMode ? 100 : undefined,
+			style: enableResizing ? {} : deviceStyles,
+			ref: mouseMoveTypingRef,
+			name: 'editor-canvas',
+			className: classnames( 'edit-site-visual-editor__editor-canvas', {
 				'is-focused': isFocused && canvasMode === 'view',
-			} ) }
-			{ ...props }
-			role={ canvasMode === 'view' ? 'button' : undefined }
-			tabIndex={ canvasMode === 'view' ? 0 : undefined }
-			aria-label={ canvasMode === 'view' ? 'Editor Canvas' : undefined }
-			onFocus={
-				canvasMode === 'view' ? () => setIsFocused( true ) : undefined
-			}
-			onBlur={
-				canvasMode === 'view' ? () => setIsFocused( false ) : undefined
-			}
-			onKeyDown={
-				canvasMode === 'view'
-					? ( event ) => {
-							const { keyCode } = event;
-							if ( keyCode === ENTER || keyCode === SPACE ) {
-								event.preventDefault();
-								setCanvasMode( 'edit' );
-							}
-					  }
-					: undefined
-			}
-			onClick={
-				canvasMode === 'view'
-					? () => setCanvasMode( 'edit' )
-					: undefined
-			}
-			readonly={ canvasMode === 'view' }
-		>
+			} ),
+			...props,
+		};
+
+		if ( canvasMode === 'view' ) {
+			iframeProps[ 'aria-label' ] = __( 'Editor Canvas' );
+			return Object.assign( {}, iframeProps, {
+				role: 'button',
+				tabIndex: 0,
+				onFocus: () => setIsFocused( true ),
+				onBlur: () => setIsFocused( false ),
+				onKeyDown: ( event ) => {
+					const { keyCode } = event;
+					if ( keyCode === ENTER || keyCode === SPACE ) {
+						event.preventDefault();
+						setCanvasMode( 'edit' );
+					}
+				},
+				onClick: () => setCanvasMode( 'edit' ),
+				readonly: true,
+			} );
+		}
+
+		return iframeProps;
+	};
+
+	return (
+		<Iframe { ...getIframeProps() }>
 			<EditorStyles styles={ settings.styles } />
 			<style>{
 				// Forming a "block formatting context" to prevent margin collapsing.
