@@ -79,11 +79,7 @@ export default function ModalEdit( props ) {
 					shouldCloseOnClickOutside={ false }
 					overlayClassName="block-editor-freeform-modal"
 				>
-					<ClassicEdit
-						id={ id }
-						defaultValue={ content }
-						className="block-editor-freeform-modal__textarea"
-					/>
+					<ClassicEdit id={ id } defaultValue={ content } />
 					<Flex
 						className="block-editor-freeform-modal__actions"
 						justify="flex-end"
