@@ -109,19 +109,9 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		let elementType;
-		switch ( blockName ) {
-			case blockNames.cover:
-				elementType = 'XCUIElementTypeButton';
-				break;
-			default:
-				elementType = 'XCUIElementTypeOther';
-				break;
-		}
-
 		const blockLocator = isAndroid()
 			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-			: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[2]`;
+			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[2]`;
 
 		await waitForVisible( this.driver, blockLocator );
 
