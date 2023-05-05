@@ -9,6 +9,9 @@ export { store } from './store';
  * Initialize the Interactivity API.
  */
 registerDirectives();
-init();
-// eslint-disable-next-line no-console
-console.log( 'Interactivity API started' );
+
+document.addEventListener( 'DOMContentLoaded', async () => {
+	await init();
+	// eslint-disable-next-line no-console
+	console.log( 'Interactivity API started' );
+} );
