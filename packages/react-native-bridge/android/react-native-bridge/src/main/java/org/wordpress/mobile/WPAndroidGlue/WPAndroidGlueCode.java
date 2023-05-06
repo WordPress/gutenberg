@@ -100,6 +100,7 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private OnGutenbergDidRequestEmbedFullscreenPreviewListener mOnGutenbergDidRequestEmbedFullscreenPreviewListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
@@ -178,6 +179,10 @@ public class WPAndroidGlueCode {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
+    public interface OnEmbedFullscreenPreviewListener {
+        void onEmbedFullscreenPreviewClicked(String html, String title);
+    }
+
     public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
     }
@@ -208,6 +213,10 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+
+    public interface OnGutenbergDidRequestEmbedFullscreenPreviewListener {
+        void gutenbergDidRequestEmbedFullscreenPreview(String html, String title);
     }
 
     public interface OnGutenbergDidSendButtonPressedActionListener {
@@ -443,7 +452,12 @@ public class WPAndroidGlueCode {
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
-
+/*
+            @Override
+            public void requestEmbedFullscreenPreview(String html, String title) {
+                mOnEmbedFullscreenPreviewListener.onEmbedFullscreenPreviewClicked(html, title);
+            }
+*/
             @Override
             public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
                 mMediaPickedByUserOnBlock = true;
@@ -460,6 +474,12 @@ public class WPAndroidGlueCode {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
                 mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
                         gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
+            }
+
+            public void gutenbergDidRequestEmbedFullscreenPreview(String html, String title) {
+                Log.d( "embed_wv", "Glue code: gutenbergDidRequestEmbedFullscreenPreview" );
+                mOnGutenbergDidRequestEmbedFullscreenPreviewListener.
+                        gutenbergDidRequestEmbedFullscreenPreview(html, title);
             }
 
             @Override
@@ -647,6 +667,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
+                                  OnGutenbergDidRequestEmbedFullscreenPreviewListener onGutenbergDidRequestEmbedFullscreenPreviewListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
@@ -669,6 +690,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
+        mOnGutenbergDidRequestEmbedFullscreenPreviewListener = onGutenbergDidRequestEmbedFullscreenPreviewListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mShowSuggestionsUtil = showSuggestionsUtil;
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
