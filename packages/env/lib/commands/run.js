@@ -62,7 +62,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 
 	// We need to pass absolute paths to the container.
 	envCwd = path.resolve(
-		// Note: mysql doesn't have the /var/www/html construct.
+		// Not all containers have the same starting working directory.
 		container === 'mysql' || container === 'tests-mysql'
 			? '/'
 			: '/var/www/html',
