@@ -97,18 +97,21 @@
 
 .edit-post-editor__list-view-overview {
 	display: flex;
-	flex-direction: column;
 	gap: $grid-unit-10;
 	border-bottom: $border-width solid $gray-300;
 	padding: $grid-unit-20;
 
-	& > div > span:first-child {
+	& > div > p {
+		margin-top: 0;
+	}
+
+	& > div > p > span:first-child {
 		// Width of the text information fields.
 		width: 90px;
 		display: inline-block;
 	}
 
-	& > div > span {
+	& > div > p > span {
 		font-size: $helptext-font-size;
 		line-height: $default-line-height;
 		color: $gray-700;
