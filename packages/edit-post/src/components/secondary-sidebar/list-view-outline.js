@@ -74,30 +74,34 @@ export default function ListViewOutline() {
 		<>
 			<div className="edit-post-editor__list-view-overview">
 				<div>
-					<Text>{ __( 'Characters:' ) }</Text>
-					<Text>
-						<CharacterCount />
-					</Text>
+					<p>
+						<Text>{ __( 'Characters:' ) }</Text>
+						<Text>
+							<CharacterCount />
+						</Text>
+					</p>
+					<p>
+						<Text>{ __( 'Words:' ) }</Text>
+						<WordCount />
+					</p>
+					<p>
+						<Text>{ __( 'Time to read:' ) }</Text>
+						<TimeToRead />
+					</p>
 				</div>
 				<div>
-					<Text>{ __( 'Words:' ) }</Text>
-					<WordCount />
-				</div>
-				<div>
-					<Text>{ __( 'Time to read:' ) }</Text>
-					<TimeToRead />
-				</div>
-				<div>
-					<Text>{ __( 'Headings:' ) }</Text>
-					{ headingCount }
-				</div>
-				<div>
-					<Text>{ __( 'Paragraphs:' ) }</Text>
-					{ paragraphCount }
-				</div>
-				<div>
-					<Text>{ __( 'Blocks:' ) }</Text>
-					{ blockCount }
+					<p>
+						<Text>{ __( 'Headings:' ) }</Text>
+						{ headingCount }
+					</p>
+					<p>
+						<Text>{ __( 'Paragraphs:' ) }</Text>
+						{ paragraphCount }
+					</p>
+					<p>
+						<Text>{ __( 'Blocks:' ) }</Text>
+						{ blockCount }
+					</p>
 				</div>
 			</div>
 			{ headingCount > 0 ? (
