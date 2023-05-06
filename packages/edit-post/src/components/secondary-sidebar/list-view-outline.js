@@ -57,12 +57,19 @@ function EmptyOutlineIllustration() {
 }
 
 export default function ListViewOutline() {
-	const { headingCount } = useSelect( ( select ) => {
-		const { getGlobalBlockCount } = select( blockEditorStore );
-		return {
-			headingCount: getGlobalBlockCount( 'core/heading' ),
-		};
-	}, [] );
+	const { headingCount, paragraphCount, blockCount } = useSelect(
+		( select ) => {
+			const { getGlobalBlockCount, getBlocks } =
+				select( blockEditorStore );
+			const blocks = getBlocks();
+			return {
+				headingCount: getGlobalBlockCount( 'core/heading' ),
+				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
+				blockCount: blocks.length ? blocks.length : 0,
+			};
+		},
+		[]
+	);
 	return (
 		<>
 			<div className="edit-post-editor__list-view-overview">
@@ -79,6 +86,18 @@ export default function ListViewOutline() {
 				<div>
 					<Text>{ __( 'Time to read:' ) }</Text>
 					<TimeToRead />
+				</div>
+				<div>
+					<Text>{ __( 'Headings:' ) }</Text>
+					{ headingCount }
+				</div>
+				<div>
+					<Text>{ __( 'Paragraphs:' ) }</Text>
+					{ paragraphCount }
+				</div>
+				<div>
+					<Text>{ __( 'Blocks:' ) }</Text>
+					{ blockCount }
 				</div>
 			</div>
 			{ headingCount > 0 ? (
