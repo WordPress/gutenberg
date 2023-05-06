@@ -63,12 +63,10 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 	// We need to pass absolute paths to the container.
 	envCwd = path.resolve( '/var/www/html', envCwd );
 
-	const isTTY = process.stdout.isTTY;
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
-		'exec',
-		! isTTY ? '--no-TTY' : '',
+		'run',
 		'-w',
 		envCwd,
 		'--user',

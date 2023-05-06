@@ -5,7 +5,7 @@
 ### Breaking Change
 
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
-between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+    between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 
 ### New feature
 
@@ -17,10 +17,6 @@ between the host, web container, and cli container. If you still encounter permi
 ### Bug fix
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
-
-### Enhancement
-
--   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
 
 ## 6.0.0 (2023-04-26)
 
