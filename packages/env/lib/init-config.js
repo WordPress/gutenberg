@@ -150,10 +150,7 @@ RUN groupadd -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
-${ installDependencies( 'wordpress', config ) }
-
-
-`;
+${ installDependencies( 'wordpress', config ) }`;
 }
 
 /**
