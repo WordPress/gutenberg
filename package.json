@@ -281,7 +281,7 @@
 		"lint:lockfile": "node ./bin/validate-package-lock.js",
 		"lint:tsconfig": "node ./bin/validate-tsconfig.mjs",
 		"lint:md:docs": "wp-scripts lint-md-docs",
-		"prelint:php": "wp-env run --env-cwd=\"wp-content/plugins/gutenberg\" cli composer \"update --no-interaction\"",
+		"prelint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
 		"lint:php": "wp-env run --env-cwd=\"wp-content/plugins/gutenberg\" cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"native": "npm run --prefix packages/react-native-editor",
