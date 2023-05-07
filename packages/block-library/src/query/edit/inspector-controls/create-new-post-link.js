@@ -14,11 +14,9 @@ const CreateNewPostLink = ( {
 	} );
 	return (
 		<div className="wp-block-query__create-new-link">
-			{ createInterpolateElement(
-				__( '<a>Add new post</a>' ),
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
-				{ a: <a href={ newPostUrl } /> }
-			) }
+			{ createInterpolateElement( __( '<a>Add new post</a>' ), {
+				a: <a href={ newPostUrl } />,
+			} ) }
 		</div>
 	);
 };
