@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../a11y-anchor-has-content';
+import rule from '../jsx-a11y-anchor-has-content';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -18,9 +18,10 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'a11y-anchor-has-content', rule, {
+ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 	valid: [
 		{
+			name: `Valid anchor with text content`,
 			code: `
 			( ) => {
 				( <div>
@@ -32,6 +33,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
+			name: `Valid anchor with text content and an extra attribute`,
 			code: `
 			( ) => {
 				( <div>
@@ -42,8 +44,8 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 			   )
 		   };`,
 		},
-		// Anchor with a custom component as content. It may or may not be valid. No errors are triggered.
 		{
+			name: `Valid anchor with a custom component as content.`,
 			code: `
 			( ) => {
 				( <div>
@@ -55,7 +57,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			// Anchor without createInterpolateElement
+			name: `Valid anchor without using createInterpolateElement`,
 			code: `
 			( ) => {
 				( <div>
@@ -65,7 +67,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			// ⚠️ This is invalid code that would get flagged by jsx-a11y/anchor-is-valid, but NOT by eslint-plugin-jsx-a11y/anchor-has-content or @wordpress/a11-anchor-has-content.
+			name: `Invalid code, but out of scope for this rule (caught by jsx-a11y/anchor-has-content)`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -77,7 +79,7 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			// ⚠️ This passes the linter, but it's actually invalid code that would fail in runtime with createInterpolateElement due to missing the conversion map.
+			name: `Invalid usage of createInterpolateElement, ignored by the this rule`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -86,20 +88,39 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 			   )
 		   };`,
 		},
+		{
+			name: `Boro is a genius (the good kind, not evil)`,
+			code: `
+			const foo = ( ) => {
+				<div>
+				{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {} ) }
+			   </div>
+			};
+			const a = ( ) => {
+				(
+					<div>
+						createInterpolateElement( __( 'help me <foo>.' ), {
+							foo: <foo />,
+						} )
+				   </div>
+			   )
+		   };`,
+		},
 	],
 	invalid: [
 		{
+			name: `Empty anchor without using createInterpolateElement (error comes from eslint-plugin-jsx-a11y/anchor-has-content)`,
 			code: `
-			<a ></a>`,
+			<a></a>`,
 			errors: [
 				{
-					// Linter failure and message by eslint-plugin-jsx-a11y/anchor-has-content.
 					message:
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
 			],
 		},
 		{
+			name: `Empty anchor wrapped in another element (error comes from eslint-plugin-jsx-a11y/anchor-has-content)`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -109,13 +130,13 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					// Linter failure and message by eslint-plugin-jsx-a11y/anchor-has-content.
 					message:
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
 			],
 		},
 		{
+			name: `Empty anchor content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -127,12 +148,12 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'anchorHasContent',
 				},
 			],
 		},
 		{
+			name: `Invalid anchor markup, with empty content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -144,12 +165,12 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'invalidMarkup',
 				},
 			],
 		},
 		{
+			name: `Invalid anchor markup, with content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
 			const a = ( ) => {
 				( <div>
@@ -161,7 +182,6 @@ ruleTester.run( 'a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					// Linter failure and messageId set by @wordpress/a11y-anchor-has-content.
 					messageId: 'invalidMarkup',
 				},
 			],
