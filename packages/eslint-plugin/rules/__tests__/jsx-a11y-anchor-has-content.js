@@ -89,22 +89,52 @@ ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 		   };`,
 		},
 		{
-			name: `Boro is a genius (the good kind, not evil)`,
+			name: `3 custom components through createInterpolateElement, all with valid anchors`,
 			code: `
-			const foo = ( ) => {
-				<div>
-				{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {} ) }
-			   </div>
-			};
-			const a = ( ) => {
-				(
+			import {
+				createInterpolateElement,
+			} from '@wordpress/element';
+			import { __ } from '@wordpress/i18n';
+			const withTranslate = ( ) => {
+				return (
 					<div>
-						createInterpolateElement( __( 'help me <foo>.' ), {
-							foo: <foo />,
-						} )
-				   </div>
-			   )
-		   };`,
+						{ createInterpolateElement( __( 'I am a <a>good anchor</a>.' ), {
+							a: <a href="example.com"/>,
+						} ) }
+					</div>
+				)
+			}
+			const usesWithTranslate = ( ) => {
+				return (
+					<div>
+						{ createInterpolateElement( __( 'A <a>good anchor</a>. <withTranslate/>' ), {
+							a: <a href="example.com"/>,
+							withTranslate: <withTranslate />
+						} ) }
+					</div>
+				)
+			};
+
+			const withoutTranslateTwoLevels = ( ) => {
+				return (
+					<div>
+						{ createInterpolateElement(
+								'I have <usesWithTranslate />. And <a>Non empty anchor</a>', {
+								usesWithTranslate: <usesWithTranslate />,
+								a: <a href="hello.com"/>,
+							} )
+						}
+					</div>
+				)
+			};
+
+			export default function hello( {
+			} ) {
+				return (
+					<withoutTranslateTwoLevels></withoutTranslateTwoLevels>
+				);
+			}
+			`,
 		},
 	],
 	invalid: [
@@ -183,6 +213,64 @@ ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 			errors: [
 				{
 					messageId: 'invalidMarkup',
+				},
+			],
+		},
+		{
+			name: `3 custom components through createInterpolateElement, 2 have invalid anchors`,
+			code: `
+			import {
+				createInterpolateElement,
+			} from '@wordpress/element';
+			import { __ } from '@wordpress/i18n';
+			const failWithTranslate = ( ) => {
+				return (
+					<div>
+						{ createInterpolateElement( __( 'My content is empty <a></a>.' ), {
+							a: <a href="hello.com"/>,
+						} ) }
+					</div>
+				)
+			}
+			const okUsesWithTranslate = ( ) => {
+				return (
+					<div>
+						{ createInterpolateElement( __( 'This one anchor <a> has content</a>. <failWithTranslate/>' ), {
+							a: <a href="hello.com"/>,
+							failWithTranslate: <failWithTranslate />
+						} ) }
+					</div>
+				)
+			};
+
+			const failWithoutTranslateTwoLevels = ( ) => {
+				return (
+					<div>
+						{ createInterpolateElement(
+								'This one with <okUsesWithTranslate /> has an empty anchor <a></a>', {
+								okUsesWithTranslate: <okUsesWithTranslate />,
+								a: <a href="hello.com"/>,
+							} )
+						}
+					</div>
+				)
+			};
+
+			export default function hello( {
+			} ) {
+				return (
+					<failWithoutTranslateTwoLevels></failWithoutTranslateTwoLevels>
+				);
+			}
+			`,
+			errors: [
+				{
+					messageId: 'anchorHasContent',
+					data: { nodeType: 'CallExpression' },
+				},
+				{
+					messageId: 'anchorHasContent',
+					data: { nodeType: 'Literal' },
 				},
 			],
 		},
