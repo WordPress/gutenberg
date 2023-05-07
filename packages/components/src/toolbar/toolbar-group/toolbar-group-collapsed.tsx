@@ -21,7 +21,7 @@ function ToolbarGroupCollapsed( {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	const renderDropdownMenu = (
-		internalToggleProps?: Record< string, any > // ExtractHTMLAttributes<any>
+		internalToggleProps?: Record< string, any >
 	) => (
 		<DropdownMenu
 			controls={ controls }
@@ -35,8 +35,7 @@ function ToolbarGroupCollapsed( {
 
 	if ( accessibleToolbarState ) {
 		return (
-			// <ToolbarItem children={ renderDropdownMenu } />
-			// <ToolbarItem { ...toggleProps } children={renderDropdownMenu}/>
+			// @ts-ignore
 			<ToolbarItem { ...toggleProps }>{ renderDropdownMenu }</ToolbarItem>
 		);
 	}
