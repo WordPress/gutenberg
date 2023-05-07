@@ -18,7 +18,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
+ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 	valid: [
 		{
 			name: `Valid anchor with text content`,
@@ -31,6 +31,7 @@ ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 				   </div>
 			   )
 		   };`,
+			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 		{
 			name: `Valid anchor with text content and an extra attribute`,
@@ -148,6 +149,8 @@ ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
 			],
+
+			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 		{
 			name: `Empty anchor wrapped in another element (error comes from eslint-plugin-jsx-a11y/anchor-has-content)`,
@@ -273,6 +276,57 @@ ruleTester.run( 'jsx-a11y-anchor-has-content', rule, {
 					data: { nodeType: 'Literal' },
 				},
 			],
+		},
+
+		{
+			name: `Empty anchor through custom component MyAnchor used in createInterpolateElement`,
+			code: `
+			//MyAnchor.js
+			import MyAnchor from './MyAnchor';
+			//some other file
+			export default function hello( {
+			} ) {
+				return (
+					<div>
+					{
+						createInterpolateElement(
+							'<MyAnchor></MyAnchor>',
+							{
+								MyAnchor: (
+									<MyAnchor href="https://gravatar.com/" />
+								),
+							}
+						)
+					}
+					</div>
+				);
+			}`,
+			errors: [
+				{
+					messageId: 'anchorHasContent',
+				},
+			],
+			options: [ { components: [ 'MyAnchor' ] } ],
+		},
+		{
+			name: `Empty anchor through custom component configured in rules (MyAnchor) should fail`,
+			code: `
+			import MyAnchor from './MyAnchor';
+			//some other file
+
+			export default function hello( {
+			} ) {
+				return (
+					<MyAnchor></MyAnchor>
+				);
+			}`,
+			errors: [
+				{
+					message:
+						'Anchors must have content and the content must be accessible by a screen reader.',
+				},
+			],
+			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 	],
 } );

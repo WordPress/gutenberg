@@ -35,18 +35,35 @@ const meta = {
 		invalidMarkup:
 			'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
 	},
-	schema: [], // no options
+	schema: [
+		{
+			type: 'object',
+			properties: {
+				components: {
+					type: 'array',
+					items: {
+						type: 'string',
+					},
+					uniqueItems: true,
+					additionalItems: false,
+				},
+			},
+		},
+	],
 };
 
 /**
  *
- * @param {string} tags markup used in createInterpolateElement
- * @return {Array} an array of the content of the <a> tags
+ * @param {*} tags     markup used in createInterpolateElement
+ * @param {*} tagNames names that we recognize as anchors, as configured in the eslint rules
+ * @return {Array} tagNames an array of the content of the <a> (or other) tags
  */
-const getATagsContent = ( tags ) => {
-	const tagParts = [ ...tags.matchAll( /<a>(.*?)<\/a>/g ) ];
+const getATagsContent = ( tags, tagNames ) => {
+	const tagText = tagNames.join( '|' );
+	const regex = new RegExp( `<(${ tagText })>(.*?)</(${ tagText })>`, 'g' );
+	const tagParts = [ ...tags.matchAll( regex ) ];
 	return tagParts.map( ( element ) => {
-		return element[ 1 ].trim();
+		return element[ 2 ].trim();
 	} );
 };
 
@@ -81,10 +98,20 @@ const getValueFromInterpolateElement = ( node ) => {
 const rule = function ( context ) {
 	return {
 		JSXOpeningElement: ( node ) => {
-			if ( node?.name?.name !== 'a' ) {
-				// bail - we only care about anchors
+			/**
+			 * Uses the custom components rules to determine if the node is an anchor or not.
+			 */
+			const options = context.options[ 0 ] || {};
+			const componentOptions = options.components || [];
+			const typeCheck = [ 'a' ].concat( componentOptions );
+			if (
+				typeCheck.filter( ( type ) => type === node?.name?.name )
+					.length === 0
+			) {
+				// bail - we only care about anchors and custom components configured through rules
 				return;
 			}
+
 			const interpolatedEl = context
 				.getAncestors()
 				.find(
@@ -105,7 +132,7 @@ const rule = function ( context ) {
 			if ( null === nodeStr ) {
 				return;
 			}
-			const tags = getATagsContent( nodeStr );
+			const tags = getATagsContent( nodeStr, typeCheck );
 			// if any of the anchors do not have content,
 			// we need to report an error like anchor-has-content does
 			tags.forEach( ( content ) => {
