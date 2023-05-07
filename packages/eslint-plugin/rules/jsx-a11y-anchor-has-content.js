@@ -8,7 +8,6 @@
  * External dependencies
  *
  * eslint-plugin-jsx-a11y/anchor-has-content: to create a wrapper around it, we need to use it
- * elementType from jsx-ast-utils: to get the type of the node we are working with.
  */
 const anchorRule = require( 'eslint-plugin-jsx-a11y' ).rules[
 	'anchor-has-content'
