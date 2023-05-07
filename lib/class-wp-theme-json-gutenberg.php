@@ -3612,6 +3612,10 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $values as $name => $value ) {
 					// if value is an array, do recursion.
 					if ( is_array( $value ) ) {
+						// make sure variations are included in the schema for recursion.
+						if ( isset( $value['variations'] ) ) {
+							$schema = $schema + array( 'variations' => null );
+						}
 						$values[ $name ] = array_merge( $value, self::sanitize_variables( $value, $schema ) );
 						continue;
 					}
