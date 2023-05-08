@@ -129,6 +129,8 @@ function gutenberg_get_remote_theme_patterns() {
  * Gets the styles resulting of merging core, theme, and user data.
  *
  * @since 5.9.0
+ * @since 6.3.0 the internal link format "var:preset|color|secondary" is resolved
+ * to "var(--wp--preset--font-size--small)" so consumers don't have to.
  *
  * @param array $path    Path to the specific style to retrieve. Optional.
  *                       If empty, will return all styles.
