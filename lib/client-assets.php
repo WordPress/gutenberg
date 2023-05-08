@@ -207,7 +207,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				if (
 					! $gutenberg_experiments ||
 					! array_key_exists( 'gutenberg-no-tinymce', $gutenberg_experiments ) ||
-					$_COOKIE[ 'requiresTinymce' ]
+					isset( $_COOKIE[ 'requiresTinymce' ] )
 				) {
 					array_push( $dependencies, 'editor' );
 				}

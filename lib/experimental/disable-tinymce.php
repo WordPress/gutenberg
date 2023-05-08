@@ -1,6 +1,6 @@
 <?php
 
-if ( $_COOKIE[ 'requiresTinymce' ] ) {
+if ( isset( $_COOKIE[ 'requiresTinymce' ] ) ) {
 	return;
 }
 
