@@ -21,7 +21,7 @@ if ( isset( $_COOKIE['requiresTinymce'] ) ) {
  * Disable TinyMCE by introducing a placeholder `_WP_Editors` class.
  */
 function gutenberg_disable_tinymce() {
-	require __DIR__ . '/wp-editors-class-placeholder.php';
+	require __DIR__ . '/class--wp-editors.php';
 }
 
 add_action( 'admin_init', 'gutenberg_disable_tinymce' );
