@@ -204,6 +204,7 @@ export class BlockList extends Component {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
+			rootClientId,
 			title,
 			header,
 			isReadOnly,
@@ -275,6 +276,9 @@ export class BlockList extends Component {
 					) }
 					data={ blockClientIds }
 					keyExtractor={ identity }
+					listKey={
+						rootClientId ? `list-${ rootClientId }` : 'list-root'
+					}
 					renderItem={ this.renderItem }
 					CellRendererComponent={ this.getCellRendererComponent }
 					shouldPreventAutomaticScroll={
@@ -305,7 +309,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -331,6 +335,7 @@ export class BlockList extends Component {
 		};
 		return (
 			<BlockListItem
+				index={ index }
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
@@ -421,6 +426,7 @@ export default compose( [
 					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
+				rootClientId,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
 				maxWidth,

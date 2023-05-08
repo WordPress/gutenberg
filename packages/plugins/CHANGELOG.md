@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0 (2023-04-26)
+
 ### Breaking Changes
 
 -   Publish types for `@wordpress/plugins` ([#49649](https://github.com/WordPress/gutenberg/pull/49649))

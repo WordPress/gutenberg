@@ -17,6 +17,7 @@ export { pasteIntoRichText } from './rich-text-paste';
 export { setupCoreBlocks } from './setup-core-blocks';
 export { setupMediaPicker } from './setup-media-picker';
 export { setupMediaUpload } from './setup-media-upload';
+export { setupPicker } from './setup-picker';
 export { changeTextOfTextInput } from './text-input-change-text';
 export { transformBlock } from './transform-block';
 export { triggerBlockListLayout } from './trigger-block-list-layout';

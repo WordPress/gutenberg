@@ -5,6 +5,7 @@ import { Children, cloneElement, useState, useMemo } from '@wordpress/element';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
+	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -25,10 +26,12 @@ import { store as editSiteStore } from '../../store';
  *
  * @return {string} Translated string corresponding to value of view. Default is ''.
  */
-export function getEditorCanvasContainerTitle( view ) {
+function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
+		case 'global-styles-revisions':
+			return __( 'Global styles revisions' );
 		default:
 			return '';
 	}
@@ -37,14 +40,13 @@ export function getEditorCanvasContainerTitle( view ) {
 // Creates a private slot fill.
 const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const SLOT_FILL_NAME = 'EditSiteEditorCanvasContainerSlot';
-const { Slot: EditorCanvasContainerSlot, Fill: EditorCanvasContainerFill } =
-	createPrivateSlotFill( SLOT_FILL_NAME );
+const {
+	privateKey,
+	Slot: EditorCanvasContainerSlot,
+	Fill: EditorCanvasContainerFill,
+} = createPrivateSlotFill( SLOT_FILL_NAME );
 
-function EditorCanvasContainer( {
-	children,
-	closeButtonLabel,
-	onClose = () => {},
-} ) {
+function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
@@ -61,7 +63,9 @@ function EditorCanvasContainer( {
 		[ editorCanvasContainerView ]
 	);
 	function onCloseContainer() {
-		onClose();
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
@@ -89,27 +93,36 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const shouldShowCloseButton = onClose || closeButtonLabel;
+
 	return (
 		<EditorCanvasContainerFill>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<section
 				className="edit-site-editor-canvas-container"
-				ref={ focusOnMountRef }
+				ref={ shouldShowCloseButton ? focusOnMountRef : null }
 				onKeyDown={ closeOnEscape }
 				aria-label={ title }
 			>
-				<Button
-					className="edit-site-editor-canvas-container__close-button"
-					icon={ closeSmall }
-					label={ closeButtonLabel || __( 'Close' ) }
-					onClick={ onCloseContainer }
-					showTooltip={ false }
-				/>
+				{ shouldShowCloseButton && (
+					<Button
+						className="edit-site-editor-canvas-container__close-button"
+						icon={ closeSmall }
+						label={ closeButtonLabel || __( 'Close' ) }
+						onClick={ onCloseContainer }
+						showTooltip={ false }
+					/>
+				) }
 				{ childrenWithProps }
 			</section>
 		</EditorCanvasContainerFill>
 	);
 }
+function useHasEditorCanvasContainer() {
+	const fills = useSlotFills( privateKey );
+	return !! fills?.length;
+}
 
 EditorCanvasContainer.Slot = EditorCanvasContainerSlot;
 export default EditorCanvasContainer;
+export { useHasEditorCanvasContainer, getEditorCanvasContainerTitle };

@@ -75,7 +75,7 @@ function SelectedBlockPopover( {
 	);
 	const isToolbarForced = useRef( false );
 	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
-		useShouldContextualToolbarShow( clientId );
+		useShouldContextualToolbarShow();
 
 	const { stopTyping } = useDispatch( blockEditorStore );
 

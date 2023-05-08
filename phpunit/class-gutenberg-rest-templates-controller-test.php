@@ -62,35 +62,43 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertSame( 'index', $response->get_data()['slug'], 'Should fallback to `index.html`.' );
 	}
 
-	public function test_context_param() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_context_param() {}
 
-	public function test_get_items() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_items() {}
 
-	public function test_get_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item() {}
 
-	public function test_create_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_create_item() {}
 
-	public function test_update_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_update_item() {}
 
-	public function test_delete_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_delete_item() {}
 
-	public function test_prepare_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_prepare_item() {}
 
-	public function test_get_item_schema() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item_schema() {}
 }

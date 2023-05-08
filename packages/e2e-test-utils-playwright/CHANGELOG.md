@@ -2,4 +2,4 @@
 
 ## Unreleased
 
--- Initial version of the package.
+- Initial version of the package.
