@@ -452,12 +452,7 @@ public class WPAndroidGlueCode {
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
-/*
-            @Override
-            public void requestEmbedFullscreenPreview(String html, String title) {
-                mOnEmbedFullscreenPreviewListener.onEmbedFullscreenPreviewClicked(html, title);
-            }
-*/
+
             @Override
             public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
                 mMediaPickedByUserOnBlock = true;
@@ -477,7 +472,6 @@ public class WPAndroidGlueCode {
             }
 
             public void gutenbergDidRequestEmbedFullscreenPreview(String html, String title) {
-                Log.d( "embed_wv", "Glue code: gutenbergDidRequestEmbedFullscreenPreview" );
                 mOnGutenbergDidRequestEmbedFullscreenPreviewListener.
                         gutenbergDidRequestEmbedFullscreenPreview(html, title);
             }

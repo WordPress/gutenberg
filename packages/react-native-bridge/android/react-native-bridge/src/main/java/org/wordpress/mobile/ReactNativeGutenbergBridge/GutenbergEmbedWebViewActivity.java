@@ -40,7 +40,6 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
         }
     };
 
-
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +54,8 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
         // Set settings
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptThirdPartyCookies(mWebView, true);
+        //CookieManager cookieManager = CookieManager.getInstance();
+        //cookieManager.setAcceptThirdPartyCookies(mWebView, true);
 
         // Setup WebView client
         setupWebViewClient();
@@ -137,10 +135,9 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Center the embed with a black background;
-                // @TODO should this use the preferred color scheme?
                 String css = "body{margin:0;background:#000;display:flex;align-items:center;}";
                 String js = String.format("(()=>{const c='%s';const s=document.createElement('style');s.textContent=c;document.head.append(s);})()", css);
-                view.evaluateJavascript(js,null);
+                view.evaluateJavascript(js, null);
                 super.onPageStarted(view, url, favicon);
             }
         });
@@ -158,7 +155,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
     @Override
     public void finish() {
         runOnUiThread(() -> {
-            mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME); // not sure we need this;
+            mWebView.removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME);
             mWebView.clearHistory();
             mWebView.clearFormData();
             mWebView.clearCache(true);
@@ -170,7 +167,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable); // Not sure we add any callbacks, might not need this
+        mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
         super.onDestroy();
     }
 }
