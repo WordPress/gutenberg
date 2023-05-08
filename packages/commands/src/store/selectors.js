@@ -18,6 +18,7 @@ export const getGroups = createSelector(
 		),
 	( state ) => [ state.commands, state.commandLoaders ]
 );
+
 export const getCommands = createSelector(
 	( state, group ) => Object.values( state.commands[ group ] ?? {} ),
 	( state, group ) => [ state.commands[ group ] ]
@@ -27,3 +28,7 @@ export const getCommandLoaders = createSelector(
 	( state, group ) => Object.values( state.commandLoaders[ group ] ?? {} ),
 	( state, group ) => [ state.commandLoaders[ group ] ]
 );
+
+export function isOpen( state ) {
+	return state.isOpen;
+}
