@@ -1,15 +1,28 @@
-.edit-site-the-frame {
-	height: 100%;
+.edit-site-the-frame__inner {
 	position: relative;
-	&.resizing {
-		.edit-site-the-frame__content {
-			pointer-events: none;
+
+	&.is-resizing {
+		@at-root {
+			body:has(&) {
+				user-select: none;
+				-webkit-user-select: none;
+			}
+		}
+
+		&::before {
+			// This covers the whole content which ensures mouse up triggers
+			// even if the content is "inert".
+			position: absolute;
+			z-index: 1;
+			inset: 0;
+			content: "";
 		}
 	}
 }
 
-.edit-site-the-frame__content {
+.edit-site-the-frame__inner-content {
 	position: absolute;
+	z-index: 0;
 	inset: 0;
 }
 
