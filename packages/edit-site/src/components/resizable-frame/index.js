@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
 	__unstableMotion as motion,
@@ -42,6 +42,10 @@ function ResizableFrame( { isFull, children } ) {
 		width: '100%',
 		height: '100%',
 	} );
+	const [
+		{ width: previousWidth, height: previousHeight },
+		setPreviousWidthHeight,
+	] = useState( { width: undefined, height: undefined } );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
@@ -49,20 +53,35 @@ function ResizableFrame( { isFull, children } ) {
 	const initialAspectRatioRef = useRef( null );
 	const initialComputedWidthRef = useRef( null );
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
+	const frameRef = useRef( null );
 
-	// Calculate the frame size based on the window width as its resized.
-	const handleResize = ( event, direction, ref ) => {
-		const updatedWidth = ref.offsetWidth;
-		const updatedHeight = ref.offsetHeight;
-
+	useEffect( () => {
 		if ( initialComputedWidthRef.current === null ) {
-			initialComputedWidthRef.current = updatedWidth;
+			initialComputedWidthRef.current =
+				frameRef.current.resizable.offsetWidth;
 		}
 
 		// Set the initial aspect ratio if it hasn't been set yet.
 		if ( initialAspectRatioRef.current === null ) {
-			initialAspectRatioRef.current = updatedWidth / updatedHeight;
+			const initialWidth = frameRef.current.resizable.offsetWidth;
+			const initialHeight = frameRef.current.resizable.offsetHeight;
+
+			initialAspectRatioRef.current = initialWidth / initialHeight;
 		}
+	}, [] );
+
+	const handleResizeStart = ( _event, _direction, ref ) => {
+		setPreviousWidthHeight( {
+			width: ref.offsetWidth,
+			height: ref.offsetHeight,
+		} );
+
+		setIsResizing( true );
+	};
+
+	// Calculate the frame size based on the window width as its resized.
+	const handleResize = ( event, _direction, ref, delta ) => {
+		const updatedWidth = previousWidth + delta.width;
 
 		// Calculate the intermediate aspect ratio based on the current width.
 		const lerpFactor =
@@ -85,37 +104,37 @@ function ResizableFrame( { isFull, children } ) {
 		);
 		const newHeight = updatedWidth / intermediateAspectRatio;
 
-		setIsResizing( true );
+		// if ( event.clientX < 344 ) {
+		if ( updatedWidth > initialComputedWidthRef.current ) {
+			// const oversizeWidth = Math.max(
+			// 	initialComputedWidthRef.current +
+			// 		( updatedWidth - initialComputedWidthRef.current ) * 2,
+			// 	initialComputedWidthRef.current
+			// );
 
-		if ( event.clientX < 344 ) {
-			const oversizeWidth = Math.max(
-				initialComputedWidthRef.current +
-					( updatedWidth - initialComputedWidthRef.current ) / 2,
-				initialComputedWidthRef.current
-			);
-
-			setFrameSize( {
-				width: oversizeWidth,
-				height: '100%',
-			} );
 			setIsOversized( true );
 		} else {
-			setFrameSize( { width: updatedWidth, height: newHeight } );
 			setIsOversized( false );
 		}
+
+		setFrameSize( {
+			width: updatedWidth,
+			height: isOversized ? '100%' : newHeight,
+		} );
 	};
 
 	// Make the frame full screen when the user resizes it to the left.
-	const handleResizeStop = ( event ) => {
+	const handleResizeStop = ( event, _direction, _ref, delta ) => {
 		// Reset the initial aspect ratio if the frame is resized slightly
 		// above the sidebar but not far enough to trigger full screen.
-		if ( event.clientX < 344 && event.clientX > 200 ) {
+		if ( isOversized && event.clientX > 200 ) {
 			setFrameSize( { width: '100%', height: '100%' } );
 		}
 
 		// Trigger full screen if the frame is resized far enough to the left.
 		if ( event.clientX < 200 ) {
 			setCanvasMode( 'edit' );
+			setIsOversized( false );
 		}
 
 		setIsResizing( false );
@@ -124,6 +143,7 @@ function ResizableFrame( { isFull, children } ) {
 	return (
 		<ResizableBox
 			as={ motion.div }
+			ref={ frameRef }
 			initial={ false }
 			animate={ {
 				flexGrow: isFull ? 1 : 0,
@@ -146,7 +166,7 @@ function ResizableFrame( { isFull, children } ) {
 				bottomLeft: false,
 				topLeft: false,
 			} }
-			resizeRatio={ isOversized ? 1 : 2 }
+			resizeRatio={ 2 }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
@@ -179,15 +199,16 @@ function ResizableFrame( { isFull, children } ) {
 					/>
 				),
 			} }
+			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-the-frame__inner', {
-				resizing: isResizing,
+				'is-resizing': isResizing,
 				'is-oversized': isOversized,
 			} ) }
 		>
 			<motion.div
-				className="edit-site-the-frame__content"
+				className="edit-site-the-frame__inner-content"
 				animate={ {
 					borderRadius: isFull ? 0 : 8,
 				} }
