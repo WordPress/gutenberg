@@ -42,10 +42,7 @@ function ResizableFrame( { isFull, children } ) {
 		width: '100%',
 		height: '100%',
 	} );
-	const [
-		{ width: previousWidth, height: previousHeight },
-		setPreviousWidthHeight,
-	] = useState( { width: undefined, height: undefined } );
+	const [ previousWidth, setPreviousWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
@@ -55,27 +52,15 @@ function ResizableFrame( { isFull, children } ) {
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
 
+	// Remember frame dimensions on initial render.
 	useEffect( () => {
-		if ( initialComputedWidthRef.current === null ) {
-			initialComputedWidthRef.current =
-				frameRef.current.resizable.offsetWidth;
-		}
-
-		// Set the initial aspect ratio if it hasn't been set yet.
-		if ( initialAspectRatioRef.current === null ) {
-			const initialWidth = frameRef.current.resizable.offsetWidth;
-			const initialHeight = frameRef.current.resizable.offsetHeight;
-
-			initialAspectRatioRef.current = initialWidth / initialHeight;
-		}
+		const { offsetWidth, offsetHeight } = frameRef.current.resizable;
+		initialComputedWidthRef.current = offsetWidth;
+		initialAspectRatioRef.current = offsetWidth / offsetHeight;
 	}, [] );
 
 	const handleResizeStart = ( _event, _direction, ref ) => {
-		setPreviousWidthHeight( {
-			width: ref.offsetWidth,
-			height: ref.offsetHeight,
-		} );
-
+		setPreviousWidth( ref.offsetWidth );
 		setIsResizing( true );
 	};
 
@@ -104,7 +89,6 @@ function ResizableFrame( { isFull, children } ) {
 		);
 		const newHeight = updatedWidth / intermediateAspectRatio;
 
-		// if ( event.clientX < 344 ) {
 		if ( updatedWidth > initialComputedWidthRef.current ) {
 			// const oversizeWidth = Math.max(
 			// 	initialComputedWidthRef.current +
@@ -124,20 +108,26 @@ function ResizableFrame( { isFull, children } ) {
 	};
 
 	// Make the frame full screen when the user resizes it to the left.
-	const handleResizeStop = ( event, _direction, _ref, delta ) => {
-		// Reset the initial aspect ratio if the frame is resized slightly
-		// above the sidebar but not far enough to trigger full screen.
-		if ( isOversized && event.clientX > 200 ) {
-			setFrameSize( { width: '100%', height: '100%' } );
-		}
-
-		// Trigger full screen if the frame is resized far enough to the left.
-		if ( event.clientX < 200 ) {
-			setCanvasMode( 'edit' );
-			setIsOversized( false );
-		}
-
+	const handleResizeStop = ( event, _direction, ref ) => {
 		setIsResizing( false );
+
+		if ( ! isOversized ) {
+			return;
+		}
+
+		setIsOversized( false );
+
+		const remainingWidth =
+			ref.ownerDocument.documentElement.offsetWidth - ref.offsetWidth;
+
+		if ( remainingWidth > 200 ) {
+			// Reset the initial aspect ratio if the frame is resized slightly
+			// above the sidebar but not far enough to trigger full screen.
+			setFrameSize( { width: '100%', height: '100%' } );
+		} else {
+			// Trigger full screen if the frame is resized far enough to the left.
+			setCanvasMode( 'edit' );
+		}
 	};
 
 	return (
@@ -182,7 +172,7 @@ function ResizableFrame( { isFull, children } ) {
 					<motion.div
 						key="handle"
 						className="edit-site-the-frame__handle"
-						title="drag to resize"
+						title="Drag to resize"
 						initial={ {
 							opacity: 0,
 							left: 0,
