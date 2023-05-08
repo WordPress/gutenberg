@@ -50,6 +50,8 @@ export default function GlobalStylesSidebar() {
 		}
 	}, [ shouldClearCanvasContainerView ] );
 
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
@@ -69,11 +71,12 @@ export default function GlobalStylesSidebar() {
 							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
 							disabled={ shouldClearCanvasContainerView }
-							onClick={ () =>
+							onClick={ () => {
+								setIsListViewOpened( false );
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
-								)
-							}
+								);
+							} }
 						/>
 					</FlexItem>
 					<FlexItem>
