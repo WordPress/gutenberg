@@ -132,18 +132,26 @@ function ResizableFrame( { isFullWidth, children } ) {
 		}
 	};
 
+	const frameAnimationVariants = {
+		default: {
+			flexGrow: 0,
+			height: frameSize.height,
+		},
+		fullWidth: {
+			flexGrow: 1,
+			height: frameSize.height,
+		},
+	};
+
 	return (
 		<ResizableBox
 			as={ motion.div }
 			ref={ frameRef }
 			initial={ false }
-			animate={ {
-				flexGrow: isFullWidth ? 1 : 0,
-				height: frameSize.height,
-			} }
-			onAnimationComplete={ ( { flexGrow } ) => {
-				if ( flexGrow === 1 )
-					// `isFullWidth` is true
+			variants={ frameAnimationVariants }
+			animate={ isFullWidth ? 'fullWidth' : 'default' }
+			onAnimationComplete={ ( definition ) => {
+				if ( definition === 'fullWidth' )
 					setFrameSize( { width: '100%', height: '100%' } );
 			} }
 			transition={ FRAME_TRANSITION }
