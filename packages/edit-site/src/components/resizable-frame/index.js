@@ -93,12 +93,6 @@ function ResizableFrame( { isFull, children } ) {
 		const updatedWidth = previousWidth + delta.width;
 
 		if ( updatedWidth > initialComputedWidthRef.current ) {
-			// const oversizeWidth = Math.max(
-			// 	initialComputedWidthRef.current +
-			// 		( updatedWidth - initialComputedWidthRef.current ) * 2,
-			// 	initialComputedWidthRef.current
-			// );
-
 			setIsOversized( true );
 		} else {
 			setIsOversized( false );
@@ -116,7 +110,7 @@ function ResizableFrame( { isFull, children } ) {
 	};
 
 	// Make the frame full screen when the user resizes it to the left.
-	const handleResizeStop = ( event, _direction, ref ) => {
+	const handleResizeStop = ( _event, _direction, ref ) => {
 		setIsResizing( false );
 
 		if ( ! isOversized ) {
