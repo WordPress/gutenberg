@@ -66,7 +66,7 @@ function ResizableFrame( { isFullWidth, children } ) {
 		width: '100%',
 		height: '100%',
 	} );
-	const [ previousWidth, setPreviousWidth ] = useState();
+	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
@@ -84,19 +84,17 @@ function ResizableFrame( { isFullWidth, children } ) {
 	}, [] );
 
 	const handleResizeStart = ( _event, _direction, ref ) => {
-		setPreviousWidth( ref.offsetWidth );
+		// Remember the starting width so we don't have to get `ref.offsetWidth` on
+		// every resize event thereafter, which will cause layout thrashing.
+		setStartingWidth( ref.offsetWidth );
 		setIsResizing( true );
 	};
 
 	// Calculate the frame size based on the window width as its resized.
-	const handleResize = ( event, _direction, _ref, delta ) => {
-		const updatedWidth = previousWidth + delta.width;
+	const handleResize = ( _event, _direction, _ref, delta ) => {
+		const updatedWidth = startingWidth + delta.width;
 
-		if ( updatedWidth > initialComputedWidthRef.current ) {
-			setIsOversized( true );
-		} else {
-			setIsOversized( false );
-		}
+		setIsOversized( updatedWidth > initialComputedWidthRef.current );
 
 		setFrameSize( {
 			width: updatedWidth,
