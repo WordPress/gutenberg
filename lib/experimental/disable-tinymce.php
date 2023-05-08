@@ -28,21 +28,20 @@ add_action( 'admin_init', 'gutenberg_disable_tinymce' );
 
 /**
  * Enqueue TinyMCE proxy script.
- * Detects TinyMCE usage and sets the `requiresTinymce` cookie to stop disabling TinyMCE loading. 
+ * Detects TinyMCE usage and sets the `requiresTinymce` cookie to stop disabling TinyMCE loading.
  */
 function gutenberg_enqueue_tinymce_proxy() {
-	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js' , __FILE__ ) );
+	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js', __FILE__ ) );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
 
 /**
  * Example TinyMCE usage used for testing.
- * Uncomment the last line of this file to enable. 
+ * Uncomment the last line of this file to enable.
  */
 function gutenberg_test_tinymce_access() {
 	echo '<script type="text/javascript">const a = window.tinymce.$;</script>';
 }
 
-// Uncomment the following line to force an external TinyMCE usage.
-// add_action( 'admin_footer', 'gutenberg_test_tinymce_access' );
+// add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
