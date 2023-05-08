@@ -6,13 +6,15 @@
 
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
 between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+-   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
 
 ### New feature
 
--   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `wp-env start` and `wp-env clean`.
+-   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `npx wp-env start` and `npx wp-env clean`.
 -   Add a `WP_ENV_AFTER_SETUP` environment variable to override the `afterSetup` option.
--   Execute the `afterSetup` command on `wp-env start` after the environment is set up. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
--   Execute the `afterSetup` command on `wp-env clean`.
+-   Execute the `afterSetup` command on `npx wp-env start` after the environment is set up. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
+-   Execute the `afterSetup` command on `npx wp-env clean`.
+-   Globally install `composer` and the correct version of `phpunit` in all of the Docker containers.
 
 ### Bug fix
 
