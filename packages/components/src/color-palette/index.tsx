@@ -220,8 +220,6 @@ function UnforwardedColorPalette(
 		</DropdownContentWrapper>
 	);
 
-	const colordColor = colord( normalizedColorValue ?? '' );
-
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
@@ -258,41 +256,43 @@ function UnforwardedColorPalette(
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Flex
-							as={ 'button' }
-							ref={ customColorPaletteCallbackRef }
-							justify="space-between"
-							align="flex-start"
-							className="components-color-palette__custom-color"
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							aria-label={ customColorAccessibleLabel }
-							style={
-								showTransparentBackground( value )
-									? { color: '#000' }
-									: {
-											background: value,
-											color:
-												colordColor.contrast() >
-												colordColor.contrast( '#000' )
-													? '#fff'
-													: '#000',
-									  }
-							}
+							direction="column"
+							gap={ 0 }
+							as="div"
+							className="components-color-palette__custom-color__container"
 						>
 							<FlexItem
-								isBlock
-								as={ Truncate }
-								className="components-color-palette__custom-color-name"
-							>
-								{ buttonLabelName }
-							</FlexItem>
-							<FlexItem
-								as="span"
-								className="components-color-palette__custom-color-value"
-							>
-								{ valueWithoutLeadingHash }
-							</FlexItem>
+								as={ 'button' }
+								ref={ customColorPaletteCallbackRef }
+								className="components-color-palette__custom-color"
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								aria-label={ customColorAccessibleLabel }
+								style={
+									showTransparentBackground( value )
+										? {}
+										: {
+												background: value,
+										  }
+								}
+							/>
+							{ value && (
+								<>
+									<FlexItem
+										as={ Truncate }
+										className="components-color-palette__custom-color-name"
+									>
+										{ buttonLabelName }
+									</FlexItem>
+									<FlexItem
+										as={ 'span' }
+										className="components-color-palette__custom-color-value"
+									>
+										{ value }
+									</FlexItem>
+								</>
+							) }
 						</Flex>
 					) }
 				/>
