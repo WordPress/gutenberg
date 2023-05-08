@@ -74,7 +74,7 @@ function validateContainerExistence( container ) {
 		'cli',
 		'tests-cli',
 	];
-	if ( ! validContainers[ container ] ) {
+	if ( ! validContainers.includes( container ) ) {
 		throw new ValidationError(
 			`The '${ container }' container does not exist. Valid selections are: ${ validContainers.join(
 				', '
