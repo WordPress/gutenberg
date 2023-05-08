@@ -1,4 +1,4 @@
-.edit-site-the-frame__inner {
+.edit-site-resizable-frame__inner {
 	position: relative;
 
 	&.is-resizing {
@@ -20,13 +20,13 @@
 	}
 }
 
-.edit-site-the-frame__inner-content {
+.edit-site-resizable-frame__inner-content {
 	position: absolute;
 	z-index: 0;
 	inset: 0;
 }
 
-.edit-site-the-frame__handle {
+.edit-site-resizable-frame__handle {
 	position: absolute;
 	width: 5px;
 	height: 50px;
@@ -58,7 +58,7 @@
 		background-color: #3858e9;
 	}
 
-	.edit-site-the-frame__handle-label {
+	.edit-site-resizable-frame__handle-label {
 		border-radius: 2px;
 		background: #3858e9;
 		padding: 4px 8px;

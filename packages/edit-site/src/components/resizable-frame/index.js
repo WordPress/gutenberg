@@ -179,7 +179,7 @@ function ResizableFrame( { isFullWidth, children } ) {
 				left: ! isHovering ? null : (
 					<motion.div
 						key="handle"
-						className="edit-site-the-frame__handle"
+						className="edit-site-resizable-frame__handle"
 						title="Drag to resize"
 						initial={ {
 							opacity: 0,
@@ -200,13 +200,13 @@ function ResizableFrame( { isFullWidth, children } ) {
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
 			onResizeStop={ handleResizeStop }
-			className={ classnames( 'edit-site-the-frame__inner', {
+			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
 				'is-oversized': isOversized,
 			} ) }
 		>
 			<motion.div
-				className="edit-site-the-frame__inner-content"
+				className="edit-site-resizable-frame__inner-content"
 				animate={ {
 					borderRadius: isFullWidth ? 0 : 8,
 				} }
