@@ -38,6 +38,7 @@ export interface State {
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
+	themeGlobalStyleRevisions: Record< number, Object >;
 	undo: UndoState;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
@@ -1246,4 +1247,24 @@ export function getNavigationFallbackId(
 	state: State
 ): EntityRecordKey | undefined {
 	return state.navigationFallbackId;
+}
+
+/**
+ * Returns the revisions of the current global styles theme.
+ *
+ * @param state Data state.
+ *
+ * @return The current global styles.
+ */
+export function getCurrentThemeGlobalStylesRevisions(
+	state: State
+): Object | null {
+	const currentGlobalStylesId =
+		__experimentalGetCurrentGlobalStylesId( state );
+
+	if ( ! currentGlobalStylesId ) {
+		return null;
+	}
+
+	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }
