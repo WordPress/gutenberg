@@ -3578,7 +3578,7 @@ class WP_Theme_JSON_Gutenberg {
 		$prefix_len = strlen( $prefix );
 		$token_in   = '|';
 		$token_out  = '--';
-		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+		if ( 0 === strpos( $value, $prefix ) ) {
 			$unwrapped_name = str_replace(
 				$token_in,
 				$token_out,
@@ -3602,7 +3602,6 @@ class WP_Theme_JSON_Gutenberg {
 	private static function sanitize_variables( $tree, $schema ) {
 		$tree   = array_intersect_key( $tree, $schema );
 		$prefix = 'var:';
-
 		foreach ( $schema as $key => $data ) {
 			if ( ! isset( $tree[ $key ] ) ) {
 				continue;
@@ -3625,11 +3624,9 @@ class WP_Theme_JSON_Gutenberg {
 
 					$values[ $name ] = self::convert_custom_properties( $value );
 				}
+			} elseif ( ! is_string( $values ) || 0 !== strpos( $values, $prefix ) ) {
+				continue;
 			} else {
-				if ( ! is_string( $values ) || 0 !== strpos( $values, $prefix ) ) {
-					continue;
-				}
-
 				$values = self::convert_custom_properties( $values );
 			}
 
