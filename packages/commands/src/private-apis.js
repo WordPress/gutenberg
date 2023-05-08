@@ -8,6 +8,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
  */
 import { default as useCommand } from './hooks/use-command';
 import { default as useCommandLoader } from './hooks/use-command-loader';
+import { store } from './store';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -19,4 +20,5 @@ export const privateApis = {};
 lock( privateApis, {
 	useCommand,
 	useCommandLoader,
+	store,
 } );

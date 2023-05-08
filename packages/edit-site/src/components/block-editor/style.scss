@@ -29,8 +29,13 @@
 
 	.edit-site-visual-editor__editor-canvas {
 		height: 100%;
-		background: $white;
+
+		&.is-focused {
+			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+			outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
+		}
 	}
+
 
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {

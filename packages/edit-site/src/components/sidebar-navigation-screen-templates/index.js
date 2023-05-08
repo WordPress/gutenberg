@@ -74,7 +74,9 @@ export default function SidebarNavigationScreenTemplates() {
 		}
 	);
 	const sortedTemplates = templates ? [ ...templates ] : [];
-	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',

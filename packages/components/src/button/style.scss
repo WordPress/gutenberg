@@ -162,10 +162,12 @@
 		background: transparent;
 
 		&:hover:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
@@ -292,11 +294,9 @@
 
 		&.has-text {
 			justify-content: start;
-			padding-right: 12px;
-		}
-
-		&.has-text svg {
-			margin-right: $grid-unit-10;
+			padding-right: $grid-unit-15;
+			padding-left: $grid-unit-10;
+			gap: $grid-unit-05;
 		}
 
 		&.has-text .dashicon {
