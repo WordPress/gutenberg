@@ -61,7 +61,7 @@ function validateContainerExistence( container ) {
 	}
 	if ( container === 'composer' ) {
 		throw new ValidationError(
-			"The 'composer' container has been removed. Please use 'wp-env run cli composer' instead."
+			"The 'composer' container has been removed. Please use 'wp-env run cli --env-cwd=wp-content/path/to/plugin composer' instead."
 		);
 	}
 
