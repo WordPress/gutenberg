@@ -16,7 +16,8 @@ export async function saveSiteEditorEntities( this: Editor ) {
 	await this.page.click(
 		'role=region[name="Save panel"i] >> role=button[name="Save"i]'
 	);
-	await this.page.waitForSelector(
-		'role=region[name="Editor top bar"i] >> role=button[name="Saved"i][disabled]'
-	);
+	// A role selector cannot be used here because it needs to check that the `is-busy` class is not present.
+	await this.page.waitForSelector( '[aria-label="Saved"].is-busy', {
+		state: 'hidden',
+	} );
 }
