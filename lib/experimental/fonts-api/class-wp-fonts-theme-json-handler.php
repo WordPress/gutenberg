@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
+	return;
+}
+
 if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
 	/**
 	 * Register fonts defined in theme.json.
