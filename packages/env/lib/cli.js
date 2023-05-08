@@ -39,8 +39,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if ( error instanceof env.ValidationError ) {
-					// Error is a validation error. That means the user did something wrong.
+				if (
+					error instanceof env.ValidationError ||
+					error instanceof env.AfterSetupError
+				) {
+					// Error is a configuration error. That means the user did something wrong.
 					spinner.fail( error.message );
 					process.exit( 1 );
 				} else if (
@@ -124,6 +127,11 @@ module.exports = function cli() {
 				coerce: parseXdebugMode,
 				type: 'string',
 			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
 		},
 		withSpinner( env.start )
 	);
@@ -144,6 +152,11 @@ module.exports = function cli() {
 				describe: "Which environments' databases to clean.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
+			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
 			} );
 		},
 		withSpinner( env.clean )
@@ -174,6 +187,13 @@ module.exports = function cli() {
 		'run <container> [command..]',
 		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
 		( args ) => {
+			args.option( 'env-cwd', {
+				type: 'string',
+				requiresArg: true,
+				default: '.',
+				describe:
+					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
+			} );
 			args.positional( 'container', {
 				type: 'string',
 				describe: 'The container to run the command on.',
@@ -208,7 +228,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'install-path',
-		'Get the path where environment files are located.',
+		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
 		() => {},
 		withSpinner( env.installPath )
 	);

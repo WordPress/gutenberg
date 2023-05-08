@@ -218,13 +218,13 @@ const variations = [
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
-		name: 'pocketcasts',
+		name: 'pocket-casts',
 		title: 'Pocket Casts',
 		icon: embedPocketCastsIcon,
 		keywords: [ __( 'podcast' ), __( 'audio' ) ],
 		description: __( 'Embed a podcast player from Pocket Casts.' ),
 		patterns: [ /^https:\/\/pca.st\/\w+/i ],
-		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
+		attributes: { providerNameSlug: 'pocket-casts', responsive: true },
 	},
 	{
 		name: 'reddit',

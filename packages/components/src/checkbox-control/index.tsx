@@ -50,6 +50,7 @@ export function CheckboxControl(
 		checked,
 		indeterminate,
 		help,
+		id: idProp,
 		onChange,
 		...additionalProps
 	} = props;
@@ -81,8 +82,11 @@ export function CheckboxControl(
 		},
 		[ checked, indeterminate ]
 	);
-	const instanceId = useInstanceId( CheckboxControl );
-	const id = `inspector-checkbox-control-${ instanceId }`;
+	const id = useInstanceId(
+		CheckboxControl,
+		'inspector-checkbox-control',
+		idProp
+	);
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.checked );
 

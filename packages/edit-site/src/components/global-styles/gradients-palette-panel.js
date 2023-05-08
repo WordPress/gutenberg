@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
@@ -17,6 +18,7 @@ import Subtitle from './subtitle';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
 
 const noop = () => {};
 
@@ -63,6 +65,9 @@ export default function GradientPalettePanel( { name } ) {
 		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
 	];
 
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
+
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
@@ -76,6 +81,7 @@ export default function GradientPalettePanel( { name } ) {
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
+					popoverProps={ popoverProps }
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -88,6 +94,7 @@ export default function GradientPalettePanel( { name } ) {
 						onChange={ setDefaultGradients }
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelLevel={ 3 }
+						popoverProps={ popoverProps }
 					/>
 				) }
 			<PaletteEdit
@@ -99,6 +106,7 @@ export default function GradientPalettePanel( { name } ) {
 					'Custom gradients are empty! Add some gradients to create your own palette.'
 				) }
 				slugPrefix="custom-"
+				popoverProps={ popoverProps }
 			/>
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>

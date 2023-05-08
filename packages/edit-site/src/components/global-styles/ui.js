@@ -31,17 +31,14 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
-import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import { ScreenVariation } from './screen-variations';
-import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
-import ScreenEffects from './screen-effects';
+import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -111,33 +108,6 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 	);
 }
 
-function BlockStyleVariationsScreens( { name } ) {
-	const blockStyleVariations = useSelect(
-		( select ) => {
-			const { getBlockStyles } = select( blocksStore );
-			return getBlockStyles( name );
-		},
-		[ name ]
-	);
-	if ( ! blockStyleVariations?.length ) {
-		return null;
-	}
-
-	return blockStyleVariations.map( ( variation ) => (
-		<ContextScreens
-			key={ variation.name + name }
-			name={ name }
-			parentMenu={
-				'/blocks/' +
-				encodeURIComponent( name ) +
-				'/variations/' +
-				encodeURIComponent( variation.name )
-			}
-			variation={ variation.name }
-		/>
-	) );
-}
-
 function BlockStylesNavigationScreens( {
 	parentMenu,
 	blockStyles,
@@ -148,12 +118,12 @@ function BlockStylesNavigationScreens( {
 			key={ index }
 			path={ parentMenu + '/variations/' + style.name }
 		>
-			<ScreenVariation blockName={ blockName } style={ style } />
+			<ScreenBlock name={ blockName } variation={ style.name } />
 		</GlobalStylesNavigationScreen>
 	) );
 }
 
-function ContextScreens( { name, parentMenu = '', variation = '' } ) {
+function ContextScreens( { name, parentMenu = '' } ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -164,68 +134,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 
 	return (
 		<>
-			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
-				<ScreenTypography name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/text' }
-			>
-				<ScreenTypographyElement name={ name } element="text" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/link' }
-			>
-				<ScreenTypographyElement name={ name } element="link" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/heading' }
-			>
-				<ScreenTypographyElement name={ name } element="heading" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/caption' }
-			>
-				<ScreenTypographyElement name={ name } element="caption" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/button' }
-			>
-				<ScreenTypographyElement name={ name } element="button" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
-				<ScreenColors name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/palette' }
 			>
 				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
-				<ScreenFilters name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
-				<ScreenBorder name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
-				<ScreenEffects name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
-				<ScreenLayout name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
-				<ScreenCSS name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (
@@ -239,7 +151,7 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 	);
 }
 
-function GlobalStylesStyleBook( { onClose } ) {
+function GlobalStylesStyleBook() {
 	const navigator = useNavigator();
 	const { path } = navigator.location;
 	return (
@@ -257,7 +169,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
-			onClose={ onClose }
 		/>
 	);
 }
@@ -296,9 +207,13 @@ function GlobalStylesBlockLink() {
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
-function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+function GlobalStylesUI() {
 	const blocks = getBlockTypes();
-
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -314,6 +229,42 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 
 			<GlobalStylesNavigationScreen path="/blocks">
 				<ScreenBlockList />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography">
+				<ScreenTypography />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/text">
+				<ScreenTypographyElement element="text" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/link">
+				<ScreenTypographyElement element="link" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/heading">
+				<ScreenTypographyElement element="heading" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/caption">
+				<ScreenTypographyElement element="caption" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/button">
+				<ScreenTypographyElement element="button" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/colors">
+				<ScreenColors />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/layout">
+				<ScreenLayout />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/css">
+				<ScreenCSS />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (
@@ -335,16 +286,8 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 				/>
 			) ) }
 
-			{ blocks.map( ( block, index ) => {
-				return (
-					<BlockStyleVariationsScreens
-						key={ 'screens-block-styles-' + block.name + index }
-						name={ block.name }
-					/>
-				);
-			} ) }
-			{ isStyleBookOpened && (
-				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
+			{ 'style-book' === editorCanvasContainerView && (
+				<GlobalStylesStyleBook />
 			) }
 
 			<GlobalStylesActionMenu />

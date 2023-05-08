@@ -45,12 +45,11 @@ async function run() {
 		return;
 	}
 
-	const headBranch =
-		github.context.eventName === 'pull_request'
-			? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-			  ( github.context.payload as PullRequestEvent ).pull_request.head
-					.ref
-			: ref.replace( /^refs\/(heads|tag)\//, '' );
+	const isPR = github.context.eventName === 'pull_request';
+	const headBranch = isPR
+		? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+		  ( github.context.payload as PullRequestEvent ).pull_request.head.ref
+		: ref.replace( /^refs\/(heads|tag)\//, '' );
 
 	const label = core.getInput( 'label', { required: true } );
 	const issues = await api.fetchAllIssuesLabeledFlaky( label );
@@ -138,7 +137,11 @@ async function run() {
 					formattedTestResults,
 				} ),
 			} );
-		} else {
+		} else if (
+			! reportedIssue &&
+			// Don't create a flaky test issue if the test was run inside a PR.
+			! isPR
+		) {
 			issue = await api.createIssue( {
 				title: issueTitle,
 				body: renderIssueBody( {
@@ -151,42 +154,42 @@ async function run() {
 			} );
 		}
 
-		reportedIssues.push( {
-			testTitle,
-			testPath,
-			issueNumber: issue.number,
-			issueUrl: issue.html_url,
-		} );
-		core.info( `Reported flaky test to ${ issue.html_url }` );
+		if ( issue ) {
+			reportedIssues.push( {
+				testTitle,
+				testPath,
+				issueNumber: issue.number,
+				issueUrl: issue.html_url,
+			} );
+			core.info( `Reported flaky test to ${ issue.html_url }` );
+		}
 	}
 
 	if ( reportedIssues.length === 0 ) {
 		return;
 	}
 
-	const { html_url: commentUrl } =
-		github.context.eventName === 'pull_request'
-			? await api.createCommentOnPR(
-					// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-					( github.context.payload as PullRequestEvent ).number,
-					renderCommitComment( {
-						runURL,
-						reportedIssues,
-						commitSHA: (
-							github.context.payload as PullRequestEvent
-						 ).pull_request.head.sha,
-					} ),
-					isReportComment
-			  )
-			: await api.createCommentOnCommit(
-					github.context.sha,
-					renderCommitComment( {
-						runURL,
-						reportedIssues,
-						commitSHA: github.context.sha,
-					} ),
-					isReportComment
-			  );
+	const { html_url: commentUrl } = isPR
+		? await api.createCommentOnPR(
+				// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+				( github.context.payload as PullRequestEvent ).number,
+				renderCommitComment( {
+					runURL,
+					reportedIssues,
+					commitSHA: ( github.context.payload as PullRequestEvent )
+						.pull_request.head.sha,
+				} ),
+				isReportComment
+		  )
+		: await api.createCommentOnCommit(
+				github.context.sha,
+				renderCommitComment( {
+					runURL,
+					reportedIssues,
+					commitSHA: github.context.sha,
+				} ),
+				isReportComment
+		  );
 
 	core.info( `Reported the summary of the flaky tests to ${ commentUrl }` );
 }

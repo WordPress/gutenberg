@@ -23,6 +23,9 @@ import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreCmmandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -32,7 +35,6 @@ import Editor from '../editor';
 import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -43,7 +45,10 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
-import { useCommands } from '../../hooks/commands';
+
+const { useCommands } = unlock( coreCmmandsPrivateApis );
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -68,8 +73,8 @@ export default function Layout() {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
+	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
@@ -82,10 +87,10 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				hasFixedToolbar:
+					select( preferencesStore ).get( 'fixedToolbar' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -139,19 +144,11 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>
-				<SiteHub
-					ref={ hubRef }
-					className="edit-site-layout__hub"
-					style={ {
-						width:
-							isResizingEnabled && forcedWidth
-								? forcedWidth - 48
-								: undefined,
-					} }
-				/>
+				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
 
 				<AnimatePresence initial={ false }>
 					{ isEditorPage && canvasMode === 'edit' && (
@@ -176,7 +173,7 @@ export default function Layout() {
 								ease: 'easeOut',
 							} }
 						>
-							{ canvasMode === 'edit' && <Header /> }
+							<Header />
 						</NavigableRegion>
 					) }
 				</AnimatePresence>
@@ -255,7 +252,7 @@ export default function Layout() {
 								}
 							>
 								<NavigableRegion
-									ariaLabel={ __( 'Navigation sidebar' ) }
+									ariaLabel={ __( 'Navigation' ) }
 								>
 									<Sidebar />
 								</NavigableRegion>

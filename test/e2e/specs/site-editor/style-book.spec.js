@@ -111,7 +111,6 @@ test.describe( 'Style Book', () => {
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
 		await page.click( 'role=button[name="Heading block styles"]' );
-		await page.click( 'role=button[name="Typography styles"]' );
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )

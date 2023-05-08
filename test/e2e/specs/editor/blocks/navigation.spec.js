@@ -48,11 +48,8 @@ test.describe( 'Navigation block', () => {
 			// Check the markup of the block is correct.
 			await editor.publishPost();
 			const content = await editor.getEditedPostContent();
-			expect( content ).toBe(
-				`<!-- wp:navigation -->
-<!-- wp:page-list /-->
-<!-- /wp:navigation -->`
-			);
+
+			expect( content ).toMatch( /<!-- wp:navigation {"ref":\d+} \/-->/ );
 		} );
 
 		test( 'default to my only existing menu', async ( {
@@ -681,7 +678,7 @@ test.describe( 'Navigation block', () => {
 						name: 'Settings',
 					} )
 					.getByRole( 'heading', {
-						name: 'Link Settings',
+						name: 'Settings',
 					} )
 			).toBeVisible();
 

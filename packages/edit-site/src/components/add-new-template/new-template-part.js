@@ -8,17 +8,20 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useHistory } from '../routes';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
+import { unlock } from '../../private-apis';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 export default function NewTemplatePart( {
 	postType,
