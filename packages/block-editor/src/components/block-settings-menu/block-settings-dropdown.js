@@ -1,21 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	getBlockType,
-	serialize,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import {
-	Children,
-	cloneElement,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
@@ -23,13 +14,11 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import BlockIcon from '../block-icon';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
-import { useShowMoversGestures } from '../block-toolbar/utils';
 
 const noop = () => {};
 const POPOVER_PROPS = {
@@ -60,9 +49,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
-		isDistractionFree,
 		onlyBlock,
-		parentBlockType,
 		previousBlockClientId,
 		nextBlockClientId,
 		selectedBlockClientIds,
@@ -70,33 +57,18 @@ export function BlockSettingsDropdown( {
 		( select ) => {
 			const {
 				getBlockCount,
-				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
-				getSettings,
-				getBlockAttributes,
 			} = select( blockEditorStore );
-
-			const { getActiveBlockVariation } = select( blocksStore );
 
 			const _firstParentClientId =
 				getBlockRootClientId( firstBlockClientId );
-			const parentBlockName =
-				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				isDistractionFree: getSettings().isDistractionFree,
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
-				parentBlockType:
-					_firstParentClientId &&
-					( getActiveBlockVariation(
-						parentBlockName,
-						getBlockAttributes( _firstParentClientId )
-					) ||
-						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
@@ -121,9 +93,6 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-
-	const { selectBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
@@ -170,24 +139,6 @@ export function BlockSettingsDropdown( {
 	const removeBlockLabel =
 		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
 
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const selectParentButtonRef = useRef();
-	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
-		ref: selectParentButtonRef,
-		onChange( isFocused ) {
-			if ( isFocused && isDistractionFree ) {
-				return;
-			}
-			toggleBlockHighlight( firstParentClientId, isFocused );
-		},
-	} );
-
-	// This can occur when the selected block (the parent)
-	// displays child blocks within a List View.
-	const parentBlockIsSelected =
-		selectedBlockClientIds?.includes( firstParentClientId );
-
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -221,33 +172,6 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ ! parentBlockIsSelected &&
-									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
-											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
-									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
