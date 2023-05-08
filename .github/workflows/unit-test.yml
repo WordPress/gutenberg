@@ -200,7 +200,7 @@ jobs:
                   # Extract the number of executed tests from the log file.
                   if ! num_tests=$(grep -Eo 'OK \([0-9]+ tests' phpunit.log) ; then
                     if ! num_tests=$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log) ; then
-                      echo "PHPUnit failed or did not run." && exit 1
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
                     fi
                   fi
                   # Extract just the number of tests from the string.
