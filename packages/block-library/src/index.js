@@ -230,7 +230,15 @@ const getAllBlocks = () => {
 	];
 
 	// Only add the classic block in WP Context
-	if ( window?.wp?.oldEditor && ! window?.__experimentalDisableTinymce ) {
+	// and when TinyMCE experiment is disabled or cookie to require TinyMCE is set
+	if (
+		window?.wp?.oldEditor &&
+		( ! window?.__experimentalDisableTinymce ||
+			( '; ' + document.cookie )
+				.split( '; requiresTinymce=' )
+				.pop()
+				.split( ';' )[ 0 ] )
+	) {
 		blocks.push( classic );
 	}
 
