@@ -83,7 +83,7 @@ test.describe( 'Global styles revisions', () => {
 			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 
 			const revisionButtons = page.getByRole( 'button', {
-				name: /^Changes saved on /,
+				name: /^Changes saved by /,
 			} );
 
 			await expect( revisionButtons ).toHaveCount(
@@ -97,7 +97,7 @@ test.describe( 'Global styles revisions', () => {
 		await page.getByRole( 'button', { name: 'Styles actions' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 		const revisionButtons = page.getByRole( 'button', {
-			name: /^Changes saved on /,
+			name: /^Changes saved by /,
 		} );
 
 		await expect( revisionButtons ).toHaveCount(
@@ -129,7 +129,7 @@ test.describe( 'Global styles revisions', () => {
 
 		// await expect( image ).toHaveCSS( 'height', '3px' );
 		await page
-			.getByRole( 'button', { name: /^Changes saved on / } )
+			.getByRole( 'button', { name: /^Changes saved by / } )
 			.last()
 			.click();
 

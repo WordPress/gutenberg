@@ -17,7 +17,7 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
  * @return {string} Translated label.
  */
 function getRevisionLabel( revision ) {
-	const authorDisplayName = revision?.author?.name;
+	const authorDisplayName = revision?.author?.name || __( 'User' );
 	const isUnsaved = 'unsaved' === revision?.id;
 
 	if ( isUnsaved ) {
@@ -37,7 +37,7 @@ function getRevisionLabel( revision ) {
 	return revision?.isLatest
 		? sprintf(
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved on %(date)s by %(name)s (current)' ),
+				__( 'Changes saved by %(name)s on %(date)s (current)' ),
 				{
 					name: authorDisplayName,
 					date: formattedDate,
@@ -45,7 +45,7 @@ function getRevisionLabel( revision ) {
 		  )
 		: sprintf(
 				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved on %(date)s by %(name)s ' ),
+				__( 'Changes saved by %(name)s on %(date)s' ),
 				{
 					name: authorDisplayName,
 					date: formattedDate,
@@ -73,6 +73,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 		>
 			{ userRevisions.map( ( revision ) => {
 				const { id, author, isLatest, modified } = revision;
+				const authorDisplayName = author?.name || __( 'User' );
 				const authorAvatar = author?.avatar_urls?.[ '48' ];
 				/*
 				 * If the currentId hasn't been selected yet, the first revision is
@@ -101,15 +102,18 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 							label={ getRevisionLabel( revision ) }
 						>
 							<span className="edit-site-global-styles-screen-revisions__description">
-								<span>
-									{ 'unsaved' === id
-										? __( 'Unsaved changes' )
-										: __( 'Changes saved' ) }
-								</span>
+								<time dateTime={ modified }>
+									{ humanTimeDiff( modified ) }
+								</time>
 								<span className="edit-site-global-styles-screen-revisions__meta">
-									<time dateTime={ modified }>
-										{ humanTimeDiff( modified ) }
-									</time>
+									{ sprintf(
+										/* translators: %(name)s author display name */
+										__( 'Changes saved by %(name)s' ),
+										{
+											name: authorDisplayName,
+										}
+									) }
+
 									<img
 										alt={ author?.name }
 										src={ authorAvatar }
