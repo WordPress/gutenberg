@@ -18,7 +18,7 @@
 	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
-			color: $gray-900;
+			color: inherit;
 		}
 
 		// Ensure that on hover, the admin color is still used.
