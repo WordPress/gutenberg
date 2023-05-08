@@ -184,8 +184,9 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_fonts( $handles = false ) {
-		$wp_fonts   = wp_fonts();
-		$registered = $wp_fonts->get_registered_font_families();
+		$wp_fonts          = wp_fonts();
+		$registered        = $wp_fonts->get_registered_font_families();
+		$in_iframed_editor = true === $handles;
 
 		// Nothing to print, as no fonts are registered.
 		if ( empty( $registered ) ) {
@@ -195,8 +196,12 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 		// Skip this reassignment decision-making when using the default of `false`.
 		if ( false !== $handles ) {
 			// When `true`, print all registered fonts for the iframed editor.
-			if ( true === $handles ) {
-				$handles = $registered;
+			if ( $in_iframed_editor ) {
+				$queue           = $wp_fonts->queue;
+				$done            = $wp_fonts->done;
+				$wp_fonts->done  = array();
+				$wp_fonts->queue = $registered;
+				$handles         = false;
 			} elseif ( empty( $handles ) ) {
 				// When falsey, assign `false` to print enqueued fonts.
 				$handles = false;
@@ -205,7 +210,15 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		return $wp_fonts->do_items( $handles );
+		$printed = $wp_fonts->do_items( $handles );
+
+		// Reset the API.
+		if ( $in_iframed_editor ) {
+			$wp_fonts->done  = $done;
+			$wp_fonts->queue = $queue;
+		}
+
+		return $printed;
 	}
 }
 
