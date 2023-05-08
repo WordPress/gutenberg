@@ -109,6 +109,11 @@ $block-inserter-tabs-height: 44px;
 
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
+
+		.components-button.has-icon {
+			min-width: initial;
+			padding: 0;
+		}
 	}
 }
 
