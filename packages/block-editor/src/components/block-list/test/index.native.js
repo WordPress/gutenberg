@@ -12,7 +12,7 @@ import {
 	within,
 } from 'test/helpers';
 
-setupCoreBlocks( [ 'core/paragraph', 'core/group' ] );
+setupCoreBlocks();
 
 describe( 'BlockList', () => {
 	describe( 'when empty', () => {
@@ -27,22 +27,58 @@ describe( 'BlockList', () => {
 		} );
 
 		it( 'renders a block appender as a content placeholder', async () => {
+			// Act
+			const appender = screen.getByPlaceholderText( /Start writing/ );
+			fireEvent.press( appender );
+
 			// Assert
-			expect(
-				screen.getByPlaceholderText( /Start writing/ )
-			).toBeTruthy();
+			expect( await getBlock( screen, 'Paragraph' ) ).toBeVisible();
 		} );
 
 		it( 'renders an end-of-list paragraph appender', async () => {
+			// Act
+			const appender = screen.getByLabelText( 'Add paragraph block' );
+			fireEvent.press( appender );
+
 			// Assert
-			expect(
-				screen.getByLabelText( 'Add paragraph block' )
-			).toBeTruthy();
+			expect( await getBlock( screen, 'Paragraph' ) ).toBeVisible();
+		} );
+	} );
+
+	describe( 'when not empty', () => {
+		it( 'renders a footer appender', async () => {
+			// Arrange
+			await initializeEditor();
+			await addBlock( screen, 'Social Icons' );
+			const socialLinksBlock = await getBlock( screen, 'Social Icons' );
+			fireEvent.press( socialLinksBlock );
+			triggerBlockListLayout( socialLinksBlock );
+
+			// Act
+			fireEvent.press(
+				within( socialLinksBlock ).getByTestId( 'appender-button' )
+			);
+			const blockList = screen.getByTestId( 'InserterUI-Blocks' );
+			fireEvent.scroll( blockList, {
+				nativeEvent: {
+					contentOffset: { y: 0, x: 0 },
+					contentSize: { width: 100, height: 100 },
+					layoutMeasurement: { width: 100, height: 100 },
+				},
+			} );
+			fireEvent.press( await screen.findByText( 'Amazon' ) );
+
+			// Assert
+			const amazonSettings = await screen.findByTestId(
+				'navigation-screen-LinkSettingsScreen'
+			);
+			expect( amazonSettings ).toBeVisible();
 		} );
 	} );
 
 	describe( 'for inner blocks', () => {
 		it( 'renders an inner block appender', async () => {
+			// Arrange
 			await initializeEditor();
 			await addBlock( screen, 'Group' );
 			const groupBlock = await getBlock( screen, 'Group' );
