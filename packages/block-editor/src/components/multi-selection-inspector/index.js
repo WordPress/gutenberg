@@ -30,7 +30,7 @@ function MultiSelectionInspector( { blocks } ) {
 				<div className="block-editor-multi-selection-inspector__card-description">
 					{ sprintf(
 						/* translators: %d: number of words */
-						_n( '%d word', '%d words', words ),
+						_n( '%d word selected.', '%d words selected.', words ),
 						words
 					) }
 				</div>
