@@ -56,7 +56,7 @@ function validateContainerExistence( container ) {
 	// Give better errors for containers that we have removed.
 	if ( container === 'phpunit' ) {
 		throw new ValidationError(
-			"The 'phpunit' container has been removed. Please use 'wp-env run tests-cli phpunit' instead."
+			"The 'phpunit' container has been removed. Please use 'wp-env run tests-cli --env-cwd=wp-content/path/to/plugin phpunit' instead."
 		);
 	}
 	if ( container === 'composer' ) {
