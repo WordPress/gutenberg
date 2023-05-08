@@ -96,7 +96,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/multi-text-selection',
 			category: 'selection',
-			description: __( 'Select text between multiple blocks.' ),
+			description: __( 'Select text across multiple blocks.' ),
 			keyCombination: {
 				modifier: 'shift',
 				character: 'arrow',
