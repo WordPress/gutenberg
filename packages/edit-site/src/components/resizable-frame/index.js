@@ -33,9 +33,33 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 const MIN_FRAME_SIZE = 340;
-const lerp = ( a, b, amount ) => {
-	return a + ( b - a ) * amount;
-};
+
+function calculateNewHeight( width, initialAspectRatio ) {
+	const lerp = ( a, b, amount ) => {
+		return a + ( b - a ) * amount;
+	};
+
+	// Calculate the intermediate aspect ratio based on the current width.
+	const lerpFactor =
+		1 -
+		Math.max(
+			0,
+			Math.min(
+				1,
+				( width - MIN_FRAME_SIZE ) / ( 1300 - MIN_FRAME_SIZE )
+			)
+		);
+
+	// Calculate the height based on the intermediate aspect ratio
+	// ensuring the frame arrives at a 9:19.5 aspect ratio.
+	const intermediateAspectRatio = lerp(
+		initialAspectRatio,
+		9 / 19.5,
+		lerpFactor
+	);
+
+	return width / intermediateAspectRatio;
+}
 
 function ResizableFrame( { isFull, children } ) {
 	const [ frameSize, setFrameSize ] = useState( {
@@ -65,29 +89,8 @@ function ResizableFrame( { isFull, children } ) {
 	};
 
 	// Calculate the frame size based on the window width as its resized.
-	const handleResize = ( event, _direction, ref, delta ) => {
+	const handleResize = ( event, _direction, _ref, delta ) => {
 		const updatedWidth = previousWidth + delta.width;
-
-		// Calculate the intermediate aspect ratio based on the current width.
-		const lerpFactor =
-			1 -
-			Math.max(
-				0,
-				Math.min(
-					1,
-					( updatedWidth - MIN_FRAME_SIZE ) /
-						( 1300 - MIN_FRAME_SIZE )
-				)
-			);
-
-		// Calculate the height based on the intermediate aspect ratio
-		// ensuring the frame arrives at a 9:19.5 aspect ratio.
-		const intermediateAspectRatio = lerp(
-			initialAspectRatioRef.current,
-			9 / 19.5,
-			lerpFactor
-		);
-		const newHeight = updatedWidth / intermediateAspectRatio;
 
 		if ( updatedWidth > initialComputedWidthRef.current ) {
 			// const oversizeWidth = Math.max(
@@ -103,7 +106,12 @@ function ResizableFrame( { isFull, children } ) {
 
 		setFrameSize( {
 			width: updatedWidth,
-			height: isOversized ? '100%' : newHeight,
+			height: isOversized
+				? '100%'
+				: calculateNewHeight(
+						updatedWidth,
+						initialAspectRatioRef.current
+				  ),
 		} );
 	};
 
