@@ -8,7 +8,8 @@
 			"alt": "",
 			"caption": "",
 			"width": 100,
-			"height": 100
+			"height": 100,
+			"enableLightbox": true
 		},
 		"innerBlocks": []
 	}

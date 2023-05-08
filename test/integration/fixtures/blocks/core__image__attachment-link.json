@@ -7,7 +7,8 @@
 			"alt": "",
 			"caption": "",
 			"href": "http://localhost:8888/?attachment_id=7",
-			"linkDestination": "attachment"
+			"linkDestination": "attachment",
+			"enableLightbox": true
 		},
 		"innerBlocks": []
 	}

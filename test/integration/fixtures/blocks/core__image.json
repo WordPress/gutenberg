@@ -5,7 +5,8 @@
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
-			"caption": ""
+			"caption": "",
+			"enableLightbox": true
 		},
 		"innerBlocks": []
 	}
