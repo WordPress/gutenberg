@@ -180,11 +180,15 @@ jobs:
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
-              run: npm run test:unit:php | tee phpunit.log
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
-              run: npm run test:unit:php:multisite | tee phpunit.log
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
 
             # Verifies that PHPUnit actually runs in the first place. We want visibility
             # into issues which can cause it to fail silently, so we check the output
