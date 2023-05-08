@@ -331,7 +331,20 @@ export default function BlockList( {
 			) : (
 				<>
 					{ blockClientIds.length > 0 ? (
-						<>
+						<View
+							style={ [
+								getStyles(
+									isRootList,
+									isStackedHorizontally,
+									horizontalAlignment
+								),
+								horizontal && styles.horizontalContentContainer,
+								isWider( blockWidth, 'medium' ) &&
+									( isContentStretch && isMultiBlocks
+										? styles.horizontalContentContainerStretch
+										: styles.horizontalContentContainerCenter ),
+							] }
+						>
 							{ blockClientIds.map( ( currentClientId, index ) =>
 								renderItem( {
 									item: currentClientId,
@@ -344,7 +357,7 @@ export default function BlockList( {
 								renderFooterAppender={ renderFooterAppender }
 								withFooter={ withFooter }
 							/>
-						</>
+						</View>
 					) : (
 						<EmptyList
 							orientation={ orientation }
