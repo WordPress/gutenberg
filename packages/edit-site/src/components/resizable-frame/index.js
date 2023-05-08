@@ -61,7 +61,7 @@ function calculateNewHeight( width, initialAspectRatio ) {
 	return width / intermediateAspectRatio;
 }
 
-function ResizableFrame( { isFull, children } ) {
+function ResizableFrame( { isFullWidth, children } ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
 		height: '100%',
@@ -138,12 +138,12 @@ function ResizableFrame( { isFull, children } ) {
 			ref={ frameRef }
 			initial={ false }
 			animate={ {
-				flexGrow: isFull ? 1 : 0,
+				flexGrow: isFullWidth ? 1 : 0,
 				height: frameSize.height,
 			} }
 			onAnimationComplete={ ( { flexGrow } ) => {
 				if ( flexGrow === 1 )
-					// `isFull` is true
+					// `isFullWidth` is true
 					setFrameSize( { width: '100%', height: '100%' } );
 			} }
 			transition={ FRAME_TRANSITION }
@@ -202,7 +202,7 @@ function ResizableFrame( { isFull, children } ) {
 			<motion.div
 				className="edit-site-the-frame__inner-content"
 				animate={ {
-					borderRadius: isFull ? 0 : 8,
+					borderRadius: isFullWidth ? 0 : 8,
 				} }
 				transition={ FRAME_TRANSITION }
 			>

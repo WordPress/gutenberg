@@ -248,7 +248,7 @@ export default function Layout() {
 								>
 									<ResizableFrame
 										startWidth={ canvasSize.width }
-										isFull={ isEditing }
+										isFullWidth={ isEditing }
 									>
 										<ErrorBoundary>
 											{ isEditorPage && <Editor /> }
