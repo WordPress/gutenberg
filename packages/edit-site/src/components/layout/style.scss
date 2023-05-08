@@ -20,7 +20,7 @@
 	}
 
 	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
+		width: calc(#{$nav-sidebar-width} - #{$canvas-padding});
 	}
 
 	.edit-site-layout.is-full-canvas & {

@@ -19,6 +19,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
+import { search } from '@wordpress/icons';
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -26,6 +28,8 @@ import { forwardRef } from '@wordpress/element';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../private-apis';
+
+const { store: commandsStore } = unlock( commandsPrivateApis );
 
 const HUB_ANIMATION_DURATION = 0.3;
 
@@ -41,6 +45,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				getSettings().__experimentalDashboardLink || 'index.php',
 		};
 	}, [] );
+	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
@@ -82,65 +87,78 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				ease: 'easeOut',
 			} }
 		>
-			<HStack
-				justify="flex-start"
-				className="edit-site-site-hub__text-content"
-				spacing="0"
-			>
-				<motion.div
-					className="edit-site-site-hub__view-mode-toggle-container"
-					layout
-					transition={ {
-						type: 'tween',
-						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-						ease: 'easeOut',
-					} }
+			<HStack justify="space-between" alignment="center">
+				<HStack
+					justify="flex-start"
+					className="edit-site-site-hub__text-content"
+					spacing="0"
 				>
-					<Button
-						{ ...siteIconButtonProps }
-						className="edit-site-layout__view-mode-toggle"
-					>
-						<motion.div
-							initial={ false }
-							animate={ {
-								scale: canvasMode === 'view' ? 0.5 : 1,
-							} }
-							whileHover={ {
-								scale: canvasMode === 'view' ? 0.5 : 0.96,
-							} }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion
-									? 0
-									: HUB_ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-						</motion.div>
-					</Button>
-				</motion.div>
-
-				<AnimatePresence>
 					<motion.div
-						layout={ canvasMode === 'edit' }
-						animate={ {
-							opacity: canvasMode === 'view' ? 1 : 0,
-						} }
-						exit={ {
-							opacity: 0,
-						} }
-						className="edit-site-site-hub__site-title"
+						className="edit-site-site-hub__view-mode-toggle-container"
+						layout
 						transition={ {
 							type: 'tween',
-							duration: disableMotion ? 0 : 0.2,
+							duration: disableMotion
+								? 0
+								: HUB_ANIMATION_DURATION,
 							ease: 'easeOut',
-							delay: canvasMode === 'view' ? 0.1 : 0,
 						} }
 					>
-						{ decodeEntities( siteTitle ) }
+						<Button
+							{ ...siteIconButtonProps }
+							className="edit-site-layout__view-mode-toggle"
+						>
+							<motion.div
+								initial={ false }
+								animate={ {
+									scale: canvasMode === 'view' ? 0.5 : 1,
+								} }
+								whileHover={ {
+									scale: canvasMode === 'view' ? 0.5 : 0.96,
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: HUB_ANIMATION_DURATION,
+									ease: 'easeOut',
+								} }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</motion.div>
+						</Button>
 					</motion.div>
-				</AnimatePresence>
+
+					<AnimatePresence>
+						<motion.div
+							layout={ canvasMode === 'edit' }
+							animate={ {
+								opacity: canvasMode === 'view' ? 1 : 0,
+							} }
+							exit={ {
+								opacity: 0,
+							} }
+							className="edit-site-site-hub__site-title"
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.2,
+								ease: 'easeOut',
+								delay: canvasMode === 'view' ? 0.1 : 0,
+							} }
+						>
+							{ decodeEntities( siteTitle ) }
+						</motion.div>
+					</AnimatePresence>
+				</HStack>
+				{ window?.__experimentalEnableCommandCenter &&
+					canvasMode === 'view' && (
+						<Button
+							className="edit-site-site-hub_toggle-command-center"
+							icon={ search }
+							onClick={ () => openCommandCenter() }
+							label={ __( 'Open command center' ) }
+						/>
+					) }
 			</HStack>
 		</motion.div>
 	);
