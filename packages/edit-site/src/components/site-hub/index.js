@@ -156,6 +156,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							className="edit-site-site-hub_toggle-command-center"
 							icon={ search }
 							onClick={ () => openCommandCenter() }
+							label={ __( 'Open command center' ) }
 						/>
 					) }
 			</HStack>
