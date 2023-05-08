@@ -46,30 +46,30 @@ function render_block_core_image( $attributes, $content ) {
 		$content = $processor->get_updated_html();
 
 		return
-<<<HTML
-			<div class="wp-lightbox-container"
-				 data-wp-island=""
-				 data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } } }'>
-					<button aria-haspopup="dialog" aria-label="$aria_label" data-wp-on.click="actions.core.image.showLightbox">
-						$content
-					</button>
-					<div data-wp-body="" class="wp-lightbox-overlay"
-						 aria-hidden="true"
-						 data-wp-class.initialized="context.core.image.initialized"
-						 data-wp-class.active="context.core.image.lightboxEnabled"
-						 data-wp-bind.aria-hidden="!context.core.image.lightboxEnabled"
-						 data-wp-effect="effects.core.image.initLightbox"
-						 data-wp-on.keydown="actions.core.image.handleKeydown"
-						 data-wp-on.mousewheel="actions.core.image.hideLightbox"
-						 data-wp-on.click="actions.core.image.hideLightbox"
-						 >
+			<<<HTML
+				<div class="wp-lightbox-container"
+					data-wp-island=""
+					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } } }'>
+						<button aria-haspopup="dialog" aria-label="$aria_label" data-wp-on.click="actions.core.image.showLightbox">
 							$content
-							<button aria-label="Close lightbox" class="close-button" data-wp-on.click="actions.core.image.hideLightbox">
-								$close_button_icon
-							</button>
-							<div class="scrim" style="background-color: $background_color"></div>
-					</div>
-			</div>
+						</button>
+						<div data-wp-body="" class="wp-lightbox-overlay"
+							aria-hidden="true"
+							data-wp-class.initialized="context.core.image.initialized"
+							data-wp-class.active="context.core.image.lightboxEnabled"
+							data-wp-bind.aria-hidden="!context.core.image.lightboxEnabled"
+							data-wp-effect="effects.core.image.initLightbox"
+							data-wp-on.keydown="actions.core.image.handleKeydown"
+							data-wp-on.mousewheel="actions.core.image.hideLightbox"
+							data-wp-on.click="actions.core.image.hideLightbox"
+							>
+								$content
+								<button aria-label="Close lightbox" class="close-button" data-wp-on.click="actions.core.image.hideLightbox">
+									$close_button_icon
+								</button>
+								<div class="scrim" style="background-color: $background_color"></div>
+						</div>
+				</div>
 HTML;
 	}
 
