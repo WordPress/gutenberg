@@ -1989,7 +1989,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $value;
 		}
 
-		return self::convert_custom_properties( $value );
+		return $value;
 	}
 
 	/**
