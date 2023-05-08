@@ -21,7 +21,9 @@ function gutenberg_block_core_file_add_directives_to_content( $block_content, $b
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$processor->next_tag();
 	$processor->set_attribute( 'data-wp-island', '' );
+	$processor->next_tag( 'object' );
 	$processor->set_attribute( 'data-wp-init', 'effects.core.file.init' );
+	$processor->set_attribute( 'hidden', true );
 	return $processor->get_updated_html();
 }
 add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_to_content', 10, 3 );

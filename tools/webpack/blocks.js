@@ -220,6 +220,11 @@ module.exports = [
 		].filter( Boolean ),
 	},
 	{
+		...baseConfig,
+		watchOptions: {
+			aggregateTimeout: 200,
+		},
+		name: 'interactivity',
 		entry: {
 			file: './packages/block-library/src/file/interactivity.js',
 			navigation:
@@ -231,6 +236,7 @@ module.exports = [
 			path: join( __dirname, '..', '..', 'build', 'block-library' ),
 		},
 		optimization: {
+			...baseConfig.optimization,
 			runtimeChunk: {
 				name: 'vendors',
 			},

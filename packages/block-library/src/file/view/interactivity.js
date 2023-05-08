@@ -2,14 +2,16 @@
  * Internal dependencies
  */
 import { store } from '../../utils/interactivity';
-import { hidePdfEmbedsOnUnsupportedBrowsers } from '../utils';
+import { browserSupportsPdfs } from '../utils';
 
 store( {
 	effects: {
 		core: {
 			file: {
-				init() {
-					hidePdfEmbedsOnUnsupportedBrowsers();
+				init( { ref } ) {
+					if ( browserSupportsPdfs() ) {
+						ref.removeAttribute( 'hidden' );
+					}
 				},
 			},
 		},
