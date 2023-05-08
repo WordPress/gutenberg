@@ -128,7 +128,7 @@ function gutenberg_get_remote_theme_patterns() {
 /**
  * Gets the styles resulting of merging core, theme, and user data.
  *
- * @since 6.3.0
+ * @since 5.9.0
  *
  * @param array $path    Path to the specific style to retrieve. Optional.
  *                       If empty, will return all styles.
