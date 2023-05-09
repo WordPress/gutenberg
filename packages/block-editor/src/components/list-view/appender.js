@@ -66,18 +66,21 @@ export const Appender = forwardRef(
 			);
 		}, [ insertedBlockTitle ] );
 
-		const orderInitialBlockItems = useCallback( ( items ) => {
-			items.sort( ( { id: aName }, { id: bName } ) => {
-				// Sort block items according to `prioritizedInserterBlocks`.
-				let aIndex = prioritizedInserterBlocks.indexOf( aName );
-				let bIndex = prioritizedInserterBlocks.indexOf( bName );
-				// All other block items should come after that.
-				if ( aIndex < 0 ) aIndex = prioritizedInserterBlocks.length;
-				if ( bIndex < 0 ) bIndex = prioritizedInserterBlocks.length;
-				return aIndex - bIndex;
-			} );
-			return items;
-		}, [] );
+		const orderInitialBlockItems = useCallback(
+			( items ) => {
+				items.sort( ( { id: aName }, { id: bName } ) => {
+					// Sort block items according to `prioritizedInserterBlocks`.
+					let aIndex = prioritizedInserterBlocks.indexOf( aName );
+					let bIndex = prioritizedInserterBlocks.indexOf( bName );
+					// All other block items should come after that.
+					if ( aIndex < 0 ) aIndex = prioritizedInserterBlocks.length;
+					if ( bIndex < 0 ) bIndex = prioritizedInserterBlocks.length;
+					return aIndex - bIndex;
+				} );
+				return items;
+			},
+			[ prioritizedInserterBlocks ]
+		);
 
 		if ( hideInserter ) {
 			return null;
