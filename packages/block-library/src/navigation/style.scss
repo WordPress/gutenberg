@@ -160,8 +160,6 @@ $navigation-icon-size: 24px;
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
 	.wp-block-navigation__submenu-container {
-		background-color: inherit;
-		color: inherit;
 		position: absolute;
 		z-index: 2;
 		display: flex;
@@ -177,6 +175,13 @@ $navigation-icon-size: 24px;
 		width: 0;
 		height: 0;
 		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
+
+		// Set a default background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
+		background-color: #fff;
+		color: #000;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
@@ -397,15 +402,13 @@ button.wp-block-navigation-item__content {
 	}
 }
 
-// Default background and font color.
+// Default border color.
 .wp-block-navigation:not(.has-background) {
 	.wp-block-navigation__submenu-container {
-		// Set a background color for submenus so that they're not transparent.
-		// NOTE TO DEVS - if refactoring this code, please double-check that
-		// submenus have a default background color, this feature has regressed
-		// several times, so care needs to be taken.
-		background-color: #fff;
-		color: #000;
+		// Sets a border for submenus for backwards compatibility.
+		// This is under a :not selector so that if a user sets
+		// a background color the borders are removed.
+		// One day is should be possible to control this via Global Styles.
 		border: 1px solid rgba(0, 0, 0, 0.15);
 	}
 }
