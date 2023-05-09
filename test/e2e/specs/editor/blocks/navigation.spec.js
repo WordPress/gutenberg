@@ -845,42 +845,51 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const overlayMenu = page.locator(
-				'nav.wp-block-navigation div.has-modal-open'
-			);
-			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
-			await expect( overlayMenu ).toBeHidden();
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
-			await expect( overlayMenu ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeVisible();
 		} );
 
 		test( 'overlay menu closes on click on close menu button', async ( {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const overlayMenu = page.locator(
-				'nav.wp-block-navigation div.has-modal-open'
-			);
-			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
-			const closeMenuButton = page.locator( '[aria-label="Close menu"]' );
-			await expect( overlayMenu ).toBeHidden();
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
-			await expect( overlayMenu ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeVisible();
 			await closeMenuButton.click();
-			await expect( overlayMenu ).toBeHidden();
+			await expect( overlayMenuFirstElement ).toBeHidden();
 		} );
 
 		test( 'overlay menu closes on ESC key', async ( { page } ) => {
 			await page.goto( '/' );
-			const overlayMenu = page.locator(
-				'nav.wp-block-navigation div.has-modal-open'
-			);
-			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
-			await expect( overlayMenu ).toBeHidden();
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
-			await expect( overlayMenu ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeVisible();
 			await page.keyboard.press( 'Escape' );
-			await expect( overlayMenu ).toBeHidden();
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
 		} );
 
@@ -888,39 +897,39 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const overlayMenu = page.locator(
-				'nav.wp-block-navigation div.has-modal-open'
-			);
-			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
-			const firstItem = page.locator(
-				'ul li.wp-block-navigation-item:first-child > *:first-child'
-			);
-			await expect( overlayMenu ).toBeHidden();
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
-			await expect( overlayMenu ).toBeVisible();
-			await expect( firstItem ).toBeFocused();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeFocused();
 		} );
 
 		test( 'overlay menu traps focus', async ( { page } ) => {
 			await page.goto( '/' );
-			const overlayMenu = page.locator(
-				'nav.wp-block-navigation div.has-modal-open'
-			);
-			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
-			const firstItem = page.locator(
-				'ul li.wp-block-navigation-item:first-child > *:first-child'
-			);
-			const closeMenuButton = page.locator( '[aria-label="Close menu"]' );
-			await expect( overlayMenu ).toBeHidden();
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
-			await expect( overlayMenu ).toBeVisible();
-			await expect( firstItem ).toBeFocused();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeFocused();
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
 			await expect( closeMenuButton ).toBeFocused();
 			await page.keyboard.press( 'Shift+Tab' );
 			await page.keyboard.press( 'Shift+Tab' );
-			await expect( firstItem ).toBeFocused();
+			await expect( overlayMenuFirstElement ).toBeFocused();
 		} );
 	} );
 
@@ -957,12 +966,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu opens on click', async ( { page } ) => {
 			await page.goto( '/' );
-			const simpleSubmenuButton = page.locator(
-				'button:has-text("Simple Submenu")'
-			);
-			const innerElement = page.locator(
-				'a:has-text("Simple Submenu Link 1")'
-			);
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -970,18 +979,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'nested submenu opens on click', async ( { page } ) => {
 			await page.goto( '/' );
-			const complexSubmenuButton = page.locator(
-				'button:has-text("Complex Submenu")'
-			);
-			const nestedSubmenuButton = page.locator(
-				'button:has-text("Nested Submenu")'
-			);
-			const firstLevelElement = page.locator(
-				'a:has-text("Complex Submenu Link 1")'
-			);
-			const secondLevelElement = page.locator(
-				'a:has-text("Nested Submenu Link 1")'
-			);
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
 			await complexSubmenuButton.click();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
@@ -993,12 +1002,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu closes on click outside', async ( { page } ) => {
 			await page.goto( '/' );
-			const simpleSubmenuButton = page.locator(
-				'button:has-text("Simple Submenu")'
-			);
-			const innerElement = page.locator(
-				'a:has-text("Simple Submenu Link 1")'
-			);
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1008,12 +1017,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu closes on ESC key', async ( { page } ) => {
 			await page.goto( '/' );
-			const simpleSubmenuButton = page.locator(
-				'button:has-text("Simple Submenu")'
-			);
-			const innerElement = page.locator(
-				'a:has-text("Simple Submenu Link 1")'
-			);
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1024,15 +1033,15 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu closes on tab outside submenu', async ( { page } ) => {
 			await page.goto( '/' );
-			const simpleSubmenuButton = page.locator(
-				'button:has-text("Simple Submenu")'
-			);
-			const complexSubmenuButton = page.locator(
-				'button:has-text("Complex Submenu")'
-			);
-			const innerElement = page.locator(
-				'a:has-text("Simple Submenu Link 1")'
-			);
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1046,18 +1055,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'nested submenu closes on click outside', async ( { page } ) => {
 			await page.goto( '/' );
-			const complexSubmenuButton = page.locator(
-				'button:has-text("Complex Submenu")'
-			);
-			const nestedSubmenuButton = page.locator(
-				'button:has-text("Nested Submenu")'
-			);
-			const firstLevelElement = page.locator(
-				'a:has-text("Complex Submenu Link 1")'
-			);
-			const secondLevelElement = page.locator(
-				'a:has-text("Nested Submenu Link 1")'
-			);
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
 			await complexSubmenuButton.click();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
@@ -1073,18 +1082,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'nested submenu closes on ESC key', async ( { page } ) => {
 			await page.goto( '/' );
-			const complexSubmenuButton = page.locator(
-				'button:has-text("Complex Submenu")'
-			);
-			const nestedSubmenuButton = page.locator(
-				'button:has-text("Nested Submenu")'
-			);
-			const firstLevelElement = page.locator(
-				'a:has-text("Complex Submenu Link 1")'
-			);
-			const secondLevelElement = page.locator(
-				'a:has-text("Nested Submenu Link 1")'
-			);
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
 			await complexSubmenuButton.click();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
@@ -1103,18 +1112,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const complexSubmenuButton = page.locator(
-				'button:has-text("Complex Submenu")'
-			);
-			const nestedSubmenuButton = page.locator(
-				'button:has-text("Nested Submenu")'
-			);
-			const firstLevelElement = page.locator(
-				'a:has-text("Complex Submenu Link 1")'
-			);
-			const secondLevelElement = page.locator(
-				'a:has-text("Nested Submenu Link 1")'
-			);
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
 			await complexSubmenuButton.click();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
@@ -1162,20 +1171,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'submenu opens on click in the arrow', async ( { page } ) => {
 			await page.goto( '/' );
-			const arrowButton = page.locator(
-				'a:has-text("Submenu") + button.wp-block-navigation__submenu-icon'
-			);
-
-			const nestedSubmenuArrowButton = page.locator(
-				'a:has-text("Nested Menu") + button.wp-block-navigation__submenu-icon'
-			);
-
-			const firstLevelElement = page.locator(
-				'a:has-text("Submenu Link")'
-			);
-			const secondLevelElement = page.locator(
-				'a:has-text("Nested Menu Link")'
-			);
+			const arrowButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const nestedSubmenuArrowButton = page.getByRole( 'button', {
+				name: 'Nested Menu submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Menu Link',
+			} );
 
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
@@ -1206,15 +1213,20 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Subpage',
 			} );
 			await editor.openDocumentSettingsSidebar();
-			const parentPage = page.locator( 'label:has-text("Parent page")' );
-
-			if ( await parentPage.isHidden() ) {
+			const parentPageList = page.getByLabel( 'Parent page:' );
+			if ( await parentPageList.isHidden() ) {
 				await page
-					.locator( 'button:has-text("Page Attributes")' )
+					.getByRole( 'button', {
+						name: 'Page Attributes',
+					} )
 					.click();
 			}
-			await page.locator( 'label:has-text("Parent page")' ).click();
-			await page.locator( 'li:has-text("Parent Page")' ).click();
+			await parentPageList.click();
+			await page
+				.getByRole( 'option', {
+					name: 'Parent Page',
+				} )
+				.click();
 			await editor.publishPost();
 
 			await admin.visitSiteEditor( {
@@ -1238,10 +1250,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'page-list submenu opens on click', async ( { page } ) => {
 			await page.goto( '/' );
-			const submenuButton = page.locator(
-				'button:has-text("Parent Page")'
-			);
-			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1251,10 +1265,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const submenuButton = page.locator(
-				'button:has-text("Parent Page")'
-			);
-			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1264,10 +1280,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 		test( 'page-list submenu closes on ESC key', async ( { page } ) => {
 			await page.goto( '/' );
-			const submenuButton = page.locator(
-				'button:has-text("Parent Page")'
-			);
-			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
@@ -1280,10 +1298,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 		} ) => {
 			await page.goto( '/' );
-			const submenuButton = page.locator(
-				'button:has-text("Parent Page")'
-			);
-			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
 			await expect( innerElement ).toBeHidden();
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
