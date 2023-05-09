@@ -795,7 +795,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
 			} else {
-				$output[ $subtree ] = static::sanitize_variables( $result );
+				$output[ $subtree ] = static::resolve_custom_css_format( $result );
 			}
 		}
 
@@ -3598,14 +3598,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $tree   Input to process.
 	 * @return array The modified $tree.
 	 */
-	private static function sanitize_variables( $tree ) {
+	private static function resolve_custom_css_format( $tree ) {
 		$prefix = 'var:';
 
 		foreach ( $tree as $key => $data ) {
 			if ( is_string( $data ) && 0 === strpos( $data, $prefix ) ) {
 				$tree[ $key ] = self::convert_custom_properties( $data );
 			} elseif ( is_array( $data ) ) {
-				$tree[ $key ] = self::sanitize_variables( $data );
+				$tree[ $key ] = self::resolve_custom_css_format( $data );
 			}
 		}
 
