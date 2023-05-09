@@ -54,8 +54,6 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
         // Set settings
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
-        //CookieManager cookieManager = CookieManager.getInstance();
-        //cookieManager.setAcceptThirdPartyCookies(mWebView, true);
 
         // Setup WebView client
         setupWebViewClient();
