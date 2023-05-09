@@ -19,8 +19,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-
-const { PrivateListView, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+import LeafMoreMenu from './leaf-more-menu';
 
 function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -145,6 +144,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		};
 	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
 
+	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	const offCanvasOnselect = useCallback(
 		( block ) => {
 			if (

@@ -124,7 +124,7 @@ function ListViewBlock( {
 		[ selectBlock ]
 	);
 
-	const { isTreeGridMounted, expand, collapse, LeafMoreMenu } =
+	const { isTreeGridMounted, expand, expandedState, collapse, LeafMoreMenu } =
 		useListViewContext();
 
 	const toggleExpanded = useCallback(
@@ -334,6 +334,8 @@ function ListViewBlock( {
 									__experimentalSelectBlock={
 										updateSelection
 									}
+									expandedState={ expandedState }
+									expand={ expand }
 								/>
 							</>
 						) }
