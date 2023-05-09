@@ -96,15 +96,13 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
-	let children;
-	if ( innerBlocks[ 0 ]?.clientId ) {
-		// Value is an array of blocks, so defer to block serializer.
-		const html = serialize( innerBlocks, { isInnerBlocks: true } );
-		// Use special-cased raw HTML tag to avoid default escaping.
-		children = <RawHTML>{ html }</RawHTML>;
-	} else {
-		children = innerBlocks;
-	}
+	const [ firstBlock ] = innerBlocks ?? [];
+	if ( ! firstBlock ) return props;
+	if ( ! firstBlock.clientId ) return { ...props, children: innerBlocks };
+	// Value is an array of blocks, so defer to block serializer.
+	const html = serialize( innerBlocks, { isInnerBlocks: true } );
+	// Use special-cased raw HTML tag to avoid default escaping.
+	const children = <RawHTML>{ html }</RawHTML>;
 
 	return { ...props, children };
 }
