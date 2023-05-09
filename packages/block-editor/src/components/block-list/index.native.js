@@ -34,14 +34,7 @@ import { store as blockEditorStore } from '../../store';
 const identity = ( x ) => x;
 
 const stylesMemo = {};
-const getStyles = (
-	isRootList,
-	isStackedHorizontally,
-	horizontalAlignment
-) => {
-	if ( isRootList ) {
-		return;
-	}
+const getStyles = ( isStackedHorizontally, horizontalAlignment ) => {
 	const styleName = `${ isStackedHorizontally }-${ horizontalAlignment }`;
 	if ( stylesMemo[ styleName ] ) {
 		return stylesMemo[ styleName ];
@@ -280,11 +273,6 @@ export default function BlockList( {
 											? styles.horizontalContentContainerStretch
 											: styles.horizontalContentContainerCenter ),
 								] }
-								style={ getStyles(
-									isRootList,
-									isStackedHorizontally,
-									horizontalAlignment
-								) }
 								data={ blockClientIds }
 								keyExtractor={ identity }
 								listKey={
@@ -333,11 +321,11 @@ export default function BlockList( {
 					{ blockClientIds.length > 0 ? (
 						<View
 							style={ [
-								getStyles(
-									isRootList,
+								...getStyles(
 									isStackedHorizontally,
 									horizontalAlignment
 								),
+								...scrollViewStyle,
 								horizontal && styles.horizontalContentContainer,
 								isWider( blockWidth, 'medium' ) &&
 									( isContentStretch && isMultiBlocks

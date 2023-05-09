@@ -25,6 +25,9 @@ jest.mock( '../use-editor-wrapper-styles.scss', () => ( {
 		width: '100%',
 		maxWidth: 580,
 	},
+	'use-editor-wrapper-styles--inner-block': {
+		maxWidth: 580,
+	},
 } ) );
 
 const defaultCanvasStyles = {
@@ -278,5 +281,20 @@ describe( 'useEditorWrapperStyles', () => {
 			{},
 		] );
 		expect( result.current[ 1 ] ).toEqual( 16 );
+	} );
+
+	it( 'should return the correct wrapper styles for inner blocks', async () => {
+		// Act
+		const { result } = renderHook( () =>
+			useEditorWrapperStyles( { hasParents: true } )
+		);
+
+		// Assert
+		expect( result.current[ 0 ] ).toEqual( [
+			expect.objectContaining( {
+				maxWidth: 580,
+			} ),
+			{},
+		] );
 	} );
 } );
