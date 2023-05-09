@@ -3646,4 +3646,49 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $tree;
 	}
+
+	/**
+	 * Replaces CSS variables with their values in place.
+	 *
+	 * @since 6.3.0
+	 * @param array $styles CSS declarations to convert.
+	 * @param array $values key => value pairs to use for replacement.
+	 * @return array
+	 */
+	private static function convert_variables_to_value( $styles, $values ) {
+		foreach ( $styles as $key => $style ) {
+			if ( is_array( $style ) ) {
+				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
+			}
+			if ( is_string( $style ) && 0 === strpos( $style, 'var(' ) ) {
+				$styles[ $key ] = isset( $values[ $style ] ) ? $values[ $style ] : $style;
+			}
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * Get styles defined in theme.json with values for the css variables.
+	 *
+	 * @since 6.3.0
+	 * @return array
+	 */
+	public function get_styles_with_values() {
+		$preset_vars = static::compute_preset_vars( self::get_settings(), static::VALID_ORIGINS );
+		$theme_vars  = static::compute_theme_vars( self::get_settings() );
+		$vars        = array_reduce(
+			array_merge( $preset_vars, $theme_vars ),
+			function( $carry, $item ) {
+				$name                    = $item['name'];
+				$carry[ "var({$name})" ] = $item['value'];
+				return  $carry;
+			},
+			array()
+		);
+
+		$styles = self::get_raw_data()['styles'];
+		return self::convert_variables_to_value( $styles, $vars );
+	}
+
 }

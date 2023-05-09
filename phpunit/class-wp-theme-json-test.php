@@ -2021,4 +2021,111 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
 
 	}
+
+	public function test_resolve_variables() {
+		$primary_color   = '#9DFF20';
+		$secondary_color = '#9DFF21';
+		$contrast_color  = '#000';
+		$large_font      = '18px';
+		$small_font      = '12px';
+		$theme_json      = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'color' => $primary_color,
+									'name'  => 'Primary',
+									'slug'  => 'primary',
+								),
+								array(
+									'color' => $secondary_color,
+									'name'  => 'Secondary',
+									'slug'  => 'secondary',
+								),
+								array(
+									'color' => $contrast_color,
+									'name'  => 'Contrast',
+									'slug'  => 'contrast',
+								),
+							),
+						),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'size' => $small_font,
+								'name' => 'Font size small',
+								'slug' => 'small',
+							),
+							array(
+								'size' => $large_font,
+								'name' => 'Font size large',
+								'slug' => 'large',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'elements' => array(
+						'button' => array(
+							'color'      => array(
+								'text' => 'var(--wp--preset--color--contrast)',
+							),
+							'typography' => array(
+								'fontSize' => 'var(--wp--preset--font-size--small)',
+							),
+						),
+					),
+					'blocks'   => array(
+						'core/post-terms' => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+							'color'      => array( 'background' => 'var(--wp--preset--color--secondary)' ),
+						),
+						'core/navigation' => array(
+							'elements' => array(
+								'link' => array(
+									'color'      => array(
+										'background' => 'var(--wp--preset--color--primary)',
+										'text'       => 'var(--wp--preset--color--secondary)',
+									),
+									'typography' => array(
+										'fontSize' => 'var(--wp--preset--font-size--large)',
+									),
+								),
+							),
+						),
+						'core/quote'      => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--large)' ),
+							'color'      => array( 'background' => 'var(--wp--preset--color--primary)' ),
+							'variations' => array(
+								'plain' => array(
+									'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+									'color'      => array( 'background' => 'var(--wp--preset--color--secondary)' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$styles = $theme_json->get_styles_with_values();
+
+		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
+		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
+
+		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+
+		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
+		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+
+		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
+	}
+
 }
