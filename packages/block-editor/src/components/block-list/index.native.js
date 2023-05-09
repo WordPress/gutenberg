@@ -66,7 +66,6 @@ export default function BlockList( {
 	renderAppender,
 	renderFooterAppender,
 	rootClientId,
-	title,
 	withFooter = true,
 } ) {
 	const {
@@ -285,7 +284,6 @@ export default function BlockList( {
 								shouldPreventAutomaticScroll={
 									shouldFlatListPreventAutomaticScroll
 								}
-								title={ title }
 								ListHeaderComponent={ header }
 								ListEmptyComponent={
 									! isReadOnly && (
