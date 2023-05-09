@@ -20,10 +20,8 @@ describe( 'Block invalid warning', () => {
             <!-- /wp:spacer -->`,
 		} );
 
-		// Act
-		const warningElement = screen.getByText( /Problem displaying block./ );
-
 		// Assert
+		const warningElement = screen.getByText( /Problem displaying block./ );
 		expect( warningElement ).toBeVisible();
 	} );
 
