@@ -61,7 +61,7 @@ function calculateNewHeight( width, initialAspectRatio ) {
 	return width / intermediateAspectRatio;
 }
 
-function ResizableFrame( { isFullWidth, children } ) {
+function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
 		height: '100%',
@@ -69,7 +69,15 @@ function ResizableFrame( { isFullWidth, children } ) {
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
-	const [ isOversized, setIsOversized ] = useState( false );
+	const [ isOversized, _setIsOversized ] = useState( false );
+	const setIsOversized = ( value ) => {
+		_setIsOversized( ( prevValue ) => {
+			if ( prevValue !== value ) {
+				onOversizeChange( value );
+			}
+			return value;
+		} );
+	};
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
 	const initialComputedWidthRef = useRef( null );
