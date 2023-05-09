@@ -278,7 +278,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert before' ) }
+											{ __( 'Add before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ pipe(
@@ -287,7 +287,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert after' ) }
+											{ __( 'Add after' ) }
 										</MenuItem>
 									</>
 								) }
