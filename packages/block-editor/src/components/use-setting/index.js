@@ -132,7 +132,7 @@ export default function useSetting( path ) {
 				blockName
 			);
 
-			if ( undefined !== result ) {
+			if ( undefined !== result || null !== result ) {
 				return result;
 			}
 
@@ -179,7 +179,7 @@ export default function useSetting( path ) {
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
-			if ( result === undefined ) {
+			if ( result === undefined || result === null ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
 				result =
