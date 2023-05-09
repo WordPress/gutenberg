@@ -6,7 +6,6 @@ const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -306,16 +305,10 @@ function getXdebugConfig( config ) {
 		}
 	}
 
-	// Discover client host does not appear to work on macOS with Docker.
-	const clientDetectSettings =
-		os.type() === 'Linux'
-			? 'xdebug.discover_client_host=true'
-			: 'xdebug.client_host="host.docker.internal"';
-
 	return `
 RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
 RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ config.xdebug }' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
+RUN echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.ini`;
 }
