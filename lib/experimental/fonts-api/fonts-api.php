@@ -22,7 +22,18 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 
 		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			$wp_fonts = new WP_Fonts();
+
+			// Initialize.
 			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
+			add_action( 'wp_head', 'wp_print_fonts', 50 );
+
+			/*
+			 * For themes without a theme.json, admin printing is initiated by the 'admin_print_styles' hook.
+			 * For themes with theme.json, admin printing is initiated by _wp_get_iframed_editor_assets().
+			 */
+			if ( ! wp_theme_has_theme_json() ) {
+				add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
+			}
 		}
 
 		return $wp_fonts;
@@ -215,9 +226,6 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 		return $printed;
 	}
 }
-
-add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
-add_action( 'wp_head', 'wp_print_fonts', 50 );
 
 /**
  * Add webfonts mime types.
