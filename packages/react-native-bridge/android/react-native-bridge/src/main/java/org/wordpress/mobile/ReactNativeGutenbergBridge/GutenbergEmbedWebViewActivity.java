@@ -79,7 +79,8 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
     }
 
     protected void load() {
-        mWebView.loadUrl("https://wordpress.org/gutenberg/");
+        String content = getIntent().getExtras().getString(ARG_CONTENT);
+        mWebView.loadData(content, "text/html", "UTF-8");
     }
 
     private void setupToolbar() {
@@ -101,7 +102,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
     }
 
     protected String getToolbarTitle() {
-        return "";
+        return getIntent().getExtras().getString(ARG_TITLE);
     }
 
     @Override
