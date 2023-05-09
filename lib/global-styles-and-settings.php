@@ -215,3 +215,19 @@ function gutenberg_add_global_styles_for_blocks() {
 		}
 	}
 }
+
+/**
+ * Private function to clean the caches used by gutenberg_get_global_settings method.
+ *
+ * @access private
+ */
+function _gutenberg_clean_theme_json_caches() {
+	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_custom_css', 'theme_json' );
+	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+}
+add_action( 'start_previewing_theme', '_gutenberg_clean_theme_json_caches' );
+add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
