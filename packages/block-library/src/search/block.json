@@ -42,6 +42,14 @@
 		"query": {
 			"type": "object",
 			"default": {}
+		},
+		"buttonBehavior": {
+			"type": "string",
+			"default": "expand-searchfield"
+		},
+		"isSearchFieldHidden": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -83,6 +91,7 @@
 		},
 		"html": false
 	},
+	"viewScript": "file:./view.js",
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"
 }
