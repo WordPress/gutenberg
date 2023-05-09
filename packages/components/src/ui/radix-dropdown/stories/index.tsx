@@ -65,6 +65,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 		docs: { source: { state: 'open', excludeDecorators: true } },
 	},
 	decorators: [
+		// Shared story state
 		( Story ) => {
 			const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
 			const [ urlsChecked, setUrlsChecked ] = useState( false );
@@ -85,11 +86,25 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 				</DropdownMenuStoryContext.Provider>
 			);
 		},
+		// Layout wrapper
+		( Story ) => (
+			<div
+				style={ {
+					width: '100%',
+					minHeight: '300px',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
+			>
+				<Story />
+			</div>
+		),
 	],
 };
 export default meta;
 
-const MenuButton = styled.div`
+const MenuButton = styled.button`
 	all: unset;
 	font-family: inherit;
 	border-radius: 100%;
@@ -168,17 +183,7 @@ const RadioItemsGroup = () => {
 };
 
 const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
-	<div
-		style={ {
-			width: '100%',
-			minHeight: '300px',
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-		} }
-	>
-		<DropdownMenu { ...props } />
-	</div>
+	<DropdownMenu { ...props } />
 );
 export const Default = Template.bind( {} );
 Default.args = {
