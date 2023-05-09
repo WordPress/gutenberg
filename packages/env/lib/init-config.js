@@ -236,24 +236,23 @@ RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
 RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
-			if ( shouldEnableXdebug( config ) ) {
-				// Xdebug is only needed for WordPress environments.
-				dockerFileContent += getXdebugSetup( config.xdebug );
-			}
 			break;
 		}
 		case 'cli': {
 			dockerFileContent += `
 RUN apk update
 RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
-RUN apk --no-cache add linux-headers
-RUN apk --no-cache add sudo
+RUN apk --no-cache add sudo linux-headers
 RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		default: {
 			throw new Error( `Invalid environment "${ environment }" given` );
 		}
+	}
+
+	if ( shouldEnableXdebug( config ) ) {
+		dockerFileContent += getXdebugSetup( config.xdebug );
 	}
 
 	// Add better PHP settings.
