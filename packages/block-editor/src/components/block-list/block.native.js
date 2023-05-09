@@ -69,7 +69,7 @@ function BlockWrapper( {
 	clientId,
 	draggingClientId,
 	draggingEnabled,
-	isInnerBlockSelected,
+	isDescendentBlockSelected,
 	isParentSelected,
 	isSelected,
 	isStackedHorizontally,
@@ -92,7 +92,7 @@ function BlockWrapper( {
 			marginHorizontal,
 		},
 	];
-	const accessible = ! ( isSelected || isInnerBlockSelected );
+	const accessible = ! ( isSelected || isDescendentBlockSelected );
 
 	return (
 		<Pressable
@@ -164,7 +164,7 @@ function BlockListBlock( {
 		draggingEnabled,
 		firstToSelectId,
 		isDescendantOfParentSelected,
-		isInnerBlockSelected,
+		isDescendentBlockSelected,
 		isParentSelected,
 		order,
 	} = useSelect(
@@ -181,7 +181,10 @@ function BlockListBlock( {
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const blockOrder = getBlockIndex( clientId );
-			const innerBlockSelected = hasSelectedInnerBlock( clientId, true );
+			const descendentBlockSelected = hasSelectedInnerBlock(
+				clientId,
+				true
+			);
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			const parents = getBlockParents( clientId, true );
@@ -206,9 +209,7 @@ function BlockListBlock( {
 			// blocks if any of them are selected. This way we prevent the long-press
 			// gesture from being disabled for elements within the block UI.
 			const isDraggingEnabled =
-				! hasInnerBlocks ||
-				isSelected ||
-				! hasSelectedInnerBlock( clientId, true );
+				! hasInnerBlocks || isSelected || ! descendentBlockSelected;
 			// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
 			// will be the top in the hierarchy.
 			const currentDraggingClientId =
@@ -224,7 +225,7 @@ function BlockListBlock( {
 				draggingEnabled: isDraggingEnabled,
 				firstToSelectId: firstBlockToSelectId,
 				isDescendantOfParentSelected: descendantOfParentSelected,
-				isInnerBlockSelected: innerBlockSelected,
+				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
 				order: blockOrder,
 			};
@@ -306,7 +307,7 @@ function BlockListBlock( {
 	] );
 
 	const { align } = attributes;
-	const isFocused = isSelected || isInnerBlockSelected;
+	const isFocused = isSelected || isDescendentBlockSelected;
 	const isTouchable =
 		isSelected ||
 		isDescendantOfParentSelected ||
@@ -328,7 +329,7 @@ function BlockListBlock( {
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
-			isInnerBlockSelected={ isInnerBlockSelected }
+			isDescendentBlockSelected={ isDescendentBlockSelected }
 			isParentSelected={ isParentSelected }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
