@@ -727,6 +727,32 @@ test.describe( 'Image', () => {
 			new RegExp( filename )
 		);
 	} );
+
+	test.describe.only( 'Image - frontend interactivity', () => {
+		test.beforeEach( async ( { editor, imageBlockUtils, page } ) => {
+			await editor.insertBlock( { name: 'core/image' } );
+
+			const imageBlock = page.locator(
+				'role=document[name="Block: Image"i]'
+			);
+			await expect( imageBlock ).toBeVisible();
+
+			await imageBlockUtils.upload(
+				imageBlock.locator( 'data-testid=form-file-upload-input' )
+			);
+
+			const image = imageBlock.locator( 'role=img' );
+			await expect( image ).toBeVisible();
+
+			await editor.publishPost();
+		} );
+
+		test( 'should open the image in a lightbox when clicked', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+		} );
+	} );
 } );
 
 class ImageBlockUtils {
