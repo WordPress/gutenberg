@@ -12,7 +12,7 @@ const yaml = require( 'js-yaml' );
  */
 const { loadConfig } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
-
+const { ValidationError } = require( './config' );
 /**
  * @typedef {import('./config').WPConfig} WPConfig
  */
@@ -266,7 +266,7 @@ function getXdebugConfig( xdebugMode = 'off', phpVersion ) {
 		const minorVer = parseInt( versionTokens[ 1 ] );
 
 		if ( isNaN( majorVer ) || isNaN( minorVer ) ) {
-			throw new Error(
+			throw new ValidationError(
 				'Something went wrong when parsing the PHP version.'
 			);
 		}
@@ -274,7 +274,7 @@ function getXdebugConfig( xdebugMode = 'off', phpVersion ) {
 		// Throw an error if someone tries to use Xdebug with an unsupported PHP version.
 		// Xdebug 3 only supports 7.2 and higher.
 		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
-			throw new Error(
+			throw new ValidationError(
 				`Cannot use XDebug 3 with PHP < 7.2. Your PHP version is ${ phpVersion }.`
 			);
 		}
