@@ -79,3 +79,16 @@ function gutenberg_enqueue_global_styles_custom_css() {
 }
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles_custom_css' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );
+
+/**
+ * Function that enqueues the CSS Custom Properties coming from theme.json.
+ *
+ * @since 5.9.0
+ */
+function gutenberg_enqueue_global_styles_css_custom_properties() {
+	wp_register_style( 'global-styles-css-custom-properties', false );
+	wp_add_inline_style( 'global-styles-css-custom-properties', gutenberg_get_global_stylesheet( array( 'variables' ) ) );
+	wp_enqueue_style( 'global-styles-css-custom-properties' );
+}
+remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_global_styles_css_custom_properties' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_global_styles_css_custom_properties' );
