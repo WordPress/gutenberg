@@ -179,10 +179,6 @@ public class WPAndroidGlueCode {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
-    public interface OnEmbedFullscreenPreviewListener {
-        void onEmbedFullscreenPreviewClicked(String html, String title);
-    }
-
     public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
     }
