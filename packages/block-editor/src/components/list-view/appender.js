@@ -17,7 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import { ComposedPrivateInserter as PrivateInserter } from '../inserter';
+import Inserter from '../inserter';
 
 export const Appender = forwardRef(
 	(
@@ -100,7 +100,7 @@ export const Appender = forwardRef(
 
 		return (
 			<div className="list-view-appender">
-				<PrivateInserter
+				<Inserter
 					ref={ ref }
 					rootClientId={ clientId }
 					position="bottom right"
