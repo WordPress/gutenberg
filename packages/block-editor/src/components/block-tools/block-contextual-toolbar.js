@@ -110,7 +110,9 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		}, [] );
 
 	useEffect( () => {
-		setIsCollapsed( false );
+		if ( ! selectedBlockClientId ) {
+			setIsCollapsed( false );
+		}
 	}, [ selectedBlockClientId ] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
