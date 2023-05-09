@@ -28,28 +28,6 @@ import type {
 	DropdownSubMenuTriggerProps,
 } from './types';
 
-// Observations / Questions:
-// - is it enough on the larger components to have only one forwarded ref?
-//   If we have only one, should it be to the "root", the "trigger", or the "content"?
-// - Should we be consistent in using the same value for the `asChild` prop on:
-//   - trigger
-//   - content
-//   - sub trigger
-//   - sub content
-// - Should we allow customizing the `asChild` prop on trigger and content?
-// - Props & customisability:
-//   - Which props should we expose?
-//   - Should props be "namespaced" for each subcomponent?
-//   - We should probably explicitly `Pick<>` every prop that we want to expose
-// - Subtrigger arrow:
-//   - Should it always be there (ie. an internal implementation)?
-//   - Should we just expect that the the consumers handle it themselves?
-//   - Should we expose it as a separate component that consumers could use?
-// - DropdowmMenuItem icon prop:
-//   - added to mirror previous menu item component
-//   - should we expect consumers to provide this directly with children?
-//   - should we expose prefix / suffix to help?
-// - Props: should we export HTML-inherited props? (e.g styles, classnames, hidden, etc..)
 export const DropdownMenu = ( {
 	// Root props
 	defaultOpen,
