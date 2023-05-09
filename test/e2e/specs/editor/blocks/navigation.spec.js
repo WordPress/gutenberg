@@ -1205,7 +1205,13 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Subpage',
 			} );
 			await editor.openDocumentSettingsSidebar();
-			await page.locator( 'button:has-text("Page Attributes")' ).click();
+			const parentPage = page.locator( 'label:has-text("Parent page")' );
+
+			if ( await parentPage.isHidden() ) {
+				await page
+					.locator( 'button:has-text("Page Attributes")' )
+					.click();
+			}
 			await page.locator( 'label:has-text("Parent page")' ).click();
 			await page.locator( 'li:has-text("Parent Page")' ).click();
 			await editor.publishPost();
@@ -1244,7 +1250,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 		} );
 
-		test.only( 'page-list submenu closes on click outside', async ( {
+		test( 'page-list submenu closes on click outside', async ( {
 			page,
 		} ) => {
 			const submenuButton = page.locator(
