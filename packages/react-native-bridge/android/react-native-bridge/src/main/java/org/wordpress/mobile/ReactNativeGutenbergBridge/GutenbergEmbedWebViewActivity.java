@@ -105,15 +105,6 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_gutenberg_embed_webview, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (mWebView == null) {
             return false;
