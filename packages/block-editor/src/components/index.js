@@ -83,7 +83,6 @@ export {
 	RichTextShortcut,
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
-	getRichTextValues,
 } from './rich-text';
 export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';
@@ -96,6 +95,7 @@ export { default as __experimentalSpacingSizesControl } from './spacing-sizes-co
 export {
 	getSpacingPresetCssVar,
 	isValueSpacingPreset,
+	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
 /*
  * Content Related Components
