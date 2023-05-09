@@ -80,6 +80,10 @@ const baseContent = css`
 	&[data-side='left'] {
 		animation-name: ${ slideRightAndFade };
 	}
+
+	@media ( prefers-reduced-motion ) {
+		animation-duration: 0s;
+	}
 `;
 
 const baseItem = css`
