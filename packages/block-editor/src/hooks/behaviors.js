@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { select } from '@wordpress/data';
@@ -22,6 +22,11 @@ import { store as blockEditorStore } from '../store';
  */
 export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
+		// Only add behaviors to the core/image block.
+		if ( props.name !== 'core/image' ) {
+			return <BlockEdit { ...props } />;
+		}
+
 		const { behaviors: blockBehaviors } = props.attributes;
 		const settings = select( blockEditorStore ).getSettings();
 		const themeBehaviors =
@@ -32,30 +37,42 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 			return <BlockEdit { ...props } />;
 		}
 
+		// By default, use the block behaviors.
+		let behaviors = blockBehaviors;
+
+		// If the theme has behaviors, but the block does not, use the theme behaviors.
 		if ( ! blockBehaviors && themeBehaviors ) {
-			props.attributes.behaviors = themeBehaviors;
+			behaviors = themeBehaviors;
 		}
 
 		return (
 			<>
 				<BlockEdit { ...props } />
 				<InspectorControls group="advanced">
-					<TextControl
+					<SelectControl
 						__nextHasNoMarginBottom
-						autoComplete="on"
 						label={ __( 'Behaviors' ) }
-						value={
-							props.attributes?.behaviors?.lightbox
-								? 'LIGHTBOX'
-								: ''
-						}
+						// At the moment we are only supporting one behavior (lightbox)
+						value={ behaviors?.lightbox || '' }
+						options={ Object.keys( behaviors )
+							.map( ( behavior ) => ( {
+								value: behavior,
+								label: behavior.toUpperCase(),
+							} ) )
+							.concat( {
+								value: '',
+								label: __( 'None' ),
+							} ) }
 						onChange={ ( nextValue ) => {
 							props.setAttributes( {
-								behaviors:
-									nextValue !== '' ? nextValue : undefined,
+								behaviors: {
+									lightbox: nextValue === '' ? false : true,
+								},
 							} );
 						} }
+						hideCancelButton={ true }
 						help={ __( 'Add behaviors' ) }
+						size="__unstable-large"
 					/>
 				</InspectorControls>
 			</>
