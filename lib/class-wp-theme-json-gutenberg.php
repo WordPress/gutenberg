@@ -795,7 +795,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
 			} else {
-				$output[ $subtree ] = static::sanitize_variables( $result, $schema[ $subtree ] );
+				$output[ $subtree ] = static::sanitize_variables( $result );
 			}
 		}
 
@@ -3596,41 +3596,17 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 * @param array $tree   Input to process.
-	 * @param array $schema Schema to adhere to.
 	 * @return array The modified $tree.
 	 */
-	private static function sanitize_variables( $tree, $schema ) {
-		$tree   = array_intersect_key( $tree, $schema );
+	private static function sanitize_variables( $tree ) {
 		$prefix = 'var:';
-		foreach ( $schema as $key => $data ) {
-			if ( ! isset( $tree[ $key ] ) ) {
-				continue;
-			}
-			$values = $tree[ $key ];
-			if ( is_array( $values ) ) {
-				foreach ( $values as $name => $value ) {
-					// if value is an array, do recursion.
-					if ( is_array( $value ) ) {
-						// make sure variations are included in the schema for recursion.
-						if ( isset( $value['variations'] ) ) {
-							$schema = $schema + array( 'variations' => null );
-						}
-						$values[ $name ] = array_merge( $value, self::sanitize_variables( $value, $schema ) );
-						continue;
-					}
-					if ( ! is_string( $value ) || 0 !== strpos( $value, $prefix ) ) {
-						continue;
-					}
 
-					$values[ $name ] = self::convert_custom_properties( $value );
-				}
-			} elseif ( ! is_string( $values ) || 0 !== strpos( $values, $prefix ) ) {
-				continue;
-			} else {
-				$values = self::convert_custom_properties( $values );
+		foreach ( $tree as $key => $data ) {
+			if ( is_string( $data ) && 0 === strpos( $data, $prefix ) ) {
+				$tree[ $key ] = self::convert_custom_properties( $data );
+			} elseif ( is_array( $data ) ) {
+				$tree[ $key ] = self::sanitize_variables( $data );
 			}
-
-			$tree[ $key ] = $values;
 		}
 
 		return $tree;
