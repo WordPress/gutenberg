@@ -178,7 +178,7 @@ Use this object to modify props available for the `Popover` component that are n
 
 -   Required: No
 
-#### `toggleProps`: `Object`
+#### `toggleProps`: `ToggleProps`
 
 Properties of `toggleProps` object will be passed as props to the nested `Button` component in the `renderToggle` implementation of the `Dropdown` component used internally.
 Use this object to modify props available for the `Button` component that are not already exposed in the `DropdownMenu` component, e.g.: the tooltip text displayed on hover set with `tooltip` prop.
