@@ -404,8 +404,8 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
-		'behaviors' => array(
-			'lightbox' => null,
+		'behaviors'                     => array(
+			'lightbox'       => null,
 		),
 	);
 
