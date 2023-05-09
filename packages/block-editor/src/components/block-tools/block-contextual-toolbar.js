@@ -117,10 +117,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	if ( blockType ) {
-		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
-			return null;
-		}
+	if (
+		blockType &&
+		! hasBlockSupport( blockType, '__experimentalToolbar', true )
+	) {
+		return null;
 	}
 
 	// Shifts the toolbar to make room for the parent block selector.
