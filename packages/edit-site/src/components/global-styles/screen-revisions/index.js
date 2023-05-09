@@ -125,7 +125,6 @@ function ScreenRevisions() {
 						<Button
 							variant="primary"
 							className="edit-site-global-styles-screen-revisions__button"
-							aria-label={ __( 'Load revision' ) }
 							disabled={
 								! globalStylesRevision?.id ||
 								globalStylesRevision?.id === 'unsaved'
