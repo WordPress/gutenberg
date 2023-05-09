@@ -108,6 +108,11 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	&.is-right-aligned {
+		justify-content: flex-end;
+	}
+
 	& > div {
 		color: $gray-900;
 		background: $white;
@@ -140,11 +145,6 @@
 			box-shadow: none;
 		}
 	}
-}
-
-.edit-site-layout__canvas:has(.is-oversized) {
-	justify-content: flex-end;
-	align-items: flex-end;
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
