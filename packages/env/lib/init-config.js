@@ -287,8 +287,13 @@ function getXdebugConfig( config ) {
 	}
 
 	// Throw an error if someone tries to use Xdebug with an unsupported PHP version.
-	if ( config.env.development.phpVersion ) {
-		const versionTokens = config.env.development.phpVersion.split( '.' );
+	const phpVersions = [
+		config.env.development.phpVersion,
+		config.env.tests.phpVersion,
+	].filter( Boolean );
+
+	for ( const phpVersion of phpVersions ) {
+		const versionTokens = phpVersion.split( '.' );
 		const majorVer = parseInt( versionTokens[ 0 ] );
 		const minorVer = parseInt( versionTokens[ 1 ] );
 
@@ -301,7 +306,9 @@ function getXdebugConfig( config ) {
 		// Xdebug 3 supports 7.2 and higher
 		// Ensure user has specified a compatible PHP version.
 		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
-			throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
+			throw new Error(
+				`Cannot use XDebug 3 with PHP < 7.2. Your PHP version is ${ phpVersion }.`
+			);
 		}
 	}
 
