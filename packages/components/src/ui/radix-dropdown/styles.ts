@@ -8,8 +8,9 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 /**
  * Internal dependencies
  */
-import { COLORS, font } from '../../utils';
+import { COLORS, font, rtl } from '../../utils';
 import { space } from '../utils/space';
+import Icon from '../../icon';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',
@@ -120,7 +121,7 @@ const itemPrefix = css`
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	margin-left: calc( -1 * ${ ITEM_HORIZONTAL_PADDING } );
+	margin-inline-start: calc( -1 * ${ ITEM_HORIZONTAL_PADDING } );
 `;
 
 const itemSuffix = css`
@@ -128,8 +129,8 @@ const itemSuffix = css`
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	margin-left: auto;
-	padding-left: ${ space( 6 ) };
+	margin-inline-start: auto;
+	padding-inline-start: ${ space( 6 ) };
 `;
 
 export const Content = styled( DropdownMenu.Content )`
@@ -175,4 +176,15 @@ export const ItemPrefixWrapper = styled.span`
 
 export const ItemSuffixWrapper = styled.span`
 	${ itemSuffix }
+`;
+
+export const RTLFlippableIcon = styled( Icon )`
+	${ rtl(
+		{
+			transform: 'scaleX(1)',
+		},
+		{
+			transform: 'scaleX(-1)',
+		}
+	)() }
 `;

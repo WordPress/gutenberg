@@ -7,8 +7,9 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { SVG, Circle } from '@wordpress/primitives';
+import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
+import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -49,6 +50,7 @@ export const DropdownMenu = ( {
 			open={ open }
 			onOpenChange={ onOpenChange }
 			modal={ modal }
+			dir={ isRTL() ? 'rtl' : 'ltr' }
 		>
 			<DropdownMenuPrimitive.Trigger asChild>
 				{ trigger }
@@ -68,9 +70,16 @@ export const DropdownMenu = ( {
 	);
 };
 
+const ChevronIcon = () => (
+	<DropdownMenuStyled.RTLFlippableIcon
+		icon={ chevronRightSmall }
+		size={ 28 }
+	/>
+);
+
 export const DropdownSubMenuTrigger = ( {
 	prefix,
-	suffix = <Icon icon={ chevronRightSmall } size={ 28 } />,
+	suffix = <ChevronIcon />,
 	children,
 }: DropdownSubMenuTriggerProps ) => {
 	return (
