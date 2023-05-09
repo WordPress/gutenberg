@@ -6,25 +6,10 @@ import {
 	getBlock,
 	getEditorHtml,
 	initializeEditor,
+	setupCoreBlocks,
 } from 'test/helpers';
 
-/**
- * WordPress dependencies
- */
-import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
-
-beforeAll( () => {
-	// Register all core blocks
-	registerCoreBlocks();
-} );
-
-afterAll( () => {
-	// Clean up registered blocks
-	getBlockTypes().forEach( ( block ) => {
-		unregisterBlockType( block.name );
-	} );
-} );
+setupCoreBlocks();
 
 describe( 'Block invalid warning', () => {
 	it( 'shows invalid placeholder', async () => {
