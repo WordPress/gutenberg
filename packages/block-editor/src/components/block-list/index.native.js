@@ -229,7 +229,6 @@ export default function BlockList( {
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
-	// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 	return (
 		<View
 			style={ containerStyle }
