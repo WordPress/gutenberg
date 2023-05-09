@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -156,15 +156,9 @@ describe( 'ColorPalette', () => {
 
 		expect( dropdownButton ).toBeVisible();
 
-		expect(
-			within( dropdownButton ).getByText( EXAMPLE_COLORS[ 0 ].name )
-		).toBeVisible();
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
 
-		expect(
-			within( dropdownButton ).getByText(
-				EXAMPLE_COLORS[ 0 ].color.replace( '#', '' )
-			)
-		).toBeVisible();
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
 
 		// Check that the popover with custom color input has appeared.
 		const dropdownColorInput = screen.getByLabelText( 'Hex color' );

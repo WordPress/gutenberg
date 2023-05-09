@@ -127,25 +127,34 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  gap: calc(4px * 2);
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: 0;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-  width: 100%;
+  height: 100%;
 }
 
 .emotion-2>* {
-  min-width: 0;
+  min-height: 0;
 }
 
-.emotion-5 {
+.emotion-4 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+}
+
+.emotion-7 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -155,17 +164,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-7 {
   display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
 }
 
 <div>
@@ -178,30 +177,35 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       class="components-dropdown"
       tabindex="-1"
     >
-      <button
-        aria-expanded="false"
-        aria-haspopup="true"
-        aria-label="Custom color picker. The currently selected color is called "red" and has a value of "f00"."
-        class="components-flex components-color-palette__custom-color emotion-2 emotion-1"
+      <div
+        class="components-flex components-color-palette__custom-color__container emotion-2 emotion-1"
         data-wp-c16t="true"
         data-wp-component="Flex"
-        style="background: rgb(255, 0, 0); color: rgb(0, 0, 0);"
       >
+        <button
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "f00"."
+          class="components-flex-item components-color-palette__custom-color emotion-4 emotion-1"
+          data-wp-c16t="true"
+          data-wp-component="FlexItem"
+          style="background: rgb(255, 0, 0);"
+        />
         <span
-          class="components-truncate components-flex-item components-color-palette__custom-color-name emotion-1 emotion-5 emotion-1"
+          class="components-truncate components-flex-item components-color-palette__custom-color-name emotion-1 emotion-7 emotion-1"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
           red
         </span>
         <span
-          class="components-flex-item components-color-palette__custom-color-value emotion-7 emotion-1"
+          class="components-flex-item components-color-palette__custom-color-value emotion-4 emotion-1"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
-          f00
+          #f00
         </span>
-      </button>
+      </div>
     </div>
     <div
       class="components-circular-option-picker"
