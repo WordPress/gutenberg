@@ -11,7 +11,14 @@ import { MenuGroup, MenuItem } from '../..';
 /**
  * WordPress dependencies
  */
-import { menu, arrowUp, arrowDown, more, trash } from '@wordpress/icons';
+import {
+	menu,
+	arrowUp,
+	arrowDown,
+	chevronDown,
+	more,
+	trash,
+} from '@wordpress/icons';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components/DropdownMenu',
@@ -19,6 +26,13 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
+	},
+	argTypes: {
+		icon: {
+			options: [ 'menu', 'chevronDown', 'more' ],
+			mapping: { menu, chevronDown, more },
+			control: { type: 'select' },
+		},
 	},
 };
 export default meta;
