@@ -229,11 +229,6 @@ export default function BlockList( {
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
-	const scrollViewStyle = [
-		{ flex: isRootList ? 1 : 0 },
-		! isRootList && styles.overflowVisible,
-	];
-
 	// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 	return (
 		<View
@@ -261,7 +256,7 @@ export default function BlockList( {
 								} }
 								extraScrollHeight={ extraScrollHeight }
 								keyboardShouldPersistTaps="always"
-								scrollViewStyle={ scrollViewStyle }
+								scrollViewStyle={ { flex: 1 } }
 								extraData={ getExtraData() }
 								scrollEnabled={ isRootList }
 								contentContainerStyle={ [
@@ -323,7 +318,8 @@ export default function BlockList( {
 									isStackedHorizontally,
 									horizontalAlignment
 								),
-								...scrollViewStyle,
+								{ flex: 0 },
+								styles.overflowVisible,
 								horizontal && styles.horizontalContentContainer,
 								isWider( blockWidth, 'medium' ) &&
 									( isContentStretch && isMultiBlocks
