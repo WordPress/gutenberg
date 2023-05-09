@@ -886,7 +886,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Open menu',
 			} );
 			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.click();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( overlayMenuFirstElement ).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await expect( overlayMenuFirstElement ).toBeHidden();
@@ -904,7 +905,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Open menu',
 			} );
 			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.click();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( overlayMenuFirstElement ).toBeVisible();
 			await expect( overlayMenuFirstElement ).toBeFocused();
 		} );
@@ -921,7 +923,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Close menu',
 			} );
 			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.click();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( overlayMenuFirstElement ).toBeVisible();
 			await expect( overlayMenuFirstElement ).toBeFocused();
 			await page.keyboard.press( 'Tab' );
@@ -1024,7 +1027,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Simple Submenu Link 1',
 			} );
 			await expect( innerElement ).toBeHidden();
-			await simpleSubmenuButton.click();
+			await simpleSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await expect( innerElement ).toBeHidden();
@@ -1043,7 +1047,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Simple Submenu Link 1',
 			} );
 			await expect( innerElement ).toBeHidden();
-			await simpleSubmenuButton.click();
+			await simpleSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 			// Tab to first element.
 			await page.keyboard.press( 'Tab' );
@@ -1094,7 +1099,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			const secondLevelElement = page.getByRole( 'link', {
 				name: 'Nested Submenu Link 1',
 			} );
-			await complexSubmenuButton.click();
+			await complexSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -1124,7 +1130,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			const secondLevelElement = page.getByRole( 'link', {
 				name: 'Nested Submenu Link 1',
 			} );
-			await complexSubmenuButton.click();
+			await complexSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -1287,7 +1294,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Subpage',
 			} );
 			await expect( innerElement ).toBeHidden();
-			await submenuButton.click();
+			await submenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await expect( innerElement ).toBeHidden();
@@ -1305,7 +1313,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Subpage',
 			} );
 			await expect( innerElement ).toBeHidden();
-			await submenuButton.click();
+			await submenuButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 			// Tab to first element.
 			await page.keyboard.press( 'Tab' );
