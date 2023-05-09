@@ -44,6 +44,9 @@ type DropdownOption = {
 	role?: HTMLElement[ 'role' ];
 };
 
+export type Controls = DropdownOption[];
+export type NormalizedControls = DropdownOption[][];
+
 type DropdownCallbackProps = {
 	isOpen: boolean;
 	onToggle: () => void;
@@ -139,6 +142,5 @@ export type DropdownMenuProps = {
 	 *
 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
 	 */
-
-	controls?: DropdownOption[];
+	controls?: Controls | NormalizedControls;
 };

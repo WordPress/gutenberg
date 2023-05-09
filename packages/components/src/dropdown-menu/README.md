@@ -146,7 +146,7 @@ A human-readable label to present as accessibility text on the focused collapsed
 
 -   Required: Yes
 
-#### `controls:` `DropdownOption[]`
+#### `controls:` `DropdownOption[] | DropdownOption[][]`
 
 An array of objects describing the options to be shown in the expanded menu.
 
