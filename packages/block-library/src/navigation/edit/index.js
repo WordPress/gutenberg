@@ -27,9 +27,9 @@ import {
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -41,7 +41,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -87,7 +86,6 @@ function Navigation( {
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
 	const {
@@ -220,42 +218,34 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
+	const { getNavigationFallbackId } = useSelect( coreStore );
+
+	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+		? getNavigationFallbackId()
+		: null;
+
 	useEffect( () => {
 		// If:
 		// - there is an existing menu, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks ) {
+		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
 			return;
 		}
 
-		apiFetch( { path: '/wp-block-editor/v1/navigation-fallback' } )
-			.then( ( fallbackNavigationMenu ) => {
-				if ( ! fallbackNavigationMenu?.id ) {
-					showNavigationMenuStatusNotice(
-						__( 'Unable to fetch a fallback Navigation Menu.' )
-					);
-					return;
-				}
+		/**
+		 *  This fallback displays (both in editor and on front)
+		 *  The fallback should not request a save (entity dirty state)
+		 *  nor to be undoable, hence why it is marked as non persistent
+		 */
 
-				/**
-				 *  This fallback displays (both in editor and on front)
-				 *  The fallback should not request a save (entity dirty state)
-				 *  nor to be undoable, hence why it is marked as non persistent
-				 */
-				__unstableMarkNextChangeAsNotPersistent();
-				setRef( fallbackNavigationMenu.id );
-			} )
-			.catch( () => {
-				showNavigationMenuStatusNotice(
-					__( 'Unable to fetch a fallback Navigation Menu.' )
-				);
-			} );
+		__unstableMarkNextChangeAsNotPersistent();
+		setRef( navigationFallbackId );
 	}, [
 		ref,
-		hasUnsavedBlocks,
 		setRef,
-		showNavigationMenuStatusNotice,
+		hasUnsavedBlocks,
+		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
@@ -588,60 +578,58 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls group="color">
-				{ hasColorSettings && (
-					<>
-						<ColorGradientSettingsDropdown
-							__experimentalIsRenderedInSidebar
-							settings={ [
-								{
-									colorValue: textColor.color,
-									label: __( 'Text' ),
-									onColorChange: setTextColor,
-									resetAllFilter: () => setTextColor(),
-								},
-								{
-									colorValue: backgroundColor.color,
-									label: __( 'Background' ),
-									onColorChange: setBackgroundColor,
-									resetAllFilter: () => setBackgroundColor(),
-								},
-								{
-									colorValue: overlayTextColor.color,
-									label: __( 'Submenu & overlay text' ),
-									onColorChange: setOverlayTextColor,
-									resetAllFilter: () => setOverlayTextColor(),
-								},
-								{
-									colorValue: overlayBackgroundColor.color,
-									label: __( 'Submenu & overlay background' ),
-									onColorChange: setOverlayBackgroundColor,
-									resetAllFilter: () =>
-										setOverlayBackgroundColor(),
-								},
-							] }
-							panelId={ clientId }
-							{ ...colorGradientSettings }
-							gradients={ [] }
-							disableCustomGradients={ true }
-						/>
-						{ enableContrastChecking && (
-							<>
-								<ContrastChecker
-									backgroundColor={ detectedBackgroundColor }
-									textColor={ detectedColor }
-								/>
-								<ContrastChecker
-									backgroundColor={
-										detectedOverlayBackgroundColor
-									}
-									textColor={ detectedOverlayColor }
-								/>
-							</>
-						) }
-					</>
-				) }
-			</InspectorControls>
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					<ColorGradientSettingsDropdown
+						__experimentalIsRenderedInSidebar
+						settings={ [
+							{
+								colorValue: textColor.color,
+								label: __( 'Text' ),
+								onColorChange: setTextColor,
+								resetAllFilter: () => setTextColor(),
+							},
+							{
+								colorValue: backgroundColor.color,
+								label: __( 'Background' ),
+								onColorChange: setBackgroundColor,
+								resetAllFilter: () => setBackgroundColor(),
+							},
+							{
+								colorValue: overlayTextColor.color,
+								label: __( 'Submenu & overlay text' ),
+								onColorChange: setOverlayTextColor,
+								resetAllFilter: () => setOverlayTextColor(),
+							},
+							{
+								colorValue: overlayBackgroundColor.color,
+								label: __( 'Submenu & overlay background' ),
+								onColorChange: setOverlayBackgroundColor,
+								resetAllFilter: () =>
+									setOverlayBackgroundColor(),
+							},
+						] }
+						panelId={ clientId }
+						{ ...colorGradientSettings }
+						gradients={ [] }
+						disableCustomGradients={ true }
+					/>
+					{ enableContrastChecking && (
+						<>
+							<ContrastChecker
+								backgroundColor={ detectedBackgroundColor }
+								textColor={ detectedColor }
+							/>
+							<ContrastChecker
+								backgroundColor={
+									detectedOverlayBackgroundColor
+								}
+								textColor={ detectedOverlayColor }
+							/>
+						</>
+					) }
+				</InspectorControls>
+			) }
 		</>
 	);
 

@@ -124,6 +124,69 @@ module.exports = async function initConfig( {
 };
 
 /**
+ * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
+ *
+ * @param {string}   image  The base docker image to use.
+ * @param {WPConfig} config The configuration object.
+ *
+ * @return {string} The dockerfile contents.
+ */
+function wordpressDockerFileContents( image, config ) {
+	return `FROM ${ image }
+
+# Update apt sources for archived versions of Debian.
+
+# stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
+RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
+RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN groupadd -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
+
+# Install any dependencies we need in the container.
+${ installDependencies( 'wordpress', config ) }`;
+}
+
+/**
+ * Generates the Dockerfile used by wp-env's `cli` and `tests-cli` instances.
+ *
+ * @param {string}   image  The base docker image to use.
+ * @param {WPConfig} config The configuration object.
+ *
+ * @return {string} The dockerfile contents.
+ */
+function cliDockerFileContents( image, config ) {
+	return `FROM ${ image }
+
+# Switch to root so we can create users.
+USER root
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN addgroup -g $HOST_GID $HOST_USERNAME || true
+RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
+
+# Install any dependencies we need in the container.
+${ installDependencies( 'cli', config ) }
+	
+# Switch back to the original user now that we're done.
+USER www-data
+
+# Have the container sleep infinitely to keep it alive for us to run commands on it.
+CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
+`;
+}
+
+/**
  * Gets the base docker image to use based on our input.
  *
  * @param {string}  phpVersion The version of PHP to get an image for.
@@ -144,6 +207,76 @@ function getBaseDockerImage( phpVersion, isCLI ) {
 	}
 
 	return wordpressImage + phpVersion;
+}
+
+/**
+ * Generates content for the Dockerfile to install dependencies.
+ *
+ * @param {string}   environment The kind of environment that we're installing dependencies on ('wordpress' or 'cli').
+ * @param {WPConfig} config      The configuration object.
+ *
+ * @return {string} The Dockerfile content for installing dependencies.
+ */
+function installDependencies( environment, config ) {
+	let dockerFileContent = '';
+
+	// At times we may need to evaluate the environment. This is because the
+	// WordPress image uses Ubuntu while the CLI image uses Alpine.
+
+	// Start with some environment-specific dependency installations.
+	if ( environment === 'wordpress' ) {
+		dockerFileContent += `
+# Make sure we're working with the latest packages.
+RUN apt-get -qy update
+
+# Install some basic PHP dependencies.
+RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+
+# Set up sudo so they can have root access.
+RUN apt-get -qy install sudo
+RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+	} else {
+		dockerFileContent += `
+RUN apk update
+RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+RUN apk --no-cache add sudo
+RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+	}
+
+	if ( config.xdebug !== 'off' ) {
+		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
+		if ( usingCompatiblePhp ) {
+			// Discover client host does not appear to work on macOS with Docker.
+			const clientDetectSettings =
+				os.type() === 'Linux'
+					? 'xdebug.discover_client_host=true'
+					: 'xdebug.client_host="host.docker.internal"';
+
+			dockerFileContent += `
+RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN docker-php-ext-enable xdebug
+RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=true' >> /usr/local/etc/php/php.ini
+RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
+		}
+	}
+
+	// Make sure Composer is available for use in the container.
+	dockerFileContent += `
+RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+RUN export COMPOSER_HASH=\`curl -sS https://composer.github.io/installer.sig\` && php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$COMPOSER_HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('/tmp/composer-setup.php'); } echo PHP_EOL;"
+RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+RUN rm /tmp/composer-setup.php`;
+
+	// Install any Composer packages we might need globally.
+	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
+	dockerFileContent += `
+USER $HOST_USERNAME
+ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+RUN composer global require --dev yoast/phpunit-polyfills:"^1.0"
+USER root`;
+
+	return dockerFileContent;
 }
 
 /**
@@ -179,98 +312,4 @@ function checkXdebugPhpCompatibility( config ) {
 	}
 
 	return phpCompatibility;
-}
-
-/**
- * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
- *
- * @param {string}   image  The base docker image to use.
- * @param {WPConfig} config The configuration object.
- *
- * @return {string} The dockerfile contents.
- */
-function wordpressDockerFileContents( image, config ) {
-	// Don't install XDebug unless it is explicitly required.
-	let shouldInstallXdebug = false;
-
-	if ( config.xdebug !== 'off' ) {
-		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
-
-		if ( usingCompatiblePhp ) {
-			shouldInstallXdebug = true;
-		}
-	}
-
-	return `FROM ${ image }
-
-# Update apt sources for archived versions of Debian.
-
-# stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
-RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
-RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
-RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
-
-# Prepare dependencies
-RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
-${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
-
-# Create the host's user so that we can match ownership in the container.
-ARG HOST_USERNAME
-ARG HOST_UID
-ARG HOST_GID
-# When the IDs are already in use we can still safely move on.
-RUN groupadd -g $HOST_GID $HOST_USERNAME || true
-RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
-
-# Set up sudo so they can have root access when using 'run' commands.
-RUN apt-get update -qy
-RUN apt-get -qy install sudo
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-`;
-}
-
-function installXdebug( enableXdebug ) {
-	const isLinux = os.type() === 'Linux';
-	// Discover client host does not appear to work on macOS with Docker.
-	const clientDetectSettings = isLinux
-		? 'xdebug.discover_client_host=true'
-		: 'xdebug.client_host="host.docker.internal"';
-
-	return `
-# Install Xdebug:
-RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
-RUN docker-php-ext-enable xdebug
-RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
-	`;
-}
-
-/**
- * Generates the Dockerfile used by wp-env's `cli` and `tests-cli` instances.
- *
- * @param {string} image The base docker image to use.
- *
- * @return {string} The dockerfile contents.
- */
-function cliDockerFileContents( image ) {
-	return `FROM ${ image }
-
-# Switch to root so we can create users.
-USER root
-	
-# Create the host's user so that we can match ownership in the container.
-ARG HOST_USERNAME
-ARG HOST_UID
-ARG HOST_GID
-# When the IDs are already in use we can still safely move on.
-RUN addgroup -g $HOST_GID $HOST_USERNAME || true
-RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
-
-# Switch back now that we're done.
-USER www-data
-
-# Have the container sleep infinitely to keep it alive for us to run commands on it.
-CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
-`;
 }

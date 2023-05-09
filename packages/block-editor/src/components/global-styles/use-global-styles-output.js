@@ -1106,9 +1106,17 @@ const processCSSNesting = ( css, blockSelector ) => {
 	return processedCSS;
 };
 
-export function useGlobalStylesOutput() {
-	let { merged: mergedConfig } = useContext( GlobalStylesContext );
-
+/**
+ * Returns the global styles output using a global styles configuration.
+ * If wishing to generate global styles and settings based on the
+ * global styles config loaded in the editor context, use `useGlobalStylesOutput()`.
+ * The use case for a custom config is to generate bespoke styles
+ * and settings for previews, or other out-of-editor experiences.
+ *
+ * @param {Object} mergedConfig Global styles configuration.
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -1189,4 +1197,14 @@ export function useGlobalStylesOutput() {
 		mergedConfig,
 		disableLayoutStyles,
 	] );
+}
+
+/**
+ * Returns the global styles output based on the current state of global styles config loaded in the editor context.
+ *
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutput() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return useGlobalStylesOutputWithConfig( mergedConfig );
 }
