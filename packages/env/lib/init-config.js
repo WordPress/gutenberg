@@ -224,8 +224,9 @@ function installDependencies( environment, config ) {
 	// WordPress image uses Ubuntu while the CLI image uses Alpine.
 
 	// Start with some environment-specific dependency installations.
-	if ( environment === 'wordpress' ) {
-		dockerFileContent += `
+	switch ( environment ) {
+		case 'wordpress': {
+			dockerFileContent += `
 # Make sure we're working with the latest packages.
 RUN apt-get -qy update
 
@@ -235,33 +236,32 @@ RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
 RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
-	} else {
-		dockerFileContent += `
+			if ( shouldEnableXdebug( config ) ) {
+				// Xdebug is only needed for WordPress environments.
+				dockerFileContent += getXdebugSetup( config.xdebug );
+			}
+			break;
+		}
+		case 'cli': {
+			dockerFileContent += `
 RUN apk update
 RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+RUN apk --no-cache add linux-headers
 RUN apk --no-cache add sudo
 RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
-	}
-
-	if ( config.xdebug !== 'off' ) {
-		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
-		if ( usingCompatiblePhp ) {
-			// Discover client host does not appear to work on macOS with Docker.
-			const clientDetectSettings =
-				os.type() === 'Linux'
-					? 'xdebug.discover_client_host=true'
-					: 'xdebug.client_host="host.docker.internal"';
-
-			dockerFileContent += `
-RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
-RUN docker-php-ext-enable xdebug
-RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=true' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
+			break;
+		}
+		default: {
+			throw new Error( `Invalid environment "${ environment }" given` );
 		}
 	}
 
-	// Make sure Composer is available for use in the container.
+	// Add better PHP settings.
+	dockerFileContent += `
+RUN echo 'upload_max_filesize = 1G' >> /usr/local/etc/php/php.ini
+RUN echo 'post_max_size = 1G' >> /usr/local/etc/php/php.ini`;
+
+	// Make sure Composer is available for use in all environments.
 	dockerFileContent += `
 RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
 RUN export COMPOSER_HASH=\`curl -sS https://composer.github.io/installer.sig\` && php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$COMPOSER_HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('/tmp/composer-setup.php'); } echo PHP_EOL;"
@@ -279,14 +279,32 @@ USER root`;
 	return dockerFileContent;
 }
 
+function getXdebugSetup( xdebugMode ) {
+	// Discover client host does not appear to work on macOS with Docker.
+	const clientDetectSettings =
+		os.type() === 'Linux'
+			? 'xdebug.discover_client_host=true'
+			: 'xdebug.client_host="host.docker.internal"';
+
+	return `
+RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN docker-php-ext-enable xdebug
+RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
+}
+
 /**
- * Checks the configured PHP version
- * against the minimum version supported by Xdebug
+ * Checks if Xdebug should be enabled based on the PHP version and config settings.
  *
  * @param {WPConfig} config
- * @return {boolean} Whether the PHP version is supported by Xdebug
+ * @return {boolean} Whether to enable Xdebug
  */
-function checkXdebugPhpCompatibility( config ) {
+function shouldEnableXdebug( config ) {
+	if ( config.xdebug === 'off' ) {
+		return false;
+	}
+
 	// By default, an undefined phpVersion uses the version on the docker image,
 	// which is supported by Xdebug 3.
 	const phpCompatibility = true;
