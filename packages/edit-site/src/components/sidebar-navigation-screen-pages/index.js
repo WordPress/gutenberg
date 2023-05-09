@@ -28,16 +28,13 @@ const PageItem = ( { postId, ...props } ) => {
 export default function SidebarNavigationScreenPages() {
 	const { records: pages, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'page',
-		{
-			orderby: 'date',
-		}
+		'page'
 	);
 
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Pages' ) }
-			description={ __( 'Browse and edit pages on your site' ) }
+			description={ __( 'Browse and edit pages on your site.' ) }
 			content={
 				<>
 					{ isLoading && (
@@ -66,7 +63,7 @@ export default function SidebarNavigationScreenPages() {
 									</PageItem>
 								) ) }
 								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
+									className="edit-site-sidebar-navigation-screen-pages__see-all"
 									href="edit.php?post_type=page"
 									onClick={ () => {
 										document.location =
