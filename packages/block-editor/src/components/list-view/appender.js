@@ -17,9 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
-
-import { unlock } from '../../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+import { ComposedPrivateInserter as PrivateInserter } from '../inserter';
 
 export const Appender = forwardRef(
 	(
@@ -91,7 +89,7 @@ export const Appender = forwardRef(
 			return null;
 		}
 		const descriptionId = `list-view-appender__${ instanceId }`;
-		const { PrivateInserter } = unlock( blockEditorPrivateApis );
+
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
 			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
