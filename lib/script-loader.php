@@ -56,3 +56,26 @@ function gutenberg_enqueue_global_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
+
+/**
+ * Enqueues the global styles custom css.
+ *
+ * @since 6.2.0
+ */
+function gutenberg_enqueue_global_styles_custom_css() {
+	if ( ! wp_is_block_theme() ) {
+		return;
+	}
+
+	// Don't enqueue Customizer's custom CSS separately.
+	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
+
+	$custom_css  = wp_get_custom_css();
+	$custom_css .= gutenberg_get_global_styles_custom_css();
+
+	if ( ! empty( $custom_css ) ) {
+		wp_add_inline_style( 'global-styles', $custom_css );
+	}
+}
+remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles_custom_css' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );

@@ -54,7 +54,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		 * entered by users does not break other global styles.
 		 */
 		$global_styles[] = array(
-			'css'            => wp_get_global_styles_custom_css(),
+			'css'            => gutenberg_get_global_styles_custom_css(),
 			'__unstableType' => 'user',
 			'isGlobalStyles' => true,
 		);
