@@ -802,6 +802,500 @@ test.describe( 'Navigation block', () => {
 	} );
 } );
 
+test.describe( 'Navigation block - Frontend interactivity', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.beforeEach( async ( { requestUtils } ) => {
+		await Promise.all( [ requestUtils.deleteAllMenus() ] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMenus(),
+			requestUtils.activateTheme( 'twentytwentyone' ),
+		] );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllMenus();
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.describe( 'Overlay menu', () => {
+		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'always' },
+			} );
+			await editor.saveSiteEditorEntities();
+			await page.goto( '/' );
+		} );
+
+		test( 'overlay menu opens on click on open menu button', async ( {
+			page,
+		} ) => {
+			const overlayMenu = page.locator(
+				'nav.wp-block-navigation div.has-modal-open'
+			);
+			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
+			await expect( overlayMenu ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenu ).toBeVisible();
+		} );
+
+		test( 'overlay menu closes on click on close menu button', async ( {
+			page,
+		} ) => {
+			const overlayMenu = page.locator(
+				'nav.wp-block-navigation div.has-modal-open'
+			);
+			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
+			const closeMenuButton = page.locator( '[aria-label="Close menu"]' );
+			await expect( overlayMenu ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenu ).toBeVisible();
+			await closeMenuButton.click();
+			await expect( overlayMenu ).toBeHidden();
+		} );
+
+		test( 'overlay menu closes on ESC key', async ( { page } ) => {
+			const overlayMenu = page.locator(
+				'nav.wp-block-navigation div.has-modal-open'
+			);
+			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
+			await expect( overlayMenu ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenu ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( overlayMenu ).toBeHidden();
+			await expect( openMenuButton ).toBeFocused();
+		} );
+
+		test( 'overlay menu focuses on first element after opening', async ( {
+			page,
+		} ) => {
+			const overlayMenu = page.locator(
+				'nav.wp-block-navigation div.has-modal-open'
+			);
+			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
+			const firstItem = page.locator(
+				'ul li.wp-block-navigation-item:first-child > *:first-child'
+			);
+			await expect( overlayMenu ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenu ).toBeVisible();
+			await expect( firstItem ).toBeFocused();
+		} );
+
+		test( 'overlay menu traps focus', async ( { page } ) => {
+			const overlayMenu = page.locator(
+				'nav.wp-block-navigation div.has-modal-open'
+			);
+			const openMenuButton = page.locator( '[aria-label="Open menu"]' );
+			const firstItem = page.locator(
+				'ul li.wp-block-navigation-item:first-child > *:first-child'
+			);
+			const closeMenuButton = page.locator( '[aria-label="Close menu"]' );
+			await expect( overlayMenu ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenu ).toBeVisible();
+			await expect( firstItem ).toBeFocused();
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await expect( closeMenuButton ).toBeFocused();
+			await page.keyboard.press( 'Shift+Tab' );
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( firstItem ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Submenus (Open on click)', () => {
+		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-submenu {"label":"Simple Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-submenu {"label":"Complex Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- /wp:navigation-submenu -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+			await page.goto( '/' );
+		} );
+
+		test( 'submenu opens on click', async ( { page } ) => {
+			const simpleSubmenuButton = page.locator(
+				'button:has-text("Simple Submenu")'
+			);
+			const innerElement = page.locator(
+				'a:has-text("Simple Submenu Link 1")'
+			);
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+		} );
+
+		test( 'nested submenu opens on click', async ( { page } ) => {
+			const complexSubmenuButton = page.locator(
+				'button:has-text("Complex Submenu")'
+			);
+			const nestedSubmenuButton = page.locator(
+				'button:has-text("Nested Submenu")'
+			);
+			const firstLevelElement = page.locator(
+				'a:has-text("Complex Submenu Link 1")'
+			);
+			const secondLevelElement = page.locator(
+				'a:has-text("Nested Submenu Link 1")'
+			);
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+		} );
+
+		test( 'submenu closes on click outside', async ( { page } ) => {
+			const simpleSubmenuButton = page.locator(
+				'button:has-text("Simple Submenu")'
+			);
+			const innerElement = page.locator(
+				'a:has-text("Simple Submenu Link 1")'
+			);
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+		} );
+
+		test( 'submenu closes on ESC key', async ( { page } ) => {
+			const simpleSubmenuButton = page.locator(
+				'button:has-text("Simple Submenu")'
+			);
+			const innerElement = page.locator(
+				'a:has-text("Simple Submenu Link 1")'
+			);
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( simpleSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'submenu closes on tab outside submenu', async ( { page } ) => {
+			const simpleSubmenuButton = page.locator(
+				'button:has-text("Simple Submenu")'
+			);
+			const complexSubmenuButton = page.locator(
+				'button:has-text("Complex Submenu")'
+			);
+			const innerElement = page.locator(
+				'a:has-text("Simple Submenu Link 1")'
+			);
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			// Tab to first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( innerElement ).toBeHidden();
+			await expect( complexSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'nested submenu closes on click outside', async ( { page } ) => {
+			const complexSubmenuButton = page.locator(
+				'button:has-text("Complex Submenu")'
+			);
+			const nestedSubmenuButton = page.locator(
+				'button:has-text("Nested Submenu")'
+			);
+			const firstLevelElement = page.locator(
+				'a:has-text("Complex Submenu Link 1")'
+			);
+			const secondLevelElement = page.locator(
+				'a:has-text("Nested Submenu Link 1")'
+			);
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+		} );
+
+		test( 'nested submenu closes on ESC key', async ( { page } ) => {
+			const complexSubmenuButton = page.locator(
+				'button:has-text("Complex Submenu")'
+			);
+			const nestedSubmenuButton = page.locator(
+				'button:has-text("Nested Submenu")'
+			);
+			const firstLevelElement = page.locator(
+				'a:has-text("Complex Submenu Link 1")'
+			);
+			const secondLevelElement = page.locator(
+				'a:has-text("Nested Submenu Link 1")'
+			);
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			await page.keyboard.press( 'Escape' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+			await expect( complexSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'only nested submenu closes on tab outside', async ( {
+			page,
+		} ) => {
+			const complexSubmenuButton = page.locator(
+				'button:has-text("Complex Submenu")'
+			);
+			const nestedSubmenuButton = page.locator(
+				'button:has-text("Nested Submenu")'
+			);
+			const firstLevelElement = page.locator(
+				'a:has-text("Complex Submenu Link 1")'
+			);
+			const secondLevelElement = page.locator(
+				'a:has-text("Nested Submenu Link 1")'
+			);
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			// Tab to nested submenu first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the nested submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			// Tab outside the complex submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( firstLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Submenus (Arrow setting)', () => {
+		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Menu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- /wp:navigation-submenu -->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off' },
+			} );
+			await editor.saveSiteEditorEntities();
+			await page.goto( '/' );
+		} );
+
+		test( 'submenu opens on click in the arrow', async ( { page } ) => {
+			const arrowButton = page.locator(
+				'a:has-text("Submenu") + button.wp-block-navigation__submenu-icon'
+			);
+
+			const nestedSubmenuArrowButton = page.locator(
+				'a:has-text("Nested Menu") + button.wp-block-navigation__submenu-icon'
+			);
+
+			const firstLevelElement = page.locator(
+				'a:has-text("Submenu Link")'
+			);
+			const secondLevelElement = page.locator(
+				'a:has-text("Nested Menu Link")'
+			);
+
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+			await arrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			await nestedSubmenuArrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Page list block', () => {
+		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+
+			// Create parent page.
+			await admin.createNewPost( {
+				postType: 'page',
+				title: 'Parent Page',
+			} );
+			await editor.publishPost();
+
+			// Create subpage.
+			await admin.createNewPost( {
+				postType: 'page',
+				title: 'Subpage',
+			} );
+			await editor.openDocumentSettingsSidebar();
+			const parentPage = page.locator( 'label:has-text("Parent page")' );
+
+			if ( await parentPage.isHidden() ) {
+				await page
+					.locator( 'button:has-text("Page Attributes")' )
+					.click();
+			}
+			await page.locator( 'label:has-text("Parent page")' ).click();
+			await page.locator( 'li:has-text("Parent Page")' ).click();
+			await editor.publishPost();
+
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:page-list /-->
+					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+			await page.goto( '/' );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'page-list submenu opens on click', async ( { page } ) => {
+			const submenuButton = page.locator(
+				'button:has-text("Parent Page")'
+			);
+			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+		} );
+
+		test( 'page-list submenu closes on click outside', async ( {
+			page,
+		} ) => {
+			const submenuButton = page.locator(
+				'button:has-text("Parent Page")'
+			);
+			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+		} );
+
+		test( 'page-list submenu closes on ESC key', async ( { page } ) => {
+			const submenuButton = page.locator(
+				'button:has-text("Parent Page")'
+			);
+			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( submenuButton ).toBeFocused();
+		} );
+
+		test( 'page-list submenu closes on tab outside submenu', async ( {
+			page,
+		} ) => {
+			const submenuButton = page.locator(
+				'button:has-text("Parent Page")'
+			);
+			const innerElement = page.locator( 'a:has-text("Subpage")' );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			// Tab to first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( innerElement ).toBeHidden();
+		} );
+	} );
+} );
+
 class LinkControl {
 	constructor( { page } ) {
 		this.page = page;
