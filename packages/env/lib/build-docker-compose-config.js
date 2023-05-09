@@ -209,6 +209,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: developmentMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
 				depends_on: [ 'tests-mysql' ],
@@ -226,6 +227,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: testsMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
@@ -241,6 +243,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					...dbEnv.development,
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
@@ -256,6 +259,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					...dbEnv.tests,
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 		},
 		volumes: {
