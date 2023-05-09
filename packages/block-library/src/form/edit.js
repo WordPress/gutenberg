@@ -41,13 +41,6 @@ const TEMPLATE = [
 	[
 		'core/form-input',
 		{
-			type: 'url',
-			label: __( 'Website' ),
-		},
-	],
-	[
-		'core/form-input',
-		{
 			type: 'textarea',
 			label: __( 'Comment' ),
 			required: true,
