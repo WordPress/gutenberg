@@ -18,18 +18,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import Inserter from '../inserter';
+import { useListViewContext } from './context';
 
 export const Appender = forwardRef(
-	(
-		{
-			nestingLevel,
-			blockCount,
-			clientId,
-			prioritizedInserterBlocks,
-			...props
-		},
-		ref
-	) => {
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+		const { prioritizedInserterBlocks } = useListViewContext();
+
 		const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 		const instanceId = useInstanceId( Appender );

@@ -208,6 +208,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			renderAdditionalBlockUI,
+			prioritizedInserterBlocks,
 		} ),
 		[
 			draggedClientIds,
@@ -217,6 +218,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			renderAdditionalBlockUI,
+			prioritizedInserterBlocks,
 		]
 	);
 
@@ -254,7 +256,6 @@ function ListViewComponent(
 						isExpanded={ isExpanded }
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						showAppender={ showAppender }
-						prioritizedInserterBlocks={ prioritizedInserterBlocks }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
