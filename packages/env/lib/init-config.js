@@ -251,9 +251,7 @@ RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 		}
 	}
 
-	if ( shouldEnableXdebug( config ) ) {
-		dockerFileContent += getXdebugSetup( config.xdebug );
-	}
+	dockerFileContent += getXdebugConfig( config );
 
 	// Add better PHP settings.
 	dockerFileContent += `
@@ -278,38 +276,18 @@ USER root`;
 	return dockerFileContent;
 }
 
-function getXdebugSetup( xdebugMode ) {
-	// Discover client host does not appear to work on macOS with Docker.
-	const clientDetectSettings =
-		os.type() === 'Linux'
-			? 'xdebug.discover_client_host=true'
-			: 'xdebug.client_host="host.docker.internal"';
-
-	return `
-RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
-RUN docker-php-ext-enable xdebug
-RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
-}
-
 /**
- * Checks if Xdebug should be enabled based on the PHP version and config settings.
+ * Gets the Xdebug config based on the options in the config object.
  *
  * @param {WPConfig} config
- * @return {boolean} Whether to enable Xdebug
+ * @return {string} The Xdebug config -- can be an empty string when it's not used.
  */
-function shouldEnableXdebug( config ) {
+function getXdebugConfig( config ) {
 	if ( config.xdebug === 'off' ) {
-		return false;
+		return '';
 	}
 
-	// By default, an undefined phpVersion uses the version on the docker image,
-	// which is supported by Xdebug 3.
-	const phpCompatibility = true;
-
-	// If PHP version is defined
-	// ensure it meets the Xdebug minimum compatibility requirment.
+	// Throw an error if someone tries to use Xdebug with an unsupported PHP version.
 	if ( config.env.development.phpVersion ) {
 		const versionTokens = config.env.development.phpVersion.split( '.' );
 		const majorVer = parseInt( versionTokens[ 0 ] );
@@ -328,5 +306,16 @@ function shouldEnableXdebug( config ) {
 		}
 	}
 
-	return phpCompatibility;
+	// Discover client host does not appear to work on macOS with Docker.
+	const clientDetectSettings =
+		os.type() === 'Linux'
+			? 'xdebug.discover_client_host=true'
+			: 'xdebug.client_host="host.docker.internal"';
+
+	return `
+RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN docker-php-ext-enable xdebug
+RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ config.xdebug }' >> /usr/local/etc/php/php.ini
+RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini`;
 }
