@@ -471,7 +471,7 @@ public class WPAndroidGlueCode {
                         gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
             }
 
-            public void gutenbergDidRequestEmbedFullscreenPreview(String html, String title) {
+            public void requestEmbedFullscreenPreview(String html, String title) {
                 mOnGutenbergDidRequestEmbedFullscreenPreviewListener.
                         gutenbergDidRequestEmbedFullscreenPreview(html, title);
             }
