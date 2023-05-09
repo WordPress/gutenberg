@@ -24,7 +24,6 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  */
 import BlockActions from '../block-actions';
 import BlockIcon from '../block-icon';
-import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
@@ -291,19 +290,6 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ canMove && ! onlyBlock && (
-									<MenuItem
-										onClick={ pipe( onClose, onMoveTo ) }
-									>
-										{ __( 'Move to' ) }
-									</MenuItem>
-								) }
-								{ count === 1 && (
-									<BlockModeToggle
-										clientId={ firstBlockClientId }
-										onToggle={ onClose }
-									/>
-								) }
 							</MenuGroup>
 							<MenuGroup>
 								<CopyMenuItem
@@ -316,7 +302,14 @@ export function BlockSettingsDropdown( {
 								</MenuItem>
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
-								fillProps={ { onClose } }
+								fillProps={ {
+									onClose,
+									canMove,
+									onMoveTo,
+									onlyBlock,
+									count,
+									firstBlockClientId,
+								} }
 								clientIds={ clientIds }
 								__unstableDisplayLocation={
 									__unstableDisplayLocation
