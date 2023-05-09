@@ -189,11 +189,7 @@ export const DropdownMenuCheckboxItem = ( {
 	return (
 		<DropdownMenuStyled.CheckboxItem { ...props } checked={ checked }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				{ /*
-					TODO: adding `asChild` seems to trigger an error due to the fact
-					that `Icon` doesn't forward refs to the underlying dom elements.
-					*/ }
-				<DropdownMenuPrimitive.ItemIndicator asChild>
+				<DropdownMenuPrimitive.ItemIndicator>
 					{ ( checked === 'indeterminate' || checked === true ) && (
 						<Icon
 							icon={
@@ -232,11 +228,7 @@ export const DropdownMenuRadioItem = ( {
 	return (
 		<DropdownMenuStyled.RadioItem { ...props }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				{ /*
-					TODO: adding `asChild` seems to trigger an error due to the fact
-					that `Icon` doesn't forward refs to the underlying dom elements.
-					*/ }
-				<DropdownMenuPrimitive.ItemIndicator asChild>
+				<DropdownMenuPrimitive.ItemIndicator>
 					<Icon icon={ radioDot } size={ 20 } />
 				</DropdownMenuPrimitive.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
