@@ -806,28 +806,22 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
-
-	test.beforeEach( async ( { requestUtils } ) => {
-		await Promise.all( [ requestUtils.deleteAllMenus() ] );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllMenus(),
-			requestUtils.activateTheme( 'twentytwentyone' ),
-		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-		await requestUtils.deleteAllMenus();
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test.describe( 'Overlay menu', () => {
-		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
@@ -845,12 +839,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				attributes: { overlayMenu: 'always' },
 			} );
 			await editor.saveSiteEditorEntities();
-			await page.goto( '/' );
 		} );
 
 		test( 'overlay menu opens on click on open menu button', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const overlayMenu = page.locator(
 				'nav.wp-block-navigation div.has-modal-open'
 			);
@@ -863,6 +857,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'overlay menu closes on click on close menu button', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const overlayMenu = page.locator(
 				'nav.wp-block-navigation div.has-modal-open'
 			);
@@ -876,6 +871,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'overlay menu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
 			const overlayMenu = page.locator(
 				'nav.wp-block-navigation div.has-modal-open'
 			);
@@ -891,6 +887,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'overlay menu focuses on first element after opening', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const overlayMenu = page.locator(
 				'nav.wp-block-navigation div.has-modal-open'
 			);
@@ -905,6 +902,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'overlay menu traps focus', async ( { page } ) => {
+			await page.goto( '/' );
 			const overlayMenu = page.locator(
 				'nav.wp-block-navigation div.has-modal-open'
 			);
@@ -927,8 +925,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 	} );
 
 	test.describe( 'Submenus (Open on click)', () => {
-		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
@@ -956,10 +953,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
 			await editor.saveSiteEditorEntities();
-			await page.goto( '/' );
 		} );
 
 		test( 'submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
 			const simpleSubmenuButton = page.locator(
 				'button:has-text("Simple Submenu")'
 			);
@@ -972,6 +969,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'nested submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
 			const complexSubmenuButton = page.locator(
 				'button:has-text("Complex Submenu")'
 			);
@@ -994,6 +992,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'submenu closes on click outside', async ( { page } ) => {
+			await page.goto( '/' );
 			const simpleSubmenuButton = page.locator(
 				'button:has-text("Simple Submenu")'
 			);
@@ -1008,6 +1007,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
 			const simpleSubmenuButton = page.locator(
 				'button:has-text("Simple Submenu")'
 			);
@@ -1023,6 +1023,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'submenu closes on tab outside submenu', async ( { page } ) => {
+			await page.goto( '/' );
 			const simpleSubmenuButton = page.locator(
 				'button:has-text("Simple Submenu")'
 			);
@@ -1044,6 +1045,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'nested submenu closes on click outside', async ( { page } ) => {
+			await page.goto( '/' );
 			const complexSubmenuButton = page.locator(
 				'button:has-text("Complex Submenu")'
 			);
@@ -1070,6 +1072,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'nested submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
 			const complexSubmenuButton = page.locator(
 				'button:has-text("Complex Submenu")'
 			);
@@ -1099,6 +1102,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'only nested submenu closes on tab outside', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const complexSubmenuButton = page.locator(
 				'button:has-text("Complex Submenu")'
 			);
@@ -1132,8 +1136,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 	} );
 
 	test.describe( 'Submenus (Arrow setting)', () => {
-		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
@@ -1155,10 +1158,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				attributes: { overlayMenu: 'off' },
 			} );
 			await editor.saveSiteEditorEntities();
-			await page.goto( '/' );
 		} );
 
 		test( 'submenu opens on click in the arrow', async ( { page } ) => {
+			await page.goto( '/' );
 			const arrowButton = page.locator(
 				'a:has-text("Submenu") + button.wp-block-navigation__submenu-icon'
 			);
@@ -1190,8 +1193,6 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 	test.describe( 'Page list block', () => {
 		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
-
 			// Create parent page.
 			await admin.createNewPost( {
 				postType: 'page',
@@ -1233,14 +1234,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
 			await editor.saveSiteEditorEntities();
-			await page.goto( '/' );
-		} );
-
-		test.afterEach( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllPages();
 		} );
 
 		test( 'page-list submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
 			const submenuButton = page.locator(
 				'button:has-text("Parent Page")'
 			);
@@ -1253,6 +1250,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'page-list submenu closes on click outside', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const submenuButton = page.locator(
 				'button:has-text("Parent Page")'
 			);
@@ -1265,6 +1263,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 
 		test( 'page-list submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
 			const submenuButton = page.locator(
 				'button:has-text("Parent Page")'
 			);
@@ -1280,6 +1279,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		test( 'page-list submenu closes on tab outside submenu', async ( {
 			page,
 		} ) => {
+			await page.goto( '/' );
 			const submenuButton = page.locator(
 				'button:has-text("Parent Page")'
 			);
