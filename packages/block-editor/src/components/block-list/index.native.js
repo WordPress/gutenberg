@@ -269,11 +269,6 @@ export default function BlockList( {
 								] }
 								data={ blockClientIds }
 								keyExtractor={ identity }
-								listKey={
-									rootClientId
-										? `list-${ rootClientId }`
-										: 'list-root'
-								}
 								renderItem={ renderItem }
 								CellRendererComponent={ BlockListItemCell }
 								shouldPreventAutomaticScroll={
