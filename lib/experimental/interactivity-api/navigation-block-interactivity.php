@@ -70,6 +70,28 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 		$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.openMenu' );
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 		$w->remove_attribute( 'data-micromodal-trigger' );
+	} else {
+		// If the open modal button not found, we handle submenus immediately.
+		$w = new WP_HTML_Tag_Processor( $w->get_updated_html() );
+
+		// Add directives to the menu container.
+		if ( $w->next_tag(
+			array(
+				'tag_name'   => 'UL',
+				'class_name' => 'wp-block-navigation__container',
+			)
+		) ) {
+			$w->set_attribute( 'data-wp-class.is-menu-open', 'context.core.navigation.isMenuOpen' );
+			$w->set_attribute( 'data-wp-bind.aria-hidden', '!context.core.navigation.isMenuOpen' );
+			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initModal' );
+			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
+			$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
+			$w->set_attribute( 'tabindex', '-1' );
+		};
+
+		gutenberg_block_core_navigation_add_directives_to_submenu( $w );
+
+		return $w->get_updated_html();
 	}
 
 	// Add directives to the menu container.
@@ -124,7 +146,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 	// Submenus.
 	gutenberg_block_core_navigation_add_directives_to_submenu( $w );
 
-	return (string) $w;
+	return $w->get_updated_html();
 };
 
 /**
@@ -209,7 +231,7 @@ add_filter(
 				gutenberg_url( 'build/block-library/interactive-blocks/navigation.min.js' ),
 				array( 'wp-interactivity-runtime' )
 			);
-			$metadata['viewScript'] = "array('wp-block-navigation-view')";
+			$metadata['viewScript'] = array( 'wp-block-navigation-view' );
 		}
 		return $metadata;
 	},
