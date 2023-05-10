@@ -145,10 +145,7 @@ test.describe( 'Cover', () => {
 		await expect( coverBlockParagraph ).toContainText( titleText );
 	} );
 
-	test.only( 'can be resized using drag & drop', async ( {
-		page,
-		editor,
-	} ) => {
+	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
