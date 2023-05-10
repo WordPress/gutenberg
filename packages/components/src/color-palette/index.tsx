@@ -5,6 +5,7 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -19,7 +20,6 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
-import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
@@ -219,11 +219,12 @@ function UnforwardedColorPalette(
 			/>
 		</DropdownContentWrapper>
 	);
-
+	// TODO: CSS vars should not have `VAR` or parentheses. They should also render in lowercase. Be careful of the hash, probably need a new variable.
+	// TODO: This variable is no longer accurate. It's only used for assistive tech now, so we can rename it.
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
-
+	//  TODO: Check with Andrew on whether or not the hash fits here. Should it be exposed to assistive tech? If hash is okay, remove `valueWithoutLeadingHash`. Otherwise, update translator hint
 	const customColorAccessibleLabel = !! valueWithoutLeadingHash
 		? sprintf(
 				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
@@ -255,16 +256,10 @@ function UnforwardedColorPalette(
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Flex
-							direction="column"
-							gap={ 0 }
-							as="div"
-							className="components-color-palette__custom-color__container"
-						>
-							<FlexItem
-								as={ 'button' }
+						<VStack spacing={ 0 }>
+							<button
 								ref={ customColorPaletteCallbackRef }
-								className="components-color-palette__custom-color"
+								className="components-color-palette__custom-color-button"
 								aria-expanded={ isOpen }
 								aria-haspopup="true"
 								onClick={ onToggle }
@@ -278,22 +273,27 @@ function UnforwardedColorPalette(
 								}
 							/>
 							{ value && (
-								<>
-									<FlexItem
-										as={ Truncate }
-										className="components-color-palette__custom-color-name"
-									>
+								<VStack
+									className="components-color-palette__custom-color-text-wrapper"
+									spacing={ 0.5 }
+								>
+									<Truncate className="components-color-palette__custom-color-name">
 										{ buttonLabelName }
-									</FlexItem>
-									<FlexItem
-										as={ 'span' }
-										className="components-color-palette__custom-color-value"
+									</Truncate>
+									<Truncate
+										className={ classnames(
+											'components-color-palette__custom-color-value',
+											{
+												'is-hex':
+													value?.startsWith( '#' ),
+											}
+										) }
 									>
 										{ value }
-									</FlexItem>
-								</>
+									</Truncate>
+								</VStack>
 							) }
-						</Flex>
+						</VStack>
 					) }
 				/>
 			) }
