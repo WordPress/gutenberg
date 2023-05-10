@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useCallback } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
@@ -48,7 +48,6 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
-	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { getBlockListSettings } = useSelect( blockEditorStore );
@@ -72,6 +71,9 @@ function InserterSearchResults( {
 		destinationRootClientId
 	);
 
+	const parentBlockListSettings = getBlockListSettings( rootClientId );
+	const parentInserterPriority = parentBlockListSettings?.inserterPriority;
+
 	const filteredBlockPatterns = useMemo( () => {
 		if ( maxBlockPatterns === 0 ) {
 			return [];
@@ -87,29 +89,34 @@ function InserterSearchResults( {
 		maxBlockTypesToShow = 0;
 	}
 
+	const orderInitialBlockItems = useCallback(
+		( items ) => {
+			items.sort( ( { id: aName }, { id: bName } ) => {
+				// Sort block items according to `prioritizedInserterBlocks`.
+				let aIndex = parentInserterPriority.indexOf( aName );
+				let bIndex = parentInserterPriority.indexOf( bName );
+				// All other block items should come after that.
+				if ( aIndex < 0 ) aIndex = parentInserterPriority.length;
+				if ( bIndex < 0 ) bIndex = parentInserterPriority.length;
+				return aIndex - bIndex;
+			} );
+			return items;
+		},
+		[ parentInserterPriority ]
+	);
+
 	const filteredBlockTypes = useMemo( () => {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
 
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
-		if ( ! filterValue && orderInitialBlockItems ) {
+		if ( ! filterValue && parentInserterPriority ) {
 			orderedItems = orderInitialBlockItems( orderedItems );
 		}
 
-		// Get the allowed blocks for the parent block.
-		const parentBlockListSettings = getBlockListSettings(
-			state,
-			rootClientId
-		);
-		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
-		if ( parentAllowedBlocks ) {
-			console.log( 'parentAllowedBlocks', parentAllowedBlocks );
-			// Use the parent allowed blocks to sort the results.
-		}
-
 		const results = searchBlockItems(
-			blockTypes,
+			orderedItems,
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
@@ -123,8 +130,9 @@ function InserterSearchResults( {
 		blockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
-		maxBlockTypes,
 		orderInitialBlockItems,
+		maxBlockTypesToShow,
+		parentInserterPriority,
 	] );
 
 	// Announce search results on change.
