@@ -19,12 +19,12 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 
-export default function SidebarNavigationScreenNavigationItem() {
+export default function SidebarNavigationScreenPage() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const {
-		params: { postType, postId },
+		params: { postId },
 	} = useNavigator();
-	const { record } = useEntityRecord( 'postType', postType, postId );
+	const { record } = useEntityRecord( 'postType', 'page', postId );
 
 	return (
 		<SidebarNavigationScreen
@@ -37,7 +37,7 @@ export default function SidebarNavigationScreenNavigationItem() {
 				/>
 			}
 			description={ __(
-				'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
+				'Pages are static and are not listed by date. Pages do not use tags or categories.'
 			) }
 			content={
 				<>
