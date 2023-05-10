@@ -2,29 +2,22 @@
  * External dependencies
  */
 import path from 'path';
-import fs from 'fs';
+const fs = require( 'fs/promises' );
 import os from 'os';
 import { v4 as uuid } from 'uuid';
+
+/** @typedef {import('@playwright/test').Page} Page */
 
 /**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function getTestImage() {
-	const testImagePath = path.join(
-		__dirname,
-		'..',
-		'..',
-		'..',
-		'assets',
-		'10x10_e2e_test_image_z9T8jK.png'
-	);
-	const filename = uuid();
-	const tmpFilename = path.join( os.tmpdir(), filename + '.png' );
-	fs.copyFileSync( testImagePath, tmpFilename );
-	return tmpFilename;
-}
+test.use( {
+	imageBlockUtils: async ( { page }, use ) => {
+		await use( new ImageBlockUtils( { page } ) );
+	},
+} );
 
 async function getBackgroundColorAndOpacity( locator ) {
 	return await locator.evaluate( ( el ) => {
@@ -73,19 +66,18 @@ test.describe( 'Cover', () => {
 	test( 'can set background image using image upload on block placeholder', async ( {
 		page,
 		editor,
+		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-
-		const testImage = await getTestImage();
-		const testImageFilename = path.basename( testImage );
 
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
-		await coverBlock
-			.getByTestId( 'form-file-upload-input' )
-			.setInputFiles( testImage );
+		const filename = await imageBlockUtils.upload(
+			coverBlock.getByTestId( 'form-file-upload-input' )
+		);
+		const fileBasename = path.basename( filename );
 
 		// Wait for the img's src attribute to be prefixed with http.
 		// Otherwise, the URL for the img src attribute is that of a placeholder.
@@ -95,24 +87,23 @@ test.describe( 'Cover', () => {
 			.locator( 'img' )
 			.getAttribute( 'src' );
 
-		expect( backgroundImageURL ).toContain( testImageFilename );
+		expect( backgroundImageURL ).toContain( fileBasename );
 	} );
 
 	test( 'dims background image down by 50% by default', async ( {
 		page,
 		editor,
+		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-
-		const testImage = await getTestImage();
 
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
-		await coverBlock
-			.getByTestId( 'form-file-upload-input' )
-			.setInputFiles( testImage );
+		await imageBlockUtils.upload(
+			coverBlock.getByTestId( 'form-file-upload-input' )
+		);
 
 		const [ backgroundDimColor, backgroundDimOpacity ] =
 			await getBackgroundColorAndOpacity(
@@ -179,6 +170,8 @@ test.describe( 'Cover', () => {
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
+		// There is no accessible locator for this element, which is a
+		// bottom edge of the Cover block for resizing.
 		const coverBlockResizeHandle = page.locator(
 			'.components-resizable-box__handle-bottom'
 		);
@@ -204,17 +197,20 @@ test.describe( 'Cover', () => {
 		);
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test.only( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
+		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const testImage = await getTestImage();
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
 
-		await page
-			.getByTestId( 'form-file-upload-input' )
-			.setInputFiles( testImage );
+		await imageBlockUtils.upload(
+			imageBlock.getByTestId( 'form-file-upload-input' )
+		);
 
 		await expect(
 			page
@@ -239,3 +235,32 @@ test.describe( 'Cover', () => {
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 } );
+
+class ImageBlockUtils {
+	constructor( { page } ) {
+		/** @type {Page} */
+		this.page = page;
+
+		this.TEST_IMAGE_FILE_PATH = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'assets',
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+	}
+
+	async upload( inputElement ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const filename = uuid();
+		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
+
+		await inputElement.setInputFiles( tmpFileName );
+
+		return filename;
+	}
+}
