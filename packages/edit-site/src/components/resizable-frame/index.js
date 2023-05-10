@@ -66,14 +66,15 @@ function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
 		width: '100%',
 		height: '100%',
 	} );
+	// The width of the resizable frame when a new resize gesture starts.
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
-
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
+	// The width of the resizable frame on initial render.
 	const initialComputedWidthRef = useRef( null );
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
@@ -122,7 +123,6 @@ function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
 		} );
 	};
 
-	// Make the frame full screen when the user resizes it to the left.
 	const handleResizeStop = ( _event, _direction, ref ) => {
 		setIsResizing( false );
 
