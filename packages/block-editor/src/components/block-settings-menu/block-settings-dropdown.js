@@ -30,7 +30,6 @@ import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
-const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
@@ -63,7 +62,6 @@ export function BlockSettingsDropdown( {
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
-		nextBlockClientId,
 		selectedBlockClientIds,
 	} = useSelect(
 		( select ) => {
@@ -72,7 +70,6 @@ export function BlockSettingsDropdown( {
 				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
-				getNextBlockClientId,
 				getSelectedBlockClientIds,
 				getSettings,
 				getBlockAttributes,
@@ -98,12 +95,12 @@ export function BlockSettingsDropdown( {
 						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
-				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ firstBlockClientId ]
 	);
+	const { getBlockOrder } = useSelect( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -125,46 +122,34 @@ export function BlockSettingsDropdown( {
 		useDispatch( blockEditorStore );
 
 	const updateSelectionAfterDuplicate = useCallback(
-		__experimentalSelectBlock
-			? async ( clientIdsPromise ) => {
-					const ids = await clientIdsPromise;
-					if ( ids && ids[ 0 ] ) {
-						__experimentalSelectBlock( ids[ 0 ] );
-					}
-			  }
-			: noop,
+		async ( clientIdsPromise ) => {
+			if ( __experimentalSelectBlock ) {
+				const ids = await clientIdsPromise;
+				if ( ids && ids[ 0 ] ) {
+					__experimentalSelectBlock( ids[ 0 ] );
+				}
+			}
+		},
 		[ __experimentalSelectBlock ]
 	);
 
-	const updateSelectionAfterRemove = useCallback(
-		__experimentalSelectBlock
-			? () => {
-					const blockToSelect =
-						previousBlockClientId ||
-						nextBlockClientId ||
-						firstParentClientId;
+	const updateSelectionAfterRemove = useCallback( () => {
+		if ( __experimentalSelectBlock ) {
+			let blockToSelect = previousBlockClientId || firstParentClientId;
 
-					if (
-						blockToSelect &&
-						// From the block options dropdown, it's possible to remove a block that is not selected,
-						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
-						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
-						// In case someone selects all blocks and removes them at once.
-						! selectedBlockClientIds.includes( blockToSelect )
-					) {
-						__experimentalSelectBlock( blockToSelect );
-					}
-			  }
-			: noop,
-		[
-			__experimentalSelectBlock,
-			previousBlockClientId,
-			nextBlockClientId,
-			firstParentClientId,
-			selectedBlockClientIds,
-		]
-	);
+			// Select the first block if there's no previous block nor parent block.
+			if ( ! blockToSelect ) {
+				blockToSelect = getBlockOrder()[ 0 ];
+			}
+
+			__experimentalSelectBlock( blockToSelect );
+		}
+	}, [
+		__experimentalSelectBlock,
+		previousBlockClientId,
+		firstParentClientId,
+		getBlockOrder,
+	] );
 
 	const removeBlockLabel =
 		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );

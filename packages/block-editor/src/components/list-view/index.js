@@ -7,7 +7,7 @@ import {
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
@@ -19,7 +19,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -33,7 +32,6 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
-import KeyboardShortcuts from './keyboard-shortcuts';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -123,13 +121,6 @@ function ListViewComponent(
 		},
 		[ draggedClientIds ]
 	);
-	const { removeBlocks, selectBlock } = useDispatch( blockEditorStore );
-	const {
-		getSelectedBlockClientIds,
-		getPreviousBlockClientId,
-		getBlockRootClientId,
-		getBlockOrder,
-	} = useSelect( blockEditorStore );
 
 	const { updateBlockSelection } = useBlockSelection();
 
@@ -150,8 +141,13 @@ function ListViewComponent(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, blockClientId ) => {
-			updateBlockSelection( event, blockClientId );
+		/**
+		 * @param {MouseEvent | KeyboardEvent | undefined} event
+		 * @param {string}                                 blockClientId
+		 * @param {null | undefined | -1 | 1}              focusPosition
+		 */
+		( event, blockClientId, focusPosition ) => {
+			updateBlockSelection( event, blockClientId, null, focusPosition );
 			setSelectedTreeId( blockClientId );
 			if ( onSelect ) {
 				onSelect( getBlock( blockClientId ) );
@@ -218,59 +214,6 @@ function ListViewComponent(
 		},
 		[ updateBlockSelection ]
 	);
-	const removeRow = useCallback(
-		( clientId ) => {
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const isDeletingSelectedBlocks =
-				selectedBlockClientIds.includes( clientId );
-			const firstBlockClientId = isDeletingSelectedBlocks
-				? selectedBlockClientIds[ 0 ]
-				: clientId;
-			let nextFocusClientId =
-				getPreviousBlockClientId( firstBlockClientId ) ??
-				// If the previous block is not found (when the first block is deleted),
-				// fallback to focus the parent block.
-				getBlockRootClientId( firstBlockClientId );
-
-			removeBlocks(
-				isDeletingSelectedBlocks
-					? selectedBlockClientIds
-					: [ clientId ],
-				false
-			);
-
-			// If there's no previous block nor parent block, focus the first block.
-			if ( ! nextFocusClientId ) {
-				nextFocusClientId = getBlockOrder()[ 0 ];
-			}
-
-			if ( elementRef.current && nextFocusClientId ) {
-				// Schedule focus on the next frame to allow the default block to be painted
-				// and focusable after all blocks have been deleted.
-				window.requestAnimationFrame( () => {
-					// Pass `null` to the second argument to prevent moving focus to the canvas.
-					selectBlock( nextFocusClientId, null );
-					const nextFocusRow = elementRef.current.querySelector(
-						`[data-block="${ nextFocusClientId }"]`
-					);
-					if ( nextFocusRow ) {
-						// Focus the first focusable element in the row.
-						focus.focusable
-							.find( nextFocusRow, { sequential: true } )[ 0 ]
-							?.focus();
-					}
-				} );
-			}
-		},
-		[
-			getBlockOrder,
-			getBlockRootClientId,
-			getPreviousBlockClientId,
-			getSelectedBlockClientIds,
-			removeBlocks,
-			selectBlock,
-		]
-	);
 
 	const contextValue = useMemo(
 		() => ( {
@@ -284,7 +227,7 @@ function ListViewComponent(
 			renderAdditionalBlockUI,
 			insertedBlock,
 			setInsertedBlock,
-			removeRow,
+			treeGridElementRef: elementRef,
 		} ),
 		[
 			draggedClientIds,
@@ -296,7 +239,6 @@ function ListViewComponent(
 			renderAdditionalBlockUI,
 			insertedBlock,
 			setInsertedBlock,
-			removeRow,
 		]
 	);
 
@@ -311,34 +253,32 @@ function ListViewComponent(
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
-			<KeyboardShortcuts removeRow={ removeRow }>
-				<TreeGrid
-					id={ id }
-					className="block-editor-list-view-tree"
-					aria-label={ __( 'Block navigation structure' ) }
-					ref={ treeGridRef }
-					onCollapseRow={ collapseRow }
-					onExpandRow={ expandRow }
-					onFocusRow={ focusRow }
-					applicationAriaLabel={ __( 'Block navigation structure' ) }
-					// eslint-disable-next-line jsx-a11y/aria-props
-					aria-description={ description }
-				>
-					<ListViewContext.Provider value={ contextValue }>
-						<ListViewBranch
-							blocks={ clientIdsTree }
-							parentId={ rootClientId }
-							selectBlock={ selectEditorBlock }
-							showBlockMovers={ showBlockMovers }
-							fixedListWindow={ fixedListWindow }
-							selectedClientIds={ selectedClientIds }
-							isExpanded={ isExpanded }
-							shouldShowInnerBlocks={ shouldShowInnerBlocks }
-							showAppender={ showAppender }
-						/>
-					</ListViewContext.Provider>
-				</TreeGrid>
-			</KeyboardShortcuts>
+			<TreeGrid
+				id={ id }
+				className="block-editor-list-view-tree"
+				aria-label={ __( 'Block navigation structure' ) }
+				ref={ treeGridRef }
+				onCollapseRow={ collapseRow }
+				onExpandRow={ expandRow }
+				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
+				// eslint-disable-next-line jsx-a11y/aria-props
+				aria-description={ description }
+			>
+				<ListViewContext.Provider value={ contextValue }>
+					<ListViewBranch
+						blocks={ clientIdsTree }
+						parentId={ rootClientId }
+						selectBlock={ selectEditorBlock }
+						showBlockMovers={ showBlockMovers }
+						fixedListWindow={ fixedListWindow }
+						selectedClientIds={ selectedClientIds }
+						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
+						showAppender={ showAppender }
+					/>
+				</ListViewContext.Provider>
+			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }

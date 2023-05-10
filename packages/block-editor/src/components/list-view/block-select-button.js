@@ -14,6 +14,8 @@ import {
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -23,7 +25,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
-import { useListViewContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 function ListViewBlockSelectButton(
 	{
@@ -39,6 +41,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaLabel,
 		ariaDescribedBy,
+		updateSelection,
 	},
 	ref
 ) {
@@ -48,7 +51,14 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { removeRow } = useListViewContext();
+	const {
+		getSelectedBlockClientIds,
+		getPreviousBlockClientId,
+		getBlockRootClientId,
+		getBlockOrder,
+	} = useSelect( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
+	const isMatch = useShortcutEventMatch();
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -65,8 +75,37 @@ function ListViewBlockSelectButton(
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
-		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
-			removeRow( clientId );
+		} else if (
+			event.keyCode === BACKSPACE ||
+			event.keyCode === DELETE ||
+			isMatch( 'core/block-editor/remove', event )
+		) {
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const isDeletingSelectedBlocks =
+				selectedBlockClientIds.includes( clientId );
+			const firstBlockClientId = isDeletingSelectedBlocks
+				? selectedBlockClientIds[ 0 ]
+				: clientId;
+
+			let blockToSelect =
+				getPreviousBlockClientId( firstBlockClientId ) ??
+				// If the previous block is not found (when the first block is deleted),
+				// fallback to focus the parent block.
+				getBlockRootClientId( firstBlockClientId );
+
+			removeBlocks(
+				isDeletingSelectedBlocks
+					? selectedBlockClientIds
+					: [ clientId ],
+				false
+			);
+
+			// If there's no previous block nor parent block, focus the first block.
+			if ( ! blockToSelect ) {
+				blockToSelect = getBlockOrder()[ 0 ];
+			}
+
+			updateSelection( blockToSelect );
 		}
 	}
 
