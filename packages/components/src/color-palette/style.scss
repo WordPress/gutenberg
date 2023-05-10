@@ -1,9 +1,4 @@
-.components-color-palette__custom-color-container {
-	border-radius: $radius-block-ui;
-	overflow: hidden;
-	position: relative;
-	border: $border-width solid $gray-200;
-}
+$border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 
 .components-color-palette__custom-color-button {
 	border: none;
@@ -24,32 +19,39 @@
 	cursor: pointer;
 	// Show a thin outline in Windows high contrast mode.
 	outline: 1px solid transparent;
+	border-radius: $radius-block-ui $radius-block-ui 0 0;
+	box-shadow: $border-as-box-shadow;
 
 	&:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		// Show a outline in Windows high contrast mode.
 		outline-width: 2px;
 	}
-
-	// box shadow
 }
 
 .components-color-palette__custom-color-text-wrapper {
 	padding: $grid-unit-15 $grid-unit-20;
-	border-top: $border-width solid $gray-200;
+	border-radius: 0 0 $radius-block-ui $radius-block-ui;
+	position: relative;
+	font-size: $default-font-size;
 
-	// bottom border
+	// Add a border with the same technique as the button above,
+	// but only for left, bottom, and right sides.
+	box-shadow:
+		inset 0 -1 * $border-width 0 0 rgba(0, 0, 0, 0.2),
+		inset $border-width 0 0 0 rgba(0, 0, 0, 0.2),
+		inset -1 * $border-width 0 0 0 rgba(0, 0, 0, 0.2);
 }
 
 .components-color-palette__custom-color-name {
-	font-size: $default-font-size;
 	color: $components-color-foreground;
 	margin: 0 $border-width;
-
 }
 
 .components-color-palette__custom-color-value {
-	font-size: $default-font-size;
-	text-transform: uppercase;
 	color: $gray-600;
+
+	&.is-hex {
+		text-transform: uppercase;
+	}
 }
