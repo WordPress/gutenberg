@@ -38,7 +38,10 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
+import {
+	getEditorCanvasContainerTitle,
+	useHasEditorCanvasContainer,
+} from '../editor-canvas-container';
 import { unlock } from '../../private-apis';
 
 const preventDefault = ( event ) => {
@@ -122,7 +125,7 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasDefaultEditorCanvasView = ! editorCanvasView;
+	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
 	const isFocusMode = templateType === 'wp_template_part';
 

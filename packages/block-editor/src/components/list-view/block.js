@@ -40,7 +40,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
-	block,
+	block: { clientId },
 	isDragged,
 	isSelected,
 	isBranchSelected,
@@ -58,7 +58,6 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { clientId } = block;
 
 	const { isLocked, isContentLocked, canEdit } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
@@ -90,6 +89,10 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = blockInformation?.title || __( 'Untitled' );
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		[ clientId ]
+	);
 	const blockName = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]

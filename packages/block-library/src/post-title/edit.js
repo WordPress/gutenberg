@@ -15,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 
 /**
@@ -27,6 +28,7 @@ export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId, queryId },
+	insertBlocksAfter,
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -38,6 +40,9 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
+	const onSplitAtEnd = () => {
+		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+	};
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -57,6 +62,7 @@ export default function PostTitleEdit( {
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
+					__unstableOnSplitAtEnd={ onSplitAtEnd }
 					{ ...blockProps }
 				/>
 			) : (
@@ -82,6 +88,7 @@ export default function PostTitleEdit( {
 						value={ rawTitle }
 						onChange={ setTitle }
 						__experimentalVersion={ 2 }
+						__unstableOnSplitAtEnd={ onSplitAtEnd }
 					/>
 				</TagName>
 			) : (
@@ -116,7 +123,7 @@ export default function PostTitleEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Make title a link' ) }

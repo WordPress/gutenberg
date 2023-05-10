@@ -8,13 +8,16 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { Routes } from '../routes';
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import { unlock } from '../../private-apis';
+
+const { RouterProvider } = unlock( routerPrivateApis );
 
 export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -37,10 +40,10 @@ export default function App() {
 				<GlobalStylesProvider>
 					<Popover.Slot />
 					<UnsavedChangesWarning />
-					<Routes>
+					<RouterProvider>
 						<Layout />
 						<PluginArea onError={ onPluginAreaError } />
-					</Routes>
+					</RouterProvider>
 				</GlobalStylesProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>

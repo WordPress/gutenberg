@@ -9,6 +9,16 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	/**
 	 * @var int
 	 */
+	protected static $second_admin_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $author_id;
+
+	/**
+	 * @var int
+	 */
 	protected static $global_styles_id;
 
 	public function set_up() {
@@ -22,9 +32,19 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
+		self::$admin_id        = $factory->user->create(
 			array(
 				'role' => 'administrator',
+			)
+		);
+		self::$second_admin_id = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		self::$author_id       = $factory->user->create(
+			array(
+				'role' => 'author',
 			)
 		);
 		// This creates the global styles for the current theme.
@@ -75,8 +95,8 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			'post_content' => wp_json_encode( $config ),
 		);
 
-		$post_id  = wp_update_post( $new_styles_post, true, false );
-		$post     = get_post( $post_id );
+		wp_update_post( $new_styles_post, true, false );
+
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -88,18 +108,12 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		// Dates.
 		$this->assertArrayHasKey( 'date', $data[0], 'Check that an date key exists' );
 		$this->assertArrayHasKey( 'date_gmt', $data[0], 'Check that an date_gmt key exists' );
-		$this->assertArrayHasKey( 'date_display', $data[0], 'Check that an date_display key exists' );
 		$this->assertArrayHasKey( 'modified', $data[0], 'Check that an modified key exists' );
 		$this->assertArrayHasKey( 'modified_gmt', $data[0], 'Check that an modified_gmt key exists' );
 		$this->assertArrayHasKey( 'modified_gmt', $data[0], 'Check that an modified_gmt key exists' );
 
 		// Author information.
-		$this->assertEquals( $post->post_author, $data[0]['author'], 'Check that author id returns expected value' );
-		$this->assertEquals( get_the_author_meta( 'display_name', $post->post_author ), $data[0]['author_display_name'], 'Check that author display_name returns expected value' );
-		$this->assertIsString(
-			$data[0]['author_avatar_url'],
-			'Check that author avatar_url returns expected value type'
-		);
+		$this->assertEquals( self::$admin_id, $data[0]['author'], 'Check that author id returns expected value' );
 
 		// Global styles.
 		$this->assertEquals(
@@ -116,6 +130,24 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 			'Check that the revision styles match the last updated styles.'
 		);
+
+		// Checks that the revisions are returned for all eligible users.
+		wp_set_current_user( self::$second_admin_id );
+		$config['styles']['color']['background'] = 'blue';
+		$new_styles_post                         = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode( $config ),
+		);
+
+		wp_update_post( $new_styles_post, true, false );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertCount( 2, $data, 'Check that two revisions exists' );
+		$this->assertEquals( self::$second_admin_id, $data[0]['author'], 'Check that second author id returns expected value' );
+		$this->assertEquals( self::$admin_id, $data[1]['author'], 'Check that second author id returns expected value' );
 	}
 
 	/**
@@ -126,19 +158,27 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 12, $properties, 'Schema properties array does not have exactly 4 elements' );
+		$this->assertCount( 9, $properties, 'Schema properties array does not have exactly 9 elements' );
 		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array does not have "id" key' );
 		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "styles" key' );
 		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array does not have "settings" key' );
 		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array does not have "parent" key' );
 		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array does not have "author" key' );
-		$this->assertArrayHasKey( 'author_display_name', $properties, 'Schema properties array does not have "author_display_name" key' );
-		$this->assertArrayHasKey( 'author_avatar_url', $properties, 'Schema properties array does not have "author_avatar_url" key' );
 		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array does not have "date" key' );
 		$this->assertArrayHasKey( 'date_gmt', $properties, 'Schema properties array does not have "date_gmt" key' );
-		$this->assertArrayHasKey( 'date_display', $properties, 'Schema properties array does not have "date_display" key' );
 		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array does not have "modified" key' );
 		$this->assertArrayHasKey( 'modified_gmt', $properties, 'Schema properties array does not have "modified_gmt" key' );
+	}
+
+	/**
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_item_permissions_check
+	 */
+	public function test_get_item_permissions_check() {
+		wp_set_current_user( self::$author_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
 	}
 
 	/**

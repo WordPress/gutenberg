@@ -54,6 +54,10 @@ Changes the text of a RichText component.
 
 Paste content into a RichText component.
 
+### [`setupApiFetch`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-api-fetch.js)
+
+Sets up the `apiFetch` library for testing by mocking request responses.
+
 ### [`setupCoreBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-core-blocks.js)
 
 Registers all core blocks or a specific list of blocks before running tests, once the tests are run, all registered blocks are unregistered.
@@ -65,6 +69,10 @@ Sets up Media Picker mock functions.
 ### [`setupMediaUpload`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-media-upload.js)
 
 Sets up the media upload mock functions for testing.
+
+### [`setupPicker`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-picker.js)
+
+Sets up the Picker component for testing.
 
 ### [`changeTextOfTextInput`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/text-input-change-text.js)
 

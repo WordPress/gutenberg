@@ -22,12 +22,6 @@ const transforms = {
 			},
 		},
 		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
-		},
-		{
 			type: 'prefix',
 			prefix: '>',
 			transform: ( content ) =>
