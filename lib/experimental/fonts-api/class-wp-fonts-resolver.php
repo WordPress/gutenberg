@@ -45,8 +45,12 @@ class WP_Fonts_Resolver {
 	 * @return array User selected font-families when exists, else empty array.
 	 */
 	public static function enqueue_user_selected_fonts() {
-		$global_styles       = wp_get_global_styles();
-		$user_selected_fonts = static::get_user_selected_fonts( $global_styles );
+		$user_selected_fonts = array();
+		$user_global_styles  = WP_Theme_JSON_Resolver_Gutenberg::get_user_data()->get_raw_data();
+		if ( isset( $user_global_styles['styles'] ) ) {
+			$user_selected_fonts = static::get_user_selected_fonts( $user_global_styles['styles'] );
+		}
+
 		if ( empty( $user_selected_fonts ) ) {
 			return array();
 		}
@@ -92,11 +96,14 @@ class WP_Fonts_Resolver {
 			return '';
 		}
 
-		$starting_pattern = "var:preset|{$preset_type}|";
+		$starting_pattern = "var(--wp--preset--{$preset_type}--";
+		$ending_pattern   = ')';
 		if ( ! str_starts_with( $style, $starting_pattern ) ) {
 			return '';
 		}
 
-		return substr( $style, strlen( $starting_pattern ) );
+		$offset = strlen( $starting_pattern );
+		$length = strpos( $style, $ending_pattern ) - $offset;
+		return substr( $style, $offset, $length );
 	}
 }
