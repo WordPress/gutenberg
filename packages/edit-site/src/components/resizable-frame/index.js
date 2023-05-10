@@ -78,6 +78,7 @@ function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 			return value;
 		} );
 	};
+	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
 	const initialComputedWidthRef = useRef( null );
@@ -100,12 +101,25 @@ function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 
 	// Calculate the frame size based on the window width as its resized.
 	const handleResize = ( _event, _direction, _ref, delta ) => {
+		const normalizedDelta = delta.width / resizeRatio;
+		const deltaAbs = Math.abs( normalizedDelta );
+		const maxDoubledDelta =
+			delta.width < 0 // is shrinking
+				? deltaAbs
+				: ( initialComputedWidthRef.current - startingWidth ) / 2;
+		const deltaToDouble = Math.min( deltaAbs, maxDoubledDelta );
+		const doubleSegment = deltaAbs === 0 ? 0 : deltaToDouble / deltaAbs;
+		const singleSegment = 1 - doubleSegment;
+
+		setResizeRatio( singleSegment + doubleSegment * 2 );
+
 		const updatedWidth = startingWidth + delta.width;
 
 		setIsOversized( updatedWidth > initialComputedWidthRef.current );
 
+		// Width will be controlled by the library (via `resizeRatio`),
+		// so we only need to update the height.
 		setFrameSize( {
-			width: updatedWidth,
 			height: isOversized
 				? '100%'
 				: calculateNewHeight(
@@ -172,7 +186,7 @@ function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 				bottomLeft: false,
 				topLeft: false,
 			} }
-			resizeRatio={ 2 }
+			resizeRatio={ resizeRatio }
 			handleClasses={ undefined }
 			handleStyles={ {
 				left: HANDLE_STYLES_OVERRIDE,
