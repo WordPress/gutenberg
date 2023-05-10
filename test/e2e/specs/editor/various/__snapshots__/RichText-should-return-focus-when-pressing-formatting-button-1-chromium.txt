@@ -1,0 +1,3 @@
+<!-- wp:paragraph -->
+<p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->

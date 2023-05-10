@@ -1,0 +1,11 @@
+<!-- wp:list -->
+<ul><li>1<ul><li>2</li></ul></li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>2</li></ul>
+<!-- /wp:list -->
