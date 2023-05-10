@@ -32,6 +32,7 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
+			<InspectorControls.Slot group="filter" />
 			<InspectorControls.Slot
 				group="typography"
 				label={ __( 'Typography' ) }

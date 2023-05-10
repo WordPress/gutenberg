@@ -6,6 +6,7 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -21,7 +22,9 @@ import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-gl
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
-import { useLocation } from '../routes';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function SidebarScreens() {
 	useSyncPathWithURL();

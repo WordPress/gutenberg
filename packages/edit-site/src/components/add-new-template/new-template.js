@@ -24,12 +24,14 @@ import {
 	post,
 	postAuthor,
 	postDate,
+	postList,
 	search,
 	tag,
 	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -45,12 +47,14 @@ import {
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
-import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 
+const { useHistory } = unlock( routerPrivateApis );
+
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
+	'home',
 	'single',
 	'page',
 	'index',
@@ -66,6 +70,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
+	home: postList,
 	single: post,
 	page,
 	archive,

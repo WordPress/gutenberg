@@ -18,6 +18,7 @@ import { selectBlocks } from './select-blocks';
 import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
+import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
@@ -68,6 +69,9 @@ export class Editor {
 	setContent: typeof setContent = setContent.bind( this );
 	/** @borrows showBlockToolbar as this.showBlockToolbar */
 	showBlockToolbar: typeof showBlockToolbar = showBlockToolbar.bind( this );
+	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
+	setIsFixedToolbar: typeof setIsFixedToolbar =
+		setIsFixedToolbar.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
 }

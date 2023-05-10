@@ -55,7 +55,7 @@ function useInstanceId(
 		const id = createId( object );
 
 		return prefix ? `${ prefix }-${ id }` : id;
-	}, [ object ] );
+	}, [ object, preferredId, prefix ] );
 }
 
 export default useInstanceId;

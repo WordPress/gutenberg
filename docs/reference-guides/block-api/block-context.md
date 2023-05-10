@@ -26,7 +26,9 @@ A block can provide a context value by assigning a `providesContext` property in
 	},
 ```
 
-For complete example, refer below section.
+For complete example, refer to the section below.
+
+#### Include a namespace
 
 As seen in the above example, it is recommended that you include a namespace as part of the name of the context key so as to avoid potential conflicts with other plugins or default context values provided by WordPress. The context namespace should be specific to your plugin, and in most cases can be the same as used in the name of the block itself.
 
@@ -124,7 +126,7 @@ registerBlockType( 'my-plugin/record-title', {
 } );
 ```
 
-3. Edit `src/edit.js`. Replace `Edit` function by following code.
+3. Edit `src/edit.js` for the `record` block. Replace `Edit` function by following code.
 
 ```js
 import { TextControl } from '@wordpress/components';
@@ -151,7 +153,7 @@ export default function Edit( props ) {
 }
 ```
 
-4. Edit `src/save.js`. Replace `save` function by following code.
+4. Edit `src/save.js` for the `record` block. Replace `save` function by following code.
 
 ```js
 export default function save( props ) {
@@ -159,6 +161,6 @@ export default function save( props ) {
 }
 ```
 
-5. Create new post and add `record` block. If you type number in the above box, you'll see the same number is shown in below box.
+5. Create new post and add the `record` block. If you type a number in the text box, you'll see the same number is shown in the `record-title` block below it.
 
 ![Block Context Example](https://user-images.githubusercontent.com/8876600/93000215-c8570380-f561-11ea-9bd0-0b2bd0ca1752.png)

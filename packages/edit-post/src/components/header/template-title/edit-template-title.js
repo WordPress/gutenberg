@@ -58,16 +58,13 @@ export default function EditTemplateTitle() {
 					const settings = getEditorSettings();
 					const newAvailableTemplates = Object.fromEntries(
 						Object.entries( settings.availableTemplates ?? {} ).map(
-							( [ id, existingTitle ] ) => {
-								if ( id !== template.slug ) {
-									return existingTitle;
-								}
-								return newTitle;
-							}
+							( [ id, existingTitle ] ) => [
+								id,
+								id !== template.slug ? existingTitle : newTitle,
+							]
 						)
 					);
 					updateEditorSettings( {
-						...settings,
 						availableTemplates: newAvailableTemplates,
 					} );
 					editEntityRecord( 'postType', 'wp_template', template.id, {

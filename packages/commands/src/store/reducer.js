@@ -23,6 +23,7 @@ function commands( state = {}, action ) {
 						label: action.label,
 						group: action.group,
 						callback: action.callback,
+						icon: action.icon,
 					},
 				},
 			};
@@ -73,9 +74,29 @@ function commandLoaders( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the command center open state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function isOpen( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN':
+			return true;
+		case 'CLOSE':
+			return false;
+	}
+
+	return state;
+}
+
 const reducer = combineReducers( {
 	commands,
 	commandLoaders,
+	isOpen,
 } );
 
 export default reducer;

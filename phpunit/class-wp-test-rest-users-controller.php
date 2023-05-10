@@ -156,34 +156,50 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * The following methods are implemented in core and tested.
 	 * We need to define them here because they exist in the abstract parent.
+	 *
+	 * @doesNotPerformAssertions
 	 */
-	public function test_register_routes() {
-		$this->markTestIncomplete();
-	}
-	public function test_context_param() {
-		$this->markTestIncomplete();
-	}
-	public function test_get_item() {
-		$this->markTestIncomplete();
-	}
-	public function test_prepare_item() {
-		$this->markTestIncomplete();
-	}
-	public function test_create_item() {
-		$this->markTestIncomplete();
-	}
-	public function test_update_item() {
-		$this->markTestIncomplete();
-	}
-	public function test_delete_item() {
-		$this->markTestIncomplete();
-	}
-	public function test_get_items() {
-		$this->markTestIncomplete();
-	}
-	public function test_get_item_schema() {
-		$this->markTestIncomplete();
-	}
+	public function test_register_routes() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_context_param() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_prepare_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_create_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_update_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_delete_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_items() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item_schema() {}
 
 	public function test_registered_query_params() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/users' );

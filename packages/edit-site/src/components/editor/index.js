@@ -37,6 +37,7 @@ import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -171,7 +172,12 @@ export default function Editor() {
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
 							className={ showIconLabels && 'show-icon-labels' }
-							notices={ isEditMode && <EditorSnackbars /> }
+							notices={
+								( isEditMode ||
+									window?.__experimentalEnableThemePreviews ) && (
+									<EditorSnackbars />
+								)
+							}
 							content={
 								<>
 									<GlobalStylesRenderer />
@@ -209,7 +215,10 @@ export default function Editor() {
 							sidebar={
 								isEditMode &&
 								isRightSidebarOpen && (
-									<ComplementaryArea.Slot scope="core/edit-site" />
+									<>
+										<ComplementaryArea.Slot scope="core/edit-site" />
+										<SidebarFixedBottomSlot />
+									</>
 								)
 							}
 							footer={
