@@ -145,7 +145,10 @@ test.describe( 'Cover', () => {
 		await expect( coverBlockParagraph ).toContainText( titleText );
 	} );
 
-	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
+	test.only( 'can be resized using drag & drop', async ( {
+		page,
+		editor,
+	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
@@ -159,18 +162,28 @@ test.describe( 'Cover', () => {
 		// Open the document sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Open the block list viewer from the toolbar.
+		// Open the block list viewer from the Editor toolbar.
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Document Overview' } )
 			.click();
 
-		// Select the Cover block from the docuemnt overview.
-		await page.getByRole( 'link', { name: 'Cover' } ).click();
+		// Select the Cover block from the Document Overview.
+		await page
+			.getByRole( 'region', { name: 'Document Overview' } )
+			.getByRole( 'link', { name: 'Cover' } )
+			.click();
+
+		// In the Block Editor Settings panel, click on the Styles subpanel.
+		const coverBlockEditorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await coverBlockEditorSettings
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		// Ensure there the default value for the minimum height of cover is undefined.
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		const defaultHeightValue = await page
+		const defaultHeightValue = await coverBlockEditorSettings
 			.getByLabel( 'Minimum height of cover' )
 			.inputValue();
 		expect( defaultHeightValue ).toBeFalsy();
@@ -201,7 +214,7 @@ test.describe( 'Cover', () => {
 		);
 	} );
 
-	test.only( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
 		imageBlockUtils,
