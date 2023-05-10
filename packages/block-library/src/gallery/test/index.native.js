@@ -258,11 +258,11 @@ describe( 'Gallery block', () => {
 		// Initialize with an empty gallery
 		const screen = await initializeWithGalleryBlock();
 		const { galleryBlock, getByText } = screen;
-		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
+		const { selectOption } = await setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		await selectOption( 'Choose from device' );
+		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
