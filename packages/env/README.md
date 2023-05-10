@@ -713,12 +713,12 @@ This is useful for performing some actions after setting up the environment, suc
 
 ### Advanced PHP settings
 
-You can set PHP settings by mapping an `.htaccess` file:
+You can set PHP settings by mapping an `.htaccess` file. This maps an `.htaccess` file to the WordPress root (`/var/www/html`) from the directory in which you run `wp-env`.
 
 ```json
 {
 	"mappings": {
-		"wp-content/.htaccess": "./.htaccess"
+		".htaccess": ".htaccess"
 	}
 }
 ```
@@ -727,13 +727,12 @@ Then, your .htaccess file can contain various settings like this:
 
 ```
 # Note: the default upload value is 1G.
-
 php_value post_max_size 2G
 php_value upload_max_filesize 2G
 php_value memory_limit 2G
 ```
 
-This is useful if there are options you'd normally add to `php.ini`, which is difficult to access in this environment.
+This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
 
 ## Contributing to this package
 
