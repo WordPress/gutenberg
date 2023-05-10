@@ -229,7 +229,9 @@ const BlockActionsMenu = ( {
 		canDuplicate && allOptions.cutButton,
 		canDuplicate && isPasteEnabled && allOptions.pasteButton,
 		canDuplicate && allOptions.duplicateButton,
-		isReusableBlockType && allOptions.convertToRegularBlocks,
+		isReusableBlockType &&
+			innerBlockCount > 0 &&
+			allOptions.convertToRegularBlocks,
 		! isLocked && allOptions.delete,
 	].filter( Boolean );
 
