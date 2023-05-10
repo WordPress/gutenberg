@@ -106,8 +106,6 @@ export default function Layout() {
 		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
-	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
-		useState( false );
 	const [ isResizing ] = useState( false );
 
 	// Sets the right context for the command center
@@ -238,13 +236,7 @@ export default function Layout() {
 									}
 									initial={ false }
 									layout="position"
-									className={ classnames(
-										'edit-site-layout__canvas',
-										{
-											'is-right-aligned':
-												isResizableFrameOversized,
-										}
-									) }
+									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
 										duration:
@@ -256,9 +248,7 @@ export default function Layout() {
 								>
 									<ResizableFrame
 										isFullWidth={ isEditing }
-										onOversizeChange={
-											setIsResizableFrameOversized
-										}
+										oversizedClassName="edit-site-layout__resizable-frame-oversized"
 									>
 										<ErrorBoundary>
 											{ isEditorPage && <Editor /> }

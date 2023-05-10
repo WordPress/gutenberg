@@ -61,7 +61,7 @@ function calculateNewHeight( width, initialAspectRatio ) {
 	return width / intermediateAspectRatio;
 }
 
-function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
+function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
 		height: '100%',
@@ -69,15 +69,8 @@ function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
-	const [ isOversized, _setIsOversized ] = useState( false );
-	const setIsOversized = ( value ) => {
-		_setIsOversized( ( prevValue ) => {
-			if ( prevValue !== value ) {
-				onOversizeChange( value );
-			}
-			return value;
-		} );
-	};
+	const [ isOversized, setIsOversized ] = useState( false );
+
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
@@ -224,7 +217,7 @@ function ResizableFrame( { isFullWidth, children, onOversizeChange } ) {
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
-				'is-oversized': isOversized,
+				[ oversizedClassName ]: isOversized,
 			} ) }
 		>
 			<motion.div
