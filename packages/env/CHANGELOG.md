@@ -4,8 +4,7 @@
 
 ### Breaking Change
 
--   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
-between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+-   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 -   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
 
 ### New feature
@@ -19,10 +18,12 @@ between the host, web container, and cli container. If you still encounter permi
 ### Bug fix
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
+-   Fix Xdebug while using PHP 7.2x.
 
 ### Enhancement
 
 -   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
+-   Increase the maximum upload size to 1GB.
 
 ## 6.0.0 (2023-04-26)
 
