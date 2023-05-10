@@ -31,14 +31,7 @@ import { store as blockEditorStore } from '../../store';
  * @return {ConvertToGroupButtonProps} Returns the properties needed by `ConvertToGroupButton`.
  */
 export default function useConvertToGroupButtonProps( selectedClientIds ) {
-	const {
-		clientIds,
-		isGroupable,
-		isUngroupable,
-		blocksSelection,
-		groupingBlockName,
-		onUngroup,
-	} = useSelect(
+	return useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
@@ -48,30 +41,30 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 			} = select( blockEditorStore );
 			const { getGroupingBlockName, getBlockType } =
 				select( blocksStore );
-			const _clientIds = selectedClientIds?.length
+			const clientIds = selectedClientIds?.length
 				? selectedClientIds
 				: getSelectedBlockClientIds();
-			const _groupingBlockName = getGroupingBlockName();
+			const groupingBlockName = getGroupingBlockName();
 
-			const rootClientId = !! _clientIds?.length
-				? getBlockRootClientId( _clientIds[ 0 ] )
+			const rootClientId = clientIds?.length
+				? getBlockRootClientId( clientIds[ 0 ] )
 				: undefined;
 
 			const groupingBlockAvailable = canInsertBlockType(
-				_groupingBlockName,
+				groupingBlockName,
 				rootClientId
 			);
 
-			const _blocksSelection = getBlocksByClientId( _clientIds );
-			const _isSingleBlockSelected = _blocksSelection.length === 1;
-			const [ firstSelectedBlock ] = _blocksSelection;
+			const blocksSelection = getBlocksByClientId( clientIds );
+			const isSingleBlockSelected = blocksSelection.length === 1;
+			const [ firstSelectedBlock ] = blocksSelection;
 			// A block is ungroupable if it is a single grouping block with inner blocks.
 			// If a block has an `ungroup` transform, it is also ungroupable, without the
 			// requirement of being the default grouping block.
 			// Do we have a single grouping Block selected and does that group have inner blocks?
-			const _isUngroupable =
-				_isSingleBlockSelected &&
-				( firstSelectedBlock.name === _groupingBlockName ||
+			const isUngroupable =
+				isSingleBlockSelected &&
+				( firstSelectedBlock.name === groupingBlockName ||
 					getBlockType( firstSelectedBlock.name )?.transforms
 						?.ungroup ) &&
 				!! firstSelectedBlock.innerBlocks.length;
@@ -79,30 +72,21 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 			// Do we have
 			// 1. Grouping block available to be inserted?
 			// 2. One or more blocks selected
-			const _isGroupable =
-				groupingBlockAvailable && _blocksSelection.length;
+			const isGroupable =
+				groupingBlockAvailable && blocksSelection.length;
 
 			return {
-				clientIds: _clientIds,
-				isGroupable: _isGroupable,
-				isUngroupable: _isUngroupable,
-				blocksSelection: _blocksSelection,
-				groupingBlockName: _groupingBlockName,
+				clientIds,
+				isGroupable,
+				isUngroupable,
+				blocksSelection,
+				groupingBlockName,
 				onUngroup:
-					_isUngroupable &&
+					isUngroupable &&
 					getBlockType( firstSelectedBlock.name )?.transforms
 						?.ungroup,
 			};
 		},
 		[ selectedClientIds ]
 	);
-
-	return {
-		clientIds,
-		isGroupable,
-		isUngroupable,
-		onUngroup,
-		blocksSelection,
-		groupingBlockName,
-	};
 }
