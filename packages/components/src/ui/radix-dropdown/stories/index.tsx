@@ -33,12 +33,12 @@ import { menu, wordpress } from '@wordpress/icons';
 import Icon from '../../../icon';
 
 const DropdownMenuStoryContext = createContext< {
-	bookmarksChecked?: boolean;
-	setBookmarksChecked?: ( v: boolean ) => void;
-	urlsChecked?: boolean;
-	setUrlsChecked?: ( v: boolean ) => void;
-	person?: string;
-	setPerson?: ( v: string ) => void;
+	itemOneChecked?: boolean;
+	setItemOneChecked?: ( v: boolean ) => void;
+	itemTwoChecked?: boolean;
+	setItemTwoChecked?: ( v: boolean ) => void;
+	radioValue?: string;
+	setRadioValue?: ( v: string ) => void;
 } >( {} );
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
@@ -67,19 +67,19 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 	decorators: [
 		// Shared story state
 		( Story ) => {
-			const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
-			const [ urlsChecked, setUrlsChecked ] = useState( false );
-			const [ person, setPerson ] = useState( 'pedro' );
+			const [ itemOneChecked, setItemOneChecked ] = useState( true );
+			const [ itemTwoChecked, setItemTwoChecked ] = useState( false );
+			const [ radioValue, setRadioValue ] = useState( 'radio-one' );
 
 			return (
 				<DropdownMenuStoryContext.Provider
 					value={ {
-						bookmarksChecked,
-						setBookmarksChecked,
-						urlsChecked,
-						setUrlsChecked,
-						person,
-						setPerson,
+						itemOneChecked,
+						setItemOneChecked,
+						itemTwoChecked,
+						setItemTwoChecked,
+						radioValue,
+						setRadioValue,
 					} }
 				>
 					<Story />
@@ -131,34 +131,30 @@ const MenuButton = styled.button`
 	}
 `;
 
-const KeyboardShortcut = styled.span`
-	opacity: 0.8;
-`;
-
 const CheckboxItemsGroup = () => {
 	const {
-		bookmarksChecked,
-		setBookmarksChecked,
-		urlsChecked,
-		setUrlsChecked,
+		itemOneChecked,
+		setItemOneChecked,
+		itemTwoChecked,
+		setItemTwoChecked,
 	} = useContext( DropdownMenuStoryContext );
 
 	return (
 		<DropdownMenuGroup>
-			<DropdownMenuLabel>Options</DropdownMenuLabel>
+			<DropdownMenuLabel>Checkbox group label</DropdownMenuLabel>
 			<DropdownMenuCheckboxItem
-				checked={ bookmarksChecked }
-				onCheckedChange={ setBookmarksChecked }
-				suffix={ <KeyboardShortcut>⌘+B</KeyboardShortcut> }
+				checked={ itemOneChecked }
+				onCheckedChange={ setItemOneChecked }
+				suffix={ <span>⌘+B</span> }
 			>
-				Show Bookmarks
+				Checkbox item one
 			</DropdownMenuCheckboxItem>
 
 			<DropdownMenuCheckboxItem
-				checked={ urlsChecked }
-				onCheckedChange={ setUrlsChecked }
+				checked={ itemTwoChecked }
+				onCheckedChange={ setItemTwoChecked }
 			>
-				Show Full URLs
+				Checkbox item two
 			</DropdownMenuCheckboxItem>
 
 			<DropdownMenuSeparator />
@@ -167,16 +163,21 @@ const CheckboxItemsGroup = () => {
 };
 
 const RadioItemsGroup = () => {
-	const { person, setPerson } = useContext( DropdownMenuStoryContext );
+	const { radioValue, setRadioValue } = useContext(
+		DropdownMenuStoryContext
+	);
 
 	return (
-		<DropdownMenuRadioGroup value={ person } onValueChange={ setPerson }>
-			<DropdownMenuLabel>People</DropdownMenuLabel>
-			<DropdownMenuRadioItem value="pedro">
-				Pedro Duarte
+		<DropdownMenuRadioGroup
+			value={ radioValue }
+			onValueChange={ setRadioValue }
+		>
+			<DropdownMenuLabel>Radio group label</DropdownMenuLabel>
+			<DropdownMenuRadioItem value="radio-one">
+				Radio item one
 			</DropdownMenuRadioItem>
-			<DropdownMenuRadioItem value="colm">
-				Colm Tuite
+			<DropdownMenuRadioItem value="radio-two">
+				Radio item two
 			</DropdownMenuRadioItem>
 		</DropdownMenuRadioGroup>
 	);
@@ -196,39 +197,53 @@ Default.args = {
 	children: (
 		<>
 			<DropdownMenuGroup>
+				<DropdownMenuItem>Menu item</DropdownMenuItem>
 				<DropdownMenuItem
 					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
-					suffix={ <KeyboardShortcut>⌘+T</KeyboardShortcut> }
 				>
-					New Tab
+					Menu item with prefix
 				</DropdownMenuItem>
-				<DropdownMenuItem
-					suffix={ <KeyboardShortcut>⌘+N</KeyboardShortcut> }
-				>
-					New Window
+				<DropdownMenuItem suffix={ <span>⌥⌘T</span> }>
+					Menu item with suffix
 				</DropdownMenuItem>
-				<DropdownMenuItem
-					disabled
-					suffix={ <KeyboardShortcut>⇧+⌘+N</KeyboardShortcut> }
-				>
-					New Private Window
-				</DropdownMenuItem>
+				<DropdownMenuItem disabled>Disabled menu item</DropdownMenuItem>
 				<DropdownSubMenu
 					trigger={
-						<DropdownSubMenuTrigger>
-							More Tools
-						</DropdownSubMenuTrigger>
+						<DropdownSubMenuTrigger>Submenu</DropdownSubMenuTrigger>
 					}
 				>
-					<DropdownMenuItem
-						suffix={ <KeyboardShortcut>⌘+S</KeyboardShortcut> }
-					>
-						Save Page As…
+					<DropdownMenuItem suffix={ <span>⌘+S</span> }>
+						Submenu with suffix
 					</DropdownMenuItem>
-					<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
-					<DropdownMenuItem>Name Window…</DropdownMenuItem>
+					<DropdownMenuItem>
+						<div
+							style={ {
+								display: 'inline-flex',
+								flexDirection: 'column',
+							} }
+						>
+							Submenu item
+							<span
+								style={ {
+									fontSize: '10px',
+									color: '#777',
+								} }
+							>
+								With additional custom text
+							</span>
+						</div>
+					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem>Developer Tools</DropdownMenuItem>
+					<DropdownSubMenu
+						trigger={
+							<DropdownSubMenuTrigger>
+								Submenu
+							</DropdownSubMenuTrigger>
+						}
+					>
+						<DropdownMenuItem>Submenu item</DropdownMenuItem>
+						<DropdownMenuItem>Submenu item</DropdownMenuItem>
+					</DropdownSubMenu>
 				</DropdownSubMenu>
 				<DropdownMenuSeparator />
 			</DropdownMenuGroup>
