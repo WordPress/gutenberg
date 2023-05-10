@@ -54,6 +54,7 @@ function render_block_core_image( $attributes, $content ) {
 							$content
 						</button>
 						<div data-wp-body="" class="wp-lightbox-overlay"
+							aria-role="dialog"
 							aria-hidden="true"
 							data-wp-class.initialized="context.core.image.initialized"
 							data-wp-class.active="context.core.image.lightboxEnabled"
