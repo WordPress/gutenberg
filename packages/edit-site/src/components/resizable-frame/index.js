@@ -192,7 +192,7 @@ function ResizableFrame( {
 				right: HANDLE_STYLES_OVERRIDE,
 			} }
 			minWidth={ MIN_FRAME_SIZE }
-			maxWidth={ '150%' }
+			maxWidth={ isFullWidth ? '100%' : '150%' }
 			maxHeight={ '100%' }
 			onMouseOver={ () => setIsHovering( true ) }
 			onMouseOut={ () => setIsHovering( false ) }
