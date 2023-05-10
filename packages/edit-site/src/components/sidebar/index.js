@@ -23,6 +23,8 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
 import { unlock } from '../../private-apis';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -42,6 +44,12 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/navigation/:postType/:postId">
 				<SidebarNavigationScreenNavigationItem />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page">
+				<SidebarNavigationScreenPages />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page/:postId">
+				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
 				<SidebarNavigationScreenTemplates />

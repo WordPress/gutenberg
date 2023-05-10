@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 15.7.1 =
+
+
+
+## Changelog
+
+### Enhancements
+
+#### Fonts API
+- Relocate which fonts to print into wp_print_fonts(). ([50151](https://github.com/WordPress/gutenberg/pull/50151))
+
+
+### Tools
+
+#### Testing
+- Skip  iframe-inline-styles end-to-end test. ([50320](https://github.com/WordPress/gutenberg/pull/50320))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@hellofromtonya @scruffian
+
+
 = 15.7.0 =
 
 ## Changelog

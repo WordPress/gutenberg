@@ -72,7 +72,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the command center; Open it using cmd + k in the site editor.', 'gutenberg' ),
+			'label' => __( 'Test the command center; Open it using cmd + k in the site or post editors.', 'gutenberg' ),
 			'id'    => 'gutenberg-command-center',
 		)
 	);
