@@ -61,7 +61,9 @@ export default function Table( { templateType } ) {
 	}
 
 	const sortedTemplates = [ ...templates ];
-	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
 	return (
 		// These explicit aria roles are needed for Safari.

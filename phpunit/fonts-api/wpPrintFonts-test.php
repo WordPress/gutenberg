@@ -123,4 +123,70 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 			$wp_fonts->enqueue( $setup['enqueued'] );
 		}
 	}
+
+	/**
+	 * @dataProvider data_should_print_all_registered_fonts_for_iframed_editor
+	 *
+	 * @param string $fonts    Fonts to register.
+	 * @param array  $expected Expected results.
+	 */
+	public function test_should_print_all_registered_fonts_for_iframed_editor( $fonts, $expected ) {
+		wp_register_fonts( $fonts );
+
+		$this->expectOutputString( $expected['output'] );
+		$actual_done = wp_print_fonts( true );
+		$this->assertSameSets( $expected['done'], $actual_done, 'All registered font-family handles should be returned' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_print_all_registered_fonts_for_iframed_editor() {
+		$local_fonts = $this->get_registered_local_fonts();
+		$font_faces  = $this->get_registered_fonts_css();
+
+		return array(
+			'Merriweather with 1 variation'      => array(
+				'fonts'    => array( 'merriweather' => $local_fonts['merriweather'] ),
+				'expected' => array(
+					'done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal']
+					),
+				),
+			),
+			'Source Serif Pro with 2 variations' => array(
+				'fonts'    => array( 'Source Serif Pro' => $local_fonts['Source Serif Pro'] ),
+				'expected' => array(
+					'done'   => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s%s\n</style>\n",
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+			'all fonts'                          => array(
+				'fonts'    => $local_fonts,
+				'expected' => array(
+					'done'   => array(
+						'merriweather',
+						'merriweather-200-900-normal',
+						'source-serif-pro',
+						'Source Serif Pro-300-normal',
+						'Source Serif Pro-900-italic',
+					),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal'],
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+		);
+	}
 }

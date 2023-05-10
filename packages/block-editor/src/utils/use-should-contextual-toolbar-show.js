@@ -14,14 +14,16 @@ import { unlock } from '../lock-unlock';
 /**
  * Returns true if the contextual block toolbar should show, or false if it should be hidden.
  *
- * @param {string} clientId The client ID of the block.
- *
  * @return {boolean} Whether the block toolbar is hidden.
  */
-export function useShouldContextualToolbarShow( clientId ) {
+export function useShouldContextualToolbarShow() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { shouldShowContextualToolbar, canFocusHiddenToolbar } = useSelect(
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useSelect(
 		( select ) => {
 			const {
 				__unstableGetEditorMode,
@@ -31,14 +33,19 @@ export function useShouldContextualToolbarShow( clientId ) {
 				getBlock,
 				getSettings,
 				isNavigationMode,
+				getSelectedBlockClientId,
+				getFirstMultiSelectedBlockClientId,
 			} = unlock( select( blockEditorStore ) );
 
 			const isEditMode = __unstableGetEditorMode() === 'edit';
 			const hasFixedToolbar = getSettings().hasFixedToolbar;
 			const isDistractionFree = getSettings().isDistractionFree;
-			const hasClientId = !! clientId;
+			const selectedBlockId =
+				getFirstMultiSelectedBlockClientId() ||
+				getSelectedBlockClientId();
+			const hasSelectedBlockId = !! selectedBlockId;
 			const isEmptyDefaultBlock = isUnmodifiedDefaultBlock(
-				getBlock( clientId ) || {}
+				getBlock( selectedBlockId ) || {}
 			);
 
 			const _shouldShowContextualToolbar =
@@ -48,13 +55,13 @@ export function useShouldContextualToolbarShow( clientId ) {
 				isLargeViewport &&
 				! isMultiSelecting() &&
 				! isTyping() &&
-				hasClientId &&
+				hasSelectedBlockId &&
 				! isEmptyDefaultBlock &&
 				! isBlockInterfaceHidden();
 
 			const _canFocusHiddenToolbar =
 				isEditMode &&
-				hasClientId &&
+				hasSelectedBlockId &&
 				! _shouldShowContextualToolbar &&
 				! hasFixedToolbar &&
 				! isDistractionFree &&
@@ -63,13 +70,16 @@ export function useShouldContextualToolbarShow( clientId ) {
 			return {
 				shouldShowContextualToolbar: _shouldShowContextualToolbar,
 				canFocusHiddenToolbar: _canFocusHiddenToolbar,
+				fixedToolbarCanBeFocused:
+					( hasFixedToolbar || ! isLargeViewport ) && selectedBlockId,
 			};
 		},
-		[ clientId, isLargeViewport ]
+		[ isLargeViewport ]
 	);
 
 	return {
 		shouldShowContextualToolbar,
 		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
 	};
 }

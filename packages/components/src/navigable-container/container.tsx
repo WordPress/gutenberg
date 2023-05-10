@@ -122,11 +122,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			const targetHasMenuItemRole =
 				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
-			// `preventDefault()` on tab to avoid having the browser move the focus
-			// after this component has already moved it.
-			const isTab = event.code === 'Tab';
-
-			if ( targetHasMenuItemRole || isTab ) {
+			if ( targetHasMenuItemRole ) {
 				event.preventDefault();
 			}
 		}
@@ -150,9 +146,16 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		const nextIndex = cycle
 			? cycleValue( index, focusables.length, offset )
 			: index + offset;
+
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
+
+			// `preventDefault()` on tab to avoid having the browser move the focus
+			// after this component has already moved it.
+			if ( event.code === 'Tab' ) {
+				event.preventDefault();
+			}
 		}
 	}
 

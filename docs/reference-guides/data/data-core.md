@@ -126,6 +126,18 @@ _Returns_
 
 -   `any`: The current theme.
 
+### getCurrentThemeGlobalStylesRevisions
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Object | null`: The current global styles.
+
 ### getCurrentUser
 
 Returns the current user.
