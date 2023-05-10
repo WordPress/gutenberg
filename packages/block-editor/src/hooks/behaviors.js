@@ -14,7 +14,10 @@ import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 /**
- * TODO: Add description.
+ * Override the default edit UI to include a new block inspector control for
+ * assigning behaviors to blocks if behaviors are enabled in the theme.json.
+ *
+ * Currently, only the `core/image` block is supported.
  *
  * @param {WPComponent} BlockEdit Original component.
  *
