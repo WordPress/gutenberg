@@ -315,10 +315,6 @@ export default function BlockList( {
 									),
 									horizontal &&
 										styles.horizontalContentContainer,
-									isWider( blockWidth, 'medium' ) &&
-										( isContentStretch && isMultiBlocks
-											? styles.horizontalContentContainerStretch
-											: styles.horizontalContentContainerCenter ),
 								] }
 							>
 								{ blockClientIds.map(
