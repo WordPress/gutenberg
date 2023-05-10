@@ -234,15 +234,17 @@ export default function Layout() {
 										ease: 'easeOut',
 									} }
 								>
-									<ResizableFrame
-										isFullWidth={ isEditing }
-										oversizedClassName="edit-site-layout__resizable-frame-oversized"
-									>
-										<ErrorBoundary>
-											{ isEditorPage && <Editor /> }
-											{ isListPage && <ListPage /> }
-										</ErrorBoundary>
-									</ResizableFrame>
+									<ErrorBoundary>
+										{ isEditorPage && (
+											<ResizableFrame
+												isFullWidth={ isEditing }
+												oversizedClassName="edit-site-layout__resizable-frame-oversized"
+											>
+												<Editor />
+											</ResizableFrame>
+										) }
+										{ isListPage && <ListPage /> }
+									</ErrorBoundary>
 								</motion.div>
 							) }
 						</motion.div>
