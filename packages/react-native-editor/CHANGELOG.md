@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Fix bug affecting undo and redo history when instering a link configured to open in a new tab
 
 ## 1.93.0
 -   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
