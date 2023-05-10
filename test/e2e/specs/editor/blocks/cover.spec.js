@@ -82,14 +82,8 @@ test.describe( 'Cover', () => {
 		// beginning with `blob`.
 		await expect( async () => {
 			const src = await coverBlock.locator( 'img' ).getAttribute( 'src' );
-			expect( src.startsWith( 'http' ) ).toBe( true );
+			expect( src.includes( fileBasename ) ).toBe( true );
 		} ).toPass();
-
-		const backgroundImageURL = await coverBlock
-			.locator( 'img' )
-			.getAttribute( 'src' );
-
-		expect( backgroundImageURL ).toContain( fileBasename );
 	} );
 
 	test( 'dims background image down by 50% by default', async ( {
