@@ -1,97 +1,45 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	TextControl,
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
-} from '@wordpress/components';
-import { settings as settingsIcon } from '@wordpress/icons';
-import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import Settings from './settings';
+const noop = () => {};
 
-function LinkSettingsDrawer( {
-	settingsOpen,
-	setSettingsOpen,
-	showTextControl,
-	showSettings,
-	textInputRef,
-	internalTextInputValue,
-	setInternalTextInputValue,
-	handleSubmitWithEnter,
+const LinkControlSettingsDrawer = ( {
 	value,
 	settings,
-	onChange,
-} ) {
-	const prefersReducedMotion = useReducedMotion();
-	const MaybeAnimatePresence = prefersReducedMotion
-		? Fragment
-		: AnimatePresence;
-	const MaybeMotionDiv = prefersReducedMotion ? 'div' : motion.div;
+	setNewValue = noop,
+} ) => {
+	if ( ! settings || ! settings.length ) {
+		return null;
+	}
 
-	const id = useInstanceId( LinkSettingsDrawer );
+	const handleSettingChange = ( setting ) => ( newValue ) => {
+		setNewValue( {
+			...value,
+			[ setting.id ]: newValue,
+		} );
+	};
 
-	const settingsDrawerId = `link-control-settings-drawer-${ id }`;
+	const theSettings = settings.map( ( setting ) => (
+		<ToggleControl
+			className="block-editor-link-control__setting"
+			key={ setting.id }
+			label={ setting.title }
+			onChange={ handleSettingChange( setting ) }
+			checked={ value ? !! value[ setting.id ] : false }
+		/>
+	) );
 
 	return (
-		<>
-			<Button
-				className="block-editor-link-control__drawer-toggle"
-				aria-expanded={ settingsOpen }
-				onClick={ () => setSettingsOpen( ! settingsOpen ) }
-				icon={ settingsIcon }
-				label={ __( 'Link Settings' ) }
-				aria-controls={ settingsDrawerId }
-			/>
-			<MaybeAnimatePresence>
-				{ settingsOpen && (
-					<MaybeMotionDiv
-						className="block-editor-link-control__drawer"
-						hidden={ ! settingsOpen }
-						id={ settingsDrawerId }
-						initial="collapsed"
-						animate="open"
-						exit="collapsed"
-						variants={ {
-							open: { opacity: 1, height: 'auto' },
-							collapsed: { opacity: 0, height: 0 },
-						} }
-						transition={ {
-							duration: 0.1,
-						} }
-					>
-						<div className="block-editor-link-control__drawer-inner">
-							{ showTextControl && (
-								<TextControl
-									__nextHasNoMarginBottom
-									ref={ textInputRef }
-									className="block-editor-link-control__setting block-editor-link-control__text-content"
-									label="Text"
-									value={ internalTextInputValue }
-									onChange={ setInternalTextInputValue }
-									onKeyDown={ handleSubmitWithEnter }
-								/>
-							) }
-							{ showSettings && (
-								<Settings
-									value={ value }
-									settings={ settings }
-									onChange={ onChange }
-								/>
-							) }
-						</div>
-					</MaybeMotionDiv>
-				) }
-			</MaybeAnimatePresence>
-		</>
+		<fieldset className="block-editor-link-control__settings">
+			<VisuallyHidden as="legend">
+				{ __( 'Currently selected link settings' ) }
+			</VisuallyHidden>
+			{ theSettings }
+		</fieldset>
 	);
-}
+};
 
-export default LinkSettingsDrawer;
+export default LinkControlSettingsDrawer;

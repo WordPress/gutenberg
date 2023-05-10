@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -98,7 +99,10 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  */
 
 const noop = () => {};
-
+const __newOnChangeForLinkControl = ( callback1, callback2, value ) => {
+	callback1( value );
+	callback2( value );
+};
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -112,7 +116,6 @@ function LinkControl( {
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
 	onRemove,
-	onCancel,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -136,18 +139,18 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const [ newValue, setNewValue ] = useState( value );
 
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
-		useInternalInputValue( value?.url || '' );
+		useInternalInputValue( newValue?.url || '' );
 
 	const [ internalTextInputValue, setInternalTextInputValue ] =
-		useInternalInputValue( value?.title || '' );
+		useInternalInputValue( newValue?.title || '' );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
-			: ! value || ! value.url
+			: ! newValue || ! newValue?.url
 	);
 
 	const { createPage, isCreatingPage, errorMessage } =
@@ -192,8 +195,6 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
-	const hasLinkValue = value?.url?.trim()?.length > 0;
-
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
@@ -203,12 +204,11 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( {
+		__newOnChangeForLinkControl( onChange, setNewValue, {
 			...updatedValue,
 			title: internalTextInputValue || updatedValue?.title,
 		} );
@@ -216,16 +216,11 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		if (
-			currentUrlInputValue !== value?.url ||
-			internalTextInputValue !== value?.title
-		) {
-			onChange( {
-				...value,
-				url: currentUrlInputValue,
-				title: internalTextInputValue,
-			} );
-		}
+		__newOnChangeForLinkControl( onChange, setNewValue, {
+			...newValue,
+			url: currentUrlInputValue,
+			title: internalTextInputValue,
+		} );
 		stopEditing();
 	};
 
@@ -240,44 +235,19 @@ function LinkControl( {
 		}
 	};
 
-	const resetInternalValues = () => {
-		setInternalUrlInputValue( value?.url );
-		setInternalTextInputValue( value?.title );
-	};
-
-	const handleCancel = ( event ) => {
-		event.preventDefault();
-		event.stopPropagation();
-
-		// Ensure that any unsubmitted input changes are reset.
-		resetInternalValues();
-
-		if ( hasLinkValue ) {
-			// If there is a link then exist editing mode and show preview.
-			stopEditing();
-		} else {
-			// If there is no link value, then remove the link entirely.
-			onRemove?.();
-		}
-
-		onCancel?.();
-	};
-
 	const currentUrlInputValue = propInputValue || internalUrlInputValue;
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
-		onRemove && value && ! isEditingLink && ! isCreatingPage;
+		onRemove && newValue && ! isEditingLink && ! isCreatingPage;
 
-	const showSettings = !! settings?.length;
+	const showSettingsDrawer = !! settings?.length;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = hasLinkValue && hasTextControl;
-
-	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const showTextControl = newValue?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
@@ -291,7 +261,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ isEditing && (
+			{ ( isEditingLink || ! newValue ) && ! isCreatingPage && (
 				<>
 					<div
 						className={ classnames( {
@@ -299,8 +269,20 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label="Text"
+								value={ internalTextInputValue }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
+
 						<LinkControlSearchInput
-							currentLink={ value }
+							currentLink={ newValue }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
 							value={ currentUrlInputValue }
@@ -317,7 +299,17 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							useLabel={ showTextControl }
-						/>
+						>
+							<div className="block-editor-link-control__search-actions">
+								<Button
+									onClick={ handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+								/>
+							</div>
+						</LinkControlSearchInput>
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -331,10 +323,10 @@ function LinkControl( {
 				</>
 			) }
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
+			{ newValue && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
+					key={ newValue?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ newValue }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
@@ -342,42 +334,15 @@ function LinkControl( {
 				/>
 			) }
 
-			{ isEditing && (
+			{ showSettingsDrawer && (
 				<div className="block-editor-link-control__tools">
-					{ ( showSettings || showTextControl ) && (
-						<LinkControlSettingsDrawer
-							settingsOpen={ settingsOpen }
-							setSettingsOpen={ setSettingsOpen }
-							showTextControl={ showTextControl }
-							showSettings={ showSettings }
-							textInputRef={ textInputRef }
-							internalTextInputValue={ internalTextInputValue }
-							setInternalTextInputValue={
-								setInternalTextInputValue
-							}
-							handleSubmitWithEnter={ handleSubmitWithEnter }
-							value={ value }
-							settings={ settings }
-							onChange={ onChange }
-						/>
-					) }
-
-					<div className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ handleSubmit }
-							className="block-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-						>
-							{ __( 'Apply' ) }
-						</Button>
-						<Button variant="tertiary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</div>
+					<LinkControlSettingsDrawer
+						value={ newValue }
+						setNewValue={ setNewValue }
+						settings={ settings }
+					/>
 				</div>
 			) }
-
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
