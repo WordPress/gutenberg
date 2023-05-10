@@ -388,7 +388,7 @@ function Footer( {
 			</>
 		);
 	} else if ( renderFooterAppender ) {
-		return renderFooterAppender();
+		return <View>{ renderFooterAppender() }</View>;
 	}
 
 	return null;
