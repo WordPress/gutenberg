@@ -153,7 +153,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 								delay: canvasMode === 'view' ? 0.1 : 0,
 							} }
 						>
-							{ decodeEntities( siteTitle ) }
+							<Tooltip text={ __( 'View site' ) }>
+								<ExternalLink href={ homeUrl }>
+									{ decodeEntities( siteTitle ) }
+								</ExternalLink>
+							</Tooltip>
 						</motion.div>
 					</AnimatePresence>
 				</HStack>
