@@ -6,6 +6,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import { store as blockEditorStore } from '../../store';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -49,7 +51,7 @@ function InserterSearchResults( {
 	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
-
+	const { getBlockListSettings } = useSelect( blockEditorStore );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
@@ -89,12 +91,25 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
 		if ( ! filterValue && orderInitialBlockItems ) {
 			orderedItems = orderInitialBlockItems( orderedItems );
 		}
+
+		// Get the allowed blocks for the parent block.
+		const parentBlockListSettings = getBlockListSettings(
+			state,
+			rootClientId
+		);
+		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
+		if ( parentAllowedBlocks ) {
+			console.log( 'parentAllowedBlocks', parentAllowedBlocks );
+			// Use the parent allowed blocks to sort the results.
+		}
+
 		const results = searchBlockItems(
-			orderedItems,
+			blockTypes,
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
