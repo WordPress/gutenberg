@@ -62,6 +62,12 @@ export default function SidebarNavigationScreenPages() {
 										) ?? __( '(no title)' ) }
 									</PageItem>
 								) ) }
+							</ItemGroup>
+
+							<SidebarNavigationSubtitle>
+								{ __( 'Quick links' ) }
+							</SidebarNavigationSubtitle>
+							<ItemGroup>
 								<SidebarNavigationItem
 									className="edit-site-sidebar-navigation-screen-pages__see-all"
 									href="edit.php?post_type=page"

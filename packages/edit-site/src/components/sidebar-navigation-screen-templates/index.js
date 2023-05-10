@@ -21,6 +21,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
+import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 
 const config = {
 	wp_template: {
@@ -122,7 +123,16 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
+						</ItemGroup>
+					) }
+
+					{ ! isLoading && ! isMobileViewport && (
+						<>
+							<SidebarNavigationSubtitle>
+								{ __( 'Quick links' ) }
+							</SidebarNavigationSubtitle>
+
+							<ItemGroup>
 								<SidebarNavigationItem
 									className="edit-site-sidebar-navigation-screen-templates__see-all"
 									{ ...browseAllLink }
@@ -131,8 +141,8 @@ export default function SidebarNavigationScreenTemplates() {
 									}
 									withChevron
 								/>
-							) }
-						</ItemGroup>
+							</ItemGroup>
+						</>
 					) }
 				</>
 			}
