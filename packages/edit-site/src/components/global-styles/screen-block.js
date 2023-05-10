@@ -145,6 +145,11 @@ function ScreenBlock( { name, variation } ) {
 		}
 	};
 	const onChangeBorders = ( newStyle ) => {
+		if ( ! newStyle?.border ) {
+			setStyle( newStyle );
+			return;
+		}
+
 		// As Global Styles can't conditionally generate styles based on if
 		// other style properties have been set, we need to force split
 		// border definitions for user set global border styles. Border
@@ -156,7 +161,8 @@ function ScreenBlock( { name, variation } ) {
 		// the `border` style property. This means if the theme.json defined
 		// split borders and the user condenses them into a flat border or
 		// vice-versa we'd get both sets of styles which would conflict.
-		const border = applyAllFallbackStyles( newStyle?.border );
+		const { radius, ...newBorder } = newStyle.border;
+		const border = applyAllFallbackStyles( newBorder );
 		const updatedBorder = ! hasSplitBorders( border )
 			? {
 					top: border,
@@ -170,7 +176,8 @@ function ScreenBlock( { name, variation } ) {
 					width: null,
 					...border,
 			  };
-		setStyle( { ...newStyle, border: updatedBorder } );
+
+		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
 	return (
