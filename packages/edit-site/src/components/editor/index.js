@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
@@ -200,7 +205,13 @@ export default function Editor() {
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
-							className={ showIconLabels && 'show-icon-labels' }
+							className={ classnames(
+								'edit-site-editor__interface-skeleton',
+								{
+									'show-icon-labels': showIconLabels,
+									'is-loading': isLoading,
+								}
+							) }
 							notices={
 								( isEditMode ||
 									window?.__experimentalEnableThemePreviews ) && (
