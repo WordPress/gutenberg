@@ -99,7 +99,7 @@
 	},
 	"styles": {
 		"typography": {
-			"fontFamily": "var(--wp--preset--font-family--system-font)"
+			"fontFamily": "var:preset|font-family|system-font"
 		}
 	},
 	"templateParts": [
