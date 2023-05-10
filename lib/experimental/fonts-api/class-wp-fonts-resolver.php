@@ -92,11 +92,14 @@ class WP_Fonts_Resolver {
 			return '';
 		}
 
-		$starting_pattern = "var:preset|{$preset_type}|";
+		$starting_pattern = "var(--wp--preset--{$preset_type}--";
+		$ending_pattern   = ')';
 		if ( ! str_starts_with( $style, $starting_pattern ) ) {
 			return '';
 		}
 
-		return substr( $style, strlen( $starting_pattern ) );
+		$offset = strlen( $starting_pattern );
+		$length = strpos( $style, $ending_pattern ) - $offset;
+		return substr( $style, $offset, $length );
 	}
 }
