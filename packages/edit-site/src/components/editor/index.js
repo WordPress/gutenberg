@@ -59,9 +59,10 @@ function useIsSiteEditorLoading() {
 	} );
 	const [ loaded, setLoaded ] = useState( false );
 	const timeoutRef = useRef( null );
+	const inLoadingPause = ! loaded && ! hasResolvingSelectors;
 
 	useEffect( () => {
-		if ( ! hasResolvingSelectors && ! loaded ) {
+		if ( inLoadingPause ) {
 			/*
 			 * We're using an arbitrary 1s timeout here to catch brief moments
 			 * without any resolving selectors that would result in displaying
@@ -78,7 +79,7 @@ function useIsSiteEditorLoading() {
 				clearTimeout( timeoutRef.current );
 			};
 		}
-	}, [ loaded, hasResolvingSelectors ] );
+	}, [ inLoadingPause ] );
 
 	return ! loaded || ! hasLoadedPost;
 }
