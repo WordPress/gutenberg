@@ -270,7 +270,7 @@ A transformation of type `shortcode` is an object that takes the following param
 
 -   **type** _(string)_: the value `shortcode`.
 -   **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
--   **transform** \_(function, optional): a callback that receives the shortcode attributes as the first argument and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as the second. It should return a block object or an array of block objects. When this parameter is defined, it will take precedence over the `attributes` parameter.
+-   **transform** _(function, optional)_: a callback that receives the shortcode attributes as the first argument and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as the second. It should return a block object or an array of block objects. When this parameter is defined, it will take precedence over the `attributes` parameter.
 -   **attributes** _(object, optional)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
 -   **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
 -   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
@@ -341,7 +341,7 @@ transforms: {
 
 Via the optional `transforms` key of the block configuration, blocks can use the `ungroup` subkey to define which inner blocks of a grouping block can be extracted, replacing the block.
 
-If a block has an `ungroup` transform, it is considered ungroupable, without the requirement of being the default grouping block. The UI used to ungroup a block with this API, is the same with the one used for the default grouping block. In order for the ugroup UI to render, we must have a single grouping block selected, which also contains some inner blocks.
+If a block has an `ungroup` transform, it is considered ungroupable, without the requirement of being the default grouping block. The UI used to ungroup a block with this API is the same as the one used for the default grouping block. In order for the Ungroup button to be displayed, we must have a single grouping block selected, which also contains some inner blocks.
 
 **ungroup** is a callback function that receives the attributes and inner blocks of the block being processed. It should return an array of block objects.
 
