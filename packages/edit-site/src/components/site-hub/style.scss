@@ -29,6 +29,21 @@
 
 .edit-site-site-hub__site-title {
 	margin-left: $grid-unit-05;
+	flex-grow: 1;
+}
+
+.edit-site-site-hub__site-view {
+	outline: none;
+	.components-external-link:focus {
+		outline: 0;
+		box-shadow: none;
+	}
+	.components-external-link__icon {
+		height: $grid-unit-30;
+		width: $grid-unit-30;
+		color: $white;
+		outline: none;
+	}
 }
 
 .edit-site-site-hub_toggle-command-center {
