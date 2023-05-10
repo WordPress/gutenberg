@@ -302,7 +302,7 @@ function styles_for_block_core_search( $attributes ) {
 	$show_label       = ( isset( $attributes['showLabel'] ) ) && false !== $attributes['showLabel'];
 
 	// Add width styles.
-	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
+	$has_width = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
 
 	if ( $has_width ) {
 		$wrapper_styles[] = sprintf(
