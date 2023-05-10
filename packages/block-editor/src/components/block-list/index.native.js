@@ -194,7 +194,6 @@ export default function BlockList( {
 			<BlockListItem
 				index={ index }
 				isStackedHorizontally={ isStackedHorizontally }
-				key={ clientId }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
