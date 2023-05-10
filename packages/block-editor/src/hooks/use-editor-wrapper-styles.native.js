@@ -218,8 +218,6 @@ export function useEditorWrapperStyles( {
 		if ( contentResizeMode === 'stretch' ) {
 			// For these cases, no width constraints should be added.
 			canvasStyles = { flex: 1 };
-		} else if ( hasParents ) {
-			canvasStyles = styles[ 'use-editor-wrapper-styles--inner-block' ];
 		} else if ( reversed ) {
 			canvasStyles = styles[ 'use-editor-wrapper-styles--reversed' ];
 		} else {
