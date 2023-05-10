@@ -62,8 +62,6 @@ function useIsSiteEditorLoading() {
 
 	useEffect( () => {
 		if ( ! hasResolvingSelectors && ! loaded ) {
-			clearTimeout( timeoutRef.current );
-
 			/*
 			 * We're using an arbitrary 1s timeout here to catch brief moments
 			 * without any resolving selectors that would result in displaying
