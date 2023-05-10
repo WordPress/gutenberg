@@ -306,18 +306,13 @@ export default function BlockList( {
 			) : (
 				<>
 					{ blockClientIds.length > 0 ? (
-						<View
-							style={ [
-								...getStyles(
-									isStackedHorizontally,
-									horizontalAlignment
-								),
-								{ flex: 0 },
-								styles.overflowVisible,
-							] }
-						>
+						<View style={ [ { flex: 0 }, styles.overflowVisible ] }>
 							<View
 								style={ [
+									...getStyles(
+										isStackedHorizontally,
+										horizontalAlignment
+									),
 									horizontal &&
 										styles.horizontalContentContainer,
 									isWider( blockWidth, 'medium' ) &&
@@ -327,11 +322,16 @@ export default function BlockList( {
 								] }
 							>
 								{ blockClientIds.map(
-									( currentClientId, index ) =>
-										renderItem( {
-											item: currentClientId,
-											index,
-										} )
+									( currentClientId, index ) => {
+										return (
+											<View key={ index }>
+												{ renderItem( {
+													item: currentClientId,
+													index,
+												} ) }
+											</View>
+										);
+									}
 								) }
 								<Footer
 									addBlockToEndOfPost={ addBlockToEndOfPost }
