@@ -45,6 +45,18 @@ class WP_Fonts_Library {
 			)
 		);
 
+        register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/google_fonts',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_google_fonts' ),
+					'permission_callback' => array( $this, 'get_fonts_library_permissions_check' ),
+				),
+			)
+		);
+
     }
 
     function get_fonts_library_permissions_check () {
@@ -91,6 +103,14 @@ class WP_Fonts_Library {
         $updated_post = wp_update_post( $updated_post_data );
         $new_post = $this->get_fonts_library_post();
         return new WP_REST_Response( $new_post );
+    }
+
+    function get_google_fonts () {
+        $file = file_get_contents(
+            path_join ( dirname(__FILE__),"google-fonts.json" )
+        );
+        $data = json_decode($file, true);
+        return new WP_REST_Response( $data );
     }
 
 }
