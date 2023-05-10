@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 
 ## 1.94.0
 -   [*] Split pasted content between title and body. [#37169]
