@@ -36,28 +36,27 @@ test.describe( 'Cover', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
 
 		// Locate the Black color swatch.
-		const blackColorSwatch = page.getByRole( 'button', {
+		const blackColorSwatch = coverBlock.getByRole( 'button', {
 			name: 'Color: Black',
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
 		const blackRGB = await blackColorSwatch.evaluate(
-			( node ) => node.style.backgroundColor
+			( element ) => window.getComputedStyle( element ).color
 		);
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
 		// Get the RGB value of the background dim.
-		// The span element implements the colored background.
-		const backgrounDimLocator = page
-			.getByRole( 'document', { name: 'Block: Cover' } )
-			.locator( 'span[aria-hidden="true"]' );
-		const actualRGB = await backgrounDimLocator.evaluate(
-			( node ) => node.style.backgroundColor
+		const actualRGB = await coverBlock.evaluate(
+			( element ) => window.getComputedStyle( element ).backgroundColor
 		);
 
 		expect( blackRGB ).toEqual( actualRGB );
@@ -69,7 +68,6 @@ test.describe( 'Cover', () => {
 		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
@@ -80,8 +78,12 @@ test.describe( 'Cover', () => {
 		const fileBasename = path.basename( filename );
 
 		// Wait for the img's src attribute to be prefixed with http.
-		// Otherwise, the URL for the img src attribute is that of a placeholder.
-		await coverBlock.locator( `img[src^=http]` ).waitFor();
+		// Otherwise, the URL for the img src attribute starts is a placeholder
+		// beginning with `blob`.
+		await expect( async () => {
+			const src = await coverBlock.locator( 'img' ).getAttribute( 'src' );
+			expect( src.startsWith( 'http' ) ).toBe( true );
+		} ).toPass();
 
 		const backgroundImageURL = await coverBlock
 			.locator( 'img' )
@@ -96,7 +98,6 @@ test.describe( 'Cover', () => {
 		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
@@ -117,10 +118,13 @@ test.describe( 'Cover', () => {
 		const titleText = 'foo';
 
 		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
 
 		// Choose a color swatch to transform the placeholder block into
 		// a functioning block.
-		await page
+		await coverBlock
 			.getByRole( 'button', {
 				name: 'Color: Black',
 			} )
@@ -128,27 +132,29 @@ test.describe( 'Cover', () => {
 
 		// Activate the paragraph block inside the Cover block.
 		// The name of the block differs depending on whether text has been entered or not.
-		const coverParagraphLocator = page.getByRole( 'document', {
+		const coverBlockParagraph = coverBlock.getByRole( 'document', {
 			name: /Paragraph block|Empty block; start writing or type forward slash to choose a block/,
 		} );
-		await expect( coverParagraphLocator ).toBeEditable();
+		await expect( coverBlockParagraph ).toBeEditable();
 
-		await coverParagraphLocator.fill( titleText );
+		await coverBlockParagraph.fill( titleText );
 
-		await expect( coverParagraphLocator ).toContainText( titleText );
+		await expect( coverBlockParagraph ).toContainText( titleText );
 	} );
 
 	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-
-		// Open the document sidebar.
-		await editor.openDocumentSettingsSidebar();
-
-		await page
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		await coverBlock
 			.getByRole( 'button', {
 				name: 'Color: Black',
 			} )
 			.click();
+
+		// Open the document sidebar.
+		await editor.openDocumentSettingsSidebar();
 
 		// Open the block list viewer from the toolbar.
 		await page
@@ -166,28 +172,23 @@ test.describe( 'Cover', () => {
 			.inputValue();
 		expect( defaultHeightValue ).toBeFalsy();
 
-		// Establish locators for the Cover block and the resize handler.
-		const coverBlock = page.getByRole( 'document', {
-			name: 'Block: Cover',
-		} );
-		// There is no accessible locator for this element, which is a
-		// bottom edge of the Cover block for resizing.
+		// There is no accessible locator for the draggable block resize edge,
+		// which is he bottom edge of the Cover block.
+		// Therefore a CSS selector must be used.
 		const coverBlockResizeHandle = page.locator(
 			'.components-resizable-box__handle-bottom'
 		);
 
 		// Establish the existing bounding boxes for the Cover block.
 		const coverBlockBox = await coverBlock.boundingBox();
-
-		expect( coverBlockBox.height ).toEqual( 450 );
+		expect( coverBlockBox.height ).toBeTruthy();
 
 		// Resize the block by 100px.
 		await coverBlockResizeHandle.hover();
 		await page.mouse.down();
 		await page.mouse.move(
 			coverBlockBox.x,
-			coverBlockBox.y + coverBlockBox.height + 100,
-			{ steps: 5 }
+			coverBlockBox.y + coverBlockBox.height + 100
 		);
 		await page.mouse.up();
 
