@@ -14,3 +14,8 @@ export const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 	'core/loginout',
 ];
+
+export const INSERTER_PRIORITY = [
+	'core/navigation-link/page',
+	'core/navigation-link',
+];
