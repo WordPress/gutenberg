@@ -50,6 +50,41 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+function useIsSiteEditorLoading() {
+	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
+	const { hasResolvingSelectors } = useSelect( ( select ) => {
+		return {
+			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
+		};
+	} );
+	const [ loaded, setLoaded ] = useState( false );
+	const timeoutRef = useRef( null );
+
+	useEffect( () => {
+		if ( ! hasResolvingSelectors && ! loaded ) {
+			clearTimeout( timeoutRef.current );
+
+			/*
+			 * We're using an arbitrary 1s timeout here to catch brief moments
+			 * without any resolving selectors that would result in displaying
+			 * brief flickers of loading state and loaded state.
+			 *
+			 * It's worth experimenting with different values, since this also
+			 * adds 1s of artificial delay after loading has finished.
+			 */
+			timeoutRef.current = setTimeout( () => {
+				setLoaded( true );
+			}, 1000 );
+
+			return () => {
+				clearTimeout( timeoutRef.current );
+			};
+		}
+	}, [ loaded, hasResolvingSelectors ] );
+
+	return ! loaded || ! hasLoadedPost;
+}
+
 export default function Editor() {
 	const {
 		record: editedPost,
@@ -153,37 +188,7 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	const { hasResolvingSelectors } = useSelect( ( select ) => {
-		return {
-			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
-		};
-	} );
-	const [ loaded, setLoaded ] = useState( false );
-	const timeoutRef = useRef( null );
-
-	useEffect( () => {
-		if ( ! hasResolvingSelectors && ! loaded ) {
-			clearTimeout( timeoutRef.current );
-
-			/*
-			 * We're using an arbitrary 1s timeout here to catch brief moments
-			 * without any resolving selectors that would result in displaying
-			 * brief flickers of loading state and loaded state.
-			 *
-			 * It's worth experimenting with different values, since this also
-			 * adds 1s of artificial delay after loading has finished.
-			 */
-			timeoutRef.current = setTimeout( () => {
-				setLoaded( true );
-			}, 1000 );
-
-			return () => {
-				clearTimeout( timeoutRef.current );
-			};
-		}
-	}, [ loaded, hasResolvingSelectors ] );
-
-	const isLoading = ! loaded || ! hasLoadedPost;
+	const isLoading = useIsSiteEditorLoading();
 
 	return (
 		<>
