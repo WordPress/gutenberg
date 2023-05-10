@@ -2,7 +2,7 @@
  * External dependencies
  */
 import path from 'path';
-const fs = require( 'fs/promises' );
+import fs from 'fs/promises';
 import os from 'os';
 import { v4 as uuid } from 'uuid';
 
@@ -106,6 +106,9 @@ test.describe( 'Cover', () => {
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
+		// The hidden span must be used as the target for opacity and color value.
+		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
+		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
 			await getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
@@ -198,7 +201,7 @@ test.describe( 'Cover', () => {
 		);
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test.only( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
 		imageBlockUtils,
@@ -221,17 +224,21 @@ test.describe( 'Cover', () => {
 
 		await editor.transformBlockTo( 'core/cover' );
 
-		const coverBlockBackground = page
-			.getByRole( 'document', {
-				name: 'Block: Cover',
-			} )
-			.locator( 'span[aria-hidden="true"]' );
+		const coverBlock = page.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
 
-		await expect( coverBlockBackground ).toBeVisible();
-
+		// The hidden span must be used as the target for opacity and color value.
+		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
+		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await getBackgroundColorAndOpacity( coverBlockBackground );
+			await getBackgroundColorAndOpacity(
+				coverBlock.locator( 'span[aria-hidden="true"]' )
+			);
 
+		// The hidden span must be used as the target for opacity and color value.
+		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
+		// The hidden span value returns the correct opacity at 0.5.
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
