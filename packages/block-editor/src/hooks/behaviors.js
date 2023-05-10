@@ -30,8 +30,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 		const { behaviors: blockBehaviors } = props.attributes;
 		const settings = select( blockEditorStore ).getSettings();
 		const themeBehaviors =
-			settings?.__experimentalFeatures?.blocks?.[ 'core/image' ]
-				.behaviors;
+			settings?.__experimentalFeatures?.blocks?.[ props.name ]?.behaviors;
 
 		if ( ! blockBehaviors && ! themeBehaviors ) {
 			return <BlockEdit { ...props } />;
