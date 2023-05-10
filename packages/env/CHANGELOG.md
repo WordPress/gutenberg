@@ -18,6 +18,7 @@
 ### Bug fix
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
+-   Fix Xdebug while using PHP 7.2x.
 
 ### Enhancement
 
