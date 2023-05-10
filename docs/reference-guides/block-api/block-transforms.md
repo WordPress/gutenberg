@@ -339,7 +339,7 @@ transforms: {
 
 ## `ungroup` blocks
 
-Via the optional `transforms` key of the block configuration, blocks can use the `ungroup` subkey to define which inner blocks of a grouping block can be extracted, replacing the block.
+Via the optional `transforms` key of the block configuration, blocks can use the `ungroup` subkey to define the blocks that will replace the block being processed. These new blocks will usually be a subset of the existing inner blocks, but could also include new blocks.
 
 If a block has an `ungroup` transform, it is considered ungroupable, without the requirement of being the default grouping block. The UI used to ungroup a block with this API is the same as the one used for the default grouping block. In order for the Ungroup button to be displayed, we must have a single grouping block selected, which also contains some inner blocks.
 
