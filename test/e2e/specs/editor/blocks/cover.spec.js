@@ -195,23 +195,29 @@ test.describe( 'Cover', () => {
 			'.components-resizable-box__handle-bottom'
 		);
 
-		// Establish the existing bounding boxes for the Cover block.
+		// Establish the existing bounding boxes for the Cover block
+		// and the Cover block's resizing handle.
 		const coverBlockBox = await coverBlock.boundingBox();
+		const coverBlockResizeHandleBox =
+			await coverBlockResizeHandle.boundingBox();
 		expect( coverBlockBox.height ).toBeTruthy();
+		expect( coverBlockResizeHandleBox.height ).toBeTruthy();
 
-		// Resize the block by 100px.
+		// Increse the Cover block height by 100px.
 		await coverBlockResizeHandle.hover();
 		await page.mouse.down();
+
+		// Counter-intuitively, the mouse movement calculation should not be made using the
+		// Cover block's bounding box, but rather based on the coordinates of the
+		// resize handle.
 		await page.mouse.move(
-			coverBlockBox.x,
-			coverBlockBox.y + coverBlockBox.height + 100
+			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2,
+			coverBlockResizeHandleBox.y + 100
 		);
 		await page.mouse.up();
 
 		const newCoverBlockBox = await coverBlock.boundingBox();
-		expect( newCoverBlockBox.height ).toBeGreaterThanOrEqual(
-			coverBlockBox.height + 100
-		);
+		expect( newCoverBlockBox.height ).toBe( coverBlockBox.height + 100 );
 	} );
 
 	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
