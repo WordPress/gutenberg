@@ -710,8 +710,15 @@ test.describe( 'Image', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		const imageInFrontend = page.getByRole( 'figure' );
-		await expect( imageInFrontend ).toBeVisible();
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
 	} );
 } );
 
