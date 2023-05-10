@@ -262,7 +262,7 @@ describe( 'Gallery block', () => {
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		selectOption( 'Choose from device' );
+		await selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
