@@ -25,6 +25,7 @@ const pendingSettingsUpdates = new WeakMap();
  * @param {string}               clientId                   The client ID of the block to update.
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
+ * @param {string[]}             inserterPriority           Block names and/or block variations to be prioritised in the inserter.
  * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
  * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
  *                                                          appender.
@@ -40,6 +41,7 @@ const pendingSettingsUpdates = new WeakMap();
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
+	inserterPriority,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -68,9 +70,15 @@ export default function useNestedSettingsUpdate(
 	// render.
 	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
 
+	const _inserterPriority = useMemo(
+		() => inserterPriority,
+		inserterPriority
+	);
+
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
+			inserterPriority: _inserterPriority,
 			templateLock:
 				templateLock === undefined || parentLock === 'contentOnly'
 					? parentLock
@@ -130,6 +138,7 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		blockListSettings,
 		_allowedBlocks,
+		_inserterPriority,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,
