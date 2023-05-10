@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
@@ -58,7 +58,6 @@ function useIsSiteEditorLoading() {
 		};
 	} );
 	const [ loaded, setLoaded ] = useState( false );
-	const timeoutRef = useRef( null );
 	const inLoadingPause = ! loaded && ! hasResolvingSelectors;
 
 	useEffect( () => {
@@ -71,12 +70,12 @@ function useIsSiteEditorLoading() {
 			 * It's worth experimenting with different values, since this also
 			 * adds 1s of artificial delay after loading has finished.
 			 */
-			timeoutRef.current = setTimeout( () => {
+			const timeout = setTimeout( () => {
 				setLoaded( true );
 			}, 1000 );
 
 			return () => {
-				clearTimeout( timeoutRef.current );
+				clearTimeout( timeout );
 			};
 		}
 	}, [ inLoadingPause ] );
