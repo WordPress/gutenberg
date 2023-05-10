@@ -45,7 +45,7 @@ class WP_Fonts_Resolver {
 	 * @return array User selected font-families when exists, else empty array.
 	 */
 	public static function enqueue_user_selected_fonts() {
-		$global_styles       = wp_get_global_styles();
+		$global_styles       = gutenberg_get_global_styles();
 		$user_selected_fonts = static::get_user_selected_fonts( $global_styles );
 		if ( empty( $user_selected_fonts ) ) {
 			return array();
