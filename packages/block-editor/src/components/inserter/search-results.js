@@ -92,7 +92,7 @@ function InserterSearchResults( {
 	const orderInitialBlockItems = useCallback(
 		( items ) => {
 			items.sort( ( { id: aName }, { id: bName } ) => {
-				// Sort block items according to `prioritizedInserterBlocks`.
+				// Sort block items according to `parentInserterPriority`.
 				let aIndex = parentInserterPriority.indexOf( aName );
 				let bIndex = parentInserterPriority.indexOf( bName );
 				// All other block items should come after that.
