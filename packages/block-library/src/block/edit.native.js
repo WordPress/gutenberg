@@ -36,6 +36,7 @@ import {
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -103,6 +104,11 @@ export default function ReusableBlockEdit( {
 		},
 		[ ref, clientId ]
 	);
+	const hostAppNamespace = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().hostAppNamespace,
+		[]
+	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
@@ -143,11 +149,19 @@ export default function ReusableBlockEdit( {
 	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
-				? __(
-						'Editing reusable blocks is not yet supported on WordPress for Android'
+				? sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing reusable blocks is not yet supported on %s for Android'
+						),
+						hostAppNamespace
 				  )
-				: __(
-						'Editing reusable blocks is not yet supported on WordPress for iOS'
+				: sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing reusable blocks is not yet supported on %s for iOS'
+						),
+						hostAppNamespace
 				  );
 
 		return (

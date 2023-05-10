@@ -18,6 +18,10 @@
 	border-radius: $radius-block-ui;
 	color: $components-color-foreground;
 
+	&.is-next-40px-default-size {
+		height: $button-size-next-default-40px;
+	}
+
 	&[aria-expanded="true"],
 	&:hover {
 		color: $components-color-accent;
@@ -284,6 +288,10 @@
 		// Icon buttons are square.
 		min-width: $button-size;
 		justify-content: center;
+
+		&.is-next-40px-default-size {
+			min-width: $button-size-next-default-40px;
+		}
 
 		.dashicon {
 			display: inline-block;
