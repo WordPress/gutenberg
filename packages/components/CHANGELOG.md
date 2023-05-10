@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state.  ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
+
 ### Breaking Changes
 
 -   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
