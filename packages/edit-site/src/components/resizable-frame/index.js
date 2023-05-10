@@ -191,26 +191,27 @@ function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
 			onMouseOver={ () => setIsHovering( true ) }
 			onMouseOut={ () => setIsHovering( false ) }
 			handleComponent={ {
-				left: ! isHovering ? null : (
-					<motion.div
-						key="handle"
-						className="edit-site-resizable-frame__handle"
-						title="Drag to resize"
-						initial={ {
-							opacity: 0,
-							left: 0,
-						} }
-						animate={ {
-							opacity: 1,
-							left: -15,
-						} }
-						exit={ {
-							opacity: 0,
-							left: 0,
-						} }
-						whileHover={ { scale: 1.1 } }
-					/>
-				),
+				left:
+					isHovering || isResizing ? (
+						<motion.div
+							key="handle"
+							className="edit-site-resizable-frame__handle"
+							title="Drag to resize"
+							initial={ {
+								opacity: 0,
+								left: 0,
+							} }
+							animate={ {
+								opacity: 1,
+								left: -15,
+							} }
+							exit={ {
+								opacity: 0,
+								left: 0,
+							} }
+							whileHover={ { scale: 1.1 } }
+						/>
+					) : null,
 			} }
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
