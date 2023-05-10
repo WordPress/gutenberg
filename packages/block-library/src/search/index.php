@@ -139,7 +139,6 @@ function render_block_core_search( $attributes ) {
 		array( 'class' => $classnames )
 	);
 
-
 	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
 		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
 			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
@@ -304,7 +303,6 @@ function styles_for_block_core_search( $attributes ) {
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
-	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
 
 	if ( $has_width ) {
 		$wrapper_styles[] = sprintf(
