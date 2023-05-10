@@ -13,18 +13,18 @@ import { v4 as uuid } from 'uuid';
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.use( {
-	imageBlockUtils: async ( { page }, use ) => {
-		await use( new ImageBlockUtils( { page } ) );
-	},
-} );
-
 async function getBackgroundColorAndOpacity( locator ) {
 	return await locator.evaluate( ( el ) => {
 		const computedStyle = window.getComputedStyle( el );
 		return [ computedStyle.backgroundColor, computedStyle.opacity ];
 	} );
 }
+
+test.use( {
+	imageBlockUtils: async ( { page }, use ) => {
+		await use( new ImageBlockUtils( { page } ) );
+	},
+} );
 
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -197,7 +197,7 @@ test.describe( 'Cover', () => {
 		);
 	} );
 
-	test.only( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
 		imageBlockUtils,
