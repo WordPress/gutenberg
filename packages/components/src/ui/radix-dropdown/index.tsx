@@ -70,16 +70,14 @@ export const DropdownMenu = ( {
 	);
 };
 
-const ChevronIcon = () => (
-	<DropdownMenuStyled.RTLFlippableIcon
-		icon={ chevronRightSmall }
-		size={ 28 }
-	/>
-);
-
 export const DropdownSubMenuTrigger = ( {
 	prefix,
-	suffix = <ChevronIcon />,
+	suffix = (
+		<DropdownMenuStyled.SubmenuRtlChevronIcon
+			icon={ chevronRightSmall }
+			size={ 24 }
+		/>
+	),
 	children,
 }: DropdownSubMenuTriggerProps ) => {
 	return (
@@ -176,7 +174,7 @@ export const DropdownMenuCheckboxItem = ( {
 	return (
 		<DropdownMenuStyled.CheckboxItem { ...props } checked={ checked }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				<DropdownMenuPrimitive.ItemIndicator>
+				<DropdownMenuStyled.ItemIndicator>
 					{ ( checked === 'indeterminate' || checked === true ) && (
 						<Icon
 							icon={
@@ -185,7 +183,7 @@ export const DropdownMenuCheckboxItem = ( {
 							size={ 20 }
 						/>
 					) }
-				</DropdownMenuPrimitive.ItemIndicator>
+				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
 			{ children }
 			{ suffix && (
@@ -215,9 +213,9 @@ export const DropdownMenuRadioItem = ( {
 	return (
 		<DropdownMenuStyled.RadioItem { ...props }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				<DropdownMenuPrimitive.ItemIndicator>
+				<DropdownMenuStyled.ItemIndicator>
 					<Icon icon={ radioDot } size={ 20 } />
-				</DropdownMenuPrimitive.ItemIndicator>
+				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
 			{ children }
 			{ suffix && (

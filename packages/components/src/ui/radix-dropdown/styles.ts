@@ -56,7 +56,7 @@ const baseContent = css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
 	border: 1px solid ${ COLORS.ui.border };
-	border-radius: 6px;
+	border-radius: 2px;
 	padding: ${ space( 2 ) };
 	box-shadow: 0 0.7px 1px rgba( 0, 0, 0, 0.1 ),
 		0 1.2px 1.7px -0.2px rgba( 0, 0, 0, 0.1 ),
@@ -91,13 +91,12 @@ const baseItem = css`
 	font-size: ${ font( 'default.fontSize' ) };
 	font-family: inherit;
 	font-weight: normal;
-	line-height: 1;
+	line-height: 20px;
 	color: ${ COLORS.gray[ 900 ] };
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
-	height: ${ space( 9 ) };
-	padding: 0 ${ ITEM_HORIZONTAL_PADDING };
+	padding: ${ space( 2 ) } ${ ITEM_HORIZONTAL_PADDING };
 	position: relative;
 	user-select: none;
 	outline: none;
@@ -126,6 +125,13 @@ const itemPrefix = css`
 	align-items: center;
 	justify-content: center;
 	margin-inline-start: calc( -1 * ${ ITEM_HORIZONTAL_PADDING } );
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
 `;
 
 const itemSuffix = css`
@@ -135,6 +141,13 @@ const itemSuffix = css`
 	justify-content: center;
 	margin-inline-start: auto;
 	padding-inline-start: ${ space( 6 ) };
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
 `;
 
 export const Content = styled( DropdownMenu.Content )`
@@ -170,8 +183,15 @@ export const Label = styled( DropdownMenu.Label )`
 
 export const Separator = styled( DropdownMenu.Separator )`
 	height: 1px;
-	background-color: ${ COLORS.ui.borderDisabled };
-	margin: ${ space( 2 ) };
+	background-color: ${ COLORS.ui.border };
+	/* Negative horizontal margin to make separator go from side to side */
+	margin: ${ space( 2 ) } ${ space( -2 ) };
+`;
+
+export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 `;
 
 export const ItemPrefixWrapper = styled.span`
@@ -182,13 +202,13 @@ export const ItemSuffixWrapper = styled.span`
 	${ itemSuffix }
 `;
 
-export const RTLFlippableIcon = styled( Icon )`
+export const SubmenuRtlChevronIcon = styled( Icon )`
 	${ rtl(
 		{
-			transform: 'scaleX(1)',
+			transform: `scaleX(1) translateX(${ space( 2 ) })`,
 		},
 		{
-			transform: 'scaleX(-1)',
+			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
 		}
 	)() }
 `;
