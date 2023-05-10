@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
@@ -49,6 +49,39 @@ const interfaceLabels = {
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 };
+
+function useIsSiteEditorLoading() {
+	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
+	const { hasResolvingSelectors } = useSelect( ( select ) => {
+		return {
+			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
+		};
+	} );
+	const [ loaded, setLoaded ] = useState( false );
+	const inLoadingPause = ! loaded && ! hasResolvingSelectors;
+
+	useEffect( () => {
+		if ( inLoadingPause ) {
+			/*
+			 * We're using an arbitrary 1s timeout here to catch brief moments
+			 * without any resolving selectors that would result in displaying
+			 * brief flickers of loading state and loaded state.
+			 *
+			 * It's worth experimenting with different values, since this also
+			 * adds 1s of artificial delay after loading has finished.
+			 */
+			const timeout = setTimeout( () => {
+				setLoaded( true );
+			}, 1000 );
+
+			return () => {
+				clearTimeout( timeout );
+			};
+		}
+	}, [ inLoadingPause ] );
+
+	return ! loaded || ! hasLoadedPost;
+}
 
 export default function Editor() {
 	const {
@@ -153,37 +186,7 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	const { hasResolvingSelectors } = useSelect( ( select ) => {
-		return {
-			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
-		};
-	} );
-	const [ loaded, setLoaded ] = useState( false );
-	const timeoutRef = useRef( null );
-
-	useEffect( () => {
-		if ( ! hasResolvingSelectors && ! loaded ) {
-			clearTimeout( timeoutRef.current );
-
-			/*
-			 * We're using an arbitrary 1s timeout here to catch brief moments
-			 * without any resolving selectors that would result in displaying
-			 * brief flickers of loading state and loaded state.
-			 *
-			 * It's worth experimenting with different values, since this also
-			 * adds 1s of artificial delay after loading has finished.
-			 */
-			timeoutRef.current = setTimeout( () => {
-				setLoaded( true );
-			}, 1000 );
-
-			return () => {
-				clearTimeout( timeoutRef.current );
-			};
-		}
-	}, [ loaded, hasResolvingSelectors ] );
-
-	const isLoading = ! loaded || ! hasLoadedPost;
+	const isLoading = useIsSiteEditorLoading();
 
 	return (
 		<>
