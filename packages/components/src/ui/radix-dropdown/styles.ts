@@ -107,11 +107,13 @@ const baseItem = css`
 	}
 
 	&[data-highlighted] {
-		color: ${ COLORS.ui.theme };
-	}
+		/*
+			TODO: reconcile with global focus styles
+			(incl high contrast mode fallbacks)
+		 */
 
-	&[data-highlighted]:focus-visible {
-		outline: 1px solid ${ COLORS.ui.theme };
+		background-color: ${ COLORS.ui.theme };
+		color: white;
 	}
 
 	svg {
@@ -168,7 +170,9 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	&[data-state='open']:not( [data-highlighted] ) {
-		background-color: ${ COLORS.ui.backgroundDisabled };
+		/* TODO: use variable */
+		background-color: rgba( 56, 88, 233, 0.04 );
+		color: ${ COLORS.ui.theme };
 	}
 
 	${ baseItem }
