@@ -219,20 +219,18 @@ function UnforwardedColorPalette(
 			/>
 		</DropdownContentWrapper>
 	);
-	// TODO: CSS vars should not have `VAR` or parentheses. They should also render in lowercase. Be careful of the hash, probably need a new variable.
-	// TODO: This variable is no longer accurate. It's only used for assistive tech now, so we can rename it.
-	const valueWithoutLeadingHash = value?.startsWith( '#' )
-		? value.substring( 1 )
-		: value ?? '';
-	//  TODO: Check with Andrew on whether or not the hash fits here. Should it be exposed to assistive tech? If hash is okay, remove `valueWithoutLeadingHash`. Otherwise, update translator hint
-	const customColorAccessibleLabel = !! valueWithoutLeadingHash
+	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+	const displayValue = value?.startsWith( '#' )
+		? value
+		: value?.replace( /^var\((.+)\)$/, '$1' );
+	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
 				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
 				__(
 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
 				),
 				buttonLabelName,
-				valueWithoutLeadingHash
+				displayValue
 		  )
 		: __( 'Custom color picker.' );
 
@@ -285,11 +283,13 @@ function UnforwardedColorPalette(
 											'components-color-palette__custom-color-value',
 											{
 												'is-hex':
-													value?.startsWith( '#' ),
+													displayValue?.startsWith(
+														'#'
+													),
 											}
 										) }
 									>
-										{ value }
+										{ displayValue }
 									</Truncate>
 								</VStack>
 							) }
