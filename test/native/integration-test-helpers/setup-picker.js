@@ -21,7 +21,7 @@ import { ActionSheetIOS } from 'react-native';
  *
  * @return {PickerMockFunctions} Picker functions.
  */
-export async function setupPicker(
+export function setupPicker(
 	screen,
 	options,
 	onPickerButtonPressed = () => {}
@@ -39,8 +39,10 @@ export async function setupPicker(
 		);
 		// The index passed is incremented by one as the first
 		// option of the picker is `Cancel`.
-		selectOption = ( option ) =>
+		selectOption = async ( option ) => {
+			await onPickerButtonPressed();
 			onOptionSelected( options.indexOf( option ) + 1 );
+		};
 	}
 	return { selectOption };
 }
