@@ -87,7 +87,6 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
@@ -95,9 +94,6 @@ export default function Layout() {
 		( isMobileViewport && isEditorPage && isEditing ) ||
 		! isMobileViewport ||
 		! isEditorPage;
-	const showFrame =
-		( ! isEditorPage && ! isMobileViewport ) ||
-		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
 		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -193,18 +189,13 @@ export default function Layout() {
 					<SavePanel />
 
 					{ showCanvas && (
-						<motion.div
+						<div
 							className={ classnames(
 								'edit-site-layout__canvas-container',
 								{
 									'is-resizing': isResizing,
 								}
 							) }
-							animate={ {
-								paddingTop: showFrame ? canvasPadding : 0,
-								paddingBottom: showFrame ? canvasPadding : 0,
-							} }
-							transition={ { duration: ANIMATION_DURATION } }
 						>
 							{ canvasResizer }
 							{ !! canvasSize.width && (
@@ -254,7 +245,7 @@ export default function Layout() {
 									</ErrorBoundary>
 								</motion.div>
 							) }
-						</motion.div>
+						</div>
 					) }
 				</div>
 			</div>
