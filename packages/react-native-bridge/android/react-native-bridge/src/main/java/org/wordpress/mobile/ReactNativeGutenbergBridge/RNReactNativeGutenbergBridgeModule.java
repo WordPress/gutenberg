@@ -368,6 +368,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestEmbedFullscreenPreview(String content, String title) {
+        mGutenbergBridgeJS2Parent.requestEmbedFullscreenPreview(content,title);
+    }
+
+    @ReactMethod
     public void actionButtonPressed(String buttonType) {
         mGutenbergBridgeJS2Parent.gutenbergDidSendButtonPressedAction(buttonType);
     }

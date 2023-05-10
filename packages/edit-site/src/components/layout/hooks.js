@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -12,19 +12,16 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 
 export const useIsEditorLoading = () => {
 	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
-
 	const { hasResolvingSelectors } = useSelect( ( select ) => {
 		return {
 			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
 		};
 	} );
 	const [ loaded, setLoaded ] = useState( false );
-	const timeoutRef = useRef( null );
+	const inLoadingPause = ! loaded && ! hasResolvingSelectors;
 
 	useEffect( () => {
-		if ( ! hasResolvingSelectors && ! loaded ) {
-			clearTimeout( timeoutRef.current );
-
+		if ( inLoadingPause ) {
 			/*
 			 * We're using an arbitrary 1s timeout here to catch brief moments
 			 * without any resolving selectors that would result in displaying
@@ -33,15 +30,15 @@ export const useIsEditorLoading = () => {
 			 * It's worth experimenting with different values, since this also
 			 * adds 1s of artificial delay after loading has finished.
 			 */
-			timeoutRef.current = setTimeout( () => {
+			const timeout = setTimeout( () => {
 				setLoaded( true );
 			}, 1000 );
 
 			return () => {
-				clearTimeout( timeoutRef.current );
+				clearTimeout( timeout );
 			};
 		}
-	}, [ loaded, hasResolvingSelectors ] );
+	}, [ inLoadingPause ] );
 
 	return ! loaded || ! hasLoadedPost;
 };
