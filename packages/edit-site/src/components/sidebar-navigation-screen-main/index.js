@@ -6,7 +6,7 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled, navigation, styles } from '@wordpress/icons';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -17,23 +17,33 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export default function SidebarNavigationScreenMain() {
-	const hasNavigationMenus = useSelect( ( select ) => {
-		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
-		// to avoid double network calls.
-		const navigationMenus = select( coreStore ).getEntityRecords(
-			'postType',
-			'wp_navigation',
-			{
-				per_page: 1,
-				status: 'publish',
-				order: 'desc',
-				orderby: 'date',
-			}
-		);
-
-		return navigationMenus?.length > 0;
-	} );
-
+	const { hasNavigationMenus, hasGlobalStyleVariations } = useSelect(
+		( select ) => {
+			const {
+				getEntityRecords,
+				__experimentalGetCurrentThemeGlobalStylesVariations,
+			} = select( coreStore );
+			// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+			// to avoid double network calls.
+			const navigationMenus = getEntityRecords(
+				'postType',
+				'wp_navigation',
+				{
+					per_page: 1,
+					status: 'publish',
+					order: 'desc',
+					orderby: 'date',
+				}
+			);
+			return {
+				hasNavigationMenus: !! navigationMenus?.length,
+				hasGlobalStyleVariations:
+					!! __experimentalGetCurrentThemeGlobalStylesVariations()
+						?.length,
+			};
+		},
+		[]
+	);
 	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
 		? hasNavigationMenus
 		: false;
@@ -56,13 +66,24 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
+					{ hasGlobalStyleVariations && (
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/wp_global_styles"
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</NavigatorButton>
+					) }
+
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/wp_global_styles"
+						path="/page"
 						withChevron
-						icon={ styles }
+						icon={ page }
 					>
-						{ __( 'Styles' ) }
+						{ __( 'Pages' ) }
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
@@ -76,7 +97,7 @@ export default function SidebarNavigationScreenMain() {
 						as={ SidebarNavigationItem }
 						path="/wp_template_part"
 						withChevron
-						icon={ symbolFilled }
+						icon={ symbol }
 					>
 						{ __( 'Template Parts' ) }
 					</NavigatorButton>

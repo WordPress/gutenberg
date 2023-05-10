@@ -4,11 +4,14 @@
 import { Button } from '@wordpress/components';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation, useHistory } from '../routes';
+import { unlock } from '../../private-apis';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function BackButton() {
 	const location = useLocation();

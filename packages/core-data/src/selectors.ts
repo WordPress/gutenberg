@@ -38,9 +38,11 @@ export interface State {
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
+	themeGlobalStyleRevisions: Record< number, Object >;
 	undo: UndoState;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
+	navigationFallbackId: EntityRecordKey;
 }
 
 type EntityRecordKey = string | number;
@@ -122,7 +124,7 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *
  * @param      state Data state.
  * @param      query Optional object of query parameters to
- *                   include with request.
+ *                   include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
  * @return Authors list.
  */
 export function getAuthors(
@@ -297,7 +299,7 @@ export interface GetEntityRecord {
  * @param name  Entity name.
  * @param key   Record's key
  * @param query Optional query. If requesting specific
- *              fields, fields must always include the ID.
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
  *
  * @return Record.
  */
@@ -441,7 +443,7 @@ export const getRawEntityRecord = createSelector(
  * @param state State tree
  * @param kind  Entity kind.
  * @param name  Entity name.
- * @param query Optional terms query.
+ * @param query Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
  *
  * @return  Whether entity records have been received.
  */
@@ -492,7 +494,7 @@ export interface GetEntityRecords {
  * @param kind  Entity kind.
  * @param name  Entity name.
  * @param query Optional terms query. If requesting specific
- *              fields, fields must always include the ID.
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
  *
  * @return Records.
  */
@@ -1233,4 +1235,36 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+/**
+ * Retrieve the fallback Navigation.
+ *
+ * @param state Data state.
+ * @return The ID for the fallback Navigation post.
+ */
+export function getNavigationFallbackId(
+	state: State
+): EntityRecordKey | undefined {
+	return state.navigationFallbackId;
+}
+
+/**
+ * Returns the revisions of the current global styles theme.
+ *
+ * @param state Data state.
+ *
+ * @return The current global styles.
+ */
+export function getCurrentThemeGlobalStylesRevisions(
+	state: State
+): Object | null {
+	const currentGlobalStylesId =
+		__experimentalGetCurrentGlobalStylesId( state );
+
+	if ( ! currentGlobalStylesId ) {
+		return null;
+	}
+
+	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }

@@ -76,10 +76,26 @@
 
 @mixin input-style__focus() {
 	border-color: var(--wp-admin-theme-color);
-	box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+	box-shadow: 0 0 0 ($border-width-focus-fallback - $border-width) var(--wp-admin-theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
+}
+
+@mixin button-style__focus() {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
+
+@mixin button-style-outset__focus($focus-color) {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) $focus-color;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 }
 
 
@@ -224,7 +240,7 @@
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wp-admin-theme-color);
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -308,7 +324,7 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wp-admin-theme-color);
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -353,7 +369,7 @@
 
 	&:focus {
 		border-color: var(--wp-admin-theme-color) !important;
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color) !important;
+		box-shadow: 0 0 0 ($border-width-focus-fallback - $border-width) var(--wp-admin-theme-color) !important;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent !important;

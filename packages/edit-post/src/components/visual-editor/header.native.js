@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { View } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
@@ -6,8 +11,10 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { PostTitle } from '@wordpress/editor';
-import { ReadableContentView } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useEditorWrapperStyles,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,12 +28,13 @@ const Header = memo(
 		title,
 		getStylesFromColorScheme,
 	} ) {
+		const [ wrapperStyles ] = useEditorWrapperStyles();
 		const blockHolderFocusedStyle = getStylesFromColorScheme(
 			styles.blockHolderFocused,
 			styles.blockHolderFocusedDark
 		);
 		return (
-			<ReadableContentView>
+			<View style={ wrapperStyles }>
 				<PostTitle
 					innerRef={ setTitleRef }
 					title={ title }
@@ -36,7 +44,7 @@ const Header = memo(
 					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
-			</ReadableContentView>
+			</View>
 		);
 	},
 	( prevProps, nextProps ) => prevProps.title === nextProps.title

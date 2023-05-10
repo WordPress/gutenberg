@@ -97,7 +97,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 					'wp_navigation',
 					navigationMenu.id,
 					{
-						status: postStatus,
+						status: 'publish',
 					},
 					{ throwOnError: true }
 				);

@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
@@ -37,6 +37,7 @@ import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -152,12 +153,41 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
+	const { hasResolvingSelectors } = useSelect( ( select ) => {
+		return {
+			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
+		};
+	} );
+	const [ loaded, setLoaded ] = useState( false );
+	const timeoutRef = useRef( null );
+
+	useEffect( () => {
+		if ( ! hasResolvingSelectors && ! loaded ) {
+			clearTimeout( timeoutRef.current );
+
+			/*
+			 * We're using an arbitrary 1s timeout here to catch brief moments
+			 * without any resolving selectors that would result in displaying
+			 * brief flickers of loading state and loaded state.
+			 *
+			 * It's worth experimenting with different values, since this also
+			 * adds 1s of artificial delay after loading has finished.
+			 */
+			timeoutRef.current = setTimeout( () => {
+				setLoaded( true );
+			}, 1000 );
+
+			return () => {
+				clearTimeout( timeoutRef.current );
+			};
+		}
+	}, [ loaded, hasResolvingSelectors ] );
+
+	const isLoading = ! loaded || ! hasLoadedPost;
 
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -171,7 +201,12 @@ export default function Editor() {
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
 							className={ showIconLabels && 'show-icon-labels' }
-							notices={ isEditMode && <EditorSnackbars /> }
+							notices={
+								( isEditMode ||
+									window?.__experimentalEnableThemePreviews ) && (
+									<EditorSnackbars />
+								)
+							}
 							content={
 								<>
 									<GlobalStylesRenderer />
@@ -209,7 +244,10 @@ export default function Editor() {
 							sidebar={
 								isEditMode &&
 								isRightSidebarOpen && (
-									<ComplementaryArea.Slot scope="core/edit-site" />
+									<>
+										<ComplementaryArea.Slot scope="core/edit-site" />
+										<SidebarFixedBottomSlot />
+									</>
 								)
 							}
 							footer={

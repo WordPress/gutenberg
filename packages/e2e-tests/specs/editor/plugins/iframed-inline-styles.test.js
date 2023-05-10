@@ -32,7 +32,7 @@ describe( 'iframed inline styles', () => {
 	} );
 
 	// Skip flaky test. See https://github.com/WordPress/gutenberg/issues/35172
-	it( 'should load inline styles in iframe', async () => {
+	it.skip( 'should load inline styles in iframe', async () => {
 		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

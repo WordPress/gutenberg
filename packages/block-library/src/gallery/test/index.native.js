@@ -14,7 +14,9 @@ import {
 	setupMediaUpload,
 	triggerBlockListLayout,
 	within,
+	setupPicker,
 } from 'test/helpers';
+import { ActionSheetIOS } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -35,6 +37,12 @@ import {
 	getGalleryItem,
 	generateGalleryBlock,
 } from './helpers';
+
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'WordPress Media Library',
+];
 
 const media = [
 	{
@@ -96,9 +104,44 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 	} );
 
+	it( 'displays correct media options picker', async () => {
+		// Initialize with an empty gallery
+		const screen = await initializeEditor( {
+			initialHtml: generateGalleryBlock( 0 ),
+		} );
+		const { getByText } = screen;
+
+		// Tap on Gallery block
+		const block = await getBlock( screen, 'Gallery' );
+		fireEvent.press( block );
+		fireEvent.press( within( block ).getByText( 'ADD MEDIA' ) );
+
+		// Observe that media options picker is displayed
+		/* eslint-disable jest/no-conditional-expect */
+		if ( Platform.isIOS ) {
+			// On iOS the picker is rendered natively, so we have
+			// to check the arguments passed to `ActionSheetIOS`.
+			expect(
+				ActionSheetIOS.showActionSheetWithOptions
+			).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Choose images',
+					options: [ 'Cancel', ...MEDIA_OPTIONS ],
+				} ),
+				expect.any( Function )
+			);
+		} else {
+			expect( getByText( 'Choose images' ) ).toBeVisible();
+			MEDIA_OPTIONS.forEach( ( option ) =>
+				expect( getByText( option ) ).toBeVisible()
+			);
+		}
+		/* eslint-enable jest/no-conditional-expect */
+	} );
+
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'displays media options picker when selecting the block', async () => {
+	it.skip( 'block remains selected after dimissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -213,11 +256,13 @@ describe( 'Gallery block', () => {
 			setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
+		const screen = await initializeWithGalleryBlock();
+		const { galleryBlock, getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		fireEvent.press( getByText( 'Choose from device' ) );
+		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
