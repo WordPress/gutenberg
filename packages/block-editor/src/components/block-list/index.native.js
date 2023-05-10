@@ -314,25 +314,34 @@ export default function BlockList( {
 								),
 								{ flex: 0 },
 								styles.overflowVisible,
-								horizontal && styles.horizontalContentContainer,
-								isWider( blockWidth, 'medium' ) &&
-									( isContentStretch && isMultiBlocks
-										? styles.horizontalContentContainerStretch
-										: styles.horizontalContentContainerCenter ),
 							] }
 						>
-							{ blockClientIds.map( ( currentClientId, index ) =>
-								renderItem( {
-									item: currentClientId,
-									index,
-								} )
-							) }
-							<Footer
-								addBlockToEndOfPost={ addBlockToEndOfPost }
-								isReadOnly={ isReadOnly }
-								renderFooterAppender={ renderFooterAppender }
-								withFooter={ withFooter }
-							/>
+							<View
+								style={ [
+									horizontal &&
+										styles.horizontalContentContainer,
+									isWider( blockWidth, 'medium' ) &&
+										( isContentStretch && isMultiBlocks
+											? styles.horizontalContentContainerStretch
+											: styles.horizontalContentContainerCenter ),
+								] }
+							>
+								{ blockClientIds.map(
+									( currentClientId, index ) =>
+										renderItem( {
+											item: currentClientId,
+											index,
+										} )
+								) }
+								<Footer
+									addBlockToEndOfPost={ addBlockToEndOfPost }
+									isReadOnly={ isReadOnly }
+									renderFooterAppender={
+										renderFooterAppender
+									}
+									withFooter={ withFooter }
+								/>
+							</View>
 						</View>
 					) : (
 						<EmptyList
