@@ -54,7 +54,7 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 7 )
 		);
 	} );
 

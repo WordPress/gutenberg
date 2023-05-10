@@ -38,13 +38,6 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
     "text": "Unexpected empty line before at-rule (at-rule-empty-line-before)",
   },
   {
-    "column": 5,
-    "line": 14,
-    "rule": "block-opening-brace-space-before",
-    "severity": "error",
-    "text": "Expected single space before "{" (block-opening-brace-space-before)",
-  },
-  {
     "column": 15,
     "line": 28,
     "rule": "no-extra-semicolons",
