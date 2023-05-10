@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
@@ -55,7 +55,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor() {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -157,38 +157,6 @@ export default function Editor() {
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
-
-	const { hasResolvingSelectors } = useSelect( ( select ) => {
-		return {
-			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
-		};
-	} );
-	const [ loaded, setLoaded ] = useState( false );
-	const timeoutRef = useRef( null );
-
-	useEffect( () => {
-		if ( ! hasResolvingSelectors && ! loaded ) {
-			clearTimeout( timeoutRef.current );
-
-			/*
-			 * We're using an arbitrary 1s timeout here to catch brief moments
-			 * without any resolving selectors that would result in displaying
-			 * brief flickers of loading state and loaded state.
-			 *
-			 * It's worth experimenting with different values, since this also
-			 * adds 1s of artificial delay after loading has finished.
-			 */
-			timeoutRef.current = setTimeout( () => {
-				setLoaded( true );
-			}, 1000 );
-
-			return () => {
-				clearTimeout( timeoutRef.current );
-			};
-		}
-	}, [ loaded, hasResolvingSelectors ] );
-
-	const isLoading = ! loaded || ! hasLoadedPost;
 
 	return (
 		<>

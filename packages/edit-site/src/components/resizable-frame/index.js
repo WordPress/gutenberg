@@ -61,7 +61,12 @@ function calculateNewHeight( width, initialAspectRatio ) {
 	return width / intermediateAspectRatio;
 }
 
-function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
+function ResizableFrame( {
+	isFullWidth,
+	isReady,
+	children,
+	oversizedClassName,
+} ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
 		height: '100%',
@@ -173,7 +178,7 @@ function ResizableFrame( { isFullWidth, children, oversizedClassName } ) {
 				top: false,
 				right: false,
 				bottom: false,
-				left: true,
+				left: isReady,
 				topRight: false,
 				bottomRight: false,
 				bottomLeft: false,

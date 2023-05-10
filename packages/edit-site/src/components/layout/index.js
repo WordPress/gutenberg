@@ -44,6 +44,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useIsEditorLoading } from './hooks';
 
 const { useCommands } = unlock( coreCmmandsPrivateApis );
 
@@ -102,6 +103,7 @@ export default function Layout() {
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
+	const isEditorLoading = useIsEditorLoading();
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -237,10 +239,15 @@ export default function Layout() {
 									<ErrorBoundary>
 										{ isEditorPage && (
 											<ResizableFrame
+												isReady={ ! isEditorLoading }
 												isFullWidth={ isEditing }
 												oversizedClassName="edit-site-layout__resizable-frame-oversized"
 											>
-												<Editor />
+												<Editor
+													isLoading={
+														isEditorLoading
+													}
+												/>
 											</ResizableFrame>
 										) }
 										{ isListPage && <ListPage /> }
