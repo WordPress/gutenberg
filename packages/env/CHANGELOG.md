@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0 (2023-05-10)
+
 ### Breaking Change
 
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.

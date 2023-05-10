@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 24.0.0 (2023-05-10)
+
 ### Breaking Changes
 
 -   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
