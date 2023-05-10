@@ -320,7 +320,7 @@ export default function BlockList( {
 								{ blockClientIds.map(
 									( currentClientId, index ) => {
 										return (
-											<View key={ index }>
+											<View key={ currentClientId }>
 												{ renderItem( {
 													item: currentClientId,
 													index,
