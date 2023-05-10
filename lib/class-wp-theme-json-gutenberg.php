@@ -1928,10 +1928,6 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Returns the style property for the given path.
 	 *
-	 * It also converts CSS Custom Property stored as
-	 * "var:preset|color|secondary" to the form
-	 * "--wp--preset--color--secondary".
-	 *
 	 * It also converts references to a path to the value
 	 * stored at that location, e.g.
 	 * { "ref": "style.color.background" } => "#fff".
