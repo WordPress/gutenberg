@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
 
 ## 1.94.0
 -   [*] Split pasted content between title and body. [#37169]
