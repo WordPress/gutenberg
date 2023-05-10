@@ -48,6 +48,7 @@ import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
+import { useIsSiteEditorLoading } from './hooks';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -107,6 +108,7 @@ export default function Layout() {
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
+	const isEditorLoading = useIsSiteEditorLoading();
 
 	// Sets the right context for the command center
 	const commandContext =
@@ -249,10 +251,15 @@ export default function Layout() {
 									<ErrorBoundary>
 										{ isEditorPage && (
 											<ResizableFrame
+												isReady={ ! isEditorLoading }
 												isFullWidth={ isEditing }
 												oversizedClassName="edit-site-layout__resizable-frame-oversized"
 											>
-												<Editor />
+												<Editor
+													isLoading={
+														isEditorLoading
+													}
+												/>
 											</ResizableFrame>
 										) }
 										{ isListPage && <ListPage /> }
