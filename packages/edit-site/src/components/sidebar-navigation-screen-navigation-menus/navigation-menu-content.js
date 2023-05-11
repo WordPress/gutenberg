@@ -191,7 +191,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
 			) }
-			<VisuallyHidden>
+			<VisuallyHidden aria-hidden="true">
 				<BlockTools>
 					<BlockList />
 				</BlockTools>
