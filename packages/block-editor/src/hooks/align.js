@@ -205,7 +205,8 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withDataAlign'
 );
 
 /**

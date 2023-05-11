@@ -25,6 +25,7 @@ import useNavigationMenu from '../use-navigation-menu';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
+const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 const MainContent = ( {
 	clientId,
@@ -33,7 +34,6 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(

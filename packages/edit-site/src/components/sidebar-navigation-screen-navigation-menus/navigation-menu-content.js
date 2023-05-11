@@ -19,7 +19,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-import { NavigationMenuLoader } from './loader';
+
+const { PrivateListView, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -144,8 +145,6 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		};
 	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
 
-	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
-
 	const offCanvasOnselect = useCallback(
 		( block ) => {
 			if (
@@ -179,16 +178,15 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
-			{ isLoading && <NavigationMenuLoader /> }
 			{ ! isLoading && (
-				<OffCanvasEditor
+				<PrivateListView
 					blocks={
 						isSinglePageList
 							? clientIdsTree[ 0 ].innerBlocks
 							: clientIdsTree
 					}
 					onSelect={ offCanvasOnselect }
-					LeafMoreMenu={ LeafMoreMenu }
+					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
 					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>

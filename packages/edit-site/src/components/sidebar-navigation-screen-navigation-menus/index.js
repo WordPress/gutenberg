@@ -14,7 +14,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import NavigationMenuContent from './navigation-menu-content';
-import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import {
@@ -75,7 +74,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		];
 	}, [ firstNavigationMenu ] );
 
-	const isLoading = ! hasResolvedNavigationMenus;
 	const hasNavigationMenus = !! navigationMenus?.length;
 
 	const onSelect = useCallback(
@@ -112,14 +110,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SidebarNavigationScreenWrapper>
 				{ __( 'There are no Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
-		);
-	}
-
-	if ( ! hasResolvedNavigationMenus || isLoading ) {
-		return (
-			<SidebarNavigationScreenWrapper>
-				<NavigationMenuLoader />
 			</SidebarNavigationScreenWrapper>
 		);
 	}
