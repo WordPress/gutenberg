@@ -30,14 +30,20 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 			return <BlockEdit { ...props } />;
 		}
 
-		const { behaviors: blockBehaviors } = props.attributes;
+		// Check the value of `settings.blocks.core/image.behavior.lightbox` in the
+		// theme.json. If false, do not add the behaviors inspector control.
 		const settings = select( blockEditorStore ).getSettings();
-		const themeBehaviors =
-			settings?.__experimentalFeatures?.blocks?.[ props.name ]?.behaviors;
-
-		if ( ! blockBehaviors && ! themeBehaviors ) {
+		if (
+			! settings?.__experimentalFeatures?.blocks?.[ props.name ]
+				?.behaviors?.lightbox
+		) {
 			return <BlockEdit { ...props } />;
 		}
+
+		const { behaviors: blockBehaviors } = props.attributes;
+
+		// TODO: Here we should get the theme behaviors but it doesn't work ATM.
+		const themeBehaviors = settings?.behaviors;
 
 		// By default, use the block behaviors.
 		let behaviors = blockBehaviors;
@@ -55,7 +61,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 						__nextHasNoMarginBottom
 						label={ __( 'Behaviors' ) }
 						// At the moment we are only supporting one behavior (lightbox)
-						value={ behaviors?.lightbox || '' }
+						value={ behaviors?.lightbox ? 'LIGHTBOX' : '' }
 						options={ Object.keys( behaviors )
 							.map( ( behavior ) => ( {
 								value: behavior,
@@ -66,6 +72,8 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 								label: __( 'None' ),
 							} ) }
 						onChange={ ( nextValue ) => {
+							// If the user selects something, it means that they want to
+							// change the default value (true) so we save it in the attributes.
 							props.setAttributes( {
 								behaviors: {
 									lightbox: nextValue === '' ? false : true,
