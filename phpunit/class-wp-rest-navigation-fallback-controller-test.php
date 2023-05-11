@@ -41,7 +41,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 
-		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallbacks', $routes, 'Fallback route should be registered.' );
+		$this->assertArrayHasKey( '/wp-block-editor/v1/navigation-fallback', $routes, 'Fallback route should be registered.' );
 	}
 
 	/**
@@ -53,7 +53,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 
 		wp_set_current_user( self::$editor_user );
 
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -71,7 +71,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 	 */
 	public function test_get_item() {
 
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -96,7 +96,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
 	public function test_get_item_schema() {
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -119,7 +119,7 @@ class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controlle
 	 * @since 6.3.0 Added Navigation Fallbacks endpoint.
 	 */
 	public function test_adds_links() {
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallbacks' );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 

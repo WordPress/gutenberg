@@ -91,3 +91,25 @@ export function unregisterCommandLoader( name, group ) {
 		group,
 	};
 }
+
+/**
+ * Opens the command center.
+ *
+ * @return {Object} action.
+ */
+export function open() {
+	return {
+		type: 'OPEN',
+	};
+}
+
+/**
+ * Closes the command center.
+ *
+ * @return {Object} action.
+ */
+export function close() {
+	return {
+		type: 'CLOSE',
+	};
+}

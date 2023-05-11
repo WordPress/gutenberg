@@ -4,7 +4,7 @@
 	"name": "core/cover",
 	"title": "Cover",
 	"category": "media",
-	"description": "Add an image or video with a text overlay — great for headers.",
+	"description": "Add an image or video with a text overlay.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {

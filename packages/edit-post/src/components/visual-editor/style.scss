@@ -7,7 +7,7 @@
 	// Gray preview overlay (desktop/tablet/mobile) is intentionally not set on an element with scrolling content like
 	// interface-interface-skeleton__content. This causes graphical glitches (flashes of the background color)
 	// when scrolling in Safari due to incorrect ordering of large compositing layers (GPU acceleration).
-	background-color: $gray-800;
+	background-color: $gray-900;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.

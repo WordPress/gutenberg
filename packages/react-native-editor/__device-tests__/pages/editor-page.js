@@ -91,7 +91,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }.")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -109,19 +109,9 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		let elementType;
-		switch ( blockName ) {
-			case blockNames.cover:
-				elementType = 'XCUIElementTypeButton';
-				break;
-			default:
-				elementType = 'XCUIElementTypeOther';
-				break;
-		}
-
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-			: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[2]`;
 
 		await waitForVisible( this.driver, blockLocator );
 
@@ -352,8 +342,10 @@ class EditorPage {
 	}
 
 	async openBlockSettings() {
-		const settingsButtonElement = 'Open Settings';
-		const settingsButton = await this.waitForElementToBeDisplayedById(
+		const settingsButtonElement = isAndroid()
+			? '//android.widget.Button[@content-desc="Open Settings"]/android.view.ViewGroup'
+			: '//XCUIElementTypeButton[@name="Open Settings"]';
+		const settingsButton = await this.waitForElementToBeDisplayedByXPath(
 			settingsButtonElement
 		);
 
@@ -362,9 +354,9 @@ class EditorPage {
 
 	async removeBlock() {
 		const blockActionsButtonElement = isAndroid()
-			? 'Open Block Actions Menu, Double tap to open Bottom Sheet with available options'
-			: 'Open Block Actions Menu';
-		const blockActionsMenu = await this.waitForElementToBeDisplayedById(
+			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
+			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
+		const blockActionsMenu = await this.waitForElementToBeDisplayedByXPath(
 			blockActionsButtonElement
 		);
 		await blockActionsMenu.click();
@@ -609,15 +601,6 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async getParagraphBlockWrapperAtPosition( position = 1 ) {
-		// iOS needs a click to get the text element
-		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
-			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
-
-		return await waitForVisible( this.driver, blockLocator );
-	}
-
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -648,7 +631,7 @@ class EditorPage {
 
 	async getNumberOfParagraphBlocks() {
 		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 
 		const locator = await this.driver.elementsByXPath(
@@ -702,7 +685,7 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
 		const listBlockTextLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
 			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );
@@ -907,7 +890,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Shortcode Block. Row ${ position }"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Shortcode Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -919,7 +902,7 @@ class EditorPage {
 
 	async getButtonBlockTextInputAtPosition( position = 1 ) {
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Button Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await this.waitForElementToBeDisplayedByXPath( blockLocator );

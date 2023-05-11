@@ -77,16 +77,8 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$scripts->add( $handle, $src, $deps, $ver, ( $in_footer ? 1 : null ) );
 	}
 
-	/*
-	 * `WP_Dependencies::set_translations` will fall over on itself if setting
-	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
-	 * as a dependency of itself, exhausting memory. The same applies for the
-	 * polyfill and hooks scripts, which are dependencies _of_ `wp-i18n`.
-	 *
-	 * See: https://core.trac.wordpress.org/ticket/46089
-	 */
-	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
-		$scripts->set_translations( $handle, 'default' );
+	if ( in_array( 'wp-i18n', $deps, true ) ) {
+		$scripts->set_translations( $handle );
 	}
 
 	/*
@@ -221,6 +213,9 @@ function gutenberg_register_packages_scripts( $scripts ) {
 			case 'wp-edit-site':
 				array_push( $dependencies, 'wp-dom-ready' );
 				break;
+			case 'wp-preferences':
+				array_push( $dependencies, 'wp-preferences-persistence' );
+				break;
 		}
 
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
@@ -283,7 +278,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
