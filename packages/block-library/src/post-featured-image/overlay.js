@@ -45,6 +45,10 @@ const Overlay = ( {
 		...borderProps.style,
 	};
 
+	if ( ! colorGradientSettings.hasColorsOrGradients ) {
+		return null;
+	}
+
 	return (
 		<>
 			{ !! dimRatio && (

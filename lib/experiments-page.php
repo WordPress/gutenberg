@@ -66,6 +66,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-command-center',
+		__( 'Command center ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the command center; Open it using cmd + k in the site or post editors.', 'gutenberg' ),
+			'id'    => 'gutenberg-command-center',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-group-grid-variation',
 		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -74,6 +86,42 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
 			'id'    => 'gutenberg-group-grid-variation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-details-blocks',
+		__( 'Details block', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Details block', 'gutenberg' ),
+			'id'    => 'gutenberg-details-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-theme-previews',
+		__( 'Block Theme Previews', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Block Theme Previews', 'gutenberg' ),
+			'id'    => 'gutenberg-theme-previews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-interactivity-api-navigation-block',
+		__( 'Navigation block', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Navigation block using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-navigation-block',
 		)
 	);
 

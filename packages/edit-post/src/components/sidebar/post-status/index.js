@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
+import { PostSwitchToDraftButton } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -48,7 +52,15 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostSlug />
 						<PostAuthor />
 						{ fills }
-						<PostTrash />
+						<HStack
+							style={ {
+								marginTop: '16px',
+							} }
+							spacing={ 4 }
+						>
+							<PostSwitchToDraftButton />
+							<PostTrash />
+						</HStack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>

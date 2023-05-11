@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { createSlotFill, PanelBody, PanelRow } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { useEffect, Fragment } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -16,7 +16,9 @@ import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
+import LastRevision from './template-revisions';
 import TemplateCard from './template-card';
+import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 
@@ -69,14 +71,23 @@ export function SidebarComplementaryAreaFills() {
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
-				closeLabel={ __( 'Close settings' ) }
+				closeLabel={ __( 'Close Settings' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
+					<>
+						<PanelBody>
+							<TemplateCard />
+							<PanelRow
+								header={ __( 'Editing history' ) }
+								className="edit-site-template-revisions"
+							>
+								<LastRevision />
+							</PanelRow>
+						</PanelBody>
+						<PluginTemplateSettingPanel.Slot />
+					</>
 				) }
 				{ sidebarName === SIDEBAR_BLOCK && (
 					<InspectorSlot bubblesVirtually />

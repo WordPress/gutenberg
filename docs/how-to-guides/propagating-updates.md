@@ -55,7 +55,7 @@ Likewise, it is generally poor practice to delete template parts in theme update
 
 ### Resources
 
-- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/support/article/comparing-patterns-template-parts-and-reusable-blocks/)
+- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/documentation/article/comparing-patterns-template-parts-and-reusable-blocks/)
 - [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
 - [Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/)
 

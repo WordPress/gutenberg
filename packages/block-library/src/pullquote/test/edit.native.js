@@ -10,7 +10,7 @@ import {
 	fireEvent,
 	within,
 	waitFor,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -35,24 +35,19 @@ describe( 'Pullquote', () => {
 		fireEvent.press( pullquoteBlock );
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( pullquoteTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( pullquoteTextInput, 'A great statement.' );
 		fireEvent( pullquoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-
-		// TODO: Determine a way to type after pressing ENTER within the block.
+		typeInRichText( pullquoteTextInput, 'Again' );
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		changeAndSelectTextOfRichText( citationTextInput, 'A person', {
-			selectionStart: 2,
-			selectionEnd: 2,
+		typeInRichText( citationTextInput, 'A person', {
+			finalSelectionStart: 2,
+			finalSelectionEnd: 2,
 		} );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
@@ -63,7 +58,7 @@ describe( 'Pullquote', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
-		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br></p><cite>A <br>person</cite></blockquote></figure>
+		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
 		<!-- /wp:pullquote -->"
 	` );
 	} );

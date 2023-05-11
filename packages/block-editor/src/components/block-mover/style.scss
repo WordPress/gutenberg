@@ -35,9 +35,12 @@
 			> * {
 				width: $block-toolbar-height * 0.5;
 				min-width: 0 !important; // overrides default button width.
-				padding-left: 0 !important;
-				padding-right: 0 !important;
 				overflow: hidden;
+			}
+
+			.block-editor-block-mover-button {
+				padding-left: 0;
+				padding-right: 0;
 			}
 
 			.block-editor-block-mover-button.is-up-button svg {
@@ -55,9 +58,12 @@
 	@include break-small() {
 		width: $block-toolbar-height * 0.5;
 		min-width: 0 !important; // overrides default button width.
-		padding-left: 0 !important;
-		padding-right: 0 !important;
 		overflow: hidden;
+
+		.block-editor-block-mover &.has-icon.has-icon {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 }
 

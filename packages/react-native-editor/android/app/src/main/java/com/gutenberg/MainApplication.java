@@ -168,6 +168,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestEmbedFullscreenPreview(String content, String title) {
+
+            }
+
+            @Override
             public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
 
             }
@@ -200,7 +205,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performGetRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+
+            @Override
+            public void performPostRequest(String path, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,

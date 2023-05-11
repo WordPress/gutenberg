@@ -56,7 +56,7 @@ export default function PostExcerptEditor( {
 				return true;
 			}
 			return !! select( coreStore ).getPostType( postType )?.supports
-				.excerpt;
+				?.excerpt;
 		},
 		[ postType ]
 	);

@@ -168,21 +168,13 @@ describe( 'actions', () => {
 			const ID = 'emptytheme//single';
 			const SLUG = 'single';
 
-			window.fetch = async ( path ) => {
-				if ( path === '/?_wp-find-template=true' ) {
-					return {
-						json: async () => ( { data: { id: ID, slug: SLUG } } ),
-					};
-				}
-
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ path }`,
-				};
-			};
-
 			apiFetch.setFetchHandler( async ( options ) => {
-				const { method = 'GET', path } = options;
+				const { method = 'GET', path, url } = options;
+
+				// Called with url arg in `__experimentalGetTemplateForLink`
+				if ( url ) {
+					return { data: { id: ID, slug: SLUG } };
+				}
 
 				if ( method === 'GET' ) {
 					if ( path.startsWith( '/wp/v2/types' ) ) {

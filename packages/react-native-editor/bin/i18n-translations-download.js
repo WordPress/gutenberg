@@ -60,31 +60,38 @@ const supportedLocales = [
 	'zh-tw', // Chinese (Taiwan)
 ];
 
-const getLanguageUrl = ( locale, plugin ) =>
-	`https://translate.wordpress.org/projects/wp-plugins/${ plugin }/dev/${ locale }/default/export-translations\?format\=json`;
+const getLanguageUrl = ( locale, projectSlug ) =>
+	`https://translate.wordpress.org/projects/${ projectSlug }/dev/${ locale }/default/export-translations\?format\=json`;
 
 const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 
-const fetchTranslation = ( locale, plugin ) => {
-	const localeUrl = getLanguageUrl( locale, plugin );
+const fetchTranslation = ( locale, projectSlug ) => {
+	const localeUrl = getLanguageUrl( locale, projectSlug );
 	return fetch( localeUrl )
 		.then( ( response ) => response.json() )
 		.then( ( body ) => {
 			return { response: body, locale };
 		} )
 		.catch( () => {
-			console.error( `Could not find translation file ${ localeUrl }` );
+			console.error(
+				`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`
+			);
 		} );
 };
 
-const fetchTranslations = ( { plugin, pluginDir, usedStrings } ) => {
+const fetchTranslations = ( {
+	plugin,
+	projectSlug,
+	pluginDir,
+	usedStrings,
+} ) => {
 	console.log(
-		`Fetching translations of plugin "${ plugin }" for the following locales:`,
+		`Fetching translations of plugin "${ plugin }" with project slug "${ projectSlug }" for the following locales:`,
 		supportedLocales
 	);
 
 	const fetchPromises = supportedLocales.map( ( locale ) =>
-		fetchTranslation( locale, plugin )
+		fetchTranslation( locale, projectSlug )
 	);
 
 	// Create data folder if it doesn't exist
@@ -230,8 +237,9 @@ const generateIndexFile = ( translations, pluginDir ) => {
 if ( require.main === module ) {
 	const args = process.argv.slice( 2 );
 	const plugin = args[ 0 ] || 'gutenberg';
-	const destination = args[ 1 ] || './i18n-cache';
-	const usedStringsFile = args[ 2 ];
+	const projectSlug = args[ 1 ] || 'wp-plugins/gutenberg';
+	const destination = args[ 2 ] || './i18n-cache';
+	const usedStringsFile = args[ 3 ];
 
 	const translationsDir = path.resolve( destination );
 	const pluginDir = path.join( translationsDir, plugin );
@@ -243,6 +251,7 @@ if ( require.main === module ) {
 
 	fetchTranslations( {
 		plugin,
+		projectSlug,
 		pluginDir,
 		usedStrings,
 	} ).then( ( { translations, missingTranslations, extraTranslations } ) => {
