@@ -32,7 +32,10 @@
 	flex-grow: 1;
 	.components-external-link {
 		color: $white;
-		text-decoration: underline;
+		text-decoration: none;
+		&:hover {
+			text-decoration: underline;
+		}
 		&:focus {
 			outline: none;
 			box-shadow: none;
