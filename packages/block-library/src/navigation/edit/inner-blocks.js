@@ -93,7 +93,7 @@ export default function NavigationInnerBlocks( {
 			onInput,
 			onChange,
 			allowedBlocks: ALLOWED_BLOCKS,
-			inserterPriority: INSERTER_PRIORITY,
+			prioritizedInserterBlocks: INSERTER_PRIORITY,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,

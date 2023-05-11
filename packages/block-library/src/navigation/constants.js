@@ -16,6 +16,7 @@ export const ALLOWED_BLOCKS = [
 ];
 
 export const INSERTER_PRIORITY = [
+	'core/spacer',
 	'core/navigation-link/page',
 	'core/navigation-link',
 ];
