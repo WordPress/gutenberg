@@ -57,7 +57,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		}
 	}, [
 		clientId,
-		selectedPattern.blocks,
+		selectedPattern?.blocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		innerBlocks,
@@ -90,7 +90,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		} );
 	}, [
 		innerBlocks,
-		selectedPattern.blocks,
+		selectedPattern?.blocks,
 		setAttributes,
 		inheritedAlignment,
 		syncStatus,

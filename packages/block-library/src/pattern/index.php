@@ -32,7 +32,8 @@ function render_block_core_pattern( $attributes, $content ) {
 		return '';
 	}
 
-	$wrapper = '<div class="align' . $attributes['forcedAlignment'] . '" data-pattern-slug="' . $attributes['slug'] . '">%s</div>';
+	$align_class = isset($attributes['inheritedAlignment']) ? 'class="align' . $attributes['inheritedAlignment'] . '"' : '';
+	$wrapper = '<div '. $align_class . ' data-pattern-slug="' . $attributes['slug'] . '">%s</div>';
 
 	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
 		return sprintf( $wrapper, $content );
