@@ -66,8 +66,11 @@ export default function useNestedSettingsUpdate(
 		[ clientId ]
 	);
 
-	// Memoize as inner blocks implementors often pass a new array on every
-	// render.
+	// Memoize allowedBlocks and prioritisedInnerBlocks based on the contents
+	// of the arrays. Implementors often pass a new array on every render,
+	// and the contents of the arrays are just strings, so the entire array
+	// can be passed as dependencies.
+	
 	const _allowedBlocks = useMemo(
 		() => allowedBlocks,
 		// eslint-disable-next-line react-hooks/exhaustive-deps
