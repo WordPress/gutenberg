@@ -22,13 +22,20 @@ function register_block_core_pattern() {
 /**
  * Renders the `core/pattern` block on the server.
  *
- * @param array $attributes Block attributes.
+ * @param array  $attributes Block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the output of the pattern.
  */
-function render_block_core_pattern( $attributes ) {
+function render_block_core_pattern( $attributes, $content ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
+	}
+
+	$wrapper = '<div class="align' . $attributes['forcedAlignment'] . '" data-pattern-slug="' . $attributes['slug'] . '">%s</div>';
+
+	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
+		return sprintf( $wrapper, $content );
 	}
 
 	$slug     = $attributes['slug'];
@@ -38,7 +45,7 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	return do_blocks( $pattern['content'] );
+	return sprintf( $wrapper, do_blocks( $pattern['content'] ) );
 }
 
 add_action( 'init', 'register_block_core_pattern' );
