@@ -1,5 +1,3 @@
-// NOTE: This file is duplciated in packages/block-library/src/navigation/edit/leaf-more-menu.js
-
 /**
  * WordPress dependencies
  */
@@ -13,10 +11,7 @@ import {
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	store as blockEditorStore,
-	useBlockDisplayInformation,
-} from '@wordpress/block-editor';
+import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -92,12 +87,10 @@ export default function LeafMoreMenu( props ) {
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled' );
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		blockTitle
+		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
 	const rootClientId = useSelect(
