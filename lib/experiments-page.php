@@ -72,7 +72,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the command center; Open it using cmd + k in the site editor.', 'gutenberg' ),
+			'label' => __( 'Test the command center; Open it using cmd + k in the site or post editors.', 'gutenberg' ),
 			'id'    => 'gutenberg-command-center',
 		)
 	);
@@ -110,6 +110,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enable Block Theme Previews', 'gutenberg' ),
 			'id'    => 'gutenberg-theme-previews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-interactivity-api-navigation-block',
+		__( 'Navigation block', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Navigation block using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-navigation-block',
 		)
 	);
 

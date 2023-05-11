@@ -10,6 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
+-   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [*] Use host app namespace in reusable block message [#50478]
 
 ## 1.94.0
 -   [*] Split pasted content between title and body. [#37169]

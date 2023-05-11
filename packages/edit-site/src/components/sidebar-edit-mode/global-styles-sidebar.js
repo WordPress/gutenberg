@@ -56,7 +56,7 @@ export default function GlobalStylesSidebar() {
 			identifier="edit-site/global-styles"
 			title={ __( 'Styles' ) }
 			icon={ styles }
-			closeLabel={ __( 'Close Styles sidebar' ) }
+			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
 				<Flex className="edit-site-global-styles-sidebar__header">

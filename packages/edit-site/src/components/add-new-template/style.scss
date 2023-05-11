@@ -18,16 +18,20 @@
 }
 
 .edit-site-custom-template-modal {
+	&__suggestions_list {
+		margin-left: - $grid-unit-15;
+		margin-right: - $grid-unit-15;
+	}
+
 	&__contents {
 		> .components-button {
 			padding: $grid-unit-30;
-			box-shadow: inset 0 0 0 $border-width $gray-600;
 			border-radius: $radius-block-ui;
-			width: 256px;
 			height: auto;
 			display: flex;
 			flex-direction: column;
-			gap: $grid-unit;
+			justify-content: center;
+			border: $border-width solid $gray-300;
 
 			// Show the boundary of the button, in High Contrast Mode.
 			outline: 1px solid transparent;
@@ -42,15 +46,17 @@
 
 			&:hover {
 				color: var(--wp-admin-theme-color-darker-10);
-				box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				border-color: transparent;
 
-				span:first-child {
+				span {
 					color: var(--wp-admin-theme-color);
 				}
 			}
 
 			&:focus {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				border-color: transparent;
 
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 3px solid transparent;
@@ -77,60 +83,58 @@
 	@include break-medium() {
 		width: 456px;
 	}
-}
 
-.edit-site-custom-template-modal__suggestions_list {
-	@include break-small() {
-		height: 232px;
-		overflow: scroll;
-	}
-
-	&__list-item {
-		display: block;
-		width: 100%;
-		text-align: left;
-		white-space: pre-wrap;
-		overflow-wrap: break-word;
-		height: auto;
-
-		mark {
-			font-weight: 700;
-			background: none;
+	.edit-site-custom-template-modal__suggestions_list {
+		@include break-small() {
+			height: 232px;
+			overflow: scroll;
 		}
 
-		&:hover {
-			background-color: $gray-100;
+		&__list-item {
+			display: block;
+			width: 100%;
+			text-align: left;
+			white-space: pre-wrap;
+			overflow-wrap: break-word;
+			height: auto;
+			padding: $grid-unit-10 $grid-unit-15;
 
 			mark {
-				color: var(--wp-admin-theme-color);
+				font-weight: 700;
+				background: none;
 			}
-		}
 
-		&:focus {
-			background-color: $gray-100;
-		}
+			&:hover {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
-		}
+				* {
+					color: var(--wp-admin-theme-color);
+				}
 
-		&__title,
-		&__info {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			display: block;
-		}
+				mark {
+					color: var(--wp-admin-theme-color);
+				}
+			}
 
-		&__title {
-			font-weight: 500;
-			margin-bottom: 0.2em;
-		}
+			&:focus {
+				background-color: $gray-100;
+			}
 
-		&__info {
-			color: $gray-700;
-			font-size: 0.9em;
-			line-height: 1.3;
-			word-break: break-all;
+			&:focus:not(:disabled) {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+			}
+
+			&__title,
+			&__info {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+			}
+
+			&__info {
+				word-break: break-all;
+				color: $gray-700;
+			}
 		}
 	}
 }

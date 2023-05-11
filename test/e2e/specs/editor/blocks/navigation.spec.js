@@ -678,7 +678,7 @@ test.describe( 'Navigation block', () => {
 						name: 'Settings',
 					} )
 					.getByRole( 'heading', {
-						name: 'Link Settings',
+						name: 'Settings',
 					} )
 			).toBeVisible();
 
@@ -798,6 +798,529 @@ test.describe( 'Navigation block', () => {
 					} )
 					.getByText( 'Top Level Item 1' )
 			).toBeVisible();
+		} );
+	} );
+} );
+
+test.describe( 'Navigation block - Frontend interactivity', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test.describe( 'Overlay menu', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'always' },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'overlay menu opens on click on open menu button', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+		} );
+
+		test( 'overlay menu closes on click on close menu button', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await closeMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeHidden();
+		} );
+
+		test( 'overlay menu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await expect( openMenuButton ).toBeFocused();
+		} );
+
+		test( 'overlay menu focuses on first element after opening', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeFocused();
+		} );
+
+		test( 'overlay menu traps focus', async ( { page } ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await expect( overlayMenuFirstElement ).toBeFocused();
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+			await expect( closeMenuButton ).toBeFocused();
+			await page.keyboard.press( 'Shift+Tab' );
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( overlayMenuFirstElement ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Submenus (Open on click)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-submenu {"label":"Simple Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-submenu {"label":"Complex Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- /wp:navigation-submenu -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+		} );
+
+		test( 'nested submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+		} );
+
+		test( 'submenu closes on click outside', async ( { page } ) => {
+			await page.goto( '/' );
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+		} );
+
+		test( 'submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( simpleSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'submenu closes on tab outside submenu', async ( { page } ) => {
+			await page.goto( '/' );
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+			// Tab to first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( innerElement ).toBeHidden();
+			await expect( complexSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'nested submenu closes on click outside', async ( { page } ) => {
+			await page.goto( '/' );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+		} );
+
+		test( 'nested submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
+			await complexSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			await page.keyboard.press( 'Escape' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+			await expect( complexSubmenuButton ).toBeFocused();
+		} );
+
+		test( 'only nested submenu closes on tab outside', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
+			await complexSubmenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			// Tab to nested submenu first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the nested submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			// Tab outside the complex submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( firstLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Submenus (Arrow setting)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Menu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- /wp:navigation-submenu -->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off' },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'submenu opens on click in the arrow', async ( { page } ) => {
+			await page.goto( '/' );
+			const arrowButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const nestedSubmenuArrowButton = page.getByRole( 'button', {
+				name: 'Nested Menu submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Menu Link',
+			} );
+
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+			await arrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			await nestedSubmenuArrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Page list block', () => {
+		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
+			// Create parent page.
+			await admin.createNewPost( {
+				postType: 'page',
+				title: 'Parent Page',
+			} );
+			await editor.publishPost();
+
+			// Create subpage.
+			await admin.createNewPost( {
+				postType: 'page',
+				title: 'Subpage',
+			} );
+			await editor.openDocumentSettingsSidebar();
+			const parentPageList = page.getByLabel( 'Parent page:' );
+			if ( await parentPageList.isHidden() ) {
+				await page
+					.getByRole( 'button', {
+						name: 'Page Attributes',
+					} )
+					.click();
+			}
+			await parentPageList.click();
+			await page
+				.getByRole( 'option', {
+					name: 'Parent Page',
+				} )
+				.click();
+			await editor.publishPost();
+
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:page-list /-->
+					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'page-list submenu opens on click', async ( { page } ) => {
+			await page.goto( '/' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+		} );
+
+		test( 'page-list submenu closes on click outside', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+		} );
+
+		test( 'page-list submenu closes on ESC key', async ( { page } ) => {
+			await page.goto( '/' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( submenuButton ).toBeFocused();
+		} );
+
+		test( 'page-list submenu closes on tab outside submenu', async ( {
+			page,
+		} ) => {
+			await page.goto( '/' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
+			await expect( innerElement ).toBeHidden();
+			await submenuButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+			// Tab to first element.
+			await page.keyboard.press( 'Tab' );
+			// Tab outside the submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( innerElement ).toBeHidden();
 		} );
 	} );
 } );

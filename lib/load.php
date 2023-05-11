@@ -98,24 +98,32 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
+require __DIR__ . '/experimental/interactivity-api/script-loader.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/navigation-fallback.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-block' ) ) {
+	require __DIR__ . '/experimental/interactivity-api/navigation-block-interactivity.php';
+}
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
+	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-utils.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider-local.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
-	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-web-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
 	require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
 	require __DIR__ . '/experimental/fonts-api/fonts-api.php';
+	// BC Layer files, which will not be backported to WP Core.
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/webfonts-deprecations.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-utils.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-provider.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts-provider-local.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts.php';
+	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-web-fonts.php';
 }
 
 // Plugin specific code.
@@ -151,3 +159,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
+

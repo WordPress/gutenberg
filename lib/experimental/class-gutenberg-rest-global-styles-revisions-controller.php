@@ -265,6 +265,9 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 			return $post;
 		}
 
+		/*
+		 * The same check as WP_REST_Global_Styles_Controller->get_item_permissions_check.
+		 */
 		if ( ! current_user_can( 'read_post', $post->ID ) ) {
 			return new WP_Error(
 				'rest_cannot_view',

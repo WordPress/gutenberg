@@ -8,8 +8,10 @@
 	align-items: center;
 	padding: 1em;
 	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
-	// TODO: Find an alternative to `overflow: hidden` so that sticky elements can be used inside the cover block.
+	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
 	overflow: hidden;
+	// Use clip instead of overflow: hidden so that sticky position works on child elements.
+	overflow: clip;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.

@@ -74,6 +74,7 @@ export default function SpacingInputControl( {
 
 	const previousValue = usePrevious( value );
 	if (
+		!! value &&
 		previousValue !== value &&
 		! isValueSpacingPreset( value ) &&
 		showCustomValueControl !== true
