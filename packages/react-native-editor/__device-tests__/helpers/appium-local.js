@@ -4,15 +4,16 @@
 const childProcess = require( 'child_process' );
 
 // Spawns an appium process.
-const start = ( localAppiumPort ) =>
+const start = ( { port = 4723, flags = '' } ) =>
 	new Promise( ( resolve, reject ) => {
 		const appium = childProcess.spawn( 'appium', [
 			'--port',
-			localAppiumPort.toString(),
+			port.toString(),
 			'--log',
 			'./appium-out.log',
 			'--log-no-colors',
 			'--relaxed-security', // Needed for mobile:shell commend for text entry on Android
+			flags,
 		] );
 
 		let appiumOutputBuffer = '';
