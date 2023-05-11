@@ -12,6 +12,7 @@ import {
 	SelectControl,
 	Button,
 	Popover,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
@@ -108,11 +109,13 @@ function Edit( props ) {
 							] }
 							onChange={ ( val ) => setDir( val ) }
 						/>
-						<Button
-							variant="primary"
-							type="submit"
-							text={ __( 'Apply' ) }
-						/>
+						<HStack alignment="right" spacing="0">
+							<Button
+								variant="primary"
+								type="submit"
+								text={ __( 'Apply' ) }
+							/>
+						</HStack>
 					</form>
 				</Popover>
 			) }
