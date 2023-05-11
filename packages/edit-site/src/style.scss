@@ -5,6 +5,7 @@
 @import "./components/canvas-spinner/style.scss";
 @import "./components/code-editor/style.scss";
 @import "./components/global-styles/style.scss";
+@import "./components/global-styles/screen-revisions/style.scss";
 @import "./components/header-edit-mode/style.scss";
 @import "./components/header-edit-mode/document-actions/style.scss";
 @import "./components/list/style.scss";
@@ -25,8 +26,10 @@
 @import "./components/sidebar-button/style.scss";
 @import "./components/sidebar-navigation-item/style.scss";
 @import "./components/sidebar-navigation-screen/style.scss";
+@import "./components/sidebar-navigation-screen-pages/style.scss";
 @import "./components/sidebar-navigation-screen-template/style.scss";
 @import "./components/sidebar-navigation-screen-templates/style.scss";
+@import "./components/sidebar-navigation-subtitle/style.scss";
 @import "./components/site-hub/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
 @import "./components/site-icon/style.scss";
@@ -85,7 +88,7 @@ body.site-editor-php {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $gray-800;
+		background-color: $gray-900;
 	}
 }
 

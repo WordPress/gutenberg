@@ -212,44 +212,6 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 }
 
 /**
- * This method is no longer used and has been deprecated in Core since 6.1.0.
- *
- * It can be deleted once Gutenberg's minimum supported WordPress version is >= 6.1
- *
- * Generates an inline style for a typography feature e.g. text decoration,
- * text transform, and font style.
- *
- * @since 5.8.0
- * @deprecated 6.1.0
- *
- * @param array  $attributes   Block's attributes.
- * @param string $feature      Key for the feature within the typography styles.
- * @param string $css_property Slug for the CSS property the inline style sets.
- *
- * @return string              CSS inline style.
- */
-function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
-	// Retrieve current attribute value or skip if not found.
-	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
-	if ( ! $style_value ) {
-		return;
-	}
-
-	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
-		return sprintf( '%s:%s;', $css_property, $style_value );
-	}
-
-	// We have a preset CSS variable as the style.
-	// Get the style value from the string and return CSS style.
-	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	$slug            = substr( $style_value, $index_to_splice );
-
-	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
-	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
-}
-
-/**
  * Renders typography styles/content to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -303,12 +265,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
 
-	// Converts numbers to pixel values by default.
+	// Converts numeric values to pixel values by default.
 	if ( is_numeric( $raw_value ) ) {
 		$raw_value = $raw_value . 'px';
 	}
@@ -467,7 +428,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	}
 
 	// Checks if fluid font sizes are activated.
-	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
+	$global_settings     = gutenberg_get_global_settings();
+	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
+	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+
 	$should_use_fluid_typography
 		= isset( $typography_settings['fluid'] ) &&
 		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
@@ -481,7 +445,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
 
 	// Defaults.
-	$default_maximum_viewport_width       = '1600px';
+	$default_maximum_viewport_width       = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : '1600px';
 	$default_minimum_viewport_width       = '320px';
 	$default_minimum_font_size_factor_max = 0.75;
 	$default_minimum_font_size_factor_min = 0.25;

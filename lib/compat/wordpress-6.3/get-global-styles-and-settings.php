@@ -124,3 +124,37 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 function gutenberg_get_remote_theme_patterns() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
+
+/**
+ * Gets the styles resulting of merging core, theme, and user data.
+ *
+ * @since 5.9.0
+ * @since 6.3.0 the internal link format "var:preset|color|secondary" is resolved
+ * to "var(--wp--preset--font-size--small)" so consumers don't have to.
+ *
+ * @param array $path    Path to the specific style to retrieve. Optional.
+ *                       If empty, will return all styles.
+ * @param array $context {
+ *     Metadata to know where to retrieve the $path from. Optional.
+ *
+ *     @type string $block_name Which block to retrieve the styles from.
+ *                              If empty, it'll return the styles for the global context.
+ *     @type string $origin     Which origin to take data from.
+ *                              Valid values are 'all' (core, theme, and user) or 'base' (core and theme).
+ *                              If empty or unknown, 'all' is used.
+ * }
+ * @return array The styles to retrieve.
+ */
+function gutenberg_get_global_styles( $path = array(), $context = array() ) {
+	if ( ! empty( $context['block_name'] ) ) {
+		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
+	}
+
+	$origin = 'custom';
+	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
+		$origin = 'theme';
+	}
+	$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles'];
+
+	return _wp_array_get( $styles, $path, $styles );
+}

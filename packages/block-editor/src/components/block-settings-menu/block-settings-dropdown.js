@@ -24,7 +24,6 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  */
 import BlockActions from '../block-actions';
 import BlockIcon from '../block-icon';
-import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
@@ -278,7 +277,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert before' ) }
+											{ __( 'Add before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ pipe(
@@ -287,22 +286,9 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert after' ) }
+											{ __( 'Add after' ) }
 										</MenuItem>
 									</>
-								) }
-								{ canMove && ! onlyBlock && (
-									<MenuItem
-										onClick={ pipe( onClose, onMoveTo ) }
-									>
-										{ __( 'Move to' ) }
-									</MenuItem>
-								) }
-								{ count === 1 && (
-									<BlockModeToggle
-										clientId={ firstBlockClientId }
-										onToggle={ onClose }
-									/>
 								) }
 							</MenuGroup>
 							<MenuGroup>
@@ -316,7 +302,14 @@ export function BlockSettingsDropdown( {
 								</MenuItem>
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
-								fillProps={ { onClose } }
+								fillProps={ {
+									onClose,
+									canMove,
+									onMoveTo,
+									onlyBlock,
+									count,
+									firstBlockClientId,
+								} }
 								clientIds={ clientIds }
 								__unstableDisplayLocation={
 									__unstableDisplayLocation

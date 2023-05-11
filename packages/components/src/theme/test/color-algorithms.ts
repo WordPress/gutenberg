@@ -53,9 +53,9 @@ describe( 'Theme color algorithms', () => {
 				'wp.components.Theme: The background color ("#000") does not have sufficient contrast against the accent color ("#111").'
 			);
 
-			generateThemeVariables( { background: '#eee' } );
+			generateThemeVariables( { background: '#1a1a1a' } );
 			expect( console ).toHaveWarnedWith(
-				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#007cba").'
+				'wp.components.Theme: The background color ("#1a1a1a") does not have sufficient contrast against the accent color ("#3858e9").'
 			);
 		} );
 
