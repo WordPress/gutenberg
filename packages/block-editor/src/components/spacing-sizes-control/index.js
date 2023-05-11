@@ -18,7 +18,7 @@ import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import LinkedButton from './linked-button';
 import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
-import useSetting from '../use-setting';
+import useSpacingSizes from './hooks/use-spacing-sizes';
 
 export default function SpacingSizesControl( {
 	inputProps,
@@ -32,18 +32,7 @@ export default function SpacingSizesControl( {
 	onMouseOver,
 	onMouseOut,
 } ) {
-	const spacingSizes = [
-		{ name: 0, slug: '0', size: 0 },
-		...( useSetting( 'spacing.spacingSizes' ) || [] ),
-	];
-
-	if ( spacingSizes.length > 8 ) {
-		spacingSizes.unshift( {
-			name: __( 'Default' ),
-			slug: 'default',
-			size: undefined,
-		} );
-	}
+	const spacingSizes = useSpacingSizes();
 
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( values );
