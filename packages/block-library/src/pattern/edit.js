@@ -14,7 +14,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { inheritedAlignment, slug, templateLock } = attributes;
+	const { inheritedAlignment, slug, syncStatus } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -29,8 +29,11 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		},
 		[ slug, clientId ]
 	);
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlocks,
+		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
@@ -43,23 +46,32 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceInnerBlocks(
-					clientId,
-					selectedPattern.blocks.map( ( block ) =>
-						cloneBlock( block )
-					)
-				);
+				if ( syncStatus === 'partial' ) {
+					replaceInnerBlocks(
+						clientId,
+						selectedPattern.blocks.map( ( block ) =>
+							cloneBlock( block )
+						)
+					);
+					return;
+				}
+				replaceBlocks( clientId, selectedPattern.blocks );
 			} );
 		}
 	}, [
 		clientId,
-		selectedPattern?.blocks,
+		selectedPattern.blocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		innerBlocks,
+		syncStatus,
+		replaceBlocks,
 	] );
 
 	useEffect( () => {
+		if ( syncStatus !== 'partial' ) {
+			return;
+		}
 		const alignments = [ 'wide', 'full' ];
 		const blocks = innerBlocks;
 		if ( ! blocks || blocks.length === 0 ) {
@@ -81,36 +93,30 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		} );
 	}, [
 		innerBlocks,
-		selectedPattern?.blocks,
+		selectedPattern.blocks,
 		setAttributes,
 		inheritedAlignment,
+		syncStatus,
 	] );
 
 	const blockProps = useBlockProps( {
-		className: inheritedAlignment && `align${ inheritedAlignment }`,
-	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: templateLock === 'contentOnly' ? 'contentOnly' : false,
+		className:
+			syncStatus === 'partial' &&
+			inheritedAlignment &&
+			`align${ inheritedAlignment }`,
 	} );
 
-	const handleSync = () => {
-		if ( templateLock === false ) {
-			setAttributes( { templateLock: 'contentOnly' } );
-		} else {
-			setAttributes( { templateLock: false } );
-		}
-	};
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,
+	} );
+
+	if ( syncStatus !== 'partial' ) {
+		return <div { ...blockProps } />;
+	}
 
 	return (
 		<>
 			<div { ...innerBlocksProps } />
-			<BlockControls group="other">
-				<ToolbarButton onClick={ handleSync }>
-					{ templateLock === false
-						? __( 'Edit content only' )
-						: __( 'Edit all' ) }
-				</ToolbarButton>
-			</BlockControls>
 		</>
 	);
 };

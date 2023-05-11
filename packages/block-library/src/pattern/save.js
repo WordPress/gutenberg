@@ -4,10 +4,10 @@
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function save( {
-	attributes: { inheritedAlignment },
+	attributes: { inheritedAlignment, syncStatus },
 	innerBlocks,
 } ) {
-	if ( innerBlocks?.length === 0 ) {
+	if ( innerBlocks?.length === 0 || syncStatus !== 'partial' ) {
 		return;
 	}
 	const blockProps = useBlockProps.save( {
