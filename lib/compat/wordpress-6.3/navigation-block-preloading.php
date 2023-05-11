@@ -50,12 +50,27 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 				'context'  => 'edit',
 				'per_page' => '100',
 				'status'   => 'publish',
-				'_locale'  => 'user',
 			),
 			$navigation_rest_route
 		),
 		'GET',
 	);
+
+	// Preload request for Browse Mode sidebar.
+	$preload_paths[] = array(
+		add_query_arg(
+			array(
+				'context'  => 'edit',
+				'per_page' => '1',
+				'status'   => 'publish',
+				'order'    => 'desc',
+				'orderby'  => 'date',
+			),
+			$navigation_rest_route
+		),
+		'GET',
+	);
+
 
 	return $preload_paths;
 }
