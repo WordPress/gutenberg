@@ -1190,6 +1190,8 @@ _Parameters_
 
 Action that inserts a single block, optionally at a specific index respective a root block list.
 
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
+
 _Parameters_
 
 -   _block_ `Object`: Block object to insert.
@@ -1205,6 +1207,8 @@ _Returns_
 ### insertBlocks
 
 Action that inserts an array of blocks, optionally at a specific index respective a root block list.
+
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
 
 _Parameters_
 

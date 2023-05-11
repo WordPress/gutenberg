@@ -75,6 +75,7 @@ export function UnforwardedButton(
 	ref: ForwardedRef< any >
 ) {
 	const {
+		__next40pxDefaultSize,
 		isSmall,
 		isPressed,
 		isBusy,
@@ -115,6 +116,7 @@ export function UnforwardedButton(
 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
 	const classes = classnames( 'components-button', className, {
+		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
 		'is-small': isSmall,

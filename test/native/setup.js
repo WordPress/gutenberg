@@ -228,6 +228,9 @@ jest.mock(
 		},
 	} )
 );
+jest.mock( 'react-native/Libraries/ActionSheetIOS/ActionSheetIOS', () => ( {
+	showActionSheetWithOptions: jest.fn(),
+} ) );
 
 // The mock provided by the package itself does not appear to work correctly.
 // Specifically, the mock provides a named export, where the module itself uses

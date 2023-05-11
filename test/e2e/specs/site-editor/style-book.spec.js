@@ -27,7 +27,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should disable toolbar butons when open', async ( { page } ) => {
+	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
 		).not.toBeVisible();
@@ -111,7 +111,6 @@ test.describe( 'Style Book', () => {
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
 		await page.click( 'role=button[name="Heading block styles"]' );
-		await page.click( 'role=button[name="Typography styles"]' );
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )

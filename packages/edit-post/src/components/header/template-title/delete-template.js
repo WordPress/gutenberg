@@ -59,7 +59,6 @@ export default function DeleteTemplate() {
 			)
 		);
 		updateEditorSettings( {
-			...settings,
 			availableTemplates: newAvailableTemplates,
 		} );
 		deleteEntityRecord( 'postType', 'wp_template', template.id, {

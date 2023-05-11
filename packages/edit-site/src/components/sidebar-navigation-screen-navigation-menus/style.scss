@@ -2,26 +2,6 @@
 	margin: 0 0 $grid-unit-40 $grid-unit-20;
 }
 
-.edit-site-sidebar-navigation-screen-navigation-menus__placeholder {
-	padding: $grid-unit-10;
-	margin: $grid-unit-10;
-	background-color: $gray-100;
-	animation: loadingpulse 1s linear infinite;
-	animation-delay: 0.5s; // avoid animating for fast network responses
-}
-
-@keyframes loadingpulse {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
 	.offcanvas-editor-list-view-leaf {
 		max-width: calc(100% - #{ $grid-unit-05 });
