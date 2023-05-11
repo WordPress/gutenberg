@@ -471,6 +471,9 @@ export default function NavigationLinkEdit( {
 						} }
 						label={ __( 'Title attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'Provide additional information to help clarify or further describe the purpose of the link.'
+						) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
@@ -480,6 +483,9 @@ export default function NavigationLinkEdit( {
 						} }
 						label={ __( 'Rel attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'The relationship of the linked URL as space-separated link types.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
