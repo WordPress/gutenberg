@@ -32,7 +32,7 @@ function render_block_core_pattern( $attributes, $content ) {
 		return '';
 	}
 	$slug_classname = str_replace( '/', '-', $attributes['slug'] );
-	$classnames = isset($attributes['className']) ?  $attributes['className'] . ' ' . $slug_classname : $slug_classname;
+	$classnames     = isset( $attributes['className'] ) ?  $attributes['className'] . ' ' . $slug_classname : $slug_classname;
 	$wrapper = '<div class="'. esc_html( $classnames ) . '">%s</div>';
 
 	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
