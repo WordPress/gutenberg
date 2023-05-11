@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -8,6 +9,8 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
+const getHostUser = require( '../get-host-user' );
+const { ValidationError } = require( '../config' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -30,6 +33,8 @@ module.exports = async function run( {
 	spinner,
 	debug,
 } ) {
+	validateContainerExistence( container );
+
 	const config = await initConfig( { spinner, debug } );
 
 	command = command.join( ' ' );
@@ -43,6 +48,42 @@ module.exports = async function run( {
 };
 
 /**
+ * Validates the container option and throws if it is invalid.
+ *
+ * @param {string} container The Docker container to run the command on.
+ */
+function validateContainerExistence( container ) {
+	// Give better errors for containers that we have removed.
+	if ( container === 'phpunit' ) {
+		throw new ValidationError(
+			"The 'phpunit' container has been removed. Please use 'wp-env run tests-cli --env-cwd=wp-content/path/to/plugin phpunit' instead."
+		);
+	}
+	if ( container === 'composer' ) {
+		throw new ValidationError(
+			"The 'composer' container has been removed. Please use 'wp-env run cli --env-cwd=wp-content/path/to/plugin composer' instead."
+		);
+	}
+
+	// Provide better error output than Docker's "service does not exist" messaging.
+	const validContainers = [
+		'mysql',
+		'tests-mysql',
+		'wordpress',
+		'tests-wordpress',
+		'cli',
+		'tests-cli',
+	];
+	if ( ! validContainers.includes( container ) ) {
+		throw new ValidationError(
+			`The '${ container }' container does not exist. Valid selections are: ${ validContainers.join(
+				', '
+			) }`
+		);
+	}
+}
+
+/**
  * Runs an arbitrary command on the given Docker container.
  *
  * @param {WPConfig} config    The wp-env configuration.
@@ -52,16 +93,31 @@ module.exports = async function run( {
  * @param {Object}   spinner   A CLI spinner which indicates progress.
  */
 function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
-	// We need to pass absolute paths to the container.
-	envCwd = path.resolve( '/var/www/html', envCwd );
+	// Both the `wordpress` and `tests-wordpress` containers have the host's
+	// user so that they can maintain ownership parity with the host OS.
+	// We should run any commands as that user so that they are able
+	// to interact with the files mounted from the host.
+	const hostUser = getHostUser();
 
+	// We need to pass absolute paths to the container.
+	envCwd = path.resolve(
+		// Not all containers have the same starting working directory.
+		container === 'mysql' || container === 'tests-mysql'
+			? '/'
+			: '/var/www/html',
+		envCwd
+	);
+
+	const isTTY = process.stdout.isTTY;
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
-		'run',
+		'exec',
+		! isTTY ? '-T' : '',
 		'-w',
 		envCwd,
-		'--rm',
+		'--user',
+		hostUser.fullUser,
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
 	];

@@ -1,0 +1,99 @@
+
+.edit-site-global-styles-screen-revisions {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-revisions__revisions-list {
+	list-style: none;
+	margin: 0;
+	li {
+		margin-bottom: 0;
+		border-left: 1px solid $gray-300;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__revision-item {
+	position: relative;
+	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
+
+	&:first-child {
+		padding-top: 0;
+	}
+
+	&:last-child {
+		padding-bottom: 0;
+	}
+
+	&::before {
+		background: $gray-300;
+		border-radius: 50%;
+		content: "\a";
+		display: inline-block;
+		height: $grid-unit-10;
+		width: $grid-unit-10;
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translate(-50%, -50%);
+	}
+	&.is-current::before {
+		background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	}
+}
+
+.edit-site-global-styles-screen-revisions__revision-button {
+	width: 100%;
+	height: auto;
+	display: block;
+	padding: $grid-unit-10 $grid-unit-15;
+
+	&:hover {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+		.edit-site-global-styles-screen-revisions__date {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.is-current {
+	.edit-site-global-styles-screen-revisions__revision-button {
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		opacity: 1;
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	}
+
+	.edit-site-global-styles-screen-revisions__meta {
+		color: var(--wp-admin-theme-color);
+	}
+}
+
+.edit-site-global-styles-screen-revisions__button {
+	justify-content: center;
+	width: 100%;
+}
+
+.edit-site-global-styles-screen-revisions__description {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: $grid-unit-10;
+}
+
+.edit-site-global-styles-screen-revisions__meta {
+	color: $gray-700;
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	align-items: center;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		border-radius: 100%;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__loading {
+	margin: $grid-unit-30 auto !important;
+}

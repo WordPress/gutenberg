@@ -23,8 +23,6 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments',
 				'details',
-				'details-content',
-				'details-summary',
 				'group',
 				'html',
 				'list',
@@ -137,8 +135,6 @@ function gutenberg_reregister_core_block_types() {
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
-		$registry = WP_Block_Type_Registry::get_instance();
-
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
 
@@ -150,10 +146,7 @@ function gutenberg_reregister_core_block_types() {
 				continue;
 			}
 
-			if ( $registry->is_registered( $metadata['name'] ) ) {
-				$registry->unregister( $metadata['name'] );
-			}
-
+			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
 			gutenberg_register_core_block_assets( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
@@ -165,9 +158,7 @@ function gutenberg_reregister_core_block_types() {
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
 			foreach ( $sub_block_names_normalized as $block_name ) {
-				if ( $registry->is_registered( $block_name ) ) {
-					$registry->unregister( $block_name );
-				}
+				gutenberg_deregister_core_block_and_assets( $block_name );
 				gutenberg_register_core_block_assets( $block_name );
 			}
 
@@ -177,6 +168,28 @@ function gutenberg_reregister_core_block_types() {
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Deregisters the existing core block type and its assets.
+ *
+ * @param string $block_name The name of the block.
+ *
+ * @return void
+ */
+function gutenberg_deregister_core_block_and_assets( $block_name ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->is_registered( $block_name ) ) {
+		$block_type = $registry->get_registered( $block_name );
+		if ( ! empty( $block_type->view_script_handles ) ) {
+			foreach ( $block_type->view_script_handles as $view_script_handle ) {
+				if ( str_starts_with( $view_script_handle, 'wp-block-' ) ) {
+					wp_deregister_script( $view_script_handle );
+				}
+			}
+		}
+		$registry->unregister( $block_name );
+	}
+}
 
 /**
  * Registers block styles for a core block.

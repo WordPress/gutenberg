@@ -197,7 +197,7 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
 }
 
 /**
- * Request to render an unsuported block.
+ * Request to render an unsupported block.
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
@@ -287,6 +287,18 @@ export function requestImageFullscreenPreview(
 	}
 	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview(
 		originalImageUrl || currentImageUrl
+	);
+}
+
+export function requestEmbedFullscreenPreview( content, title ) {
+	if ( isIOS ) {
+		/* eslint-disable-next-line no-console */
+		console.warn( 'requestEmbedFullscreenPreview is not supported on iOS' );
+		return;
+	}
+	return RNReactNativeGutenbergBridge.requestEmbedFullscreenPreview(
+		content,
+		title
 	);
 }
 
