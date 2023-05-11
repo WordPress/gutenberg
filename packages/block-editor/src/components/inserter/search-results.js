@@ -50,7 +50,19 @@ function InserterSearchResults( {
 	selectBlockOnInsert,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const { getBlockListSettings } = useSelect( blockEditorStore );
+
+	const { parentInserterPriority } = useSelect(
+		( select ) => {
+			const { inserterPriority } =
+				select( blockEditorStore ).getBlockListSettings( rootClientId );
+
+			return {
+				parentInserterPriority: inserterPriority,
+			};
+		},
+		[ rootClientId ]
+	);
+
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
@@ -70,9 +82,6 @@ function InserterSearchResults( {
 		onInsertBlocks,
 		destinationRootClientId
 	);
-
-	const parentBlockListSettings = getBlockListSettings( rootClientId );
-	const parentInserterPriority = parentBlockListSettings?.inserterPriority;
 
 	const filteredBlockPatterns = useMemo( () => {
 		if ( maxBlockPatterns === 0 ) {
