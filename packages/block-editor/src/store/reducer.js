@@ -745,16 +745,12 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-const withBlockFilters = ( reducer ) => ( state, action ) => {
-	const newState = reducer( state, action );
-	const filteredState = applyFilters(
-		'blockEditor.higherOrderReducer',
-		newState,
-		reducer
-	);
+// The random number is used so it can't be used without the unlocker.
+// eslint-disable-next-line no-restricted-syntax
+export const horKey = 'blockEditor.higherOrderReducer' + Math.random();
 
-	return filteredState;
-};
+const withHorFilters = ( reducer ) => ( state, action ) =>
+	applyFilters( horKey, reducer( state, action ), reducer );
 
 /**
  * Reducer returning the blocks state.
@@ -774,7 +770,7 @@ export const blocks = pipe(
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 	withResetControlledBlocks,
-	withBlockFilters
+	withHorFilters
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact

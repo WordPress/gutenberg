@@ -465,14 +465,14 @@ function findContent( blocks, richTextValues = [] ) {
 
 	for ( const block of blocks ) {
 		if (
-			block.type?.__unstableIsRichTextContent ===
+			block?.type?.__unstableIsRichTextContent ===
 			ForwardedRichTextContainer.Content.__unstableIsRichTextContent
 		) {
 			richTextValues.push( block.props.value );
 			continue;
 		}
 
-		if ( block.props?.children ) {
+		if ( block?.props?.children ) {
 			findContent( block.props.children, richTextValues );
 		}
 	}
