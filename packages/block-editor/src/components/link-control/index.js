@@ -99,10 +99,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  */
 
 const noop = () => {};
-const __newOnChangeForLinkControl = ( callback1, callback2, value ) => {
-	callback1( value );
-	callback2( value );
-};
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -165,6 +162,11 @@ function LinkControl( {
 		}
 	}, [ forceIsEditingLink ] );
 
+	const newOnChangeForLinkControl = ( data ) => {
+		setNewValue( data );
+		onChange( data );
+	};
+
 	useEffect( () => {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
@@ -208,7 +210,7 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		__newOnChangeForLinkControl( onChange, setNewValue, {
+		newOnChangeForLinkControl( {
 			...updatedValue,
 			title: internalTextInputValue || updatedValue?.title,
 		} );
@@ -216,7 +218,7 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		__newOnChangeForLinkControl( onChange, setNewValue, {
+		newOnChangeForLinkControl( {
 			...newValue,
 			url: currentUrlInputValue,
 			title: internalTextInputValue,
