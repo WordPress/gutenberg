@@ -8,7 +8,7 @@
 			"caption": "",
 			"href": "https://wordpress.org/",
 			"linkDestination": "custom",
-			"enableLightbox": true
+			"enableLightbox": false
 		},
 		"innerBlocks": []
 	}

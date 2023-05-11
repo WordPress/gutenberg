@@ -9,7 +9,7 @@
 			"href": "https://wordpress.org/",
 			"linkClass": "custom-link",
 			"linkDestination": "custom",
-			"enableLightbox": true
+			"enableLightbox": false
 		},
 		"innerBlocks": []
 	}

@@ -25,7 +25,7 @@
 					"id": 1421,
 					"sizeSlug": "large",
 					"linkDestination": "none",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -39,7 +39,7 @@
 					"id": 1440,
 					"sizeSlug": "large",
 					"linkDestination": "none",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			}

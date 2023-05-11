@@ -19,7 +19,7 @@
 					"caption": "",
 					"id": 1,
 					"linkDestination": "none",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -32,7 +32,7 @@
 					"caption": "",
 					"id": 2,
 					"linkDestination": "none",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			}

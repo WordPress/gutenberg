@@ -9,7 +9,7 @@
 			"caption": "",
 			"width": 100,
 			"height": 100,
-			"enableLightbox": true
+			"enableLightbox": false
 		},
 		"innerBlocks": []
 	}

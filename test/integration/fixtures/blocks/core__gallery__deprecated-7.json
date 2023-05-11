@@ -25,7 +25,7 @@
 					"id": 705,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -40,7 +40,7 @@
 					"id": 704,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -55,7 +55,7 @@
 					"id": 703,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			}
@@ -87,7 +87,7 @@
 					"id": 705,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -102,7 +102,7 @@
 					"id": 704,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -117,7 +117,7 @@
 					"id": 703,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": true
+					"enableLightbox": false
 				},
 				"innerBlocks": []
 			}
