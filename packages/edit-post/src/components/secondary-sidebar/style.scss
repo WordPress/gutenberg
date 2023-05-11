@@ -96,25 +96,39 @@
 }
 
 .edit-post-editor__list-view-overview {
-	display: flex;
-	gap: $grid-unit-10;
-	border-bottom: $border-width solid $gray-300;
-	padding: $grid-unit-20;
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin-bottom: $grid-unit-20;
+	margin-top: $grid-unit-20;
+	padding: 0;
 
-	& > div > p {
-		margin-top: 0;
-	}
+	> tbody {
+		> tr {
+			> td {
+				padding-bottom: $grid-unit-10;
+				padding-top: $grid-unit-10;
+				text-align: left;
+			}
 
-	& > div > p > span:first-child {
-		// Width of the text information fields.
-		width: 90px;
-		display: inline-block;
-	}
+			> td:first-of-type {
+				padding-left: $grid-unit-20;
+			}
 
-	& > div > p > span {
-		font-size: $helptext-font-size;
-		line-height: $default-line-height;
-		color: $gray-700;
+			> td:not(:first-of-type) {
+				padding-left: $grid-unit-10;
+			}
+
+			> td:last-of-type {
+				padding-right: $grid-unit-20;
+			}
+		}
+
+		> tr:last-of-type {
+			> td {
+				border-bottom: $border-width solid $gray-300;
+				padding-bottom: $grid-unit-20;
+			}
+		}
 	}
 }
 
