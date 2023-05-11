@@ -610,6 +610,15 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
 -	**Attributes:** slug
 
+## Playlist
+
+Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist))
+
+-	**Name:** core/playlist
+-	**Category:** media
+-	**Supports:** align, anchor, spacing (margin, padding)
+-	**Attributes:** artists, ids, images, order, tracklist, tracknumbers, type
+
 ## Author (deprecated)
 
 This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
