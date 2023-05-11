@@ -11,13 +11,7 @@ import {
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
-import BlockTitle from '../block-title';
-import { useListViewContext } from './context';
+import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -30,8 +24,7 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-submenu',
 ];
 
-function AddSubmenuItem( { block, onClose } ) {
-	const { expandedState, expand } = useListViewContext();
+function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -90,7 +83,6 @@ function AddSubmenuItem( { block, onClose } ) {
 export default function LeafMoreMenu( props ) {
 	const { block } = props;
 	const { clientId } = block;
-
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -139,7 +131,13 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						<AddSubmenuItem block={ block } onClose={ onClose } />
+						<AddSubmenuItem
+							block={ block }
+							onClose={ onClose }
+							expanded
+							expandedState={ props.expandedState }
+							expand={ props.expand }
+						/>
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

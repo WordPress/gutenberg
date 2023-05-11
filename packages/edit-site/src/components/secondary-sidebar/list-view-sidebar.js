@@ -19,6 +19,8 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 
+const { PrivateListView } = unlock( blockEditorPrivateApis );
+
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
@@ -31,7 +33,6 @@ export default function ListViewSidebar() {
 		}
 	}
 
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
