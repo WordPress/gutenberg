@@ -29,6 +29,11 @@ import type {
 	DropdownSubMenuTriggerProps,
 } from './types';
 
+// Menu content's side padding + 4px
+const SUB_MENU_OFFSET_SIDE = 12;
+// Opposite amount of the top padding of the menu item
+const SUB_MENU_OFFSET_ALIGN = -8;
+
 export const DropdownMenu = ( {
 	// Root props
 	defaultOpen,
@@ -124,8 +129,8 @@ export const DropdownSubMenu = ( {
 			<DropdownMenuPrimitive.Portal>
 				<DropdownMenuStyled.SubContent
 					loop
-					sideOffset={ 4 }
-					alignOffset={ -8 }
+					sideOffset={ SUB_MENU_OFFSET_SIDE }
+					alignOffset={ SUB_MENU_OFFSET_ALIGN }
 				>
 					{ children }
 				</DropdownMenuStyled.SubContent>
@@ -180,7 +185,7 @@ export const DropdownMenuCheckboxItem = ( {
 							icon={
 								checked === 'indeterminate' ? lineSolid : check
 							}
-							size={ 20 }
+							size={ 24 }
 						/>
 					) }
 				</DropdownMenuStyled.ItemIndicator>
@@ -214,7 +219,7 @@ export const DropdownMenuRadioItem = ( {
 		<DropdownMenuStyled.RadioItem { ...props }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
 				<DropdownMenuStyled.ItemIndicator>
-					<Icon icon={ radioDot } size={ 20 } />
+					<Icon icon={ radioDot } size={ 22 } />
 				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
 			{ children }

@@ -131,6 +131,18 @@ const MenuButton = styled.button`
 	}
 `;
 
+const ItemHelpText = styled.span`
+	font-size: 10px;
+	color: #777;
+
+	/* "> * > &" syntax is to target only immediate parent menu item */
+	[data-highlighted] > * > &,
+	[data-state='open'] > * > &,
+	[data-disabled] > * & {
+		color: inherit;
+	}
+`;
+
 const CheckboxItemsGroup = () => {
 	const {
 		itemOneChecked,
@@ -223,14 +235,9 @@ Default.args = {
 							} }
 						>
 							Submenu item
-							<span
-								style={ {
-									fontSize: '10px',
-									color: '#777',
-								} }
-							>
+							<ItemHelpText>
 								With additional custom text
-							</span>
+							</ItemHelpText>
 						</div>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />

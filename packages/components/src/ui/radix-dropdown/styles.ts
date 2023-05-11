@@ -18,7 +18,9 @@ const ANIMATION_PARAMS = {
 	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
 };
 
-const ITEM_HORIZONTAL_PADDING = space( 2 );
+const ITEM_PREFIX_WIDTH = space( 7 );
+const ITEM_PADDING_INLINE_START = space( 2 );
+const ITEM_PADDING_INLINE_END = space( 2.5 );
 
 const slideUpAndFade = keyframes( {
 	'0%': {
@@ -55,12 +57,12 @@ const slideLeftAndFade = keyframes( {
 const baseContent = css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
-	border: 1px solid ${ COLORS.ui.border };
-	border-radius: 2px;
+	border-radius: 6px;
 	padding: ${ space( 2 ) };
-	box-shadow: 0 0.7px 1px rgba( 0, 0, 0, 0.1 ),
-		0 1.2px 1.7px -0.2px rgba( 0, 0, 0, 0.1 ),
-		0 2.3px 3.3px -0.5px rgba( 0, 0, 0, 0.1 );
+	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
+		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
+		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
+		0px 0.7px 1px rgba( 0, 0, 0, 0.1 );
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 	will-change: transform, opacity;
@@ -86,6 +88,66 @@ const baseContent = css`
 	}
 `;
 
+const itemPrefix = css`
+	width: ${ ITEM_PREFIX_WIDTH };
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* Prefixes don't get affected by the item's inline start padding */
+	margin-inline-start: calc( -1 * ${ ITEM_PADDING_INLINE_START } );
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
+`;
+
+const itemSuffix = css`
+	width: max-content;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* Push prefix to the inline-end of the item */
+	margin-inline-start: auto;
+	/* Minimum space between the item's content and suffix */
+	padding-inline-start: ${ space( 6 ) };
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
+
+	/*
+		Override color in normal conditions, but inherit the item's color
+	  for altered conditions.
+
+		TODO:
+		  - For now, used opacity like for disabled item, which makes it work
+			  regardless of the theme
+		  - how do we translate this for themes? Should we have a new variable
+		for "secondary" text?
+	*/
+	opacity: 0.6;
+
+	[data-highlighted] > &,
+	[data-state='open'] > &,
+	[data-disabled] > & {
+		opacity: 1;
+	}
+`;
+
+export const ItemPrefixWrapper = styled.span`
+	${ itemPrefix }
+`;
+
+export const ItemSuffixWrapper = styled.span`
+	${ itemSuffix }
+`;
+
 const baseItem = css`
 	all: unset;
 	font-size: ${ font( 'default.fontSize' ) };
@@ -96,13 +158,19 @@ const baseItem = css`
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
-	padding: ${ space( 2 ) } ${ ITEM_HORIZONTAL_PADDING };
+	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+		${ ITEM_PADDING_INLINE_START };
 	position: relative;
 	user-select: none;
 	outline: none;
 
 	&[data-disabled] {
-		color: ${ COLORS.ui.textDisabled };
+		/*
+			TODO:
+			  - we need a disabled color in the Theme variables
+			  - design specs use opacity instead of setting a new text color
+		*/
+		opacity: 0.5;
 		pointer-events: none;
 	}
 
@@ -119,37 +187,10 @@ const baseItem = css`
 	svg {
 		fill: currentColor;
 	}
-`;
 
-const itemPrefix = css`
-	width: ${ space( 8 ) };
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	margin-inline-start: calc( -1 * ${ ITEM_HORIZONTAL_PADDING } );
-	/*
-		Negative margin allows the suffix to be as tall as the whole item
-		(incl. padding) before increasing the items' height. This can be useful,
-		e.g., when using icons that are bigger than 20x20 px
-	*/
-	margin-top: ${ space( -2 ) };
-	margin-bottom: ${ space( -2 ) };
-`;
-
-const itemSuffix = css`
-	width: max-content;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	margin-inline-start: auto;
-	padding-inline-start: ${ space( 6 ) };
-	/*
-		Negative margin allows the suffix to be as tall as the whole item
-		(incl. padding) before increasing the items' height. This can be useful,
-		e.g., when using icons that are bigger than 20x20 px
-	*/
-	margin-top: ${ space( -2 ) };
-	margin-bottom: ${ space( -2 ) };
+	&:not( :has( ${ ItemPrefixWrapper } ) ) {
+		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
+	}
 `;
 
 export const Content = styled( DropdownMenu.Content )`
@@ -179,31 +220,35 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 `;
 
 export const Label = styled( DropdownMenu.Label )`
-	padding: 0 ${ ITEM_HORIZONTAL_PADDING };
-	font-size: ${ font( 'helpText.fontSize' ) };
-	line-height: ${ space( 7 ) };
-	color: ${ COLORS.ui.textDisabled };
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	min-height: ${ space( 8 ) };
+
+	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+		${ ITEM_PREFIX_WIDTH };
+	/* TODO: color doesn't match available UI variables */
+	color: ${ COLORS.gray[ 700 ] };
+
+	/* TODO: font size doesn't match available ones via "font" utils */
+	font-size: 11px;
+	line-height: 1.4;
+	font-weight: 500;
+	text-transform: uppercase;
 `;
 
 export const Separator = styled( DropdownMenu.Separator )`
 	height: 1px;
-	background-color: ${ COLORS.ui.border };
+	/* TODO: doesn't match border color from variables */
+	background-color: ${ COLORS.ui.borderDisabled };
 	/* Negative horizontal margin to make separator go from side to side */
-	margin: ${ space( 2 ) } ${ space( -2 ) };
+	margin: ${ space( 2 ) } 0;
 `;
 
 export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-`;
-
-export const ItemPrefixWrapper = styled.span`
-	${ itemPrefix }
-`;
-
-export const ItemSuffixWrapper = styled.span`
-	${ itemSuffix }
 `;
 
 export const SubmenuRtlChevronIcon = styled( Icon )`
