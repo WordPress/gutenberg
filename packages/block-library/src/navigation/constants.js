@@ -15,7 +15,7 @@ export const ALLOWED_BLOCKS = [
 	'core/loginout',
 ];
 
-export const INSERTER_PRIORITY = [
+export const PRIORITIZED_INSERTER_BLOCKS = [
 	'core/navigation-link/page',
 	'core/navigation-link',
 ];
