@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import {
 	getBlockMenuDefaultClassName,
 	cloneBlock,
@@ -58,7 +57,7 @@ export function useBlockVariationTransforms( { clientIds, blocks } ) {
 	return transformations;
 }
 
-const BlockVariationTransformationsMenu = ( {
+const BlockVariationTransformations = ( {
 	transformations,
 	onSelect,
 	blocks,
@@ -66,7 +65,7 @@ const BlockVariationTransformationsMenu = ( {
 	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
 		useState();
 	return (
-		<MenuGroup label={ __( 'Variations' ) }>
+		<>
 			{ hoveredTransformItemName && (
 				<PreviewBlockPopover
 					blocks={ cloneBlock(
@@ -85,7 +84,7 @@ const BlockVariationTransformationsMenu = ( {
 					setHoveredTransformItemName={ setHoveredTransformItemName }
 				/>
 			) ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -111,4 +110,4 @@ function BlockVariationTranformationItem( {
 	);
 }
 
-export default BlockVariationTransformationsMenu;
+export default BlockVariationTransformations;

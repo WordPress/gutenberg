@@ -24,10 +24,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import BlockTransformationsMenu from './block-transformations-menu';
-import {
-	useBlockVariationTransforms,
-	default as BlockVariationTransformationsMenu,
-} from './block-variation-transformations-menu';
+import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
@@ -184,10 +181,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					blocks.length
 			  );
 
+	const hasBlockOrBlockVariationTransforms =
+		hasPossibleBlockTransformations ||
+		hasPossibleBlockVariationTransformations;
 	const showDropDown =
 		hasBlockStyles ||
-		hasPossibleBlockTransformations ||
-		hasPossibleBlockVariationTransformations ||
+		hasBlockOrBlockVariationTransforms ||
 		hasPatternTransformation;
 	return (
 		<ToolbarGroup>
@@ -238,26 +237,21 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											} }
 										/>
 									) }
-									{ hasPossibleBlockTransformations && (
+									{ hasBlockOrBlockVariationTransforms && (
 										<BlockTransformationsMenu
 											className="block-editor-block-switcher__transforms__menugroup"
 											possibleBlockTransformations={
 												possibleBlockTransformations
+											}
+											possibleBlockVariationTransformations={
+												blockVariationTransformations
 											}
 											blocks={ blocks }
 											onSelect={ ( name ) => {
 												onBlockTransform( name );
 												onClose();
 											} }
-										/>
-									) }
-									{ hasPossibleBlockVariationTransformations && (
-										<BlockVariationTransformationsMenu
-											transformations={
-												blockVariationTransformations
-											}
-											blocks={ blocks }
-											onSelect={ ( name ) => {
+											onSelectVariation={ ( name ) => {
 												onBlockVariationTransform(
 													name
 												);
