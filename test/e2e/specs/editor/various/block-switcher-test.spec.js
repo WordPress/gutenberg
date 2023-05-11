@@ -34,10 +34,12 @@ test.describe( 'Block Switcher', () => {
 		);
 		// Transform to `Stack` variation.
 		await editor.clickBlockToolbarButton( 'Stack' );
+		const variations = page.getByRole( 'menu', { name: 'Stack' } )
+			.getByRole( 'group', { name: 'variations' } );
 		await expect(
-			page.locator( 'role=menuitem[name="Stack"i]' )
+			variations.getByRole( 'menuitem', { name: 'Stack' } )
 		).toBeHidden();
-		await page.click( 'role=menuitem[name="Row"i]' );
+		await variations.getByRole( 'menuitem', { name: 'Row' } ).click();
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
