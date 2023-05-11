@@ -17,6 +17,8 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 
+const EMPTY_OBJECT = {};
+
 export function useBlockVariationTransforms( { clientIds, blocks } ) {
 	const { activeBlockVariation, blockVariationTransformations } = useSelect(
 		( select ) => {
@@ -33,7 +35,7 @@ export function useBlockVariationTransforms( { clientIds, blocks } ) {
 			const canRemove = canRemoveBlocks( clientIds, rootClientId );
 			// Only handle single selected blocks for now.
 			if ( blocks.length !== 1 || ! canRemove ) {
-				return;
+				return EMPTY_OBJECT;
 			}
 			const [ firstBlock ] = blocks;
 			return {
