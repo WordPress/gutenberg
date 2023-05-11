@@ -13,7 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 -   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
 -   [*] Use host app namespace in reusable block message [#50478]
--   [**] Fix bug affecting undo and redo history when instering a link configured to open in a new tab [#50460]
+-   [**] Fix bug affecting undo and redo history when inserting a link configured to open in a new tab [#50460]
 
 ## 1.94.0
 -   [*] Split pasted content between title and body. [#37169]
