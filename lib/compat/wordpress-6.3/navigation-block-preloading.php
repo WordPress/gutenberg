@@ -9,7 +9,8 @@
 /**
  * Preloads requests needed for Navigation posts
  *
- * @param array $preload_paths    Preload paths to be filtered.
+ * @param array                   $preload_paths    Preload paths to be filtered.
+ * @param WP_Block_Editor_Context $context          The current block editor context.
  * @return array
  */
 function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
