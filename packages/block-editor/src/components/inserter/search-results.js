@@ -71,11 +71,12 @@ function InserterSearchResults( {
 
 	const { prioritisedBlocks } = useSelect(
 		( select ) => {
-			const { prioritizedInserterBlocks } =
+			const blockListSettings =
 				select( blockEditorStore ).getBlockListSettings( rootClientId );
 
 			return {
-				prioritisedBlocks: prioritizedInserterBlocks,
+				prioritisedBlocks:
+					blockListSettings?.prioritizedInserterBlocks || [],
 			};
 		},
 		[ rootClientId ]
@@ -123,7 +124,7 @@ function InserterSearchResults( {
 
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
 
-		if ( ! filterValue && prioritisedBlocks ) {
+		if ( ! filterValue && prioritisedBlocks.length ) {
 			orderedItems = orderInitialBlockItems(
 				orderedItems,
 				prioritisedBlocks
