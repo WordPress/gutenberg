@@ -38,7 +38,6 @@ const orderInitialBlockItems = ( items, priority ) => {
 		return items;
 	}
 
-	// Sort is "in place".
 	items.sort( ( { id: aName }, { id: bName } ) => {
 		// Sort block items according to `priority`.
 		let aIndex = priority.indexOf( aName );
