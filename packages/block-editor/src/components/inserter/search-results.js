@@ -69,13 +69,13 @@ function InserterSearchResults( {
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	const { prioritisedBlocks } = useSelect(
+	const { prioritizedBlocks } = useSelect(
 		( select ) => {
 			const blockListSettings =
 				select( blockEditorStore ).getBlockListSettings( rootClientId );
 
 			return {
-				prioritisedBlocks:
+				prioritizedBlocks:
 					blockListSettings?.prioritizedInserterBlocks || [],
 			};
 		},
@@ -124,10 +124,10 @@ function InserterSearchResults( {
 
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
 
-		if ( ! filterValue && prioritisedBlocks.length ) {
+		if ( ! filterValue && prioritizedBlocks.length ) {
 			orderedItems = orderInitialBlockItems(
 				orderedItems,
-				prioritisedBlocks
+				prioritizedBlocks
 			);
 		}
 
@@ -147,7 +147,7 @@ function InserterSearchResults( {
 		blockTypeCategories,
 		blockTypeCollections,
 		maxBlockTypesToShow,
-		prioritisedBlocks,
+		prioritizedBlocks,
 	] );
 
 	// Announce search results on change.
