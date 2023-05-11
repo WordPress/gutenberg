@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.lang.String.format;
 
 public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
     public static final String ARG_CONTENT = "content";
@@ -80,7 +83,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
 
     protected void load() {
         String content = getIntent().getExtras().getString(ARG_CONTENT);
-        mWebView.loadData(content, "text/html", "UTF-8");
+        mWebView.loadDataWithBaseURL(null, content, "text/html", "UTF-8", null);
     }
 
     private void setupToolbar() {
@@ -126,7 +129,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Center the embed with a black background;
                 String css = "body{margin:0;background:#000;display:flex;align-items:center;}";
-                String js = String.format("(()=>{const c='%s';const s=document.createElement('style');s.textContent=c;document.head.append(s);})()", css);
+                String js = format("(()=>{const c='%s';const s=document.createElement('style');s.textContent=c;document.head.append(s);})()", css);
                 view.evaluateJavascript(js, null);
                 super.onPageStarted(view, url, favicon);
             }
