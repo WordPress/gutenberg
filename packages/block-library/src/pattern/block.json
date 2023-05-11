@@ -25,10 +25,10 @@
 				"type": "constrained"
 			}
 		},
-		"syncStatus": {
+		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "full", "partial", "none" ],
-			"default": "none"
+			"enum": [ "contentOnly", false ],
+			"default": "contentOnly"
 		}
 	}
 }
