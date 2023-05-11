@@ -27,7 +27,7 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 	// Preload the OPTIONS request for all Navigation posts request.
 	$preload_paths[] = array( $navigation_rest_route, 'OPTIONS' );
 
-	// Preload the GET request for all 'published' or 'draft' Navigation posts.
+	// Preload the GET request for ALL 'published' or 'draft' Navigation posts.
 	$preload_paths[] = array(
 		add_query_arg(
 			array(
@@ -43,20 +43,7 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 		'GET',
 	);
 
-	// Preload the GET request for 'published' Navigation posts only.
-	$preload_paths[] = array(
-		add_query_arg(
-			array(
-				'context'  => 'edit',
-				'per_page' => '100',
-				'status'   => 'publish',
-			),
-			$navigation_rest_route
-		),
-		'GET',
-	);
-
-	// Preload request for Browse Mode sidebar.
+	// Preload request for Browse Mode sidebar "Navigation" section.
 	$preload_paths[] = array(
 		add_query_arg(
 			array(
