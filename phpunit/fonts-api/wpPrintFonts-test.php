@@ -14,6 +14,7 @@ require_once __DIR__ . '/../fixtures/mock-provider.php';
  * @covers ::wp_print_fonts
  */
 class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
+	private static $pagenow = '';
 
 	public static function set_up_before_class() {
 		self::$requires_switch_theme_fixtures = true;
@@ -21,6 +22,12 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 		parent::set_up_before_class();
 
 		static::set_up_admin_user();
+		self::$pagenow = $GLOBALS['pagenow'];
+	}
+
+	public function tear_down() {
+		$GLOBALS['pagenow'] = self::$pagenow;
+		parent::tear_down();
 	}
 
 	public function test_should_return_empty_array_when_no_fonts_registered() {
@@ -113,13 +120,21 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_print_all_registered_fonts_for_iframed_editor
+	 * @dataProvider data_should_print_registered_fonts_for_site_editor
 	 *
 	 * @param string $fonts    Fonts to register.
 	 * @param array  $expected Expected results.
 	 */
-	public function test_should_print_all_registered_fonts_for_iframed_editor( $fonts, $expected ) {
-		wp_register_fonts( $fonts );
+	public function test_should_print_registered_fonts_for_site_editor( $fonts, $expected ) {
+		// Set up the Site Editor.
+		global $pagenow;
+		$pagenow = 'site-editor.php';
+		set_current_screen( 'site-editor' );
+
+		$setup = array(
+			'registered' => $fonts,
+		);
+		$this->setup_integrated_deps( $setup, wp_fonts(), false );
 
 		$this->expectOutputString( $expected['output'] );
 		$actual_done = wp_print_fonts( true );
@@ -131,7 +146,7 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	 *
 	 * @return array
 	 */
-	public function data_should_print_all_registered_fonts_for_iframed_editor() {
+	public function data_should_print_registered_fonts_for_site_editor() {
 		$local_fonts = $this->get_registered_local_fonts();
 		$font_faces  = $this->get_registered_fonts_css();
 
@@ -141,7 +156,7 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 				'expected' => array(
 					'done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
 					'output' => sprintf(
-						"<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
+						"<style id='wp-fonts-local'>\n%s\n</style>\n",
 						$font_faces['merriweather-200-900-normal']
 					),
 				),
@@ -151,7 +166,7 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 				'expected' => array(
 					'done'   => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
 					'output' => sprintf(
-						"<style id='wp-fonts-local' type='text/css'>\n%s%s\n</style>\n",
+						"<style id='wp-fonts-local'>\n%s%s\n</style>\n",
 						$font_faces['Source Serif Pro-300-normal'],
 						$font_faces['Source Serif Pro-900-italic']
 					),
@@ -168,7 +183,80 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 						'Source Serif Pro-900-italic',
 					),
 					'output' => sprintf(
-						"<style id='wp-fonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+						"<style id='wp-fonts-local'>\n%s%s%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal'],
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_should_print_enqueued_fonts_for_non_site_editor
+	 *
+	 * @param string $fonts    Fonts to enqueue.
+	 * @param array  $expected Expected results.
+	 */
+	public function test_should_print_enqueued_fonts_for_non_site_editor( $fonts, $expected ) {
+		global $pagenow;
+		$pagenow = 'post.php';
+		set_current_screen( 'edit-post' );
+
+		$setup = array(
+			'registered' => $this->get_registered_local_fonts(),
+			'enqueued'   => $fonts,
+		);
+		$this->setup_integrated_deps( $setup, wp_fonts() );
+
+		$this->expectOutputString( $expected['output'] );
+		$actual_done = wp_print_fonts( true );
+		$this->assertSameSets( $expected['done'], $actual_done, 'All enqueued font-family handles should be returned' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_print_enqueued_fonts_for_non_site_editor() {
+		$font_faces = $this->get_registered_fonts_css();
+
+		return array(
+			'Merriweather with 1 variation'      => array(
+				'fonts'    => array( 'merriweather' ),
+				'expected' => array(
+					'done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local'>\n%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal']
+					),
+				),
+			),
+			'Source Serif Pro with 2 variations' => array(
+				'fonts'    => array( 'source-serif-pro' ),
+				'expected' => array(
+					'done'   => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local'>\n%s%s\n</style>\n",
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+			'all fonts'                          => array(
+				'fonts'    => array( 'merriweather', 'source-serif-pro' ),
+				'expected' => array(
+					'done'   => array(
+						'merriweather',
+						'merriweather-200-900-normal',
+						'source-serif-pro',
+						'Source Serif Pro-300-normal',
+						'Source Serif Pro-900-italic',
+					),
+					'output' => sprintf(
+						"<style id='wp-fonts-local'>\n%s%s%s\n</style>\n",
 						$font_faces['merriweather-200-900-normal'],
 						$font_faces['Source Serif Pro-300-normal'],
 						$font_faces['Source Serif Pro-900-italic']
@@ -212,11 +300,15 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	 * @param bool     $enqueue  Whether to enqueue. Default true.
 	 */
 	private function setup_integrated_deps( array $setup, $wp_fonts, $enqueue = true ) {
-		foreach ( $setup['provider'] as $provider ) {
-			$wp_fonts->register_provider( $provider['id'], $provider['class'] );
+		if ( isset( $setup['provider'] ) ) {
+			foreach ( $setup['provider'] as $provider ) {
+				$wp_fonts->register_provider( $provider['id'], $provider['class'] );
+			}
 		}
-		foreach ( $setup['registered'] as $handle => $variations ) {
-			$this->setup_register( $handle, $variations, $wp_fonts );
+		if ( isset( $setup['registered'] ) ) {
+			foreach ( $setup['registered'] as $handle => $variations ) {
+				$this->setup_register( $handle, $variations, $wp_fonts );
+			}
 		}
 
 		if ( $enqueue ) {
