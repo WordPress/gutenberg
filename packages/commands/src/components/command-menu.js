@@ -111,6 +111,10 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 		[ group, hasSearch ]
 	);
 
+	if ( ! commands.length && ! loaders.length ) {
+		return null;
+	}
+
 	return (
 		<Command.Group>
 			{ commands.map( ( command ) => (
@@ -230,7 +234,7 @@ export function CommandMenu() {
 						/>
 					</div>
 					<Command.List>
-						{ ! isLoading && (
+						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
 							</Command.Empty>

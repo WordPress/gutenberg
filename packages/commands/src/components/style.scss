@@ -93,7 +93,15 @@
 	[cmdk-root] > [cmdk-list] {
 		max-height: 400px;
 		overflow: auto;
-		padding: $grid-unit;
+
+		& > [cmdk-list-sizer] {
+			padding: $grid-unit;
+
+			// Hides the padding in empty contexts.
+			&:empty {
+				display: none;
+			}
+		}
 	}
 
 	[cmdk-empty] {
