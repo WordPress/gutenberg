@@ -25,28 +25,33 @@ test.describe( 'Block Switcher', () => {
 				},
 			],
 		} );
-		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:group {"layout":{"type":"flex","orientation":"vertical"}} -->
-<div class="wp-block-group"><!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->`
-		);
 		// Transform to `Stack` variation.
 		await editor.clickBlockToolbarButton( 'Stack' );
-		const variations = page.getByRole( 'menu', { name: 'Stack' } )
-			.getByRole( 'group', { name: 'variations' } );
+		const variations = page
+			.getByRole( 'menu', { name: 'Stack' } )
+			.getByRole( 'group' );
 		await expect(
 			variations.getByRole( 'menuitem', { name: 'Stack' } )
 		).toBeHidden();
 		await variations.getByRole( 'menuitem', { name: 'Row' } ).click();
-		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-<div class="wp-block-group"><!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->`
-		);
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: expect.objectContaining( {
+					layout: {
+						type: 'flex',
+						flexWrap: 'nowrap',
+						orientation: undefined,
+					},
+				} ),
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: '1' },
+					},
+				],
+			},
+		] );
 		await editor.clickBlockToolbarButton( 'Row' );
 		await expect(
 			page.locator( 'role=menuitem[name="Stack"i]' )
