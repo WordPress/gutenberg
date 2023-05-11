@@ -727,30 +727,177 @@ test.describe( 'Image', () => {
 			new RegExp( filename )
 		);
 	} );
+} );
 
-	test.describe.only( 'Image - frontend interactivity', () => {
-		test.beforeEach( async ( { editor, imageBlockUtils, page } ) => {
-			await editor.insertBlock( { name: 'core/image' } );
+test.describe( 'Image - interactivity', () => {
+	let postId = null;
+	let filename = null;
 
-			const imageBlock = page.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
 
-			await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
+	test.beforeEach( async ( { admin, page, editor, imageBlockUtils } ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/image' } );
 
-			const image = imageBlock.locator( 'role=img' );
-			await expect( image ).toBeVisible();
+		const imageBlock = page.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
 
-			await editor.publishPost();
+		filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		const image = imageBlock.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		await editor.openDocumentSettingsSidebar();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'should toggle "enable lightbox" in saved attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await page
+			.getByRole( 'checkbox', { name: 'Lightbox' } )
+			.setChecked( true );
+		const testForTrue = new RegExp(
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","enableLightbox":true} -->
+<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
+<!-- \\/wp:image -->`
+		);
+		expect( await editor.getEditedPostContent() ).toMatch( testForTrue );
+
+		await page
+			.getByRole( 'checkbox', { name: 'Lightbox' } )
+			.setChecked( false );
+		const testForFalse = new RegExp(
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
+<!-- \\/wp:image -->`
+		);
+		expect( await editor.getEditedPostContent() ).toMatch( testForFalse );
+	} );
+
+	test( 'should open and close the image in a lightbox using the mouse', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await page
+			.getByRole( 'checkbox', { name: 'Lightbox' } )
+			.setChecked( true );
+
+		postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const lightbox = page.locator( '.wp-lightbox-overlay' );
+		await expect( lightbox ).toBeHidden();
+
+		const image = lightbox.locator( 'img' );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		await page
+			.getByRole( 'button', { name: 'Open image lightbox' } )
+			.click();
+
+		await expect( lightbox ).toBeVisible();
+
+		const closeButton = page.getByRole( 'button', {
+			name: 'Close lightbox',
+		} );
+		await closeButton.click();
+
+		await expect( lightbox ).toBeHidden();
+	} );
+
+	test.describe( 'keyboard navigation', () => {
+		let openLightboxButton;
+		let lightbox;
+		let closeButton;
+
+		test.beforeEach( async ( { page, editor } ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Lightbox' } )
+				.setChecked( true );
+
+			postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			openLightboxButton = page.getByRole( 'button', {
+				name: 'Open image lightbox',
+			} );
+			lightbox = page.locator( '.wp-lightbox-overlay' );
+			closeButton = lightbox.getByRole( 'button', {
+				name: 'Close lightbox',
+			} );
 		} );
 
-		test( 'should open the image in a lightbox when clicked', async ( {
+		test( 'should open and focus appropriately using enter key', async ( {
 			page,
 		} ) => {
-			await page.goto( '/' );
+			// Open and close lightbox using the close button
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using enter key on close button', async ( {
+			page,
+		} ) => {
+			// Open and close lightbox using the close button
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using escape key', async ( {
+			page,
+		} ) => {
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using tab', async ( {
+			page,
+		} ) => {
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Tab' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using shift+tab', async ( {
+			page,
+		} ) => {
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
 		} );
 	} );
 } );
