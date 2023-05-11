@@ -72,38 +72,69 @@ export default function ListViewOutline() {
 	);
 	return (
 		<>
-			<div className="edit-post-editor__list-view-overview">
-				<div>
-					<p>
-						<Text>{ __( 'Characters:' ) }</Text>
-						<Text>
-							<CharacterCount />
-						</Text>
-					</p>
-					<p>
-						<Text>{ __( 'Words:' ) }</Text>
-						<WordCount />
-					</p>
-					<p>
-						<Text>{ __( 'Time to read:' ) }</Text>
-						<TimeToRead />
-					</p>
-				</div>
-				<div>
-					<p>
-						<Text>{ __( 'Headings:' ) }</Text>
-						{ headingCount }
-					</p>
-					<p>
-						<Text>{ __( 'Paragraphs:' ) }</Text>
-						{ paragraphCount }
-					</p>
-					<p>
-						<Text>{ __( 'Blocks:' ) }</Text>
-						{ blockCount }
-					</p>
-				</div>
-			</div>
+			<table className="edit-post-editor__list-view-overview">
+				<caption className="screen-reader-text">
+					{ __( 'Outline information about current post' ) }
+				</caption>
+				<thead className="screen-reader-text">
+					<tr>
+						<th scope="col">{ __( 'Metric' ) }</th>
+						<th scope="col">{ __( 'Value' ) }</th>
+						<th scope="col">{ __( 'Metric' ) }</th>
+						<th scope="col">{ __( 'Value' ) }</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<Text>{ __( 'Characters:' ) }</Text>
+						</td>
+						<td>
+							<Text>
+								<CharacterCount />
+							</Text>
+						</td>
+						<td>
+							<Text>{ __( 'Headings:' ) }</Text>
+						</td>
+						<td>
+							<Text>{ headingCount }</Text>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<Text>{ __( 'Words:' ) }</Text>
+						</td>
+						<td>
+							<Text>
+								<WordCount />
+							</Text>
+						</td>
+						<td>
+							<Text>{ __( 'Paragraphs:' ) }</Text>
+						</td>
+						<td>
+							<Text>{ paragraphCount }</Text>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<Text>{ __( 'Time to read:' ) }</Text>
+						</td>
+						<td>
+							<Text>
+								<TimeToRead />
+							</Text>
+						</td>
+						<td>
+							<Text>{ __( 'Blocks:' ) }</Text>
+						</td>
+						<td>
+							<Text>{ blockCount }</Text>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 			{ headingCount > 0 ? (
 				<DocumentOutline />
 			) : (
