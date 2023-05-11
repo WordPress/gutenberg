@@ -22,6 +22,7 @@ export default forwardRef( ( props, ref ) => {
 			rootClientId={ null }
 			onSelect={ null }
 			renderAdditionalBlockUI={ null }
+			blockSettingsMenu={ undefined }
 		/>
 	);
 } );
