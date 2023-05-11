@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useCallback } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
@@ -32,6 +32,25 @@ const INITIAL_INSERTER_RESULTS = 9;
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
+
+const orderInitialBlockItems = ( items, priority ) => {
+	if ( ! priority ) {
+		return items;
+	}
+
+	// Sort is "in place".
+	items.sort( ( { id: aName }, { id: bName } ) => {
+		// Sort block items according to `priority`.
+		let aIndex = priority.indexOf( aName );
+		let bIndex = priority.indexOf( bName );
+		// All other block items should come after that.
+		if ( aIndex < 0 ) aIndex = priority.length;
+		if ( bIndex < 0 ) bIndex = priority.length;
+		return aIndex - bIndex;
+	} );
+
+	return items;
+};
 
 function InserterSearchResults( {
 	filterValue,
@@ -98,30 +117,18 @@ function InserterSearchResults( {
 		maxBlockTypesToShow = 0;
 	}
 
-	const orderInitialBlockItems = useCallback(
-		( items ) => {
-			items.sort( ( { id: aName }, { id: bName } ) => {
-				// Sort block items according to `parentInserterPriority`.
-				let aIndex = parentInserterPriority.indexOf( aName );
-				let bIndex = parentInserterPriority.indexOf( bName );
-				// All other block items should come after that.
-				if ( aIndex < 0 ) aIndex = parentInserterPriority.length;
-				if ( bIndex < 0 ) bIndex = parentInserterPriority.length;
-				return aIndex - bIndex;
-			} );
-			return items;
-		},
-		[ parentInserterPriority ]
-	);
-
 	const filteredBlockTypes = useMemo( () => {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
 
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+
 		if ( ! filterValue && parentInserterPriority ) {
-			orderedItems = orderInitialBlockItems( orderedItems );
+			orderedItems = orderInitialBlockItems(
+				orderedItems,
+				parentInserterPriority
+			);
 		}
 
 		const results = searchBlockItems(
@@ -139,7 +146,6 @@ function InserterSearchResults( {
 		blockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
-		orderInitialBlockItems,
 		maxBlockTypesToShow,
 		parentInserterPriority,
 	] );
@@ -156,7 +162,12 @@ function InserterSearchResults( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [
+		filterValue,
+		debouncedSpeak,
+		filteredBlockTypes,
+		filteredBlockPatterns,
+	] );
 
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,
