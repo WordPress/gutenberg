@@ -31,9 +31,9 @@ function render_block_core_pattern( $attributes, $content ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
 	}
-
-	$align_class = isset($attributes['inheritedAlignment']) ? 'class="align' . $attributes['inheritedAlignment'] . '"' : '';
-	$wrapper = '<div '. $align_class . ' data-pattern-slug="' . $attributes['slug'] . '">%s</div>';
+	$slug_classname = str_replace( '/', '-', $attributes['slug'] );
+	$classnames = isset($attributes['className']) ?  $attributes['className'] . ' ' . $slug_classname : $slug_classname;
+	$wrapper = '<div class="'. esc_html( $classnames ) . '">%s</div>';
 
 	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
 		return sprintf( $wrapper, $content );

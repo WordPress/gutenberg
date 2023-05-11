@@ -465,7 +465,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** 
--	**Attributes:** inheritedAlignment, layout, slug, syncStatus
+-	**Attributes:** layout, slug, syncStatus
 
 ## Post Author
 

@@ -10,8 +10,8 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
-const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
-	const { inheritedAlignment, slug, syncStatus } = attributes;
+const PatternEdit = ( { attributes, clientId } ) => {
+	const { slug, syncStatus } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
 			return {
@@ -65,43 +65,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		replaceBlocks,
 	] );
 
-	useEffect( () => {
-		if ( syncStatus !== 'partial' ) {
-			return;
-		}
-		const alignments = [ 'wide', 'full' ];
-		const blocks = innerBlocks;
-		if ( ! blocks || blocks.length === 0 ) {
-			return;
-		}
-		// Determine the widest setting of all the contained blocks.
-		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
-			const { align } = block.attributes;
-			return alignments.indexOf( align ) >
-				alignments.indexOf( accumulator )
-				? align
-				: accumulator;
-		}, undefined );
-
-		// Set the attribute of the Pattern block to match the widest
-		// alignment.
-		setAttributes( {
-			inheritedAlignment: widestAlignment ?? '',
-		} );
-	}, [
-		innerBlocks,
-		selectedPattern?.blocks,
-		setAttributes,
-		inheritedAlignment,
-		syncStatus,
-	] );
-
-	const blockProps = useBlockProps( {
-		className:
-			syncStatus === 'partial' &&
-			inheritedAlignment &&
-			`align${ inheritedAlignment }`,
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,
@@ -111,11 +75,7 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 		return <div { ...blockProps } />;
 	}
 
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-		</>
-	);
+	return <div { ...innerBlocksProps } />;
 };
 
 export default PatternEdit;
