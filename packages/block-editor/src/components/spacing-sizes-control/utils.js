@@ -2,6 +2,61 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	link,
+	sidesAll,
+	sidesAxial,
+	sidesBottom,
+	sidesHorizontal,
+	sidesLeft,
+	sidesRight,
+	sidesTop,
+	sidesVertical,
+} from '@wordpress/icons';
+
+export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+export const DEFAULT_VALUES = {
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
+
+export const ICONS = {
+	custom: sidesAll,
+	linked: link,
+	axial: sidesAxial,
+	horizontal: sidesHorizontal,
+	vertical: sidesVertical,
+	top: sidesTop,
+	right: sidesRight,
+	bottom: sidesBottom,
+	left: sidesLeft,
+};
+
+export const LABELS = {
+	linked: __( 'All sides' ),
+	top: __( 'Top' ),
+	bottom: __( 'Bottom' ),
+	left: __( 'Left' ),
+	right: __( 'Right' ),
+	mixed: __( 'Mixed' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
+	axial: __( 'Horizontal & vertical' ),
+	custom: __( 'Custom' ),
+};
+
+export const VIEWS = {
+	linked: 'linked',
+	axial: 'axial',
+	top: 'top',
+	right: 'right',
+	bottom: 'bottom',
+	left: 'left',
+	custom: 'custom',
+};
 
 /**
  * Checks is given value is a spacing preset.
@@ -131,26 +186,6 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
-export const LABELS = {
-	all: __( 'All sides' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
-};
-
-export const DEFAULT_VALUES = {
-	top: undefined,
-	right: undefined,
-	bottom: undefined,
-	left: undefined,
-};
-
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-
 /**
  * Gets an items with the most occurrence within an array
  * https://stackoverflow.com/a/20762713
@@ -207,4 +242,140 @@ export function isValuesDefined( values ) {
 		return false;
 	}
 	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
+}
+
+/**
+ * Determines whether a particular axis has support. If no axis is
+ * specified, this function checks if either axis is supported.
+ *
+ * @param {Array}  sides Supported sides.
+ * @param {string} axis  Which axis to check.
+ *
+ * @return {boolean} Whether there is support for the specified axis or both axes.
+ */
+export function hasAxisSupport( sides, axis ) {
+	if ( ! sides || ! sides.length ) {
+		return false;
+	}
+
+	const hasHorizontalSupport =
+		sides.includes( 'horizontal' ) ||
+		( sides.includes( 'left' ) && sides.includes( 'right' ) );
+
+	const hasVerticalSupport =
+		sides.includes( 'vertical' ) ||
+		( sides.includes( 'top' ) && sides.includes( 'bottom' ) );
+
+	if ( axis === 'horizontal' ) {
+		return hasHorizontalSupport;
+	}
+
+	if ( axis === 'vertical' ) {
+		return hasVerticalSupport;
+	}
+
+	return hasHorizontalSupport || hasVerticalSupport;
+}
+
+/**
+ * Determines which menu options should be included in then SidePicker.
+ *
+ * @param {Array} sides Supported sides.
+ *
+ * @return {Object} Menu options split into two groups.
+ *                  - Primary for more specific side options
+ *                  - Secondary for general options like custom or linked
+ */
+export function getSupportedMenuItems( sides ) {
+	if ( ! sides || ! sides.length ) {
+		return {};
+	}
+
+	const primaryItems = {};
+	const secondaryItems = {};
+
+	// Determine the primary "side" menu options.
+	const hasHorizontalSupport = hasAxisSupport( sides, 'horizontal' );
+	const hasVerticalSupport = hasAxisSupport( sides, 'vertical' );
+
+	if ( hasHorizontalSupport && hasVerticalSupport ) {
+		primaryItems.axial = { label: LABELS.axial, icon: ICONS.axial };
+	} else if ( hasHorizontalSupport ) {
+		primaryItems.axial = {
+			label: LABELS.horizontal,
+			icon: ICONS.horizontal,
+		};
+	} else if ( hasVerticalSupport ) {
+		primaryItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
+	}
+
+	// Track whether we have any individual sides so we can omit the custom
+	// option if required.
+	let numberOfIndividualSides = 0;
+
+	ALL_SIDES.forEach( ( side ) => {
+		if ( sides.includes( side ) ) {
+			numberOfIndividualSides += 1;
+			primaryItems[ side ] = {
+				label: LABELS[ side ],
+				icon: ICONS[ side ],
+			};
+		}
+	} );
+
+	// Add secondary menu items.
+	if ( numberOfIndividualSides > 1 ) {
+		secondaryItems.custom = { label: LABELS.custom, icon: ICONS.custom };
+	}
+
+	secondaryItems.linked = { label: LABELS.linked, icon: ICONS.linked };
+
+	return { primaryItems, secondaryItems };
+}
+
+/**
+ * Determines which view the SpacingSizesControl should default to on its
+ * first render.
+ *
+ * Linked: No defined values, only one side supported, or mixed values.
+ * Axial: Horizontal or vertical axis support and only those axial values set.
+ * Custom: Mixed values requiring all supported siddes to be displayed.
+ * Single: Only an individual side has a value.
+ *
+ * @param {Object} values Current side values.
+ * @param {Array}  sides  Supported sides.
+ *
+ * @return {string} View to display.
+ */
+export function getInitialView( values, sides ) {
+	// Primary "linked" view, formerly the "all" values version of the control.
+	if (
+		sides?.length === 1 ||
+		! isValuesDefined( values ) ||
+		! isValuesMixed( values, sides )
+	) {
+		return VIEWS.linked;
+	}
+	const { top, right, bottom, left } = values;
+
+	// Horizontal & vertical are supported and have matching values.
+	if (
+		hasAxisSupport( sides ) &&
+		top === bottom &&
+		left === right &&
+		( !! top || !! left )
+	) {
+		return VIEWS.axial;
+	}
+
+	// Custom (separated sides) view check.
+	const sideValues = [ top, right, bottom, left ].filter( Boolean );
+
+	if ( sideValues.length > 1 ) {
+		return VIEWS.custom;
+	}
+
+	// Single (all values set to undefined is covered by linked view check).
+	// TODO: Do we need to ensure its the first key with a defined value?
+	return Object.keys( values )[ 0 ];
 }
