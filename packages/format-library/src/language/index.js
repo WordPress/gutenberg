@@ -109,7 +109,7 @@ function Edit( props ) {
 							] }
 							onChange={ ( val ) => setDir( val ) }
 						/>
-						<HStack alignment="right" spacing="0">
+						<HStack alignment="right">
 							<Button
 								variant="primary"
 								type="submit"
