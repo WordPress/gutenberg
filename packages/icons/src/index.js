@@ -119,6 +119,7 @@ export { default as justifyStretch } from './library/justify-stretch';
 export { default as key } from './library/key';
 export { default as keyboardClose } from './library/keyboard-close';
 export { default as keyboardReturn } from './library/keyboard-return';
+export { default as language } from './library/language';
 export { default as layout } from './library/layout';
 export { default as levelUp } from './library/level-up';
 export { default as lifesaver } from './library/lifesaver';
