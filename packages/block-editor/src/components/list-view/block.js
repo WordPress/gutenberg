@@ -169,7 +169,11 @@ function ListViewBlock( {
 
 	const updateSelection = useCallback(
 		( newClientId ) => {
-			selectBlock( undefined, newClientId, null, null );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			// Select the block to be focused if there isn't any block selected.
+			if ( ! selectedBlockClientIds.length ) {
+				selectBlock( undefined, newClientId, null, null );
+			}
 
 			const getFocusElement = () => {
 				const row = treeGridElementRef.current?.querySelector(
