@@ -8,6 +8,7 @@
  * @property {string}      name     Command name.
  * @property {string}      label    Command label.
  * @property {string=}     group    Command group.
+ * @property {string=}     context  Command context.
  * @property {JSX.Element} icon     Command icon.
  * @property {Function}    callback Command callback.
  */
@@ -21,9 +22,10 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string}              name  Command loader name.
- * @property {string=}             group Command loader group.
- * @property {WPCommandLoaderHook} hook  Command loader hook.
+ * @property {string}              name    Command loader name.
+ * @property {string=}             group   Command loader group.
+ * @property {string=}             context Command loader context.
+ * @property {WPCommandLoaderHook} hook    Command loader hook.
  */
 
 /**
@@ -33,14 +35,11 @@
  *
  * @return {Object} action.
  */
-export function registerCommand( { name, label, icon, callback, group = '' } ) {
+export function registerCommand( config ) {
 	return {
 		type: 'REGISTER_COMMAND',
-		name,
-		label,
-		icon,
-		callback,
-		group,
+		...config,
+		group: config.group ?? '',
 	};
 }
 
@@ -67,12 +66,11 @@ export function unregisterCommand( name, group ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( { name, group = '', hook } ) {
+export function registerCommandLoader( config ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
-		name,
-		group,
-		hook,
+		...config,
+		group: config.group ?? '',
 	};
 }
 
@@ -111,5 +109,19 @@ export function open() {
 export function close() {
 	return {
 		type: 'CLOSE',
+	};
+}
+
+/**
+ * Sets the active context.
+ *
+ * @param {string} context Context.
+ *
+ * @return {Object} action.
+ */
+export function setContext( context ) {
+	return {
+		type: 'SET_CONTEXT',
+		context,
 	};
 }

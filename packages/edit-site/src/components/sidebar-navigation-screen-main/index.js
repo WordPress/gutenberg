@@ -55,12 +55,26 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
+<<<<<<< HEAD
 					<SidebarNavigationItemGlobalStyles
 						withChevron
 						icon={ styles }
 					>
 						{ __( 'Styles' ) }
 					</SidebarNavigationItemGlobalStyles>
+=======
+					{ hasGlobalStyleVariations && (
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/styles"
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</NavigatorButton>
+					) }
+
+>>>>>>> 65eb8ab435 (Add contextual commands)
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/page"

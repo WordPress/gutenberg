@@ -32,3 +32,25 @@ export const getCommandLoaders = createSelector(
 export function isOpen( state ) {
 	return state.isOpen;
 }
+
+export function getContext( state ) {
+	return state.context;
+}
+
+export const getContextualCommands = createSelector(
+	( state, group ) => {
+		return getCommands( state, group ).filter(
+			( command ) => command.context === state.context
+		);
+	},
+	( state, group ) => [ state.commands[ group ], state.context ]
+);
+
+export const getContextualCommandLoaders = createSelector(
+	( state, group ) => {
+		return getCommandLoaders( state, group ).filter(
+			( loader ) => loader.context === state.context
+		);
+	},
+	( state, group ) => [ state.commandLoaders[ group ], state.context ]
+);

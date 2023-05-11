@@ -25,6 +25,7 @@ export default function useCommand( command ) {
 		registerCommand( {
 			name: command.name,
 			group: command.group,
+			context: command.context,
 			label: command.label,
 			icon: command.icon,
 			callback: currentCallback.current,
@@ -37,6 +38,7 @@ export default function useCommand( command ) {
 		command.label,
 		command.group,
 		command.icon,
+		command.context,
 		registerCommand,
 		unregisterCommand,
 	] );

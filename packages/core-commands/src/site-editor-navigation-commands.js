@@ -15,7 +15,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  */
 import { unlock } from './lock-unlock';
 
-const { useCommandLoader } = unlock( privateApis );
+const { useCommandLoader, useCommand } = unlock( privateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
@@ -31,29 +31,31 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
 			postType
 		);
-		const deps = supportsSearch ? [ search ] : [];
-		const { records, isLoading } = useSelect( ( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const query = supportsSearch
-				? {
-						search: !! search ? search : undefined,
-						per_page: 10,
-						orderby: search ? 'relevance' : 'date',
-				  }
-				: {
-						per_page: -1,
-				  };
-			return {
-				records: getEntityRecords( 'postType', postType, query ),
-				isLoading: ! select( coreStore ).hasFinishedResolution(
-					'getEntityRecords',
-					[ 'postType', postType, query ]
-				),
-				// We're using the string literal to check whether we're in the site editor.
-				/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
-				isSiteEditor: !! select( 'edit-site' ),
-			};
-		}, deps );
+		const { records, isLoading } = useSelect(
+			( select ) => {
+				const { getEntityRecords } = select( coreStore );
+				const query = supportsSearch
+					? {
+							search: !! search ? search : undefined,
+							per_page: 10,
+							orderby: search ? 'relevance' : 'date',
+					  }
+					: {
+							per_page: -1,
+					  };
+				return {
+					records: getEntityRecords( 'postType', postType, query ),
+					isLoading: ! select( coreStore ).hasFinishedResolution(
+						'getEntityRecords',
+						[ 'postType', postType, query ]
+					),
+					// We're using the string literal to check whether we're in the site editor.
+					/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
+					isSiteEditor: !! select( 'edit-site' ),
+				};
+			},
+			[ supportsSearch, search ]
+		);
 
 		const commands = useMemo( () => {
 			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
@@ -106,6 +108,8 @@ const useTemplatePartNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
 export function useSiteEditorNavigationCommands() {
+	const history = useHistory();
+
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		group: __( 'Pages' ),
@@ -125,5 +129,27 @@ export function useSiteEditorNavigationCommands() {
 		name: 'core/edit-site/navigate-template-parts',
 		group: __( 'Template Parts' ),
 		hook: useTemplatePartNavigationCommandLoader,
+	} );
+
+	useCommand( {
+		name: 'core/edit-site/browse-styles',
+		label: __( 'Browse Styles' ),
+		group: __( 'Site Editor' ),
+		context: 'site-editor',
+		icon: layout,
+		callback: () => {
+			const isSiteEditor = getPath( window.location.href )?.includes(
+				'site-editor.php'
+			);
+			const args = {
+				path: '/styles',
+			};
+			const targetUrl = addQueryArgs( 'site-editor.php', args );
+			if ( isSiteEditor ) {
+				history.push( args );
+			} else {
+				document.location = targetUrl;
+			}
+		},
 	} );
 }

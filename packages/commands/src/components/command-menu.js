@@ -90,15 +90,25 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 }
 
 export function CommandMenuGroup( { group, search, setLoader, close } ) {
+	const hasSearch = !! search;
 	const { commands, loaders } = useSelect(
 		( select ) => {
-			const { getCommands, getCommandLoaders } = select( commandsStore );
+			const {
+				getCommands,
+				getCommandLoaders,
+				getContextualCommands,
+				getContextualCommandLoaders,
+			} = select( commandsStore );
 			return {
-				commands: getCommands( group ),
-				loaders: getCommandLoaders( group ),
+				commands: hasSearch
+					? getCommands( group )
+					: getContextualCommands( group ),
+				loaders: hasSearch
+					? getCommandLoaders( group )
+					: getContextualCommandLoaders( group ),
 			};
 		},
-		[ group ]
+		[ group, hasSearch ]
 	);
 
 	return (
@@ -219,24 +229,22 @@ export function CommandMenu() {
 							placeholder={ __( 'Type a command or search' ) }
 						/>
 					</div>
-					{ search && (
-						<Command.List>
-							{ ! isLoading && (
-								<Command.Empty>
-									{ __( 'No results found.' ) }
-								</Command.Empty>
-							) }
-							{ groups.map( ( group ) => (
-								<CommandMenuGroup
-									key={ group }
-									group={ group }
-									search={ search }
-									setLoader={ setLoader }
-									close={ closeAndReset }
-								/>
-							) ) }
-						</Command.List>
-					) }
+					<Command.List>
+						{ ! isLoading && (
+							<Command.Empty>
+								{ __( 'No results found.' ) }
+							</Command.Empty>
+						) }
+						{ groups.map( ( group ) => (
+							<CommandMenuGroup
+								key={ group }
+								group={ group }
+								search={ search }
+								setLoader={ setLoader }
+								close={ closeAndReset }
+							/>
+						) ) }
+					</Command.List>
 				</Command>
 			</div>
 		</Modal>

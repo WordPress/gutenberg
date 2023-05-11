@@ -22,6 +22,7 @@ function commands( state = {}, action ) {
 						name: action.name,
 						label: action.label,
 						group: action.group,
+						context: action.context,
 						callback: action.callback,
 						icon: action.icon,
 					},
@@ -57,6 +58,7 @@ function commandLoaders( state = {}, action ) {
 					...state[ action.group ],
 					[ action.name ]: {
 						name: action.name,
+						context: action.context,
 						hook: action.hook,
 					},
 				},
@@ -93,10 +95,28 @@ function isOpen( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the command center's active context.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function context( state = 'root', action ) {
+	switch ( action.type ) {
+		case 'SET_CONTEXT':
+			return action.context;
+	}
+
+	return state;
+}
+
 const reducer = combineReducers( {
 	commands,
 	commandLoaders,
 	isOpen,
+	context,
 } );
 
 export default reducer;
