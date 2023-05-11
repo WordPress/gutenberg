@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
-import path from 'path';
-import fs from 'fs/promises';
-import os from 'os';
-import { v4 as uuid } from 'uuid';
+const path = require( 'path' );
+const fs = require( 'fs/promises' );
+const os = require( 'os' );
+const { v4: uuid } = require( 'uuid' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 
@@ -12,13 +12,6 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-async function getBackgroundColorAndOpacity( locator ) {
-	return await locator.evaluate( ( el ) => {
-		const computedStyle = window.getComputedStyle( el );
-		return [ computedStyle.backgroundColor, computedStyle.opacity ];
-	} );
-}
 
 test.use( {
 	imageBlockUtils: async ( { page }, use ) => {
@@ -34,6 +27,7 @@ test.describe( 'Cover', () => {
 	test( 'can set overlay color using color picker on block placeholder', async ( {
 		page,
 		editor,
+		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
@@ -47,17 +41,16 @@ test.describe( 'Cover', () => {
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
-		const blackRGB = await blackColorSwatch.evaluate(
-			( element ) => window.getComputedStyle( element ).color
+		const [ blackRGB ] = await imageBlockUtils.getBackgroundColorAndOpacity(
+			coverBlock
 		);
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
 		// Get the RGB value of the background dim.
-		const actualRGB = await coverBlock.evaluate(
-			( element ) => window.getComputedStyle( element ).backgroundColor
-		);
+		const [ actualRGB ] =
+			await imageBlockUtils.getBackgroundColorAndOpacity( coverBlock );
 
 		expect( blackRGB ).toEqual( actualRGB );
 	} );
@@ -104,7 +97,7 @@ test.describe( 'Cover', () => {
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await getBackgroundColorAndOpacity(
+			await imageBlockUtils.getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
 			);
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
@@ -242,7 +235,7 @@ test.describe( 'Cover', () => {
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await getBackgroundColorAndOpacity(
+			await imageBlockUtils.getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
 			);
 
@@ -269,7 +262,7 @@ class ImageBlockUtils {
 		);
 	}
 
-	async upload( inputElement ) {
+	async upload( locator ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
@@ -277,8 +270,15 @@ class ImageBlockUtils {
 		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
-		await inputElement.setInputFiles( tmpFileName );
+		await locator.setInputFiles( tmpFileName );
 
 		return filename;
+	}
+
+	async getBackgroundColorAndOpacity( locator ) {
+		return await locator.evaluate( ( el ) => {
+			const computedStyle = window.getComputedStyle( el );
+			return [ computedStyle.backgroundColor, computedStyle.opacity ];
+		} );
 	}
 }
