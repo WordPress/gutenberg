@@ -576,7 +576,10 @@ export const getNavigationFallbackId =
 	async ( { dispatch } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
-				_embed: true,
+				// _embed is intentionally set as `1` (as opposed to `true`)
+				// to ensure preloading of this request works correctly.
+				// see https://github.com/WordPress/gutenberg/pull/48683/#issuecomment-1543726404.
+				_embed: 1,
 			} ),
 		} );
 

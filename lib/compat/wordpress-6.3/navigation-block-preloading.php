@@ -58,6 +58,17 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 		'GET',
 	);
 
+	// Preload the request for a fallback navigation menu.
+	$preload_paths[] = array(
+		add_query_arg(
+			array(
+				'_embed' => 1,
+			),
+			'wp-block-editor/v1/navigation-fallback'
+		),
+		'GET',
+	);
+
 	return $preload_paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_preload_navigation_posts', 10, 2 );
