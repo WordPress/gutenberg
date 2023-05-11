@@ -16,7 +16,10 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import {
+	store as keyboardShortcutsStore,
+	__unstableUseShortcutEventMatch,
+} from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
@@ -117,6 +120,7 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
+	const isMatch = __unstableUseShortcutEventMatch();
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
@@ -197,6 +201,42 @@ export function BlockSettingsDropdown( {
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
+					menuProps={ {
+						/**
+						 * @param {KeyboardEvent} event
+						 */
+						onKeyDown( event ) {
+							if ( event.defaultPrevented ) return;
+
+							if (
+								isMatch( 'core/block-editor/remove', event )
+							) {
+								event.preventDefault();
+								updateSelectionAfterRemove( onRemove() );
+							} else if (
+								isMatch( 'core/block-editor/duplicate', event )
+							) {
+								event.preventDefault();
+								updateSelectionAfterDuplicate( onDuplicate() );
+							} else if (
+								isMatch(
+									'core/block-editor/insert-after',
+									event
+								)
+							) {
+								event.preventDefault();
+								onInsertAfter();
+							} else if (
+								isMatch(
+									'core/block-editor/insert-before',
+									event
+								)
+							) {
+								event.preventDefault();
+								onInsertBefore();
+							}
+						},
+					} }
 					{ ...props }
 				>
 					{ ( { onClose } ) => (
