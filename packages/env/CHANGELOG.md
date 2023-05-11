@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Removed the second shell from the execution of `run` commands. This removes the need for double-escaping and fixes problems with undocumented evaluation of escaped shell tokens before they are passed to the container. As a consequence of this change, quoted strings will now be treated as single arguments instead of separate ones. For example, `npx wp-env run cli "wp help"` will attempt to run `"wp help"` on the container instead of `wp` with `help` as an argument. If you are using commands with excess escaping or quotes you will need to review them and ensure they are compatible with the update. 
+
+### Enhancement
+
+-   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
+
 ## 7.0.0 (2023-05-10)
 
 ### Breaking Change
