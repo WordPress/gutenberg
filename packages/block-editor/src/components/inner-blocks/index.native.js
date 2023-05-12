@@ -73,9 +73,13 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
+		__experimentalCaptureToolbars: captureToolbars,
 		orientation,
 		renderAppender,
 		renderFooterAppender,
@@ -97,7 +101,17 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useBlockContext( clientId );
 
-	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
+	useNestedSettingsUpdate(
+		clientId,
+		allowedBlocks,
+		prioritizedInserterBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
+		templateLock,
+		captureToolbars,
+		orientation,
+		layout
+	);
 
 	useInnerBlockTemplateSync(
 		clientId,
