@@ -42,7 +42,7 @@ const DropdownMenuStoryContext = createContext< {
 } >( {} );
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
-	title: 'Components/Radix DropdownMenu',
+	title: 'Components (Experimental)/DropdownMenu v2',
 	component: DropdownMenu,
 	subcomponents: {
 		DropdownMenuItem,
