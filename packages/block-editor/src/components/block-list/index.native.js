@@ -11,7 +11,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
-	ReadableContentView,
 	WIDE_ALIGNMENTS,
 	alignmentHelpers,
 } from '@wordpress/components';
@@ -29,6 +28,7 @@ import {
 	DEFAULT_BLOCK_LIST_CONTEXT,
 } from './block-list-context';
 import { BlockDraggableWrapper } from '../block-draggable';
+import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
 
 const identity = ( x ) => x;
@@ -423,24 +423,22 @@ function EmptyList( {
 					! blockClientIds[ insertionPoint.index ] ),
 		};
 	} );
+	const align = renderAppender ? WIDE_ALIGNMENTS.alignments.full : undefined;
+	const [ wrapperStyles ] = useEditorWrapperStyles( { align } );
 
 	if ( renderFooterAppender || renderAppender === false ) {
 		return null;
 	}
 
+	const containerStyles = [ styles.defaultAppender, wrapperStyles ];
+
 	return (
-		<View style={ styles.defaultAppender }>
-			<ReadableContentView
-				align={
-					renderAppender ? WIDE_ALIGNMENTS.alignments.full : undefined
-				}
-			>
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					showSeparator={ shouldShowInsertionPoint }
-				/>
-			</ReadableContentView>
+		<View style={ containerStyles }>
+			<BlockListAppender
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				showSeparator={ shouldShowInsertionPoint }
+			/>
 		</View>
 	);
 }
