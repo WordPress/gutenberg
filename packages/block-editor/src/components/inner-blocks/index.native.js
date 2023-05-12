@@ -17,7 +17,6 @@ import useBlockContext from './use-block-context';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import BlockListCompact from '../block-list/block-list-compact';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
@@ -92,7 +91,6 @@ function UncontrolledInnerBlocks( props ) {
 		blockWidth,
 		__experimentalLayout: layout = defaultLayout,
 		gridProperties,
-		useCompactList,
 	} = props;
 
 	const context = useBlockContext( clientId );
@@ -106,12 +104,10 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const BlockListComponent = useCompactList ? BlockListCompact : BlockList;
-
 	return (
 		<LayoutProvider value={ layout }>
 			<BlockContextProvider value={ context }>
-				<BlockListComponent
+				<BlockList
 					marginVertical={ marginVertical }
 					marginHorizontal={ marginHorizontal }
 					rootClientId={ clientId }
