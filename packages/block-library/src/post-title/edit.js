@@ -40,8 +40,8 @@ export default function PostTitleEdit( {
 	 */
 	const userCanEdit = useCanEditEntity(
 		'postType',
-		isDescendentOfQueryLoop ? '' : postType,
-		isDescendentOfQueryLoop ? '' : postId
+		! isDescendentOfQueryLoop && postType,
+		postId
 	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
