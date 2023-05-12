@@ -818,7 +818,13 @@
 	{
 		"title": "DropdownMenu",
 		"slug": "dropdown-menu",
-		"markdown_source": "../packages/components/src/dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/dropdown-menu/v1/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DropdownMenu",
+		"slug": "dropdown-menu",
+		"markdown_source": "../packages/components/src/dropdown-menu/v2/README.md",
 		"parent": "components"
 	},
 	{
