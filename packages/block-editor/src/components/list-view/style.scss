@@ -223,6 +223,7 @@
 
 		// Show on hover, visible, and show above to keep the hit area size.
 		&:hover,
+		&:focus-within,
 		&.is-visible {
 			> * {
 				opacity: 1;
