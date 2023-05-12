@@ -10,14 +10,14 @@ import SpacingInputControl from './spacing-input-control';
 import { getAllRawValue, isValuesMixed, isValuesDefined } from '../utils';
 
 export default function AllInputControl( {
+	minimumCustomValue,
 	onChange,
-	values,
+	onMouseOut,
+	onMouseOver,
 	sides,
 	spacingSizes,
 	type,
-	minimumCustomValue,
-	onMouseOver,
-	onMouseOut,
+	values,
 } ) {
 	const allValue = getAllRawValue( values );
 	const hasValues = isValuesDefined( values );

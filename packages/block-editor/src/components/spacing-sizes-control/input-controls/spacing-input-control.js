@@ -6,21 +6,21 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import {
-	BaseControl,
 	Button,
-	RangeControl,
 	CustomSelectControl,
-	__experimentalUnitControl as UnitControl,
+	Icon,
+	RangeControl,
 	__experimentalHStack as HStack,
+	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useState, useMemo } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,15 +45,16 @@ const CUSTOM_VALUE_SETTINGS = {
 };
 
 export default function SpacingInputControl( {
-	spacingSizes,
-	value,
-	side,
-	onChange,
+	icon,
 	isMixed = false,
-	type,
 	minimumCustomValue,
-	onMouseOver,
+	onChange,
 	onMouseOut,
+	onMouseOver,
+	side,
+	spacingSizes,
+	type,
+	value,
 } ) {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
@@ -159,16 +160,12 @@ export default function SpacingInputControl( {
 
 	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
 
-	const currentValueHint = ! isMixed
-		? customTooltipContent( currentValue )
-		: __( 'Mixed' );
-
 	const options = selectListSizes.map( ( size, index ) => ( {
 		key: index,
 		name: size.name,
 	} ) );
 
-	const marks = spacingSizes.map( ( newValue, index ) => ( {
+	const marks = spacingSizes.map( ( _newValue, index ) => ( {
 		value: index,
 		label: undefined,
 	} ) );
@@ -180,52 +177,13 @@ export default function SpacingInputControl( {
 		type?.toLowerCase()
 	);
 
-	const showHint =
-		showRangeControl &&
-		! showCustomValueControl &&
-		currentValueHint !== undefined;
-
 	return (
-		<>
-			{ side !== 'all' && (
-				<HStack className="components-spacing-sizes-control__side-labels">
-					<BaseControl.VisualLabel className="components-spacing-sizes-control__side-label">
-						{ LABELS[ side ] }
-					</BaseControl.VisualLabel>
-
-					{ showHint && (
-						<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-single">
-							{ currentValueHint }
-						</BaseControl.VisualLabel>
-					) }
-				</HStack>
-			) }
-			{ side === 'all' && showHint && (
-				<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-all">
-					{ currentValueHint }
-				</BaseControl.VisualLabel>
-			) }
-
-			{ ! disableCustomSpacingSizes && (
-				<Button
-					label={
-						showCustomValueControl
-							? __( 'Use size preset' )
-							: __( 'Set custom size' )
-					}
-					icon={ settings }
-					onClick={ () => {
-						setShowCustomValueControl( ! showCustomValueControl );
-					} }
-					isPressed={ showCustomValueControl }
-					isSmall
-					className={ classnames( {
-						'components-spacing-sizes-control__custom-toggle-all':
-							side === 'all',
-						'components-spacing-sizes-control__custom-toggle-single':
-							side !== 'all',
-					} ) }
-					iconSize={ 24 }
+		<HStack className="components-spacing-sizes-control__wrapper">
+			{ icon && (
+				<Icon
+					className="components-spacing-sizes-control__icon"
+					icon={ icon }
+					size={ 24 }
 				/>
 			) }
 			{ showCustomValueControl && (
@@ -248,7 +206,6 @@ export default function SpacingInputControl( {
 						className="components-spacing-sizes-control__custom-value-input"
 						size={ '__unstable-large' }
 					/>
-
 					<RangeControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
@@ -324,6 +281,28 @@ export default function SpacingInputControl( {
 					onBlur={ onMouseOut }
 				/>
 			) }
-		</>
+			{ ! disableCustomSpacingSizes && (
+				<Button
+					label={
+						showCustomValueControl
+							? __( 'Use size preset' )
+							: __( 'Set custom size' )
+					}
+					icon={ settings }
+					onClick={ () => {
+						setShowCustomValueControl( ! showCustomValueControl );
+					} }
+					isPressed={ showCustomValueControl }
+					isSmall
+					className={ classnames( {
+						'components-spacing-sizes-control__custom-toggle-all':
+							side === 'all',
+						'components-spacing-sizes-control__custom-toggle-single':
+							side !== 'all',
+					} ) }
+					iconSize={ 24 }
+				/>
+			) }
+		</HStack>
 	);
 }
