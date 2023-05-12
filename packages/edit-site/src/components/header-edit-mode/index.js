@@ -106,6 +106,7 @@ export default function HeaderEditMode() {
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -121,10 +122,10 @@ export default function HeaderEditMode() {
 		}
 	}, [ isInserterOpen, setIsInserterOpened ] );
 
-	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
-	);
+	const toggleListView = useCallback( () => {
+		toggle( 'core/edit-site', 'showListViewByDefault' );
+		setIsListViewOpened( ! isListViewOpen );
+	}, [ toggle, setIsListViewOpened, isListViewOpen ] );
 
 	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 	const {

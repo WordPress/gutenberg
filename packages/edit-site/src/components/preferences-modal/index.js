@@ -42,13 +42,6 @@ export default function EditSitePreferencesModal( {
 						help={ __( 'Show text instead of icons on buttons.' ) }
 					/>
 					<EnableFeature
-						featureName="showListViewByDefault"
-						help={ __(
-							'Opens the block list view sidebar by default.'
-						) }
-						label={ __( 'Always open list view' ) }
-					/>
-					<EnableFeature
 						featureName="showBlockBreadcrumbs"
 						help={ __(
 							'Shows block breadcrumbs at the bottom of the editor.'
