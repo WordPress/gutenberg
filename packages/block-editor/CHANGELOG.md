@@ -7,6 +7,16 @@
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
 
+## 12.1.0 (2023-05-10)
+
+-   `MediaPlaceholder`: Remove the undocumented `onHTMLDrop` prop ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+
+## 12.0.0 (2023-04-26)
+
+### Breaking Changes
+
+- Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+
 ## 11.8.0 (2023-04-12)
 
 

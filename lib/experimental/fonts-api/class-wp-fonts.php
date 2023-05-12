@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Fonts' ) ) {
  *
  * @since X.X.X
  */
-class WP_Fonts extends WP_Webfonts {
+class WP_Fonts extends WP_Dependencies {
 
 	/**
 	 * An array of registered providers.

@@ -131,3 +131,18 @@ export function isResolving( state, selectorName, args ) {
 export function getCachedResolvers( state ) {
 	return state;
 }
+
+/**
+ * Whether the store has any currently resolving selectors.
+ *
+ * @param {State} state Data state.
+ *
+ * @return {boolean} True if one or more selectors are resolving, false otherwise.
+ */
+export function hasResolvingSelectors( state ) {
+	return [ ...Object.values( state ) ].some( ( selectorState ) =>
+		[ ...selectorState._map.values() ].some(
+			( resolution ) => resolution[ 1 ]?.status === 'resolving'
+		)
+	);
+}

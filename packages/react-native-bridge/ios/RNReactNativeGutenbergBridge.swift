@@ -1,3 +1,5 @@
+import React
+
 struct GutenbergEvent {
     let name: String
     let body: Any?
@@ -426,6 +428,7 @@ extension RNReactNativeGutenbergBridge {
         case toggleHTMLMode
         case updateHtml
         case featuredImageIdNativeUpdated
+        case postHasBeenJustSaved
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
