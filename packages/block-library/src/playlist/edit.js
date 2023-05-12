@@ -199,7 +199,6 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 								controls="controls"
 								src={ ids[ trackListIndex ].url }
 								onEnded={ onTrackEnd }
-								autoPlay={ true }
 							/>
 						</div>
 					) }
