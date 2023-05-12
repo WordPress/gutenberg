@@ -210,7 +210,7 @@ module.exports = async function start( {
 	}
 
 	if ( scripts ) {
-		executeLifecycleScript( 'afterStart', config, spinner );
+		await executeLifecycleScript( 'afterStart', config, spinner );
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;

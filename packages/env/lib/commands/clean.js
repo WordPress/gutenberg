@@ -66,7 +66,7 @@ module.exports = async function clean( {
 	await Promise.all( tasks );
 
 	if ( scripts ) {
-		executeLifecycleScript( 'afterClean', config, spinner );
+		await executeLifecycleScript( 'afterClean', config, spinner );
 	}
 
 	spinner.text = `Cleaned ${ description }.`;

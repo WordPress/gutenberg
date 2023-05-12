@@ -58,7 +58,7 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 	}
 
 	if ( scripts ) {
-		executeLifecycleScript( 'beforeDestroy', config, spinner );
+		await executeLifecycleScript( 'beforeDestroy', config, spinner );
 	}
 
 	spinner.text = 'Removing docker images, volumes, and networks.';
