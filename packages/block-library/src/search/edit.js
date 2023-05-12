@@ -148,7 +148,7 @@ export default function SearchEdit( {
 				isSearchFieldHidden: true,
 			} );
 		}
-	}, [ isSelected ] );
+	}, [ hasOnlyButton, isSelected, setAttributes ] );
 
 	useEffect( () => {
 		if ( hasOnlyButton || ! isSelected ) {
@@ -158,7 +158,7 @@ export default function SearchEdit( {
 		setAttributes( {
 			isSearchFieldHidden: false,
 		} );
-	}, [ width ] );
+	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return classnames(
