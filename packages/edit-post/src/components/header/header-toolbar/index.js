@@ -32,7 +32,7 @@ const preventDefault = ( event ) => {
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } =
+	const { setIsInserterOpened, setIsListViewOpened, toggleFeature } =
 		useDispatch( editPostStore );
 	const {
 		isInserterEnabled,
@@ -85,10 +85,10 @@ function HeaderToolbar() {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
-	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
-	);
+	const toggleListView = useCallback( () => {
+		toggleFeature( 'showListViewByDefault' );
+		setIsListViewOpened( ! isListViewOpen );
+	}, [ toggleFeature, setIsListViewOpened, isListViewOpen ] );
 	const overflowItems = (
 		<>
 			<ToolbarItem
