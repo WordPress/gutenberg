@@ -223,10 +223,15 @@ class BottomSheetCell extends Component {
 				styles.cellValue,
 				styles.cellTextDark
 			);
-			const finalStyle = {
+			const textInputStyle = {
 				...cellValueStyle,
 				...valueStyle,
 				...styleRTL,
+			};
+			const textStyle = {
+				...( disabled && styles.cellDisabled ),
+				...cellValueStyle,
+				...valueStyle,
 			};
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
@@ -238,7 +243,7 @@ class BottomSheetCell extends Component {
 				<TextInput
 					ref={ ( c ) => ( this._valueTextInput = c ) }
 					numberOfLines={ 1 }
-					style={ finalStyle }
+					style={ textInputStyle }
 					value={ value }
 					placeholder={ valuePlaceholder }
 					placeholderTextColor={ '#87a6bc' }
@@ -255,7 +260,7 @@ class BottomSheetCell extends Component {
 				/>
 			) : (
 				<Text
-					style={ { ...cellValueStyle, ...valueStyle } }
+					style={ textStyle }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
 				>
