@@ -64,6 +64,9 @@ describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 		// Should still be only 6 results regardless of the priority ordering.
 		const inserterItems = await getAllBlockInserterItemTitles();
 
+		// Should still be only 6 results regardless of the priority ordering.
+		expect( inserterItems ).toHaveLength( 6 );
+
 		expect( inserterItems.slice( 0, 3 ) ).toEqual( [
 			'Audio',
 			'Spacer',
