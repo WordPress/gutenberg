@@ -33,12 +33,10 @@ export default function PostTitleEdit( {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	/**
-	 * Hack: useCanEditEntity may trigger an OPTIONS request. When the post title
-	 * is a descendant of a query loop, we know for sure that user cannot edit
-	 * the title. To avoid unnecessary OPTIONS requests we should avoid using
-	 * useCanEditEntity. However, it's a hook and cannot be fired conditionally,
-	 * hence instead we call it without proper data. In this case hook automatically
-	 * returns false without calling a backend.
+	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
+	 * However, when the Post Title is a descendant of a Query Loop block, the title cannot be edited.
+	 * In order to avoid these unnecessary requests, we call the hook without
+	 * the proper data, resulting in returning early without making them.
 	 */
 	const userCanEdit = useCanEditEntity(
 		'postType',
