@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -217,9 +216,13 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			const subMatchers = mapValues(
-				sourceConfig.query,
-				matcherFromSource
+			const subMatchers = Object.fromEntries(
+				Object.entries( sourceConfig.query ).map(
+					( [ key, subSourceConfig ] ) => [
+						key,
+						matcherFromSource( subSourceConfig ),
+					]
+				)
 			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
@@ -275,8 +278,13 @@ export function getBlockAttributes(
 	const doc = parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	const blockAttributes = mapValues( blockType.attributes, ( schema, key ) =>
-		getBlockAttribute( key, schema, doc, attributes, innerHTML )
+	const blockAttributes = Object.fromEntries(
+		Object.entries( blockType.attributes ?? {} ).map(
+			( [ key, schema ] ) => [
+				key,
+				getBlockAttribute( key, schema, doc, attributes, innerHTML ),
+			]
+		)
 	);
 
 	return applyFilters(

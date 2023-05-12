@@ -386,7 +386,8 @@ export const withPositionStyles = createHigherOrderComponent(
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
-	}
+	},
+	'withPositionStyles'
 );
 
 addFilter(

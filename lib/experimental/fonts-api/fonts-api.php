@@ -22,7 +22,18 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 
 		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			$wp_fonts = new WP_Fonts();
+
+			// Initialize.
 			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
+			add_action( 'wp_head', 'wp_print_fonts', 50 );
+
+			/*
+			 * For themes without a theme.json, admin printing is initiated by the 'admin_print_styles' hook.
+			 * For themes with theme.json, admin printing is initiated by _wp_get_iframed_editor_assets().
+			 */
+			if ( ! wp_theme_has_theme_json() ) {
+				add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
+			}
 		}
 
 		return $wp_fonts;
@@ -55,12 +66,6 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 	function wp_register_fonts( array $fonts ) {
 		$registered = array();
 		$wp_fonts   = wp_fonts();
-
-		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( $wp_fonts->is_deprecated_structure( $fonts ) ) {
-			$fonts = $wp_fonts->migrate_deprecated_structure( $fonts );
-		}
-		// BACKPORT NOTE: end of code block.
 
 		foreach ( $fonts as $font_family => $variations ) {
 			$font_family_handle = $wp_fonts->add_font_family( $font_family );
@@ -176,33 +181,51 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
-	 *                                       single item (string), or multiple items (array of strings).
-	 *                                       Default false.
+	 * @param string|string[]|bool $handles Optional. Items to be processed: queue (false),
+	 *                                      for iframed editor assets (true), single item (string),
+	 *                                      or multiple items (array of strings).
+	 *                                      Default false.
 	 * @return array|string[] Array of font handles that have been processed.
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_fonts( $handles = false ) {
-		$wp_fonts   = wp_fonts();
-		$registered = $wp_fonts->get_registered_font_families();
+		$wp_fonts          = wp_fonts();
+		$registered        = $wp_fonts->get_registered_font_families();
+		$in_iframed_editor = true === $handles;
 
 		// Nothing to print, as no fonts are registered.
 		if ( empty( $registered ) ) {
 			return array();
 		}
 
-		if ( empty( $handles ) ) {
-			$handles = false;
+		// Skip this reassignment decision-making when using the default of `false`.
+		if ( false !== $handles ) {
+			// When `true`, print all registered fonts for the iframed editor.
+			if ( $in_iframed_editor ) {
+				$queue           = $wp_fonts->queue;
+				$done            = $wp_fonts->done;
+				$wp_fonts->done  = array();
+				$wp_fonts->queue = $registered;
+				$handles         = false;
+			} elseif ( empty( $handles ) ) {
+				// When falsey, assign `false` to print enqueued fonts.
+				$handles = false;
+			}
 		}
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		return $wp_fonts->do_items( $handles );
+		$printed = $wp_fonts->do_items( $handles );
+
+		// Reset the API.
+		if ( $in_iframed_editor ) {
+			$wp_fonts->done  = $done;
+			$wp_fonts->queue = $queue;
+		}
+
+		return $printed;
 	}
 }
-
-add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
-add_action( 'wp_head', 'wp_print_fonts', 50 );
 
 /**
  * Add webfonts mime types.

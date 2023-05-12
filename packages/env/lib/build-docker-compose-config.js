@@ -168,33 +168,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	// Defaults are to use the most recent version of PHPUnit that provides
-	// support for the specified version of PHP.
-	// PHP Unit is assumed to be for Tests so use the testsPhpVersion.
-	let phpunitTag = 'latest';
-	const phpunitPhpVersion = '-php-' + config.env.tests.phpVersion + '-fpm';
-	if ( config.env.tests.phpVersion === '5.6' ) {
-		phpunitTag = '5' + phpunitPhpVersion;
-	} else if ( config.env.tests.phpVersion === '7.0' ) {
-		phpunitTag = '6' + phpunitPhpVersion;
-	} else if ( config.env.tests.phpVersion === '7.1' ) {
-		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( config.env.tests.phpVersion === '7.2' ) {
-		phpunitTag = '8' + phpunitPhpVersion;
-	} else if (
-		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf(
-			config.env.tests.phpVersion
-		) >= 0
-	) {
-		phpunitTag = '9' + phpunitPhpVersion;
-	}
-	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
-
-	// If the user mounted their own uploads folder, we should not override it in the phpunit service.
-	const isMappingTestUploads = testsMounts.some( ( mount ) =>
-		mount.endsWith( ':/var/www/html/wp-content/uploads' )
-	);
-
 	return {
 		version: '3.7',
 		services: {
@@ -236,6 +209,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: developmentMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
 				depends_on: [ 'tests-mysql' ],
@@ -253,6 +227,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: testsMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
@@ -268,6 +243,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					...dbEnv.development,
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
@@ -283,26 +259,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					...dbEnv.tests,
 					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
-			},
-			composer: {
-				image: 'composer',
-				volumes: [ `${ config.configDirectoryPath }:/app` ],
-			},
-			phpunit: {
-				image: phpunitImage,
-				depends_on: [ 'tests-wordpress' ],
-				volumes: [
-					...testsMounts,
-					...( ! isMappingTestUploads
-						? [ 'phpunit-uploads:/var/www/html/wp-content/uploads' ]
-						: [] ),
-				],
-				environment: {
-					LOCAL_DIR: 'html',
-					WP_TESTS_DIR: '/wordpress-phpunit',
-					...dbEnv.credentials,
-					...dbEnv.tests,
-				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 		},
 		volumes: {
@@ -310,7 +267,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 			...( ! config.env.tests.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
 			'mysql-test': {},
-			'phpunit-uploads': {},
 			'user-home': {},
 			'tests-user-home': {},
 		},
