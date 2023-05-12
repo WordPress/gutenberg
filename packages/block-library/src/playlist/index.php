@@ -18,7 +18,6 @@ function render_block_core_playlist( $attributes ) {
 	 * Escaping
 	 * Order
 	 * Aria
-	 * screen reader texts.
 	 */
 	$order              = !! $attributes[ 'order' ] ? $attributes[ 'order' ] : 'ASC';
 	$tracklist          = !! $attributes[ 'tracklist' ] ? $attributes[ 'tracklist' ] : true;
@@ -68,8 +67,16 @@ function render_block_core_playlist( $attributes ) {
 					$html .= $attributes[ 'ids' ][ $key ][ 'title' ];
 				}
 				$html .= '</span>';
-				$html .= '<span class="wp-block-playlist__item-artist">— ' . $attributes[ 'ids' ][ $key ][ 'artist' ] . '</span>';
-				$html .= '<span class="wp-block-playlist__item-length">' . $attributes[ 'ids' ][ $key ][ 'length' ] . '</span>';
+				$html .= '<span class="wp-block-playlist__item-artist">— ' .
+					$attributes[ 'ids' ][ $key ][ 'artist' ] . '</span>';
+				if ( $attributes[ 'ids' ][ $key ][ 'length' ] ) {
+					$html .= '<span class="wp-block-playlist__item-length">';
+					$html .= '<span class="screen-reader-text">' .
+					_x( 'Length:', 'Label for track length in minutes:seconds' ) . '</span>' .
+					$attributes[ 'ids' ][ $key ][ 'length' ] . '</span>';
+				}
+				$html .= '<span class="screen-reader-text">' .
+					__( 'Select to play this track' ) . '</span>';
 				$html .= '</button>';
 				$html .= '</li>';
 			}
