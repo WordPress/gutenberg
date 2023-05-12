@@ -184,4 +184,4 @@ For example, a button block, deeply nested in several levels of block `X` that u
 ### `prioritizedInserterBlocks`
 
 -   **Type:** `Array`
--   **Default:** - `undefined`. Determines which inner blocks should be returned first from the block inserter. For example, when inserting a block within the Navigation Block, `core/navigation-link` and `core/navigation-link/page` are the most common inner blocks. We can use `prioritizedInserterBlocks` to pass these `navigation-link` blocks as an array so they can be returned first by default from the Navigation Block inserter.
+-   **Default:** - `undefined`. Determines which inner blocks should be returned first from the block inserter. For example, when inserting a block within the Navigation Block, `core/navigation-link` and `core/navigation-link/page` are the most commonly used inner blocks. We can use `prioritizedInserterBlocks` to pass these `navigation-link` blocks as an array so they can be returned first by default from the Navigation Block inserter.
