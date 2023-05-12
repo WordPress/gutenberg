@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -55,16 +54,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
 
-	// When the style book is opened, switch to the style book view.
-	// This is done in a useEffect to ensure that the canvas mode is changed,
-	// and the global styles sidebar is opened before attempting to open the style book.
-	useEffect( () => {
-		if ( isStyleBookOpened ) {
-			setEditorCanvasContainerView( 'style-book' );
-		}
-	}, [ setEditorCanvasContainerView, isStyleBookOpened ] );
+	const openGlobalStyles = async () =>
+		Promise.all( [
+			setCanvasMode( 'edit' ),
+			openGeneralSidebar( 'edit-site/global-styles' ),
+		] );
 
 	return (
 		<SidebarNavigationScreen
@@ -78,26 +73,18 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					<SidebarButton
 						icon={ seen }
 						label={ __( 'Style Book' ) }
-						onClick={ () => {
-							// Switch to edit mode.
-							setCanvasMode( 'edit' );
-							// Open global styles sidebar.
-							openGeneralSidebar( 'edit-site/global-styles' );
-							// Open style book, via the useEffect above.
-							// This is done via a local state change to ensure that the canvas mode is changed,
-							// and the global styles sidebar is opened before attempting to open the style book.
-							setIsStyleBookOpened( true );
+						onClick={ async () => {
+							await openGlobalStyles();
+							// Open the Style Book once the canvas mode is set to edit,
+							// and the global styles sidebar is open. This ensures that
+							// the Style Book is not prematurely closed.
+							setEditorCanvasContainerView( 'style-book' );
 						} }
 					/>
 					<SidebarButton
 						icon={ edit }
 						label={ __( 'Edit styles' ) }
-						onClick={ () => {
-							// Switch to edit mode.
-							setCanvasMode( 'edit' );
-							// Open global styles sidebar.
-							openGeneralSidebar( 'edit-site/global-styles' );
-						} }
+						onClick={ async () => await openGlobalStyles() }
 					/>
 				</div>
 			}
