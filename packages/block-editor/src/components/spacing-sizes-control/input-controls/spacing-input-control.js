@@ -25,15 +25,15 @@ import { usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
-import { store as blockEditorStore } from '../../store';
+import useSetting from '../../use-setting';
+import { store as blockEditorStore } from '../../../store';
 import {
 	LABELS,
 	getSliderValueFromPreset,
 	getCustomValueFromPreset,
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
-} from './utils';
+} from '../utils';
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },

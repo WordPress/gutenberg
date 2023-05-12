@@ -7,7 +7,7 @@ import { __experimentalApplyValueToSides as applyValueToSides } from '@wordpress
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { getAllRawValue, isValuesMixed, isValuesDefined } from './utils';
+import { getAllRawValue, isValuesMixed, isValuesDefined } from '../utils';
 
 export default function AllInputControl( {
 	onChange,

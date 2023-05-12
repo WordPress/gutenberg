@@ -2,41 +2,57 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { ALL_SIDES, LABELS } from './utils';
+import { LABELS } from '../utils';
 
-export default function BoxInputControls( {
+const groupedSides = [ 'vertical', 'horizontal' ];
+
+export default function AxialInputControls( {
+	onChange,
 	values,
 	sides,
-	onChange,
 	spacingSizes,
 	type,
 	minimumCustomValue,
 	onMouseOver,
 	onMouseOut,
 } ) {
-	// Filter sides if custom configuration provided, maintaining default order.
-	const filteredSides = sides?.length
-		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
-		: ALL_SIDES;
-
 	const createHandleOnChange = ( side ) => ( next ) => {
+		if ( ! onChange ) {
+			return;
+		}
 		const nextValues = { ...values };
-		nextValues[ side ] = next;
+
+		if ( side === 'vertical' ) {
+			nextValues.top = next;
+			nextValues.bottom = next;
+		}
+
+		if ( side === 'horizontal' ) {
+			nextValues.left = next;
+			nextValues.right = next;
+		}
 
 		onChange( nextValues );
 	};
 
+	// Filter sides if custom configuration provided, maintaining default order.
+	const filteredSides = sides?.length
+		? groupedSides.filter( ( side ) => sides.includes( side ) )
+		: groupedSides;
+
 	return (
 		<>
 			{ filteredSides.map( ( side ) => {
+				const axisValue =
+					side === 'vertical' ? values.top : values.left;
 				return (
 					<SpacingInputControl
-						value={ values[ side ] }
+						value={ axisValue }
+						onChange={ createHandleOnChange( side ) }
 						label={ LABELS[ side ] }
 						key={ `spacing-sizes-control-${ side }` }
 						withInputField={ false }
 						side={ side }
-						onChange={ createHandleOnChange( side ) }
 						spacingSizes={ spacingSizes }
 						type={ type }
 						minimumCustomValue={ minimumCustomValue }
