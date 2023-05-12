@@ -14,6 +14,7 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
@@ -125,6 +126,19 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		fixedToolbarCanBeFocused;
+
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
 	const isFocusMode = templateType === 'wp_template_part';
@@ -150,6 +164,9 @@ export default function HeaderEditMode() {
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
+					shouldUseKeyboardFocusShortcut={
+						! blockToolbarCanBeFocused
+					}
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
 						<ToolbarItem

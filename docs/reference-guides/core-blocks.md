@@ -235,30 +235,12 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 ## Details
 
-A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+Hide and show additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
 
 -	**Name:** core/details
 -	**Category:** text
--	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** showContent
-
-## Details Content
-
-Add content that may be shown or hidden via a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
-
--	**Name:** core/details-content
--	**Category:** text
--	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** 
-
-## Details Summary
-
-Provide summary text used to toggle the display of content inside a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
-
--	**Name:** core/details-summary
--	**Category:** text
--	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** summary
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** showContent, summary
 
 ## Embed
 

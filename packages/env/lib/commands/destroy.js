@@ -12,7 +12,6 @@ const inquirer = require( 'inquirer' );
  * Promisified dependencies
  */
 const rimraf = util.promisify( require( 'rimraf' ) );
-const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
@@ -58,48 +57,20 @@ module.exports = async function destroy( { spinner, debug } ) {
 		return;
 	}
 
-	spinner.text = 'Removing WordPress docker containers.';
+	spinner.text = 'Removing docker images, volumes, and networks.';
 
-	await dockerCompose.rm( {
+	await dockerCompose.down( {
 		config: dockerComposeConfigPath,
-		commandOptions: [ '--stop', '-v' ],
+		commandOptions: [ '--volumes', '--remove-orphans', '--rmi', 'all' ],
 		log: debug,
 	} );
 
-	const directoryHash = path.basename( workDirectoryPath );
-
-	spinner.text = 'Removing docker volumes.';
-	await removeDockerItems( 'volume', 'name', directoryHash );
-
-	spinner.text = 'Removing docker networks.';
-	await removeDockerItems( 'network', 'name', directoryHash );
-
-	spinner.text = 'Removing docker images.';
-	await removeDockerItems( 'image', 'reference', directoryHash + '*' );
-
 	spinner.text = 'Removing local files.';
-
+	// Note: there is a race condition where docker compose actually hasn't finished
+	// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+	// but using 10s in case it's dependant on the machine.
+	await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 	await rimraf( workDirectoryPath );
 
 	spinner.text = 'Removed WordPress environment.';
 };
-
-/**
- * Removes docker items, like networks or volumes, matching the given name.
- *
- * @param {string} itemType    The item type, like "volume", or "network".
- * @param {string} filter      The filtering to search using.
- * @param {string} filterValue The filtering value that we're looking for.
- */
-async function removeDockerItems( itemType, filter, filterValue ) {
-	const { stdout: items } = await exec(
-		`docker ${ itemType } ls -q --filter ${ filter }='${ filterValue }'`
-	);
-	if ( items ) {
-		await exec(
-			`docker ${ itemType } rm ${ items
-				.split( '\n' ) // TODO: use os.EOL?
-				.join( ' ' ) }`
-		);
-	}
-}

@@ -33,6 +33,10 @@
 
 .edit-site {
 	.edit-site-list {
+		background: $white;
+		border-radius: $radius-block-ui * 4;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+
 		.interface-interface-skeleton__editor {
 			min-width: 100%;
 

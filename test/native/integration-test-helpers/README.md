@@ -54,6 +54,10 @@ Changes the text of a RichText component.
 
 Paste content into a RichText component.
 
+### [`setupApiFetch`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-api-fetch.js)
+
+Sets up the `apiFetch` library for testing by mocking request responses.
+
 ### [`setupCoreBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/setup-core-blocks.js)
 
 Registers all core blocks or a specific list of blocks before running tests, once the tests are run, all registered blocks are unregistered.

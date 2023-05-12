@@ -34,12 +34,11 @@ add_action( 'wp_default_scripts', 'gutenberg_register_interactivity_scripts', 10
  * Adds the "defer" attribute to all the interactivity script tags.
  *
  * @param string $tag    The generated script tag.
- * @param string $handle The script's registered handle.
  *
  * @return string The modified script tag.
  */
-function gutenberg_interactivity_scripts_add_defer_attribute( $tag, $handle ) {
-	if ( str_starts_with( $handle, 'wp-interactivity-' ) ) {
+function gutenberg_interactivity_scripts_add_defer_attribute( $tag ) {
+	if ( str_contains( $tag, '/block-library/interactive-blocks/' ) ) {
 		$p = new WP_HTML_Tag_Processor( $tag );
 		$p->next_tag( array( 'tag' => 'script' ) );
 		$p->set_attribute( 'defer', true );
@@ -47,4 +46,4 @@ function gutenberg_interactivity_scripts_add_defer_attribute( $tag, $handle ) {
 	}
 	return $tag;
 }
-add_filter( 'script_loader_tag', 'gutenberg_interactivity_scripts_add_defer_attribute', 10, 2 );
+add_filter( 'script_loader_tag', 'gutenberg_interactivity_scripts_add_defer_attribute', 10, 1 );

@@ -219,6 +219,14 @@
 					}
 				}
 			}
+
+			.blocks-widgets-container & {
+				margin-left: $grid-unit-80 * 2.4;
+
+				&.is-collapsed {
+					margin-left: $grid-unit-80 * 4.2;
+				}
+			}
 		}
 
 		&.is-fixed .block-editor-block-parent-selector {
