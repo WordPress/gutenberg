@@ -14,8 +14,8 @@ const { v4: uuid } = require( 'uuid' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	imageBlockUtils: async ( { page }, use ) => {
-		await use( new ImageBlockUtils( { page } ) );
+	coverBlockUtils: async ( { page }, use ) => {
+		await use( new CoverBlockUtils( { page } ) );
 	},
 } );
 
@@ -27,7 +27,7 @@ test.describe( 'Cover', () => {
 	test( 'can set overlay color using color picker on block placeholder', async ( {
 		page,
 		editor,
-		imageBlockUtils,
+		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
@@ -41,7 +41,7 @@ test.describe( 'Cover', () => {
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
-		const [ blackRGB ] = await imageBlockUtils.getBackgroundColorAndOpacity(
+		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
 			coverBlock
 		);
 
@@ -50,7 +50,7 @@ test.describe( 'Cover', () => {
 
 		// Get the RGB value of the background dim.
 		const [ actualRGB ] =
-			await imageBlockUtils.getBackgroundColorAndOpacity( coverBlock );
+			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
 
 		expect( blackRGB ).toEqual( actualRGB );
 	} );
@@ -58,14 +58,14 @@ test.describe( 'Cover', () => {
 	test( 'can set background image using image upload on block placeholder', async ( {
 		page,
 		editor,
-		imageBlockUtils,
+		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const filename = await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 		const fileBasename = path.basename( filename );
@@ -82,14 +82,14 @@ test.describe( 'Cover', () => {
 	test( 'dims background image down by 50% by default', async ( {
 		page,
 		editor,
-		imageBlockUtils,
+		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = page.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
-		await imageBlockUtils.upload(
+		await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
@@ -97,7 +97,7 @@ test.describe( 'Cover', () => {
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await imageBlockUtils.getBackgroundColorAndOpacity(
+			await coverBlockUtils.getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
 			);
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
@@ -207,7 +207,7 @@ test.describe( 'Cover', () => {
 	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
 		page,
 		editor,
-		imageBlockUtils,
+		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -215,7 +215,7 @@ test.describe( 'Cover', () => {
 			name: 'Block: Image',
 		} );
 
-		await imageBlockUtils.upload(
+		await coverBlockUtils.upload(
 			imageBlock.getByTestId( 'form-file-upload-input' )
 		);
 
@@ -235,7 +235,7 @@ test.describe( 'Cover', () => {
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
 		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await imageBlockUtils.getBackgroundColorAndOpacity(
+			await coverBlockUtils.getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
 			);
 
@@ -247,7 +247,7 @@ test.describe( 'Cover', () => {
 	} );
 } );
 
-class ImageBlockUtils {
+class CoverBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
 		this.page = page;
