@@ -9,25 +9,32 @@ const { execSync } = require( 'child_process' );
  */
 
 /**
- * Error subtype which indicates that the afterSetup command failed.
+ * Error subtype which indicates that the lifecycle script failed.
  */
-class AfterSetupError extends Error {}
+class LifecycleScriptError extends Error {
+	constructor( event, stderr ) {
+		super( `${ event } Error:\n${ stderr }` );
+
+		this.event = event;
+	}
+}
 
 /**
  * Executes any defined afterSetup command.
  *
+ * @param {string}   event   The lifecycle event to run the script for.
  * @param {WPConfig} config  The config object to use.
  * @param {Object}   spinner A CLI spinner which indciates progress.
  */
-function executeAfterSetup( config, spinner ) {
-	if ( ! config.lifecycleScripts.afterSetup ) {
+function executeLifecycleScript( event, config, spinner ) {
+	if ( ! config.lifecycleScripts[ event ] ) {
 		return;
 	}
 
-	spinner.text = 'Executing Script: afterSetup';
+	spinner.text = `Executing ${ event } Script`;
 
 	try {
-		let output = execSync( config.lifecycleScripts.afterSetup, {
+		let output = execSync( config.lifecycleScripts[ event ], {
 			encoding: 'utf-8',
 			stdio: 'pipe',
 			env: process.env,
@@ -38,14 +45,14 @@ function executeAfterSetup( config, spinner ) {
 
 		// We don't need to bother with any output if there isn't any.
 		if ( output ) {
-			spinner.info( `After Setup:\n${ output }` );
+			spinner.info( `${ event }:\n${ output }` );
 		}
 	} catch ( error ) {
-		throw new AfterSetupError( `After Setup:\n${ error.stderr }` );
+		throw new LifecycleScriptError( event, error.stderr );
 	}
 }
 
 module.exports = {
-	AfterSetupError,
-	executeAfterSetup,
+	LifecycleScriptError,
+	executeLifecycleScript,
 };

@@ -31,7 +31,7 @@ const {
 } = require( '../wordpress' );
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
-const { executeAfterSetup } = require( '../execute-after-setup' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -205,7 +205,7 @@ module.exports = async function start( {
 
 		// Execute any configured command that should run after the environment has finished being set up.
 		if ( scripts ) {
-			executeAfterSetup( config, spinner );
+			executeLifecycleScript( 'afterSetup', config, spinner );
 		}
 
 		// Set the cache key once everything has been configured.

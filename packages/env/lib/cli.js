@@ -41,7 +41,7 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof env.ValidationError ||
-					error instanceof env.AfterSetupError
+					error instanceof env.LifecycleScriptError
 				) {
 					// Error is a configuration error. That means the user did something wrong.
 					spinner.fail( error.message );

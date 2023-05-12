@@ -9,7 +9,7 @@ const dockerCompose = require( 'docker-compose' );
  */
 const initConfig = require( '../init-config' );
 const { configureWordPress, resetDatabase } = require( '../wordpress' );
-const { executeAfterSetup } = require( '../execute-after-setup' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../wordpress').WPEnvironment} WPEnvironment
@@ -67,7 +67,7 @@ module.exports = async function clean( {
 
 	// Execute any configured command that should run after the environment has finished being set up.
 	if ( scripts ) {
-		executeAfterSetup( config, spinner );
+		executeLifecycleScript( 'afterSetup', config, spinner );
 	}
 
 	spinner.text = `Cleaned ${ description }.`;
