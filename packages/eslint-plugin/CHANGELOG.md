@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- The bundled eslint-plugin-jsdoc dependency has been updated from requiring ^39.6.9 to requiring ^44.2.3 ([#50586](https://github.com/WordPress/gutenberg/pull/50586)) :
+- The bundled eslint-plugin-jsdoc dependency has been updated from requiring ^39.6.9 to requiring ^44.2.3 ([#50590](https://github.com/WordPress/gutenberg/pull/50590)) :
     - Removes `jsdoc/newline-after-description` rule in favor of `jsdoc/tag-lines` with option `startLines: 0` for "never" and `startLines: 1` for "always". Defaults now to `startLines: 0`
     - Removes `dropEndLines: true` from `jsdoc/tag-lines` in favor of option `endLines: 0`
     - Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`
