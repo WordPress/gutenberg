@@ -29,6 +29,7 @@ const BottomSheetTextControl = ( {
 	icon,
 	footerNote,
 	cellPlaceholder,
+	disabled = false,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -62,6 +63,7 @@ const BottomSheetTextControl = ( {
 					onPress={ openSubSheet }
 					value={ initialValue || '' }
 					placeholder={ cellPlaceholder || placeholder || '' }
+					disabled={ disabled }
 				>
 					<Icon icon={ chevronRight }></Icon>
 				</BottomSheet.Cell>
