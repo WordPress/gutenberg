@@ -199,6 +199,14 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 								controls="controls"
 								src={ ids[ trackListIndex ].url }
 								onEnded={ onTrackEnd }
+								aria-label={
+									ids[ trackListIndex ]?.title +
+									', ' +
+									ids[ trackListIndex ]?.album +
+									', ' +
+									ids[ trackListIndex ]?.artist
+								}
+								tabIndex={ 0 }
 							/>
 						</div>
 					) }
@@ -239,7 +247,18 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 										</span>
 									) }
 									<span className="wp-block-playlist__item-length">
+										{ track?.length && (
+											<span className="screen-reader-text">
+												{
+													/* translators: %s: track length in "minutes:seconds" format */
+													__( 'Length:' )
+												}
+											</span>
+										) }
 										{ track?.length }
+									</span>
+									<span className="screen-reader-text">
+										{ __( 'Select to play this track' ) }
 									</span>
 								</Button>
 							</li>

@@ -53,7 +53,13 @@ export default function save( { attributes } ) {
 					<audio
 						controls="controls"
 						src={ currentTrack.url }
-						autoPlay={ true }
+						aria-label={
+							currentTrack?.title +
+							', ' +
+							currentTrack?.album +
+							', ' +
+							currentTrack?.artist
+						}
 					/>
 				</div>
 				<TagName
@@ -90,7 +96,18 @@ export default function save( { attributes } ) {
 									</span>
 								) }
 								<span className="wp-block-playlist__item-length">
+									{ track?.length && (
+										<span className="screen-reader-text">
+											{
+												/* translators: %s: track length in "minutes:seconds" format */
+												'Length:'
+											}
+										</span>
+									) }
 									{ track?.length }
+								</span>
+								<span className="screen-reader-text">
+									{ 'Select to play this track' }
 								</span>
 							</button>
 						</li>
