@@ -1,5 +1,12 @@
 {
 	"kind": "webfonts#webfontList",
+	"categories": [
+		"serif",
+		"sans-serif",
+		"display",
+		"handwriting",
+		"monospace"
+	],
 	"items": [
 		{
 			"family": "ABeeZee",
