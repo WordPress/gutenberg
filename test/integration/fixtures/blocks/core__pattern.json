@@ -3,12 +3,10 @@
 		"name": "core/pattern",
 		"isValid": true,
 		"attributes": {
-			"forcedAlignment": "full",
+			"slug": "core/text-two-columns",
 			"layout": {
 				"type": "constrained"
-			},
-			"slug": "core/text-two-columns",
-			"syncStatus": "synced"
+			}
 		},
 		"innerBlocks": []
 	}
