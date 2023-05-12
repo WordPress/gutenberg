@@ -19,15 +19,6 @@ import {
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-// Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	debounce: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
-
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
 <!-- /wp:buttons -->`;
