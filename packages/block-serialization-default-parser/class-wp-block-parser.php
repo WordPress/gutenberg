@@ -314,11 +314,11 @@ class WP_Block_Parser {
 	 * @internal
 	 * @since 3.9.0
 	 *
-	 * @param string $innerHTML HTML content of block.
+	 * @param string $inner_html HTML content of block.
 	 * @return WP_Block_Parser_Block freeform block object.
 	 */
-	public function freeform( $innerHTML ) {
-		return new WP_Block_Parser_Block( null, $this->empty_attrs, array(), $innerHTML, array( $innerHTML ) );
+	public function freeform( $inner_html ) {
+		return new WP_Block_Parser_Block( null, $this->empty_attrs, array(), $inner_html, array( $inner_html ) );
 	}
 
 	/**

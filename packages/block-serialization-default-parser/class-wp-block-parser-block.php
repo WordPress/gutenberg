@@ -21,7 +21,7 @@ class WP_Block_Parser_Block {
 	 * @since 5.0.0
 	 * @var string
 	 */
-	public $blockName;
+	public $blockName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 	/**
 	 * Optional set of attributes from block comment delimiters
@@ -40,7 +40,7 @@ class WP_Block_Parser_Block {
 	 * @since 5.0.0
 	 * @var WP_Block_Parser_Block[]
 	 */
-	public $innerBlocks;
+	public $innerBlocks; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 	/**
 	 * Resultant HTML from inside block comment delimiters
@@ -51,7 +51,7 @@ class WP_Block_Parser_Block {
 	 * @since 5.0.0
 	 * @var string
 	 */
-	public $innerHTML;
+	public $innerHTML; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 	/**
 	 * List of string fragments and null markers where inner blocks were found
@@ -65,7 +65,7 @@ class WP_Block_Parser_Block {
 	 * @since 4.2.0
 	 * @var array
 	 */
-	public $innerContent;
+	public $innerContent; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 	/**
 	 * Constructor.
@@ -74,17 +74,17 @@ class WP_Block_Parser_Block {
 	 *
 	 * @since 5.0.0
 	 *
-	 * @param string $name         Name of block.
-	 * @param array  $attrs        Optional set of attributes from block comment delimiters.
-	 * @param array  $innerBlocks  List of inner blocks (of this same class).
-	 * @param string $innerHTML    Resultant HTML from inside block comment delimiters after removing inner blocks.
-	 * @param array  $innerContent List of string fragments and null markers where inner blocks were found.
+	 * @param string $name          Name of block.
+	 * @param array  $attrs         Optional set of attributes from block comment delimiters.
+	 * @param array  $inner_blocks  List of inner blocks (of this same class).
+	 * @param string $inner_html    Resultant HTML from inside block comment delimiters after removing inner blocks.
+	 * @param array  $inner_content List of string fragments and null markers where inner blocks were found.
 	 */
-	public function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
-		$this->blockName    = $name;
+	public function __construct( $name, $attrs, $inner_blocks, $inner_html, $inner_content ) {
+		$this->blockName    = $name;          // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$this->attrs        = $attrs;
-		$this->innerBlocks  = $innerBlocks;
-		$this->innerHTML    = $innerHTML;
-		$this->innerContent = $innerContent;
+		$this->innerBlocks  = $inner_blocks;  // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$this->innerHTML    = $inner_html;    // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$this->innerContent = $inner_content; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 	}
 }
