@@ -41,6 +41,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( 'lightbox' );
 	} );
 
@@ -70,7 +71,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		// Right now the selector has an empty value.
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
+		// Right now the selector should not appear.
+		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 0 );
 	} );
 } );
