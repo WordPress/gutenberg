@@ -124,8 +124,7 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-playlist-block',
 		)
 	);
-  
-  
+
 	add_settings_field(
 		'gutenberg-interactivity-api-navigation-block',
 		__( 'Navigation block', 'gutenberg' ),
