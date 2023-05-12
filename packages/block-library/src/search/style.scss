@@ -89,8 +89,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	}
 
 	.wp-block-search__input {
-		transition-property: all;
-		transition-duration: 0;
+		transition-duration: 300ms;
 		flex-basis: 100%;
 	}
 

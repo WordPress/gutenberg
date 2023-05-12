@@ -1,5 +1,4 @@
 window.addEventListener( 'DOMContentLoaded', () => {
-	const transitionDuration = 300;
 	const hiddenClass = 'wp-block-search__searchfield-hidden';
 	const wrapperClass = '.wp-block-search__inside-wrapper';
 	const buttonClass = '.wp-block-search__button';
@@ -15,11 +14,6 @@ window.addEventListener( 'DOMContentLoaded', () => {
 
 		// Hide search on init.
 		block.classList.add( hiddenClass );
-		setTimeout(
-			() =>
-				( searchField.style.transitionDuration = `${ transitionDuration }ms` ),
-			transitionDuration
-		);
 
 		const toggleSearchField = ( e ) => {
 			if ( e.target !== button && ! e.target.closest( buttonClass ) ) {
@@ -38,6 +32,7 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			searchField.focus();
 
 			wrapper.removeEventListener( 'click', toggleSearchField );
+			button.removeEventListener( 'focus', toggleSearchField );
 			document.body.addEventListener( 'click', doSearch );
 		};
 
@@ -54,8 +49,10 @@ window.addEventListener( 'DOMContentLoaded', () => {
 
 			document.body.removeEventListener( 'click', doSearch );
 			wrapper.addEventListener( 'click', toggleSearchField );
+			button.addEventListener( 'focus', toggleSearchField );
 		};
 
 		wrapper.addEventListener( 'click', toggleSearchField );
+		button.addEventListener( 'focus', toggleSearchField );
 	} );
 } );
