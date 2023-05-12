@@ -20,14 +20,14 @@ class AfterSetupError extends Error {}
  * @param {Object}   spinner A CLI spinner which indciates progress.
  */
 function executeAfterSetup( config, spinner ) {
-	if ( ! config.afterSetup ) {
+	if ( ! config.lifecycleScripts.afterSetup ) {
 		return;
 	}
 
 	spinner.text = 'Executing Script: afterSetup';
 
 	try {
-		let output = execSync( config.afterSetup, {
+		let output = execSync( config.lifecycleScripts.afterSetup, {
 			encoding: 'utf-8',
 			stdio: 'pipe',
 			env: process.env,

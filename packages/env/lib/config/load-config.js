@@ -27,7 +27,7 @@ const postProcessConfig = require( './post-process-config' );
  * @property {string}                               workDirectoryPath       Path to the work directory located in ~/.wp-env.
  * @property {string}                               dockerComposeConfigPath Path to the docker-compose.yml file.
  * @property {boolean}                              detectedLocalConfig     If true, wp-env detected local config and used it.
- * @property {string}                               afterSetup              The command(s) to run after configuring WordPress on start and clean.
+ * @property {Object.<string, string>}              lifecycleScripts        Any lifecycle scripts that we might need to execute.
  * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
  * @property {boolean}                              debug                   True if debug mode is enabled.
  */
@@ -68,7 +68,9 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
-		afterSetup: config.afterSetup,
+		lifecycleScripts: {
+			afterSetup: config.afterSetup,
+		},
 		env: config.env,
 	};
 };
