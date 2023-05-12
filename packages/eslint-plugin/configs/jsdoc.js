@@ -105,7 +105,15 @@ module.exports = {
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
 		'jsdoc/require-yields': 'off',
-		'jsdoc/tag-lines': 'off',
+		'jsdoc/tag-lines': [
+			1,
+			'any',
+			{
+				startLines: 0,
+				endLines: 0,
+				applyToEndTag: false,
+			},
+		],
 		'jsdoc/no-multi-asterisks': [
 			'error',
 			{ preventAtMiddleLines: false },
@@ -127,7 +135,6 @@ module.exports = {
 		'jsdoc/check-values': 'off',
 		'jsdoc/empty-tags': 'error',
 		'jsdoc/implements-on-classes': 'error',
-		'jsdoc/newline-after-description': 'error',
 		'jsdoc/require-param': 'error',
 		'jsdoc/require-param-name': 'error',
 		'jsdoc/require-param-type': 'error',
