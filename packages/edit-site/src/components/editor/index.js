@@ -52,13 +52,15 @@ const interfaceLabels = {
 
 function useIsSiteEditorLoading() {
 	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
-	const { hasResolvingSelectors } = useSelect( ( select ) => {
-		return {
-			hasResolvingSelectors: select( coreStore ).hasResolvingSelectors(),
-		};
-	} );
 	const [ loaded, setLoaded ] = useState( false );
-	const inLoadingPause = ! loaded && ! hasResolvingSelectors;
+	const inLoadingPause = useSelect(
+		( select ) => {
+			const hasResolvingSelectors =
+				select( coreStore ).hasResolvingSelectors();
+			return ! loaded && ! hasResolvingSelectors;
+		},
+		[ loaded ]
+	);
 
 	useEffect( () => {
 		if ( inLoadingPause ) {

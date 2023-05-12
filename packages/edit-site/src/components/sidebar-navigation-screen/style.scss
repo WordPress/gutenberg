@@ -6,7 +6,7 @@
 }
 
 .edit-site-sidebar-navigation-screen__content {
-	margin: 0 $grid-unit-20 $grid-unit-20 $button-size;
+	margin: 0 0 $grid-unit-20 0;
 	color: $gray-600;
 	//z-index: z-index(".edit-site-sidebar-navigation-screen__content");
 }
@@ -34,7 +34,6 @@
 	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	padding-right: $grid-unit-20;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
 }
 

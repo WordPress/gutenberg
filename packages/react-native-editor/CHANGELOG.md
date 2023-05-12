@@ -10,29 +10,6 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-
--   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
--   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
--   [*] Use host app namespace in reusable block message [#50478]
--   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
-
-## 1.94.0
-
--   [*] Split pasted content between title and body. [#37169]
-
-## 1.93.1
-
--   [**] Fix regression with the Color hook and ColorPanel. [#49917]
-
-## 1.93.0
-
--   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
-
-## 1.92.1
-
--   [*] Avoid empty Gallery block error [#49557]
-
--   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 -   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
 -   [*] Use host app namespace in reusable block message [#50478]
