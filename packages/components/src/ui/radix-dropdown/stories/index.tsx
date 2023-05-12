@@ -168,8 +168,6 @@ const CheckboxItemsGroup = () => {
 			>
 				Checkbox item two
 			</DropdownMenuCheckboxItem>
-
-			<DropdownMenuSeparator />
 		</DropdownMenuGroup>
 	);
 };
@@ -225,7 +223,7 @@ Default.args = {
 					}
 				>
 					<DropdownMenuItem suffix={ <span>⌘+S</span> }>
-						Submenu with suffix
+						Submenu item with suffix
 					</DropdownMenuItem>
 					<DropdownMenuItem>
 						<div
@@ -244,7 +242,7 @@ Default.args = {
 					<DropdownSubMenu
 						trigger={
 							<DropdownSubMenuTrigger>
-								Submenu
+								Second level submenu
 							</DropdownSubMenuTrigger>
 						}
 					>
@@ -252,10 +250,13 @@ Default.args = {
 						<DropdownMenuItem>Submenu item</DropdownMenuItem>
 					</DropdownSubMenu>
 				</DropdownSubMenu>
-				<DropdownMenuSeparator />
 			</DropdownMenuGroup>
 
+			<DropdownMenuSeparator />
+
 			<CheckboxItemsGroup />
+
+			<DropdownMenuSeparator />
 
 			<RadioItemsGroup />
 		</>
