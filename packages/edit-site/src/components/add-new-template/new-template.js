@@ -2,33 +2,16 @@
  * WordPress dependencies
  */
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	Tooltip,
-	VisuallyHidden,
+	Button,
+	Modal,
+	__experimentalGrid as Grid,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	archive,
-	blockMeta,
-	category,
-	home,
-	list,
-	media,
-	notFound,
-	page,
-	plus,
-	post,
-	postAuthor,
-	postDate,
-	postList,
-	search,
-	tag,
-	layout as customGenericTemplateIcon,
-} from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -68,28 +51,33 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'404',
 ];
 
-const TEMPLATE_ICONS = {
-	'front-page': home,
-	home: postList,
-	single: post,
-	page,
-	archive,
-	search,
-	404: notFound,
-	index: list,
-	category,
-	author: postAuthor,
-	taxonomy: blockMeta,
-	date: postDate,
-	tag,
-	attachment: media,
-};
+function TemplateListItem( { title, description, onClick } ) {
+	return (
+		<Button onClick={ onClick }>
+			<VStack as="span" spacing={ 2 }>
+				<Text
+					weight={ 500 }
+					lineHeight={ 1.53846153846 } // 20px
+				>
+					{ title }
+				</Text>
+				<Text
+					lineHeight={ 1.53846153846 } // 20px
+				>
+					{ description }
+				</Text>
+			</VStack>
+		</Button>
+	);
+}
 
 export default function NewTemplate( {
 	postType,
 	toggleProps,
 	showIcon = true,
 } ) {
+	const [ showTemplatesListModal, setShowTemplatesListModal ] =
+		useState( false );
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
 	const [
@@ -167,99 +155,63 @@ export default function NewTemplate( {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
-
-	const customTemplateDescription = __(
-		'A custom template can be manually applied to any post or page.'
-	);
-
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
+	// TODO: Remove obsolete styles..
 	return (
 		<>
-			<DropdownMenu
-				className="edit-site-new-template-dropdown"
-				icon={ showIcon ? plus : null }
-				text={ showIcon ? null : postType.labels.add_new }
-				label={ postType.labels.add_new_item }
-				popoverProps={ {
-					noArrow: false,
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
+			<Toggle
+				{ ...restToggleProps }
+				onClick={ () => {
+					setShowTemplatesListModal( true );
 				} }
-				toggleProps={ toggleProps }
+				icon={ showIcon ? plus : null }
+				label={ postType.labels.add_new }
 			>
-				{ () => (
-					<>
-						{ isCreatingTemplate && (
-							<TemplateActionsLoadingScreen />
-						) }
-						<div className="edit-site-new-template-dropdown__menu-groups">
-							<MenuGroup label={ postType.labels.add_new_item }>
-								{ missingTemplates.map( ( template ) => {
-									const {
-										title,
-										description,
-										slug,
-										onClick,
-										icon,
-									} = template;
-									return (
-										<Tooltip
-											key={ slug }
-											position="top right"
-											text={ description }
-											className="edit-site-new-template-dropdown__menu-item-tooltip"
-										>
-											<MenuItem
-												icon={
-													icon ||
-													TEMPLATE_ICONS[ slug ] ||
-													post
-												}
-												iconPosition="left"
-												onClick={ () =>
-													onClick
-														? onClick( template )
-														: createTemplate(
-																template
-														  )
-												}
-											>
-												{ title }
-												{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-												 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-												<VisuallyHidden>
-													{ description }
-												</VisuallyHidden>
-											</MenuItem>
-										</Tooltip>
-									);
-								} ) }
-							</MenuGroup>
-							<MenuGroup>
-								<Tooltip
-									position="top right"
-									text={ customTemplateDescription }
-									className="edit-site-new-template-dropdown__menu-item-tooltip"
-								>
-									<MenuItem
-										icon={ customGenericTemplateIcon }
-										iconPosition="left"
-										onClick={ () =>
-											setShowCustomGenericTemplateModal(
-												true
-											)
-										}
-									>
-										{ __( 'Custom template' ) }
-										{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-										 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-										<VisuallyHidden>
-											{ customTemplateDescription }
-										</VisuallyHidden>
-									</MenuItem>
-								</Tooltip>
-							</MenuGroup>
-						</div>
-					</>
-				) }
-			</DropdownMenu>
+				{ showIcon ? null : postType.labels.add_new }
+			</Toggle>
+			{ showTemplatesListModal && (
+				<Modal
+					title={ __( 'Add template' ) }
+					// isFullScreen
+					className="edit-site-add-new-template__modal"
+					onRequestClose={ () => setShowTemplatesListModal( false ) }
+				>
+					<Grid
+						columns={ 3 }
+						gap={ 4 }
+						align="flex-start"
+						justify="center"
+						className="edit-site-add-new-template__modal__contents"
+					>
+						{ missingTemplates.map( ( template ) => {
+							const { title, description, slug, onClick } =
+								template;
+							return (
+								<TemplateListItem
+									key={ slug }
+									title={ title }
+									description={ description }
+									onClick={ () =>
+										onClick
+											? onClick( template )
+											: createTemplate( template )
+									}
+								/>
+							);
+						} ) }
+						<TemplateListItem
+							title={ __( 'Custom template' ) }
+							description={ __(
+								'A custom template can be manually applied to any post or page.'
+							) }
+							onClick={ () =>
+								setShowCustomGenericTemplateModal( true )
+							}
+						/>
+					</Grid>
+				</Modal>
+			) }
 			{ showCustomTemplateModal && (
 				<AddCustomTemplateModal
 					onClose={ () => setShowCustomTemplateModal( false ) }
