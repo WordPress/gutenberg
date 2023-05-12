@@ -53,7 +53,7 @@ function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
-	const { setEditorCanvasContainerView } = unlock(
+	const { setEditorCanvasContainerView, setCanvasMode } = unlock(
 		useDispatch( editSiteStore )
 	);
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -66,6 +66,7 @@ function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 		if ( typeof onClose === 'function' ) {
 			onClose();
 		}
+		setCanvasMode( 'edit' );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
