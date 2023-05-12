@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -320,7 +319,9 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {
