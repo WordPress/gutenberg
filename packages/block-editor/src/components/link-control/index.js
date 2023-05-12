@@ -20,6 +20,7 @@ import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
+import Settings from './settings';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -136,18 +137,19 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const [ settingsOpen, setSettingsOpen ] = useState( true );
+	const [ newValue, setNewValue ] = useState( value );
 
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
-		useInternalInputValue( value?.url || '' );
+		useInternalInputValue( newValue?.url || '' );
 
 	const [ internalTextInputValue, setInternalTextInputValue ] =
-		useInternalInputValue( value?.title || '' );
+		useInternalInputValue( newValue?.title || '' );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
-			: ! value || ! value.url
+			: ! newValue || ! newValue.url
 	);
 
 	const { createPage, isCreatingPage, errorMessage } =
@@ -192,7 +194,7 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
-	const hasLinkValue = value?.url?.trim()?.length > 0;
+	const hasLinkValue = newValue?.url?.trim()?.length > 0;
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
@@ -203,29 +205,24 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( {
+		setNewValue( {
 			...updatedValue,
 			title: internalTextInputValue || updatedValue?.title,
 		} );
-		stopEditing();
 	};
 
 	const handleSubmit = () => {
-		if (
-			currentUrlInputValue !== value?.url ||
-			internalTextInputValue !== value?.title
-		) {
-			onChange( {
-				...value,
-				url: currentUrlInputValue,
-				title: internalTextInputValue,
-			} );
-		}
+		const valueToSubmit = {
+			...newValue,
+			url: currentUrlInputValue,
+			title: internalTextInputValue,
+		};
+		setNewValue( valueToSubmit );
+		onChange( valueToSubmit );
 		stopEditing();
 	};
 
@@ -241,8 +238,8 @@ function LinkControl( {
 	};
 
 	const resetInternalValues = () => {
-		setInternalUrlInputValue( value?.url );
-		setInternalTextInputValue( value?.title );
+		setInternalUrlInputValue( newValue?.url );
+		setInternalTextInputValue( newValue?.title );
 	};
 
 	const handleCancel = ( event ) => {
@@ -268,7 +265,7 @@ function LinkControl( {
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
-		onRemove && value && ! isEditingLink && ! isCreatingPage;
+		onRemove && newValue && ! isEditingLink && ! isCreatingPage;
 
 	const showSettings = !! settings?.length;
 
@@ -277,7 +274,7 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = hasLinkValue && hasTextControl;
 
-	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isEditing = ( isEditingLink || ! newValue ) && ! isCreatingPage;
 
 	return (
 		<div
@@ -300,7 +297,7 @@ function LinkControl( {
 						} ) }
 					>
 						<LinkControlSearchInput
-							currentLink={ value }
+							currentLink={ newValue }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
 							value={ currentUrlInputValue }
@@ -331,15 +328,27 @@ function LinkControl( {
 				</>
 			) }
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
-				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
-				/>
+			{ newValue && ! isEditingLink && ! isCreatingPage && (
+				<>
+					<LinkPreview
+						key={ newValue?.url } // force remount when URL changes to avoid race conditions for rich previews
+						value={ newValue }
+						onEditClick={ () => setIsEditingLink( true ) }
+						hasRichPreviews={ hasRichPreviews }
+						hasUnlinkControl={ shownUnlinkControl }
+						onRemove={ onRemove }
+					/>
+					<div className="block-editor-link-control__tools_in_preview">
+						<Settings
+							value={ value }
+							settings={ settings }
+							onChange={ ( val ) => {
+								setNewValue( val );
+								onChange( val );
+							} }
+						/>
+					</div>
+				</>
 			) }
 
 			{ isEditing && (
@@ -356,9 +365,9 @@ function LinkControl( {
 								setInternalTextInputValue
 							}
 							handleSubmitWithEnter={ handleSubmitWithEnter }
-							value={ value }
+							value={ newValue }
 							settings={ settings }
-							onChange={ onChange }
+							setNewValue={ setNewValue }
 						/>
 					) }
 

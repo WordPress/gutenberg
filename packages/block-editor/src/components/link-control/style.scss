@@ -462,13 +462,21 @@ $preview-image-height: 140px;
 	}
 }
 
-.block-editor-link-control__tools {
+.block-editor-link-control__tools,
+.block-editor-link-control__tools_in_preview {
 	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
-	justify-content: space-between;
 	margin: 0;
 	padding: $grid-unit-20;
+}
+
+.block-editor-link-control__tools_in_preview {
+	border-top: 1px solid #ddd;
+}
+
+.block-editor-link-control__tools {
+	flex-wrap: wrap;
+	justify-content: space-between;
 
 	// To hide the horizontal scrollbar on toggle.
 	// Margin and padding are needed to prevent cutoff of the toggle button focus outline.
