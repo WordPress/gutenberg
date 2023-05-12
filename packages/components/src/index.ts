@@ -71,7 +71,7 @@ export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
-export { default as DropdownMenu } from './dropdown-menu';
+export { default as DropdownMenu } from './dropdown-menu/v1';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';

@@ -9,7 +9,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
  * Internal dependencies
  */
 import { COLORS, font, rtl } from '../../utils';
-import { space } from '../utils/space';
+import { space } from '../../ui/utils/space';
 import Icon from '../../icon';
 
 const ANIMATION_PARAMS = {

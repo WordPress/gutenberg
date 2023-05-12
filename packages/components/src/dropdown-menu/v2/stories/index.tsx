@@ -19,7 +19,7 @@ import {
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 	DropdownSubMenuTrigger,
-} from '../';
+} from '..';
 
 /**
  * WordPress dependencies

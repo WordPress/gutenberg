@@ -20,7 +20,7 @@ import {
 	DropdownMenuSeparator as DropdownMenuSeparatorV2,
 	DropdownSubMenu as DropdownSubMenuV2,
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
-} from './ui/radix-dropdown';
+} from './dropdown-menu/v2';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
