@@ -18,28 +18,32 @@ import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../private-apis';
 
 export default function GlobalStylesSidebar() {
-	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea } = select( interfaceStore );
-			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _isVisualEditorMode =
-				'visual' === select( editSiteStore ).getEditorMode();
-			const _isEditCanvasMode = 'edit' === getCanvasMode();
+	const {
+		shouldClearCanvasContainerView,
+		isStyleBookOpened,
+		showListViewByDefault,
+	} = useSelect( ( select ) => {
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _isVisualEditorMode =
+			'visual' === select( editSiteStore ).getEditorMode();
+		const _isEditCanvasMode = 'edit' === getCanvasMode();
+		const _showListViewByDefault = select( editSiteStore ).isFeatureActive(
+			'showListViewByDefault'
+		);
 
-			return {
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				shouldClearCanvasContainerView:
-					'edit-site/global-styles' !==
-						getActiveComplementaryArea( 'core/edit-site' ) ||
-					! _isVisualEditorMode ||
-					! _isEditCanvasMode,
-			};
-		},
-		[]
-	);
+		return {
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			shouldClearCanvasContainerView:
+				'edit-site/global-styles' !==
+					getActiveComplementaryArea( 'core/edit-site' ) ||
+				! _isVisualEditorMode ||
+				! _isEditCanvasMode,
+			showListViewByDefault: _showListViewByDefault,
+		};
+	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -72,7 +76,9 @@ export default function GlobalStylesSidebar() {
 							isPressed={ isStyleBookOpened }
 							disabled={ shouldClearCanvasContainerView }
 							onClick={ () => {
-								setIsListViewOpened( false );
+								setIsListViewOpened(
+									isStyleBookOpened && showListViewByDefault
+								);
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
 								);
