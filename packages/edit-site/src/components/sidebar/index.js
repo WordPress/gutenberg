@@ -76,9 +76,7 @@ function Sidebar() {
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
-			<div className="edit-site-sidebar__footer">
-				<SaveHub />
-			</div>
+			<SaveHub />
 		</>
 	);
 }
