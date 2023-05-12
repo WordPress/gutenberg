@@ -68,9 +68,7 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
-		lifecycleScripts: {
-			afterSetup: config.afterSetup,
-		},
+		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
 	};
 };

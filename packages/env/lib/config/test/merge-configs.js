@@ -16,11 +16,17 @@ describe( 'mergeConfigs', () => {
 				config: {
 					WP_TEST: 'test',
 				},
+				lifecycleScripts: {
+					afterStart: 'test',
+				},
 			},
 			{
 				port: 8889,
 				config: {
 					WP_TEST_2: 'test-2',
+				},
+				lifecycleScripts: {
+					afterEnd: 'test-2',
 				},
 			}
 		);
@@ -34,6 +40,10 @@ describe( 'mergeConfigs', () => {
 			config: {
 				WP_TEST: 'test',
 				WP_TEST_2: 'test-2',
+			},
+			lifecycleScripts: {
+				afterStart: 'test',
+				afterEnd: 'test-2',
 			},
 		} );
 	} );

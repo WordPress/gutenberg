@@ -443,7 +443,8 @@ Destroy the WordPress environment. Deletes docker containers, volumes, and
 networks associated with the WordPress environment and removes local files.
 
 Options:
-  --debug            Enable debug output.             [boolean] [default: false]
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env logs [environment]`
@@ -559,19 +560,16 @@ These can be overridden by setting a value within the `config` configuration. Se
 
 Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 
-## Lifecycle Hooks
+## Lifecycle Scripts
 
-These hooks are executed at certain points during the lifecycle of a command's execution. Keep in mind that these will be executed on both fresh and existing
-environments, so, ensure any commands you build won't break on subsequent executions.
+Using the `lifecycleScripts` option in `.wp-env.json` will allow you to set arbitrary commands to be executed at certain points in the lifecycle. This configuration
+can also be overridden using `WP_ENV_LIFECYCLE_SCRIPT_{LIFECYCLE_EVENT}` environment variables, with the remainder being the all-caps snake_case name of the option, for
+example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be executed on both fresh and existing environments, so, ensure any commands you
+build won't break on subsequent executions.
 
-### After Setup
-
-Using the `afterSetup` option in `.wp-env.json` files will allow you to configure an arbitrary command to execute after the environment's setup is complete:
-
--   `wp-env start`: Runs when the config changes, WordPress updates, or you pass the `--update` flag.
--   `wp-env clean`: Runs after the selected environments have been cleaned.
-
-You can override the `afterSetup` option using the `WP_ENV_AFTER_SETUP` environment variable.
+* `afterStart`: Runs after `wp-env start` has finished setting up the environment.
+* `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
+* `beforeDestroy`: Runs before `wp-env destroy` begins destroying anything.
 
 ## Examples
 
@@ -707,7 +705,7 @@ This is useful for performing some actions after setting up the environment, suc
 
 ```json
 {
-	"afterSetup": "node tests/e2e/bin/setup-env.js"
+	"afterStart": "node tests/e2e/bin/setup-env.js"
 }
 ```
 

@@ -20,7 +20,7 @@ class LifecycleScriptError extends Error {
 }
 
 /**
- * Executes any defined afterSetup command.
+ * Executes any defined life cycle script.
  *
  * @param {string}   event   The lifecycle event to run the script for.
  * @param {WPConfig} config  The config object to use.

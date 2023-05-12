@@ -203,15 +203,14 @@ module.exports = async function start( {
 			} ),
 		] );
 
-		// Execute any configured command that should run after the environment has finished being set up.
-		if ( scripts ) {
-			executeLifecycleScript( 'afterSetup', config, spinner );
-		}
-
 		// Set the cache key once everything has been configured.
 		await setCache( CONFIG_CACHE_KEY, configHash, {
 			workDirectoryPath,
 		} );
+	}
+
+	if ( scripts ) {
+		executeLifecycleScript( 'afterStart', config, spinner );
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;

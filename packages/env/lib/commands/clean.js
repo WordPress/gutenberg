@@ -65,9 +65,8 @@ module.exports = async function clean( {
 
 	await Promise.all( tasks );
 
-	// Execute any configured command that should run after the environment has finished being set up.
 	if ( scripts ) {
-		executeLifecycleScript( 'afterSetup', config, spinner );
+		executeLifecycleScript( 'afterClean', config, spinner );
 	}
 
 	spinner.text = `Cleaned ${ description }.`;

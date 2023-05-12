@@ -51,7 +51,7 @@ const DEFAULT_CONFIG = {
 		WP_HOME: 'http://localhost',
 	},
 	mappings: {},
-	afterSetup: null,
+	lifecycleScripts: {},
 	env: {
 		development: {},
 		tests: {
@@ -76,7 +76,7 @@ describe( 'parseConfig', () => {
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
 		delete process.env.WP_ENV_PHP_VERSION;
-		delete process.env.WP_ENV_AFTER_SETUP;
+		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
 	it( 'should return default config', async () => {
@@ -141,7 +141,9 @@ describe( 'parseConfig', () => {
 				return {
 					core: 'WordPress/WordPress#Test',
 					phpVersion: '1.0',
-					afterSetup: 'test',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
 					env: {
 						development: {
 							port: 1234,
@@ -181,7 +183,9 @@ describe( 'parseConfig', () => {
 				type: 'git',
 			},
 			phpVersion: '2.0',
-			afterSetup: 'test',
+			lifecycleScripts: {
+				afterStart: 'test',
+			},
 			env: {
 				development: {
 					...DEFAULT_CONFIG.env.development,
@@ -270,7 +274,7 @@ describe( 'parseConfig', () => {
 		process.env.WP_ENV_TESTS_PORT = 456;
 		process.env.WP_ENV_CORE = 'WordPress/WordPress#test';
 		process.env.WP_ENV_PHP_VERSION = '3.0';
-		process.env.WP_ENV_AFTER_SETUP = 'test after';
+		process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START = 'test after';
 
 		const parsed = await parseConfig( './', '/cache' );
 
@@ -288,7 +292,9 @@ describe( 'parseConfig', () => {
 				type: 'git',
 			},
 			phpVersion: '3.0',
-			afterSetup: 'test after',
+			lifecycleScripts: {
+				afterStart: 'test after',
+			},
 			env: {
 				development: {
 					port: 123,

@@ -34,10 +34,10 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number}                               port       The port to use in the development environment.
- * @property {number}                               testsPort  The port to use in the tests environment.
- * @property {string|null}                          afterSetup The command(s) to run after configuring WordPress on start and clean.
- * @property {Object.<string, WPEnvironmentConfig>} env        The environment-specific configuration options.
+ * @property {number}                               port       		 The port to use in the development environment.
+ * @property {number}                               testsPort  		 The port to use in the tests environment.
+ * @property {Object.<string, string|null>} 		lifecycleScripts The scripts to run at certain points in the command lifecycle.
+ * @property {Object.<string, WPEnvironmentConfig>} env        		 The environment-specific configuration options.
  */
 
 /**
@@ -223,7 +223,11 @@ async function getDefaultConfig(
 
 		// These configuration options are root-only and should not be present
 		// on environment-specific configuration objects.
-		afterSetup: null,
+		lifecycleScripts: {
+			afterStart: null,
+			afterClean: null,
+			afterDestroy: null,
+		},
 		env: {
 			development: {},
 			tests: {
@@ -250,6 +254,7 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	// Create a service config object so we can merge it with the others
 	// and override anything that the configuration options need to.
 	const overrideConfig = {
+		lifecycleScripts: overrides.lifecycleScripts,
 		env: {
 			development: {},
 			tests: {},
@@ -280,10 +285,6 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.phpVersion = overrides.phpVersion;
 		overrideConfig.env.development.phpVersion = overrides.phpVersion;
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
-	}
-
-	if ( overrides.afterSetup ) {
-		overrideConfig.afterSetup = overrides.afterSetup;
 	}
 
 	return overrideConfig;
@@ -333,12 +334,20 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
-	if ( rawConfig.afterSetup !== undefined ) {
-		// Support null as a valid input.
-		if ( rawConfig.afterSetup !== null ) {
-			checkString( configFile, 'afterSetup', rawConfig.afterSetup );
+	if ( rawConfig.lifecycleScripts ) {
+		parsedConfig.lifecycleScripts = {};
+
+		for ( const key in rawConfig.lifecycleScripts ) {
+			if ( rawConfig.lifecycleScripts[ key ] !== null ) {
+				checkString(
+					configFile,
+					key,
+					rawConfig.lifecycleScripts[ key ]
+				);
+			}
+			parsedConfig.lifecycleScripts[ key ] =
+				rawConfig.lifecycleScripts[ key ];
 		}
-		parsedConfig.afterSetup = rawConfig.afterSetup;
 	}
 
 	// Parse the environment-specific configs so they're accessible to the root.

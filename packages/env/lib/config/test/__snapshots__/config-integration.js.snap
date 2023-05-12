@@ -62,7 +62,8 @@ exports[`Config Integration should load local and override configuration files 1
     },
   },
   "lifecycleScripts": {
-    "afterSetup": null,
+    "afterEnd": "test",
+    "afterStart": null,
   },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
@@ -131,7 +132,7 @@ exports[`Config Integration should load local configuration file 1`] = `
     },
   },
   "lifecycleScripts": {
-    "afterSetup": "test",
+    "afterStart": "test",
   },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
@@ -199,9 +200,7 @@ exports[`Config Integration should use default configuration 1`] = `
       "themeSources": [],
     },
   },
-  "lifecycleScripts": {
-    "afterSetup": null,
-  },
+  "lifecycleScripts": {},
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
@@ -271,7 +270,7 @@ exports[`Config Integration should use environment variables over local and over
     },
   },
   "lifecycleScripts": {
-    "afterSetup": "test",
+    "afterStart": "test",
   },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
