@@ -72,8 +72,8 @@ export default function TemplatePartEdit( {
 				isResolved: hasResolvedEntity,
 				isMissing:
 					hasResolvedEntity &&
-					entityRecord &&
-					Object.keys( entityRecord ).length > 0,
+					( ! entityRecord ||
+						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
 			};
 		},
