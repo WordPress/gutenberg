@@ -16,16 +16,20 @@ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
-    const [ customFonts ] = useGlobalSetting( 'typography.fontFamilies' );
-	const customFontFamilies = customFonts?.theme  || [];
-	const [ fontLibrary, setFontLibrary ] = useState( {} );
-	const libraryFontFamilies = fontLibrary.fontFamilies || [];
+	// Global Styles Fonts
+    const [ customFontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const customFonts = customFontFamilies?.theme  || [];
+
+	// Library Fonts
+	const [ libraryFonts, setLibraryFonts ] = useState( [] );
+
+	// Google Fonts
 	const [ googleFonts, setGoogleFonts ] = useState( [] );
 	const [ googleFontsCategories, setGoogleFontsCategories ] = useState( [] );
 
 	useEffect( () => {
 		getFontLibrary().then( ( response ) => {
-			setFontLibrary( response );
+			setLibraryFonts( response );
 		} );
 		getGoogleFonts().then( ( { items, categories } ) => {
 			setGoogleFonts( items );
@@ -33,33 +37,40 @@ function FontLibraryProvider( { children } ) {
 		} );
 	}, [] );
 
+	// Set used to check if a font is already installed on the Google Fonts Tab of the modal
 	const installedFontNames = useMemo( () => {
 		const names = new Set();
-		customFontFamilies.forEach( ( font ) => {
-			if (font.name || font.fontFamily) names.add( font.name || font.fontFamily );
+		customFonts.forEach( ( font ) => {
+			if ( font.name || font.fontFamily ) names.add( font.name || font.fontFamily );
 		} );
-		libraryFontFamilies.forEach( ( font ) => {
-			if (font.name || font.fontFamily) names.add( font.name || font.fontFamily );
+		libraryFonts.forEach( ( font ) => {
+			if ( font.name || font.fontFamily ) names.add( font.name || font.fontFamily );
 		} );
 		return names;
-	}, [ customFontFamilies, fontLibrary ] );
+	}, [ customFonts, libraryFonts ] );
 
-	console.log(installedFontNames);
+	
+	const addToLibrary = ( newFontFamily ) => {
+		return [ ...libraryFonts, newFontFamily ];
+	}
 
-    async function installGoogleFonts ( fonts ) {
-        const response = await updateFontsLibrary( fonts );
-        return response;
+
+    async function updateLibrary ( newLibrary ) {
+        const newFontFamilies = await updateFontsLibrary( newLibrary );
+		console.log( 'newFontFamilies', newFontFamilies );
+		setLibraryFonts( newFontFamilies );
     }
 
 	return (
 		<FontLibraryContext.Provider
 			value={ {
-                customFontFamilies,
-				fontLibrary,
+                customFonts,
+				libraryFonts,
 				googleFonts,
 				googleFontsCategories,
 				installedFontNames,
-                installGoogleFonts,
+				addToLibrary,
+                updateLibrary,
 			} }
 		>
 			{ children }

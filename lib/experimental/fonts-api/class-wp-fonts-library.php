@@ -71,7 +71,8 @@ class WP_Fonts_Library {
 
     function get_fonts_library () {
         $post = $this->get_fonts_library_post();
-        return new WP_REST_Response( $post );
+        $post_content = json_decode( $post->post_content );
+        return new WP_REST_Response( $post_content );
     }
 
     private function get_fonts_library_post () {
@@ -102,7 +103,8 @@ class WP_Fonts_Library {
         );
         $updated_post = wp_update_post( $updated_post_data );
         $new_post = $this->get_fonts_library_post();
-        return new WP_REST_Response( $new_post );
+        $post_content = json_decode( $new_post->post_content );
+        return new WP_REST_Response( $post_content );
     }
 
     function get_google_fonts () {

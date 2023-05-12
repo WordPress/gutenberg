@@ -50,11 +50,11 @@ export function googleVariantToFullVariant ( variant ) {
     return `${ style } ${ weight }`;
 }
 
-function getStyleFromGoogleVariant( variant ) {
+export function getStyleFromGoogleVariant( variant ) {
 	return variant.includes( 'italic' ) ? 'italic' : 'normal';
 }
 
-function getWeightFromGoogleVariant( variant ) {
+export function getWeightFromGoogleVariant( variant ) {
 	return variant === 'regular' || variant === 'italic'
 		? '400'
 		: variant.replace( 'italic', '' );
@@ -70,8 +70,8 @@ function getFallbackForGoogleFont ( googleFontCategory ) {
 * @param {string[]} variantsSelected array of variant names selected
 * @return {Object[]} array of font definitions
 */
-export function getGoogleFontDefinitions ( googleFont, variantsSelected=[] ) {
-    const fontFamilies = [{
+export function fontFamilyFromGoogleFont ( googleFont, variantsSelected=[] ) {
+    const fontFamily = {
         name: googleFont.family,
         fontFamily: `${googleFont.family}, ${ getFallbackForGoogleFont( googleFont.category ) }`,
         fontFace: googleFont.variants
@@ -85,6 +85,6 @@ export function getGoogleFontDefinitions ( googleFont, variantsSelected=[] ) {
                     fontStyle: getStyleFromGoogleVariant( variant ),
                 }
         ) ),
-    }];
-    return fontFamilies;
+    };
+    return fontFamily;
 }

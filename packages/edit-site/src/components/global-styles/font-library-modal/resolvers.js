@@ -9,8 +9,8 @@ export async function getFontLibrary() {
     const config = {
         path: '/wp/v2/fonts_library',
     };
-    const data = await apiFetch( config );
-    return data;
+    const { fontFamilies } = await apiFetch( config );
+    return fontFamilies;
 }
 
 export async function getGoogleFonts() {
@@ -28,8 +28,8 @@ export async function updateFontsLibrary( data ) {
     const config = {
         path: '/wp/v2/fonts_library',
         method: 'POST',
-        data: data,
+        data: { fontFamilies: data },
     };
-    const response = await apiFetch( config );
-    return response;
+    const { fontFamilies } = await apiFetch( config );
+    return fontFamilies;
 }

@@ -20,19 +20,12 @@ import {
 
 
 function InstalledFonts () {
+	const { libraryFonts, customFonts } = useContext( FontLibraryContext );
 
-	const { fontLibrary, customFontFamilies } = useContext( FontLibraryContext );
-    const fontFamilies = fontLibrary.fontFamilies || [];
-
-    const fontLibraryFonts = fontFamilies.map( family => fontFamilyToCardFont( family, false ) );
-    const customFonts = customFontFamilies.map( family => fontFamilyToCardFont( family, true ) );
-
-    const fonts = fontLibraryFonts.concat( customFonts );
-    
-
-    console.log("fontLibrary", fontLibrary);
-    console.log("fontFamilies", fontFamilies);
-    console.log("fonts", fonts);
+    const fonts = [
+        ...libraryFonts.map( family => fontFamilyToCardFont( family, false ) ),
+        ...customFonts.map( family => fontFamilyToCardFont( family, true ) ),
+    ].sort( ( a, b ) => a.name.localeCompare( b.name ) );
 
     return (
         <TabLayout
