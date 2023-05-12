@@ -14,22 +14,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
+import { DEFAULT_BLOCK, ALLOWED_BLOCKS } from '../constants';
 
 export default function NavigationInnerBlocks( {
 	clientId,

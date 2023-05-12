@@ -183,6 +183,26 @@ Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://dev
 
 While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
 
+## Using `composer`, `phpunit`, and `wp-cli` tools.
+
+For ease of use, Composer, PHPUnit, and wp-cli are available for in the environment. To run these executables, use `wp-env run <env> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run tests-cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
+
+For the `env` part, `cli` and `wordpress` share a database and mapped volumes, but more tools are available in the cli environment. You should use the `tests-cli` / `tests-wordpress` environments for a separate testing database.
+
+By default, the cwd of the run command is the root of the WordPress install. If you're working on a plugin, you likely need to pass `--env-cwd` to make sure composer/phpunit commands are executed relative to the plugin you're working on. For example, `wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer install`.
+
+To make this easier, it's often helpful to add scripts in your `package.json` file:
+
+```json
+{
+	"scripts": {
+		"composer": "wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer"
+	}
+}
+```
+
+Then, `npm run composer install` would run composer install in the environment. You could also do this for phpunit, wp-cli, etc.
+
 ## Using Xdebug
 
 Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
@@ -310,9 +330,10 @@ back to using quotation marks; <code>wp-env</code> considers everything inside t
 quotation marks to be command argument.
 
 For example, to ask <code>WP-CLI</code> for its help text:
+
 <pre>sh
 <code class="language-sh">wp-env run cli "wp --help"</code></pre>
-	
+
 Without the quotation marks, <code>wp-env</code> will print its own help text instead of
 passing it to the container. If you experience any problems where the command
 is not being passed correctly, fall back to using quotation marks.
@@ -396,6 +417,7 @@ Success: Installed 1 of 1 plugins.
 ```
 
 #### Changing the permalink structure
+
 You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
 
 **Examples**
@@ -540,14 +562,14 @@ Additionally, the values referencing a URL include the specified port for the gi
 ## Lifecycle Hooks
 
 These hooks are executed at certain points during the lifecycle of a command's execution. Keep in mind that these will be executed on both fresh and existing
-environments, so, ensure any commands you build won't break on subsequent executions. 
+environments, so, ensure any commands you build won't break on subsequent executions.
 
 ### After Setup
 
 Using the `afterSetup` option in `.wp-env.json` files will allow you to configure an arbitrary command to execute after the environment's setup is complete:
 
-- `wp-env start`: Runs when the config changes, WordPress updates, or you pass the `--update` flag.
-- `wp-env clean`: Runs after the selected environments have been cleaned.
+-   `wp-env start`: Runs when the config changes, WordPress updates, or you pass the `--update` flag.
+-   `wp-env clean`: Runs after the selected environments have been cleaned.
 
 You can override the `afterSetup` option using the `WP_ENV_AFTER_SETUP` environment variable.
 
@@ -688,6 +710,29 @@ This is useful for performing some actions after setting up the environment, suc
 	"afterSetup": "node tests/e2e/bin/setup-env.js"
 }
 ```
+
+### Advanced PHP settings
+
+You can set PHP settings by mapping an `.htaccess` file. This maps an `.htaccess` file to the WordPress root (`/var/www/html`) from the directory in which you run `wp-env`.
+
+```json
+{
+	"mappings": {
+		".htaccess": ".htaccess"
+	}
+}
+```
+
+Then, your .htaccess file can contain various settings like this:
+
+```
+# Note: the default upload value is 1G.
+php_value post_max_size 2G
+php_value upload_max_filesize 2G
+php_value memory_limit 2G
+```
+
+This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
 
 ## Contributing to this package
 

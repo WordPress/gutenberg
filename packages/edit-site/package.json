@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "5.9.0",
+	"version": "5.10.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,6 +38,7 @@
 		"@wordpress/core-commands": "file:../core-commands",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",

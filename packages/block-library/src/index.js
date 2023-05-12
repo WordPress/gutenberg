@@ -46,8 +46,6 @@ import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as details from './details';
-import * as detailsContent from './details-content';
-import * as detailsSummary from './details-summary';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -231,8 +229,6 @@ const getAllBlocks = () => {
 	];
 	if ( window?.__experimentalEnableDetailsBlocks ) {
 		blocks.push( details );
-		blocks.push( detailsContent );
-		blocks.push( detailsSummary );
 	}
 	if ( window?.__experimentalEnablePlaylistBlock ) {
 		blocks.push( playlist );

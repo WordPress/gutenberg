@@ -18,6 +18,10 @@
 	border-radius: $radius-block-ui;
 	color: $components-color-foreground;
 
+	&.is-next-40px-default-size {
+		height: $button-size-next-default-40px;
+	}
+
 	&[aria-expanded="true"],
 	&:hover {
 		color: $components-color-accent;
@@ -160,13 +164,14 @@
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
-		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
 		&:hover:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
@@ -284,6 +289,10 @@
 		min-width: $button-size;
 		justify-content: center;
 
+		&.is-next-40px-default-size {
+			min-width: $button-size-next-default-40px;
+		}
+
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
@@ -293,11 +302,9 @@
 
 		&.has-text {
 			justify-content: start;
-			padding-right: 12px;
-		}
-
-		&.has-text svg {
-			margin-right: $grid-unit-10;
+			padding-right: $grid-unit-15;
+			padding-left: $grid-unit-10;
+			gap: $grid-unit-05;
 		}
 
 		&.has-text .dashicon {

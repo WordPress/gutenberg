@@ -37,14 +37,20 @@ export default function SaveButton( {
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
-	let label;
-	if ( isPreviewingTheme() && isDirty ) {
-		label = __( 'Activate & Save' );
-	} else if ( isPreviewingTheme() ) {
-		label = __( 'Activate' );
-	} else {
-		label = __( 'Save' );
-	}
+	const getLabel = () => {
+		if ( disabled ) {
+			return __( 'Saved' );
+		}
+
+		if ( isPreviewingTheme() && isDirty ) {
+			return __( 'Activate & Save' );
+		} else if ( isPreviewingTheme() ) {
+			return __( 'Activate' );
+		}
+
+		return __( 'Save' );
+	};
+	const label = getLabel();
 
 	return (
 		<Button

@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy
+/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy @ndiego
 
 # Schemas
 /schemas/json                                   @ajlende
@@ -57,7 +57,7 @@
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/docs/tool                                      @ajitbohra @ndiego
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -125,7 +125,7 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @noahtallen
+/packages/env                                   @noahtallen @ObliviousHarmony
 
 # PHP
 /lib                                            @spacedmonkey

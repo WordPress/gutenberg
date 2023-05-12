@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -22,14 +21,9 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-
-function compareVariations( a, b ) {
-	return (
-		fastDeepEqual( a.styles, b.styles ) &&
-		fastDeepEqual( a.settings, b.settings )
-	);
-}
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
+	blockEditorPrivateApis
+);
 
 function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -63,7 +57,7 @@ function Variation( { variation } ) {
 	};
 
 	const isActive = useMemo( () => {
-		return compareVariations( user, variation );
+		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
 
 	return (

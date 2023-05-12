@@ -20,7 +20,7 @@
 	}
 
 	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
+		width: calc(#{$nav-sidebar-width} - #{$canvas-padding});
 	}
 
 	.edit-site-layout.is-full-canvas & {
@@ -105,11 +105,10 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
+	overflow: hidden;
 
 	& > div {
 		color: $gray-900;
-		background: $white;
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 	}
 
 	@include break-medium {
@@ -135,7 +134,6 @@
 
 		& > div {
 			border-radius: 0;
-			box-shadow: none;
 		}
 	}
 }

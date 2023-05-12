@@ -8,14 +8,15 @@ export default function useInternalInputValue( value ) {
 		value || ''
 	);
 
+	// If the value prop changes, update the internal state.
 	useEffect( () => {
-		/**
-		 * If the value changes then sync this
-		 * back up with state.
-		 */
-		if ( value && value !== internalInputValue ) {
-			setInternalInputValue( value );
-		}
+		setInternalInputValue( ( prevValue ) => {
+			if ( value && value !== prevValue ) {
+				return value;
+			}
+
+			return prevValue;
+		} );
 	}, [ value ] );
 
 	return [ internalInputValue, setInternalInputValue ];
