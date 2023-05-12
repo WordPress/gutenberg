@@ -3,15 +3,16 @@
 	const { createElement: el } = wp.element;
 	const { InnerBlocks } = wp.blockEditor;
 	const __ = wp.i18n.__;
-	const divProps = {
+
+    const divProps = {
 		className: 'product',
 		style: { outline: '1px solid gray', padding: 5 },
 	};
+
+    // Make it easier to select the block.
 	const template = [
 		[ 'core/image' ],
-		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
-		[ 'core/quote' ],
-	];
+    ];
 
 	const save = function () {
 		return el( 'div', divProps, el( InnerBlocks.Content ) );
@@ -37,10 +38,11 @@
 				'div',
 				divProps,
 				el( InnerBlocks, {
-					template,
+                    template,
 					prioritizedInserterBlocks: [
+                        'core/audio',
 						'core/spacer',
-						'core/button',
+                        'core/code',
 					],
 				} )
 			);
