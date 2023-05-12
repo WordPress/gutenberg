@@ -1,5 +1,4 @@
 ( function () {
-	const { withSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
 	const { InnerBlocks } = wp.blockEditor;
@@ -13,8 +12,6 @@
 		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
 		[ 'core/quote' ],
 	];
-	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
-	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
 	const save = function () {
 		return el( 'div', divProps, el( InnerBlocks.Content ) );
@@ -31,32 +28,28 @@
 		save,
 	} );
 
-	// registerBlockType( 'test/allowed-blocks-set', {
-	// 	title: 'Allowed Blocks Set',
-	// 	icon: 'carrot',
-	// 	category: 'text',
+	registerBlockType( 'test/prioritized-inserter-blocks-set', {
+		title: 'Prioritized Inserter Blocks Set',
+		icon: 'carrot',
+		category: 'text',
+		edit() {
+			return el(
+				'div',
+				divProps,
+				el( InnerBlocks, {
+					template,
+					prioritizedInserterBlocks: [
+						'core/spacer',
+						'core/button',
+					],
+				} )
+			);
+		},
 
-	// 	edit() {
-	// 		return el(
-	// 			'div',
-	// 			divProps,
-	// 			el( InnerBlocks, {
-	// 				template,
-	// 				allowedBlocks: [
-	// 					'core/button',
-	// 					'core/gallery',
-	// 					'core/list',
-	// 					'core/media-text',
-	// 					'core/quote',
-	// 				],
-	// 			} )
-	// 		);
-	// 	},
+		save,
+	} );
 
-	// 	save,
-	// } );
-
-	// registerBlockType( 'test/allowed-blocks-dynamic', {
+	// registerBlockType( 'test/prioritized-inserter-blocks-dynamic', {
 	// 	title: 'Allowed Blocks Dynamic',
 	// 	icon: 'carrot',
 	// 	category: 'text',
