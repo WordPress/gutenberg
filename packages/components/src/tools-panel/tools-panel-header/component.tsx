@@ -13,7 +13,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../../dropdown-menu';
+import DropdownMenu from '../../dropdown-menu/v1';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';

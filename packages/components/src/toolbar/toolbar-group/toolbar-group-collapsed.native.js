@@ -9,7 +9,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../../dropdown-menu';
+import DropdownMenu from '../../dropdown-menu/v1';
 import styles from './style.scss';
 
 function ToolbarGroupCollapsed( {

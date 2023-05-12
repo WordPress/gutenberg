@@ -32,7 +32,7 @@ import { ItemGroup } from '../item-group';
 import { VStack } from '../v-stack';
 import GradientPicker from '../gradient-picker';
 import ColorPalette from '../color-palette';
-import DropdownMenu from '../dropdown-menu';
+import DropdownMenu from '../dropdown-menu/v1';
 import Popover from '../popover';
 import {
 	PaletteActionsContainer,

@@ -10,7 +10,7 @@ import { forwardRef, useContext } from '@wordpress/element';
  */
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
-import DropdownMenu from '../../dropdown-menu';
+import DropdownMenu from '../../dropdown-menu/v1';
 
 function ToolbarDropdownMenu( props, ref ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
