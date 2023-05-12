@@ -54,15 +54,13 @@ export type DropdownMenuProps = {
 	 */
 	alignOffset?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'alignOffset' ];
 	/**
-	 * The contents rendered inside the trigger
+	 * The trigger button.
 	 */
 	trigger: React.ReactNode;
 	/**
 	 * The contents of the dropdown
 	 */
 	children: React.ReactNode;
-
-	// TODO: slot name ?
 };
 
 export type DropdownSubMenuTriggerProps = {
@@ -77,7 +75,7 @@ export type DropdownSubMenuTriggerProps = {
 	/**
 	 * The contents of the item's suffix.
 	 *
-	 * By default, it is the standard icon for a submenu trigger.
+	 * @default The standard chevron icon for a submenu trigger.
 	 */
 	suffix?: React.ReactNode;
 };
@@ -97,8 +95,6 @@ export type DropdownSubMenuProps = {
 	 * Event handler called when the open state of the submenu changes.
 	 */
 	onOpenChange?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'onOpenChange' ];
-
-	// TODO: conflict/duplication when using `asChild` and <DropdownMenuItem /> ?
 	/**
 	 * When `true`, prevents the user from interacting with the item.
 	 */
@@ -110,18 +106,17 @@ export type DropdownSubMenuProps = {
 	 */
 	textValue?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'textValue' ];
 	/**
-	 * The contents rendered inside the trigger
+	 * The contents rendered inside the trigger. The trigger should be
+	 * an instance of the `DropdownSubMenuTriggerProps` component.
 	 */
 	trigger: React.ReactNode;
 	/**
 	 * The contents of the dropdown sub menu
 	 */
 	children: React.ReactNode;
-
-	// TODO: slot name ?
 };
 
-export type DropdownItemProps = {
+export type DropdownMenuItemProps = {
 	/**
 	 * When true, prevents the user from interacting with the item.
 	 *

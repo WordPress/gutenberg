@@ -19,7 +19,7 @@ import * as DropdownMenuStyled from './styles';
 import type {
 	DropdownMenuProps,
 	DropdownSubMenuProps,
-	DropdownItemProps,
+	DropdownMenuItemProps,
 	DropdownMenuLabelProps,
 	DropdownMenuGroupProps,
 	DropdownMenuCheckboxItemProps,
@@ -34,6 +34,10 @@ const SUB_MENU_OFFSET_SIDE = 12;
 // Opposite amount of the top padding of the menu item
 const SUB_MENU_OFFSET_ALIGN = -8;
 
+/**
+ * `DropdownMenu` displays a menu to the user (such as a set of actions
+ * or functions) triggered by a button.
+ */
 export const DropdownMenu = ( {
 	// Root props
 	defaultOpen,
@@ -149,7 +153,7 @@ export const DropdownMenuGroup = ( props: DropdownMenuGroupProps ) => (
 
 export const DropdownMenuItem = forwardRef(
 	(
-		{ children, prefix, suffix, ...props }: DropdownItemProps,
+		{ children, prefix, suffix, ...props }: DropdownMenuItemProps,
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (

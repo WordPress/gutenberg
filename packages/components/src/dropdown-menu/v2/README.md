@@ -1,6 +1,6 @@
 # `DropdownMenu` (v2)
 
-`DropdownMenu` aisplays a menu to the user (such as a set of actions or functions) triggered by a button.
+`DropdownMenu` displays a menu to the user (such as a set of actions or functions) triggered by a button.
 
 
 ## Design guidelines
