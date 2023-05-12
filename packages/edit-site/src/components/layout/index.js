@@ -45,6 +45,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import AddNewPageModal from '../add-new-page';
 
 const { useCommands } = unlock( coreCmmandsPrivateApis );
 
@@ -132,6 +133,7 @@ export default function Layout() {
 	return (
 		<>
 			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
+			<AddNewPageModal />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }
