@@ -76,7 +76,7 @@ function InserterSearchResults( {
 
 			return {
 				prioritizedBlocks:
-					blockListSettings?.prioritizedInserterBlocks || [],
+					blockListSettings?.prioritizedInserterBlocks || EMPTY_ARRAY,
 			};
 		},
 		[ rootClientId ]
