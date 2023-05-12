@@ -70,4 +70,32 @@ describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			'Code',
 		] );
 	} );
+
+	it( 'obeys allowed blocks over prioritzed blocks setting if conflicted', async () => {
+		const parentBlockSelector =
+			'[data-type="test/prioritized-inserter-blocks-set-with-conflicting-allowed-blocks"]';
+		await insertBlock(
+			'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks'
+		);
+		await closeGlobalBlockInserter();
+
+		await page.waitForSelector( parentBlockSelector );
+
+		await page.click(
+			`${ parentBlockSelector } .block-list-appender .block-editor-inserter__toggle`
+		);
+
+		await page.waitForSelector( QUICK_INSERTER_RESULTS_SELECTOR );
+
+		const inserterItems = await getAllBlockInserterItemTitles();
+
+		expect( inserterItems.slice( 0, 3 ) ).toEqual( [
+			'Spacer',
+			'Code',
+			'Paragraph',
+		] );
+		expect( inserterItems ).toEqual(
+			expect.not.arrayContaining( [ 'Audio' ] )
+		);
+	} );
 } );

@@ -2,7 +2,6 @@
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
 	const { InnerBlocks } = wp.blockEditor;
-	const __ = wp.i18n.__;
 
     const divProps = {
 		className: 'product',
@@ -51,32 +50,32 @@
 		save,
 	} );
 
-	// registerBlockType( 'test/prioritized-inserter-blocks-dynamic', {
-	// 	title: 'Allowed Blocks Dynamic',
-	// 	icon: 'carrot',
-	// 	category: 'text',
+    registerBlockType( 'test/prioritized-inserter-blocks-set-with-conflicting-allowed-blocks', {
+		title: 'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks',
+		icon: 'carrot',
+		category: 'text',
+		edit() {
+			return el(
+				'div',
+				divProps,
+				el( InnerBlocks, {
+                    template,
+                    allowedBlocks: [
+                        'core/spacer',
+                        'core/code',
+                        'core/paragraph',
+                        'core/heading'
+                    ],
+					prioritizedInserterBlocks: [
+                        'core/audio', // this is **not** in the allowedBlocks list
+						'core/spacer',
+                        'core/code',
+					],
+				} )
+			);
+		},
 
-	// 	edit: withSelect( function ( select, ownProps ) {
-	// 		const getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
-	// 		return {
-	// 			numberOfChildren: getBlockOrder( ownProps.clientId ).length,
-	// 		};
-	// 	} )( function ( props ) {
-	// 		return el(
-	// 			'div',
-	// 			{
-	// 				...divProps,
-	// 				'data-number-of-children': props.numberOfChildren,
-	// 			},
-	// 			el( InnerBlocks, {
-	// 				allowedBlocks:
-	// 					props.numberOfChildren < 2
-	// 						? allowedBlocksWhenSingleEmptyChild
-	// 						: allowedBlocksWhenMultipleChildren,
-	// 			} )
-	// 		);
-	// 	} ),
+		save,
+	} );
 
-	// 	save,
-	// } );
 } )();
