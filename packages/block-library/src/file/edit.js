@@ -271,16 +271,18 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					</ResizableBox>
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
-					<RichText
-						tagName="a"
-						value={ fileName }
-						placeholder={ __( 'Write file name…' ) }
-						withoutInteractiveFormatting
-						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
-						}
-						href={ textLinkHref }
-					/>
+					<div className="wp-block-file__button-richtext-wrapper">
+						<RichText
+							tagName="a"
+							value={ fileName }
+							placeholder={ __( 'Write file name…' ) }
+							withoutInteractiveFormatting
+							onChange={ ( text ) =>
+								setAttributes( { fileName: text } )
+							}
+							href={ textLinkHref }
+						/>
+					</div>
 					{ showDownloadButton && (
 						<div
 							className={
