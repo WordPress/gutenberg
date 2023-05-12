@@ -7,6 +7,7 @@ import { styles, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -30,7 +31,8 @@ export default function GlobalStylesSidebar() {
 		const _isVisualEditorMode =
 			'visual' === select( editSiteStore ).getEditorMode();
 		const _isEditCanvasMode = 'edit' === getCanvasMode();
-		const _showListViewByDefault = select( editSiteStore ).isFeatureActive(
+		const _showListViewByDefault = select( preferencesStore ).get(
+			'core/edit-site',
 			'showListViewByDefault'
 		);
 
