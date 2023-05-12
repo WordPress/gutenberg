@@ -12,11 +12,11 @@ import {
 import { chevronLeft } from "@wordpress/icons";
 
 
-function TabLayout ({ title, description, handleBack, children }) {
+function TabLayout ({ title, description, handleBack, children, footer }) {
     return (
         <div className="tab-layout">
             <Spacer margin={4} />
-            <VStack spacing={4}>
+            <VStack spacing={4} justify="space-between">
                 <header>
                     <VStack spacing={2}>
                         <HStack justify="flex-start">
@@ -37,7 +37,7 @@ function TabLayout ({ title, description, handleBack, children }) {
                     { children }
                 </main>
                 <footer>
-
+                    { footer }
                 </footer>
             </VStack>
         </div>

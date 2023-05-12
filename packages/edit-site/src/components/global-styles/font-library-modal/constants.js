@@ -4,12 +4,7 @@
 import { __ } from '@wordpress/i18n';
 
 
-export const FONT_LIBRARY_MODAL_TABS = [
-    {
-        name: 'active-fonts',
-        title: __('Active Fonts'),
-        className: 'active-fonts',
-    },
+export const MODAL_TABS = [
     {
         name: 'installed-fonts',
         title: __('Installed Fonts'),
@@ -28,3 +23,12 @@ export const FONT_LIBRARY_MODAL_TABS = [
 ];
 
 export const DEMO_TEXT = __( "Incredible as it may seem, I believe that the Aleph of Garay Street was a false Aleph" );
+
+// Google Fonts API categories mappping to fallback system fonts
+export const GOOGLE_FONT_FALLBACKS = {
+    'display': 'system-ui',
+    'sans-serif': 'sans-serif',
+    'serif': 'serif',
+    'handwriting': 'cursive',
+    'monospace': 'monospace',
+};

@@ -17,10 +17,12 @@ import {
 import { DEMO_TEXT } from "./constants";
 
 
-function FontFamilyCard ( { font, onClick, actionHandler } ) {
+function FontCard ( { font, onClick, actionHandler, elevation } ) {
     return (
         <div onClick={ onClick }>
-            <Card>
+            <Card
+                elevation={ elevation }
+            >
                 <CardBody>
                     <VStack gap={3}>
                         <HStack justify="space-between">
@@ -36,4 +38,4 @@ function FontFamilyCard ( { font, onClick, actionHandler } ) {
     );
 }
 
-export default FontFamilyCard;
+export default FontCard;

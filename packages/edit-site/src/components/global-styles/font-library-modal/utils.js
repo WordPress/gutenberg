@@ -1,15 +1,22 @@
 /**
+ * Internal dependencies
+ */
+import { GOOGLE_FONT_FALLBACKS } from './constants';
+
+
+/**
  * Receives a theme.json like FontFamily object and outputs a font object for a FontCard component.
  *
  * @param {object} fontFamily a theme.json like FontFamily object
  * @return {object} font objected used by FontCard component.
  */
-export function fontFamilyToCardFont ( fontFamily ) {
+export function fontFamilyToCardFont ( fontFamily, isActive = false ) {
     return {
-        name: fontFamily.name,
+        name: fontFamily.name || fontFamily.fontFamily,
         family: fontFamily.fontFamily,
         variantsCount: fontFamily.fontFace?.length || 1,
         asset: fontFamily.fontFace?.[ 0 ]?.src,
+        isActive,
     };
 }
 
@@ -35,15 +42,49 @@ export function googleFontToCardFont ( googleFont ) {
  * @return {string} a full variant name with the font weight and style.
  *  
  * @example
- * googleVariantToFullVariant( "regular" ) // "Regular 400"
- * googleVariantToFullVariant( "italic" ) // "Italic 400"
- * googleVariantToFullVariant( "500" ) // "Regular 500"
  * googleVariantToFullVariant( "500italic" ) // "Italic 500"
  */
-export function googleVariantToFullVariant ( variantName ) {
-    const weight = ( variantName === "italic" || variantName === "regular")
-        ? "400"
-        : variantName.replace( "italic", "" );
-    const style = variantName.includes( "italic" ) ? "Italic" : "Normal";
+export function googleVariantToFullVariant ( variant ) {
+    const weight = getWeightFromGoogleVariant( variant );
+    const style = variant.includes( "italic" ) ? "Italic" : "Normal";
     return `${ style } ${ weight }`;
+}
+
+function getStyleFromGoogleVariant( variant ) {
+	return variant.includes( 'italic' ) ? 'italic' : 'normal';
+}
+
+function getWeightFromGoogleVariant( variant ) {
+	return variant === 'regular' || variant === 'italic'
+		? '400'
+		: variant.replace( 'italic', '' );
+}
+
+function getFallbackForGoogleFont ( googleFontCategory ) {
+    return GOOGLE_FONT_FALLBACKS[ googleFontCategory ] || "system-ui";
+}
+
+/**
+* Get the font definitions for a Google font family
+* @param {Object} googleFont font family object as defined by Google Fonts API
+* @param {string[]} variantsSelected array of variant names selected
+* @return {Object[]} array of font definitions
+*/
+export function getGoogleFontDefinitions ( googleFont, variantsSelected=[] ) {
+    const fontFamilies = [{
+        name: googleFont.family,
+        fontFamily: `${googleFont.family}, ${ getFallbackForGoogleFont( googleFont.category ) }`,
+        fontFace: googleFont.variants
+            .filter(variant  => (
+                !variantsSelected.length ? true : variantsSelected.includes( variant )
+            ))
+            .map( variant => (
+                {
+                    src: googleFont.files?.[ variant ],
+                    fontWeight: getWeightFromGoogleVariant( variant ),
+                    fontStyle: getStyleFromGoogleVariant( variant ),
+                }
+        ) ),
+    }];
+    return fontFamilies;
 }
