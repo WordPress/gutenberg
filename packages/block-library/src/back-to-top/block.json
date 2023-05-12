@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/back-to-top",
+	"title": "Back to top",
+	"category": "design",
+	"description": "A link that takes you back to the top.",
+	"keywords": [ "top", "skip link" ],
+	"textdomain": "default",
+	"attributes": {
+		"text": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false
+	}
+}
