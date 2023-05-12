@@ -38,60 +38,58 @@ export default function SidebarNavigationScreenPages() {
 	const { setIsCreatePageModalOpened } = useDispatch( editSiteStore );
 
 	return (
-		<>
-			<SidebarNavigationScreen
-				title={ __( 'Pages' ) }
-				description={ __( 'Browse and edit pages on your site.' ) }
-				actions={
-					<SidebarButton
-						icon={ plus }
-						label={ __( 'Create a new page' ) }
-						onClick={ () => setIsCreatePageModalOpened( true ) }
-					/>
-				}
-				content={
-					<>
-						{ isLoading && (
+		<SidebarNavigationScreen
+			title={ __( 'Pages' ) }
+			description={ __( 'Browse and edit pages on your site.' ) }
+			actions={
+				<SidebarButton
+					icon={ plus }
+					label={ __( 'Create a new page' ) }
+					onClick={ () => setIsCreatePageModalOpened( true ) }
+				/>
+			}
+			content={
+				<>
+					{ isLoading && (
+						<ItemGroup>
+							<Item>{ __( 'Loading pages' ) }</Item>
+						</ItemGroup>
+					) }
+					{ ! isLoading && (
+						<>
+							<SidebarNavigationSubtitle>
+								{ __( 'Recent' ) }
+							</SidebarNavigationSubtitle>
 							<ItemGroup>
-								<Item>{ __( 'Loading pages' ) }</Item>
-							</ItemGroup>
-						) }
-						{ ! isLoading && (
-							<>
-								<SidebarNavigationSubtitle>
-									{ __( 'Recent' ) }
-								</SidebarNavigationSubtitle>
-								<ItemGroup>
-									{ ! pages?.length && (
-										<Item>{ __( 'No page found' ) }</Item>
-									) }
-									{ pages?.map( ( page ) => (
-										<PageItem
-											postId={ page.id }
-											key={ page.id }
-											withChevron
-										>
-											{ decodeEntities(
-												page.title?.rendered
-											) ?? __( '(no title)' ) }
-										</PageItem>
-									) ) }
-									<SidebarNavigationItem
-										className="edit-site-sidebar-navigation-screen-pages__see-all"
-										href="edit.php?post_type=page"
-										onClick={ () => {
-											document.location =
-												'edit.php?post_type=page';
-										} }
+								{ ! pages?.length && (
+									<Item>{ __( 'No page found' ) }</Item>
+								) }
+								{ pages?.map( ( page ) => (
+									<PageItem
+										postId={ page.id }
+										key={ page.id }
+										withChevron
 									>
-										{ __( 'Manage all pages' ) }
-									</SidebarNavigationItem>
-								</ItemGroup>
-							</>
-						) }
-					</>
-				}
-			/>
-		</>
+										{ decodeEntities(
+											page.title?.rendered
+										) ?? __( '(no title)' ) }
+									</PageItem>
+								) ) }
+								<SidebarNavigationItem
+									className="edit-site-sidebar-navigation-screen-pages__see-all"
+									href="edit.php?post_type=page"
+									onClick={ () => {
+										document.location =
+											'edit.php?post_type=page';
+									} }
+								>
+									{ __( 'Manage all pages' ) }
+								</SidebarNavigationItem>
+							</ItemGroup>
+						</>
+					) }
+				</>
+			}
+		/>
 	);
 }
