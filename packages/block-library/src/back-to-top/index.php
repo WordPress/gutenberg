@@ -8,13 +8,11 @@
 /**
  * Renders the `core/back-to-top` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array   $attributes Block attributes.
  * @return string Return the back to top link.
  */
 function render_block_core_back_to_top( $attributes ) {
-	$link_text = isset( $attributes[ 'text' ] ) ? $attributes[ 'text' ] : __( 'Back to top' );
+	$link_text          = isset( $attributes['text'] ) ? $attributes['text'] : __( 'Back to top' );
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return sprintf(
