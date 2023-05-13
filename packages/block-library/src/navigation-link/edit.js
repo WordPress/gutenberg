@@ -472,7 +472,7 @@ export default function NavigationLinkEdit( {
 						label={ __( 'Title attribute' ) }
 						autoComplete="off"
 						help={ __(
-							'Provide additional information to help clarify or further describe the purpose of the link.'
+							'Additional information to help clarify the purpose of the link.'
 						) }
 					/>
 					<TextControl
