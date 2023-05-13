@@ -68,7 +68,7 @@
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
 		"is-plain-object": "^5.0.0",
-		"memize": "^2.0.0",
+		"memize": "^2.1.0",
 		"path-to-regexp": "^6.2.1",
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.3.1",
