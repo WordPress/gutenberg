@@ -8,7 +8,7 @@
 /**
  * Renders the `core/back-to-top` block on the server.
  *
- * @param array   $attributes Block attributes.
+ * @param array $attributes Block attributes.
  * @return string Return the back to top link.
  */
 function render_block_core_back_to_top( $attributes ) {
