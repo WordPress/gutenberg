@@ -18,7 +18,10 @@
 					"alt": "",
 					"caption": "",
 					"id": 1421,
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"behaviors": {
+						"lightbox": true
+					}
 				},
 				"innerBlocks": []
 			},
@@ -30,7 +33,10 @@
 					"alt": "",
 					"caption": "",
 					"id": 1440,
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"behaviors": {
+						"lightbox": true
+					}
 				},
 				"innerBlocks": []
 			},
@@ -42,7 +48,10 @@
 					"alt": "",
 					"caption": "",
 					"id": 1362,
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"behaviors": {
+						"lightbox": true
+					}
 				},
 				"innerBlocks": []
 			}

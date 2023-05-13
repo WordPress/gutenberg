@@ -18,7 +18,10 @@
 					"alt": "title",
 					"caption": "",
 					"id": 1,
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"behaviors": {
+						"lightbox": true
+					}
 				},
 				"innerBlocks": []
 			},
@@ -30,7 +33,10 @@
 					"alt": "title",
 					"caption": "",
 					"id": 2,
-					"linkDestination": "none"
+					"linkDestination": "none",
+					"behaviors": {
+						"lightbox": true
+					}
 				},
 				"innerBlocks": []
 			}
