@@ -83,7 +83,7 @@ export default function SaveHub() {
 		}
 	}
 
-	const label = dirtyLocal
+	let label = dirtyLocal
 		? __( 'Save' )
 		: sprintf(
 				// translators: %d: number of unsaved changes (number).
@@ -94,6 +94,10 @@ export default function SaveHub() {
 				),
 				countUnsavedChanges
 		  );
+
+	if ( isSaving ) {
+		label = __( 'Saving' );
+	}
 
 	const saveCurrentEntity = async () => {
 		if ( ! dirtyLocal ) return;
@@ -136,6 +140,7 @@ export default function SaveHub() {
 					variant="primary"
 					onClick={ saveCurrentEntity }
 					isBusy={ isSaving }
+					aria-disabled={ isSaving }
 					className="edit-site-save-hub__button"
 				>
 					{ label }

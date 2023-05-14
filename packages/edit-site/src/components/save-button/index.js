@@ -40,7 +40,10 @@ export default function SaveButton( {
 
 	const getLabel = () => {
 		if ( disabled ) {
-			return __( 'No changes to save' );
+			return __( 'Saved' );
+		}
+		if ( isSaving ) {
+			return __( 'Saving' );
 		}
 
 		if ( defaultLabel ) return defaultLabel;
