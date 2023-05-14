@@ -1,50 +1,46 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
+import {
+	BaseControl,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { BaseControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import AllInputControl from './all-input-control';
-import InputControls from './input-controls';
-import AxialInputControls from './axial-input-controls';
-import LinkedButton from './linked-button';
-import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
+import AllInputControl from './input-controls/all';
+import AxialInputControls from './input-controls/axial';
+import SeparatedInputControls from './input-controls/separated';
+import SingleInputControl from './input-controls/single';
+import SidesDropdown from './sides-dropdown';
 import useSpacingSizes from './hooks/use-spacing-sizes';
+import {
+	ALL_SIDES,
+	DEFAULT_VALUES,
+	LABELS,
+	VIEWS,
+	getInitialView,
+} from './utils';
 
 export default function SpacingSizesControl( {
 	inputProps,
-	onChange,
-	label = __( 'Spacing Control' ),
-	values,
-	sides,
-	splitOnAxis = false,
-	useSelect,
+	labels = LABELS,
 	minimumCustomValue = 0,
-	onMouseOver,
+	onChange,
 	onMouseOut,
+	onMouseOver,
+	sides = ALL_SIDES,
+	useSelect,
+	values,
 } ) {
 	const spacingSizes = useSpacingSizes();
-
 	const inputValues = values || DEFAULT_VALUES;
-	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;
 
-	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues, sides ) || hasOneSide
-	);
-
-	const toggleLinked = () => {
-		setIsLinked( ! isLinked );
-	};
+	const [ view, setView ] = useState( getInitialView( inputValues, sides ) );
+	const label = ALL_SIDES.includes( view ) ? labels[ view ] : labels.default;
 
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
@@ -53,43 +49,50 @@ export default function SpacingSizesControl( {
 
 	const inputControlProps = {
 		...inputProps,
-		onChange: handleOnChange,
-		isLinked,
-		sides,
-		values: inputValues,
-		spacingSizes,
-		useSelect,
-		type: label,
 		minimumCustomValue,
-		onMouseOver,
+		onChange: handleOnChange,
 		onMouseOut,
+		onMouseOver,
+		sides,
+		spacingSizes,
+		type: labels.default,
+		useSelect,
+		values: inputValues,
+	};
+
+	const renderControls = () => {
+		switch ( view ) {
+			case VIEWS.axial:
+				return <AxialInputControls { ...inputControlProps } />;
+			case VIEWS.custom:
+				return <SeparatedInputControls { ...inputControlProps } />;
+			case VIEWS.linked:
+				return <AllInputControl { ...inputControlProps } />;
+			default:
+				return (
+					<SingleInputControl
+						side={ view }
+						{ ...inputControlProps }
+					/>
+				);
+		}
 	};
 
 	return (
-		<fieldset
-			className={ classnames( 'component-spacing-sizes-control', {
-				'is-unlinked': ! isLinked,
-			} ) }
-		>
-			<BaseControl.VisualLabel as="legend">
-				{ label }
-			</BaseControl.VisualLabel>
-			{ ! hasOneSide && (
-				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
-			) }
-			{ isLinked && (
-				<AllInputControl
-					aria-label={ label }
-					{ ...inputControlProps }
-				/>
-			) }
-
-			{ ! isLinked && splitOnAxis && (
-				<AxialInputControls { ...inputControlProps } />
-			) }
-			{ ! isLinked && ! splitOnAxis && (
-				<InputControls { ...inputControlProps } />
-			) }
+		<fieldset className="components-spacing-sizes-control">
+			<HStack className="components-spacing-sizes-control__header">
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+				{ ! hasOneSide && (
+					<SidesDropdown
+						onChange={ setView }
+						sides={ sides }
+						value={ view }
+					/>
+				) }
+			</HStack>
+			{ renderControls() }
 		</fieldset>
 	);
 }

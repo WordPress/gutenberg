@@ -36,6 +36,7 @@ export const ICONS = {
 };
 
 export const LABELS = {
+	default: __( 'Spacing control' ),
 	linked: __( 'All sides' ),
 	top: __( 'Top' ),
 	bottom: __( 'Bottom' ),
@@ -339,7 +340,7 @@ export function getSupportedMenuItems( sides ) {
  *
  * Linked: No defined values, only one side supported, or mixed values.
  * Axial: Horizontal or vertical axis support and only those axial values set.
- * Custom: Mixed values requiring all supported siddes to be displayed.
+ * Custom: Mixed values requiring all supported sides to be displayed.
  * Single: Only an individual side has a value.
  *
  * @param {Object} values Current side values.
