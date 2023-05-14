@@ -9,6 +9,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import BlockPopover from '../components/block-popover';
 import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { getNameFromPresetVar } from '../components/spacing-sizes-control/utils';
+import useSetting from '../components/use-setting';
 
 function getComputedCSS( element, property ) {
 	return element.ownerDocument.defaultView
@@ -19,6 +21,7 @@ function getComputedCSS( element, property ) {
 export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const margin = attributes?.style?.spacing?.margin;
 
@@ -26,6 +29,15 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 		if ( ! blockElement ) {
 			return;
 		}
+
+		// Render diagonal stripes to represent spacing.
+		// Leverage blend modes to ensure visibility
+		// over different sets of backgrounds.
+		const stripes = {
+			opacity: '0.5',
+			mixBlendMode: 'multiply',
+		};
+		const stripesColor = 'var(--wp-admin-theme-color)';
 
 		const top = getComputedCSS( blockElement, 'margin-top' );
 		const right = getComputedCSS( blockElement, 'margin-right' );
@@ -41,6 +53,8 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 			right: right ? `-${ right }` : 0,
 			bottom: bottom ? `-${ bottom }` : 0,
 			left: left ? `-${ left }` : 0,
+			backgroundImage: `linear-gradient(135deg, ${ stripesColor } 7.14%, transparent 7.14%, transparent 50%, ${ stripesColor } 50%, ${ stripesColor } 57.14%, transparent 57.14%, transparent 100%)`,
+			...stripes,
 		} );
 	}, [ blockElement, margin ] );
 
@@ -82,7 +96,25 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
 		>
-			<div className="block-editor__padding-visualizer" style={ style } />
+			<div className="block-editor__margin-visualizer" style={ style } />
+			{ margin?.top && (
+				<span
+					className="block-editor__margin-visualizer-label-top"
+					style={ { top: style.top, right: '0' } }
+				>
+					{ getNameFromPresetVar( margin?.top, spacingSizes ) ||
+						margin?.top }
+				</span>
+			) }
+			{ margin?.bottom && (
+				<span
+					className="block-editor__margin-visualizer-label-bottom"
+					style={ { bottom: style.bottom, right: '0' } }
+				>
+					{ getNameFromPresetVar( margin?.bottom, spacingSizes ) ||
+						margin?.bottom }
+				</span>
+			) }
 		</BlockPopover>
 	);
 }
