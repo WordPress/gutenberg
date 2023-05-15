@@ -140,6 +140,7 @@ export default function SaveHub() {
 					variant="primary"
 					onClick={ saveCurrentEntity }
 					isBusy={ isSaving }
+					disabled={ isSaving }
 					aria-disabled={ isSaving }
 					className="edit-site-save-hub__button"
 				>
@@ -150,7 +151,7 @@ export default function SaveHub() {
 					className="edit-site-save-hub__button"
 					variant={ disabled ? null : 'primary' }
 					showTooltip={ false }
-					icon={ disabled ? check : null }
+					icon={ disabled && ! isSaving ? check : null }
 					defaultLabel={ label }
 				/>
 			) }

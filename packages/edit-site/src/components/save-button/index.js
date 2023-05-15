@@ -39,11 +39,11 @@ export default function SaveButton( {
 	const disabled = isSaving || ! activateSaveEnabled;
 
 	const getLabel = () => {
-		if ( disabled ) {
-			return __( 'Saved' );
-		}
 		if ( isSaving ) {
 			return __( 'Saving' );
+		}
+		if ( disabled ) {
+			return __( 'Saved' );
 		}
 
 		if ( defaultLabel ) return defaultLabel;
