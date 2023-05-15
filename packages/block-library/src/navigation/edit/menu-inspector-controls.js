@@ -13,7 +13,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -46,6 +46,7 @@ const MainContent = ( {
 
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
+	// Note: This is only the top-level items. Submenu items will not show in this tree.
 	const clientIdsTree = useSelect(
 		( select ) => {
 			const { __unstableGetClientIdsTree } = select( blockEditorStore );
@@ -73,21 +74,25 @@ const MainContent = ( {
 	} = useInsertedBlock( lastInsertedBlockClientId );
 
 	const hasExistingLinkValue = insertedBlockAttributes?.url;
+	const isMounted = useRef( false );
 
 	useEffect( () => {
+		// We need to check isMounted because we never want to show the Link UI on initial render,
+		// as there's no way that a user interaction would have caused the Link UI to be shown from that state.
 		if (
+			isMounted &&
 			lastInsertedBlockClientId &&
 			BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
 			! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
 		) {
 			setClientIdWithOpenLinkUI( lastInsertedBlockClientId );
 		}
-	}, [
-		lastInsertedBlockClientId,
-		clientId,
-		insertedBlockName,
-		hasExistingLinkValue,
-	] );
+	}, [ lastInsertedBlockClientId, insertedBlockName, hasExistingLinkValue ] );
+
+	// This is to prevent the Link UI from showing on initial render if the lastInsertedBlockId doesn't have a link value: https://github.com/WordPress/gutenberg/issues/50601
+	useEffect( () => {
+		isMounted.current = true;
+	}, [] );
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
