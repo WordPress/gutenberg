@@ -25,7 +25,7 @@ const pendingSettingsUpdates = new WeakMap();
  * @param {string}               clientId                   The client ID of the block to update.
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
- * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter.
+ * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
  * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
  * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
  *                                                          appender.
