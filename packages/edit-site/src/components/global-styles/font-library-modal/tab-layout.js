@@ -14,7 +14,7 @@ import { chevronLeft } from "@wordpress/icons";
 
 function TabLayout ({ title, description, handleBack, children, footer }) {
     return (
-        <div className="tab-layout">
+        <div className="font-library-modal__tab-layout">
             <Spacer margin={4} />
             <VStack spacing={4} justify="space-between">
                 <header>

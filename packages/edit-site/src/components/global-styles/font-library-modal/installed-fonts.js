@@ -18,6 +18,7 @@ import { fontFamilyToCardFont } from './utils';
 import FontsGrid from './fonts-grid';
 import LibraryFontCard from './library-font-card';
 import LibraryFontDetails from './library-font-details';
+import SaveButton from '../../save-button';
 
 
 function InstalledFonts () {
@@ -57,6 +58,13 @@ function InstalledFonts () {
                             onClick={ () => { handleSelectFont( font.name ) } }
                         />
                     ) )}
+                    {fonts.map( font => (
+                        <LibraryFontCard
+                            font={ font }
+                            key={ font.name }
+                            onClick={ () => { handleSelectFont( font.name ) } }
+                        />
+                    ) )}
                 </FontsGrid>
             )}
 
@@ -72,8 +80,7 @@ function InstalledFonts () {
 function Footer() {
     return (
         <HStack justify="flex-end">
-            <Button variant="tertiary">{ __("Cancel") }</Button>
-            <Button variant="primary">{ __("Save") }</Button>
+            <SaveButton />
         </HStack>
     );
 }
