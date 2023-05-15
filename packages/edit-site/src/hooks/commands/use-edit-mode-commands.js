@@ -1,0 +1,81 @@
+/**
+ * WordPress dependencies
+ */
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { trash } from '@wordpress/icons';
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+import useEditedEntityRecord from '../../components/use-edited-entity-record';
+import isTemplateRemovable from '../../utils/is-template-removable';
+import isTemplateRevertable from '../../utils/is-template-revertable';
+import { unlock } from '../../private-apis';
+
+const { useCommandLoader } = unlock( commandsPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
+
+function useEditModeCommandLoader() {
+	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
+	const history = useHistory();
+	const { isLoaded, record: template } = useEditedEntityRecord();
+	const isRemovable =
+		isLoaded && !! template && isTemplateRemovable( template );
+	const isRevertable =
+		isLoaded && !! template && isTemplateRevertable( template );
+
+	const commands = [];
+	if ( isRemovable ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Delete template' )
+				: __( 'Delete template part' );
+		commands.push( {
+			name: label,
+			label,
+			icon: trash,
+			context: 'site-editor-edit',
+			callback: ( { close } ) => {
+				removeTemplate( template );
+				// Navigate to the template list
+				history.push( {
+					path: '/' + template.type,
+				} );
+				close();
+			},
+		} );
+	}
+	if ( isRevertable ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Clear template customizations' )
+				: __( 'Clear template part customizations' );
+		commands.push( {
+			name: label,
+			label,
+			icon: trash,
+			callback: ( { close } ) => {
+				revertTemplate( template, { allowUndo: false } );
+				close();
+			},
+		} );
+	}
+
+	return {
+		isLoading: ! isLoaded,
+		commands,
+	};
+}
+
+export function useEditModeCommands() {
+	useCommandLoader( {
+		name: 'core/edit-site/manipulate-document',
+		group: __( 'Templates' ),
+		hook: useEditModeCommandLoader,
+		context: 'site-editor-edit',
+	} );
+}

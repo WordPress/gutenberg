@@ -15,7 +15,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  */
 import { unlock } from './lock-unlock';
 
-const { useCommandLoader, useCommand } = unlock( privateApis );
+const { useCommandLoader } = unlock( privateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
@@ -108,8 +108,6 @@ const useTemplatePartNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
 export function useSiteEditorNavigationCommands() {
-	const history = useHistory();
-
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		group: __( 'Pages' ),
@@ -129,27 +127,5 @@ export function useSiteEditorNavigationCommands() {
 		name: 'core/edit-site/navigate-template-parts',
 		group: __( 'Template Parts' ),
 		hook: useTemplatePartNavigationCommandLoader,
-	} );
-
-	useCommand( {
-		name: 'core/edit-site/browse-styles',
-		label: __( 'Browse Styles' ),
-		group: __( 'Site Editor' ),
-		context: 'site-editor',
-		icon: layout,
-		callback: () => {
-			const isSiteEditor = getPath( window.location.href )?.includes(
-				'site-editor.php'
-			);
-			const args = {
-				path: '/styles',
-			};
-			const targetUrl = addQueryArgs( 'site-editor.php', args );
-			if ( isSiteEditor ) {
-				history.push( args );
-			} else {
-				document.location = targetUrl;
-			}
-		},
 	} );
 }
