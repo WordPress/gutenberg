@@ -80,7 +80,7 @@ const MainContent = ( {
 		// We need to check isMounted because we never want to show the Link UI on initial render,
 		// as there's no way that a user interaction would have caused the Link UI to be shown from that state.
 		if (
-			isMounted &&
+			isMounted.current &&
 			lastInsertedBlockClientId &&
 			BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
 			! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
