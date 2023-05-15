@@ -95,7 +95,7 @@ export default function EntitiesSavedStates( { close, onSave = identity } ) {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
 		useDispatch( noticesStore );
 
 	// To group entities by type.
@@ -148,6 +148,8 @@ export default function EntitiesSavedStates( { close, onSave = identity } ) {
 	};
 
 	const saveCheckedEntitiesAndActivate = () => {
+		const saveNoticeId = 'site-editor-save-success';
+		removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
 				return ! unselectedEntities.some(
@@ -208,6 +210,7 @@ export default function EntitiesSavedStates( { close, onSave = identity } ) {
 				} else {
 					createSuccessNotice( __( 'Site updated.' ), {
 						type: 'snackbar',
+						id: saveNoticeId,
 					} );
 				}
 			} )
