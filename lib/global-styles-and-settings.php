@@ -267,7 +267,7 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 }
 
 /**
-* Returns the current theme's wanted patterns (slugs) to be
+ * Returns the current theme's wanted patterns (slugs) to be
  * registered from Pattern Directory.
  *
  * @since 6.3.0
