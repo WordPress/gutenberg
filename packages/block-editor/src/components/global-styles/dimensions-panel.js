@@ -484,11 +484,16 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ paddingValues }
 							onChange={ setPaddingValues }
-							label={ __( 'Padding' ) }
+							labels={ {
+								default: __( 'Padding' ),
+								top: __( 'Padding top' ),
+								right: __( 'Padding right' ),
+								bottom: __( 'Padding bottom' ),
+								left: __( 'Padding left' ),
+							} }
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialPadding }
 							onMouseOver={ onMouseOverPadding }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -525,11 +530,16 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ marginValues }
 							onChange={ setMarginValues }
-							label={ __( 'Margin' ) }
+							labels={ {
+								default: __( 'Margin' ),
+								top: __( 'Margin top' ),
+								right: __( 'Margin right' ),
+								bottom: __( 'Margin bottom' ),
+								left: __( 'Margin left' ),
+							} }
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialMargin }
 							onMouseOver={ onMouseOverMargin }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -573,13 +583,18 @@ export default function DimensionsPanel( {
 						) ) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
-							label={ __( 'Block spacing' ) }
+							labels={ {
+								default: __( 'Block spacing' ),
+								top: __( 'Block spacing top' ),
+								right: __( 'Block spacing right' ),
+								bottom: __( 'Block spacing bottom' ),
+								left: __( 'Block spacing left' ),
+							} }
 							min={ 0 }
 							onChange={ setGapValues }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
-							splitOnAxis={ isAxialGap }
 						/>
 					) }
 				</ToolsPanelItem>
