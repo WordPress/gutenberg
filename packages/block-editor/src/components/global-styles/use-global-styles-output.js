@@ -416,7 +416,7 @@ export function getStylesDeclarations(
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
  * @param {Object}  props
- * @param {Object}  props.layoutDefinitions     An array of layout definitions.
+ * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
