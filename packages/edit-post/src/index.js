@@ -79,7 +79,7 @@ export function initializeEditor(
 	}
 
 	/*
-	 * Prevent adding template part in the post editor.
+	 * Prevent adding template part and post content block in the post editor.
 	 * Only add the filter when the post editor is initialized, not imported.
 	 * Also only add the filter(s) after registerCoreBlocks()
 	 * so that common filters in the block library are not overwritten.
@@ -90,7 +90,8 @@ export function initializeEditor(
 		( canInsert, blockType ) => {
 			if (
 				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/template-part'
+				( blockType.name === 'core/template-part' ||
+					blockType.name === 'core/post-content' )
 			) {
 				return false;
 			}
