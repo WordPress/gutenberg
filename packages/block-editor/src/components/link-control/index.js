@@ -237,19 +237,13 @@ function LinkControl( {
 		}
 	};
 
-	const resetInternalValues = () => {
-		setInternalUrlInputValue( newValue?.url );
-		setInternalTextInputValue( newValue?.title );
-	};
-
 	const handleCancel = ( event ) => {
 		event.preventDefault();
 		event.stopPropagation();
 
-		// Ensure that any unsubmitted input changes are reset.
-		resetInternalValues();
+		setNewValue( value );
 
-		if ( hasLinkValue ) {
+		if ( value?.url?.trim()?.length > 0 ) {
 			// If there is a link then exist editing mode and show preview.
 			stopEditing();
 		} else {
