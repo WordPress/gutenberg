@@ -44,14 +44,6 @@
 			"padding": true
 		}
 	},
-	"styles": [
-		{
-			"name": "light",
-			"label": "Light",
-			"isDefault": true
-		},
-		{ "name": "dark", "label": "Dark" }
-	],
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
