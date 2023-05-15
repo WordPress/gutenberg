@@ -41,7 +41,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaLabel,
 		ariaDescribedBy,
-		updateSelection,
+		updateFocusAndSelection,
 	},
 	ref
 ) {
@@ -56,6 +56,7 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
@@ -86,26 +87,37 @@ function ListViewBlockSelectButton(
 			const firstBlockClientId = isDeletingSelectedBlocks
 				? selectedBlockClientIds[ 0 ]
 				: clientId;
+			const firstBlockRootClientId =
+				getBlockRootClientId( firstBlockClientId );
 
-			let blockToSelect =
+			const blocksToDelete = isDeletingSelectedBlocks
+				? selectedBlockClientIds
+				: [ clientId ];
+
+			// Don't update the selection if the blocks cannot be deleted.
+			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
+				return;
+			}
+
+			let blockToFocus =
 				getPreviousBlockClientId( firstBlockClientId ) ??
 				// If the previous block is not found (when the first block is deleted),
 				// fallback to focus the parent block.
-				getBlockRootClientId( firstBlockClientId );
+				firstBlockRootClientId;
 
-			removeBlocks(
-				isDeletingSelectedBlocks
-					? selectedBlockClientIds
-					: [ clientId ],
-				false
-			);
+			removeBlocks( blocksToDelete, false );
+
+			// Update the selection if the original selection has been removed.
+			const shouldUpdateSelection =
+				selectedBlockClientIds.length > 0 &&
+				getSelectedBlockClientIds().length === 0;
 
 			// If there's no previous block nor parent block, focus the first block.
-			if ( ! blockToSelect ) {
-				blockToSelect = getBlockOrder()[ 0 ];
+			if ( ! blockToFocus ) {
+				blockToFocus = getBlockOrder()[ 0 ];
 			}
 
-			updateSelection( blockToSelect );
+			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
 		}
 	}
 

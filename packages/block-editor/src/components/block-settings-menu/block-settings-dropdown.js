@@ -103,7 +103,8 @@ export function BlockSettingsDropdown( {
 		},
 		[ firstBlockClientId ]
 	);
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockOrder, getSelectedBlockClientIds } =
+		useSelect( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -124,13 +125,14 @@ export function BlockSettingsDropdown( {
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
+	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	const updateSelectionAfterDuplicate = useCallback(
 		async ( clientIdsPromise ) => {
 			if ( __experimentalSelectBlock ) {
 				const ids = await clientIdsPromise;
 				if ( ids && ids[ 0 ] ) {
-					__experimentalSelectBlock( ids[ 0 ] );
+					__experimentalSelectBlock( ids[ 0 ], false );
 				}
 			}
 		},
@@ -139,20 +141,26 @@ export function BlockSettingsDropdown( {
 
 	const updateSelectionAfterRemove = useCallback( () => {
 		if ( __experimentalSelectBlock ) {
-			let blockToSelect = previousBlockClientId || firstParentClientId;
+			let blockToFocus = previousBlockClientId || firstParentClientId;
 
-			// Select the first block if there's no previous block nor parent block.
-			if ( ! blockToSelect ) {
-				blockToSelect = getBlockOrder()[ 0 ];
+			// Focus the first block if there's no previous block nor parent block.
+			if ( ! blockToFocus ) {
+				blockToFocus = getBlockOrder()[ 0 ];
 			}
 
-			__experimentalSelectBlock( blockToSelect );
+			// Only update the selection if the original selection is removed.
+			const shouldUpdateSelection =
+				hasSelectedBlocks && getSelectedBlockClientIds().length === 0;
+
+			__experimentalSelectBlock( blockToFocus, shouldUpdateSelection );
 		}
 	}, [
 		__experimentalSelectBlock,
 		previousBlockClientId,
 		firstParentClientId,
 		getBlockOrder,
+		hasSelectedBlocks,
+		getSelectedBlockClientIds,
 	] );
 
 	const removeBlockLabel =
@@ -209,12 +217,17 @@ export function BlockSettingsDropdown( {
 							if ( event.defaultPrevented ) return;
 
 							if (
-								isMatch( 'core/block-editor/remove', event )
+								isMatch( 'core/block-editor/remove', event ) &&
+								canRemove
 							) {
 								event.preventDefault();
 								updateSelectionAfterRemove( onRemove() );
 							} else if (
-								isMatch( 'core/block-editor/duplicate', event )
+								isMatch(
+									'core/block-editor/duplicate',
+									event
+								) &&
+								canDuplicate
 							) {
 								event.preventDefault();
 								updateSelectionAfterDuplicate( onDuplicate() );
@@ -222,7 +235,8 @@ export function BlockSettingsDropdown( {
 								isMatch(
 									'core/block-editor/insert-after',
 									event
-								)
+								) &&
+								canInsertDefaultBlock
 							) {
 								event.preventDefault();
 								onInsertAfter();
@@ -230,7 +244,8 @@ export function BlockSettingsDropdown( {
 								isMatch(
 									'core/block-editor/insert-before',
 									event
-								)
+								) &&
+								canInsertDefaultBlock
 							) {
 								event.preventDefault();
 								onInsertBefore();
