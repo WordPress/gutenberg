@@ -15,7 +15,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
+function AddCustomGenericTemplateModalContent( { onClose, createTemplate } ) {
 	const [ title, setTitle ] = useState( '' );
 	const defaultTitle = __( 'Custom Template' );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -79,4 +79,4 @@ function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
 	);
 }
 
-export default AddCustomGenericTemplateModal;
+export default AddCustomGenericTemplateModalContent;

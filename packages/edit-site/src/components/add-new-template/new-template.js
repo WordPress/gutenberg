@@ -24,7 +24,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import AddCustomTemplateModal from './add-custom-template-modal';
+import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
 	useDefaultTemplateTypes,
@@ -33,7 +33,7 @@ import {
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
 } from './utils';
-import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
+import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
@@ -253,14 +253,14 @@ export default function NewTemplate( {
 						</Grid>
 					) }
 					{ modalContent === modalContentMap.customTemplate && (
-						<AddCustomTemplateModal
+						<AddCustomTemplateModalContent
 							onSelect={ createTemplate }
 							entityForSuggestions={ entityForSuggestions }
 						/>
 					) }
 					{ modalContent ===
 						modalContentMap.customGenericTemplate && (
-						<AddCustomGenericTemplateModal
+						<AddCustomGenericTemplateModalContent
 							onClose={ onModalClose }
 							createTemplate={ createTemplate }
 						/>

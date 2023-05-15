@@ -177,18 +177,18 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModal( { onSelect, entityForSuggestions } ) {
+function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
 	return (
-		<>
+		<VStack
+			spacing={ 4 }
+			className="edit-site-custom-template-modal__contents-wrapper"
+			alignment="left"
+		>
 			{ ! showSearchEntities && (
-				<VStack
-					spacing={ 4 }
-					className="edit-site-custom-template-modal__contents-wrapper"
-					alignment="left"
-				>
+				<>
 					<Text as="p">
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
@@ -259,14 +259,10 @@ function AddCustomTemplateModal( { onSelect, entityForSuggestions } ) {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</VStack>
+				</>
 			) }
 			{ showSearchEntities && (
-				<VStack
-					spacing={ 4 }
-					className="edit-site-custom-template-modal__contents-wrapper"
-					alignment="left"
-				>
+				<>
 					<Text as="p">
 						{ __(
 							'This template will be used only for the specific item chosen.'
@@ -276,10 +272,10 @@ function AddCustomTemplateModal( { onSelect, entityForSuggestions } ) {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</VStack>
+				</>
 			) }
-		</>
+		</VStack>
 	);
 }
 
-export default AddCustomTemplateModal;
+export default AddCustomTemplateModalContent;
