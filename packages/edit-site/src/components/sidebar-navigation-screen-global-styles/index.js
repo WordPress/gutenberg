@@ -32,7 +32,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			<NavigatorButton
 				{ ...props }
 				as={ SidebarNavigationItem }
-				path="/styles"
+				path="/wp_global_styles"
 			/>
 		);
 	}

@@ -39,7 +39,7 @@ function SidebarScreens() {
 			<NavigatorScreen path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
 			</NavigatorScreen>
-			<NavigatorScreen path="/styles">
+			<NavigatorScreen path="/wp_global_styles">
 				<SidebarNavigationScreenGlobalStyles />
 			</NavigatorScreen>
 			<NavigatorScreen path="/navigation/:postType/:postId">
