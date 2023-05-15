@@ -166,7 +166,10 @@ function editorCanvasContainerView( state = undefined, action ) {
 function createPageModal( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_CREATE_PAGE_MODAL_OPENED':
-			return action.isOpen;
+			return {
+				isOpen: action.isOpen,
+				options: action.options,
+			};
 	}
 
 	return state;

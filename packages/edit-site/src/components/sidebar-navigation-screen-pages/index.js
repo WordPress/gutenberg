@@ -44,8 +44,12 @@ export default function SidebarNavigationScreenPages() {
 			actions={
 				<SidebarButton
 					icon={ plus }
-					label={ __( 'Create a new page' ) }
-					onClick={ () => setIsCreatePageModalOpened( true ) }
+					label={ __( 'Draft a new page' ) }
+					onClick={ () =>
+						setIsCreatePageModalOpened( true, {
+							redirectAfterSave: false,
+						} )
+					}
 				/>
 			}
 			content={

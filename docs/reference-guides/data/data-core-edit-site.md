@@ -275,6 +275,7 @@ Sets whether the create new page modal is open
 _Parameters_
 
 -   _isOpen_ `boolean`: If true, opens the create new page modal. If false, closes it. It does not toggle the state, but sets it directly.
+-   _options_ `Object`: Options for the create new page modal.
 
 ### setIsInserterOpened
 

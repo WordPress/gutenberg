@@ -70,20 +70,21 @@ export default function AddNewPageModal() {
 				{ throwOnError: true }
 			);
 
-			// Set template before navigating away to avoid initial stale value.
-			setPage( {
-				context: { postType: 'page', postId: newPage.id },
-			} );
+			if ( isCreatePageModalOpen.options?.redirectAfterSave ) {
+				// Set template before navigating away to avoid initial stale value.
+				setPage( {
+					context: { postType: 'page', postId: newPage.id },
+				} );
+				// Navigate to the created template editor.
+				history.push( {
+					postId: newPage.id,
+					postType: newPage.type,
+					canvas: 'edit',
+				} );
+			}
 
 			// Close the modal when complete
 			setIsCreatePageModalOpened( false );
-
-			// Navigate to the created template editor.
-			history.push( {
-				postId: newPage.id,
-				postType: newPage.type,
-				canvas: 'edit',
-			} );
 
 			createSuccessNotice(
 				sprintf(
@@ -113,7 +114,7 @@ export default function AddNewPageModal() {
 		setIsCreatePageModalOpened( false );
 	};
 
-	if ( ! isCreatePageModalOpen ) return null;
+	if ( ! isCreatePageModalOpen.isOpen ) return null;
 
 	return (
 		<Modal title="Create a new page" onRequestClose={ handleClose }>
