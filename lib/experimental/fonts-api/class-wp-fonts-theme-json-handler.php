@@ -122,7 +122,7 @@ class WP_Fonts_Theme_Json_Handler
 	 * @param array $data The global styles.
 	 * @return array The global styles with missing fonts data.
 	 */
-	public static function gutenberg_add_registered_fonts_to_theme_json( $data ) {
+	public static function add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
 
 		$raw_data = $data->get_raw_data();
