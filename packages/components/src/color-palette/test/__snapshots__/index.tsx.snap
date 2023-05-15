@@ -210,7 +210,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             red
           </span>
           <span
-            class="components-truncate components-color-palette__custom-color-value is-hex emotion-6 emotion-1"
+            class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-6 emotion-1"
             data-wp-c16t="true"
             data-wp-component="Truncate"
           >
