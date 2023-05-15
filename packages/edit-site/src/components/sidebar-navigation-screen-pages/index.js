@@ -7,8 +7,10 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { layout, page } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,20 +20,52 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 
-const PageItem = ( { postId, ...props } ) => {
+const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
-		postType: 'page',
+		postType,
 		postId,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 
 export default function SidebarNavigationScreenPages() {
-	const { records: pages, isResolving: isLoading } = useEntityRecords(
+	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
 		{ status: 'any' }
 	);
+
+	const { records: templates, isResolving: isLoadingTemplates } =
+		useEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+		} );
+
+	const dynamicPageTemplates =
+		templates &&
+		templates.filter( ( template ) => {
+			return template.slug === '404' || template.slug === 'search';
+		} );
+
+	const homeTemplate =
+		templates?.find( ( template ) => template.slug === 'front-page' ) ||
+		templates?.find( ( template ) => template.slug === 'home' ) ||
+		templates?.find( ( template ) => template.slug === 'index' );
+
+	const pagesAndTemplates = pages?.concat( dynamicPageTemplates, [
+		homeTemplate,
+	] );
+
+	const { frontPage, postsPage } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		return {
+			frontPage: siteSettings?.page_on_front,
+			postsPage: siteSettings?.page_for_posts,
+		};
+	}, [] );
+
+	const isHomePageBlog = frontPage === postsPage;
 
 	return (
 		<SidebarNavigationScreen
@@ -39,31 +73,56 @@ export default function SidebarNavigationScreenPages() {
 			description={ __( 'Browse and edit pages on your site.' ) }
 			content={
 				<>
-					{ isLoading && (
+					{ ( isLoadingPages || isLoadingTemplates ) && (
 						<ItemGroup>
 							<Item>{ __( 'Loading pages' ) }</Item>
 						</ItemGroup>
 					) }
-					{ ! isLoading && (
+					{ ! ( isLoadingPages || isLoadingTemplates ) && (
 						<>
 							<SidebarNavigationSubtitle>
 								{ __( 'Recent' ) }
 							</SidebarNavigationSubtitle>
 							<ItemGroup>
-								{ ! pages?.length && (
+								{ ! pagesAndTemplates?.length && (
 									<Item>{ __( 'No page found' ) }</Item>
 								) }
-								{ pages?.map( ( page ) => (
+								{ isHomePageBlog && homeTemplate && (
 									<PageItem
-										postId={ page.id }
-										key={ page.id }
+										postType="wp_template"
+										postId={ homeTemplate.id }
+										key={ homeTemplate.id }
+										icon={ layout }
 										withChevron
 									>
-										<Truncate numberOfLines={ 1 }>
-											{ decodeEntities(
-												page.title?.rendered
-											) ?? __( 'Untitled' ) }
-										</Truncate>
+										{ decodeEntities(
+											homeTemplate.title?.rendered
+										) ?? __( '(no title)' ) }
+									</PageItem>
+								) }
+								{ pages?.map( ( item ) => (
+									<PageItem
+										postId={ item.id }
+										key={ item.id }
+										icon={ page }
+										withChevron
+									>
+										{ decodeEntities(
+											item.title?.rendered
+										) ?? __( '(no title)' ) }
+									</PageItem>
+								) ) }
+								{ dynamicPageTemplates?.map( ( item ) => (
+									<PageItem
+										postType="wp_template"
+										postId={ item.id }
+										key={ item.id }
+										icon={ layout }
+										withChevron
+									>
+										{ decodeEntities(
+											item.title?.rendered
+										) ?? __( '(no title)' ) }
 									</PageItem>
 								) ) }
 								<SidebarNavigationItem
