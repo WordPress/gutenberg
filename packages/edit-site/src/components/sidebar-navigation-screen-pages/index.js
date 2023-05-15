@@ -9,7 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { layout, page } from '@wordpress/icons';
+import { layout, page, home } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -18,7 +18,6 @@ import { useSelect } from '@wordpress/data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -79,64 +78,57 @@ export default function SidebarNavigationScreenPages() {
 						</ItemGroup>
 					) }
 					{ ! ( isLoadingPages || isLoadingTemplates ) && (
-						<>
-							<SidebarNavigationSubtitle>
-								{ __( 'Recent' ) }
-							</SidebarNavigationSubtitle>
-							<ItemGroup>
-								{ ! pagesAndTemplates?.length && (
-									<Item>{ __( 'No page found' ) }</Item>
-								) }
-								{ isHomePageBlog && homeTemplate && (
-									<PageItem
-										postType="wp_template"
-										postId={ homeTemplate.id }
-										key={ homeTemplate.id }
-										icon={ layout }
-										withChevron
-									>
-										{ decodeEntities(
-											homeTemplate.title?.rendered
-										) ?? __( '(no title)' ) }
-									</PageItem>
-								) }
-								{ pages?.map( ( item ) => (
-									<PageItem
-										postId={ item.id }
-										key={ item.id }
-										icon={ page }
-										withChevron
-									>
-										{ decodeEntities(
-											item.title?.rendered
-										) ?? __( '(no title)' ) }
-									</PageItem>
-								) ) }
-								{ dynamicPageTemplates?.map( ( item ) => (
-									<PageItem
-										postType="wp_template"
-										postId={ item.id }
-										key={ item.id }
-										icon={ layout }
-										withChevron
-									>
-										{ decodeEntities(
-											item.title?.rendered
-										) ?? __( '(no title)' ) }
-									</PageItem>
-								) ) }
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-pages__see-all"
-									href="edit.php?post_type=page"
-									onClick={ () => {
-										document.location =
-											'edit.php?post_type=page';
-									} }
+						<ItemGroup>
+							{ ! pagesAndTemplates?.length && (
+								<Item>{ __( 'No page found' ) }</Item>
+							) }
+							{ isHomePageBlog && homeTemplate && (
+								<PageItem
+									postType="wp_template"
+									postId={ homeTemplate.id }
+									key={ homeTemplate.id }
+									icon={ home }
+									withChevron
 								>
-									{ __( 'Manage all pages' ) }
-								</SidebarNavigationItem>
-							</ItemGroup>
-						</>
+									{ decodeEntities(
+										homeTemplate.title?.rendered
+									) ?? __( '(no title)' ) }
+								</PageItem>
+							) }
+							{ pages?.map( ( item ) => (
+								<PageItem
+									postId={ item.id }
+									key={ item.id }
+									icon={ page }
+									withChevron
+								>
+									{ decodeEntities( item.title?.rendered ) ??
+										__( '(no title)' ) }
+								</PageItem>
+							) ) }
+							{ dynamicPageTemplates?.map( ( item ) => (
+								<PageItem
+									postType="wp_template"
+									postId={ item.id }
+									key={ item.id }
+									icon={ layout }
+									withChevron
+								>
+									{ decodeEntities( item.title?.rendered ) ??
+										__( '(no title)' ) }
+								</PageItem>
+							) ) }
+							<SidebarNavigationItem
+								className="edit-site-sidebar-navigation-screen-pages__see-all"
+								href="edit.php?post_type=page"
+								onClick={ () => {
+									document.location =
+										'edit.php?post_type=page';
+								} }
+							>
+								{ __( 'Manage all pages' ) }
+							</SidebarNavigationItem>
+						</ItemGroup>
 					) }
 				</>
 			}
