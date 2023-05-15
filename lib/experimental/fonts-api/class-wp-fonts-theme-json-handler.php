@@ -9,11 +9,12 @@ if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
 	return;
 }
 
-if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
+class WP_Fonts_Theme_Json_Handler
+{
 	/**
 	 * Register fonts defined in theme.json.
 	 */
-	function gutenberg_register_fonts_from_theme_json() {
+	public static function gutenberg_register_fonts_from_theme_json() {
 		// Get settings.
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
@@ -114,16 +115,14 @@ if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
 		wp_register_fonts( $fonts );
 		wp_enqueue_fonts( $handles );
 	}
-}
 
-if ( ! function_exists( 'gutenberg_add_registered_fonts_to_theme_json' ) ) {
 	/**
 	 * Add missing fonts data to the global styles.
 	 *
 	 * @param array $data The global styles.
 	 * @return array The global styles with missing fonts data.
 	 */
-	function gutenberg_add_registered_fonts_to_theme_json( $data ) {
+	public static function gutenberg_add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
 
 		$raw_data = $data->get_raw_data();
@@ -190,4 +189,4 @@ if ( ! function_exists( 'gutenberg_add_registered_fonts_to_theme_json' ) ) {
 // This priority value is added dynamically during the build. See: tools/webpack/blocks.js.
 // We want to make sure Gutenberg blocks are re-registered before any Theme_JSON operations take place
 // so that we have access to updated merged data.
-add_action( 'init', 'gutenberg_register_fonts_from_theme_json', 21 );
+add_action( 'init', 'WP_Fonts_Theme_Json_Handler::gutenberg_register_fonts_from_theme_json', 21 );
