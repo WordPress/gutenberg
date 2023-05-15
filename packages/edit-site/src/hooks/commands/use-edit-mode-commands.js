@@ -3,7 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash } from '@wordpress/icons';
+import { trash, backup } from '@wordpress/icons';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -52,12 +52,12 @@ function useEditModeCommandLoader() {
 	if ( isRevertable ) {
 		const label =
 			template.type === 'wp_template'
-				? __( 'Clear template customizations' )
-				: __( 'Clear template part customizations' );
+				? __( 'Reset template' )
+				: __( 'Reset template part' );
 		commands.push( {
 			name: label,
 			label,
-			icon: trash,
+			icon: backup,
 			callback: ( { close } ) => {
 				revertTemplate( template, { allowUndo: false } );
 				close();
