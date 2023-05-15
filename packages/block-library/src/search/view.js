@@ -12,9 +12,6 @@ window.addEventListener( 'DOMContentLoaded', () => {
 		const searchField = block.querySelector( '.wp-block-search__input' );
 		const button = block.querySelector( buttonClass );
 
-		// Hide search on init.
-		block.classList.add( hiddenClass );
-
 		const toggleSearchField = ( e ) => {
 			if ( e.target !== button && ! e.target.closest( buttonClass ) ) {
 				return false;
@@ -32,27 +29,14 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			searchField.focus();
 
 			wrapper.removeEventListener( 'click', toggleSearchField );
-			button.removeEventListener( 'focus', toggleSearchField );
-			document.body.addEventListener( 'click', doSearch );
+			button.addEventListener( 'blur', toggleSearchField );
+			document.body.addEventListener( 'click', doHideSearchField );
 		};
 
 		const doHideSearchField = () => {
 			block.classList.add( hiddenClass );
 		};
 
-		const doSearch = ( e ) => {
-			if ( e.target.closest( wrapperClass ) ) {
-				return false;
-			}
-
-			doHideSearchField();
-
-			document.body.removeEventListener( 'click', doSearch );
-			wrapper.addEventListener( 'click', toggleSearchField );
-			button.addEventListener( 'focus', toggleSearchField );
-		};
-
-		wrapper.addEventListener( 'click', toggleSearchField );
-		button.addEventListener( 'focus', toggleSearchField );
+		searchField.addEventListener( 'focus', doShowSearchField );
 	} );
 } );
