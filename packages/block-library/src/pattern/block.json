@@ -5,21 +5,10 @@
 	"title": "Pattern",
 	"category": "theme",
 	"description": "Show a block pattern.",
-	"supports": {
-		"__experimentalLayout": {
-			"allowEditing": false
-		}
-	},
 	"textdomain": "default",
 	"attributes": {
 		"slug": {
 			"type": "string"
-		},
-		"layout": {
-			"type": "object",
-			"default": {
-				"type": "constrained"
-			}
 		},
 		"syncStatus": {
 			"type": [ "string", "boolean" ],
