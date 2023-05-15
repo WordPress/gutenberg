@@ -31,17 +31,13 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
 
-	if ( ! isLoading && ! commands.length ) {
+	if ( ! commands.length ) {
 		return null;
 	}
 
 	return (
 		<>
 			<Command.List>
-				{ isLoading && (
-					<Command.Loading>{ __( 'Searching…' ) }</Command.Loading>
-				) }
-
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
@@ -93,26 +89,16 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	);
 }
 
-export function CommandMenuGroup( { group, search, setLoader, close } ) {
-	const hasSearch = !! search;
+export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
-			const {
-				getCommands,
-				getCommandLoaders,
-				getContextualCommands,
-				getContextualCommandLoaders,
-			} = select( commandsStore );
+			const { getCommands, getCommandLoaders } = select( commandsStore );
 			return {
-				commands: hasSearch
-					? getCommands( group )
-					: getContextualCommands( group ),
-				loaders: hasSearch
-					? getCommandLoaders( group )
-					: getContextualCommandLoaders( group ),
+				commands: getCommands( isContextual ),
+				loaders: getCommandLoaders( isContextual ),
 			};
 		},
-		[ group, hasSearch ]
+		[ isContextual ]
 	);
 
 	if ( ! commands.length && ! loaders.length ) {
@@ -157,13 +143,10 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const { groups, isOpen } = useSelect( ( select ) => {
-		const { getGroups, isOpen: _isOpen } = select( commandsStore );
-		return {
-			groups: getGroups(),
-			isOpen: _isOpen(),
-		};
-	}, [] );
+	const isOpen = useSelect(
+		( select ) => select( commandsStore ).isOpen(),
+		[]
+	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
 	const commandMenuInput = useRef();
@@ -243,15 +226,19 @@ export function CommandMenu() {
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
-						{ groups.map( ( group ) => (
+						<CommandMenuGroup
+							search={ search }
+							setLoader={ setLoader }
+							close={ closeAndReset }
+							isContextual
+						/>
+						{ search && (
 							<CommandMenuGroup
-								key={ group }
-								group={ group }
 								search={ search }
 								setLoader={ setLoader }
 								close={ closeAndReset }
 							/>
-						) ) }
+						) }
 					</Command.List>
 				</Command>
 			</div>

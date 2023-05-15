@@ -24,19 +24,17 @@ export default function useCommand( command ) {
 	useEffect( () => {
 		registerCommand( {
 			name: command.name,
-			group: command.group,
 			context: command.context,
 			label: command.label,
 			icon: command.icon,
 			callback: currentCallback.current,
 		} );
 		return () => {
-			unregisterCommand( command.name, command.group );
+			unregisterCommand( command.name );
 		};
 	}, [
 		command.name,
 		command.label,
-		command.group,
 		command.icon,
 		command.context,
 		registerCommand,

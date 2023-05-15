@@ -7,7 +7,6 @@
  *
  * @property {string}      name     Command name.
  * @property {string}      label    Command label.
- * @property {string=}     group    Command group.
  * @property {string=}     context  Command context.
  * @property {JSX.Element} icon     Command icon.
  * @property {Function}    callback Command callback.
@@ -23,7 +22,6 @@
  * @typedef {Object} WPCommandLoaderConfig
  *
  * @property {string}              name    Command loader name.
- * @property {string=}             group   Command loader group.
  * @property {string=}             context Command loader context.
  * @property {WPCommandLoaderHook} hook    Command loader hook.
  */
@@ -39,23 +37,20 @@ export function registerCommand( config ) {
 	return {
 		type: 'REGISTER_COMMAND',
 		...config,
-		group: config.group ?? '',
 	};
 }
 
 /**
  * Returns an action object used to unregister a command.
  *
- * @param {string} name  Command name.
- * @param {string} group Command group.
+ * @param {string} name Command name.
  *
  * @return {Object} action.
  */
-export function unregisterCommand( name, group ) {
+export function unregisterCommand( name ) {
 	return {
 		type: 'UNREGISTER_COMMAND',
 		name,
-		group,
 	};
 }
 
@@ -70,23 +65,20 @@ export function registerCommandLoader( config ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
 		...config,
-		group: config.group ?? '',
 	};
 }
 
 /**
  * Unregister command loader hook.
  *
- * @param {string} name  Command loader name.
- * @param {string} group Command loader group.
+ * @param {string} name Command loader name.
  *
  * @return {Object} action.
  */
-export function unregisterCommandLoader( name, group ) {
+export function unregisterCommandLoader( name ) {
 	return {
 		type: 'UNREGISTER_COMMAND_LOADER',
 		name,
-		group,
 	};
 }
 

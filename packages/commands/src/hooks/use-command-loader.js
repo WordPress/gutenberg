@@ -20,16 +20,14 @@ export default function useCommandLoader( loader ) {
 	useEffect( () => {
 		registerCommandLoader( {
 			name: loader.name,
-			group: loader.group,
 			hook: loader.hook,
 			context: loader.context,
 		} );
 		return () => {
-			unregisterCommandLoader( loader.name, loader.group );
+			unregisterCommandLoader( loader.name );
 		};
 	}, [
 		loader.name,
-		loader.group,
 		loader.hook,
 		loader.context,
 		registerCommandLoader,

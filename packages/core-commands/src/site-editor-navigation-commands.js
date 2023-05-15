@@ -110,22 +110,18 @@ const useTemplatePartNavigationCommandLoader =
 export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
-		group: __( 'Pages' ),
 		hook: usePageNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-posts',
-		group: __( 'Posts' ),
 		hook: usePostNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
-		group: __( 'Templates' ),
 		hook: useTemplateNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',
-		group: __( 'Template Parts' ),
 		hook: useTemplatePartNavigationCommandLoader,
 	} );
 }

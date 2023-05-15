@@ -74,7 +74,6 @@ function useEditModeCommandLoader() {
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
-		group: __( 'Templates' ),
 		hook: useEditModeCommandLoader,
 		context: 'site-editor-edit',
 	} );
