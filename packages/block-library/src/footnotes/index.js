@@ -23,7 +23,9 @@ export const settings = {
 	save,
 };
 
+// Would be good to also remove the format if the block is unregistered.
+registerFormatType( 'core/footnote', format );
+
 export const init = () => {
 	initBlock( { name, metadata, settings } );
-	registerFormatType( 'core/footnote', format );
 };
