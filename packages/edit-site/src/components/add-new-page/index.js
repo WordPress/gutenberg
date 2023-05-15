@@ -117,7 +117,7 @@ export default function AddNewPageModal() {
 	if ( ! isCreatePageModalOpen.isOpen ) return null;
 
 	return (
-		<Modal title="Create a new page" onRequestClose={ handleClose }>
+		<Modal title="Draft a new page" onRequestClose={ handleClose }>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
@@ -128,7 +128,7 @@ export default function AddNewPageModal() {
 					/>
 					<HStack spacing={ 2 } justify="end">
 						<Button variant="tertiary" onClick={ handleClose }>
-							Cancel
+							{ __( 'Cancel' ) }
 						</Button>
 						<Button
 							variant="primary"
@@ -136,7 +136,7 @@ export default function AddNewPageModal() {
 							isBusy={ isCreatingPage }
 							aria-disabled={ isCreatingPage }
 						>
-							Create
+							{ __( 'Create draft' ) }
 						</Button>
 					</HStack>
 				</VStack>
