@@ -5,6 +5,10 @@
 	"title": "Pattern",
 	"category": "theme",
 	"description": "Show a block pattern.",
+	"supports": {
+		"html": false,
+		"inserter": false
+	},
 	"textdomain": "default",
 	"attributes": {
 		"slug": {
