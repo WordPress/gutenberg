@@ -37,19 +37,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		static::$user_id = self::factory()->user->create();
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_generates_layout_styles( $layout_definitions ) {
+	public function test_get_stylesheet_generates_layout_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => true,
 					),
@@ -70,19 +62,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_generates_valid_block_gap_values_and_skips_null_or_false_values( $layout_definitions ) {
+	public function test_get_stylesheet_generates_valid_block_gap_values_and_skips_null_or_false_values() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => true,
 					),
@@ -124,19 +108,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_generates_layout_styles_with_spacing_presets( $layout_definitions ) {
+	public function test_get_stylesheet_generates_layout_styles_with_spacing_presets() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => true,
 					),
@@ -157,19 +133,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_generates_fallback_gap_layout_styles( $layout_definitions ) {
+	public function test_get_stylesheet_generates_fallback_gap_layout_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => null,
 					),
@@ -191,19 +159,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_generates_base_fallback_gap_layout_styles( $layout_definitions ) {
+	public function test_get_stylesheet_generates_base_fallback_gap_layout_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => null,
 					),
@@ -220,20 +180,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @dataProvider data_get_layout_definitions
-	 *
-	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
-	 */
-	public function test_get_stylesheet_skips_layout_styles( $layout_definitions ) {
+	public function test_get_stylesheet_skips_layout_styles() {
 		add_theme_support( 'disable-layout-styles' );
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'layout'  => array(
-						'definitions' => $layout_definitions,
-					),
 					'spacing' => array(
 						'blockGap' => null,
 					),
@@ -248,89 +200,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			'',
 			$stylesheet
-		);
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_get_layout_definitions() {
-		return array(
-			'layout definitions' => array(
-				array(
-					'default' => array(
-						'name'          => 'default',
-						'slug'          => 'flow',
-						'className'     => 'is-layout-flow',
-						'baseStyles'    => array(
-							array(
-								'selector' => ' > .alignleft',
-								'rules'    => array(
-									'float'               => 'left',
-									'margin-inline-start' => '0',
-									'margin-inline-end'   => '2em',
-								),
-							),
-							array(
-								'selector' => ' > .alignright',
-								'rules'    => array(
-									'float'               => 'right',
-									'margin-inline-start' => '2em',
-									'margin-inline-end'   => '0',
-								),
-							),
-							array(
-								'selector' => ' > .aligncenter',
-								'rules'    => array(
-									'margin-left'  => 'auto !important',
-									'margin-right' => 'auto !important',
-								),
-							),
-						),
-						'spacingStyles' => array(
-							array(
-								'selector' => ' > *',
-								'rules'    => array(
-									'margin-block-start' => '0',
-									'margin-block-end'   => '0',
-								),
-							),
-							array(
-								'selector' => ' > * + *',
-								'rules'    => array(
-									'margin-block-start' => null,
-									'margin-block-end'   => '0',
-								),
-							),
-						),
-					),
-					'flex'    => array(
-						'name'          => 'flex',
-						'slug'          => 'flex',
-						'className'     => 'is-layout-flex',
-						'displayMode'   => 'flex',
-						'baseStyles'    => array(
-							array(
-								'selector' => '',
-								'rules'    => array(
-									'flex-wrap'   => 'wrap',
-									'align-items' => 'center',
-								),
-							),
-						),
-						'spacingStyles' => array(
-							array(
-								'selector' => '',
-								'rules'    => array(
-									'gap' => null,
-								),
-							),
-						),
-					),
-				),
-			),
 		);
 	}
 

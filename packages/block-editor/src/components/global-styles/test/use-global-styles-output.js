@@ -706,7 +706,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: false,
@@ -722,7 +723,8 @@ describe( 'global styles renderer', () => {
 			const style = {};
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -738,7 +740,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -754,7 +757,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: true,
@@ -770,7 +774,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: false, // This means that the fallback value will be used instead of the "real" one.
