@@ -44,7 +44,11 @@ function FontFamiliesMenu ({ onToggle, toggleFontLibrary }) {
 
 function FontFamilies() {
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
-	const themeFontFamilies = fontFamilies?.theme  || [];
+
+    const fonts  = Array.isArray( fontFamilies?.custom )
+        ? fontFamilies?.custom
+        : fontFamilies?.theme || [];
+
     const [ isFontLibraryModalOpen, setIsFontLibraryModalOpen ] = useState( false );
 
     const toggleFontLibrary = () => {
@@ -76,7 +80,7 @@ function FontFamilies() {
                     />
                 </HStack>
                 <ItemGroup isBordered isSeparated>
-                    {themeFontFamilies.map( family => (
+                    {fonts.map( family => (
                         <Item key={family.slug}>
                             <HStack justify="flex-start">
                                 <FlexItem style={{ fontFamily: family.fontFamily }}>{ family.name }</FlexItem>

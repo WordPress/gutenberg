@@ -106,7 +106,7 @@ function GoogleFonts() {
                                     <GoogleFontCard
                                         key={ font.family }
                                         font={ font }
-                                        handleSelectFont={ handleSelectFont }
+                                        onClick={ handleSelectFont }
                                     />
                                 ) ) }
                             </FontsGrid>

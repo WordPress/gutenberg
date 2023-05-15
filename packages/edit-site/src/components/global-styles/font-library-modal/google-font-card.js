@@ -15,7 +15,7 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import { fontFamilyFromGoogleFont } from './utils';
 
-function GoogleFontCard ( { font, handleSelectFont } ) {
+function GoogleFontCard ( { font, onClick } ) {
 
     const {
         googleFonts,
@@ -37,9 +37,8 @@ function GoogleFontCard ( { font, handleSelectFont } ) {
     return (
         <FontCard
             font={ font }
-            key={ font.name }
             onClick={ () =>
-                handleSelectFont( font.name )
+                onClick( font.name )
             }
             actionHandler={
                 !isInstalled

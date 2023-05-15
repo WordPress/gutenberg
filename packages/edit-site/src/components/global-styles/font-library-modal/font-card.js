@@ -26,10 +26,10 @@ function FontCard ( { font, onClick, actionHandler, elevation } ) {
                 <CardBody>
                     <VStack gap={3}>
                         <HStack justify="space-between">
-                            <Heading level={3}>{ font.name }</Heading>
+                            <Text>{ font.name }</Text>
                             { !!actionHandler && (actionHandler) }
                         </HStack>
-                        <Heading level={4}>{font.variantsCount} { _n( "variant", "variants", font.variantsCount ) }</Heading>
+                        <Text>{font.variantsCount} { _n( "variant", "variants", font.variantsCount ) }</Text>
                         <Text>{ DEMO_TEXT }</Text>
                     </VStack>
                 </CardBody>
