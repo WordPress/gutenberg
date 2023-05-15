@@ -22,13 +22,21 @@ function register_block_core_pattern() {
 /**
  * Renders the `core/pattern` block on the server.
  *
- * @param array $attributes Block attributes.
+ * @param array  $attributes Block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the output of the pattern.
  */
-function render_block_core_pattern( $attributes ) {
+function render_block_core_pattern( $attributes, $content ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
+	}
+	$slug_classname = str_replace( '/', '-', $attributes['slug'] );
+	$classnames     = isset( $attributes['className'] ) ? $attributes['className'] . ' ' . $slug_classname : $slug_classname;
+	$wrapper        = '<div class="' . esc_attr( $classnames ) . '">%s</div>';
+
+	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
+		return sprintf( $wrapper, $content );
 	}
 
 	$slug     = $attributes['slug'];
@@ -38,7 +46,7 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	return do_blocks( $pattern['content'] );
+	return sprintf( $wrapper, do_blocks( $pattern['content'] ) );
 }
 
 add_action( 'init', 'register_block_core_pattern' );

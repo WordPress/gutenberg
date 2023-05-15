@@ -19,9 +19,8 @@ import RenameMenuItem from './rename-menu-item';
 export default function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
 		useDispatch( noticesStore );
-
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
@@ -30,6 +29,8 @@ export default function Actions( { template } ) {
 	}
 
 	async function revertAndSaveTemplate() {
+		const noticeId = 'edit-site-template-reverted';
+		removeNotice( noticeId );
 		try {
 			await revertTemplate( template, { allowUndo: false } );
 			await saveEditedEntityRecord(
@@ -37,9 +38,14 @@ export default function Actions( { template } ) {
 				template.type,
 				template.id
 			);
+			const notice =
+				template.type === 'wp_template'
+					? __( 'Template reverted.' )
+					: __( 'Template part reverted.' );
 
-			createSuccessNotice( __( 'Entity reverted.' ), {
+			createSuccessNotice( notice, {
 				type: 'snackbar',
+				id: noticeId,
 			} );
 		} catch ( error ) {
 			const errorMessage =

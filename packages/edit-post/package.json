@@ -58,7 +58,7 @@
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.3.1",
-		"memize": "^1.1.0",
+		"memize": "^2.1.0",
 		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {

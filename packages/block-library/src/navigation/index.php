@@ -470,7 +470,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Restore legacy classnames for submenu positioning.
 	$layout_class = '';
-	if ( isset( $attributes['layout']['justifyContent'] ) ) {
+	if (
+		isset( $attributes['layout']['justifyContent'] ) &&
+		isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
+	) {
 		$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
 	}
 	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
