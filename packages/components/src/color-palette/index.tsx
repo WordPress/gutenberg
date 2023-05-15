@@ -284,7 +284,7 @@ function UnforwardedColorPalette(
 										className={ classnames(
 											'components-color-palette__custom-color-value',
 											{
-												'is-hex':
+												'components-color-palette__custom-color-value--is-hex':
 													displayValue?.startsWith(
 														'#'
 													),
