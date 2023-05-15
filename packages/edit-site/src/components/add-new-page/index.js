@@ -84,7 +84,7 @@ export default function AddNewPageModal() {
 			}
 
 			// Close the modal when complete
-			setIsCreatePageModalOpened( false );
+			setIsCreatePageModalOpened( false, { redirectAfterSave: false } );
 
 			createSuccessNotice(
 				sprintf(
