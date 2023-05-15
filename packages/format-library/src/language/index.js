@@ -23,8 +23,8 @@ const title = __( 'Language' );
 
 export const language = {
 	name,
-	tagName: 'span',
-	className: 'has-language',
+	tagName: 'bdo',
+	className: null,
 	edit: Edit,
 	title,
 };
