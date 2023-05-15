@@ -34,7 +34,7 @@ test.describe( 'Block Switcher', () => {
 			variations.getByRole( 'menuitem', { name: 'Stack' } )
 		).toBeHidden();
 		await variations.getByRole( 'menuitem', { name: 'Row' } ).click();
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/group',
 				attributes: expect.objectContaining( {
