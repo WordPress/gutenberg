@@ -223,7 +223,7 @@ export default function NewTemplate( {
 							gap={ 4 }
 							align="flex-start"
 							justify="center"
-							className="edit-site-add-new-template__modal__contents"
+							className="edit-site-add-new-template__template-list__contents"
 						>
 							{ missingTemplates.map( ( template ) => {
 								const { title, description, slug, onClick } =
