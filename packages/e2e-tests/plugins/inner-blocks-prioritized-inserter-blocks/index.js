@@ -8,7 +8,8 @@
 		style: { outline: '1px solid gray', padding: 5 },
 	};
 
-    // Make it easier to select the block.
+    // without a placeholder within the inner blocks it can be difficult to select the block using e2e tests
+    // especially using Puppeteer, so we use an image block which has a placeholder.
 	const template = [
 		[ 'core/image' ],
     ];
