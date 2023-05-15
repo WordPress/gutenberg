@@ -270,13 +270,15 @@ function UnforwardedColorPalette(
 										  }
 								}
 							/>
-							{ value && (
+							{
 								<VStack
 									className="components-color-palette__custom-color-text-wrapper"
 									spacing={ 0.5 }
 								>
 									<Truncate className="components-color-palette__custom-color-name">
-										{ buttonLabelName }
+										{ value
+											? buttonLabelName
+											: 'No color selected' }
 									</Truncate>
 									<Truncate
 										className={ classnames(
@@ -292,7 +294,7 @@ function UnforwardedColorPalette(
 										{ displayValue }
 									</Truncate>
 								</VStack>
-							) }
+							}
 						</VStack>
 					) }
 				/>
