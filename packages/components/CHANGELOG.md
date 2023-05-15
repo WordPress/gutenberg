@@ -11,6 +11,7 @@
 ### Bug Fix
 
 -   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
+-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state.  ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
 
 ### Internal
 

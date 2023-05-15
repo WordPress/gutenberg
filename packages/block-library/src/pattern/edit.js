@@ -42,17 +42,17 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// because nested pattern blocks cannot be inserted if the parent block supports
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
+				// Clone blocks from the pattern before insertion to ensure they receive
+				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
+				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
+					cloneBlock( block )
+				);
 				__unstableMarkNextChangeAsNotPersistent();
 				if ( syncStatus === 'partial' ) {
-					replaceInnerBlocks(
-						clientId,
-						selectedPattern.blocks.map( ( block ) =>
-							cloneBlock( block )
-						)
-					);
+					replaceInnerBlocks( clientId, clonedBlocks );
 					return;
 				}
-				replaceBlocks( clientId, selectedPattern.blocks );
+				replaceBlocks( clientId, clonedBlocks );
 			} );
 		}
 	}, [
