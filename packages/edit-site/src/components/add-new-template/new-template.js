@@ -186,7 +186,6 @@ export default function NewTemplate( {
 	} else if ( showCustomGenericTemplateModal ) {
 		modalTitle = __( 'Create custom template' );
 	}
-	// TODO: Remove obsolete styles and unify modals's styles.
 	return (
 		<>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
@@ -194,9 +193,9 @@ export default function NewTemplate( {
 				{ ...restToggleProps }
 				onClick={ () => setShowModal( true ) }
 				icon={ showIcon ? plus : null }
-				label={ postType.labels.add_new }
+				label={ postType.labels.add_new_item }
 			>
-				{ showIcon ? null : postType.labels.add_new }
+				{ showIcon ? null : postType.labels.add_new_item }
 			</Toggle>
 			{ showModal && (
 				<Modal
