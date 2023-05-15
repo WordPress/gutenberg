@@ -18,9 +18,19 @@
 }
 
 .edit-site-custom-template-modal {
-	&__suggestions_list {
-		margin-left: - $grid-unit-15;
-		margin-right: - $grid-unit-15;
+	&__contents-wrapper {
+		height: 100%;
+		justify-content: flex-start !important; // Required as topLeft alignment isn't working on VStack
+
+		> * {
+			width: 100%;
+		}
+
+		&__suggestions_list {
+			margin-left: - $grid-unit-15;
+			margin-right: - $grid-unit-15;
+			width: calc(100% + #{$grid-unit-15 * 2});
+		}
 	}
 
 	&__contents {
@@ -48,7 +58,6 @@
 
 	.edit-site-custom-template-modal__suggestions_list {
 		@include break-small() {
-			height: 232px;
 			overflow: scroll;
 		}
 
@@ -140,6 +149,21 @@
 		justify-content: center;
 		height: 100%;
 	}
+}
+
+.edit-site-add-new-template__modal,
+.edit-site-custom-template-modal {
+	max-width: $grid-unit-80 * 13;
+	width: calc(100% - #{$grid-unit-80});
+	height: calc(100% - #{$grid-unit-80});
+	max-height: none;
+
+	@include break-large() {
+		width: calc(100% - #{$grid-unit-80 * 2});
+		height: calc(100% - #{$grid-unit-80 * 2});
+		max-height: none;
+	}
+
 	.components-modal__children-container {
 		height: 100%;
 	}
@@ -153,6 +177,7 @@
 		display: flex;
 		flex-direction: column;
 		border: $border-width solid $gray-300;
+		min-height: $grid-unit-80 * 3;
 
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
@@ -190,8 +215,11 @@
 }
 
 .edit-site-add-new-template__modal__contents {
+	padding-bottom: $grid-unit-40;
+
 	> .components-button {
 		height: 100%;
 		text-align: start;
+		align-items: flex-start;
 	}
 }

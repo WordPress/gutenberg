@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -54,7 +59,12 @@ const DEFAULT_TEMPLATE_SLUGS = [
 function TemplateListItem( { title, description, onClick } ) {
 	return (
 		<Button onClick={ onClick }>
-			<VStack as="span" spacing={ 2 }>
+			<VStack
+				as="span"
+				spacing={ 2 }
+				justify="flex-start"
+				style={ { width: '100%' } }
+			>
 				<Text
 					weight={ 500 }
 					lineHeight={ 1.53846153846 } // 20px
@@ -71,15 +81,21 @@ function TemplateListItem( { title, description, onClick } ) {
 	);
 }
 
+const modalContentMap = {
+	templatesList: 1,
+	customTemplate: 2,
+	customGenericTemplate: 3,
+};
+
 export default function NewTemplate( {
 	postType,
 	toggleProps,
 	showIcon = true,
 } ) {
-	const [ showTemplatesListModal, setShowTemplatesListModal ] =
-		useState( false );
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
-		useState( false );
+	const [ showModal, setShowModal ] = useState( false );
+	const [ modalContent, setModalContent ] = useState(
+		modalContentMap.templatesList
+	);
 	const [
 		showCustomGenericTemplateModal,
 		setShowCustomGenericTemplateModal,
@@ -147,94 +163,115 @@ export default function NewTemplate( {
 			setIsCreatingTemplate( false );
 		}
 	}
+	const onModalClose = () => {
+		setShowModal( false );
+		setModalContent( modalContentMap.templatesList );
+	};
 
-	const missingTemplates = useMissingTemplates(
-		setEntityForSuggestions,
-		setShowCustomTemplateModal
+	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
+		setModalContent( modalContentMap.customTemplate )
 	);
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
 	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
-	// TODO: Remove obsolete styles..
+
+	let modalTitle = __( 'Add template' );
+	if ( modalContent === modalContentMap.customTemplate ) {
+		modalTitle = sprintf(
+			// translators: %s: Name of the post type e.g: "Post".
+			__( 'Add template: %s' ),
+			entityForSuggestions.labels.singular_name
+		);
+	} else if ( showCustomGenericTemplateModal ) {
+		modalTitle = __( 'Create custom template' );
+	}
+	// TODO: Remove obsolete styles and unify modals's styles.
 	return (
 		<>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<Toggle
 				{ ...restToggleProps }
-				onClick={ () => {
-					setShowTemplatesListModal( true );
-				} }
+				onClick={ () => setShowModal( true ) }
 				icon={ showIcon ? plus : null }
 				label={ postType.labels.add_new }
 			>
 				{ showIcon ? null : postType.labels.add_new }
 			</Toggle>
-			{ showTemplatesListModal && (
+			{ showModal && (
 				<Modal
-					title={ __( 'Add template' ) }
-					// isFullScreen
-					className="edit-site-add-new-template__modal"
-					onRequestClose={ () => setShowTemplatesListModal( false ) }
+					title={ modalTitle }
+					className={ classnames(
+						'edit-site-add-new-template__modal',
+						{
+							'edit-site-add-new-template__modal_template_list':
+								modalContent === modalContentMap.templatesList,
+							'edit-site-custom-template-modal':
+								modalContent === modalContentMap.customTemplate,
+						}
+					) }
+					onRequestClose={ onModalClose }
+					overlayClassName={
+						modalContent === modalContentMap.customGenericTemplate
+							? 'edit-site-custom-generic-template__modal'
+							: undefined
+					}
 				>
-					<Grid
-						columns={ 3 }
-						gap={ 4 }
-						align="flex-start"
-						justify="center"
-						className="edit-site-add-new-template__modal__contents"
-					>
-						{ missingTemplates.map( ( template ) => {
-							const { title, description, slug, onClick } =
-								template;
-							return (
-								<TemplateListItem
-									key={ slug }
-									title={ title }
-									description={ description }
-									onClick={ () =>
-										onClick
-											? onClick( template )
-											: createTemplate( template )
-									}
-								/>
-							);
-						} ) }
-						<TemplateListItem
-							title={ __( 'Custom template' ) }
-							description={ __(
-								'A custom template can be manually applied to any post or page.'
-							) }
-							onClick={ () =>
-								setShowCustomGenericTemplateModal( true )
-							}
+					{ modalContent === modalContentMap.templatesList && (
+						<Grid
+							columns={ 3 }
+							gap={ 4 }
+							align="flex-start"
+							justify="center"
+							className="edit-site-add-new-template__modal__contents"
+						>
+							{ missingTemplates.map( ( template ) => {
+								const { title, description, slug, onClick } =
+									template;
+								return (
+									<TemplateListItem
+										key={ slug }
+										title={ title }
+										description={ description }
+										onClick={ () =>
+											onClick
+												? onClick( template )
+												: createTemplate( template )
+										}
+									/>
+								);
+							} ) }
+							<TemplateListItem
+								title={ __( 'Custom template' ) }
+								description={ __(
+									'A custom template can be manually applied to any post or page.'
+								) }
+								onClick={ () =>
+									setShowCustomGenericTemplateModal( true )
+								}
+							/>
+						</Grid>
+					) }
+					{ modalContent === modalContentMap.customTemplate && (
+						<AddCustomTemplateModal
+							onSelect={ createTemplate }
+							entityForSuggestions={ entityForSuggestions }
 						/>
-					</Grid>
+					) }
+					{ modalContent ===
+						modalContentMap.customGenericTemplate && (
+						<AddCustomGenericTemplateModal
+							onClose={ onModalClose }
+							createTemplate={ createTemplate }
+						/>
+					) }
 				</Modal>
-			) }
-			{ showCustomTemplateModal && (
-				<AddCustomTemplateModal
-					onClose={ () => setShowCustomTemplateModal( false ) }
-					onSelect={ createTemplate }
-					entityForSuggestions={ entityForSuggestions }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
-			) }
-			{ showCustomGenericTemplateModal && (
-				<AddCustomGenericTemplateModal
-					onClose={ () => setShowCustomGenericTemplateModal( false ) }
-					createTemplate={ createTemplate }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
 			) }
 		</>
 	);
 }
 
-function useMissingTemplates(
-	setEntityForSuggestions,
-	setShowCustomTemplateModal
-) {
+function useMissingTemplates( setEntityForSuggestions, onClick ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -246,7 +283,7 @@ function useMissingTemplates(
 			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
-		setShowCustomTemplateModal( true );
+		onClick?.();
 		setEntityForSuggestions( _entityForSuggestions );
 	};
 	// We need to replace existing default template types with

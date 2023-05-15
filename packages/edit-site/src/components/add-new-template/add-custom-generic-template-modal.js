@@ -10,22 +10,12 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	Modal,
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import TemplateActionsLoadingScreen from './template-actions-loading-screen';
-
-function AddCustomGenericTemplateModal( {
-	onClose,
-	createTemplate,
-	isCreatingTemplate,
-} ) {
+function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
 	const [ title, setTitle ] = useState( '' );
 	const defaultTitle = __( 'Custom Template' );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -50,51 +40,42 @@ function AddCustomGenericTemplateModal( {
 		}
 	}
 	return (
-		<Modal
-			title={ __( 'Create custom template' ) }
-			onRequestClose={ () => {
-				onClose();
-			} }
-			overlayClassName="edit-site-custom-generic-template__modal"
-		>
-			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
-			<form onSubmit={ onCreateTemplate }>
-				<VStack spacing={ 6 }>
-					<TextControl
-						__nextHasNoMarginBottom
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						placeholder={ defaultTitle }
-						disabled={ isBusy }
-						help={ __(
-							'Describe the template, e.g. "Post with sidebar".'
-						) }
-					/>
-					<HStack
-						className="edit-site-custom-generic-template__modal-actions"
-						justify="right"
+		<form onSubmit={ onCreateTemplate }>
+			<VStack spacing={ 6 }>
+				<TextControl
+					__nextHasNoMarginBottom
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					placeholder={ defaultTitle }
+					disabled={ isBusy }
+					help={ __(
+						'Describe the template, e.g. "Post with sidebar".'
+					) }
+				/>
+				<HStack
+					className="edit-site-custom-generic-template__modal-actions"
+					justify="right"
+				>
+					<Button
+						variant="tertiary"
+						onClick={ () => {
+							onClose();
+						} }
 					>
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								onClose();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							isBusy={ isBusy }
-							aria-disabled={ isBusy }
-						>
-							{ __( 'Create' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		</Modal>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						type="submit"
+						isBusy={ isBusy }
+						aria-disabled={ isBusy }
+					>
+						{ __( 'Create' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
 	);
 }
 
