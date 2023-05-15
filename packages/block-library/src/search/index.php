@@ -191,10 +191,8 @@ function classnames_for_block_core_search( $attributes ) {
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
-			if ( ! empty( $attributes['buttonBehavior'] ) ) {
-				if ( 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-					$classnames[] = 'wp-block-search__button-behavior-expand';
-				}
+			if ( ! empty( $attributes['buttonBehavior'] ) && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search__searchfield-hidden';
 			}
 		}
 	}
