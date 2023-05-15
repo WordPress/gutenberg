@@ -43,6 +43,8 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import { useBlockEditingMode } from '../block-editing-mode';
+
 export const BlockListBlockContext = createContext();
 
 /**
@@ -101,14 +103,12 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		hasContentLockedParent,
 		isContentBlock,
-		isContentLocking,
 		isTemporarilyEditingAsBlocks,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
 				__unstableGetContentLockingParent,
-				getTemplateLock,
 				__unstableGetTemporarilyEditingAsBlocks,
 			} = select( blockEditorStore );
 			const _hasContentLockedParent =
@@ -120,9 +120,6 @@ function BlockListBlock( {
 						name
 					),
 				hasContentLockedParent: _hasContentLockedParent,
-				isContentLocking:
-					getTemplateLock( clientId ) === 'contentOnly' &&
-					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 			};
@@ -133,6 +130,8 @@ function BlockListBlock( {
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	const parentLayout = useLayout() || {};
+
+	const blockEditingMode = useBlockEditingMode( clientId );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -234,10 +233,11 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-content-locked': isContentLocking,
+				'is-editing-disabled':
+					blockEditingMode === 'disabled' ||
+					( hasContentLockedParent && ! isContentBlock ),
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
-				'is-content-block': hasContentLockedParent && isContentBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className

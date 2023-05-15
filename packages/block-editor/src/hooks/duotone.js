@@ -38,6 +38,7 @@ import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockSettings } from './utils';
 import { store as blockEditorStore } from '../store';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const EMPTY_ARRAY = [];
 
@@ -235,15 +236,19 @@ const withDuotoneControls = createHigherOrderComponent(
 			[ props.clientId ]
 		);
 
+		const blockEditingMode = useBlockEditingMode( props.clientId );
+
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && ! isContentLocked && (
-					<DuotonePanel { ...props } />
-				) }
+				{ hasDuotoneSupport &&
+					! isContentLocked &&
+					blockEditingMode === 'default' && (
+						<DuotonePanel { ...props } />
+					) }
 				<BlockEdit { ...props } />
 			</>
 		);

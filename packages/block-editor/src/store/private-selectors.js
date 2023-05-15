@@ -18,3 +18,19 @@ export function isBlockInterfaceHidden( state ) {
 export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
+
+export function getBlockEditingMode( state, clientId ) {
+	if ( ! clientId ) {
+		return state.settings.rootBlockEditingMode;
+	}
+	while (
+		! state.blockEditingModes.has( clientId ) &&
+		state.blocks.parents.has( clientId )
+	) {
+		clientId = state.blocks.parents.get( clientId );
+	}
+	return (
+		state.blockEditingModes.get( clientId ) ??
+		state.settings.rootBlockEditingMode
+	);
+}

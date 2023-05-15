@@ -66,3 +66,18 @@ export function showBlockInterface() {
 		type: 'SHOW_BLOCK_INTERFACE',
 	};
 }
+
+export function setBlockEditingMode( clientId, mode ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		clientId,
+		mode,
+	};
+}
+
+export function unsetBlockEditingMode( clientId ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
+		clientId,
+	};
+}

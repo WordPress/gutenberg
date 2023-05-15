@@ -32,6 +32,7 @@ import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
+import { unlock } from '../../lock-unlock';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
 	const {
@@ -52,7 +53,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			getBlockRootClientId,
 			getSettings,
 			__unstableGetContentLockingParent,
-		} = select( blockEditorStore );
+			getBlockEditingMode,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
@@ -73,9 +75,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			isContentLocked: !! __unstableGetContentLockingParent(
-				selectedBlockClientId
-			),
+			isContentLocked:
+				!! __unstableGetContentLockingParent( selectedBlockClientId ) ||
+				getBlockEditingMode( selectedBlockClientId ) !== 'default',
 		};
 	}, [] );
 
