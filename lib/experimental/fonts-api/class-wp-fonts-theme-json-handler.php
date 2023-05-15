@@ -49,9 +49,16 @@ class WP_Fonts_Theme_Json_Handler
 			return;
 		}
 
-		$fonts   = array();
-		$handles = array();
+		list( $fonts, $handles ) = static::parse_font_families( $settings );
 
+		wp_register_fonts( $fonts );
+		wp_enqueue_fonts( $handles );
+	}
+
+	private static function parse_font_families( array $settings )
+	{
+		$handles = array();
+		$fonts = array();
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $font_family ) {
@@ -112,8 +119,7 @@ class WP_Fonts_Theme_Json_Handler
 			}
 		}
 
-		wp_register_fonts( $fonts );
-		wp_enqueue_fonts( $handles );
+		return array( $fonts, $handles );
 	}
 
 	/**
