@@ -8,7 +8,11 @@
 .edit-site-sidebar-navigation-screen__content {
 	margin: 0 0 $grid-unit-20 0;
 	color: $gray-400;
-	padding: $grid-unit-20;
+	padding: 0 $grid-unit-20;
+	.components-item-group {
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
+	}
 	.components-text {
 		color: $gray-400;
 	}
@@ -80,7 +84,6 @@
 }
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
-	margin-left: $grid-unit-20;
 	.edit-site-global-styles-variations_item-preview {
 		border: $gray-900 $border-width solid;
 	}
