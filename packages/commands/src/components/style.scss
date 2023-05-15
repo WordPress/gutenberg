@@ -94,13 +94,8 @@
 		max-height: 400px;
 		overflow: auto;
 
-		& > [cmdk-list-sizer] {
+		& > [cmdk-list-sizer] :has([cmdk-group-items]:not(:empty)) {
 			padding: $grid-unit;
-
-			// Hides the padding in empty contexts.
-			&:empty {
-				display: none;
-			}
 		}
 	}
 

@@ -31,6 +31,10 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
 
+	if ( ! isLoading && ! commands.length ) {
+		return null;
+	}
+
 	return (
 		<>
 			<Command.List>
