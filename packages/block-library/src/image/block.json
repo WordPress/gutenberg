@@ -82,10 +82,7 @@
 			"attribute": "target"
 		},
 		"behaviors": {
-			"type": "object",
-			"default": {
-				"lightbox": true
-			}
+			"type": "object"
 		}
 	},
 	"supports": {
