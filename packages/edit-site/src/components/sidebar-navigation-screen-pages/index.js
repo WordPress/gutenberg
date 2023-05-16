@@ -22,6 +22,7 @@ const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postType,
 		postId,
+		backToPreviousScreen: true,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
