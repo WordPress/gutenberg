@@ -44,7 +44,7 @@
 		"change-case": "^4.1.2",
 		"equivalent-key-map": "^0.2.2",
 		"fast-deep-equal": "^3.1.3",
-		"memize": "^1.1.0",
+		"memize": "^2.1.0",
 		"rememo": "^4.0.2",
 		"uuid": "^8.3.0"
 	},

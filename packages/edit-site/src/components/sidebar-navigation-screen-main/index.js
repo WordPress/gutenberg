@@ -15,35 +15,24 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 
 export default function SidebarNavigationScreenMain() {
-	const { hasNavigationMenus, hasGlobalStyleVariations } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				__experimentalGetCurrentThemeGlobalStylesVariations,
-			} = select( coreStore );
-			// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
-			// to avoid double network calls.
-			const navigationMenus = getEntityRecords(
-				'postType',
-				'wp_navigation',
-				{
-					per_page: 1,
-					status: 'publish',
-					order: 'desc',
-					orderby: 'date',
-				}
-			);
-			return {
-				hasNavigationMenus: !! navigationMenus?.length,
-				hasGlobalStyleVariations:
-					!! __experimentalGetCurrentThemeGlobalStylesVariations()
-						?.length,
-			};
-		},
-		[]
-	);
+	const hasNavigationMenus = useSelect( ( select ) => {
+		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+		// to avoid double network calls.
+		const navigationMenus = select( coreStore ).getEntityRecords(
+			'postType',
+			'wp_navigation',
+			{
+				per_page: 1,
+				status: 'publish',
+				order: 'desc',
+				orderby: 'date',
+			}
+		);
+		return !! navigationMenus?.length;
+	}, [] );
 	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
 		? hasNavigationMenus
 		: false;
@@ -66,17 +55,12 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
-					{ hasGlobalStyleVariations && (
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/wp_global_styles"
-							withChevron
-							icon={ styles }
-						>
-							{ __( 'Styles' ) }
-						</NavigatorButton>
-					) }
-
+					<SidebarNavigationItemGlobalStyles
+						withChevron
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/page"
