@@ -28,7 +28,7 @@ const PageItem = ( { postId, ...props } ) => {
 	} );
 	const handleNavigationItemHover = ( event ) => {
 		event.stopPropagation();
-		history.push( {
+		history.replace( {
 			path: '/' + 'page',
 			postId,
 			postType: 'page',
@@ -38,6 +38,7 @@ const PageItem = ( { postId, ...props } ) => {
 	return (
 		<SidebarNavigationItem
 			onMouseEnter={ handleNavigationItemHover }
+			onFocus={ handleNavigationItemHover }
 			{ ...linkInfo }
 			{ ...props }
 		/>
