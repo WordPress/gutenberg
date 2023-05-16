@@ -10,8 +10,7 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { layout, page, home, loop, plus } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { plus } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -20,13 +19,31 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarButton from '../sidebar-button';
+import { unlock } from '../../private-apis';
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
+	const { useHistory } = unlock( routerPrivateApis );
+	const history = useHistory();
 	const linkInfo = useLink( {
 		postType,
 		postId,
 	} );
-	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+	const handleNavigationItemHover = ( event ) => {
+		event.stopPropagation();
+		history.push( {
+			path: '/' + 'page',
+			postId,
+			postType: 'page',
+		} );
+	};
+
+	return (
+		<SidebarNavigationItem
+			onMouseEnter={ handleNavigationItemHover }
+			{ ...linkInfo }
+			{ ...props }
+		/>
+	);
 };
 
 export default function SidebarNavigationScreenPages() {
