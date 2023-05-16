@@ -42,16 +42,15 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 
 		const { behaviors: blockBehaviors } = props.attributes;
 
-		// TODO: Here we should get the theme behaviors but it doesn't work ATM.
-		const themeBehaviors = settings?.behaviors;
+		// Get the theme behaviors from the theme.json.
+		//
+		// TODO: We probably want to use a top-level `behaviors` property of
+		// `theme.json` instead of `settings.behaviors` like we do now.
+		const themeBehaviors = settings?.__experimentalFeatures?.behaviors;
 
 		// By default, use the block behaviors.
-		let behaviors = blockBehaviors;
-
 		// If the theme has behaviors, but the block does not, use the theme behaviors.
-		if ( ! blockBehaviors && themeBehaviors ) {
-			behaviors = themeBehaviors;
-		}
+		const behaviors = blockBehaviors || themeBehaviors || {};
 
 		return (
 			<>
