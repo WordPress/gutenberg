@@ -1208,11 +1208,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 	test.describe( 'Page list block', () => {
 		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
 			// Create parent page.
-			await admin.createNewPost( {
-				postType: 'page',
+			await requestUtils.createPage( {
 				title: 'Parent Page',
+				status: 'publish',
 			} );
-			await editor.publishPost();
 
 			// Create subpage.
 			await admin.createNewPost( {
