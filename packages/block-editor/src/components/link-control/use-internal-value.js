@@ -3,14 +3,12 @@
  */
 import { useState, useEffect } from '@wordpress/element';
 
-export default function useInternalInputValue( value ) {
-	const [ internalInputValue, setInternalInputValue ] = useState(
-		value || {}
-	);
+export default function useInternalValue( value ) {
+	const [ internalValue, setInternalValue ] = useState( value || {} );
 
 	// If the value prop changes, update the internal state.
 	useEffect( () => {
-		setInternalInputValue( ( prevValue ) => {
+		setInternalValue( ( prevValue ) => {
 			if ( value && value !== prevValue ) {
 				return value;
 			}
@@ -19,5 +17,5 @@ export default function useInternalInputValue( value ) {
 		} );
 	}, [ value ] );
 
-	return [ internalInputValue, setInternalInputValue ];
+	return [ internalValue, setInternalValue ];
 }

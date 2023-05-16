@@ -20,7 +20,7 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
-import useInternalInputValue from './use-internal-input-value';
+import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -140,7 +140,7 @@ function LinkControl( {
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
 	const [ internalControlValue, setInternalControlValue ] =
-		useInternalInputValue( value );
+		useInternalValue( value );
 
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
