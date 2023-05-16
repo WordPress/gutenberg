@@ -77,11 +77,15 @@ function Revisions( { onClose, userConfig, blocks } ) {
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"
+				style={ {
+					marginTop: '-105px',
+					marginBottom: '0px',
+					transform: 'scale(0.75)',
+				} }
 				name="revisions"
 				tabIndex={ 0 }
 				expand={ true }
-				scale={ 0.75 }
-				frameSize={ 100 }
+				scale={ 1 }
 			>
 				<EditorStyles styles={ editorStyles } />
 				<style>
