@@ -123,6 +123,9 @@ export function getSaveElement(
 	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	if ( ! blockType?.save ) return null;
+
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
