@@ -9,7 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { layout, page, home } from '@wordpress/icons';
+import { layout, page, home, loop } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -66,6 +66,14 @@ export default function SidebarNavigationScreenPages() {
 
 	const isHomePageBlog = frontPage === postsPage;
 
+	if ( ! isHomePageBlog ) {
+		const homePageIndex = pagesAndTemplates?.findIndex(
+			( item ) => item.id === frontPage
+		);
+		const homePage = pages?.splice( homePageIndex, 1 );
+		pages?.splice( 0, 0, ...homePage );
+	}
+
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Pages' ) }
@@ -95,17 +103,37 @@ export default function SidebarNavigationScreenPages() {
 									) ?? __( '(no title)' ) }
 								</PageItem>
 							) }
-							{ pages?.map( ( item ) => (
-								<PageItem
-									postId={ item.id }
-									key={ item.id }
-									icon={ page }
-									withChevron
-								>
-									{ decodeEntities( item.title?.rendered ) ??
-										__( '(no title)' ) }
-								</PageItem>
-							) ) }
+							{ pages?.map( ( item ) => {
+								const pageIsFrontPage = item.id === frontPage;
+								const pageIsPostsPage = item.id === postsPage;
+								let itemIcon;
+								switch ( item.id ) {
+									case frontPage:
+										itemIcon = home;
+										break;
+									case postsPage:
+										itemIcon = loop;
+										break;
+									default:
+										itemIcon = page;
+								}
+								return (
+									<PageItem
+										postId={ item.id }
+										key={ item.id }
+										icon={ itemIcon }
+										withChevron
+									>
+										{ decodeEntities(
+											item.title?.rendered
+										) ?? __( '(no title)' ) }
+										{ pageIsFrontPage &&
+											__( ' (Front Page)' ) }
+										{ pageIsPostsPage &&
+											__( ' (Posts Page)' ) }
+									</PageItem>
+								);
+							} ) }
 							{ dynamicPageTemplates?.map( ( item ) => (
 								<PageItem
 									postType="wp_template"
