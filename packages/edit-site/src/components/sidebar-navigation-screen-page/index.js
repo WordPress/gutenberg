@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalHStack as HStack,
@@ -10,7 +10,7 @@ import {
 	__experimentalText as Text,
 	ExternalLink,
 } from '@wordpress/components';
-import { useEntityRecord } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
 
@@ -24,13 +24,92 @@ import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import SidebarDetails from '../sidebar-navigation-data-list';
 
+function countWordsInHTML( htmlString ) {
+	const parser = new window.DOMParser();
+	const doc = parser.parseFromString( htmlString, 'text/html' );
+
+	let wordCount = 0;
+
+	function countWords( node ) {
+		if ( node.nodeType === 3 ) {
+			const text = node.textContent.trim();
+
+			if ( text !== '' ) {
+				const words = text.split( /\s+/ );
+				wordCount += words.length;
+			}
+		} else if ( node.nodeType === 1 ) {
+			const children = node.childNodes;
+			for ( let i = 0; i < children.length; i++ ) {
+				countWords( children[ i ] );
+			}
+		}
+	}
+
+	countWords( doc.body );
+	return wordCount;
+}
+const estimateReadingTime = ( wordCount, wordsPerMinute = 200 ) =>
+	Math.ceil( wordCount / wordsPerMinute );
+
+function getPageDetails( page ) {
+	if ( ! page ) {
+		return [];
+	}
+
+	const wordCount = countWordsInHTML( page?.content?.rendered ) || 0;
+	const readingTime = estimateReadingTime( wordCount );
+
+	return [
+		{
+			label: 'Template',
+			value: page?.template ? page?.template : 'Default',
+		},
+		{
+			label: 'Parent',
+			value: page?.parentTitle,
+		},
+		{
+			label: 'Words',
+			value: wordCount.toLocaleString() || 'Unknown',
+		},
+		{
+			label: 'Time to read',
+			value:
+				readingTime > 1
+					? `${ readingTime.toLocaleString() } mins`
+					: '1 min',
+		},
+	];
+}
+
 export default function SidebarNavigationScreenPage() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const {
 		params: { postId },
 	} = useNavigator();
-	const { record } = useEntityRecord( 'postType', 'page', postId );
 
+	const { record } = useEntityRecord( 'postType', 'page', postId );
+	const parentTitle = useSelect(
+		( select ) => {
+			const parent = record?.parent
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'page',
+						record.parent
+				  )
+				: null;
+
+			if ( parent ) {
+				return parent?.title?.rendered
+					? decodeEntities( parent.title.rendered )
+					: 'No title';
+			}
+
+			return 'Top level';
+		},
+		[ record ]
+	);
 	return (
 		<SidebarNavigationScreen
 			title={ record ? decodeEntities( record?.title?.rendered ) : null }
@@ -81,12 +160,10 @@ export default function SidebarNavigationScreenPage() {
 						Details
 					</SidebarNavigationSubtitle>
 					<SidebarDetails
-						details={ [
-							{ label: 'Template', value: 'Page' },
-							{ label: 'Parent', value: 'Top level' },
-							{ label: 'Words', value: '1402' },
-							{ label: 'Time to read', value: '7 minutes' },
-						] }
+						details={ getPageDetails( {
+							parentTitle,
+							...record,
+						} ) }
 					/>
 				</>
 			}
