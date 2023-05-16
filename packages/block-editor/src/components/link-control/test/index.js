@@ -1790,7 +1790,13 @@ describe( 'Addition Settings UI', () => {
 
 		const mockOnChange = jest.fn();
 
-		const selectedLink = fauxEntitySuggestions[ 0 ];
+		const selectedLink = {
+			...fauxEntitySuggestions[ 0 ],
+			// Including a setting here helps to assert on a potential bug
+			// whereby settings on the suggestion override the current (internal)
+			// settings values set by the user in the UI.
+			opensInNewTab: false,
+		};
 
 		render(
 			<LinkControl
