@@ -1229,35 +1229,17 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 	} );
 
 	test.describe( 'Page list block', () => {
-		test.beforeEach( async ( { admin, editor, page, requestUtils } ) => {
-			// Create parent page.
-			await admin.createNewPost( {
-				postType: 'page',
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			const parentPage = await requestUtils.createPage( {
 				title: 'Parent Page',
+				status: 'publish',
 			} );
-			await editor.publishPost();
 
-			// Create subpage.
-			await admin.createNewPost( {
-				postType: 'page',
+			await requestUtils.createPage( {
 				title: 'Subpage',
+				status: 'publish',
+				parent: parentPage.id,
 			} );
-			await editor.openDocumentSettingsSidebar();
-			const parentPageList = page.getByLabel( 'Parent page:' );
-			if ( await parentPageList.isHidden() ) {
-				await page
-					.getByRole( 'button', {
-						name: 'Page Attributes',
-					} )
-					.click();
-			}
-			await parentPageList.click();
-			await page
-				.getByRole( 'option', {
-					name: 'Parent Page',
-				} )
-				.click();
-			await editor.publishPost();
 
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
@@ -1265,7 +1247,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.canvas.click( 'body' );
 			await requestUtils.createNavigationMenu( {
-				title: 'Hidden menu',
+				title: 'Page list menu',
 				content: `
 					<!-- wp:page-list /-->
 					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
