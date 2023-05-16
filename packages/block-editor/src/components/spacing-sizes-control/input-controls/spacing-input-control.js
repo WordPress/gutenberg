@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -171,7 +166,7 @@ export default function SpacingInputControl( {
 	} ) );
 
 	const ariaLabel = sprintf(
-		// translators: 1: The side of the block being modified (top, bottom, left, etc.). 2. Type of spacing being modified (Padding, margin, etc)
+		// translators: 1: The side of the block being modified (top, bottom, left, All sides etc.). 2. Type of spacing being modified (Padding, margin, etc)
 		__( '%1$s %2$s' ),
 		LABELS[ side ],
 		type?.toLowerCase()
@@ -294,12 +289,7 @@ export default function SpacingInputControl( {
 					} }
 					isPressed={ showCustomValueControl }
 					isSmall
-					className={ classnames( {
-						'components-spacing-sizes-control__custom-toggle-all':
-							side === 'all',
-						'components-spacing-sizes-control__custom-toggle-single':
-							side !== 'all',
-					} ) }
+					className="components-spacing-sizes-control__custom-toggle"
 					iconSize={ 24 }
 				/>
 			) }
