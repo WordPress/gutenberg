@@ -1820,16 +1820,16 @@ export function lastBlockInserted( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block that is eding temporarily edited as blocks.
+ * Reducer returning the block client ID that is temporarily unlocked.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|null} state  Current state.
+ * @param {Object}      action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function temporarilyEditingAsBlocks( state = '', action ) {
-	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
-		return action.temporarilyEditingAsBlocks;
+export function temporarilyUnlockedBlock( state = null, action ) {
+	if ( action.type === 'SET_TEMPORARILY_UNLOCKED_BLOCK' ) {
+		return action.clientId;
 	}
 	return state;
 }
@@ -1854,7 +1854,7 @@ const combinedReducers = combineReducers( {
 	hasBlockMovingClientId,
 	highlightedBlock,
 	lastBlockInserted,
-	temporarilyEditingAsBlocks,
+	temporarilyUnlockedBlock,
 	blockVisibility,
 } );
 

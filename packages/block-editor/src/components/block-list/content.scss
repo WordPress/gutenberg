@@ -165,7 +165,8 @@
 	.block-editor-block-list__block {
 		pointer-events: none;
 	}
-	.is-content-block {
+	.is-content-block,
+	.is-content-block .block-editor-block-list__block {
 		pointer-events: initial;
 	}
 }
@@ -322,7 +323,7 @@
 }
 
 .is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+.is-focus-mode .block-editor-block-list__block.is-content-temporarily-unlocked.has-child-selected {
 	&,
 	& .block-editor-block-list__block {
 		opacity: 1;

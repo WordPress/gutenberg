@@ -13,6 +13,7 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
+import { unlock } from '../lock-unlock';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -45,18 +46,15 @@ export const withBlockControls = createHigherOrderComponent(
 		const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
 			( select ) => {
 				const {
-					__unstableGetContentLockingParent,
+					isContentLockedBlock,
 					getTemplateLock,
-					__unstableGetTemporarilyEditingAsBlocks,
-				} = select( blockEditorStore );
+					getTemporarilyUnlockedBlock,
+				} = unlock( select( blockEditorStore ) );
 				return {
 					templateLock: getTemplateLock( props.clientId ),
-					isLockedByParent: !! __unstableGetContentLockingParent(
-						props.clientId
-					),
+					isLockedByParent: isContentLockedBlock( props.clientId ),
 					isEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks() ===
-						props.clientId,
+						getTemporarilyUnlockedBlock() === props.clientId,
 				};
 			},
 			[ props.clientId ]

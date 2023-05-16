@@ -17,6 +17,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
+import { CONTENT_BLOCK_TYPES } from './constants';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -102,6 +103,8 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
  */
 export const getSettings = createSelector(
 	( state, setIsInserterOpen ) => {
+		const isLocked = hasPageContentLock( state );
+
 		const settings = {
 			...state.settings,
 			outlineMode: true,
@@ -122,6 +125,8 @@ export const getSettings = createSelector(
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
 				'wp_template' === getEditedPostType( state ),
+			contentBlockTypes: isLocked ? CONTENT_BLOCK_TYPES : null,
+			templateLock: isLocked ? 'contentOnly' : false,
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -136,6 +141,7 @@ export const getSettings = createSelector(
 				...rest,
 			} );
 		};
+
 		return settings;
 	},
 	( state ) => [
@@ -147,6 +153,7 @@ export const getSettings = createSelector(
 		__unstableGetPreference( state, 'showIconLabels' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
+		hasPageContentLock( state ),
 	]
 );
 
@@ -331,4 +338,28 @@ export function isNavigationOpened() {
 		since: '6.2',
 		version: '6.4',
 	} );
+}
+
+/**
+ * Whether or not the editor has a page loaded into it.
+ *
+ * @see setPage
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor has a page loaded into it.
+ */
+export function isPage( state ) {
+	return !! state.editedPost.context?.postId;
+}
+
+/**
+ * Whether or not the editor is locked so that only page content can be edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor is locked.
+ */
+export function hasPageContentLock( state ) {
+	return isPage( state ) ? state.hasPageContentLock : false;
 }

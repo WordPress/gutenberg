@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Icon } from '@wordpress/components';
+import { PanelRow, PanelBody } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,8 +14,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
+import LastRevision from './last-revision';
+import SidebarCard from '../sidebar-card';
 
-export default function TemplateCard() {
+export default function TemplatePanel() {
 	const {
 		info: { title, description, icon },
 		template,
@@ -38,22 +41,22 @@ export default function TemplateCard() {
 	}
 
 	return (
-		<>
-			<div className="edit-site-template-card">
-				<Icon className="edit-site-template-card__icon" icon={ icon } />
-				<div className="edit-site-template-card__content">
-					<div className="edit-site-template-card__header">
-						<h2 className="edit-site-template-card__title">
-							{ decodeEntities( title ) }
-						</h2>
-						<TemplateActions template={ template } />
-					</div>
-					<div className="edit-site-template-card__description">
-						{ decodeEntities( description ) }
-					</div>
-					<TemplateAreas />
-				</div>
-			</div>
-		</>
+		<PanelBody className="edit-site-template-panel">
+			<SidebarCard
+				className="edit-site-template-card"
+				title={ decodeEntities( title ) }
+				icon={ icon }
+				description={ decodeEntities( description ) }
+				actions={ <TemplateActions template={ template } /> }
+			>
+				<TemplateAreas />
+			</SidebarCard>
+			<PanelRow
+				header={ __( 'Editing history' ) }
+				className="edit-site-template-revisions"
+			>
+				<LastRevision />
+			</PanelRow>
+		</PanelBody>
 	);
 }

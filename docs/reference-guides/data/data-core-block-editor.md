@@ -1000,6 +1000,23 @@ _Returns_
 
 -   `boolean`: Whether the caret is within formatted text.
 
+### isContentLockedBlock
+
+Returns whether or not the given block is _content locked_.
+
+A block is _content locked_ if it is nested within a block that has a `templateLock` attribute set to `'contentOnly'` (a _content locking_ block), or if the editor has a `templateLock` of `'contentOnly'`.
+
+If the block is nested within a content block type (see `settings.contentBlockTypes`) then it is not _content locked_.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The client ID of the block to check.
+
+_Returns_
+
+-   `boolean`: Whether or not the block is content locked.
+
 ### isDraggingBlocks
 
 Returns true if the user is dragging blocks, or false otherwise.
@@ -1024,6 +1041,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
+
+### isInsertionLocked
+
+Determines if the editor or a given container is locked and does not allow block insertion.
+
+Only the `templateLock` settings of the editor or container block are checked. For more rigorous checking that checks the `allowedBlockTypes` attribute, use `canInsertBlockType()`.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Container block's client ID, or `null` to check the editor.
+
+_Returns_
+
+-   `boolean`: Whether block insertion is locked.
 
 ### isLastBlockChangePersistent
 

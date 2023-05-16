@@ -25,7 +25,10 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
-import { __experimentalUpdateSettings } from './private-actions';
+import {
+	__experimentalUpdateSettings,
+	setTemporarilyUnlockedBlock,
+} from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -406,14 +409,16 @@ export const replaceBlocks =
 		);
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
-		for ( let index = 0; index < blocks.length; index++ ) {
-			const block = blocks[ index ];
-			const canInsertBlock = select.canInsertBlockType(
-				block.name,
-				rootClientId
-			);
-			if ( ! canInsertBlock ) {
-				return;
+		if ( ! meta?.skipChecks ) {
+			for ( let index = 0; index < blocks.length; index++ ) {
+				const block = blocks[ index ];
+				const canInsertBlock = select.canInsertBlockType(
+					block.name,
+					rootClientId
+				);
+				if ( ! canInsertBlock ) {
+					return;
+				}
 			}
 		}
 		dispatch( {
@@ -1630,7 +1635,7 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
+		const isLocked = select.isInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}
@@ -1655,7 +1660,7 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
+		const isLocked = select.isInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}
@@ -1724,20 +1729,12 @@ export function setBlockVisibility( updates ) {
 	};
 }
 
-/**
- * Action that sets whether a block is being temporaritly edited as blocks.
- *
- * DO-NOT-USE in production.
- * This action is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
- */
 export function __unstableSetTemporarilyEditingAsBlocks(
 	temporarilyEditingAsBlocks
 ) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-	};
+	deprecated( '__unstableSetTemporarilyEditingAsBlocks', {
+		since: '6.3',
+		version: '6.4',
+	} );
+	return setTemporarilyUnlockedBlock( temporarilyEditingAsBlocks );
 }

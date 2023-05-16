@@ -11,6 +11,7 @@ import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
 import { cleanEmptyObject } from './hooks/utils';
+import ContentBlocksList from './components/content-blocks-list';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -26,4 +27,5 @@ lock( privateApis, {
 	BlockInfo,
 	useShouldContextualToolbarShow,
 	cleanEmptyObject,
+	ContentBlocksList,
 } );

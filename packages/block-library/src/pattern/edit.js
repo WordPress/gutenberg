@@ -52,7 +52,15 @@ const PatternEdit = ( { attributes, clientId } ) => {
 					replaceInnerBlocks( clientId, clonedBlocks );
 					return;
 				}
-				replaceBlocks( clientId, clonedBlocks );
+				replaceBlocks(
+					clientId,
+					selectedPattern.blocks,
+					/* indexToSelect: */ undefined,
+					/* initialPosition: */ 0,
+					{
+						skipChecks: true,
+					}
+				);
 			} );
 		}
 	}, [

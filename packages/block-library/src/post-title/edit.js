@@ -12,11 +12,13 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,6 +30,7 @@ export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId, queryId },
+	clientId,
 	insertBlocksAfter,
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
@@ -58,6 +61,11 @@ export default function PostTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const isContentLocked = useSelect(
+		( select ) =>
+			select( blockEditorStore ).isContentLockedBlock( clientId ),
+		[ clientId ]
+	);
 
 	let titleElement = (
 		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
@@ -114,20 +122,22 @@ export default function PostTitleEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ ! isContentLocked && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl

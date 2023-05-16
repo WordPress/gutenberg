@@ -175,6 +175,25 @@ function createPageModal( state = false, action ) {
 	return state;
 }
 
+/*
+ * Reducer used to track whether the page content is locked.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function hasPageContentLock( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITED_POST':
+			return !! action.context?.postId;
+		case 'TOGGLE_PAGE_CONTENT_LOCK':
+			return action.hasPageContentLock ?? ! state;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -185,4 +204,5 @@ export default combineReducers( {
 	createPageModal,
 	canvasMode,
 	editorCanvasContainerView,
+	hasPageContentLock,
 } );

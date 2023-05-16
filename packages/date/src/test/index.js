@@ -645,3 +645,26 @@ describe( 'Moment.js Localization', () => {
 		} );
 	} );
 } );
+
+describe( 'humanTimeDiff', () => {
+	it( 'should return human readable time differences', () => {
+		expect(
+			humanTimeDiff(
+				'2023-04-28T11:00:00.000Z',
+				'2023-04-28T12:00:00.000Z'
+			)
+		).toBe( 'an hour ago' );
+		expect(
+			humanTimeDiff(
+				'2023-04-28T11:00:00.000Z',
+				'2023-04-28T13:00:00.000Z'
+			)
+		).toBe( '2 hours ago' );
+		expect(
+			humanTimeDiff(
+				'2023-04-28T11:00:00.000Z',
+				'2023-04-30T13:00:00.000Z'
+			)
+		).toBe( '2 days ago' );
+	} );
+} );

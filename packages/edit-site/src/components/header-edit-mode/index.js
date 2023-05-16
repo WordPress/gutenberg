@@ -44,6 +44,7 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import { unlock } from '../../private-apis';
+import PageContentBreadcrumbs from './page-content-breadcrumbs';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -64,6 +65,7 @@ export default function HeaderEditMode() {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		isPage,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -71,6 +73,7 @@ export default function HeaderEditMode() {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			isPage: _isPage,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -99,6 +102,7 @@ export default function HeaderEditMode() {
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
+			isPage: _isPage(),
 		};
 	}, [] );
 
@@ -249,11 +253,14 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ ! hasDefaultEditorCanvasView ? (
-					getEditorCanvasContainerTitle( editorCanvasView )
-				) : (
+				{ hasDefaultEditorCanvasView && isPage && (
+					<PageContentBreadcrumbs />
+				) }
+				{ hasDefaultEditorCanvasView && ! isPage && (
 					<DocumentActions />
 				) }
+				{ ! hasDefaultEditorCanvasView &&
+					getEditorCanvasContainerTitle( editorCanvasView ) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">

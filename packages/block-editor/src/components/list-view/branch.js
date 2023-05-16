@@ -17,6 +17,7 @@ import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -101,47 +102,52 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
+	const branchBlocks = useSelect(
+		( select ) => {
+			const {
+				getTemplateLock,
+				isContentLockingBlock,
+				getContentClientIdsTree,
+				canEditBlock,
+			} = unlock( select( blockEditorStore ) );
+
+			const isContentLocking = parentId
+				? isContentLockingBlock( parentId )
+				: getTemplateLock() === 'contentOnly';
+
+			if ( isContentLocking ) {
+				return getContentClientIdsTree( parentId );
+			}
+
+			if ( ! parentId || canEditBlock( parentId ) ) {
+				return blocks.filter( Boolean );
+			}
+
+			return [];
+		},
+		[ parentId, blocks ]
+	);
+
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
 
-	const canParentExpand = useSelect(
-		( select ) => {
-			if ( ! parentId ) {
-				return true;
-			}
-
-			const isContentLocked =
-				select( blockEditorStore ).getTemplateLock( parentId ) ===
-				'contentOnly';
-			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
-
-			return isContentLocked ? false : canEdit;
-		},
-		[ parentId ]
-	);
-
 	const { expandedState, draggedClientIds } = useListViewContext();
-
-	if ( ! canParentExpand ) {
-		return null;
-	}
 
 	// Only show the appender at the first level.
 	const showAppender = showAppenderProp && level === 1;
-	const filteredBlocks = blocks.filter( Boolean );
-	const blockCount = filteredBlocks.length;
+	const blockCount = branchBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
 
 	return (
 		<>
-			{ filteredBlocks.map( ( block, index ) => {
+			{ branchBlocks.map( ( block, index ) => {
 				const { clientId, innerBlocks } = block;
 
 				if ( index > 0 ) {
 					nextPosition += countBlocks(
-						filteredBlocks[ index - 1 ],
+						branchBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
 						isExpanded

@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
+import { togglePageContentLock } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -213,6 +214,22 @@ describe( 'actions', () => {
 			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'togglePageContentLock', () => {
+		it( 'returns the correct toggle action', () => {
+			expect( togglePageContentLock( true ) ).toEqual( {
+				type: 'TOGGLE_PAGE_CONTENT_LOCK',
+				hasPageContentLock: true,
+			} );
+			expect( togglePageContentLock( false ) ).toEqual( {
+				type: 'TOGGLE_PAGE_CONTENT_LOCK',
+				hasPageContentLock: false,
+			} );
+			expect( togglePageContentLock() ).toEqual( {
+				type: 'TOGGLE_PAGE_CONTENT_LOCK',
+			} );
 		} );
 	} );
 } );

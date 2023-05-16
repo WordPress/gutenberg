@@ -79,7 +79,7 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getSettings, getTemplateLock } =
+		const { getBlockCount, getSettings, isInsertionLocked } =
 			select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
@@ -87,7 +87,7 @@ export default compose(
 
 		return {
 			showPrompt: isEmpty,
-			isLocked: !! getTemplateLock( ownProps.rootClientId ),
+			isLocked: isInsertionLocked( ownProps.rootClientId ),
 			placeholder: bodyPlaceholder,
 		};
 	} ),
