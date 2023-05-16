@@ -2236,7 +2236,7 @@ describe( 'Controlling link title text', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should reset state on value change', async () => {
+	it( 'should reset state upon controlled value change', async () => {
 		const user = userEvent.setup();
 		const textValue = 'My new text value';
 		const mockOnChange = jest.fn();
