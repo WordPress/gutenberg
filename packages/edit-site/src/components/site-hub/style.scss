@@ -19,6 +19,24 @@
 .edit-site-site-hub__text-content {
 	// Necessary for the ellipsis to work.
 	overflow: hidden;
+	.components-external-link {
+		flex-grow: 0;
+		display: none;
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+		.components-external-link__icon {
+			fill: $white;
+			height: 18px;
+			width: 18px;
+		}
+	}
+	&:hover {
+		.components-external-link {
+			display: inline-block;
+		}
+	}
 }
 
 .edit-site-site-hub__title {
@@ -30,20 +48,6 @@
 .edit-site-site-hub__site-title {
 	margin-left: $grid-unit-05;
 	flex-grow: 1;
-	.components-external-link {
-		color: $white;
-		text-decoration: none;
-		&:hover {
-			text-decoration: underline;
-		}
-		&:focus {
-			outline: none;
-			box-shadow: none;
-		}
-	}
-	.components-external-link__icon {
-		display: none;
-	}
 }
 
 .edit-site-site-hub_toggle-command-center {
