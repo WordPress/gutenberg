@@ -12,7 +12,6 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
@@ -39,7 +38,7 @@ const ListViewBlockContents = forwardRef(
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
 				const { hasBlockMovingClientId, getSelectedBlockClientId } =
-					unlock( select( blockEditorStore ) );
+					select( blockEditorStore );
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
