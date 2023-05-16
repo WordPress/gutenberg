@@ -1784,6 +1784,57 @@ describe( 'Addition Settings UI', () => {
 			} )
 		).toBeChecked();
 	} );
+
+	it( 'should require settings changes to be submitted/applied', async () => {
+		const user = userEvent.setup();
+
+		const mockOnChange = jest.fn();
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		// check that the "Apply" button is disabled by default.
+		const submitButton = screen.queryByRole( 'button', {
+			name: 'Apply',
+		} );
+
+		expect( submitButton ).toBeDisabled();
+
+		await toggleSettingsDrawer( user );
+
+		const opensInNewTabToggle = screen.queryByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		// toggle the checkbox
+		await user.click( opensInNewTabToggle );
+
+		// Check settings are **not** directly submitted
+		// which would trigger the onChange handler.
+		expect( mockOnChange ).not.toHaveBeenCalled();
+
+		// Check Apply button is now enabled because changes
+		// have been detected.
+		expect( submitButton ).toBeEnabled();
+
+		// Submit the changed setting value using the Apply button
+		await user.click( submitButton );
+
+		// Assert the value is updated.
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				opensInNewTab: true,
+			} )
+		);
+	} );
 } );
 
 describe( 'Post types', () => {

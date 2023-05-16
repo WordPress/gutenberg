@@ -192,8 +192,8 @@ function LinkControl( {
 		) {
 			setIsEditingLink( forceIsEditingLink );
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		// Todo: bug if the missing dep is introduced. Will need a fix.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
@@ -242,19 +242,41 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
+		const settingsKeys = settings.map( ( { id } ) => id );
+
+		// Suggestions may contains "settings" values (e.g. `opensInNewTab`)
+		// which should not overide any existing settings values set by the
+		// user. This filters out any settings values from the suggestion.
+		const nonSettingsChanges = Object.keys( updatedValue ).reduce(
+			( acc, key ) => {
+				if ( ! settingsKeys.includes( key ) ) {
+					acc[ key ] = updatedValue[ key ];
+				}
+				return acc;
+			},
+			{}
+		);
+
 		onChange( {
-			...updatedValue,
+			...internalControlValue,
+			...nonSettingsChanges,
+			// As title is not a setting, it must be manually applied
+			// in such a way as to preserve the users changes over
+			// any "title" value provided by the "suggestion".
 			title: internalControlValue?.title || updatedValue?.title,
 		} );
+
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
 		if ( valueHasChanges ) {
+			// Submit the original value with new stored values applied
+			// on top. URL is a special case as it may also be a prop.
 			onChange( {
 				...value,
+				...internalControlValue,
 				url: currentUrlInputValue,
-				title: internalControlValue?.title,
 			} );
 		}
 		stopEditing();
