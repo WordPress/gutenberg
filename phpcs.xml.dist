@@ -110,5 +110,4 @@
 	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
-
 </ruleset>
