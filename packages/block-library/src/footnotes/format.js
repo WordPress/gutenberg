@@ -19,6 +19,7 @@ export const format = {
 	title: __( 'Footnote' ),
 	tagName: 'a',
 	className: 'fn',
+	contentEditable: false,
 	edit: function Edit( { value, onChange, isActive } ) {
 		const registry = useRegistry();
 		const { getBlocks } = useSelect( blockEditorStore );
@@ -34,7 +35,6 @@ export const format = {
 						href: '#' + id,
 						id: `${ id }-link`,
 						'data-fn': id,
-						contenteditable: 'false',
 					},
 				} );
 
