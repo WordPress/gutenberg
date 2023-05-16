@@ -20,7 +20,6 @@ import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
-import Settings from './settings';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -323,26 +322,14 @@ function LinkControl( {
 			) }
 
 			{ newValue && ! isEditingLink && ! isCreatingPage && (
-				<>
-					<LinkPreview
-						key={ newValue?.url } // force remount when URL changes to avoid race conditions for rich previews
-						value={ newValue }
-						onEditClick={ () => setIsEditingLink( true ) }
-						hasRichPreviews={ hasRichPreviews }
-						hasUnlinkControl={ shownUnlinkControl }
-						onRemove={ onRemove }
-					/>
-					<div className="block-editor-link-control__tools_in_preview">
-						<Settings
-							value={ value }
-							settings={ settings }
-							onChange={ ( val ) => {
-								setNewValue( val );
-								onChange( val );
-							} }
-						/>
-					</div>
-				</>
+				<LinkPreview
+					key={ newValue?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ newValue }
+					onEditClick={ () => setIsEditingLink( true ) }
+					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
+				/>
 			) }
 
 			{ isEditing && (
