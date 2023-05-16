@@ -145,10 +145,8 @@ function LinkControl( {
 	// const [ internalTextInputValue?.title, setInternalTextInputValue ] =
 	// 	useInternalInputValue( value?.title || '' );
 
-	const valueHasChanges = ! isShallowEqualObjects(
-		internalControlValue,
-		value
-	);
+	const valueHasChanges =
+		value && ! isShallowEqualObjects( internalControlValue, value );
 
 	const setInternalURLInputValue = ( nextValue ) => {
 		setInternalControlValue( {
@@ -281,7 +279,8 @@ function LinkControl( {
 		onCancel?.();
 	};
 
-	const currentUrlInputValue = propInputValue || internalControlValue?.url;
+	const currentUrlInputValue =
+		propInputValue || internalControlValue?.url || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
