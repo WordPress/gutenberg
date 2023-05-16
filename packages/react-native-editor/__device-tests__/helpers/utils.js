@@ -506,6 +506,31 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	}
 };
 
+const setThemeJSONFromClipboard = async ( driver, theme ) => {
+	await setClipboard( driver, theme );
+
+	if ( isAndroid() ) {
+		// Hit the "Menu" key.
+		await driver.pressKeycode( 82 );
+
+		const showHtmlButtonXpath =
+			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[11]';
+
+		await clickIfClickable( driver, showHtmlButtonXpath );
+	} else {
+		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
+		await driver.sleep( 3000 );
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
+		);
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Set theme.json from Clipboard"]'
+		);
+	}
+};
+
 const toggleOrientation = async ( driver ) => {
 	const orientation = await driver.getOrientation();
 	if ( orientation === 'LANDSCAPE' ) {
@@ -719,6 +744,7 @@ module.exports = {
 	setClipboard,
 	setupDriver,
 	selectTextFromElement,
+	setThemeJSONFromClipboard,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
