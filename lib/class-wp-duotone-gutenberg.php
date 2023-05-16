@@ -712,6 +712,15 @@ class WP_Duotone_Gutenberg {
 	 * @param string $filter_value     The filter CSS value. e.g. 'url(#wp-duotone-blue-orange)' or 'unset'.
 	 */
 	private static function enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value ) {
+		if ( ! array_key_exists( $filter_id, self::$global_styles_presets ) ) {
+			$error_message = sprintf(
+				/* translators: %s: duotone filter ID */
+				__( 'The duotone id "%s" is not registered in theme.json settings.' ),
+				$filter_id
+			);
+			trigger_error( $error_message );
+			return;
+		}
 		self::$used_global_styles_presets[ $filter_id ] = self::$global_styles_presets[ $filter_id ];
 		self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, self::$global_styles_presets[ $filter_id ] );
 	}
