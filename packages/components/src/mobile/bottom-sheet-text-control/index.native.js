@@ -29,7 +29,7 @@ const BottomSheetTextControl = ( {
 	icon,
 	footerNote,
 	cellPlaceholder,
-	disabled = false,
+	disabled,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
