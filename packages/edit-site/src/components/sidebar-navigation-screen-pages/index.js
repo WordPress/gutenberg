@@ -8,6 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -16,13 +17,31 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
+import { unlock } from '../../private-apis';
 
 const PageItem = ( { postId, ...props } ) => {
+	const { useHistory } = unlock( routerPrivateApis );
+	const history = useHistory();
 	const linkInfo = useLink( {
 		postType: 'page',
 		postId,
 	} );
-	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+	const handleNavigationItemHover = ( event ) => {
+		event.stopPropagation();
+		history.push( {
+			path: '/' + 'page',
+			postId,
+			postType: 'page',
+		} );
+	};
+
+	return (
+		<SidebarNavigationItem
+			onMouseEnter={ handleNavigationItemHover }
+			{ ...linkInfo }
+			{ ...props }
+		/>
+	);
 };
 
 export default function SidebarNavigationScreenPages() {
