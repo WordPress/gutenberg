@@ -4,7 +4,7 @@
 import { createSlotFill } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { useEffect, Fragment } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -17,6 +17,7 @@ import GlobalStylesSidebar from './global-styles-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplatePanel from './template-panel';
+import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 import PagePanels from './page-panels';
@@ -76,16 +77,20 @@ export function SidebarComplementaryAreaFills() {
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
-				closeLabel={ __( 'Close settings' ) }
+				closeLabel={ __( 'Close Settings' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
-				{ sidebarName === SIDEBAR_TEMPLATE &&
-					( hasPageContentLock ? (
-						<PagePanels />
-					) : (
-						<TemplatePanel />
-					) ) }
+				{ sidebarName === SIDEBAR_TEMPLATE && (
+					<>
+						{ hasPageContentLock ? (
+							<PagePanels />
+						) : (
+							<TemplatePanel />
+						) }
+						<PluginTemplateSettingPanel.Slot />
+					</>
+				) }
 				{ sidebarName === SIDEBAR_BLOCK && (
 					<InspectorSlot bubblesVirtually />
 				) }

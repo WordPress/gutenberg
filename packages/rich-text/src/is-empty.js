@@ -3,7 +3,7 @@
  */
 import { LINE_SEPARATOR } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Check if a Rich Text value is Empty, meaning it contains no text or any

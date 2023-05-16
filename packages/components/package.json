@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "23.8.0",
+	"version": "24.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -68,7 +68,7 @@
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
 		"is-plain-object": "^5.0.0",
-		"memize": "^1.1.0",
+		"memize": "^2.1.0",
 		"path-to-regexp": "^6.2.1",
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.3.1",

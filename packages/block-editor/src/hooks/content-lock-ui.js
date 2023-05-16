@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { ToolbarButton, MenuItem } from '@wordpress/components';
@@ -39,7 +34,7 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		if ( ! isBlockOrDescendantSelected ) {
 			stopEditingAsBlock();
 		}
-	}, [ isBlockOrDescendantSelected ] );
+	}, [ isBlockOrDescendantSelected, stopEditingAsBlock ] );
 	return null;
 }
 
@@ -90,7 +85,6 @@ export const withBlockControls = createHigherOrderComponent(
 			__unstableSetTemporarilyEditingAsBlocks();
 		}, [
 			props.clientId,
-			focusModeToRevert,
 			updateSettings,
 			updateBlockListSettings,
 			getBlockListSettings,
@@ -100,7 +94,7 @@ export const withBlockControls = createHigherOrderComponent(
 		] );
 
 		if ( ! isContentLocked && ! isEditingAsBlocks ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
@@ -155,14 +149,7 @@ export const withBlockControls = createHigherOrderComponent(
 						) }
 					</BlockSettingsMenuControls>
 				) }
-				<BlockEdit
-					{ ...props }
-					className={ classnames(
-						props.className,
-						isEditingAsBlocks &&
-							'is-content-locked-editing-as-blocks'
-					) }
-				/>
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},

@@ -6,6 +6,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import { store as blockEditorStore } from '../../store';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -30,6 +32,24 @@ const INITIAL_INSERTER_RESULTS = 9;
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
+
+const orderInitialBlockItems = ( items, priority ) => {
+	if ( ! priority ) {
+		return items;
+	}
+
+	items.sort( ( { id: aName }, { id: bName } ) => {
+		// Sort block items according to `priority`.
+		let aIndex = priority.indexOf( aName );
+		let bIndex = priority.indexOf( bName );
+		// All other block items should come after that.
+		if ( aIndex < 0 ) aIndex = priority.length;
+		if ( bIndex < 0 ) bIndex = priority.length;
+		return aIndex - bIndex;
+	} );
+
+	return items;
+};
 
 function InserterSearchResults( {
 	filterValue,
@@ -46,9 +66,21 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
-	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
+
+	const { prioritizedBlocks } = useSelect(
+		( select ) => {
+			const blockListSettings =
+				select( blockEditorStore ).getBlockListSettings( rootClientId );
+
+			return {
+				prioritizedBlocks:
+					blockListSettings?.prioritizedInserterBlocks || EMPTY_ARRAY,
+			};
+		},
+		[ rootClientId ]
+	);
 
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
@@ -89,10 +121,16 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
-		if ( ! filterValue && orderInitialBlockItems ) {
-			orderedItems = orderInitialBlockItems( orderedItems );
+
+		if ( ! filterValue && prioritizedBlocks.length ) {
+			orderedItems = orderInitialBlockItems(
+				orderedItems,
+				prioritizedBlocks
+			);
 		}
+
 		const results = searchBlockItems(
 			orderedItems,
 			blockTypeCategories,
@@ -108,8 +146,8 @@ function InserterSearchResults( {
 		blockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
-		maxBlockTypes,
-		orderInitialBlockItems,
+		maxBlockTypesToShow,
+		prioritizedBlocks,
 	] );
 
 	// Announce search results on change.
@@ -124,7 +162,12 @@ function InserterSearchResults( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [
+		filterValue,
+		debouncedSpeak,
+		filteredBlockTypes,
+		filteredBlockPatterns,
+	] );
 
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,

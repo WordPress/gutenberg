@@ -39,7 +39,6 @@
 	// so explicit radii set by tools are preserved.
 	&:where(.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected)) {
 		border-radius: $radius-block-ui;
-		overflow: hidden;
 	}
 
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {

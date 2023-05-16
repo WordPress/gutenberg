@@ -429,7 +429,8 @@ export const withLayoutStyles = createHigherOrderComponent(
 				/>
 			</>
 		);
-	}
+	},
+	'withLayoutStyles'
 );
 
 /**
@@ -484,7 +485,8 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
-	}
+	},
+	'withChildLayoutStyles'
 );
 
 addFilter(

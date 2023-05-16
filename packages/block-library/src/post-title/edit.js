@@ -16,6 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -30,10 +31,21 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context: { postType, postId, queryId },
 	clientId,
+	insertBlocksAfter,
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	/**
+	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
+	 * However, when the Post Title is a descendant of a Query Loop block, the title cannot be edited.
+	 * In order to avoid these unnecessary requests, we call the hook without
+	 * the proper data, resulting in returning early without making them.
+	 */
+	const userCanEdit = useCanEditEntity(
+		'postType',
+		! isDescendentOfQueryLoop && postType,
+		postId
+	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,
@@ -41,6 +53,9 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
+	const onSplitAtEnd = () => {
+		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+	};
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -57,54 +72,52 @@ export default function PostTitleEdit( {
 	);
 
 	if ( postType && postId ) {
-		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
-				<PlainText
-					tagName={ TagName }
-					placeholder={ __( 'No Title' ) }
-					value={ rawTitle }
-					onChange={ setTitle }
-					__experimentalVersion={ 2 }
-					{ ...blockProps }
-				/>
-			) : (
-				<TagName
-					{ ...blockProps }
-					dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
-				/>
-			);
+		titleElement = userCanEdit ? (
+			<PlainText
+				tagName={ TagName }
+				placeholder={ __( 'No Title' ) }
+				value={ rawTitle }
+				onChange={ setTitle }
+				__experimentalVersion={ 2 }
+				__unstableOnSplitAtEnd={ onSplitAtEnd }
+				{ ...blockProps }
+			/>
+		) : (
+			<TagName
+				{ ...blockProps }
+				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+			/>
+		);
 	}
 
 	if ( isLink && postType && postId ) {
-		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
-				<TagName { ...blockProps }>
-					<PlainText
-						tagName="a"
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						placeholder={
-							! rawTitle.length ? __( 'No Title' ) : null
-						}
-						value={ rawTitle }
-						onChange={ setTitle }
-						__experimentalVersion={ 2 }
-					/>
-				</TagName>
-			) : (
-				<TagName { ...blockProps }>
-					<a
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						onClick={ ( event ) => event.preventDefault() }
-						dangerouslySetInnerHTML={ {
-							__html: fullTitle?.rendered,
-						} }
-					/>
-				</TagName>
-			);
+		titleElement = userCanEdit ? (
+			<TagName { ...blockProps }>
+				<PlainText
+					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					placeholder={ ! rawTitle.length ? __( 'No Title' ) : null }
+					value={ rawTitle }
+					onChange={ setTitle }
+					__experimentalVersion={ 2 }
+					__unstableOnSplitAtEnd={ onSplitAtEnd }
+				/>
+			</TagName>
+		) : (
+			<TagName { ...blockProps }>
+				<a
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					onClick={ ( event ) => event.preventDefault() }
+					dangerouslySetInnerHTML={ {
+						__html: fullTitle?.rendered,
+					} }
+				/>
+			</TagName>
+		);
 	}
 
 	return (
@@ -126,7 +139,7 @@ export default function PostTitleEdit( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Make title a link' ) }

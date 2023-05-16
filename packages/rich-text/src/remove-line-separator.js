@@ -6,7 +6,7 @@ import { LINE_SEPARATOR } from './special-characters';
 import { isCollapsed } from './is-collapsed';
 import { remove } from './remove';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Removes a line separator character, if existing, from a Rich Text value at

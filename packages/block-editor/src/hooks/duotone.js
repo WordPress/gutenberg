@@ -142,6 +142,7 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 					value={ { filter: { duotone: duotonePresetOrColors } } }
 					onChange={ ( newDuotone ) => {
 						const newStyle = {
+							...style,
 							color: {
 								...newDuotone?.filter,
 							},

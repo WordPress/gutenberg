@@ -20,7 +20,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -163,7 +163,7 @@ export default function TypographyPanel( {
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'fontFamily' ],
 				slug
@@ -190,7 +190,7 @@ export default function TypographyPanel( {
 			: newValue;
 
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'fontSize' ],
 				actualValue || undefined
@@ -231,14 +231,14 @@ export default function TypographyPanel( {
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'lineHeight' ],
 				newValue || undefined
 			)
 		);
 	};
-	const hasLineHeight = () => !! value?.typography?.lineHeight;
+	const hasLineHeight = () => value?.typography?.lineHeight !== undefined;
 	const resetLineHeight = () => setLineHeight( undefined );
 
 	// Letter Spacing
@@ -248,7 +248,7 @@ export default function TypographyPanel( {
 	);
 	const setLetterSpacing = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'letterSpacing' ],
 				newValue || undefined
@@ -263,7 +263,7 @@ export default function TypographyPanel( {
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
 	const setTextColumns = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'textColumns' ],
 				newValue || undefined
@@ -280,7 +280,7 @@ export default function TypographyPanel( {
 	);
 	const setTextTransform = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'textTransform' ],
 				newValue || undefined
@@ -297,7 +297,7 @@ export default function TypographyPanel( {
 	);
 	const setTextDecoration = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'textDecoration' ],
 				newValue || undefined

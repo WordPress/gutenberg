@@ -4,12 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import {
-	forwardRef,
-	useState,
-	useEffect,
-	useCallback,
-} from '@wordpress/element';
+import { forwardRef, useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -18,11 +13,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { ComposedPrivateInserter as PrivateInserter } from '../inserter';
-
-const prioritizedInserterBlocks = [
-	'core/navigation-link/page',
-	'core/navigation-link',
-];
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
@@ -68,19 +58,6 @@ export const Appender = forwardRef(
 			);
 		}, [ insertedBlockTitle ] );
 
-		const orderInitialBlockItems = useCallback( ( items ) => {
-			items.sort( ( { id: aName }, { id: bName } ) => {
-				// Sort block items according to `prioritizedInserterBlocks`.
-				let aIndex = prioritizedInserterBlocks.indexOf( aName );
-				let bIndex = prioritizedInserterBlocks.indexOf( bName );
-				// All other block items should come after that.
-				if ( aIndex < 0 ) aIndex = prioritizedInserterBlocks.length;
-				if ( bIndex < 0 ) bIndex = prioritizedInserterBlocks.length;
-				return aIndex - bIndex;
-			} );
-			return items;
-		}, [] );
-
 		if ( hideInserter ) {
 			return null;
 		}
@@ -110,7 +87,6 @@ export const Appender = forwardRef(
 							setInsertedBlock( maybeInsertedBlock );
 						}
 					} }
-					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 				<div
 					className="offcanvas-editor-appender__description"

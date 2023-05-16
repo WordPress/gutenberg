@@ -165,7 +165,7 @@ export default function Sidebar() {
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
-			closeLabel={ __( 'Close settings' ) }
+			closeLabel={ __( 'Close Settings' ) }
 			scope="core/edit-widgets"
 			identifier={ currentArea }
 			icon={ cog }

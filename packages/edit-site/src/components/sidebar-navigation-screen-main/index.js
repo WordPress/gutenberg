@@ -6,7 +6,7 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled, navigation, styles } from '@wordpress/icons';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 
 export default function SidebarNavigationScreenMain() {
 	const hasNavigationMenus = useSelect( ( select ) => {
@@ -30,10 +31,8 @@ export default function SidebarNavigationScreenMain() {
 				orderby: 'date',
 			}
 		);
-
-		return navigationMenus?.length > 0;
-	} );
-
+		return !! navigationMenus?.length;
+	}, [] );
 	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
 		? hasNavigationMenus
 		: false;
@@ -56,13 +55,19 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/wp_global_styles"
+					<SidebarNavigationItemGlobalStyles
 						withChevron
 						icon={ styles }
 					>
 						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/page"
+						withChevron
+						icon={ page }
+					>
+						{ __( 'Pages' ) }
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
@@ -76,7 +81,7 @@ export default function SidebarNavigationScreenMain() {
 						as={ SidebarNavigationItem }
 						path="/wp_template_part"
 						withChevron
-						icon={ symbolFilled }
+						icon={ symbol }
 					>
 						{ __( 'Template Parts' ) }
 					</NavigatorButton>
