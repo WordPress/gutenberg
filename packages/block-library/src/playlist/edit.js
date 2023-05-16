@@ -122,7 +122,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					name={ __( 'Edit' ) }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
-					addToPlaylist={ true } // Without this, the replace flow does not fetch all the audo file data.
+					addToPlaylist={ true } // Without this, the replace flow does not fetch all the audio file data.
 					mediaIds={ ids
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
