@@ -431,7 +431,6 @@ class BottomSheetCell extends Component {
 							styles.cellRowContainer,
 						] }
 						pointerEvents={ disabled ? 'none' : 'auto' }
-						aria-disabled={ disabled }
 					>
 						{ children }
 					</View>
