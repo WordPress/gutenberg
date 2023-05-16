@@ -68,11 +68,19 @@ export default function SidebarNavigationScreenPages() {
 	const isHomePageBlog = frontPage === postsPage;
 
 	if ( ! isHomePageBlog ) {
-		const homePageIndex = pagesAndTemplates?.findIndex(
+		const homePageIndex = pages?.findIndex(
 			( item ) => item.id === frontPage
 		);
 		const homePage = pages?.splice( homePageIndex, 1 );
 		pages?.splice( 0, 0, ...homePage );
+
+		const postsPageIndex = pages?.findIndex(
+			( item ) => item.id === postsPage
+		);
+
+		const blogPage = pages?.splice( postsPageIndex, 1 );
+
+		pages?.splice( 1, 0, ...blogPage );
 	}
 
 	return (
