@@ -21,15 +21,6 @@ export function getPathFromURL( urlParams ) {
 			case 'wp_template':
 			case 'wp_template_part':
 			case 'page':
-				/*
-				 * We are on the pages list path (/path),
-				 * and have triggered a history event
-				 * using a single page's type and id.
-				 * Do not navigate to the single page path.
-				 */
-				if ( path === '/page' ) {
-					return path;
-				}
 				path = `/${ encodeURIComponent(
 					urlParams.postType
 				) }/${ encodeURIComponent( urlParams.postId ) }`;
