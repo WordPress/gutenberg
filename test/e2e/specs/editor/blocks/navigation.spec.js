@@ -1278,7 +1278,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'page-list submenu opens on click', async ( { page } ) => {
+		test( 'page-list submenu user interactions', async ( { page } ) => {
 			await page.goto( '/' );
 			const submenuButton = page.getByRole( 'button', {
 				name: 'Parent Page',
@@ -1287,58 +1287,27 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Subpage',
 			} );
 			await expect( innerElement ).toBeHidden();
-			await submenuButton.click();
-			await expect( innerElement ).toBeVisible();
-		} );
 
-		test( 'page-list submenu closes on click outside', async ( {
-			page,
-		} ) => {
-			await page.goto( '/' );
-			const submenuButton = page.getByRole( 'button', {
-				name: 'Parent Page',
-			} );
-			const innerElement = page.getByRole( 'link', {
-				name: 'Subpage',
-			} );
-			await expect( innerElement ).toBeHidden();
+			// page-list submenu opens on click
 			await submenuButton.click();
 			await expect( innerElement ).toBeVisible();
+
+			// page-list submenu closes on click outside
 			await page.click( 'body' );
 			await expect( innerElement ).toBeHidden();
-		} );
 
-		test( 'page-list submenu closes on ESC key', async ( { page } ) => {
-			await page.goto( '/' );
-			const submenuButton = page.getByRole( 'button', {
-				name: 'Parent Page',
-			} );
-			const innerElement = page.getByRole( 'link', {
-				name: 'Subpage',
-			} );
-			await expect( innerElement ).toBeHidden();
+			// page-list submenu opens on enter keypress
 			await submenuButton.focus();
 			await page.keyboard.press( 'Enter' );
 			await expect( innerElement ).toBeVisible();
+
+			// page-list submenu closes on ESC key and focuses submenu button
 			await page.keyboard.press( 'Escape' );
 			await expect( innerElement ).toBeHidden();
 			await expect( submenuButton ).toBeFocused();
-		} );
 
-		test( 'page-list submenu closes on tab outside submenu', async ( {
-			page,
-		} ) => {
-			await page.goto( '/' );
-			const submenuButton = page.getByRole( 'button', {
-				name: 'Parent Page',
-			} );
-			const innerElement = page.getByRole( 'link', {
-				name: 'Subpage',
-			} );
-			await expect( innerElement ).toBeHidden();
-			await submenuButton.focus();
+			// page-list submenu closes on tab outside submenu
 			await page.keyboard.press( 'Enter' );
-			await expect( innerElement ).toBeVisible();
 			// Tab to first element.
 			await page.keyboard.press( 'Tab' );
 			// Tab outside the submenu.
