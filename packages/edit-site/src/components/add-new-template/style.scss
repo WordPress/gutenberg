@@ -129,6 +129,8 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
+		position: absolute;
+		left: 50%;
 	}
 }
 
@@ -142,10 +144,6 @@
 		width: calc(100% - #{$grid-unit-80 * 2});
 		height: calc(100% - #{$grid-unit-80 * 2});
 		max-height: none;
-	}
-
-	.components-modal__children-container {
-		height: 100%;
 	}
 }
 
@@ -195,8 +193,6 @@
 }
 
 .edit-site-add-new-template__template-list__contents {
-	padding-bottom: $grid-unit-40;
-
 	> .components-button {
 		height: 100%;
 		text-align: start;
