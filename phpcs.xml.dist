@@ -47,6 +47,8 @@
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
+	<!-- Exclude third party libraries -->
+	<exclude-pattern>./vendor/*</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
