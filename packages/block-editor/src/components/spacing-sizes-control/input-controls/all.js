@@ -32,7 +32,7 @@ export default function AllInputControl( {
 		<SpacingInputControl
 			value={ allValue }
 			onChange={ handleOnChange }
-			side={ 'all' }
+			side={ 'linked' }
 			spacingSizes={ spacingSizes }
 			isMixed={ isMixed }
 			type={ type }
