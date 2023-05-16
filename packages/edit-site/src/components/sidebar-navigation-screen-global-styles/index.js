@@ -6,6 +6,7 @@ import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -50,19 +51,23 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 }
 
-function GlobalStylesStyleBook( { onSelect } ) {
+function GlobalStylesStyleBook( { onClick, onSelect } ) {
 	return (
 		<StyleBook
 			isSelected={ () => false }
+			onClick={ onClick }
 			onSelect={ async ( blockName ) => {
 				await onSelect( blockName );
 			} }
+			showCloseButton={ false }
+			showTabs={ false }
 		/>
 	);
 }
 
 export default function SidebarNavigationScreenGlobalStyles() {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -82,6 +87,18 @@ export default function SidebarNavigationScreenGlobalStyles() {
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
 
+	const openStyleBook = async ( event ) => {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+		event.preventDefault();
+		await openGlobalStyles();
+		// Open the Style Book once the canvas mode is set to edit,
+		// and the global styles sidebar is open. This ensures that
+		// the Style Book is not prematurely closed.
+		setEditorCanvasContainerView( 'style-book' );
+	};
+
 	return (
 		<>
 			<SidebarNavigationScreen
@@ -92,20 +109,24 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				content={ <StyleVariationsContainer /> }
 				actions={
 					<div>
-						<SidebarButton
-							icon={ seen }
-							label={ __( 'Style Book' ) }
-							onClick={ async () => {
-								if ( ! isStyleBookOpened ) {
-									setEditorCanvasContainerView(
-										'style-book'
-									);
-								} else {
-									setEditorCanvasContainerView( undefined );
-								}
-							} }
-							isPressed={ isStyleBookOpened }
-						/>
+						{ ! isMobileViewport && (
+							<SidebarButton
+								icon={ seen }
+								label={ __( 'Style Book' ) }
+								onClick={ async () => {
+									if ( ! isStyleBookOpened ) {
+										setEditorCanvasContainerView(
+											'style-book'
+										);
+									} else {
+										setEditorCanvasContainerView(
+											undefined
+										);
+									}
+								} }
+								isPressed={ isStyleBookOpened }
+							/>
+						) }
 						<SidebarButton
 							icon={ edit }
 							label={ __( 'Edit styles' ) }
@@ -114,15 +135,10 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					</div>
 				}
 			/>
-			{ isStyleBookOpened && (
+			{ isStyleBookOpened && ! isMobileViewport && (
 				<GlobalStylesStyleBook
-					onSelect={ async () => {
-						await openGlobalStyles();
-						// Open the Style Book once the canvas mode is set to edit,
-						// and the global styles sidebar is open. This ensures that
-						// the Style Book is not prematurely closed.
-						setEditorCanvasContainerView( 'style-book' );
-					} }
+					onClick={ openStyleBook }
+					onSelect={ openStyleBook }
 				/>
 			) }
 		</>
