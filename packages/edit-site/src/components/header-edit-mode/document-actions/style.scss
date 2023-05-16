@@ -34,3 +34,14 @@
 		justify-content: center;
 	}
 }
+
+.edit-site-document-actions__shortcut {
+	color: $gray-700;
+	&:hover {
+		color: $gray-700;
+	}
+}
+
+.edit-site-document-actions__left {
+	min-width: $button-size;
+}

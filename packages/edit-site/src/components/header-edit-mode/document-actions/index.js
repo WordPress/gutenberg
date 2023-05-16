@@ -42,15 +42,18 @@ export default function DocumentActions() {
 			? __( 'template part' )
 			: __( 'template' );
 
+	const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
+
 	return (
 		<div className="edit-site-document-actions">
-			<span></span>
+			<span className="edit-site-document-actions__left"></span>
 			<Text
 				size="body"
 				as="h1"
 				className="edit-site-document-actions__title"
 			>
 				<Button onClick={ () => openCommandCenter() }>
+					<BlockIcon icon={ icon } />
 					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
@@ -61,7 +64,12 @@ export default function DocumentActions() {
 					{ getTitle() }
 				</Button>
 			</Text>
-			<BlockIcon icon={ icon } />
+			<Button
+				className="edit-site-document-actions__shortcut"
+				onClick={ openCommandCenter }
+			>
+				{ isMac ? '⌘' : 'Ctrl' } K
+			</Button>
 		</div>
 	);
 }
