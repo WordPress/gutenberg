@@ -244,6 +244,7 @@ function OffCanvasEditor(
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
 							showAppender={ showAppender }
+							onSelect={ onSelect }
 						/>
 						<TreeGridRow
 							level={ 1 }

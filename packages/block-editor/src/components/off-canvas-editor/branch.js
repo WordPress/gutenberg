@@ -98,6 +98,7 @@ function ListViewBranch( props ) {
 		parentId,
 		shouldShowInnerBlocks = true,
 		showAppender: showAppenderProp = true,
+		onSelect,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -186,6 +187,7 @@ function ListViewBranch( props ) {
 								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
+								onSelect={ onSelect }
 							/>
 						) }
 						{ ! showBlock && (
