@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -47,13 +48,26 @@ const {
 } = createPrivateSlotFill( SLOT_FILL_NAME );
 
 function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
+		( select ) => {
+			const _editorCanvasContainerView = unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView();
+
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			);
+
+			return {
+				editorCanvasContainerView: _editorCanvasContainerView,
+				showListViewByDefault: _showListViewByDefault,
+			};
+		},
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
-	const { setEditorCanvasContainerView, setCanvasMode } = unlock(
+	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -62,11 +76,14 @@ function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
 		[ editorCanvasContainerView ]
 	);
+
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
 	function onCloseContainer() {
 		if ( typeof onClose === 'function' ) {
 			onClose();
 		}
-		setCanvasMode( 'edit' );
+		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
