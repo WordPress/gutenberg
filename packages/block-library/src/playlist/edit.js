@@ -19,8 +19,9 @@ import {
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
+import { safeHTML, __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -119,16 +120,16 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					name={ __( 'Edit' ) }
+					onSelect={ onSelectTracks }
 					accept="audio/*"
+					addToPlaylist={ true }
 					playlist={ true }
-					multiple={ true }
 					mediaIds={ ids
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
-					addToPlaylist={ true }
-					onSelect={ onSelectTracks }
+					multiple={ true }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
 				/>
@@ -172,7 +173,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					{ !! ids[ trackListIndex ].id && (
+					{ !! ids[ trackListIndex ]?.id && (
 						<div className="wp-block-playlist__current-item">
 							{ images && (
 								<img
@@ -183,29 +184,57 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 								/>
 							) }
 							<ul>
-								<li className="wp-block-playlist__item-title">
-									{ '\u201c' +
-										ids[ trackListIndex ]?.title +
-										'\u201d' }
-								</li>
-								<li className="wp-block-playlist__item-album">
-									{ ids[ trackListIndex ]?.album }
-								</li>
-								<li className="wp-block-playlist__item-artist">
-									{ ids[ trackListIndex ]?.artist }
-								</li>
+								{ ids[ trackListIndex ]?.title && (
+									<li
+										className="wp-block-playlist__item-title"
+										dangerouslySetInnerHTML={ {
+											__html: safeHTML(
+												ids[ trackListIndex ]?.title
+											),
+										} }
+									/>
+								) }
+								{ ids[ trackListIndex ]?.album && (
+									<li
+										className="wp-block-playlist__item-album"
+										dangerouslySetInnerHTML={ {
+											__html: safeHTML(
+												ids[ trackListIndex ]?.album
+											),
+										} }
+									/>
+								) }
+								{ ids[ trackListIndex ]?.artist && (
+									<li
+										className="wp-block-playlist__item-artist"
+										dangerouslySetInnerHTML={ {
+											__html: safeHTML(
+												ids[ trackListIndex ]?.artist
+											),
+										} }
+									/>
+								) }
 							</ul>
 							<audio
 								controls="controls"
 								src={ ids[ trackListIndex ].url }
 								onEnded={ onTrackEnd }
-								aria-label={
-									ids[ trackListIndex ]?.title +
-									', ' +
-									ids[ trackListIndex ]?.album +
-									', ' +
-									ids[ trackListIndex ]?.artist
-								}
+								aria-label={ stripHTML(
+									!! ids[ trackListIndex ]?.title &&
+										!! ids[ trackListIndex ]?.artist &&
+										!! ids[ trackListIndex ]?.album
+										? sprintf(
+												/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+												_x(
+													'%1$s by %2$s from the album %3$s',
+													'track title, artist name, album name'
+												),
+												ids[ trackListIndex ]?.title,
+												ids[ trackListIndex ]?.artist,
+												ids[ trackListIndex ]?.album
+										  )
+										: ids[ trackListIndex ]?.title
+								) }
 								tabIndex={ 0 }
 							/>
 						</div>
@@ -224,27 +253,54 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 										track.id === ids[ trackListIndex ]?.id
 									}
 									data-playlist-track-url={ track.url }
-									data-playlist-track-title={ track.title }
-									data-playlist-track-artist={ track.artist }
-									data-playlist-track-album={ track.album }
+									data-playlist-track-title={ stripHTML(
+										track.title
+									) }
+									data-playlist-track-artist={ stripHTML(
+										track.artist
+									) }
+									data-playlist-track-album={ stripHTML(
+										track.album
+									) }
 									data-playlist-track-image-src={
 										track.image.src
 									}
 									onClick={ () => onChangeTrack( index ) }
 								>
-									<span className="wp-block-playlist__item-title">
-										{ /* Only use quotation marks for titles when they are
-										 * combined with the artist name,
-										 * @see https://core.trac.wordpress.org/changeset/55251
-										 */ }
-										{ artists
-											? '\u201c' + track?.title + '\u201d'
-											: track?.title }
-									</span>
+									{ artists ? (
+										<span
+											className="wp-block-playlist__item-title"
+											/* Use quotation marks for titles when they are
+											 * combined with the artist name,
+											 * @see https://core.trac.wordpress.org/changeset/55251
+											 */
+											dangerouslySetInnerHTML={ {
+												__html: safeHTML(
+													'\u201c' +
+														track?.title +
+														'\u201d'
+												),
+											} }
+										/>
+									) : (
+										<span
+											className="wp-block-playlist__item-title"
+											dangerouslySetInnerHTML={ {
+												__html: safeHTML(
+													track?.title
+												),
+											} }
+										/>
+									) }
 									{ artists && track.artist && (
-										<span className="wp-block-playlist__item-artist">
-											{ '\u2014 ' + track.artist }
-										</span>
+										<span
+											className="wp-block-playlist__item-artist"
+											dangerouslySetInnerHTML={ {
+												__html: safeHTML(
+													'\u2014 ' + track.artist
+												),
+											} }
+										/>
 									) }
 									<span className="wp-block-playlist__item-length">
 										{ track?.length && (
