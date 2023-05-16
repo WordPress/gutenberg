@@ -24,8 +24,8 @@
  *     data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
  *     data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
  *     data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
- *     data-wp-effect="effects.core.navigation.initModal"
- *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+ *     data-wp-effect="effects.core.navigation.initMenu"
+ *     data-wp-on.keydow="actions.core.navigation.handleMenuKeydown"
  *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
  *     tabindex="-1"
  *   >
@@ -89,7 +89,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 		$w->set_attribute( 'data-wp-class.has-modal-open', 'context.core.navigation.isMenuOpen' );
 		$w->set_attribute( 'data-wp-class.is-menu-open', 'context.core.navigation.isMenuOpen' );
 		$w->set_attribute( 'data-wp-bind.aria-hidden', '!context.core.navigation.isMenuOpen' );
-		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initModal' );
+		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 		$w->set_attribute( 'tabindex', '-1' );
@@ -153,7 +153,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  *   <span>Title</span>
  *   <ul
  *     class="wp-block-navigation__submenu-container"
- *     data-wp-effect="effects.core.navigation.initModal"
+ *     data-wp-effect="effects.core.navigation.initMenu"
  *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
  *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
  *   >
@@ -195,7 +195,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initModal' );
+			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 			$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 		};

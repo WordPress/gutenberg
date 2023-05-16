@@ -21,7 +21,7 @@ store( {
 	effects: {
 		core: {
 			navigation: {
-				initModal: ( { context, ref } ) => {
+				initMenu: ( { context, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
