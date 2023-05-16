@@ -5,11 +5,12 @@
  *
  * @typedef {Object} WPCommandConfig
  *
- * @property {string}      name     Command name.
- * @property {string}      label    Command label.
- * @property {string=}     context  Command context.
- * @property {JSX.Element} icon     Command icon.
- * @property {Function}    callback Command callback.
+ * @property {string}      name        Command name.
+ * @property {string}      label       Command label.
+ * @property {string=}     searchLabel Command label.
+ * @property {string=}     context     Command context.
+ * @property {JSX.Element} icon        Command icon.
+ * @property {Function}    callback    Command callback.
  */
 
 /**

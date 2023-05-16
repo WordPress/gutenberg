@@ -66,7 +66,8 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
 					: {};
 				return {
-					name: record.title?.rendered + ' ' + record.id,
+					name: postType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),

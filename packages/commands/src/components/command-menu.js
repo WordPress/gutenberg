@@ -41,7 +41,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
-						value={ command.name }
+						value={ command.searchLabel ?? command.label }
 						onSelect={ () => command.callback( { close } ) }
 					>
 						<HStack
@@ -110,7 +110,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
-					value={ command.name }
+					value={ command.searchLabel ?? command.label }
 					onSelect={ () => command.callback( { close } ) }
 				>
 					<HStack

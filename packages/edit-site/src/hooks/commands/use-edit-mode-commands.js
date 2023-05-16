@@ -35,7 +35,7 @@ function useEditModeCommandLoader() {
 				? __( 'Delete template' )
 				: __( 'Delete template part' );
 		commands.push( {
-			name: label,
+			name: 'core/remove-template',
 			label,
 			icon: trash,
 			context: 'site-editor-edit',
@@ -55,7 +55,7 @@ function useEditModeCommandLoader() {
 				? __( 'Reset template' )
 				: __( 'Reset template part' );
 		commands.push( {
-			name: label,
+			name: 'core/reset-template',
 			label,
 			icon: backup,
 			callback: ( { close } ) => {
