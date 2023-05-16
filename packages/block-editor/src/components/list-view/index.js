@@ -22,10 +22,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-
-import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
-
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
@@ -33,6 +29,8 @@ import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
+import { store as blockEditorStore } from '../../store';
+import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
