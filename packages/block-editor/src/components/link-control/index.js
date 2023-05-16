@@ -142,9 +142,6 @@ function LinkControl( {
 	const [ internalControlValue, setInternalControlValue ] =
 		useInternalInputValue( value );
 
-	// const [ internalTextInputValue?.title, setInternalTextInputValue ] =
-	// 	useInternalInputValue( value?.title || '' );
-
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
 
@@ -163,9 +160,10 @@ function LinkControl( {
 	};
 
 	const setInternalSettingValue = ( nextValue ) => {
-		const settingUpdates = Object.keys( nextValue ).reduce(
+		const nonSettingsKeys = [ 'url', 'title' ];
+		const settingsUpdates = Object.keys( nextValue ).reduce(
 			( acc, key ) => {
-				if ( key !== 'url' && key !== 'title' ) {
+				if ( ! nonSettingsKeys?.includes( key ) ) {
 					acc[ key ] = nextValue[ key ];
 				}
 				return acc;
@@ -174,7 +172,7 @@ function LinkControl( {
 		);
 		setInternalControlValue( {
 			...internalControlValue,
-			...settingUpdates,
+			...settingsUpdates,
 		} );
 	};
 
