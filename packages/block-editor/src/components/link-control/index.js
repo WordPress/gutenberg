@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
+import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -138,11 +139,30 @@ function LinkControl( {
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
-	const [ internalUrlInputValue, setInternalUrlInputValue ] =
-		useInternalInputValue( value?.url || '' );
+	const [ internalControlValue, setInternalControlValue ] =
+		useInternalInputValue( value || {} );
 
-	const [ internalTextInputValue, setInternalTextInputValue ] =
-		useInternalInputValue( value?.title || '' );
+	// const [ internalTextInputValue?.title, setInternalTextInputValue ] =
+	// 	useInternalInputValue( value?.title || '' );
+
+	const valueHasChanges = ! isShallowEqualObjects(
+		internalControlValue,
+		value
+	);
+
+	const setInternalURLInputValue = ( nextValue ) => {
+		setInternalControlValue( {
+			...internalControlValue,
+			url: nextValue,
+		} );
+	};
+
+	const setInternalTextInputValue = ( nextValue ) => {
+		setInternalControlValue( {
+			...internalControlValue,
+			title: nextValue,
+		} );
+	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -160,6 +180,8 @@ function LinkControl( {
 		) {
 			setIsEditingLink( forceIsEditingLink );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Todo: bug if the missing dep is introduced. Will need a fix.
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
@@ -210,20 +232,17 @@ function LinkControl( {
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
 			...updatedValue,
-			title: internalTextInputValue || updatedValue?.title,
+			title: internalControlValue?.title || updatedValue?.title,
 		} );
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
-		if (
-			currentUrlInputValue !== value?.url ||
-			internalTextInputValue !== value?.title
-		) {
+		if ( valueHasChanges ) {
 			onChange( {
 				...value,
 				url: currentUrlInputValue,
-				title: internalTextInputValue,
+				title: internalControlValue?.title,
 			} );
 		}
 		stopEditing();
@@ -233,7 +252,7 @@ function LinkControl( {
 		const { keyCode } = event;
 		if (
 			keyCode === ENTER &&
-			! currentInputIsEmpty // Disallow submitting empty values.
+			currentInputIsEmpty // Disallow submitting empty values.
 		) {
 			event.preventDefault();
 			handleSubmit();
@@ -241,8 +260,7 @@ function LinkControl( {
 	};
 
 	const resetInternalValues = () => {
-		setInternalUrlInputValue( value?.url );
-		setInternalTextInputValue( value?.title );
+		setInternalControlValue( value );
 	};
 
 	const handleCancel = ( event ) => {
@@ -263,7 +281,7 @@ function LinkControl( {
 		onCancel?.();
 	};
 
-	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+	const currentUrlInputValue = propInputValue || internalControlValue?.url;
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
@@ -306,7 +324,7 @@ function LinkControl( {
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalUrlInputValue }
+							onChange={ setInternalURLInputValue }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
@@ -351,7 +369,9 @@ function LinkControl( {
 							showTextControl={ showTextControl }
 							showSettings={ showSettings }
 							textInputRef={ textInputRef }
-							internalTextInputValue={ internalTextInputValue }
+							internalTextInputValue={
+								internalControlValue?.title
+							}
 							setInternalTextInputValue={
 								setInternalTextInputValue
 							}
@@ -367,7 +387,9 @@ function LinkControl( {
 							variant="primary"
 							onClick={ handleSubmit }
 							className="block-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+							disabled={
+								! valueHasChanges || currentInputIsEmpty
+							}
 						>
 							{ __( 'Apply' ) }
 						</Button>
