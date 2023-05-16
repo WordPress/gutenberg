@@ -28,7 +28,7 @@ function LinkSettingsDrawer( {
 	handleSubmitWithEnter,
 	value,
 	settings,
-	setNewValue = () => {},
+	onChange,
 } ) {
 	const prefersReducedMotion = useReducedMotion();
 	const MaybeAnimatePresence = prefersReducedMotion
@@ -83,7 +83,7 @@ function LinkSettingsDrawer( {
 								<Settings
 									value={ value }
 									settings={ settings }
-									onChange={ setNewValue }
+									onChange={ onChange }
 								/>
 							) }
 						</div>

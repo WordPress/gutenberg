@@ -349,7 +349,7 @@ function LinkControl( {
 							handleSubmitWithEnter={ handleSubmitWithEnter }
 							value={ newValue }
 							settings={ settings }
-							setNewValue={ setNewValue }
+							onChange={ setNewValue }
 						/>
 					) }
 
