@@ -424,7 +424,16 @@ class BottomSheetCell extends Component {
 						/>
 					) }
 					{ showValue && getValueComponent() }
-					{ children }
+					<View
+						style={ [
+							disabled && styles.cellDisabled,
+							styles.cellRowContainer,
+						] }
+						pointerEvents={ disabled ? 'none' : 'auto' }
+						aria-disabled={ disabled }
+					>
+						{ children }
+					</View>
 				</View>
 				{ help && (
 					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>
