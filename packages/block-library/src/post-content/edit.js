@@ -48,19 +48,12 @@ function EditableContent( { context = {}, clientId } ) {
 
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
-			0,
+			select( blockEditorStore ).getBlock( clientId )?.innerBlocks
+				.length > 0,
 		[ clientId ]
 	);
 
-	const initialInnerBlocks = [
-		[
-			'core/paragraph',
-			{
-				placeholder: __( 'Type / to add blocks to your page' ),
-			},
-		],
-	];
+	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
 
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
