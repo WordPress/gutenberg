@@ -863,9 +863,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'overlay menu opens on click on open menu button', async ( {
-			page,
-		} ) => {
+		test( 'Overlay menu interactions', async ( { page } ) => {
 			await page.goto( '/' );
 			const overlayMenuFirstElement = page.getByRole( 'link', {
 				name: 'Item 1',
@@ -874,87 +872,36 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'Open menu',
 			} );
 
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.click();
-			await expect( overlayMenuFirstElement ).toBeVisible();
-		} );
-
-		test( 'overlay menu closes on click on close menu button', async ( {
-			page,
-		} ) => {
-			await page.goto( '/' );
-			const overlayMenuFirstElement = page.getByRole( 'link', {
-				name: 'Item 1',
-			} );
-			const openMenuButton = page.getByRole( 'button', {
-				name: 'Open menu',
-			} );
 			const closeMenuButton = page.getByRole( 'button', {
 				name: 'Close menu',
 			} );
+
+			// Test: overlay menu opens on click on open menu button
 			await expect( overlayMenuFirstElement ).toBeHidden();
 			await openMenuButton.click();
 			await expect( overlayMenuFirstElement ).toBeVisible();
-			await closeMenuButton.click();
-			await expect( overlayMenuFirstElement ).toBeHidden();
-		} );
 
-		test( 'overlay menu closes on ESC key', async ( { page } ) => {
-			await page.goto( '/' );
-			const overlayMenuFirstElement = page.getByRole( 'link', {
-				name: 'Item 1',
-			} );
-			const openMenuButton = page.getByRole( 'button', {
-				name: 'Open menu',
-			} );
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( overlayMenuFirstElement ).toBeVisible();
-			await page.keyboard.press( 'Escape' );
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await expect( openMenuButton ).toBeFocused();
-		} );
-
-		test( 'overlay menu focuses on first element after opening', async ( {
-			page,
-		} ) => {
-			await page.goto( '/' );
-			const overlayMenuFirstElement = page.getByRole( 'link', {
-				name: 'Item 1',
-			} );
-			const openMenuButton = page.getByRole( 'button', {
-				name: 'Open menu',
-			} );
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( overlayMenuFirstElement ).toBeVisible();
+			// Test: overlay menu focuses on first element after opening
 			await expect( overlayMenuFirstElement ).toBeFocused();
-		} );
 
-		test( 'overlay menu traps focus', async ( { page } ) => {
-			await page.goto( '/' );
-			const overlayMenuFirstElement = page.getByRole( 'link', {
-				name: 'Item 1',
-			} );
-			const openMenuButton = page.getByRole( 'button', {
-				name: 'Open menu',
-			} );
-			const closeMenuButton = page.getByRole( 'button', {
-				name: 'Close menu',
-			} );
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( overlayMenuFirstElement ).toBeVisible();
-			await expect( overlayMenuFirstElement ).toBeFocused();
+			// Test: overlay menu traps focus
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
 			await expect( closeMenuButton ).toBeFocused();
 			await page.keyboard.press( 'Shift+Tab' );
 			await page.keyboard.press( 'Shift+Tab' );
 			await expect( overlayMenuFirstElement ).toBeFocused();
+
+			// Test: overlay menu closes on click on close menu button
+			await closeMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeHidden();
+
+			// Test: overlay menu closes on ESC key
+			await openMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await expect( openMenuButton ).toBeFocused();
 		} );
 	} );
 
