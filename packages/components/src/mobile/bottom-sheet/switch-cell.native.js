@@ -13,7 +13,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import Cell from './cell';
 
 export default function BottomSheetSwitchCell( props ) {
-	const { value, onValueChange, disabled, ...cellProps } = props;
+	const { value, onValueChange, ...cellProps } = props;
 
 	const onPress = () => {
 		onValueChange( ! value );
@@ -60,13 +60,8 @@ export default function BottomSheetSwitchCell( props ) {
 			onPress={ onPress }
 			editable={ false }
 			value={ '' }
-			disabled={ disabled }
 		>
-			<Switch
-				value={ value }
-				onValueChange={ onValueChange }
-				disabled={ disabled }
-			/>
+			<Switch value={ value } onValueChange={ onValueChange } />
 		</Cell>
 	);
 }
