@@ -2,13 +2,17 @@
  * WordPress dependencies
  */
 import { cloneBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useEffect, useCallback } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
+import { addFilter } from '@wordpress/hooks';
+
+const EMPTY_OBJECT = {};
 
 const PatternEdit = ( { attributes, clientId } ) => {
 	const { slug, syncStatus } = attributes;
@@ -81,3 +85,94 @@ const PatternEdit = ( { attributes, clientId } ) => {
 };
 
 export default PatternEdit;
+
+/**
+ * Override the default edit UI to include layout controls
+ *
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
+ */
+export const withChildContentAttributes = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const { name: blockName, clientId, setAttributes } = props;
+
+		const registry = useRegistry();
+
+		const { patternClientId, patternSyncStatus, patternContent } =
+			useSelect(
+				( select ) => {
+					const { getBlockParentsByBlockName, getBlockAttributes } =
+						select( blockEditorStore );
+
+					const patternBlockParents = getBlockParentsByBlockName(
+						clientId,
+						'core/pattern'
+					);
+
+					const parentPatternClientId = patternBlockParents?.[ 0 ];
+
+					if ( ! parentPatternClientId ) {
+						return EMPTY_OBJECT;
+					}
+
+					const { syncStatus, content } = getBlockAttributes(
+						parentPatternClientId
+					);
+
+					return {
+						patternClientId: parentPatternClientId,
+						patternSyncStatus: syncStatus,
+						patternContent: content,
+					};
+				},
+				[ clientId ]
+			);
+
+		const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+		if ( patternSyncStatus !== 'partial' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		const setContentAttributes = useCallback(
+			( newAttributes ) => {
+				registry.batch( () => {
+					// Sync any attribute updates to a partially synced pattern parent.
+					// todo
+					// - Only set `role: 'content' attributes.
+					// - Handle multiple blocks of the same type.
+					updateBlockAttributes( patternClientId, {
+						content: {
+							...patternContent,
+							[ blockName ]: {
+								...patternContent?.[ blockName ],
+								...newAttributes,
+							},
+						},
+					} );
+					setAttributes( newAttributes );
+				} );
+			},
+			[
+				blockName,
+				patternClientId,
+				patternContent,
+				registry,
+				setAttributes,
+				updateBlockAttributes,
+			]
+		);
+
+		return (
+			<BlockEdit { ...props } setAttributes={ setContentAttributes } />
+		);
+	},
+	'withInspectorControls'
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'core/block-library/pattern/with-child-content-attributes',
+	withChildContentAttributes
+);

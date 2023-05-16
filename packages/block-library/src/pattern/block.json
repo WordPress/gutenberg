@@ -17,6 +17,9 @@
 		"syncStatus": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "full", "partial" ]
+		},
+		"content": {
+			"type": "object"
 		}
 	}
 }
