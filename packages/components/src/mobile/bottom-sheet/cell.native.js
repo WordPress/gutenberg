@@ -256,6 +256,7 @@ class BottomSheetCell extends Component {
 					onBlur={ finishEditing }
 					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
+					disabled={ disabled }
 					{ ...valueProps }
 				/>
 			) : (
