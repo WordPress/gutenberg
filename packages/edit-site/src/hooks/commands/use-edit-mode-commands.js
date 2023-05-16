@@ -59,7 +59,7 @@ function useEditModeCommandLoader() {
 			label,
 			icon: backup,
 			callback: ( { close } ) => {
-				revertTemplate( template, { allowUndo: false } );
+				revertTemplate( template );
 				close();
 			},
 		} );
