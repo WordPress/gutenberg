@@ -248,9 +248,10 @@ function LinkControl( {
 
 	const handleSubmitWithEnter = ( event ) => {
 		const { keyCode } = event;
+
 		if (
 			keyCode === ENTER &&
-			currentInputIsEmpty // Disallow submitting empty values.
+			! currentInputIsEmpty // Disallow submitting empty values.
 		) {
 			event.preventDefault();
 			handleSubmit();

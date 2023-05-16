@@ -2199,7 +2199,7 @@ describe( 'Controlling link title text', () => {
 
 	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
 		const user = userEvent.setup();
-		const textValue = 'My new text value';
+		const newTextValue = 'My new text value';
 		const mockOnChange = jest.fn();
 
 		render(
@@ -2218,14 +2218,14 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toBeVisible();
 
 		await user.clear( textInput );
-		await user.keyboard( textValue );
+		await user.keyboard( newTextValue );
 
 		// Attempt to submit the empty search value in the input.
 		triggerEnter( textInput );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				title: textValue,
+				title: newTextValue,
 				url: selectedLink.url,
 			} )
 		);
