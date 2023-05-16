@@ -416,6 +416,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
+
+        devSupportManager.addCustomDevOption("Set theme.json from Clipboard", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setThemeJSON();
+            }
+        });
     }
 
     @Override

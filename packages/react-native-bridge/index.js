@@ -178,6 +178,16 @@ export function subscribeShowEditorHelp( callback ) {
 }
 
 /**
+ * Subscribe a listener for handling requests to set a theme.json data.
+ *
+ * @param {Function} callback RN Callback function to set a theme.json data.
+ *
+ */
+export function subscribeSetThemeJSON( callback ) {
+	return gutenbergBridgeEvents.addListener( 'setThemeJSON', callback );
+}
+
+/**
  * Request media picker for the given media source.
  *
  * Kinds of media source can be device library, camera, etc.

@@ -201,6 +201,10 @@ public class Gutenberg: UIResponder {
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
     }
+    
+    public func setThemeJSON() {
+        bridgeModule.sendEventIfNeeded(.setThemeJSON, body: nil)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
