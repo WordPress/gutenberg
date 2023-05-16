@@ -1011,7 +1011,7 @@ export class RichText extends Component {
 
 		// Until we parse CSS values correctly, avoid passing NaN values to Aztec
 		if ( isNaN( newLineHeight ) ) {
-			return undefined;
+			return 1;
 		}
 
 		return newLineHeight;
