@@ -226,7 +226,7 @@ class BottomSheetRangeCell extends Component {
 								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
-								disabled={ disabled }
+								disabled={ disabled && ! isIOS }
 								step={ step }
 								minimumValue={ minimumValue }
 								maximumValue={ maximumValue }
