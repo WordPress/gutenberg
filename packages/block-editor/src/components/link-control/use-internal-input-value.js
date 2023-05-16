@@ -5,7 +5,7 @@ import { useState, useEffect } from '@wordpress/element';
 
 export default function useInternalInputValue( value ) {
 	const [ internalInputValue, setInternalInputValue ] = useState(
-		value || ''
+		value || {}
 	);
 
 	// If the value prop changes, update the internal state.

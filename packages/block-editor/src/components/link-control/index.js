@@ -140,7 +140,7 @@ function LinkControl( {
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
 	const [ internalControlValue, setInternalControlValue ] =
-		useInternalInputValue( value || {} );
+		useInternalInputValue( value );
 
 	// const [ internalTextInputValue?.title, setInternalTextInputValue ] =
 	// 	useInternalInputValue( value?.title || '' );
