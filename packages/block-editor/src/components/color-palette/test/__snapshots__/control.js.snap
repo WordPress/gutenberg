@@ -78,18 +78,18 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: normal;
-  -webkit-box-align: normal;
-  -ms-flex-align: normal;
-  align-items: normal;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   gap: 0;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  justify-content: space-between;
-  height: 100%;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
 }
 
 .emotion-10>* {
@@ -97,25 +97,33 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-12 {
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: block;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 0.5);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
 }
 
-.emotion-15 {
+.emotion-12>* {
+  min-height: 0;
+}
+
+.emotion-14 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: block;
 }
 
 <div>
@@ -157,33 +165,37 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 tabindex="-1"
               >
                 <div
-                  class="components-flex components-color-palette__custom-color__container emotion-10 emotion-5"
+                  class="components-flex components-h-stack components-v-stack emotion-10 emotion-5"
                   data-wp-c16t="true"
-                  data-wp-component="Flex"
+                  data-wp-component="VStack"
                 >
                   <button
                     aria-expanded="false"
                     aria-haspopup="true"
-                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "f00"."
-                    class="components-flex-item components-color-palette__custom-color emotion-12 emotion-5"
-                    data-wp-c16t="true"
-                    data-wp-component="FlexItem"
+                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+                    class="components-color-palette__custom-color-button"
                     style="background: rgb(255, 0, 0);"
                   />
-                  <span
-                    class="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
+                  <div
+                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
                     data-wp-c16t="true"
-                    data-wp-component="FlexItem"
+                    data-wp-component="VStack"
                   >
-                    red
-                  </span>
-                  <span
-                    class="components-flex-item components-color-palette__custom-color-value emotion-12 emotion-5"
-                    data-wp-c16t="true"
-                    data-wp-component="FlexItem"
-                  >
-                    #f00
-                  </span>
+                    <span
+                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="Truncate"
+                    >
+                      red
+                    </span>
+                    <span
+                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="Truncate"
+                    >
+                      #f00
+                    </span>
+                  </div>
                 </div>
               </div>
               <div
