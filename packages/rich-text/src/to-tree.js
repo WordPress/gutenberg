@@ -101,6 +101,10 @@ function fromFormat( {
 		}
 	}
 
+	if ( isEditableTree && formatType.contentEditable === false ) {
+		elementAttributes.contenteditable = 'false';
+	}
+
 	return {
 		type: formatType.tagName === '*' ? tagName : formatType.tagName,
 		object: formatType.object,
