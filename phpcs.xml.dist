@@ -111,17 +111,4 @@
 		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
 
-	<!-- Ignore some rules for test themes -->
-	<rule ref="Squiz.Commenting.FunctionComment.Missing">
-		<exclude-pattern>/test/emptytheme/*</exclude-pattern>
-		<exclude-pattern>/test/gutenberg-test-themes/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FileComment.Missing">
-		<exclude-pattern>/test/emptytheme/*</exclude-pattern>
-		<exclude-pattern>/test/gutenberg-test-themes/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FileComment.WrongStyle">
-		<exclude-pattern>/test/emptytheme/*</exclude-pattern>
-		<exclude-pattern>/test/gutenberg-test-themes/*</exclude-pattern>
-	</rule>
 </ruleset>
