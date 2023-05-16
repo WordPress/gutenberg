@@ -157,6 +157,24 @@ function editorCanvasContainerView( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer used to track the create new page modal which can be opened in and out of editor
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+function createPageModal( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_CREATE_PAGE_MODAL_OPENED':
+			return {
+				isOpen: action.isOpen,
+				options: action.options,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -164,6 +182,7 @@ export default combineReducers( {
 	blockInserterPanel,
 	listViewPanel,
 	saveViewPanel,
+	createPageModal,
 	canvasMode,
 	editorCanvasContainerView,
 } );

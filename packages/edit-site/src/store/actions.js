@@ -355,6 +355,21 @@ export function setIsSaveViewOpened( isOpen ) {
 }
 
 /**
+ * Sets whether the create new page modal is open
+ *
+ * @param {boolean} isOpen  If true, opens the create new page modal. If false, closes it.
+ *                          It does not toggle the state, but sets it directly.
+ * @param {Object}  options Options for the create new page modal.
+ */
+export function setIsCreatePageModalOpened( isOpen, options ) {
+	return {
+		type: 'SET_IS_CREATE_PAGE_MODAL_OPENED',
+		isOpen,
+		options,
+	};
+}
+
+/**
  * Reverts a template to its original theme-provided file.
  *
  * @param {Object}  template            The template to revert.

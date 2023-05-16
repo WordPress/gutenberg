@@ -8,8 +8,10 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { layout, page, home, loop } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { layout, page, home, loop, plus } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { plus } from '@wordpress/icons';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +19,7 @@ import { useSelect } from '@wordpress/data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import SidebarButton from '../sidebar-button';
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -71,11 +74,23 @@ export default function SidebarNavigationScreenPages() {
 		const homePage = pages?.splice( homePageIndex, 1 );
 		pages?.splice( 0, 0, ...homePage );
 	}
+	const { setIsCreatePageModalOpened } = useDispatch( editSiteStore );
 
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Pages' ) }
 			description={ __( 'Browse and edit pages on your site.' ) }
+			actions={
+				<SidebarButton
+					icon={ plus }
+					label={ __( 'Draft a new page' ) }
+					onClick={ () =>
+						setIsCreatePageModalOpened( true, {
+							redirectAfterSave: false,
+						} )
+					}
+				/>
+			}
 			content={
 				<>
 					{ ( isLoadingPages || isLoadingTemplates ) && (
