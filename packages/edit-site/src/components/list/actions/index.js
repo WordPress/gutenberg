@@ -3,7 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -19,7 +19,7 @@ import RenameMenuItem from './rename-menu-item';
 export default function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice, removeNotice } =
+	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
@@ -29,8 +29,6 @@ export default function Actions( { template } ) {
 	}
 
 	async function revertAndSaveTemplate() {
-		const noticeId = 'edit-site-template-reverted';
-		removeNotice( noticeId );
 		try {
 			await revertTemplate( template, { allowUndo: false } );
 			await saveEditedEntityRecord(
@@ -38,15 +36,18 @@ export default function Actions( { template } ) {
 				template.type,
 				template.id
 			);
-			const notice =
-				template.type === 'wp_template'
-					? __( 'Template reverted.' )
-					: __( 'Template part reverted.' );
 
-			createSuccessNotice( notice, {
-				type: 'snackbar',
-				id: noticeId,
-			} );
+			createSuccessNotice(
+				sprintf(
+					/* translators: The template/part's name. */
+					__( '"%s" reverted.' ),
+					template.title.rendered
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-template-reverted',
+				}
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

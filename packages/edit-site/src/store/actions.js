@@ -146,7 +146,7 @@ export const removeTemplate =
 					__( '"%s" deleted.' ),
 					template.title.rendered
 				),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
 		} catch ( error ) {
 			const errorMessage =
