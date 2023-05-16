@@ -47,7 +47,7 @@ export default function SidebarNavigationScreenPages() {
 					label={ __( 'Draft a new page' ) }
 					onClick={ () =>
 						setIsCreatePageModalOpened( true, {
-							redirectAfterSave: false,
+							redirectAfterSave: true,
 						} )
 					}
 				/>
