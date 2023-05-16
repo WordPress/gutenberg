@@ -13,7 +13,7 @@
  * @return string The render.
  */
 function render_block_core_site_logo( $attributes ) {
-	$adjust_width_height_filter = function ( $image ) use ( $attributes ) {
+	$adjust_width_height_filter = static function ( $image ) use ( $attributes ) {
 		if ( empty( $attributes['width'] ) || empty( $image ) || ! $image[1] || ! $image[2] ) {
 			return $image;
 		}

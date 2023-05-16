@@ -185,7 +185,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	private static function capture_http_urls() {
 		add_filter(
 			'pre_http_request',
-			function ( $preempt, $args, $url ) {
+			static function ( $preempt, $args, $url ) {
 				if ( 'api.wordpress.org' !== wp_parse_url( $url, PHP_URL_HOST ) ) {
 					return $preempt;
 				}

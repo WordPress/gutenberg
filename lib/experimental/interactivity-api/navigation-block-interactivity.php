@@ -224,7 +224,7 @@ add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add
 // Enqueue the `interactivity.js` file with the store.
 add_filter(
 	'block_type_metadata',
-	function ( $metadata ) {
+	static function ( $metadata ) {
 		if ( 'core/navigation' === $metadata['name'] ) {
 			wp_register_script(
 				'wp-block-navigation-view',

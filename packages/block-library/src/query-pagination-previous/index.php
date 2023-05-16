@@ -29,7 +29,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	// Check if the pagination is for Query that inherits the global context
 	// and handle appropriately.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
-		$filter_link_attributes = function() use ( $wrapper_attributes ) {
+		$filter_link_attributes = static function() use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
 
