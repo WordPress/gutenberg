@@ -23,7 +23,7 @@ function FontCard ( { font, onClick, actionHandler, demoText } ) {
     const fakeFontFace = {
         fontStyle: 'normal',
         fontWeight: '400',
-        fontFamily: font.name,
+        fontFamily: font.fontFamily,
     };
 
     const displayFontFace = (font.fontFace && font.fontFace.length)

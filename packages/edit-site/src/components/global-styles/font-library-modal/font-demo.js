@@ -47,7 +47,9 @@ function FontFaceDemo ( { fontFace, style={} } ) {
     useEffect( () => {
         const loadAsset = async () => {
             if ( isIntersecting ) {
-                await loadFontFaceAsset( fontFace );
+                if ( fontFace.src ) {
+                    await loadFontFaceAsset( fontFace );
+                }
                 setIsAssetLoaded( true );
             }
         }
