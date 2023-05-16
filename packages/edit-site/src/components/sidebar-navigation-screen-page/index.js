@@ -10,7 +10,11 @@ import {
 	__experimentalText as Text,
 	ExternalLink,
 } from '@wordpress/components';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
 
@@ -63,7 +67,7 @@ function getPageDetails( page ) {
 	return [
 		{
 			label: 'Template',
-			value: page?.template ? page?.template : 'Default',
+			value: page?.templateTitle,
 		},
 		{
 			label: 'Parent',
@@ -90,6 +94,16 @@ export default function SidebarNavigationScreenPage() {
 	} = useNavigator();
 
 	const { record } = useEntityRecord( 'postType', 'page', postId );
+	const { records: templates, isResolving: areTemplatesLoading } =
+		useEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+		} );
+
+	const templateTitle = areTemplatesLoading
+		? ''
+		: templates?.find( ( template ) => template?.slug === record?.template )
+				?.title?.rendered || 'Default';
+
 	const parentTitle = useSelect(
 		( select ) => {
 			const parent = record?.parent
@@ -110,6 +124,7 @@ export default function SidebarNavigationScreenPage() {
 		},
 		[ record ]
 	);
+
 	return (
 		<SidebarNavigationScreen
 			title={ record ? decodeEntities( record?.title?.rendered ) : null }
@@ -162,6 +177,7 @@ export default function SidebarNavigationScreenPage() {
 					<SidebarDetails
 						details={ getPageDetails( {
 							parentTitle,
+							templateTitle,
 							...record,
 						} ) }
 					/>
