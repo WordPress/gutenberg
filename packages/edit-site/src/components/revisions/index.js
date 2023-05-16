@@ -79,9 +79,6 @@ function Revisions( { onClose, userConfig, blocks } ) {
 				className="edit-site-revisions__iframe"
 				name="revisions"
 				tabIndex={ 0 }
-				expand={ true }
-				scale={ 0.75 }
-				frameSize={ 100 }
 			>
 				<EditorStyles styles={ editorStyles } />
 				<style>
