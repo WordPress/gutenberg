@@ -21,7 +21,9 @@
 	overflow: hidden;
 	.components-external-link {
 		flex-grow: 0;
-		display: none;
+		@media (min-width: 600px) {
+			display: none;
+		}
 		&:focus {
 			outline: none;
 			box-shadow: none;
