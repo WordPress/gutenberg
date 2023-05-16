@@ -30,6 +30,8 @@
 		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
 	</rule>
 
+	<rule ref="SlevomatCodingStandard.Functions.StaticClosure" />
+
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
