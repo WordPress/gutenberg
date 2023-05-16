@@ -396,6 +396,26 @@ test.describe( 'Navigation block', () => {
 			<!-- /wp:navigation-submenu -->`,
 		};
 
+		test.beforeAll( async ( { requestUtils } ) => {
+			// We need pages to be published so the Link Control can return pages
+			await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Test Page 2',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Test Page 3',
+				status: 'publish',
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
 		test.use( {
 			linkControl: async ( { page }, use ) => {
 				await use( new LinkControl( { page } ) );
