@@ -137,13 +137,11 @@
 .edit-site-add-new-template__modal {
 	max-width: $grid-unit-80 * 13;
 	width: calc(100% - #{$grid-unit-80});
-	height: calc(100% - #{$grid-unit-80});
-	max-height: none;
+	margin-top: $grid-unit-80;
+	max-height: calc(100% - #{$grid-unit-80 * 2});
 
 	@include break-large() {
 		width: calc(100% - #{$grid-unit-80 * 2});
-		height: calc(100% - #{$grid-unit-80 * 2});
-		max-height: none;
 	}
 }
 
