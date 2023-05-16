@@ -162,6 +162,22 @@ function LinkControl( {
 		} );
 	};
 
+	const setInternalSettingValue = ( nextValue ) => {
+		const settingUpdates = Object.keys( nextValue ).reduce(
+			( acc, key ) => {
+				if ( key !== 'url' && key !== 'title' ) {
+					acc[ key ] = nextValue[ key ];
+				}
+				return acc;
+			},
+			{}
+		);
+		setInternalControlValue( {
+			...internalControlValue,
+			...settingUpdates,
+		} );
+	};
+
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
@@ -376,9 +392,9 @@ function LinkControl( {
 								setInternalTextInputValue
 							}
 							handleSubmitWithEnter={ handleSubmitWithEnter }
-							value={ value }
+							value={ internalControlValue }
 							settings={ settings }
-							onChange={ onChange }
+							onChange={ setInternalSettingValue }
 						/>
 					) }
 
