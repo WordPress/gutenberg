@@ -23,7 +23,6 @@ function register_block_core_pattern() {
  * Renders the `core/pattern` block on the server.
  *
  * @param array  $attributes Block attributes.
- * @param string $content    The block rendered content.
  *
  * @return string Returns the output of the pattern.
  */
@@ -34,7 +33,7 @@ function render_block_core_pattern( $attributes ) {
 
 	$slug     = $attributes['slug'];
 	$registry = WP_Block_Patterns_Registry::get_instance();
-	
+
 	if ( ! $registry->is_registered( $slug ) ) {
 		return '';
 	}
