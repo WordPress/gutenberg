@@ -20,6 +20,7 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const { useHistory } = unlock( routerPrivateApis );
