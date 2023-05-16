@@ -22,6 +22,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
 import { store as blockEditorStore } from '../../store';
 
 const INITIAL_INSERTER_RESULTS = 9;
@@ -32,24 +33,6 @@ const INITIAL_INSERTER_RESULTS = 9;
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-
-const orderInitialBlockItems = ( items, priority ) => {
-	if ( ! priority ) {
-		return items;
-	}
-
-	items.sort( ( { id: aName }, { id: bName } ) => {
-		// Sort block items according to `priority`.
-		let aIndex = priority.indexOf( aName );
-		let bIndex = priority.indexOf( bName );
-		// All other block items should come after that.
-		if ( aIndex < 0 ) aIndex = priority.length;
-		if ( bIndex < 0 ) bIndex = priority.length;
-		return aIndex - bIndex;
-	} );
-
-	return items;
-};
 
 function InserterSearchResults( {
 	filterValue,
@@ -125,7 +108,7 @@ function InserterSearchResults( {
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
 
 		if ( ! filterValue && prioritizedBlocks.length ) {
-			orderedItems = orderInitialBlockItems(
+			orderedItems = orderInserterBlockItems(
 				orderedItems,
 				prioritizedBlocks
 			);
