@@ -160,16 +160,19 @@ function LinkControl( {
 	};
 
 	const setInternalSettingValue = ( nextValue ) => {
-		const nonSettingsKeys = [ 'url', 'title' ];
+		const settingsKeys = settings.map( ( { id } ) => id );
+
+		// Only apply settings values which are defined in the settings prop.
 		const settingsUpdates = Object.keys( nextValue ).reduce(
 			( acc, key ) => {
-				if ( ! nonSettingsKeys?.includes( key ) ) {
+				if ( settingsKeys.includes( key ) ) {
 					acc[ key ] = nextValue[ key ];
 				}
 				return acc;
 			},
 			{}
 		);
+
 		setInternalControlValue( {
 			...internalControlValue,
 			...settingsUpdates,
