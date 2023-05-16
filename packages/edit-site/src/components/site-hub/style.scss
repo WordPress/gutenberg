@@ -21,7 +21,7 @@
 	overflow: hidden;
 	.components-external-link {
 		flex-grow: 0;
-		@media (min-width: 600px) {
+		@include break-mobile() {
 			display: none;
 		}
 		&:focus {
