@@ -136,7 +136,7 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ settingsOpen, setSettingsOpen ] = useState( true );
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
 	const [ newValue, setNewValue ] = useState( value );
 
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
@@ -204,6 +204,7 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
+		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
