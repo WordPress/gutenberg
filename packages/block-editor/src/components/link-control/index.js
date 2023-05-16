@@ -325,7 +325,7 @@ function LinkControl( {
 				</>
 			) }
 
-			{ newValue && ! isEditingLink && ! isCreatingPage && (
+			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
 					key={ newValue?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ newValue }
