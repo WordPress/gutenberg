@@ -53,4 +53,4 @@ function gutenberg_interactivity_scripts_add_defer_attribute( $tag, $handle ) {
 	}
 	return $tag;
 }
-add_filter( 'script_loader_tag', 'gutenberg_interactivity_scripts_add_defer_attribute', 10, 1 );
+add_filter( 'script_loader_tag', 'gutenberg_interactivity_scripts_add_defer_attribute', 10, 2 );
