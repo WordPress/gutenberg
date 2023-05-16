@@ -438,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Styles",
 		"slug": "block-styles",
 		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
@@ -450,7 +456,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Templates",
+		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -603,6 +609,12 @@
 		"title": "Migrating to Newer Versions",
 		"slug": "theme-json-migrations",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
 		"parent": "theme-json-reference"
 	},
 	{
@@ -1464,6 +1476,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/commands",
+		"slug": "packages-commands",
+		"markdown_source": "../packages/commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",
@@ -1473,6 +1491,12 @@
 		"title": "@wordpress/compose",
 		"slug": "packages-compose",
 		"markdown_source": "../packages/compose/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-commands",
+		"slug": "packages-core-commands",
+		"markdown_source": "../packages/core-commands/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1498,12 +1522,6 @@
 		"slug": "packages-create-block-external-template",
 		"markdown_source": "../packages/create-block/docs/external-template.md",
 		"parent": "packages-create-block"
-	},
-	{
-		"title": "@wordpress/custom-templated-path-webpack-plugin",
-		"slug": "packages-custom-templated-path-webpack-plugin",
-		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
-		"parent": "packages"
 	},
 	{
 		"title": "@wordpress/customize-widgets",
@@ -1557,6 +1575,12 @@
 		"title": "@wordpress/dom",
 		"slug": "packages-dom",
 		"markdown_source": "../packages/dom/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-test-utils-playwright",
+		"slug": "packages-e2e-test-utils-playwright",
+		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1698,12 +1722,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/library-export-default-webpack-plugin",
-		"slug": "packages-library-export-default-webpack-plugin",
-		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
@@ -1815,6 +1833,12 @@
 		"title": "@wordpress/rich-text",
 		"slug": "packages-rich-text",
 		"markdown_source": "../packages/rich-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2034,7 +2058,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
@@ -2256,7 +2280,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"

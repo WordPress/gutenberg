@@ -211,7 +211,6 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		value,
 		settings,
 	} );
 

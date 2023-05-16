@@ -84,6 +84,20 @@ const LineHeightControl = ( {
 		? undefined
 		: { marginBottom: 24 };
 
+	const handleOnChange = ( nextValue, { event } ) => {
+		if ( nextValue === '' ) {
+			onChange();
+			return;
+		}
+
+		if ( event.type === 'click' ) {
+			onChange( adjustNextValue( `${ nextValue }`, false ) );
+			return;
+		}
+
+		onChange( `${ nextValue }` );
+	};
+
 	return (
 		<div
 			className="block-editor-line-height-control"
@@ -93,7 +107,7 @@ const LineHeightControl = ( {
 				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
-				onChange={ onChange }
+				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }

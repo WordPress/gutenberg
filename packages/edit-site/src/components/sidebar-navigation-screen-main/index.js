@@ -6,7 +6,7 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled, navigation } from '@wordpress/icons';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -15,25 +15,37 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 
 export default function SidebarNavigationScreenMain() {
-	const { navigationMenus } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		return {
-			navigationMenus: getEntityRecords( 'postType', 'wp_navigation', {
-				per_page: -1,
+	const hasNavigationMenus = useSelect( ( select ) => {
+		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+		// to avoid double network calls.
+		const navigationMenus = select( coreStore ).getEntityRecords(
+			'postType',
+			'wp_navigation',
+			{
+				per_page: 1,
 				status: 'publish',
-			} ),
-		};
-	} );
-
+				order: 'desc',
+				orderby: 'date',
+			}
+		);
+		return !! navigationMenus?.length;
+	}, [] );
+	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
+		? hasNavigationMenus
+		: false;
 	return (
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
+			description={ __(
+				'Customize the appearance of your website using the block editor.'
+			) }
 			content={
 				<ItemGroup>
-					{ !! navigationMenus && navigationMenus.length > 0 && (
+					{ showNavigationScreen && (
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/navigation"
@@ -43,6 +55,20 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
+					<SidebarNavigationItemGlobalStyles
+						withChevron
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/page"
+						withChevron
+						icon={ page }
+					>
+						{ __( 'Pages' ) }
+					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/wp_template"
@@ -55,7 +81,7 @@ export default function SidebarNavigationScreenMain() {
 						as={ SidebarNavigationItem }
 						path="/wp_template_part"
 						withChevron
-						icon={ symbolFilled }
+						icon={ symbol }
 					>
 						{ __( 'Template Parts' ) }
 					</NavigatorButton>

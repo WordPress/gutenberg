@@ -102,6 +102,32 @@ test.describe( 'Post Editor Template mode', () => {
 		).toBeVisible();
 	} );
 
+	test( 'Allow editing the title of a new custom template', async ( {
+		page,
+		postEditorTemplateMode,
+	} ) => {
+		async function editTemplateTitle( newTitle ) {
+			await page
+				.getByRole( 'button', { name: 'Template Options' } )
+				.click();
+
+			await page
+				.getByRole( 'textbox', { name: 'Title' } )
+				.fill( newTitle );
+
+			const editorContent = page.getByLabel( 'Editor Content' );
+			await editorContent.click();
+		}
+
+		await postEditorTemplateMode.createPostAndSaveDraft();
+		await postEditorTemplateMode.createNewTemplate( 'Foobar' );
+		await editTemplateTitle( 'Barfoo' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Template Options' } )
+		).toHaveText( 'Barfoo' );
+	} );
+
 	test.describe( 'Delete Post Template Confirmation Dialog', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentyone' );

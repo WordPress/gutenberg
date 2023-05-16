@@ -102,7 +102,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div>
+    <div
+      class="components-modal__children-container"
+    >
       <div
         class="interface-preferences__tabs"
       >
@@ -608,13 +610,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-13:hover {
-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-13:focus {
   background-color: transparent;
-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   outline: 3px solid transparent;
 }
 
@@ -723,7 +725,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div>
+    <div
+      class="components-modal__children-container"
+    >
       <div
         class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
         data-wp-c16t="true"
@@ -733,7 +737,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
           class="emotion-2 components-navigator-screen"
           data-wp-c16t="true"
           data-wp-component="NavigatorScreen"
-          style="opacity: 0; transform: translateX(50px) translateZ(0);"
+          style="opacity: 1; transform: none;"
         >
           <div
             class="components-surface components-card emotion-3 emotion-1"

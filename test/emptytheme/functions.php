@@ -1,6 +1,14 @@
 <?php
+/**
+ * Empty theme functions and definitions.
+ *
+ * @package Gutenberg
+ */
 
 if ( ! function_exists( 'emptytheme_support' ) ) :
+	/**
+	 * Add theme support for various features.
+	 */
 	function emptytheme_support() {
 
 		// Adding support for core block visual styles.

@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
@@ -32,11 +32,12 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -48,6 +49,41 @@ const interfaceLabels = {
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 };
+
+function useIsSiteEditorLoading() {
+	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
+	const [ loaded, setLoaded ] = useState( false );
+	const inLoadingPause = useSelect(
+		( select ) => {
+			const hasResolvingSelectors =
+				select( coreStore ).hasResolvingSelectors();
+			return ! loaded && ! hasResolvingSelectors;
+		},
+		[ loaded ]
+	);
+
+	useEffect( () => {
+		if ( inLoadingPause ) {
+			/*
+			 * We're using an arbitrary 1s timeout here to catch brief moments
+			 * without any resolving selectors that would result in displaying
+			 * brief flickers of loading state and loaded state.
+			 *
+			 * It's worth experimenting with different values, since this also
+			 * adds 1s of artificial delay after loading has finished.
+			 */
+			const timeout = setTimeout( () => {
+				setLoaded( true );
+			}, 1000 );
+
+			return () => {
+				clearTimeout( timeout );
+			};
+		}
+	}, [ inLoadingPause ] );
+
+	return ! loaded || ! hasLoadedPost;
+}
 
 export default function Editor() {
 	const {
@@ -67,6 +103,7 @@ export default function Editor() {
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -94,6 +131,10 @@ export default function Editor() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -101,8 +142,11 @@ export default function Editor() {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const showBlockBreakcrumb =
-		isEditMode && showVisualEditor && blockEditorMode !== 'zoom-out';
+	const shouldShowBlockBreakcrumbs =
+		showBlockBreadcrumbs &&
+		isEditMode &&
+		showVisualEditor &&
+		blockEditorMode !== 'zoom-out';
 	const shouldShowInserter = isEditMode && showVisualEditor && isInserterOpen;
 	const shouldShowListView = isEditMode && showVisualEditor && isListViewOpen;
 	const secondarySidebarLabel = isListViewOpen
@@ -144,12 +188,11 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
+	const isLoading = useIsSiteEditorLoading();
 
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -157,70 +200,74 @@ export default function Editor() {
 					type={ editedPostType }
 					id={ editedPostId }
 				>
-					<GlobalStylesProvider>
-						<BlockContextProvider value={ blockContext }>
-							<SidebarComplementaryAreaFills />
-							{ isEditMode && <StartTemplateOptions /> }
-							<InterfaceSkeleton
-								enableRegionNavigation={ false }
-								className={
-									showIconLabels && 'show-icon-labels'
-								}
-								notices={ isEditMode && <EditorSnackbars /> }
-								content={
+					<BlockContextProvider value={ blockContext }>
+						<SidebarComplementaryAreaFills />
+						{ isEditMode && <StartTemplateOptions /> }
+						<InterfaceSkeleton
+							enableRegionNavigation={ false }
+							className={ showIconLabels && 'show-icon-labels' }
+							notices={
+								( isEditMode ||
+									window?.__experimentalEnableThemePreviews ) && (
+									<EditorSnackbars />
+								)
+							}
+							content={
+								<>
+									<GlobalStylesRenderer />
+									{ isEditMode && <EditorNotices /> }
+									{ showVisualEditor && editedPost && (
+										<BlockEditor />
+									) }
+									{ editorMode === 'text' &&
+										editedPost &&
+										isEditMode && <CodeEditor /> }
+									{ hasLoadedPost && ! editedPost && (
+										<Notice
+											status="warning"
+											isDismissible={ false }
+										>
+											{ __(
+												"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+											) }
+										</Notice>
+									) }
+									{ isEditMode && (
+										<KeyboardShortcutsEditMode />
+									) }
+								</>
+							}
+							secondarySidebar={
+								isEditMode &&
+								( ( shouldShowInserter && (
+									<InserterSidebar />
+								) ) ||
+									( shouldShowListView && (
+										<ListViewSidebar />
+									) ) )
+							}
+							sidebar={
+								isEditMode &&
+								isRightSidebarOpen && (
 									<>
-										<GlobalStylesRenderer />
-										{ isEditMode && <EditorNotices /> }
-										{ showVisualEditor && editedPost && (
-											<BlockEditor />
-										) }
-										{ editorMode === 'text' &&
-											editedPost &&
-											isEditMode && <CodeEditor /> }
-										{ hasLoadedPost && ! editedPost && (
-											<Notice
-												status="warning"
-												isDismissible={ false }
-											>
-												{ __(
-													"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-												) }
-											</Notice>
-										) }
-										{ isEditMode && (
-											<KeyboardShortcutsEditMode />
-										) }
-									</>
-								}
-								secondarySidebar={
-									isEditMode &&
-									( ( shouldShowInserter && (
-										<InserterSidebar />
-									) ) ||
-										( shouldShowListView && (
-											<ListViewSidebar />
-										) ) )
-								}
-								sidebar={
-									isEditMode &&
-									isRightSidebarOpen && (
 										<ComplementaryArea.Slot scope="core/edit-site" />
-									)
-								}
-								footer={
-									showBlockBreakcrumb && (
-										<BlockBreadcrumb
-											rootLabelText={ __( 'Template' ) }
-										/>
-									)
-								}
-								labels={ {
-									...interfaceLabels,
-									secondarySidebar: secondarySidebarLabel,
-								} }
-							/>
-						</BlockContextProvider>
-					</GlobalStylesProvider>
+										<SidebarFixedBottomSlot />
+									</>
+								)
+							}
+							footer={
+								shouldShowBlockBreakcrumbs && (
+									<BlockBreadcrumb
+										rootLabelText={ __( 'Template' ) }
+									/>
+								)
+							}
+							labels={ {
+								...interfaceLabels,
+								secondarySidebar: secondarySidebarLabel,
+							} }
+						/>
+					</BlockContextProvider>
 				</EntityProvider>
 			</EntityProvider>
 		</>

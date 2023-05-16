@@ -32,9 +32,6 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	// TODO: We should update this to filter by template part's areas as well.
 	const browseAllLinkProps = useLink( {
-		canvas: 'view',
-		postType: template.type,
-		postId: undefined,
 		path: '/' + template.type + '/all',
 	} );
 
@@ -105,6 +102,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			<Button
 				className="edit-site-template-details__show-all-button"
 				{ ...browseAllLinkProps }
+				onClick={ () => onClose() }
 			>
 				{ template?.type === 'wp_template'
 					? __( 'Manage all templates' )

@@ -196,9 +196,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '4' );
+		await pageUtils.pressKeys( 'access+4' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -227,9 +227,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '2' );
+		await pageUtils.pressKeys( 'access+2' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -259,9 +259,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '0' );
+		await pageUtils.pressKeys( 'access+0' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

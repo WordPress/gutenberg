@@ -74,11 +74,6 @@ describe( 'AutocompleterUI', () => {
 							selectedIndex={ 0 }
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }
-							value={ {
-								text: 'This is the text that is being edited.',
-								start: 0,
-								end: 0,
-							} }
 							contentRef={ contentRef }
 							reset={ resetSpy }
 						/>

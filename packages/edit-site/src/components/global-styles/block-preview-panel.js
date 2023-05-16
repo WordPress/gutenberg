@@ -11,7 +11,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 		...blockExample,
 		attributes: {
 			...blockExample?.attributes,
-			className: variation,
+			className: 'is-style-' + variation,
 		},
 	};
 	const blocks =

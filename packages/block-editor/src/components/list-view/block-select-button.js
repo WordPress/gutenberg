@@ -35,6 +35,9 @@ function ListViewBlockSelectButton(
 		onDragStart,
 		onDragEnd,
 		draggable,
+		isExpanded,
+		ariaLabel,
+		ariaDescribedBy,
 	},
 	ref
 ) {
@@ -76,10 +79,16 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-hidden={ true }
+				aria-label={ ariaLabel }
+				aria-describedby={ ariaDescribedBy }
+				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
+				<BlockIcon
+					icon={ blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
 				<HStack
 					alignment="center"
 					className="block-editor-list-view-block-select-button__label-wrapper"

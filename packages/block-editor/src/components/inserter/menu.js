@@ -152,7 +152,6 @@ function InserterMenu(
 			destinationRootClientId,
 			onInsert,
 			onHover,
-			delayedFilterValue,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
 		]

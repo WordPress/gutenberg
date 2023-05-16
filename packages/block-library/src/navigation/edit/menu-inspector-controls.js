@@ -22,6 +22,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../private-apis';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
+import LeafMoreMenu from './leaf-more-menu';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -33,7 +34,8 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+	const { OffCanvasEditor } = unlock( blockEditorPrivateApis );
+
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -44,10 +46,6 @@ const MainContent = ( {
 		[ clientId ]
 	);
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
-
-	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <p>{ __( 'Select or create a menu' ) }</p>;
-	}
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
@@ -69,6 +67,7 @@ const MainContent = ( {
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
+			parentClientId={ clientId }
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
@@ -89,9 +88,7 @@ const MenuInspectorControls = ( props ) => {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody
-				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
-			>
+			<PanelBody title={ null }>
 				<HStack className="wp-block-navigation-off-canvas-editor__header">
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"

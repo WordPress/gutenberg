@@ -6,6 +6,7 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -17,10 +18,15 @@ import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
-import { useLocation } from '../routes';
+import { unlock } from '../../private-apis';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function SidebarScreens() {
 	useSyncPathWithURL();
@@ -33,8 +39,17 @@ function SidebarScreens() {
 			<NavigatorScreen path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
 			</NavigatorScreen>
+			<NavigatorScreen path="/wp_global_styles">
+				<SidebarNavigationScreenGlobalStyles />
+			</NavigatorScreen>
 			<NavigatorScreen path="/navigation/:postType/:postId">
 				<SidebarNavigationScreenNavigationItem />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page">
+				<SidebarNavigationScreenPages />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page/:postId">
+				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
 				<SidebarNavigationScreenTemplates />

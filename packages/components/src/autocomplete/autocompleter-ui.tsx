@@ -12,8 +12,6 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-// Error expected because `@wordpress/rich-text` is not yet fully typed.
-// @ts-expect-error
 import { useAnchor } from '@wordpress/rich-text';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
@@ -42,13 +40,11 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		onSelect,
 		onReset,
 		reset,
-		value,
 		contentRef,
 	}: AutocompleterUIProps ) {
 		const [ items ] = useItems( filterValue );
 		const popoverAnchor = useAnchor( {
 			editableContentElement: contentRef.current,
-			value,
 		} );
 
 		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );

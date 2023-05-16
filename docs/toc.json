@@ -179,6 +179,9 @@
 					{
 						"docs/reference-guides/block-api/block-registration.md": []
 					},
+					{
+						"docs/reference-guides/block-api/block-selectors.md": []
+					},
 					{ "docs/reference-guides/block-api/block-styles.md": [] },
 					{ "docs/reference-guides/block-api/block-supports.md": [] },
 					{
@@ -247,6 +250,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/styles-versions.md": []
 					}
 				]
 			},

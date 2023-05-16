@@ -315,6 +315,17 @@
 						}
 					}
 				},
+				"filter": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific filter property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"duotone": {
+							"type": "boolean",
+							"description": "Allow blocks to define a duotone filter.",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -427,6 +438,104 @@
 				}
 			},
 			"additionalProperties": true
+		},
+		"selectors": {
+			"type": "object",
+			"description": "Provides custom CSS selectors and mappings for the block. Selectors may be set for the block itself or per-feature e.g. typography. Custom selectors per feature or sub-feature, allow different block styles to be applied to different elements within the block.",
+			"properties": {
+				"root": {
+					"type": "string",
+					"description": "The primary CSS class to apply to the block. This replaces the `.wp-block-name` class if set."
+				},
+				"border": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json border styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"color": { "type": "string" },
+								"radius": { "type": "string" },
+								"style": { "type": "string" },
+								"width": { "type": "string" }
+							}
+						}
+					]
+				},
+				"color": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json color styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"text": { "type": "string" },
+								"background": { "type": "string" }
+							}
+						}
+					]
+				},
+				"dimensions": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json dimensions styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"minHeight": { "type": "string" }
+							}
+						}
+					]
+				},
+				"spacing": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json spacing styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"blockGap": { "type": "string" },
+								"padding": { "type": "string" },
+								"margin": { "type": "string" }
+							}
+						}
+					]
+				},
+				"typography": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json typography styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"fontFamily": { "type": "string" },
+								"fontSize": { "type": "string" },
+								"fontStyle": { "type": "string" },
+								"fontWeight": { "type": "string" },
+								"lineHeight": { "type": "string" },
+								"letterSpacing": { "type": "string" },
+								"textDecoration": { "type": "string" },
+								"textTransform": { "type": "string" }
+							}
+						}
+					]
+				}
+			}
 		},
 		"styles": {
 			"type": "array",

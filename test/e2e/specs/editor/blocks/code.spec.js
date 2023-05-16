@@ -40,7 +40,7 @@ test.describe( 'Code', () => {
 		// Test to see if HTML and white space is kept.
 		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

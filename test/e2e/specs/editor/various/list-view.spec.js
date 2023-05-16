@@ -19,7 +19,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -27,7 +27,8 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
@@ -43,10 +44,12 @@ test.describe( 'List View', () => {
 
 		// Drag the paragraph above the heading.
 		const paragraphBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Paragraph link',
+			name: 'Paragraph',
+			exact: true,
 		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Heading link',
+			name: 'Heading',
+			exact: true,
 		} );
 		await paragraphBlockItem.dragTo( headingBlockItem, { x: 0, y: 0 } );
 
@@ -72,7 +75,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -80,19 +83,18 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Go to the image block in List View.
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Image link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Image',
+			} )
 		).toBeFocused();
 
 		// Select the image block in the canvas.
@@ -110,9 +112,7 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// List View should have two rows.
-		await expect(
-			listView.getByRole( 'gridcell', { name: /link/i } )
-		).toHaveCount( 2 );
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026.
@@ -127,7 +127,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -135,18 +135,17 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Remove the Paragraph block via its options menu in List View.
 		await listView
-			.getByRole( 'button', { name: 'Options for Paragraph block' } )
+			.getByRole( 'button', { name: 'Options for Paragraph' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
-			.click();
+		await page.getByRole( 'menuitem', { name: /Delete/i } ).click();
 
 		// Heading block should be selected as previous block.
 		await expect(
@@ -168,7 +167,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -176,27 +175,26 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Select the image block in List View.
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Image link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Image',
+			} )
 		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 
 		// Remove the Image block via its options menu in List View.
 		await listView
-			.getByRole( 'button', { name: 'Options for Image block' } )
+			.getByRole( 'button', { name: 'Options for Image' } )
 			.click();
-		await page.getByRole( 'menuitem', { name: /Remove Image/i } ).click();
+		await page.getByRole( 'menuitem', { name: /Delete/i } ).click();
 
 		// Heading block should be selected as previous block.
 		await expect(
@@ -221,7 +219,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -229,25 +227,27 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Heading link',
+				name: 'Heading',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Select the Image block as well.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Image link',
+				name: 'Image',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Remove both blocks.
 		await listView
-			.getByRole( 'button', { name: 'Options for Image block' } )
+			.getByRole( 'button', { name: 'Options for Image' } )
 			.click();
-		await page.getByRole( 'menuitem', { name: /Remove blocks/i } ).click();
+		await page.getByRole( 'menuitem', { name: /Delete blocks/i } ).click();
 
 		// Newly created paragraph block should be selected.
 		await expect(
@@ -271,15 +271,15 @@ test.describe( 'List View', () => {
 			.click();
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
 
 		// Things start off expanded.
 		await expect(
-			listView.getByRole( 'gridcell', {
-				name: 'Cover link',
+			listView.getByRole( 'link', {
+				name: 'Cover',
 				expanded: true,
 			} )
 		).toBeVisible();
@@ -287,28 +287,27 @@ test.describe( 'List View', () => {
 		// The child paragraph block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Collapse the Cover block.
 		await listView
-			.getByRole( 'gridcell', { name: 'Cover link' } )
+			.getByRole( 'gridcell', { name: 'Cover', exact: true } )
 			.getByTestId( 'list-view-expander', { includeHidden: true } )
 			// Force the click to bypass the visibility check. The expander is
 			// intentionally aria-hidden. See the implementation for details.
 			.click( { force: true } );
 
 		// Check that we're collapsed.
-		await expect(
-			listView.getByRole( 'gridcell', { name: /link/i } )
-		).toHaveCount( 1 );
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 1 );
 
 		// Click the Cover block List View item.
 		await listView
-			.getByRole( 'gridcell', {
-				name: 'Cover link',
+			.getByRole( 'link', {
+				name: 'Cover',
 				expanded: false,
 			} )
 			.click();
@@ -322,7 +321,8 @@ test.describe( 'List View', () => {
 		// The child paragraph block in List View should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
@@ -341,7 +341,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/group' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -349,7 +349,8 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Group link',
+				name: 'Group',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
@@ -357,35 +358,32 @@ test.describe( 'List View', () => {
 		// Press Home to go to the first inserted block (image).
 		await page.keyboard.press( 'Home' );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Image link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Image',
+			} )
 		).toBeFocused();
 
 		// Press End followed by Arrow Up to go to the second to last block (columns).
 		await page.keyboard.press( 'End' );
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Columns link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Columns',
+				exact: true,
+			} )
 		).toBeFocused();
 
 		// Navigate the right column to image block options button via Home key.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Home' );
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Image block' } )
+			listView.getByRole( 'button', { name: 'Options for Image' } )
 		).toBeFocused();
 
 		// Navigate the right column to group block options button.
 		await page.keyboard.press( 'End' );
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Group block' } )
+			listView.getByRole( 'button', { name: 'Options for Group' } )
 		).toBeFocused();
 	} );
 
@@ -409,7 +407,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -417,18 +415,17 @@ test.describe( 'List View', () => {
 		// The paragraph item should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Navigate to the image block item.
 		await page.keyboard.press( 'ArrowUp' );
-		const imageItem = listView
-			.getByRole( 'gridcell', {
-				name: 'Image link',
-			} )
-			.getByRole( 'link', { includeHidden: true } );
+		const imageItem = listView.getByRole( 'link', {
+			name: 'Image',
+		} );
 
 		await expect( imageItem ).toBeFocused();
 
@@ -445,12 +442,12 @@ test.describe( 'List View', () => {
 		// Since focus is now at the image block upload button in the canvas,
 		// pressing the list view shortcut should bring focus back to the image
 		// block in the list view.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		await expect( imageItem ).toBeFocused();
 
 		// Since focus is now inside the list view, the shortcut should close
 		// the sidebar.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 
 		// Focus should now be on the paragraph block since that is
 		// where we opened the list view sidebar. This is not a perfect
@@ -464,31 +461,33 @@ test.describe( 'List View', () => {
 		await expect( listView ).not.toBeVisible();
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
 		// out of range of the sidebar region. Must shift+tab 3 times to reach
 		// close button before tabs.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
-			editor.canvas.getByRole( 'button', {
-				name: 'Close Document Overview Sidebar',
-			} )
+			editor.canvas
+				.getByRole( 'region', { name: 'Document Overview' } )
+				.getByRole( 'button', {
+					name: 'Close',
+				} )
 		).toBeFocused();
 
 		// Close List View and ensure it's closed.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).not.toBeVisible();
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		const outlineButton = editor.canvas.getByRole( 'button', {
 			name: 'Outline',
 		} );
@@ -497,14 +496,14 @@ test.describe( 'List View', () => {
 
 		// From here, tab in to the editor so focus can be checked on return to
 		// the outline tab in the sidebar.
-		await pageUtils.pressKeyTimes( 'Tab', 2 );
+		await pageUtils.pressKeys( 'Tab', { times: 2 } );
 		// Focus should be placed on the outline tab button since there is
 		// nothing to focus inside the tab itself.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		await expect( outlineButton ).toBeFocused();
 
 		// Close List View and ensure it's closed.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).not.toBeVisible();
 	} );
 
@@ -519,7 +518,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Open List View.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -527,19 +526,18 @@ test.describe( 'List View', () => {
 		// The last inserted block should be selected.
 		await expect(
 			listView.getByRole( 'gridcell', {
-				name: 'Paragraph link',
+				name: 'Paragraph',
+				exact: true,
 				selected: true,
 			} )
 		).toBeVisible();
 
 		// Go to the image block in List View.
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Image link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Image',
+			} )
 		).toBeFocused();
 
 		// Select the image block in the canvas.
@@ -552,13 +550,11 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 
 		// Triggering the List View shortcut should result in the image block gaining focus.
-		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await pageUtils.pressKeys( 'access+o' );
 		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: 'Image link',
-				} )
-				.getByRole( 'link', { includeHidden: true } )
+			listView.getByRole( 'link', {
+				name: 'Image',
+			} )
 		).toBeFocused();
 	} );
 } );

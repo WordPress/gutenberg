@@ -143,6 +143,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		mediaWidth,
 		rel,
 		verticalAlignment,
+		allowedBlocks,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
@@ -270,17 +271,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			{ mediaType === 'image' && (
 				<TextareaControl
 					__nextHasNoMarginBottom
-					label={ __( 'Alt text (alternative text)' ) }
+					label={ __( 'Alternative text' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
+								{ __( 'Describe the purpose of the image.' ) }
 							</ExternalLink>
-							{ __(
-								'Leave empty if the image is purely decorative.'
-							) }
+							<br />
+							{ __( 'Leave empty if decorative.' ) }
 						</>
 					}
 				/>
@@ -291,7 +291,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
-					imageSizeHelp={ __( 'Select which image size to load.' ) }
+					imageSizeHelp={ __(
+						'Select the size of the source image.'
+					) }
 				/>
 			) }
 			{ mediaUrl && (
@@ -314,7 +316,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE }
+		{ template: TEMPLATE, allowedBlocks }
 	);
 
 	return (

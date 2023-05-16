@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import type { WPElement } from '@wordpress/element';
+import type { RichTextValue } from '@wordpress/rich-text';
+
 /**
  * Internal dependencies
  */
@@ -141,10 +143,11 @@ export type AutocompleterUIProps = {
 	 * A function that defines the behavior of the completer when it is reset
 	 */
 	reset: ( event: Event ) => void;
+	// This is optional because it's still needed for mobile/native.
 	/**
 	 * The rich text value object the autocompleter is being applied to.
 	 */
-	value: RichTextValue;
+	value?: RichTextValue;
 	/**
 	 * A ref containing the editable element that will serve as the anchor for
 	 * `Autocomplete`'s `Popover`.
@@ -154,24 +157,6 @@ export type AutocompleterUIProps = {
 
 export type CancelablePromise< T = void > = Promise< T > & {
 	canceled?: boolean;
-};
-
-/**
- * When `@wordpress/rich-text` is fully typed, the following
- * types should be moved to and imported from there
- *
- * @see /packages/rich-text/src/create.js
- */
-type RichTextFormat = {
-	type: string;
-};
-type RichTextFormatList = Array< RichTextFormat >;
-type RichTextValue = {
-	text: string;
-	formats?: Array< RichTextFormatList >;
-	replacements?: Array< RichTextFormat >;
-	start: number | undefined;
-	end: number | undefined;
 };
 
 export type UseAutocompleteProps = {
@@ -186,7 +171,7 @@ export type UseAutocompleteProps = {
 	 * A function to be called when an option is selected to insert into the
 	 * existing text.
 	 */
-	onChange: ( value: string ) => void;
+	onChange: ( value: RichTextValue ) => void;
 	/**
 	 * A function to be called when an option is selected to replace the
 	 * existing text.

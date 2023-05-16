@@ -27,7 +27,7 @@ export default function InspectorControlsSlot( {
 	}
 	const Slot = groups[ group ]?.Slot;
 	if ( ! Slot ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
+		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
 

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -362,7 +361,15 @@ export const entities = ( state = {}, action ) => {
 	// Generates a dynamic reducer for the entities.
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
+		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+			const { kind } = record;
+			if ( ! acc[ kind ] ) {
+				acc[ kind ] = [];
+			}
+			acc[ kind ].push( record );
+			return acc;
+		}, {} );
+
 		entitiesDataReducer = combineReducers(
 			Object.entries( entitiesByKind ).reduce(
 				( memo, [ kind, subEntities ] ) => {
@@ -635,6 +642,35 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function navigationFallbackId( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
+			return action.fallbackId;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -643,6 +679,7 @@ export default combineReducers( {
 	currentUser,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
+	themeGlobalStyleRevisions,
 	taxonomies,
 	entities,
 	undo,
@@ -651,4 +688,5 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	navigationFallbackId,
 } );

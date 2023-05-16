@@ -1,19 +1,15 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -36,8 +32,28 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 	},
 ];
 
-export default function EntitiesSavedStates( { close } ) {
+function identity( values ) {
+	return values;
+}
+
+function isPreviewingTheme() {
+	return (
+		window?.__experimentalEnableThemePreviews &&
+		getQueryArg( window.location.href, 'theme_preview' ) !== undefined
+	);
+}
+
+function currentlyPreviewingTheme() {
+	if ( isPreviewingTheme() ) {
+		return getQueryArg( window.location.href, 'theme_preview' );
+	}
+	return null;
+}
+
+export default function EntitiesSavedStates( { close, onSave = identity } ) {
 	const saveButtonRef = useRef();
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		const dirtyRecords =
 			select( coreStore ).__experimentalGetDirtyEntityRecords();
@@ -79,11 +95,18 @@ export default function EntitiesSavedStates( { close } ) {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
 		useDispatch( noticesStore );
 
 	// To group entities by type.
-	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+		const { name } = record;
+		if ( ! acc[ name ] ) {
+			acc[ name ] = [];
+		}
+		acc[ name ].push( record );
+		return acc;
+	}, {} );
 
 	// Sort entity groups.
 	const {
@@ -124,7 +147,9 @@ export default function EntitiesSavedStates( { close } ) {
 		}
 	};
 
-	const saveCheckedEntities = () => {
+	const saveCheckedEntitiesAndActivate = () => {
+		const saveNoticeId = 'site-editor-save-success';
+		removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
 				return ! unselectedEntities.some(
@@ -175,6 +200,9 @@ export default function EntitiesSavedStates( { close } ) {
 
 		Promise.all( pendingSavedRecords )
 			.then( ( values ) => {
+				return onSave( values );
+			} )
+			.then( ( values ) => {
 				if (
 					values.some( ( value ) => typeof value === 'undefined' )
 				) {
@@ -182,6 +210,7 @@ export default function EntitiesSavedStates( { close } ) {
 				} else {
 					createSuccessNotice( __( 'Site updated.' ), {
 						type: 'snackbar',
+						id: saveNoticeId,
 					} );
 				}
 			} )
@@ -198,6 +227,18 @@ export default function EntitiesSavedStates( { close } ) {
 		onClose: () => dismissPanel(),
 	} );
 
+	const isDirty = dirtyEntityRecords.length - unselectedEntities.length > 0;
+	const activateSaveEnabled = isPreviewingTheme() || isDirty;
+
+	let activateSaveLabel;
+	if ( isPreviewingTheme() && isDirty ) {
+		activateSaveLabel = __( 'Activate & Save' );
+	} else if ( isPreviewingTheme() ) {
+		activateSaveLabel = __( 'Activate' );
+	} else {
+		activateSaveLabel = __( 'Save' );
+	}
+
 	return (
 		<div
 			ref={ saveDialogRef }
@@ -210,15 +251,11 @@ export default function EntitiesSavedStates( { close } ) {
 					as={ Button }
 					ref={ saveButtonRef }
 					variant="primary"
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
-					onClick={ saveCheckedEntities }
+					disabled={ ! activateSaveEnabled }
+					onClick={ saveCheckedEntitiesAndActivate }
 					className="editor-entities-saved-states__save-button"
 				>
-					{ __( 'Save' ) }
+					{ activateSaveLabel }
 				</FlexItem>
 				<FlexItem
 					isBlock
@@ -232,11 +269,21 @@ export default function EntitiesSavedStates( { close } ) {
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				<p>
-					{ __(
-						'The following changes have been made to your site, templates, and content.'
-					) }
-				</p>
+				{ isPreviewingTheme() && (
+					<p>
+						{ sprintf(
+							'Saving your changes will change your active theme to  %1$s.',
+							theme?.name?.rendered
+						) }
+					</p>
+				) }
+				{ isDirty && (
+					<p>
+						{ __(
+							'The following changes have been made to your site, templates, and content.'
+						) }
+					</p>
+				) }
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {

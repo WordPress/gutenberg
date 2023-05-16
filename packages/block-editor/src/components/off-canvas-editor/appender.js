@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import Inserter from '../inserter';
+import { ComposedPrivateInserter as PrivateInserter } from '../inserter';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
@@ -61,7 +61,6 @@ export const Appender = forwardRef(
 		if ( hideInserter ) {
 			return null;
 		}
-
 		const descriptionId = `off-canvas-editor-appender__${ instanceId }`;
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
@@ -73,11 +72,11 @@ export const Appender = forwardRef(
 
 		return (
 			<div className="offcanvas-editor-appender">
-				<Inserter
+				<PrivateInserter
 					ref={ ref }
 					rootClientId={ clientId }
 					position="bottom right"
-					isAppender={ true }
+					isAppender
 					selectBlockOnInsert={ false }
 					shouldDirectInsert={ false }
 					__experimentalIsQuick

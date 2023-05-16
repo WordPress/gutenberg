@@ -18,8 +18,6 @@ import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-jest.useRealTimers();
-
 describe( 'withSelect', () => {
 	it( 'passes the relevant data to the component', () => {
 		const registry = createRegistry();

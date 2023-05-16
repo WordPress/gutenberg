@@ -33,7 +33,6 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
-import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -41,7 +40,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
-	block,
+	block: { clientId },
 	isDragged,
 	isSelected,
 	isBranchSelected,
@@ -54,13 +53,11 @@ function ListViewBlock( {
 	path,
 	isExpanded,
 	selectedClientIds,
-	preventAnnouncement,
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { clientId } = block;
 
 	const { isLocked, isContentLocked, canEdit } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
@@ -91,6 +88,11 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = blockInformation?.title || __( 'Untitled' );
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		[ clientId ]
+	);
 	const blockName = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
@@ -112,30 +114,28 @@ function ListViewBlock( {
 		level
 	);
 
-	let blockAriaLabel = __( 'Link' );
-	if ( blockInformation ) {
-		blockAriaLabel = isLocked
-			? sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the locked block.
-					__( '%s link (locked)' ),
-					blockInformation.title
-			  )
-			: sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the block.
-					__( '%s link' ),
-					blockInformation.title
-			  );
-	}
-
-	const settingsAriaLabel = blockInformation
+	const blockAriaLabel = isLocked
 		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Options for %s block' ),
-				blockInformation.title
+				// translators: %s: The title of the block. This string indicates a link to select the locked block.
+				__( '%s (locked)' ),
+				blockTitle
 		  )
-		: __( 'Options' );
+		: blockTitle;
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s' ),
+		blockTitle
+	);
+
+	const {
+		isTreeGridMounted,
+		expand,
+		collapse,
+		BlockSettingsMenu,
+		listViewInstanceId,
+		expandedState,
+	} = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -246,20 +246,16 @@ function ListViewBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
-			id={ `list-view-block-${ clientId }` }
+			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			isExpanded={ canExpand ? isExpanded : undefined }
-			aria-selected={ !! isSelected || forceSelectionContentLock }
+			data-expanded={ canExpand ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected || forceSelectionContentLock }
-				aria-expanded={ canExpand ? isExpanded : undefined }
-				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -276,9 +272,10 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ isExpanded }
+							isExpanded={ canExpand ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
-							preventAnnouncement={ preventAnnouncement }
+							ariaLabel={ blockAriaLabel }
+							ariaDescribedBy={ descriptionId }
 						/>
 						<div
 							className="block-editor-list-view-block-select-button__description"
@@ -321,14 +318,15 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && (
+			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected || forceSelectionContentLock }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsDropdown
+						<BlockSettingsMenu
 							clientIds={ dropdownClientIds }
+							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							toggleProps={ {
@@ -339,6 +337,8 @@ function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ updateSelection }
+							expand={ expand }
+							expandedState={ expandedState }
 						/>
 					) }
 				</TreeGridCell>
