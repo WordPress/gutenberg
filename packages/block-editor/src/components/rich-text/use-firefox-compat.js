@@ -46,6 +46,10 @@ export function useFirefoxCompat( props ) {
 				return;
 			}
 
+			if ( element.closest( 'button, summary' ) === null ) {
+				return;
+			}
+
 			const { value, onChange } = propsRef.current;
 			onChange( insert( value, ' ' ) );
 			event.preventDefault();
