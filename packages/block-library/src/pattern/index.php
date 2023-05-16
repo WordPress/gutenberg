@@ -27,25 +27,28 @@ function register_block_core_pattern() {
  *
  * @return string Returns the output of the pattern.
  */
-function render_block_core_pattern( $attributes, $content ) {
+function render_block_core_pattern( $attributes ) {
 	if ( empty( $attributes['slug'] ) ) {
 		return '';
-	}
-	$slug_classname = str_replace( '/', '-', $attributes['slug'] );
-	$classnames     = isset( $attributes['className'] ) ? $attributes['className'] . ' ' . $slug_classname : $slug_classname;
-	$wrapper        = '<div class="' . esc_attr( $classnames ) . '">%s</div>';
-
-	if ( isset( $attributes['syncStatus'] ) && 'unsynced' === $attributes['syncStatus'] ) {
-		return sprintf( $wrapper, $content );
 	}
 
 	$slug     = $attributes['slug'];
 	$registry = WP_Block_Patterns_Registry::get_instance();
+	
 	if ( ! $registry->is_registered( $slug ) ) {
 		return '';
 	}
 
 	$pattern = $registry->get_registered( $slug );
+
+	if ( ! isset( $attributes['syncStatus'] ) ) {
+		return do_blocks( $pattern['content'] );
+	}
+
+	$block_classnames = 'wp-block-pattern ' . str_replace( '/', '-', $attributes['slug'] );
+	$classnames       = isset( $attributes['className'] ) ? $attributes['className'] . ' ' . $block_classnames : $block_classnames;
+	$wrapper          = '<div class="' . esc_attr( $classnames ) . '">%s</div>';
+
 	return sprintf( $wrapper, do_blocks( $pattern['content'] ) );
 }
 
