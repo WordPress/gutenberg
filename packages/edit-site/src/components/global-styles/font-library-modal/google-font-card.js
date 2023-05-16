@@ -22,6 +22,7 @@ function GoogleFontCard ( { font, onClick } ) {
         addToLibrary,
         updateLibrary,
         installedFontNames,
+        demoText,
     } = useContext( FontLibraryContext );
 
     const handleDonwloadFont = async ( event, name ) => {
@@ -37,6 +38,7 @@ function GoogleFontCard ( { font, onClick } ) {
     return (
         <FontCard
             font={ font }
+            demoText={ demoText }
             onClick={ () =>
                 onClick( font.name )
             }

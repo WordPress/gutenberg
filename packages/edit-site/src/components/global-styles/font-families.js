@@ -28,16 +28,16 @@ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamiliesMenu ({ onToggle, toggleFontLibrary }) {
 
-    const displayFontLibrary = () => {
+    const displayFontLibrary = ( tabName ) => {
         onToggle(); // Close the dropdown
-        toggleFontLibrary(); // Open the modal
+        toggleFontLibrary( tabName ); // Open the modal
     };
 
 	return (
 		<MenuGroup>
-			<MenuItem onClick={ displayFontLibrary }>{ __( 'Manage Font Library' ) }</MenuItem>
-			<MenuItem>{ __( 'Install Google Fonts' ) }</MenuItem>
-            <MenuItem>{ __( 'Install Local Fonts' ) }</MenuItem>
+			<MenuItem onClick={ () => displayFontLibrary( 'installed-fonts' ) }>{ __( 'Manage Font Library' ) }</MenuItem>
+			<MenuItem onClick={ () => displayFontLibrary( 'google-fonts' ) }>{ __( 'Install Google Fonts' ) }</MenuItem>
+            <MenuItem onClick={ () => displayFontLibrary( 'local-fonts' ) }>{ __( 'Install Local Fonts' ) }</MenuItem>
 		</MenuGroup>
 	)	
 }
@@ -49,17 +49,18 @@ function FontFamilies() {
         ? fontFamilies?.custom
         : fontFamilies?.theme || [];
 
-    const [ isFontLibraryModalOpen, setIsFontLibraryModalOpen ] = useState( false );
+    const [ tabOpen, setTabOpen ] = useState( null );
 
-    const toggleFontLibrary = () => {
-        setIsFontLibraryModalOpen( !isFontLibraryModalOpen );
+    const toggleFontLibrary = ( tabName ) => {
+        setTabOpen( !!tabOpen ? null : tabName );
     };
 
 	return (
         <>
-            { isFontLibraryModalOpen && (
+            { !!tabOpen && (
                 <FontLibraryModal
                     onRequestClose={ toggleFontLibrary }
+                    initialTabName={ tabOpen }
                 />
             )}
             

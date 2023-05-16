@@ -43,16 +43,18 @@ function FontLibraryProvider( { children } ) {
 	// Google Fonts
 	const [ googleFonts, setGoogleFonts ] = useState( [] );
 	const [ googleFontsCategories, setGoogleFontsCategories ] = useState( [] );
-
+	
 	// Demo
+	const loadedFontUrls = new Set();
 	const [ demoText, setDemoText ] = useState( DEMO_TEXT );
 
 	useEffect( () => {
 		getFontLibrary().then( ( response ) => {
 			setLibraryFonts( response );
 		} );
-		getGoogleFonts().then( ( { items, categories } ) => {
-			setGoogleFonts( items );
+		getGoogleFonts().then( ( { fontFamilies, categories } ) => {
+			setGoogleFonts( fontFamilies );
+			console.log("googleFonts", fontFamilies, "categories", categories);
 			setGoogleFontsCategories( categories );
 		} );
 	}, [] );
@@ -74,10 +76,8 @@ function FontLibraryProvider( { children } ) {
 		return [ ...libraryFonts, newFontFamily ];
 	}
 
-
     async function updateLibrary ( newLibrary ) {
         const newFontFamilies = await updateFontsLibrary( newLibrary );
-		console.log( 'newFontFamilies', newFontFamilies );
 		setLibraryFonts( newFontFamilies );
     }
 
@@ -130,6 +130,24 @@ function FontLibraryProvider( { children } ) {
 		} );
 	}
 
+	// Load a font asset from a url
+	const loadFontFaceAsset = async ( fontFace ) => {
+		const src = Array.isArray( fontFace.src ) ? fontFace.src[ 0 ] : fontFace.src;
+
+		if ( loadedFontUrls.has( src ) ) {
+			return;
+		}
+
+		const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
+			style: fontFace.fontStyle,
+			weight: fontFace.fontWeight,
+		} );
+
+		const loadedFace = await newFont.load();
+		loadedFontUrls.add( src );
+		document.fonts.add( loadedFace );
+	}
+
 	return (
 		<FontLibraryContext.Provider
 			value={ {
@@ -138,9 +156,10 @@ function FontLibraryProvider( { children } ) {
 				customFonts,
 				libraryFonts,
 				installedFonts,
+				installedFontNames,
 				googleFonts,
 				googleFontsCategories,
-				installedFontNames,
+				loadFontFaceAsset,
 				addToLibrary,
                 updateLibrary,
 				toggleActivateFont,

@@ -88,3 +88,18 @@ export function fontFamilyFromGoogleFont ( googleFont, variantsSelected=[] ) {
     };
     return fontFamily;
 }
+
+export function getFontFamilyFromGoogleFont ( font ) {
+    return {
+        name: font.family,
+        fontFamily: `${font.family}, ${ getFallbackForGoogleFont( font.category ) }`,
+        slug: font.family.replace( /\s+/g, '-' ).toLowerCase(),
+        fontFace: font.variants.map( variant => (
+            {
+                src: font.files?.[ variant ],
+                fontWeight: getWeightFromGoogleVariant( variant ),
+                fontStyle: getStyleFromGoogleVariant( variant ),
+            }
+        ) ),
+    };
+}

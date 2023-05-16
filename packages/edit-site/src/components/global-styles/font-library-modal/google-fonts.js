@@ -19,14 +19,10 @@ import {
  */
 import TabLayout from './tab-layout';
 import FontsGrid from './fonts-grid';
-import { DEMO_TEXT } from './constants';
-import {
-	googleFontToCardFont,
-	googleVariantToFullVariant,
-} from './utils';
 import { FontLibraryContext } from './context';
 import GoogleFontCard from './google-font-card';
 import GoolgeFontDetails from './google-font-details';
+import { useEffect } from 'react';
 
 function GoogleFonts() {
 	const {
@@ -34,12 +30,16 @@ function GoogleFonts() {
         googleFontsCategories,
     } = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
-	const [ filters, setFilters ] = useState( {
-		category: googleFontsCategories[ 0 ],
-	} );
+	const [ filters, setFilters ] = useState( {} );
+
+	useEffect( () => {
+		if ( googleFontsCategories.length > 0 ) {
+			setFilters( { category: googleFontsCategories[ 0 ] } );
+		}
+	}, [ googleFontsCategories ] );
 
 	const handleSelectFont = ( name ) => {
-		const font = googleFonts.find( ( font ) => font.family === name );
+		const font = googleFonts.find( font => font.name === name );
 		setFontSelected( font );
 	};
 
@@ -47,21 +47,15 @@ function GoogleFonts() {
 		setFontSelected( null );
 	};
 
-	const fonts = useMemo(
-		() =>
-			googleFonts.reduce( ( acc, font ) => {
+	const fonts = googleFonts.reduce( ( acc, font ) => {
 				if ( filters.category === font.category ) {
-					acc.push( googleFontToCardFont( font ) );
+					return [...acc, font];
 				}
 				return acc;
-			}, [] ),
-		[ googleFonts, filters ]
-	);
-
-	// console.log( 'filtered fonts', fonts, filters );
+			}, [] );
 
 	const tabDescription = fontSelected
-		? __( `Select ${ fontSelected.family } variants you want to install` )
+		? __( `Select ${ fontSelected.name } variants you want to install` )
 		: __( 'Select a font to install' );
 
 	const handleCategoryFilter = ( category ) => {
@@ -70,14 +64,14 @@ function GoogleFonts() {
 
 	return (
 		<TabLayout
-			title={ fontSelected?.family || '' }
+			title={ fontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! fontSelected && handleUnselectFont }
 		>
 			
 
 			{ fonts.length === 0 && (
-				<HStack>
+				<HStack justify='flex-start'>
 					<Spinner />
 					<Text>{ __( 'Loading fonts...' ) }</Text>
 				</HStack>
@@ -104,7 +98,7 @@ function GoogleFonts() {
                             <FontsGrid>
                                 { fonts.map( ( font ) => (
                                     <GoogleFontCard
-                                        key={ font.family }
+                                        key={ font.name }
                                         font={ font }
                                         onClick={ handleSelectFont }
                                     />

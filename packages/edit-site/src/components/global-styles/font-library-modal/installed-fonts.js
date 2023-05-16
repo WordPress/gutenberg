@@ -25,15 +25,6 @@ function InstalledFonts () {
 	const { installedFonts } = useContext( FontLibraryContext );
     const [ fontSelected, setFontSelected ] = useState( null );
 
-    // const fonts = [
-    //     ...libraryFonts.map( family => fontFamilyToCardFont( family, false ) ),
-    //     ...themeFonts.map( family => fontFamilyToCardFont( family, true ) ),
-    // ].sort( ( a, b ) => a.name.localeCompare( b.name ) );
-    const fonts = useMemo(
-        () => installedFonts.map( fontFamilyToCardFont ),
-        [ installedFonts ]
-    );
-
     const handleUnselectFont = () => {
         setFontSelected( null );
     };
@@ -51,14 +42,7 @@ function InstalledFonts () {
         >
             {!fontSelected && (
                 <FontsGrid>
-                    {fonts.map( font => (
-                        <LibraryFontCard
-                            font={ font }
-                            key={ font.name }
-                            onClick={ () => { handleSelectFont( font.name ) } }
-                        />
-                    ) )}
-                    {fonts.map( font => (
+                    {installedFonts.map( font => (
                         <LibraryFontCard
                             font={ font }
                             key={ font.name }

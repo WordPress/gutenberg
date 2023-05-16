@@ -17,9 +17,9 @@ export async function getGoogleFonts() {
     const config = {
         path: '/wp/v2/fonts_library/google_fonts',
     };
-    const { items, categories } = await apiFetch( config );
+    const { fontFamilies, categories } = await apiFetch( config );
     return {
-        items,
+        fontFamilies,
         categories,
     };
 }

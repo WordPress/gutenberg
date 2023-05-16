@@ -7,34 +7,25 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	googleVariantToFullVariant,
-} from './utils';
 import { FontLibraryContext } from './context';
-import { getWeightFromGoogleVariant, getStyleFromGoogleVariant } from './utils';
 import FontVariant from './font-variant';
 
 
-function GoogleFontVariant ({ font, variantName }) {
-
+function GoogleFontVariant ({ font, fontFace }) {
     const { installedFontNames, libraryFonts } = useContext( FontLibraryContext );
 
-    const style = getStyleFromGoogleVariant( variantName );
-    const weight = getWeightFromGoogleVariant( variantName );
-    const displayVariantName = googleVariantToFullVariant( variantName );
-
     const isIstalled = () => {
-        const isFontInstalled = installedFontNames.has( font.family );
+        const isFontInstalled = installedFontNames.has( font.name );
         if ( ! isFontInstalled ) {
             return false;
         }
-        const libraryFont = libraryFonts.find(libFont => libFont.name === font.family || libFont.name === font.family );
-        return !!libraryFont?.fontFace.find( face => face.fontStyle === style && face.fontWeight === weight );
+        const libraryFont = libraryFonts.find( libFont => libFont.name === font.family || libFont.name === font.family );
+        return !!libraryFont?.fontFace.find( face => face.fontStyle === fontFace.fontStyle && face.fontWeight === fontFace.fontWeight );
     }
 
     return (
         <FontVariant
-            variantName={ displayVariantName }
+            fontFace={ fontFace }         
             checked={ isIstalled() }
         />
     );

@@ -15,8 +15,6 @@ function LibraryFontVariant ({ face, font }) {
 
     const { customFonts, toggleActivateFont } = useContext( FontLibraryContext );
 
-    const displayVariantName = `${face.fontWeight} ${face.fontStyle}`;
-
     const isIstalled = () => {
         const activeFont = customFonts.find( family => family.name === font.name );
         if ( ! activeFont ) {
@@ -27,7 +25,7 @@ function LibraryFontVariant ({ face, font }) {
 
     return (
         <FontVariant
-            variantName={ displayVariantName }
+            fontFace={ face }
             checked={ isIstalled() }
             onClick={ () => toggleActivateFont( font.name, face.fontStyle, face.fontWeight ) }
         />

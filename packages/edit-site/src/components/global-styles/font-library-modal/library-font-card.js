@@ -13,7 +13,7 @@ import { FontLibraryContext } from './context';
 
 
 function LibraryFontCard ({ font, onClick }) {
-    const { customFonts, toggleActivateFont } = useContext( FontLibraryContext );
+    const { customFonts, toggleActivateFont, demoText } = useContext( FontLibraryContext );
     const isActive = !!customFonts.find( family => family.name === font.name );
 
     const handleToggleFontActivation = () => {
@@ -25,6 +25,7 @@ function LibraryFontCard ({ font, onClick }) {
         <FontCard
             onClick={ () => { onClick( font.name ) } }
             font={ font }
+            demoText={ demoText }
             actionHandler={
                 <CheckboxControl
                     checked={ isActive }

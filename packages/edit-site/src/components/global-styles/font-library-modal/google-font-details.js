@@ -17,11 +17,11 @@ function GoolgeFontDetails ({ font }) {
         <>
             <Spacer margin={ 8 } />
             <VStack spacing={ 4 }>
-                { font.variants.map( ( variantName ) => (
+                { font.fontFace.map( ( face, i ) => (
                     <GoogleFontVariant
                         font={ font }
-                        variantName={ variantName }
-                        key={variantName}
+                        fontFace={ face }
+                        key={`variant${i}`}
                     />
                 ) ) }
             </VStack>

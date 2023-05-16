@@ -34,10 +34,6 @@ function FontLibraryModal( { onRequestClose, initialTabName = "installed-fonts" 
                 >
                     { ( tab ) => {
                         switch ( tab.name ) {
-                            case 'installed-fonts':
-                                return (
-                                    <InstalledFonts />
-                                );
                             case 'google-fonts':
                                 return (
                                     <GoogleFonts />
@@ -46,8 +42,11 @@ function FontLibraryModal( { onRequestClose, initialTabName = "installed-fonts" 
                                 return (
                                     <LocalFonts />
                                 );
+                            case 'installed-fonts':
                             default:
-                                return null;
+                                return (
+                                    <InstalledFonts />
+                                );
                         }
                     } }
                 </TabPanel>

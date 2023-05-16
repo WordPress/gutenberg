@@ -14,23 +14,35 @@ import {
 /**
  * Internal dependencies
  */
-import { DEMO_TEXT } from "./constants";
+import FontFaceDemo from "./font-demo";
 
 
-function FontCard ( { font, onClick, actionHandler, elevation } ) {
+
+function FontCard ( { font, onClick, actionHandler, demoText } ) {
+
+    const fakeFontFace = {
+        fontStyle: 'normal',
+        fontWeight: '400',
+        fontFamily: font.name,
+    };
+
+    const displayFontFace = (font.fontFace && font.fontFace.length)
+        ? font?.fontFace?.find( face => face.fontStyle === 'normal' && face.fontWeight === '400') || font.fontFace[0]
+        : fakeFontFace;
+
+    const variantsCount = font.fontFace?.length || 1;
+    
     return (
         <div onClick={ onClick }>
-            <Card
-                elevation={ elevation }
-            >
+            <Card>
                 <CardBody>
                     <VStack gap={3}>
                         <HStack justify="space-between">
                             <Text>{ font.name }</Text>
                             { !!actionHandler && (actionHandler) }
                         </HStack>
-                        <Text>{font.variantsCount} { _n( "variant", "variants", font.variantsCount ) }</Text>
-                        <Text>{ DEMO_TEXT }</Text>
+                        <Text>{variantsCount} { _n( "variant", "variants", variantsCount ) }</Text>
+                        <FontFaceDemo fontFace={ displayFontFace } />
                     </VStack>
                 </CardBody>
             </Card>
