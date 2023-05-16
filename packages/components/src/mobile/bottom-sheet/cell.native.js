@@ -92,6 +92,7 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			disabledStyle = styles.cellDisabled,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -426,7 +427,7 @@ class BottomSheetCell extends Component {
 					{ showValue && getValueComponent() }
 					<View
 						style={ [
-							disabled && styles.cellDisabled,
+							disabled && disabledStyle,
 							styles.cellRowContainer,
 						] }
 						pointerEvents={ disabled ? 'none' : 'auto' }
