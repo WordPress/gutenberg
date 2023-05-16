@@ -25,7 +25,7 @@
  *     data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
  *     data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
  *     data-wp-effect="effects.core.navigation.initMenu"
- *     data-wp-on.keydow="actions.core.navigation.handleMenuKeydown"
+ *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
  *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
  *     tabindex="-1"
  *   >
