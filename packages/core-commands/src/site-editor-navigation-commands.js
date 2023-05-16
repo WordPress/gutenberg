@@ -28,9 +28,11 @@ const icons = {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
-			postType
-		);
+		const supportsSearch = ! [
+			'wp_template',
+			'wp_template_part',
+			'page',
+		].includes( postType );
 		const deps = supportsSearch ? [ search ] : [];
 		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
