@@ -40,6 +40,9 @@ function render_block_core_pattern( $attributes ) {
 
 	$pattern = $registry->get_registered( $slug );
 
+	// Currently all existing blocks should be returned here without a wp-block-pattern wrapper
+	// as the syncStatus attribute is only used if the gutenberg-pattern-enhancements experiment
+	// is enabled.
 	if ( ! isset( $attributes['syncStatus'] ) ) {
 		return do_blocks( $pattern['content'] );
 	}
