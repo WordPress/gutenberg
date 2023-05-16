@@ -9,6 +9,8 @@ import classnames from 'classnames';
 import { Button, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
+import { select, dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -136,7 +138,14 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const isSettingsOpen = select( preferencesStore ).get(
+		'core/editor',
+		'linkControlSettingsOpen'
+	);
+
+	const [ settingsOpen, setSettingsOpen ] = useState(
+		isSettingsOpen || false
+	);
 
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
 		useInternalInputValue( value?.url || '' );
@@ -191,6 +200,14 @@ function LinkControl( {
 
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
+
+	useEffect( () => {
+		dispatch( preferencesStore ).set(
+			'core/editor',
+			'linkControlSettingsOpen',
+			settingsOpen
+		);
+	}, [ settingsOpen ] );
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
