@@ -106,7 +106,6 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					} }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
-					addToPlaylist={ true }
 					multiple={ true }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
@@ -124,7 +123,6 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					onSelect={ onSelectTracks }
 					accept="audio/*"
 					addToPlaylist={ true }
-					playlist={ true }
 					mediaIds={ ids
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
