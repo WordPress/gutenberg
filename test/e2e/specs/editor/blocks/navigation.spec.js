@@ -958,7 +958,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
-	test.describe( 'Submenu interactions', () => {
+	test.describe( 'Submenu mouse and keyboard interactions', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
@@ -989,7 +989,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'Submenus interactions', async ( { page } ) => {
+		test( 'Submenu interactions', async ( { page } ) => {
 			await page.goto( '/' );
 			const simpleSubmenuButton = page.getByRole( 'button', {
 				name: 'Simple Submenu',
