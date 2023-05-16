@@ -137,6 +137,7 @@ class BottomSheetRangeCell extends Component {
 			defaultValue,
 			minimumValue = 0,
 			maximumValue = 10,
+			disabled,
 			step = 1,
 			preferredColorScheme,
 			minimumTrackTintColor = preferredColorScheme === 'light'
@@ -217,6 +218,7 @@ class BottomSheetRangeCell extends Component {
 						activeOpacity={ 1 }
 						accessible={ false }
 						valueStyle={ styles.valueStyle }
+						disabled={ disabled }
 					>
 						<View style={ containerStyle }>
 							{ preview }
@@ -224,6 +226,7 @@ class BottomSheetRangeCell extends Component {
 								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
+								disabled={ disabled }
 								step={ step }
 								minimumValue={ minimumValue }
 								maximumValue={ maximumValue }
