@@ -1,23 +1,42 @@
 .edit-site-document-actions {
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
 	flex-direction: column;
 	justify-content: center;
-	padding: 0 $grid-unit;
-	height: 100%;
+	width: 100%;
+	height: 36px;
+	max-width: 400px;
+	border-radius: 2px;
+	background: $gray-100;
+	color: $gray-700;
+	padding: 0 $grid-unit-10;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
+	cursor: pointer;
+
+	&:hover {
+		background: $gray-200;
+	}
 
 	.edit-site-document-actions__title-wrapper {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-
+		grid-column: 2 / 3;
 		// See comment above about min-width
 		min-width: 0;
+		color: $gray-900;
+		svg {
+			fill: currentColor;
+		}
+
+		&.is-global {
+			color: var(--wp-block-synced-color);
+		}
 
 		.components-dropdown {
 			display: inline-flex;
@@ -27,6 +46,18 @@
 				min-width: 0;
 				padding: 0;
 			}
+		}
+	}
+
+	.edit-site-document-actions__back {
+		color: $gray-700;
+	}
+
+	.edit-site-document-actions__shortcut {
+		color: $gray-700;
+		padding: 0 $grid-unit-10;
+		.components-text {
+			color: $gray-700;
 		}
 	}
 
