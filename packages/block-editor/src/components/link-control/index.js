@@ -209,10 +209,13 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		setNewValue( {
+		const valueToApplyAndFormat = {
 			...updatedValue,
 			title: internalTextInputValue || updatedValue?.title,
-		} );
+		};
+		setNewValue( valueToApplyAndFormat );
+		onChange( valueToApplyAndFormat );
+		stopEditing();
 	};
 
 	const handleSubmit = () => {
