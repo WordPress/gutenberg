@@ -3,6 +3,7 @@
  */
 import memize from 'memize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -20,6 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
+	subscribeSetThemeJSON,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -179,6 +181,10 @@ class NativeEditorProvider extends Component {
 			this.setState( { isHelpVisible: true } );
 		} );
 
+		this.subscriptionParentSetThemeJSON = subscribeSetThemeJSON( () => {
+			this.setThemeJSONDataFromClipboard();
+		} );
+
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
@@ -237,6 +243,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentShowEditorHelp ) {
 			this.subscriptionParentShowEditorHelp.remove();
+		}
+
+		if ( this.subscriptionParentSetThemeJSON ) {
+			this.subscriptionParentSetThemeJSON.remove();
 		}
 	}
 
@@ -308,6 +318,40 @@ class NativeEditorProvider extends Component {
 	updateHtmlAction( html ) {
 		const parsed = parse( html );
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	}
+
+	/*
+	 * Only used for development environments for E2E testing.
+	 */
+	async setThemeJSONDataFromClipboard() {
+		const { updateEditorSettings } = this.props;
+		const jsonData = await Clipboard.getString();
+
+		try {
+			const parsedData = JSON.parse( jsonData );
+			const rawFeatures = parsedData?.settings;
+
+			if ( rawFeatures?.color?.palette ) {
+				rawFeatures.color.palette = {
+					theme: rawFeatures.color.palette,
+				};
+			}
+			if ( rawFeatures.typography.fontSizes ) {
+				rawFeatures.typography.fontSizes = {
+					theme: rawFeatures.typography.fontSizes,
+				};
+			}
+
+			updateEditorSettings(
+				this.getThemeColors( {
+					rawFeatures: JSON.stringify( rawFeatures ),
+					rawStyles: JSON.stringify( parsedData?.styles ),
+				} )
+			);
+		} catch ( err ) {
+			// eslint-disable-next-line no-console
+			console.warn( err );
+		}
 	}
 
 	replaceBlockAction( html, blockClientId ) {
