@@ -52,7 +52,7 @@ export default function DocumentActions() {
 		>
 			<span className="edit-site-document-actions__left"></span>
 			<HStack
-				spacing={ 2 }
+				spacing={ 1 }
 				justify="center"
 				className="edit-site-document-actions__title"
 			>
