@@ -93,6 +93,7 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
+require __DIR__ . '/compat/wordpress-6.3/behaviors.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
@@ -165,4 +166,3 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
-
