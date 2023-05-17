@@ -822,6 +822,7 @@ test.describe( 'Navigation block', () => {
 	} );
 } );
 
+// Interactivity tests
 test.describe( 'Navigation block - Frontend interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
