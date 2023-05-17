@@ -93,7 +93,7 @@ With `createInterpolateElement` and a translate `__` function call:
 With createInterpolateElement, without `__`:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
 					   { createInterpolateElement( 'This is an <a></a>.', {
 							   a: <a href="https://wordpress.org" />,
@@ -103,10 +103,10 @@ With createInterpolateElement, without `__`:
 		   };
 ```
 
-Without createInterpolateElement:
+Without `createInterpolateElement`:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
 					   This is an <a href="https://wordpress.org"></a>
 				   </div>
@@ -114,13 +114,13 @@ Without createInterpolateElement:
 		   };
 ```
 
-With custom components configured (works with and without createInterpolateElement)
+With custom components configured (works with and without `createInterpolateElement`)
 
 ```jsx
 // MyAnchor.js
-const MyAnchor = props => {
+const MyAnchor = ( props ) => {
   return (
-    <a {...props}>{ props.children }</a>
+    <a { ...props }>{ props.children }</a>
   );
 }
 
