@@ -1,9 +1,9 @@
 {
 	"version": 2,
+	"behaviors": {
+		"lightbox": true
+	},
 	"settings": {
-		"behaviors": {
-			"lightbox": true
-		},
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
 		"border": {
