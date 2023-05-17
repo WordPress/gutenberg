@@ -229,6 +229,18 @@ function LinkSettings( {
 		[ linkRelInputValue ]
 	);
 
+	const clearURLInput = () => {
+		setUrlInputValue( '' );
+	};
+
+	const clearLabelInput = () => {
+		setLabelInputValue( '' );
+	};
+
+	const clearLinkRelInput = () => {
+		setLinkRelInputValue( '' );
+	};
+
 	const onChangeLinkRel = useCallback( ( value ) => {
 		setLinkRelInputValue( value );
 	}, [] );
@@ -260,10 +272,12 @@ function LinkSettings( {
 						/>
 					) : (
 						<TextControl
+							displayClearButton={ true }
 							icon={ showIcon && link }
 							label={ options.url.label }
 							value={ urlInputValue }
 							valuePlaceholder={ options.url.placeholder }
+							onClear={ () => clearURLInput() }
 							onChange={ onChangeURL }
 							onSubmit={ onCloseSettingsSheet }
 							autoCapitalize="none"
@@ -277,9 +291,11 @@ function LinkSettings( {
 					) ) }
 				{ options.linkLabel && (
 					<TextControl
+						displayClearButton={ true }
 						label={ options.linkLabel.label }
 						value={ labelInputValue }
 						valuePlaceholder={ options.linkLabel.placeholder }
+						onClear={ () => clearLabelInput() }
 						onChange={ onChangeLabel }
 					/>
 				) }
@@ -295,10 +311,12 @@ function LinkSettings( {
 						) }
 						{ options.linkRel && (
 							<TextControl
+								displayClearButton={ true }
 								icon={ showIcon && LinkRelIcon }
 								label={ options.linkRel.label }
 								value={ linkRelInputValue }
 								valuePlaceholder={ options.linkRel.placeholder }
+								onClear={ () => clearLinkRelInput() }
 								onChange={ onChangeLinkRel }
 								onSubmit={ onCloseSettingsSheet }
 								autoCapitalize="none"

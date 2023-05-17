@@ -83,6 +83,10 @@ const LinkSettingsScreen = ( {
 		linkValues.isRemovingLink,
 	] );
 
+	const clearInput = () => {
+		setText( '' );
+	};
+
 	const clearFormat = ( { skipStateUpdates = false } = {} ) => {
 		onChange( { ...value, activeFormats: [] } );
 		if ( ! skipStateUpdates ) {
@@ -196,10 +200,12 @@ const LinkSettingsScreen = ( {
 					onPress={ onLinkCellPressed }
 				/>
 				<BottomSheet.Cell
+					displayClearButton={ true }
 					icon={ textColor }
 					label={ __( 'Link text' ) }
 					value={ text }
 					placeholder={ __( 'Add link text' ) }
+					onClear={ () => clearInput() }
 					onChangeValue={ setText }
 					onSubmit={ submit }
 					separatorType={ shouldShowLinkOptions ? undefined : 'none' }

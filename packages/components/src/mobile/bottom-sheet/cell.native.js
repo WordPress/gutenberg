@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
-import { check } from '@wordpress/icons';
+import { check, cancelCircleFilled, close } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -92,6 +92,7 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			displayClearButton,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -106,6 +107,7 @@ class BottomSheetCell extends Component {
 			valueStyle = {},
 			cellContainerStyle = {},
 			cellRowContainerStyle = {},
+			onClear,
 			onChangeValue,
 			onSubmit,
 			children,
@@ -187,6 +189,25 @@ class BottomSheetCell extends Component {
 			}
 		};
 
+		const clearButton = () => {
+			return (
+				<TouchableOpacity
+					onPress={ onClear }
+					style={ styles.clearIconContainer }
+					accessibilityLabel={ __( 'Clear Button' ) }
+					accessibilityHint={ __(
+						'Tap here to clear the value of the text input'
+					) }
+				>
+					<Icon
+						icon={ isIOS ? cancelCircleFilled : close }
+						fill={ iconStyleBase.color }
+						size={ 24 }
+					/>
+				</TouchableOpacity>
+			);
+		};
+
 		const separatorStyle = () => {
 			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
@@ -235,24 +256,27 @@ class BottomSheetCell extends Component {
 			// We also show the TextInput to display placeholder.
 			const shouldShowPlaceholder = isInteractive && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
-				<TextInput
-					ref={ ( c ) => ( this._valueTextInput = c ) }
-					numberOfLines={ 1 }
-					style={ finalStyle }
-					value={ value }
-					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
-					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
-					pointerEvents={
-						this.state.isEditingValue ? 'auto' : 'none'
-					}
-					onFocus={ startEditing }
-					onBlur={ finishEditing }
-					onSubmitEditing={ onSubmit }
-					keyboardType={ this.typeToKeyboardType( type, step ) }
-					{ ...valueProps }
-				/>
+				<View style={ styles.cellTextInputContainer }>
+					<TextInput
+						ref={ ( c ) => ( this._valueTextInput = c ) }
+						numberOfLines={ 1 }
+						style={ finalStyle }
+						value={ value }
+						placeholder={ valuePlaceholder }
+						placeholderTextColor={ '#87a6bc' }
+						onChangeText={ onChangeValue }
+						editable={ isValueEditable }
+						pointerEvents={
+							this.state.isEditingValue ? 'auto' : 'none'
+						}
+						onFocus={ startEditing }
+						onBlur={ finishEditing }
+						onSubmitEditing={ onSubmit }
+						keyboardType={ this.typeToKeyboardType( type, step ) }
+						{ ...valueProps }
+					/>
+					{ value !== '' && displayClearButton && clearButton() }
+				</View>
 			) : (
 				<Text
 					style={ { ...cellValueStyle, ...valueStyle } }
