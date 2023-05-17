@@ -5,6 +5,8 @@
 ### Internal
 
 -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
+-   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
+
 
 ## 24.0.0 (2023-05-10)
 
@@ -21,7 +23,6 @@
 
 -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
 -   `ToolbarItem`: Convert to TypeScript ([#49190](https://github.com/WordPress/gutenberg/pull/49190)).
--   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
 -   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
 -   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133)).
 
