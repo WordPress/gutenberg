@@ -105,7 +105,12 @@ const getInterpolatedNodeText = ( node ) => {
 	}
 	return text;
 };
-
+/**
+ * A wrapper around eslint-plugin/anchor-has-content to allow usage with `createInterpolateElement`
+ *
+ * @param {*} context https://eslint.org/docs/latest/extend/custom-rules#the-context-object
+ * @return {Object} the rule object
+ */
 const rule = function ( context ) {
 	return {
 		JSXOpeningElement: ( node ) => {
