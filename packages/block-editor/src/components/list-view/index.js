@@ -224,8 +224,8 @@ function ListViewComponent(
 		]
 	);
 
-	// If there are no blocks to show, do not render the list view.
-	if ( ! clientIdsTree.length ) {
+	// If there are no blocks to show and we're not showing the appender, do not render the list view.
+	if ( ! clientIdsTree.length && ! showAppender ) {
 		return null;
 	}
 
