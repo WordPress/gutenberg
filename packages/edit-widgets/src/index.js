@@ -9,7 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -51,7 +51,6 @@ const disabledBlocks = [
  */
 export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
-	const root = createRoot( target );
 
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
@@ -91,9 +90,7 @@ export function initializeEditor( id, settings ) {
 	// see: https://github.com/WordPress/gutenberg/issues/33097
 	setFreeformContentHandlerName( 'core/html' );
 
-	root.render( <Layout blockEditorSettings={ settings } /> );
-
-	return root;
+	render( <Layout blockEditorSettings={ settings } />, target );
 }
 
 /**

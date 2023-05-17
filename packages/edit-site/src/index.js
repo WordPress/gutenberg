@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
@@ -37,7 +37,6 @@ import App from './components/app';
  */
 export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
-	const root = createRoot( target );
 
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
@@ -90,9 +89,7 @@ export function initializeEditor( id, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render( <App /> );
-
-	return root;
+	render( <App />, target );
 }
 
 export function reinitializeEditor() {

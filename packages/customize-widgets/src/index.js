@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -91,12 +91,13 @@ export function initialize( editorName, blockEditorSettings ) {
 			}
 		} );
 
-		createRoot( container ).render(
+		render(
 			<CustomizeWidgets
 				api={ wp.customize }
 				sidebarControls={ sidebarControls }
 				blockEditorSettings={ blockEditorSettings }
-			/>
+			/>,
+			container
 		);
 	} );
 }
