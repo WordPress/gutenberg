@@ -5,7 +5,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { useState } from '@wordpress/elements';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
