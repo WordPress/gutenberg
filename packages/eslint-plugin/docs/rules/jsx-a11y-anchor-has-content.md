@@ -1,7 +1,7 @@
 # jsx-a11y-anchor-has-content
 
-This rule wraps around [eslint-plugin-jsx-a11y/anchor-has-content](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md), continuing to enforce the original rule unless createInterpolateElement is being used to render an anchor element
-In scenarios where an anchor is used through createInterpolateElement, this wrap-around rule identifies missing content in anchors for simple scenarios.
+This rule wraps around [jsx-a11y/anchor-has-content](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md), continuing to enforce the original rule unless `createInterpolateElement` is being used to render an anchor element.
+In scenarios where an anchor is used through `createInterpolateElement`, this wrap-around rule identifies missing content in anchors for simple scenarios.
 
 ## Rule details
 
