@@ -331,6 +331,9 @@ function normalizeFontSizes( fontSizes ) {
 		if ( fontSizes[ key ] ) {
 			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
 				( fontSizeObject ) => {
+					if ( ! fontSizeObject?.name ) {
+						fontSizeObject.name = fontSizeObject?.slug;
+					}
 					fontSizeObject.sizePx = getPxFromCssUnit(
 						fontSizeObject.size,
 						{
