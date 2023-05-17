@@ -13,6 +13,7 @@ import {
 	CheckboxControl,
 	__experimentalInputControl as InputControl,
 	Button,
+	SelectControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 
@@ -135,7 +136,7 @@ function GoogleFonts() {
 				</HStack>
 			) }
 
-			{ fonts && fonts.length >= 0 && (
+			{ ( fonts && fonts.length >= 0 && !fontSelected ) && (
 				<>
 					<HStack justify='flex-start' alignment='center'>
 						<HStack justify='flex-start'>
@@ -145,17 +146,17 @@ function GoogleFonts() {
 								label={ __( 'Search' ) }
 								onChange={ debouncedUpdateSearchInput }
 							/>
-						</HStack>
-						<HStack justify='flex-start'>
-							<Text>{ __( 'Categories:' ) }</Text>
-							{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
-								<Button
-									isPressed={ filters.category === category }
-									onClick={ () => handleCategoryFilter( category ) }
-								>
-									{ category }
-								</Button>
-							) ) }
+							<SelectControl
+								label={ __( 'Category' ) }
+								value={ filters.category }
+								onChange={ handleCategoryFilter }
+							>
+								{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
+									<option value={category}>
+										{ category }
+									</option>
+								) ) }
+							</SelectControl>
 						</HStack>
 					</HStack>
 
