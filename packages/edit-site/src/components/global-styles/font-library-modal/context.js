@@ -12,6 +12,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { getFontLibrary, getGoogleFonts, updateFontsLibrary } from './resolvers';
 import { unlock } from '../../../private-apis';
 import { DEMO_TEXT } from './constants';
+import { use } from '@wordpress/data';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 export const FontLibraryContext = createContext( {} );
@@ -22,15 +23,6 @@ function FontLibraryProvider( { children } ) {
 
 	const themeFonts = fontFamilies.theme || [];
 	const customFonts = fontFamilies.custom || [];
-
-	// // Fonts added by theme
-	// const [ { theme: themeFonts = [] } = baseFonts ] = useGlobalSetting( 'typography.fontFamilies', null, 'base' );
-	// // Active fonts ( global styles )
-	// const [ { custom: customFonts = [] } = baseFonts, setCustomFonts ] = useGlobalSetting( 'typography.fontFamilies', null, 'user' );
-
-	console.log("fontFamilies", fontFamilies);
-	console.log("themeFonts", themeFonts);
-	console.log("customFonts", customFonts);
 
 	// Library Fonts
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
@@ -54,32 +46,109 @@ function FontLibraryProvider( { children } ) {
 		} );
 		getGoogleFonts().then( ( { fontFamilies, categories } ) => {
 			setGoogleFonts( fontFamilies );
-			console.log("googleFonts", fontFamilies, "categories", categories);
 			setGoogleFontsCategories( categories );
 		} );
 	}, [] );
 
-	// Set used to check if a font is already installed on the Google Fonts Tab of the modal
-	const installedFontNames = useMemo( () => {
-		const names = new Set();
-		themeFonts.forEach( ( font ) => {
-			if ( font.name || font.fontFamily ) names.add( font.name || font.fontFamily );
-		} );
-		libraryFonts.forEach( ( font ) => {
-			if ( font.name || font.fontFamily ) names.add( font.name || font.fontFamily );
-		} );
-		return names;
-	}, [ themeFonts, libraryFonts ] );
-
-	
-	const addToLibrary = ( newFontFamily ) => {
-		return [ ...libraryFonts, newFontFamily ];
+	const getAvailableFontsOutline = ( fontFamilies ) => {
+		const outline = fontFamilies.reduce( ( acc, font ) => {
+				if ( !font.shouldBeRemoved ) {
+					const availableFontFaces = (font?.fontFace || []).reduce( (faces, face) => (
+						!face.shouldBeRemoved ? [...faces, face.fontStyle + face.fontWeight] : faces
+					), [] );
+					if ( availableFontFaces.length ) {
+						acc[ font.name ] = availableFontFaces;
+					}
+				}
+				return acc;
+			}
+		, {} );
+		return outline;
 	}
 
-    async function updateLibrary ( newLibrary ) {
-        const newFontFamilies = await updateFontsLibrary( newLibrary );
-		setLibraryFonts( newFontFamilies );
+	const installedFontsOutline = useMemo( () => {
+		return getAvailableFontsOutline( installedFonts );
+	}, [ installedFonts ] );
+
+	const isFontInstalled = ( name, style, weight ) => {
+		if (!style && !weight) {
+			return !!installedFontsOutline[ name ];
+		}
+		return installedFontsOutline[ name ]?.includes( style + weight );
+	}
+	
+    async function updateLibrary () {
+        const newLibraryFonts = await updateFontsLibrary( libraryFonts );
+		setLibraryFonts( newLibraryFonts );
     }
+
+	const toggleInstallFont = ( name, fontFace ) => {
+		console.log("libraryFonts", libraryFonts);
+		const libraryFont = libraryFonts.find( ( font ) => font.name === name );
+		const font = googleFonts.find( ( font ) => font.name === name );
+		let newLibraryFonts;
+		let newFontFaces;
+		
+		if ( !fontFace ) { // Entire font family
+			if ( libraryFont ){ // If the font is already installed
+				newLibraryFonts = libraryFonts.map( font => {
+					if ( font.name === name ) {
+						// This logic handles several sucesive install/remove calls for a font family in the client
+						const { shouldBeRemoved, fontFace: familyFaces, ...restFont } = font;
+						const newFont = {
+							...restFont,
+							fontFace: familyFaces.map( face => {
+								const { shouldBeRemoved, ...restFace } = face;
+								return { ...restFace, ...(!shouldBeRemoved ? { shouldBeRemoved: true } : {}) };
+							} ),
+							...(!shouldBeRemoved ? { shouldBeRemoved: true } : {}),
+						};
+						return newFont;
+					}
+					return font;
+				});
+			} else { // If the font is not installed
+				newLibraryFonts = [ ...libraryFonts, font ];
+			}
+
+		} else { // Single font variant
+			const libraryFontFace = (libraryFont?.fontFace || []).find( ( face ) => face.fontStyle === fontFace.fontStyle && face.fontWeight === fontFace.fontWeight );
+			
+			if ( !libraryFont ) { // If the font is not installed the fontface should be missing so we add it to the library
+				newLibraryFonts = [ ...libraryFonts, { ...font, fontFace: [ fontFace ] } ];
+			} else {
+				//If the font is already installed the fontface the font face could be installed or not
+				if ( libraryFontFace ) {
+					const { shouldBeRemoved, ...restFontFace } = libraryFontFace;
+					newFontFaces = libraryFont.fontFace.map( face => (
+						face.fontStyle === fontFace.fontStyle && face.fontWeight === fontFace.fontWeight
+						? { ...restFontFace, ...(!shouldBeRemoved ? { shouldBeRemoved: true } : {}) }
+						: face
+					));
+				} else {
+					newFontFaces = [ ...libraryFont.fontFace, fontFace ];
+				}
+				// Update the font face of a existing font
+				newLibraryFonts = libraryFonts.map( font => {
+					if ( font.name === name ) {
+						const { shouldBeRemoved, ...restFont } = font;
+						return {
+							...restFont,
+							fontFace: newFontFaces,
+							...(!shouldBeRemoved ? { shouldBeRemoved: true } : {})
+						};
+					}
+					return font;
+				});
+
+			}
+
+		}
+		console.log("newLibraryFonts", newLibraryFonts);
+		setLibraryFonts( newLibraryFonts );
+	}
+
+
 
 	const toggleActivateFont = ( name, style, weight ) => {
 		console.log("toggleActivateFont", name, style, weight);
@@ -121,9 +190,7 @@ function FontLibraryProvider( { children } ) {
 			// set the newFontFaces in the newCustomFonts
 			newCustomFonts = customFonts.map( font => font.name === name ? { ...font, fontFace: newFontFaces } : font);
 		}
-	
 
-		console.log("toggleActivateFont", newCustomFonts);
 		setFontFamilies( {
 			theme: themeFonts,
 			custom: newCustomFonts,
@@ -156,13 +223,13 @@ function FontLibraryProvider( { children } ) {
 				customFonts,
 				libraryFonts,
 				installedFonts,
-				installedFontNames,
+				isFontInstalled,
 				googleFonts,
 				googleFontsCategories,
 				loadFontFaceAsset,
-				addToLibrary,
                 updateLibrary,
 				toggleActivateFont,
+				toggleInstallFont,
 			} }
 		>
 			{ children }
