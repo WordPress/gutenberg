@@ -268,31 +268,27 @@ function UnforwardedColorPalette(
 										  }
 								}
 							/>
-							{
-								<VStack
-									className="components-color-palette__custom-color-text-wrapper"
-									spacing={ 0.5 }
+							<VStack
+								className="components-color-palette__custom-color-text-wrapper"
+								spacing={ 0.5 }
+							>
+								<Truncate className="components-color-palette__custom-color-name">
+									{ value
+										? buttonLabelName
+										: 'No color selected' }
+								</Truncate>
+								<Truncate
+									className={ classnames(
+										'components-color-palette__custom-color-value',
+										{
+											'components-color-palette__custom-color-value--is-hex':
+												displayValue?.startsWith( '#' ),
+										}
+									) }
 								>
-									<Truncate className="components-color-palette__custom-color-name">
-										{ value
-											? buttonLabelName
-											: 'No color selected' }
-									</Truncate>
-									<Truncate
-										className={ classnames(
-											'components-color-palette__custom-color-value',
-											{
-												'components-color-palette__custom-color-value--is-hex':
-													displayValue?.startsWith(
-														'#'
-													),
-											}
-										) }
-									>
-										{ displayValue }
-									</Truncate>
-								</VStack>
-							}
+									{ displayValue }
+								</Truncate>
+							</VStack>
 						</VStack>
 					) }
 				/>
