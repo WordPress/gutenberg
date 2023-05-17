@@ -133,6 +133,11 @@ const MainContent = ( {
 
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">
+			{ clientIdsTree.length === 0 && (
+				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
+					{ __( 'This navigation menu is empty.' ) }
+				</p>
+			) }
 			<PrivateListView
 				blocks={ clientIdsTree }
 				rootClientId={ clientId }
