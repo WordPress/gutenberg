@@ -181,7 +181,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		   };`,
 			errors: [
 				{
-					messageId: 'anchorHasContent',
+					messageId: 'anchorIsEmpty',
 				},
 			],
 		},
@@ -268,11 +268,11 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			`,
 			errors: [
 				{
-					messageId: 'anchorHasContent',
+					messageId: 'anchorIsEmpty',
 					data: { nodeType: 'CallExpression' },
 				},
 				{
-					messageId: 'anchorHasContent',
+					messageId: 'anchorIsEmpty',
 					data: { nodeType: 'Literal' },
 				},
 			],
@@ -303,7 +303,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			}`,
 			errors: [
 				{
-					messageId: 'anchorHasContent',
+					messageId: 'anchorIsEmpty',
 				},
 			],
 			options: [ { components: [ 'MyAnchor' ] } ],

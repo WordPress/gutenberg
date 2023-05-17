@@ -31,7 +31,7 @@ const meta = {
 	},
 	fixable: 'code',
 	messages: {
-		anchorHasContent:
+		anchorIsEmpty:
 			'Anchors must have content and the content must be accessible by a screen reader. Check the first parameter to createInterpolateElement.',
 		invalidMarkup:
 			'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
@@ -78,9 +78,10 @@ const validateAnchors = ( markup, tagNames ) => {
 };
 
 /**
+ * Get the content of the first parameter to `createInterpolateElement
  *
- * @param {Node} node the first param of createInterpolateElement
- * @return {string|null} a string of the content of the node
+ * @param {Node} node the first param of `createInterpolateElement`
+ * @return {string|null} the content of the element, or null if we can't verify it
  */
 const getInterpolatedNodeText = ( node ) => {
 	let text = null;
@@ -96,7 +97,7 @@ const getInterpolatedNodeText = ( node ) => {
 		// An unknown function call in a translate function may produce a valid string
 		// but verifying it is not straight-forward, so we bail
 		if ( args.filter( Boolean ).length === 0 ) {
-			text = null;
+			return null;
 		}
 		text = args.join( '' );
 	} else if ( node.type === 'Literal' ) {
@@ -146,7 +147,7 @@ const rule = function ( context ) {
 				validateAnchors( interpolatedText, typeCheck );
 			} catch ( e ) {
 				context.report( {
-					node: textParam,
+					node: interpolatedNode,
 					messageId: e.message,
 				} );
 			}
