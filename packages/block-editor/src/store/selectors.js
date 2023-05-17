@@ -2491,6 +2491,17 @@ export function getSettings( state ) {
 }
 
 /**
+ * Returns the behaviors.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor behaviors object.
+ */
+export function getBehaviors( state ) {
+	return state.settings.behaviors;
+}
+
+/**
  * Returns true if the most recent block change is be considered persistent, or
  * false otherwise. A persistent change is one committed by BlockEditorProvider
  * via its `onChange` callback, in addition to `onInput`.
