@@ -23,7 +23,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Valid anchor with text content`,
 			code: `
-			( ) => {
+			() => {
 				( <div>
 					   { createInterpolateElement( __( 'This is a <a> link </a>.' ), {
 							   a: <a href="https://wordpress.org" />,
