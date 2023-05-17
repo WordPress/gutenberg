@@ -90,7 +90,7 @@ With `createInterpolateElement` and a translate `__` function call:
 		   };
 ```
 
-With createInterpolateElement, without `__`:
+With `createInterpolateElement`, without `__`:
 
 ```jsx
 () => {
