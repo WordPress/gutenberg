@@ -5,6 +5,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalTruncate as Truncate,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -145,18 +146,21 @@ export default function SidebarNavigationScreenPages() {
 									</PageItem>
 								);
 							} ) }
-							{ dynamicPageTemplates?.map( ( item ) => (
-								<PageItem
-									postType="wp_template"
-									postId={ item.id }
-									key={ item.id }
-									icon={ layout }
-									withChevron
-								>
-									{ decodeEntities( item.title?.rendered ) ??
-										__( '(no title)' ) }
-								</PageItem>
-							) ) }
+							<VStack className="edit-site-sidebar-navigation-screen__sticky-section">
+								{ dynamicPageTemplates?.map( ( item ) => (
+									<PageItem
+										postType="wp_template"
+										postId={ item.id }
+										key={ item.id }
+										icon={ layout }
+										withChevron
+									>
+										{ decodeEntities(
+											item.title?.rendered
+										) ?? __( '(no title)' ) }
+									</PageItem>
+								) ) }
+							</VStack>
 							<SidebarNavigationItem
 								className="edit-site-sidebar-navigation-screen-pages__see-all"
 								href="edit.php?post_type=page"

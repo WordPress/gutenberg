@@ -2,3 +2,9 @@
 	/* Overrides the margin that comes from the Item component */
 	margin-top: $grid-unit-20 !important;
 }
+.edit-site-sidebar-navigation-screen__sticky-section.edit-site-sidebar-navigation-screen__sticky-section {
+	position: sticky;
+	bottom: 0;
+	background-color: $gray-900;
+	gap: 0;
+}
