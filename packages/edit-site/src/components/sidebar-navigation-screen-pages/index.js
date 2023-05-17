@@ -4,6 +4,7 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -134,10 +135,16 @@ export default function SidebarNavigationScreenPages() {
 										{ decodeEntities(
 											item.title?.rendered
 										) ?? __( '(no title)' ) }
-										{ pageIsFrontPage &&
-											__( ' (Front Page)' ) }
-										{ pageIsPostsPage &&
-											__( ' (Posts Page)' ) }
+										{ pageIsFrontPage && (
+											<Text className="edit-site-sidebar-navigation-item__type">
+												{ __( ' - Front Page' ) }
+											</Text>
+										) }
+										{ pageIsPostsPage && (
+											<Text className="edit-site-sidebar-navigation-item__type">
+												{ __( ' - Posts Page' ) }
+											</Text>
+										) }
 									</PageItem>
 								);
 							} ) }
