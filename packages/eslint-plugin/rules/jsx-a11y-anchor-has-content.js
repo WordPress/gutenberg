@@ -53,6 +53,7 @@ const meta = {
 };
 
 /**
+ * Get content of anchors - this can be from <a> or other tags that are configured in the eslint 'component' rules (e.g. <MyAnchor>)
  *
  * @param {*} tags     markup used in createInterpolateElement
  * @param {*} tagNames names that we recognize as anchors, as configured in the eslint rules
@@ -63,6 +64,7 @@ const getATagsContent = ( tags, tagNames ) => {
 	const regex = new RegExp( `<(${ tagText })>(.*?)</(${ tagText })>`, 'g' );
 	const tagParts = [ ...tags.matchAll( regex ) ];
 	return tagParts.map( ( element ) => {
+		// `<a> </a>` should not be valid, so we trim the content which would result in an empty string
 		return element[ 2 ].trim();
 	} );
 };
