@@ -48,19 +48,25 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 			if ( ! media ) {
 				return;
 			}
+			// Todo: Solve issue with multiple uploads in the replace flow.
+			if ( ! Array.isArray( media ) ) {
+				const currentIds = [ ...ids ];
+				media = [ ...currentIds, media ];
+			}
+
 			const trackList = media.map( ( track ) => ( {
-				id: track.id,
+				id: track.id ? track.id : track.url,
 				url: track.url,
 				title: track.title,
 				artist: track.artist,
 				album: track.album,
 				caption: track.caption,
 				length: track.fileLength,
-				image: track.image,
+				image: track.image ? track.image : '',
 			} ) );
 			setAttributes( { ids: trackList } );
 		},
-		[ setAttributes ]
+		[ ids, setAttributes ]
 	);
 
 	const onChangeTrack = useCallback( ( index ) => {
@@ -120,7 +126,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Edit' ) }
-					onSelect={ onSelectTracks }
+					onSelect={ ( value ) => onSelectTracks( value ) }
 					accept="audio/*"
 					addToPlaylist={ true } // Without this, the replace flow does not fetch all the audio file data.
 					mediaIds={ ids
@@ -175,7 +181,11 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 						<div className="wp-block-playlist__current-item">
 							{ images && (
 								<img
-									src={ ids[ trackListIndex ]?.image.src }
+									src={
+										ids[ trackListIndex ]?.image.src
+											? ids[ trackListIndex ]?.image.src
+											: '/wp-includes/images/media/audio.png'
+									}
 									width="48px"
 									height="64px"
 									alt=""
@@ -262,6 +272,8 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 									) }
 									data-playlist-track-image-src={
 										track.image.src
+											? track.image.src
+											: '/wp-includes/images/media/audio.png'
 									}
 									onClick={ () => onChangeTrack( index ) }
 								>
