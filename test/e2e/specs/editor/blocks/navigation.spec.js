@@ -616,7 +616,7 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			const submenuOptions = listView.getByRole( 'button', {
-				name: 'Options for Submenu block',
+				name: 'Options for Submenu',
 			} );
 
 			// Open the options menu.
@@ -626,7 +626,7 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const removeBlockOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Submenu block',
+					name: 'Options for Submenu',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Remove Top Level Item 2',
