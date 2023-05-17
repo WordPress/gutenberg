@@ -9,6 +9,7 @@
 	margin: 0 0 $grid-unit-20 0;
 	color: $gray-400;
 	padding: 0 $grid-unit-20;
+	flex-grow: 1;
 	.components-item-group {
 		margin-left: -$grid-unit-20;
 		margin-right: -$grid-unit-20;
@@ -30,9 +31,8 @@
 }
 
 .edit-site-sidebar-modified {
-	margin: 0 0 $grid-unit-20 0;
+	margin: 0 0 $grid-unit-40 $grid-unit-20;
 	color: $gray-600;
-	margin-left: $grid-unit-20;
 	.components-text {
 		color: $gray-600;
 	}
@@ -64,6 +64,8 @@
 	border-radius: 2px;
 	margin-bottom: $grid-unit-20;
 	display: block;
+	height: 128px;
+	background: $gray-800;
 	max-height: 128px;
 }
 

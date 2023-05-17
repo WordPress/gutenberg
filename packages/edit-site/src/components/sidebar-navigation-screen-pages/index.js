@@ -4,12 +4,15 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalText as Text,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { layout, page, home, loop, plus } from '@wordpress/icons';
+import { layout, page, home, loop, edit, settings } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -17,13 +20,15 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import SidebarButton from '../sidebar-button';
+import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postType,
 		postId,
+		backToPreviousScreen: true,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
@@ -67,11 +72,19 @@ export default function SidebarNavigationScreenPages() {
 	const isHomePageBlog = frontPage === postsPage;
 
 	if ( ! isHomePageBlog ) {
-		const homePageIndex = pagesAndTemplates?.findIndex(
+		const homePageIndex = pages?.findIndex(
 			( item ) => item.id === frontPage
 		);
 		const homePage = pages?.splice( homePageIndex, 1 );
 		pages?.splice( 0, 0, ...homePage );
+
+		const postsPageIndex = pages?.findIndex(
+			( item ) => item.id === postsPage
+		);
+
+		const blogPage = pages?.splice( postsPageIndex, 1 );
+
+		pages?.splice( 1, 0, ...blogPage );
 	}
 	const { setIsCreatePageModalOpened } = useDispatch( editSiteStore );
 
@@ -108,7 +121,6 @@ export default function SidebarNavigationScreenPages() {
 									postId={ homeTemplate.id }
 									key={ homeTemplate.id }
 									icon={ home }
-									withChevron
 								>
 									{ decodeEntities(
 										homeTemplate.title?.rendered
@@ -134,15 +146,20 @@ export default function SidebarNavigationScreenPages() {
 										postId={ item.id }
 										key={ item.id }
 										icon={ itemIcon }
-										withChevron
 									>
 										{ decodeEntities(
 											item.title?.rendered
 										) ?? __( '(no title)' ) }
-										{ pageIsFrontPage &&
-											__( ' (Front Page)' ) }
-										{ pageIsPostsPage &&
-											__( ' (Posts Page)' ) }
+										{ pageIsFrontPage && (
+											<Text className="edit-site-sidebar-navigation-item__type">
+												{ __( ' - Front Page' ) }
+											</Text>
+										) }
+										{ pageIsPostsPage && (
+											<Text className="edit-site-sidebar-navigation-item__type">
+												{ __( ' - Posts Page' ) }
+											</Text>
+										) }
 									</PageItem>
 								);
 							} ) }
@@ -152,7 +169,6 @@ export default function SidebarNavigationScreenPages() {
 									postId={ item.id }
 									key={ item.id }
 									icon={ layout }
-									withChevron
 								>
 									{ decodeEntities( item.title?.rendered ) ??
 										__( '(no title)' ) }
