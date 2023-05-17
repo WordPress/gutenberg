@@ -14,28 +14,26 @@
 	border-radius: 4px;
 	width: min(100%, 450px);
 
-	&:has(.edit-site-document-actions__title:hover) {
+	&:hover {
+		color: currentColor;
 		background: $gray-200;
-		.edit-site-document-actions__title > button {
-			color: inherit;
-		}
 	}
 }
 
 .edit-site-document-actions__title {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	color: currentColor;
 	flex-grow: 1;
+	color: var(--wp-block-synced-color);
 
-	> button {
-		width: 100%;
-		justify-content: center;
+	h1 {
+		color: var(--wp-block-synced-color);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 }
 
 .edit-site-document-actions__shortcut {
+	flex-shrink: 0;
 	color: $gray-700;
 	&:hover {
 		color: $gray-700;
@@ -44,4 +42,5 @@
 
 .edit-site-document-actions__left {
 	min-width: $button-size;
+	flex-shrink: 0;
 }

@@ -7,6 +7,7 @@ import {
 	Button,
 	VisuallyHidden,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
@@ -45,15 +46,18 @@ export default function DocumentActions() {
 	const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
 
 	return (
-		<div className="edit-site-document-actions">
+		<Button
+			className="edit-site-document-actions"
+			onClick={ () => openCommandCenter() }
+		>
 			<span className="edit-site-document-actions__left"></span>
-			<Text
-				size="body"
-				as="h1"
+			<HStack
+				spacing={ 2 }
+				justify="center"
 				className="edit-site-document-actions__title"
 			>
-				<Button onClick={ () => openCommandCenter() }>
-					<BlockIcon icon={ icon } />
+				<BlockIcon icon={ icon } />
+				<Text size="body" as="h1">
 					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
@@ -62,14 +66,11 @@ export default function DocumentActions() {
 						) }
 					</VisuallyHidden>
 					{ getTitle() }
-				</Button>
-			</Text>
-			<Button
-				className="edit-site-document-actions__shortcut"
-				onClick={ openCommandCenter }
-			>
+				</Text>
+			</HStack>
+			<span className="edit-site-document-actions__shortcut">
 				{ isMac ? '⌘' : 'Ctrl' } K
-			</Button>
-		</div>
+			</span>
+		</Button>
 	);
 }
