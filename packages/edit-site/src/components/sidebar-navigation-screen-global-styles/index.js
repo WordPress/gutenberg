@@ -58,14 +58,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		useDispatch( editSiteStore )
 	);
 
-	const { isStyleBookOpened } = useSelect( ( select ) => {
-		const { getEditorCanvasContainerView } = unlock(
-			select( editSiteStore )
-		);
-		return {
-			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
-		};
-	}, [] );
+	const isStyleBookOpened = useSelect(
+		( select ) =>
+			'style-book' ===
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 
 	const openGlobalStyles = async () =>
 		Promise.all( [
@@ -95,17 +93,13 @@ export default function SidebarNavigationScreenGlobalStyles() {
 							<SidebarButton
 								icon={ seen }
 								label={ __( 'Style Book' ) }
-								onClick={ async () => {
-									if ( ! isStyleBookOpened ) {
-										setEditorCanvasContainerView(
-											'style-book'
-										);
-									} else {
-										setEditorCanvasContainerView(
-											undefined
-										);
-									}
-								} }
+								onClick={ () =>
+									setEditorCanvasContainerView(
+										! isStyleBookOpened
+											? 'style-book'
+											: undefined
+									)
+								}
 								isPressed={ isStyleBookOpened }
 							/>
 						) }
