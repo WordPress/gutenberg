@@ -48,6 +48,7 @@ import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
+import { useIsEditorLoading } from './hooks';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -124,7 +125,6 @@ export default function Layout() {
 	return (
 		<>
 			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
-			<AddNewPageModal />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }

@@ -131,30 +131,6 @@ _Returns_
 
 -   `Object`: Settings.
 
-### isCreatePageModalOpened
-
-Returns the current opened/closed state of the create page modal.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: True if the create page modal should be open; false if closed.
-
-### hasPageContentLock
-
-Whether or not the editor is locked so that only page content can be edited.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether or not the editor is locked.
-
 ### isFeatureActive
 
 > **Deprecated**
@@ -197,22 +173,6 @@ _Returns_
 ### isNavigationOpened
 
 > **Deprecated**
-
-### isPage
-
-Whether or not the editor has a page loaded into it.
-
-_Related_
-
--   setPage
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -295,15 +255,6 @@ _Returns_
 ### setHomeTemplateId
 
 > **Deprecated**
-
-### setIsCreatePageModalOpened
-
-Sets whether the create new page modal is open
-
-_Parameters_
-
--   _isOpen_ `boolean`: If true, opens the create new page modal. If false, closes it. It does not toggle the state, but sets it directly.
--   _options_ `Object`: Options for the create new page modal.
 
 ### setIsInserterOpened
 
@@ -403,18 +354,6 @@ Dispatches an action that toggles a feature flag.
 _Parameters_
 
 -   _featureName_ `string`: Feature name.
-
-### togglePageContentLock
-
-Action that toggles whether or not the editor is locked so that only page content can be edited.
-
-_Parameters_
-
--   _hasPageContentLock_ `boolean`: True to enable lock, false to disable, or undefined to toggle.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### updateSettings
 

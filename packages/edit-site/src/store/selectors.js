@@ -297,17 +297,6 @@ export function getEditorMode( state ) {
 }
 
 /**
- * Returns the current opened/closed state of the create page modal.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} True if the create page modal should be open; false if closed.
- */
-export function isCreatePageModalOpened( state ) {
-	return state.createPageModal;
-}
-
-/**
  * @deprecated
  */
 export function getCurrentTemplateNavigationPanelSubMenu() {

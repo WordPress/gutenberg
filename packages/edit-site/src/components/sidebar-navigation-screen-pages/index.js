@@ -6,11 +6,13 @@ import {
 	__experimentalItem as Item,
 	__experimentalText as Text,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { layout, page, home, loop, plus } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -20,6 +22,10 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
+import AddNewPageModal from '../add-new-page';
+import { unlock } from '../../private-apis';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -83,108 +89,132 @@ export default function SidebarNavigationScreenPages() {
 
 		pages?.splice( 1, 0, ...blogPage );
 	}
-	const { setIsCreatePageModalOpened } = useDispatch( editSiteStore );
+
+	const [ showAddPage, setShowAddPage ] = useState( false );
+
+	const history = useHistory();
+	const { setPage } = unlock( useDispatch( editSiteStore ) );
+
+	const handleNewPage = ( { type, id } ) => {
+		setPage( {
+			context: { postType: type, postId: id },
+		} );
+		// Navigate to the created template editor.
+		history.push( {
+			postId: id,
+			postType: type,
+			canvas: 'edit',
+		} );
+		setShowAddPage( false );
+	};
 
 	return (
-		<SidebarNavigationScreen
-			title={ __( 'Pages' ) }
-			description={ __( 'Browse and edit pages on your site.' ) }
-			actions={
-				<SidebarButton
-					icon={ plus }
-					label={ __( 'Draft a new page' ) }
-					onClick={ () =>
-						setIsCreatePageModalOpened( true, {
-							redirectAfterSave: true,
-						} )
-					}
+		<>
+			{ showAddPage && (
+				<AddNewPageModal
+					onSave={ handleNewPage }
+					onCancel={ () => setShowAddPage( false ) }
 				/>
-			}
-			content={
-				<>
-					{ ( isLoadingPages || isLoadingTemplates ) && (
-						<ItemGroup>
-							<Item>{ __( 'Loading pages' ) }</Item>
-						</ItemGroup>
-					) }
-					{ ! ( isLoadingPages || isLoadingTemplates ) && (
-						<ItemGroup>
-							{ ! pagesAndTemplates?.length && (
-								<Item>{ __( 'No page found' ) }</Item>
-							) }
-							{ isHomePageBlog && homeTemplate && (
-								<PageItem
-									postType="wp_template"
-									postId={ homeTemplate.id }
-									key={ homeTemplate.id }
-									icon={ home }
-								>
-									{ decodeEntities(
-										homeTemplate.title?.rendered
-									) ?? __( '(no title)' ) }
-								</PageItem>
-							) }
-							{ pages?.map( ( item ) => {
-								const pageIsFrontPage = item.id === frontPage;
-								const pageIsPostsPage = item.id === postsPage;
-								let itemIcon;
-								switch ( item.id ) {
-									case frontPage:
-										itemIcon = home;
-										break;
-									case postsPage:
-										itemIcon = loop;
-										break;
-									default:
-										itemIcon = page;
-								}
-								return (
+			) }
+			<SidebarNavigationScreen
+				title={ __( 'Pages' ) }
+				description={ __( 'Browse and edit pages on your site.' ) }
+				actions={
+					<SidebarButton
+						icon={ plus }
+						label={ __( 'Draft a new page' ) }
+						onClick={ () => setShowAddPage( true ) }
+					/>
+				}
+				content={
+					<>
+						{ ( isLoadingPages || isLoadingTemplates ) && (
+							<ItemGroup>
+								<Item>{ __( 'Loading pages' ) }</Item>
+							</ItemGroup>
+						) }
+						{ ! ( isLoadingPages || isLoadingTemplates ) && (
+							<ItemGroup>
+								{ ! pagesAndTemplates?.length && (
+									<Item>{ __( 'No page found' ) }</Item>
+								) }
+								{ isHomePageBlog && homeTemplate && (
 									<PageItem
+										postType="wp_template"
+										postId={ homeTemplate.id }
+										key={ homeTemplate.id }
+										icon={ home }
+									>
+										{ decodeEntities(
+											homeTemplate.title?.rendered
+										) ?? __( '(no title)' ) }
+									</PageItem>
+								) }
+								{ pages?.map( ( item ) => {
+									const pageIsFrontPage =
+										item.id === frontPage;
+									const pageIsPostsPage =
+										item.id === postsPage;
+									let itemIcon;
+									switch ( item.id ) {
+										case frontPage:
+											itemIcon = home;
+											break;
+										case postsPage:
+											itemIcon = loop;
+											break;
+										default:
+											itemIcon = page;
+									}
+									return (
+										<PageItem
+											postId={ item.id }
+											key={ item.id }
+											icon={ itemIcon }
+										>
+											{ decodeEntities(
+												item.title?.rendered
+											) ?? __( '(no title)' ) }
+											{ pageIsFrontPage && (
+												<Text className="edit-site-sidebar-navigation-item__type">
+													{ __( ' - Front Page' ) }
+												</Text>
+											) }
+											{ pageIsPostsPage && (
+												<Text className="edit-site-sidebar-navigation-item__type">
+													{ __( ' - Posts Page' ) }
+												</Text>
+											) }
+										</PageItem>
+									);
+								} ) }
+								{ dynamicPageTemplates?.map( ( item ) => (
+									<PageItem
+										postType="wp_template"
 										postId={ item.id }
 										key={ item.id }
-										icon={ itemIcon }
+										icon={ layout }
 									>
 										{ decodeEntities(
 											item.title?.rendered
 										) ?? __( '(no title)' ) }
-										{ pageIsFrontPage && (
-											<Text className="edit-site-sidebar-navigation-item__type">
-												{ __( ' - Front Page' ) }
-											</Text>
-										) }
-										{ pageIsPostsPage && (
-											<Text className="edit-site-sidebar-navigation-item__type">
-												{ __( ' - Posts Page' ) }
-											</Text>
-										) }
 									</PageItem>
-								);
-							} ) }
-							{ dynamicPageTemplates?.map( ( item ) => (
-								<PageItem
-									postType="wp_template"
-									postId={ item.id }
-									key={ item.id }
-									icon={ layout }
+								) ) }
+								<SidebarNavigationItem
+									className="edit-site-sidebar-navigation-screen-pages__see-all"
+									href="edit.php?post_type=page"
+									onClick={ () => {
+										document.location =
+											'edit.php?post_type=page';
+									} }
 								>
-									{ decodeEntities( item.title?.rendered ) ??
-										__( '(no title)' ) }
-								</PageItem>
-							) ) }
-							<SidebarNavigationItem
-								className="edit-site-sidebar-navigation-screen-pages__see-all"
-								href="edit.php?post_type=page"
-								onClick={ () => {
-									document.location =
-										'edit.php?post_type=page';
-								} }
-							>
-								{ __( 'Manage all pages' ) }
-							</SidebarNavigationItem>
-						</ItemGroup>
-					) }
-				</>
-			}
-		/>
+									{ __( 'Manage all pages' ) }
+								</SidebarNavigationItem>
+							</ItemGroup>
+						) }
+					</>
+				}
+			/>
+		</>
 	);
 }
