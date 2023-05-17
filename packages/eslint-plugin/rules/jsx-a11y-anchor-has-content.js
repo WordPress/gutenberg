@@ -153,6 +153,10 @@ const rule = function ( context ) {
 			try {
 				validateAnchors( interpolatedText, typeCheck );
 			} catch ( e ) {
+				// if the error is not what we expect, something else went wrong and we should re-throw
+				if ( ! meta.messages.hasOwnProperty( e.message ) ) {
+					throw e;
+				}
 				context.report( {
 					node: interpolatedNode,
 					messageId: e.message,
