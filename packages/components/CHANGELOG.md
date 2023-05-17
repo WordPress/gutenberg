@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
+-   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
+
+
 ## 24.0.0 (2023-05-10)
 
 ### Breaking Changes

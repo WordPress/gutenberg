@@ -4,7 +4,7 @@
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { trash, backup } from '@wordpress/icons';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -16,7 +16,6 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { unlock } from '../../private-apis';
 
-const { useCommandLoader } = unlock( commandsPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function useEditModeCommandLoader() {

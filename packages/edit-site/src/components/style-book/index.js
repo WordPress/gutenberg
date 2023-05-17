@@ -192,7 +192,10 @@ function StyleBook( { isSelected, onSelect } ) {
 	);
 
 	return (
-		<EditorCanvasContainer closeButtonLabel={ __( 'Close Style Book' ) }>
+		<EditorCanvasContainer
+			enableResizing={ true }
+			closeButtonLabel={ __( 'Close Style Book' ) }
+		>
 			<div
 				className={ classnames( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
