@@ -924,6 +924,14 @@ class EditorPage {
 		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
 	}
 
+	async getListItemBlockTextInputAtPosition( position = 1 ) {
+		const blockLocator = isAndroid()
+			? `//android.widget.Button[@content-desc="List item Block. Row ${ position }"]//android.widget.EditText`
+			: `//XCUIElementTypeButton[contains(@name, "List item Block. Row ${ position }")]//XCUIElementTypeOther[2]//XCUIElementTypeTextView`;
+
+		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
+	}
+
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
