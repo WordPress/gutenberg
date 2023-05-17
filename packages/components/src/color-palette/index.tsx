@@ -220,9 +220,7 @@ function UnforwardedColorPalette(
 		</DropdownContentWrapper>
 	);
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
-	const displayValue = value?.startsWith( '#' )
-		? value
-		: value?.replace( /^var\((.+)\)$/, '$1' );
+	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
 	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
 				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
