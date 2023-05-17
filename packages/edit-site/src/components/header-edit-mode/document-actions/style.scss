@@ -35,6 +35,7 @@
 .edit-site-document-actions__shortcut {
 	flex-shrink: 0;
 	color: $gray-700;
+	width: #{$grid-unit * 4.5};
 	&:hover {
 		color: $gray-700;
 	}
