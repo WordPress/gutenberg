@@ -11,7 +11,7 @@ import type { DropdownProps } from '../dropdown/types';
 import type { Props as IconProps } from '../icon';
 import type { NavigableMenuProps } from '../navigable-container/types';
 
-type DropdownOption = {
+export type DropdownOption = {
 	/**
 	 * The Dashicon icon slug to be shown for the option.
 	 */
@@ -43,9 +43,6 @@ type DropdownOption = {
 	 */
 	role?: HTMLElement[ 'role' ];
 };
-
-export type Controls = DropdownOption[];
-export type NormalizedControls = DropdownOption[][];
 
 type DropdownCallbackProps = {
 	isOpen: boolean;
@@ -142,5 +139,5 @@ export type DropdownMenuProps = {
 	 *
 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
 	 */
-	controls?: Controls | NormalizedControls;
+	controls?: DropdownOption[] | DropdownOption[][];
 };

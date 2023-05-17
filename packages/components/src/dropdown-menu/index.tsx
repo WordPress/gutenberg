@@ -14,7 +14,7 @@ import { menu } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
-import type { Controls, DropdownMenuProps, NormalizedControls } from './types';
+import type { DropdownMenuProps, DropdownOption } from './types';
 
 function mergeProps<
 	T extends { className?: string; [ key: string ]: unknown }
@@ -139,7 +139,7 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets: NormalizedControls;
+	let controlSets: DropdownOption[][];
 	if ( controls?.length ) {
 		// @ts-expect-error The check below is needed because `DropdownMenus`
 		// rendered by `ToolBarGroup` receive controls as a nested array.
@@ -147,7 +147,7 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			// This is not ideal, but at this point we know that `controls` is
 			// not a nested array, even if TypeScript doesn't.
-			controlSets = [ controls as Controls ];
+			controlSets = [ controls as DropdownOption[] ];
 		}
 	}
 
