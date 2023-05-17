@@ -1,19 +1,69 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-400;
 	// 6px right padding to align with + button
-	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
+	height: 36px;
 	border: none;
 	min-height: $grid-unit-50;
 
-	svg {
-		color: $gray-600;
+	&.is-active {
+		background: var(--wp-admin-theme-color);
+		color: #fff;
+		.edit-site-sidebar-navigation-item__actions {
+			display: flex;
+			.components-button {
+				background: #fff;
+				color: var(--wp-admin-theme-color);
+				svg {
+					width: 20px;
+					height: 20px;
+				}
+				&.is-tertiary {
+					box-shadow: none;
+					color: rgba(255, 255, 255, 0.75);
+					background: rgba(255, 255, 255, 0.1);
+					&:hover {
+						background: rgba(255, 255, 255, 0.2);
+						color: rgba(255, 255, 255, 1);
+					}
+				}
+			}
+		}
 	}
 
-	&:hover,
-	&:focus,
-	&[aria-current] {
-		color: $white;
-		background: $gray-800;
+	.edit-site-sidebar-navigation-item__actions {
+		flex: 0 1 fit-content;
+		display: none;
+		.components-button {
+			color: #fff;
+			svg {
+				width: 20px;
+				height: 20px;
+			}
+			&.is-tertiary {
+				box-shadow: none;
+				background: rgba(255, 255, 255, 0.1);
+				color: $gray-600;
+				&:hover {
+					background: rgba(255, 255, 255, 0.2);
+					color: rgba(255, 255, 255, 1);
+				}
+			}
+		}
+	}
+
+	> svg {
+		color: $gray-600;
+	}
+	&:not(.is-active) {
+		&:hover,
+		&:focus,
+		&[aria-current] {
+			color: $white;
+			background: $gray-800;
+			.edit-site-sidebar-navigation-item__actions {
+				display: flex;
+			}
+		}
 	}
 
 	&[aria-current] {

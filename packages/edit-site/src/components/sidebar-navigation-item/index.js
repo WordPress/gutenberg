@@ -18,12 +18,16 @@ export default function SidebarNavigationItem( {
 	icon,
 	withChevron = false,
 	children,
+	actions,
+	linkInfo,
+	isActive,
 	...props
 } ) {
 	return (
 		<Item
 			className={ classnames(
 				'edit-site-sidebar-navigation-item',
+				{ 'is-active': isActive },
 				className
 			) }
 			{ ...props }
@@ -37,6 +41,12 @@ export default function SidebarNavigationItem( {
 					/>
 				) }
 				<FlexBlock>{ children }</FlexBlock>
+				<HStack
+					spacing={ 2 }
+					className="edit-site-sidebar-navigation-item__actions"
+				>
+					{ actions }
+				</HStack>
 				{ withChevron && (
 					<Icon
 						icon={ chevronRightSmall }
