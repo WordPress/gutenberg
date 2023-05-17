@@ -12,7 +12,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { getFontLibrary, getGoogleFonts, updateFontsLibrary } from './resolvers';
 import { unlock } from '../../../private-apis';
 import { DEMO_TEXT } from './constants';
-import { use } from '@wordpress/data';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 export const FontLibraryContext = createContext( {} );
@@ -33,8 +32,8 @@ function FontLibraryProvider( { children } ) {
 	), [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
-	const [ googleFonts, setGoogleFonts ] = useState( [] );
-	const [ googleFontsCategories, setGoogleFontsCategories ] = useState( [] );
+	const [ googleFonts, setGoogleFonts ] = useState( null );
+	const [ googleFontsCategories, setGoogleFontsCategories ] = useState( null );
 	
 	// Demo
 	const loadedFontUrls = new Set();
@@ -46,7 +45,7 @@ function FontLibraryProvider( { children } ) {
 		} );
 		getGoogleFonts().then( ( { fontFamilies, categories } ) => {
 			setGoogleFonts( fontFamilies );
-			setGoogleFontsCategories( categories );
+			setGoogleFontsCategories( ['all', ...categories] );
 		} );
 	}, [] );
 

@@ -11,8 +11,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	CheckboxControl,
+	__experimentalInputControl as InputControl,
 	Button,
 } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,6 +26,25 @@ import GoogleFontCard from './google-font-card';
 import GoolgeFontDetails from './google-font-details';
 import { useEffect } from 'react';
 
+const filterFonts = ( fonts, filters ) => {
+	const { category, search } = filters;
+	let filteredFonts = fonts || [];
+
+	if ( category && category !== 'all' ) {
+		filteredFonts = filteredFonts.filter( ( font ) =>
+			font.category === category
+		);
+	}
+
+	if ( search ) {
+		filteredFonts = filteredFonts.filter( ( font ) =>
+			font.name.toLowerCase().includes( search.toLowerCase() )
+		);
+	}
+	
+	return filteredFonts.slice(0,96);
+}
+
 function GoogleFonts() {
 	const {
 		libraryFonts,
@@ -33,6 +54,7 @@ function GoogleFonts() {
     } = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
 	const [ filters, setFilters ] = useState( {} );
+	
 
 	const [ initialLibraryFonts, setInitialLibraryFonts ] = useState( [] );
 	const [ hasChanges,setHasChanges ] = useState( false );
@@ -52,7 +74,7 @@ function GoogleFonts() {
 	}, [ libraryFonts ] );
 
 	useEffect( () => {
-		if ( googleFontsCategories.length > 0 ) {
+		if ( googleFontsCategories && googleFontsCategories.length > 0 ) {
 			setFilters( { category: googleFontsCategories[ 0 ] } );
 		}
 	}, [ googleFontsCategories ] );
@@ -66,12 +88,14 @@ function GoogleFonts() {
 		setFontSelected( null );
 	};
 
-	const fonts = googleFonts.reduce( ( acc, font ) => {
-				if ( filters.category === font.category ) {
-					return [...acc, font];
-				}
-				return acc;
-			}, [] );
+	const handleUpdateSearchInput = ( value ) => {
+		setFilters( { ...filters, search: value } );
+	};
+	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+
+	const fonts = useMemo( () => filterFonts( googleFonts, filters ), 
+		[googleFonts, filters]
+	);
 
 	const tabDescription = fontSelected
 		? __( `Select ${ fontSelected.name } variants you want to install` )
@@ -104,43 +128,59 @@ function GoogleFonts() {
 			handleBack={ !! fontSelected && handleUnselectFont }
 			footer={ <Footer /> }
 		>
-			
-
-			{ fonts.length === 0 && (
+			{ fonts === null && (
 				<HStack justify='flex-start'>
 					<Spinner />
 					<Text>{ __( 'Loading fonts...' ) }</Text>
 				</HStack>
 			) }
 
-			{ fonts.length > 0 && (
+			{ fonts && fonts.length >= 0 && (
+				<>
+					<HStack justify='flex-start' alignment='center'>
+						<HStack justify='flex-start'>
+							<InputControl
+								value={ filters.search }
+								placeholder={ __('Font name...') }
+								label={ __( 'Search' ) }
+								onChange={ debouncedUpdateSearchInput }
+							/>
+						</HStack>
+						<HStack justify='flex-start'>
+							<Text>{ __( 'Categories:' ) }</Text>
+							{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
+								<Button
+									isPressed={ filters.category === category }
+									onClick={ () => handleCategoryFilter( category ) }
+								>
+									{ category }
+								</Button>
+							) ) }
+						</HStack>
+					</HStack>
+
+					<Spacer margin={ 8 } />
+				</>
+			)}
+
+			{ fonts && fonts.length === 0 && (
+				<HStack justify='flex-start'>
+					<Text>{ __( 'No fonts found try another search term' ) }</Text>
+				</HStack>
+			)}
+
+			{ fonts && fonts.length > 0 && (
 				<>
 					{ ! fontSelected && (
-                        <>
-                            <HStack justify='flex-start'>
-                                <Text>{ __( 'Categories:' ) }</Text>
-                                { googleFontsCategories.map( ( category ) => (
-                                    <Button
-                                        isPressed={ filters.category === category }
-                                        onClick={ () => handleCategoryFilter( category ) }
-                                    >
-                                        { category }
-                                    </Button>
-                                ) ) }
-                            </HStack>
-
-                            <Spacer margin={ 8 } />
-                            
-                            <FontsGrid>
-                                { fonts.map( ( font ) => (
-                                    <GoogleFontCard
-                                        key={ font.name }
-                                        font={ font }
-                                        onClick={ handleSelectFont }
-                                    />
-                                ) ) }
-                            </FontsGrid>
-                        </>
+						<FontsGrid>
+							{ fonts.map( ( font ) => (
+								<GoogleFontCard
+									key={ font.name }
+									font={ font }
+									onClick={ handleSelectFont }
+								/>
+							) ) }
+						</FontsGrid>
 					) }
 
 					{ fontSelected && (
