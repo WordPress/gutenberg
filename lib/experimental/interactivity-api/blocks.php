@@ -7,6 +7,29 @@
  */
 
 /**
+ * Adds Interactivity API directives to the File block markup using the Tag Processor.
+ *
+ * @param string   $block_content Markup of the File block.
+ * @param array    $block         The full block, including name and attributes.
+ * @param WP_Block $instance      The block instance.
+ *
+ * @return string File block markup with the directives injected when applicable.
+ */
+function gutenberg_block_core_file_add_directives_to_content( $block_content, $block, $instance ) {
+	if ( empty( $instance->attributes['displayPreview'] ) ) {
+		return $block_content;
+	}
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$processor->next_tag();
+	$processor->set_attribute( 'data-wp-island', '' );
+	$processor->next_tag( 'object' );
+	$processor->set_attribute( 'data-wp-bind.hidden', 'selectors.core.file.hasNoPdfPreview' );
+	$processor->set_attribute( 'hidden', true );
+	return $processor->get_updated_html();
+}
+add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_to_content', 10, 3 );
+
+/**
  * Add Interactivity API directives to the navigation block markup using the Tag Processor
  * The final HTML of the navigation block will look similar to this:
  *
@@ -221,20 +244,20 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 
 add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 1 );
 
-// Enqueue the `interactivity.js` file with the store.
-add_filter(
-	'block_type_metadata',
-	function ( $metadata ) {
-		if ( 'core/navigation' === $metadata['name'] ) {
-			wp_register_script(
-				'wp-block-navigation-view',
-				gutenberg_url( 'build/block-library/interactive-blocks/navigation.min.js' ),
-				array( 'wp-interactivity-runtime' )
-			);
-			$metadata['viewScript'] = array( 'wp-block-navigation-view' );
-		}
-		return $metadata;
-	},
-	10,
-	1
-);
+/**
+ * Replaces view script for the File and Navigation blocks with version using Interactivity API.
+ *
+ * @param array $metadata Block metadata as read in via block.json.
+ *
+ * @return array Filtered block type metadata.
+ */
+function gutenberg_block_update_interactive_view_script( $metadata ) {
+	if (
+		in_array( $metadata['name'], array( 'core/file', 'core/navigation' ), true ) &&
+		str_contains( $metadata['file'], 'build/block-library/blocks' )
+	) {
+		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+	}
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_block_update_interactive_view_script', 10, 1 );

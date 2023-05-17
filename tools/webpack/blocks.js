@@ -220,16 +220,23 @@ module.exports = [
 		].filter( Boolean ),
 	},
 	{
+		...baseConfig,
+		watchOptions: {
+			aggregateTimeout: 200,
+		},
+		name: 'interactivity',
 		entry: {
+			file: './packages/block-library/src/file/interactivity.js',
 			navigation:
 				'./packages/block-library/src/navigation/interactivity.js',
 		},
 		output: {
 			devtoolNamespace: 'wp',
-			filename: './build/block-library/interactive-blocks/[name].min.js',
-			path: join( __dirname, '..', '..' ),
+			filename: './blocks/[name]/interactivity.min.js',
+			path: join( __dirname, '..', '..', 'build', 'block-library' ),
 		},
 		optimization: {
+			...baseConfig.optimization,
 			runtimeChunk: {
 				name: 'vendors',
 			},
@@ -238,12 +245,14 @@ module.exports = [
 					vendors: {
 						name: 'vendors',
 						test: /[\\/]node_modules[\\/]/,
+						filename: './interactivity/[name].min.js',
 						minSize: 0,
 						chunks: 'all',
 					},
-					interactivity: {
-						name: 'interactivity',
+					runtime: {
+						name: 'runtime',
 						test: /[\\/]utils\/interactivity[\\/]/,
+						filename: './interactivity/[name].min.js',
 						chunks: 'all',
 						minSize: 0,
 						priority: -10,
@@ -279,5 +288,12 @@ module.exports = [
 				},
 			],
 		},
+		plugins: [
+			...plugins,
+			new DependencyExtractionWebpackPlugin( {
+				__experimentalInjectInteractivityRuntime: true,
+				injectPolyfill: false,
+			} ),
+		].filter( Boolean ),
 	},
 ];
