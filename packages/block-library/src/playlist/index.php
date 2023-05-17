@@ -21,7 +21,7 @@ function render_block_core_playlist( $attributes ) {
 	$tracknumbers       = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
 	$images             = isset( $attributes['images'] ) ? $attributes['images'] : true;
 	$artists            = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
-	$tagname            = $attributes['tracknumbers'] ? 'ol' : 'ul';
+	$tagname            = $tracknumbers ? 'ol' : 'ul';
 	$current_id         = $attributes['ids'][0]['id']; // The current track is the first one in the list.
 	$current_title      = isset( $attributes['ids'][0]['title'] ) ? $attributes['ids'][0]['title'] : '';
 	$current_album      = isset( $attributes['ids'][0]['album'] ) ? $attributes['ids'][0]['album'] : '';
@@ -32,14 +32,14 @@ function render_block_core_playlist( $attributes ) {
 	if ( $current_title && $current_artist && $current_album ) {
 		$aria_label = sprintf(
 			/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-			_x( '%1$s by %2$s from the album %3$s','track title, artist name, album name' ),
+			_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
 			$current_title,
 			$current_artist,
 			$current_album
 		);
 	}
 
-	$html = '<figure ' . $wrapper_attributes . '>';
+	$html  = '<figure ' . $wrapper_attributes . '>';
 	$html .= '<div class="wp-block-playlist__current-item">';
 	if ( $images && isset( $attributes['ids'][0]['image']['src'] ) ) {
 		$html .= '<img src="' . esc_url( $attributes['ids'][0]['image']['src'] ) . '" alt="">';
@@ -64,19 +64,19 @@ function render_block_core_playlist( $attributes ) {
 	if ( $tracklist ) {
 		$html .= '<' . $tagname . ' class="wp-block-playlist__tracks">';
 		foreach ( $attributes['ids'] as $key => $value ) {
-			$url    = isset( $attributes['ids'][ $key ]['url']) ? $attributes['ids'][ $key ]['url'] : '';
-			$title  = isset( $attributes['ids'][ $key ]['title']) ? $attributes['ids'][ $key ]['title'] : '';
-			$artist = isset( $attributes['ids'][ $key ]['artist']) ? $attributes['ids'][ $key ]['artist'] : '';
-			$album  = isset( $attributes['ids'][ $key ]['album']) ? $attributes['ids'][ $key ]['album'] : '';
-			$image  = isset( $attributes['ids'][ $key ]['image']['src']) ? $attributes['ids'][ $key ]['image']['src'] : '';
-			$length = isset( $attributes['ids'][ $key ]['length']) ? $attributes['ids'][ $key ]['length'] : '';
+			$url    = isset( $attributes['ids'][ $key ]['url'] ) ? $attributes['ids'][ $key ]['url'] : '';
+			$title  = isset( $attributes['ids'][ $key ]['title'] ) ? $attributes['ids'][ $key ]['title'] : '';
+			$artist = isset( $attributes['ids'][ $key ]['artist'] ) ? $attributes['ids'][ $key ]['artist'] : '';
+			$album  = isset( $attributes['ids'][ $key ]['album'] ) ? $attributes['ids'][ $key ]['album'] : '';
+			$image  = isset( $attributes['ids'][ $key ]['image']['src'] ) ? $attributes['ids'][ $key ]['image']['src'] : '';
+			$length = isset( $attributes['ids'][ $key ]['length'] ) ? $attributes['ids'][ $key ]['length'] : '';
 
 			$html .= '<li class="wp-block-playlist__item">';
 			$html .= '<button';
 			if ( isset( $attributes['ids'][ $key ]['id'] ) && $attributes['ids'][ $key ]['id'] === $current_id ) {
 				$html .= ' aria-current="true"';
 			}
-			$html .=' data-playlist-track-url="' . esc_url( $url ) . '" .
+			$html .= ' data-playlist-track-url="' . esc_url( $url ) . '" .
 			data-playlist-track-title="' . esc_attr( $title ) . '" .
 			data-playlist-track-artist="' . esc_attr( $artist ) . '" .
 			data-playlist-track-album="' . esc_attr( $album ) . '" .
@@ -85,6 +85,7 @@ function render_block_core_playlist( $attributes ) {
 
 			/**
 			 * Use quotation marks for song titles when they are combined with the artist name,
+			 *
 			 * @see https://core.trac.wordpress.org/changeset/55251
 			*/
 			if ( $artists && $artist && $title ) {
