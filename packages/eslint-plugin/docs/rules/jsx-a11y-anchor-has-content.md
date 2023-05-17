@@ -5,7 +5,7 @@ In scenarios where an anchor is used through `createInterpolateElement`, this wr
 
 ## Rule details
 
-To use the optional object argument of type object (as in [eslint-plugin-jsx-a11y/anchor-has-content](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md)), configure it under the rule wrapper's name. See the [original documentation](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md) for other details.
+To use the optional object argument of type object (as in [jsx-a11y/anchor-has-content](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md)), configure it under the rule wrapper's name. See the [original documentation](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/anchor-has-content.md) for other details.
 
 ```json
 {
@@ -19,12 +19,12 @@ To use the optional object argument of type object (as in [eslint-plugin-jsx-a11
 
 ## Examples of correct usage
 
-With createInterpolateElement and a translate `__` function call:
+With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
-					   { createInterpolateElement( __( 'This is an <a> anchor with content </a>.' ), {
+					   { createInterpolateElement( __( 'This is an <a>anchor with content</a>.' ), {
 							   a: <a href="https://wordpress.org" />,
 					   } ) }
 				   </div>
@@ -32,12 +32,12 @@ With createInterpolateElement and a translate `__` function call:
 		   };
 ```
 
-With createInterpolateElement, without `__`:
+With `createInterpolateElement`, without `__`:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
-					   { createInterpolateElement( 'This is an <a> anchor with content </a>.', {
+					   { createInterpolateElement( 'This is an <a>anchor with content</a>.', {
 							   a: <a href="https://wordpress.org" />,
 					   } ) }
 				   </div>
