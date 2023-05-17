@@ -23,6 +23,7 @@
 .edit-site-document-actions__title {
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
+	overflow: hidden;
 
 	h1 {
 		color: var(--wp-block-synced-color);
