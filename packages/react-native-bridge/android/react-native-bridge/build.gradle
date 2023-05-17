@@ -14,11 +14,11 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 33
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
