@@ -378,7 +378,12 @@ export default function useListViewDropZone() {
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
-			( event, currentTarget ) => {
+			( event, currentTarget, action ) => {
+				if ( action === 'clear' ) {
+					setTarget( null );
+					return;
+				}
+
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 
@@ -433,6 +438,9 @@ export default function useListViewDropZone() {
 
 	const ref = useDropZone( {
 		onDrop: onBlockDrop,
+		onDragLeave( event ) {
+			throttled( event, event.currentTarget, 'clear' );
+		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -59,6 +64,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Object}         props                         Components props.
  * @param {string}         props.id                      An HTML element id for the root element of ListView.
  * @param {Array}          props.blocks                  _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {?string}        props.className               Optional class name to add to the TreeGrid element.
  * @param {?boolean}       props.showBlockMovers         Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded              Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender            Flag to show or hide the block appender. Defaults to `false`.
@@ -73,6 +79,7 @@ function ListViewComponent(
 	{
 		id,
 		blocks,
+		className,
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
@@ -237,7 +244,10 @@ function ListViewComponent(
 			/>
 			<TreeGrid
 				id={ id }
-				className="block-editor-list-view-tree"
+				className={ classNames(
+					'block-editor-list-view-tree',
+					className
+				) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }

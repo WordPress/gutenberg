@@ -83,6 +83,18 @@
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
 }
 
+.edit-post-editor__list-view-panel-content {
+	padding: 0;
+}
+
+.edit-post-editor__list-view-panel-content__list-view {
+	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
+	// Override the border collapse set by the TreeGrid table.
+	// This is so that the panel's height and padding can take effect.
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
 .edit-post-editor__list-view-empty-headings {
 	& > svg {
 		margin-top: $grid-unit-30 + $grid-unit-05;
