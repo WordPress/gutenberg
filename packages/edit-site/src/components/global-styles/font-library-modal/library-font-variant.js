@@ -16,6 +16,9 @@ function LibraryFontVariant ({ face, font }) {
     const { customFonts, toggleActivateFont } = useContext( FontLibraryContext );
 
     const isIstalled = () => {
+        if ( font.shouldBeRemoved ) {
+            return false;
+        }
         const activeFont = customFonts.find( family => family.name === font.name );
         if ( ! activeFont ) {
             return false;

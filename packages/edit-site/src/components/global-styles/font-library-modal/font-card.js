@@ -18,7 +18,7 @@ import FontFaceDemo from "./font-demo";
 
 
 
-function FontCard ( { font, onClick, actionHandler, demoText } ) {
+function FontCard ( { font, onClick, actionHandler } ) {
 
     const fakeFontFace = {
         fontStyle: 'normal',
@@ -31,17 +31,24 @@ function FontCard ( { font, onClick, actionHandler, demoText } ) {
         : fakeFontFace;
 
     const variantsCount = font.fontFace?.length || 1;
+
+    const style = {
+        cursor: !!onClick ? 'pointer' : 'default',
+        opacity: !!font.shouldBeRemoved ? 0.5 : 1,
+    };
     
     return (
-        <div onClick={ onClick }>
+        <div onClick={ onClick } style={ style } className="font-library-modal__font-card">
             <Card>
                 <CardBody>
-                    <VStack gap={3}>
+                    <VStack spacing={4}>
                         <HStack justify="space-between">
-                            <Text>{ font.name }</Text>
+                            <VStack spacing={1}>
+                                <Text className="font-library-modal__font-card__name">{ font.name }</Text>
+                                <Text className="font-library-modal__font-card__count">{variantsCount} { _n( "variant", "variants", variantsCount ) }</Text>
+                            </VStack>
                             { !!actionHandler && (actionHandler) }
                         </HStack>
-                        <Text>{variantsCount} { _n( "variant", "variants", variantsCount ) }</Text>
                         <FontFaceDemo fontFace={ displayFontFace } />
                     </VStack>
                 </CardBody>

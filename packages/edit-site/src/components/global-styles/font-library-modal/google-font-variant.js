@@ -12,21 +12,14 @@ import FontVariant from './font-variant';
 
 
 function GoogleFontVariant ({ font, fontFace }) {
-    const { installedFontNames, libraryFonts } = useContext( FontLibraryContext );
-
-    const isIstalled = () => {
-        const isFontInstalled = installedFontNames.has( font.name );
-        if ( ! isFontInstalled ) {
-            return false;
-        }
-        const libraryFont = libraryFonts.find( libFont => libFont.name === font.family || libFont.name === font.family );
-        return !!libraryFont?.fontFace.find( face => face.fontStyle === fontFace.fontStyle && face.fontWeight === fontFace.fontWeight );
-    }
-
+    const { isFontInstalled, toggleInstallFont } = useContext( FontLibraryContext );
+    const isInstalled = isFontInstalled( font.name, fontFace.fontStyle, fontFace.fontWeight );
     return (
         <FontVariant
             fontFace={ fontFace }         
-            checked={ isIstalled() }
+            checked={ isInstalled }
+            onClick={ () => toggleInstallFont( font.name, fontFace ) }
+            onChange={ () => {} }
         />
     );
 }

@@ -13,6 +13,7 @@ import {
 import GoogleFontVariant from './google-font-variant';
 
 function GoolgeFontDetails ({ font }) {
+    console.log("GoolgeFontDetails", font);
     return (
         <>
             <Spacer margin={ 8 } />

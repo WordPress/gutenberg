@@ -15,8 +15,6 @@ import { FontLibraryContext } from './context';
 
 
 function FontFaceDemo ( { fontFace, style={} } ) {
-
-    console.log("fontFace::::", fontFace);
     const ref = useRef(null);
     const [isIntersecting, setIsIntersecting] = useState(false);
     const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );

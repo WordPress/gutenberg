@@ -13,26 +13,34 @@ import { FontLibraryContext } from './context';
 
 
 function LibraryFontCard ({ font, onClick }) {
-    const { customFonts, toggleActivateFont, demoText } = useContext( FontLibraryContext );
+    const { customFonts, toggleActivateFont } = useContext( FontLibraryContext );
     const isActive = !!customFonts.find( family => family.name === font.name );
 
     const handleToggleFontActivation = () => {
-        console.log("handleActivateFont");
         toggleActivateFont( font.name );
     }
 
+    const handleClick = font.shouldBeRemoved
+        ? null
+        : () => { onClick( font.name ) };
+
+    const actionHandler = (
+        font.shouldBeRemoved
+        ? null
+        : (
+            <CheckboxControl
+                checked={ isActive }
+                onClick={ (e) => e.stopPropagation() }
+                onChange={ handleToggleFontActivation }
+            />
+        )
+    );
+
     return (
         <FontCard
-            onClick={ () => { onClick( font.name ) } }
+            onClick={ handleClick }
             font={ font }
-            demoText={ demoText }
-            actionHandler={
-                <CheckboxControl
-                    checked={ isActive }
-                    onClick={ (e) => e.stopPropagation() }
-                    onChange={ handleToggleFontActivation }
-                />
-            }
+            actionHandler={ actionHandler }
         />
     );
 }

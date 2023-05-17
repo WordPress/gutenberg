@@ -26,11 +26,30 @@ import { useEffect } from 'react';
 
 function GoogleFonts() {
 	const {
+		libraryFonts,
         googleFonts,
         googleFontsCategories,
+		updateLibrary,
     } = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
 	const [ filters, setFilters ] = useState( {} );
+
+	const [ initialLibraryFonts, setInitialLibraryFonts ] = useState( [] );
+	const [ hasChanges,setHasChanges ] = useState( false );
+	const [ isSaving, setIsSaving ] = useState( false );
+
+	useEffect( () => {
+		if( initialLibraryFonts.length === 0 && libraryFonts.length > 0 ){
+			setInitialLibraryFonts( libraryFonts );
+		}
+		
+		if (
+			initialLibraryFonts.length !== 0 &&
+			libraryFonts !== initialLibraryFonts
+		) {
+			setHasChanges( true );
+		}
+	}, [ libraryFonts ] );
 
 	useEffect( () => {
 		if ( googleFontsCategories.length > 0 ) {
@@ -62,11 +81,28 @@ function GoogleFonts() {
 		setFilters( { ...filters, category } );
 	};
 
+	const handleSaveChanges = async () => {
+		setIsSaving( true );
+		await updateLibrary();
+		setIsSaving( false );
+	};
+
+	const Footer = () => {
+		return (
+			<HStack justify="flex-end">
+				<Button variant="primary" onClick={ handleSaveChanges } disabled={ !hasChanges || isSaving }>
+					{ isSaving && <Spinner/> } { __("Save Installed Fonts") }
+				</Button>
+			</HStack>
+		);
+	}
+
 	return (
 		<TabLayout
 			title={ fontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! fontSelected && handleUnselectFont }
+			footer={ <Footer /> }
 		>
 			
 

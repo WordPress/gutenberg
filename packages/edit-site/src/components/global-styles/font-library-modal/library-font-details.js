@@ -8,6 +8,8 @@ import {
     __experimentalHStack as HStack,
     __experimentalVStack as VStack,
     __experimentalSpacer as Spacer,
+    __experimentalHeading as Heading,
+    __experimentalText as Text,
 } from '@wordpress/components';
 
 
@@ -20,22 +22,32 @@ import LibraryFontVariant from './library-font-variant';
 
 function LibraryFontDetails ({ font }) {
 
+    const { toggleInstallFont } = useContext( FontLibraryContext );
+
     const fontFaces = ( font.fontFace && font.fontFace.length )
         ? font.fontFace
         : [ { fontFamily: font.name, fontStyle: 'normal', fontWeight: 'normal' } ];
 
     return (
-        <>
-            <Spacer margin={ 8 } />
-            <VStack spacing={ 4 }>
-                { fontFaces.map( ( face, i ) => (
-                    <LibraryFontVariant
-                        font={ font }
-                        face={ face }
-                        key={`face${i}`}
-                    />
-                ) ) }
-            </VStack>
+        <>  
+            <HStack>
+                
+                <VStack spacing={ 4 }>
+                    <Spacer margin={ 8 } />
+                    { fontFaces.map( ( face, i ) => (
+                        <LibraryFontVariant
+                            font={ font }
+                            face={ face }
+                            key={`face${i}`}
+                        />
+                    ) ) }
+                </VStack>
+
+                <VStack spacing={ 4 }>
+                    <Button isDestructive onClick={ () => toggleInstallFont( font.name ) }>Delete Font</Button>
+                </VStack>
+
+            </HStack>
         </>
     );
 }
