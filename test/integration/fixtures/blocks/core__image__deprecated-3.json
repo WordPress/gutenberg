@@ -8,10 +8,7 @@
 			"alt": "",
 			"caption": "",
 			"width": 100,
-			"height": 100,
-			"behaviors": {
-				"lightbox": true
-			}
+			"height": 100
 		},
 		"innerBlocks": []
 	}

@@ -46,7 +46,7 @@ test.describe( 'Testing behaviors functionality', () => {
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( 'lightbox' );
+		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {

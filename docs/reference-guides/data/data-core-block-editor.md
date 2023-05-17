@@ -168,6 +168,18 @@ _Returns_
 
 -   `Array?`: The list of allowed block types.
 
+### getBehaviors
+
+Returns the behaviors.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: The editor behaviors object.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block, containing its `blockName`, `clientId`, and current `attributes` state. This is not the block's registration settings, which must be retrieved from the blocks module registration store.
