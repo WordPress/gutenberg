@@ -666,10 +666,12 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			// Click on the first menu item to open its settings.
-			const firstMenuItemAnchor = listView.getByRole( 'link', {
-				name: 'Top Level Item 1',
-				includeHidden: true,
-			} );
+			const firstMenuItemAnchor = listView
+				.getByRole( 'link', {
+					name: 'Page',
+					includeHidden: true,
+				} )
+				.getByText( 'Top Level Item 1' );
 			await firstMenuItemAnchor.click();
 
 			// Get the settings panel.
@@ -771,7 +773,7 @@ test.describe( 'Navigation block', () => {
 			const firstItemOptions = firstMenuItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} );
 
 			// Open the options menu.
@@ -782,7 +784,7 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const addSubmenuOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Add submenu',
@@ -1030,6 +1032,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Simple Submenu Link 1',
+				includeHidden: true,
 			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
