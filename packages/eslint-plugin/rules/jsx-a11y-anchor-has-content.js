@@ -121,8 +121,10 @@ const rule = function ( context ) {
 			const componentOptions = options.components || [];
 			const typeCheck = [ 'a' ].concat( componentOptions );
 			if (
-				typeCheck.filter( ( type ) => type === node?.name?.name )
-					.length === 0
+				// in theory we should never actually have a falsy value as a custom component option, but we do `&& type` just in case it happens
+				typeCheck.filter(
+					( type ) => type === node?.name?.name && type
+				).length === 0
 			) {
 				// bail - we only care about anchors and custom components configured through rules
 				return;
