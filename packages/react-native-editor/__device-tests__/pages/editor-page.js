@@ -502,11 +502,10 @@ class EditorPage {
 	async navigateUp() {
 		let navigateUpElements = [];
 		do {
-			await editorPage.driver.sleep( 2000 );
-			navigateUpElements =
-				await editorPage.driver.elementsByAccessibilityId(
-					'Navigate Up'
-				);
+			await this.driver.sleep( 2000 );
+			navigateUpElements = await this.driver.elementsByAccessibilityId(
+				'Navigate Up'
+			);
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
 			}
