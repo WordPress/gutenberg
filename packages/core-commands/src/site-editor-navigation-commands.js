@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -15,7 +15,6 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  */
 import { unlock } from './lock-unlock';
 
-const { useCommandLoader } = unlock( privateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
