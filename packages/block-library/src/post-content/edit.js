@@ -8,9 +8,12 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
@@ -37,7 +40,7 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	);
 }
 
-function EditableContent( { context = {}, clientId } ) {
+function EditableContent( { context = {} } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -46,12 +49,18 @@ function EditableContent( { context = {}, clientId } ) {
 		{ id: postId }
 	);
 
-	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlock( clientId )?.innerBlocks
-				.length > 0,
-		[ clientId ]
+	const entityRecord = useSelect(
+		( select ) => {
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ postType, postId ]
 	);
+
+	const hasInnerBlocks = !! entityRecord?.content?.raw;
 
 	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
 
@@ -125,7 +134,6 @@ function RecursionError() {
 export default function PostContentEdit( {
 	context,
 	attributes,
-	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
@@ -139,11 +147,7 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
-				<Content
-					context={ context }
-					layout={ layout }
-					clientId={ clientId }
-				/>
+				<Content context={ context } layout={ layout } />
 			) : (
 				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
