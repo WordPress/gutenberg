@@ -60,9 +60,9 @@ With custom components configured (works with and without `createInterpolateElem
 
 ```jsx
 // MyAnchor.js
-const MyAnchor = props => {
+const MyAnchor = ( props ) => {
   return (
-    <a {...props}>{ props.children }</a>
+    <a { ...props }>{ props.children }</a>
   );
 }
 
@@ -71,16 +71,16 @@ const MyAnchor = props => {
 // Something.js
 ...
 return (
-  <MyAnchor>This is valid content</Anchor>
+  <MyAnchor>This is valid content</MyAnchor>
 );
 ```
 
 ## Examples of incorrect usage
 
-With createInterpolateElement and a translate `__` function call:
+With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
 					   { createInterpolateElement( __( 'This is an <a></a>.' ), {
 							   a: <a href="https://wordpress.org" />,
