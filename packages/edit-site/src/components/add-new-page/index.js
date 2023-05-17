@@ -14,42 +14,20 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
 
 const DEFAULT_TITLE = __( 'Untitled page' );
 
-const { useHistory } = unlock( routerPrivateApis );
-
-export default function AddNewPageModal() {
+export default function AddNewPageModal( { onSave, onCancel } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 	const [ title, setTitle ] = useState( DEFAULT_TITLE );
 
-	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-
-	const { isCreatePageModalOpen } = useSelect( ( select ) => {
-		const { isCreatePageModalOpened } = unlock( select( editSiteStore ) );
-
-		return {
-			isCreatePageModalOpen: isCreatePageModalOpened(),
-		};
-	}, [] );
-
-	const { setIsCreatePageModalOpened } = useDispatch( editSiteStore );
-
-	const { setPage } = unlock( useDispatch( editSiteStore ) );
 
 	async function createPage( event ) {
 		event.preventDefault();
@@ -70,21 +48,7 @@ export default function AddNewPageModal() {
 				{ throwOnError: true }
 			);
 
-			if ( isCreatePageModalOpen.options?.redirectAfterSave ) {
-				// Set template before navigating away to avoid initial stale value.
-				setPage( {
-					context: { postType: 'page', postId: newPage.id },
-				} );
-				// Navigate to the created template editor.
-				history.push( {
-					postId: newPage.id,
-					postType: newPage.type,
-					canvas: 'edit',
-				} );
-			}
-
-			// Close the modal when complete
-			setIsCreatePageModalOpened( false, { redirectAfterSave: false } );
+			onSave( newPage );
 
 			createSuccessNotice(
 				sprintf(
@@ -110,14 +74,8 @@ export default function AddNewPageModal() {
 		}
 	}
 
-	const handleClose = () => {
-		setIsCreatePageModalOpened( false );
-	};
-
-	if ( ! isCreatePageModalOpen.isOpen ) return null;
-
 	return (
-		<Modal title="Draft a new page" onRequestClose={ handleClose }>
+		<Modal title="Draft a new page" onRequestClose={ onCancel }>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
@@ -127,7 +85,7 @@ export default function AddNewPageModal() {
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ handleClose }>
+						<Button variant="tertiary" onClick={ onCancel }>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
