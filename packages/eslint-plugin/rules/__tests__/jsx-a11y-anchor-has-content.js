@@ -34,11 +34,11 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 		{
-			name: `Valid anchor with text content and an extra attribute`,
+			name: `Valid anchor with text content with trailing spaces, and an extra attribute`,
 			code: `
 			() => {
 				( <div>
-					   { createInterpolateElement( __( 'help me <a>test with multiple words</a>.' ), {
+					   { createInterpolateElement( __( 'help me <a> test with multiple words</a>.' ), {
 							   a: <a href="https://example.com" target="_blank" />,
 					   } ) }
 				   </div>
@@ -51,6 +51,18 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			() => {
 				( <div>
 					   { createInterpolateElement( __( 'help me <a><TextWrapper /></a>.' ), {
+							   a: <a href="https://example.com" target="_blank" />,
+					   } ) }
+				   </div>
+			   )
+		   };`,
+		},
+		{
+			name: `Presumably valid anchor with a call to another function in the translation text (we bail).`,
+			code: `
+			() => {
+				( <div>
+					   { createInterpolateElement( __( callMe() ), {
 							   a: <a href="https://example.com" target="_blank" />,
 					   } ) }
 				   </div>
@@ -220,13 +232,28 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			],
 		},
 		{
+			name: `Anchor with a call to another function within a TemplateLiteral (we do not bail).`,
+			code: `
+			() => {
+				( <div>
+					{ createInterpolateElement( __( \`hello \${ hello }\` ), {a: <a href="https://example.com" target="_blank" />,} ) }
+					</div>
+				)
+			};`,
+			errors: [
+				{
+					messageId: 'invalidMarkup',
+				},
+			],
+		},
+		{
 			name: `3 custom components through createInterpolateElement, 2 have invalid anchors`,
 			code: `
 			import {
 				createInterpolateElement,
 			} from '@wordpress/element';
 			import { __ } from '@wordpress/i18n';
-			const failWithTranslate = () => {
+			const FailWithTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'My content is empty <a></a>.' ), {
@@ -235,23 +262,23 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			}
-			const okUsesWithTranslate = () => {
+			const OkUsesWithTranslate = () => {
 				return (
 					<div>
-						{ createInterpolateElement( __( 'This one anchor <a>has content</a>. <failWithTranslate/>' ), {
+						{ createInterpolateElement( __( 'This one anchor <a>has content</a>. <FailWithTranslate/>' ), {
 							a: <a href="hello.com"/>,
-							failWithTranslate: <failWithTranslate />
+							FailWithTranslate: <FailWithTranslate />
 						} ) }
 					</div>
 				)
 			};
 
-			const failWithoutTranslateTwoLevels = ( ) => {
+			const FailWithoutTranslateTwoLevels = ( ) => {
 				return (
 					<div>
 						{ createInterpolateElement(
-								'This one with <okUsesWithTranslate /> has an empty anchor <a></a>', {
-								okUsesWithTranslate: <okUsesWithTranslate />,
+								'This one with <OkUsesWithTranslate /> has an empty anchor <a></a>', {
+								OkUsesWithTranslate: <OkUsesWithTranslate />,
 								a: <a href="hello.com"/>,
 							} )
 						}
@@ -262,7 +289,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			export default function hello( {
 			} ) {
 				return (
-					<failWithoutTranslateTwoLevels></failWithoutTranslateTwoLevels>
+					<FailWithoutTranslateTwoLevels></FailWithoutTranslateTwoLevels>
 				);
 			}
 			`,
@@ -277,7 +304,6 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				},
 			],
 		},
-
 		{
 			name: `Empty anchor through custom component MyAnchor used in createInterpolateElement`,
 			code: `
