@@ -64,6 +64,25 @@ class WP_Fonts_Theme_Json_Handler
 		return $settings;
 	}
 
+	/**
+	 * Helper to get an array of the font-families.
+	 *
+	 * @param array $families_data The font-families data.
+	 * @return array The font-families array.
+	 */
+	private static function get_families( $families_data ) {
+		$families = array();
+		foreach ( $families_data as $family ) {
+			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $family );
+			$handle      = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
+			if ( ! empty( $handle ) ) {
+				$families[ $handle ] = true;
+			}
+		}
+
+		return ! empty( $families ) ? array_keys( $families ) : array();
+	}
+
 	private static function parse_font_families( array $settings )
 	{
 		$handles = array();
@@ -146,29 +165,10 @@ class WP_Fonts_Theme_Json_Handler
 			? $raw_data['settings']['typography']['fontFamilies']['theme']
 			: array();
 
-		/**
-		 * Helper to get an array of the font-families.
-		 *
-		 * @param array $families_data The font-families data.
-		 * @return array The font-families array.
-		 */
-		$get_families = static function ( $families_data ) {
-			$families = array();
-			foreach ( $families_data as $family ) {
-				$font_family = WP_Fonts_Utils::get_font_family_from_variation( $family );
-				$handle      = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
-				if ( ! empty( $handle ) ) {
-					$families[ $handle ] = true;
-				}
-			}
-
-			return ! empty( $families ) ? array_keys( $families ) : array();
-		};
-
 		// Find missing fonts that are not in the theme's theme.json.
 		$to_add = array();
 		if ( ! empty( $font_families_registered ) ) {
-			$to_add = array_diff( $font_families_registered, $get_families( $font_families_from_theme ) );
+			$to_add = array_diff( $font_families_registered, static::get_families( $font_families_from_theme ) );
 		}
 
 		// Bail out early if there are no missing fonts.
