@@ -25,7 +25,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			code: `
 			() => {
 				( <div>
-					   { createInterpolateElement( __( 'This is a <a> link </a>.' ), {
+					   { createInterpolateElement( __( 'This is a <a>link</a>.' ), {
 							   a: <a href="https://wordpress.org" />,
 					   } ) }
 				   </div>
@@ -36,9 +36,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Valid anchor with text content and an extra attribute`,
 			code: `
-			( ) => {
+			() => {
 				( <div>
-					   { createInterpolateElement( __( 'help me <a> test with multiple words </a>.' ), {
+					   { createInterpolateElement( __( 'help me <a>test with multiple words</a>.' ), {
 							   a: <a href="https://example.com" target="_blank" />,
 					   } ) }
 				   </div>
@@ -48,9 +48,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Valid anchor with a custom component as content.`,
 			code: `
-			( ) => {
+			() => {
 				( <div>
-					   { createInterpolateElement( __( 'help me <a> <TextWrapper /> </a>.' ), {
+					   { createInterpolateElement( __( 'help me <a><TextWrapper /></a>.' ), {
 							   a: <a href="https://example.com" target="_blank" />,
 					   } ) }
 				   </div>
@@ -60,9 +60,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Valid anchor without using createInterpolateElement`,
 			code: `
-			( ) => {
+			() => {
 				( <div>
-					   <a href="https://example.com"> test with multiple words </a>.
+					   <a href="https://example.com">test with multiple words</a>.
 				   </div>
 			   )
 		   };`,
@@ -70,7 +70,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Invalid code, but out of scope for this rule (caught by jsx-a11y/anchor-has-content)`,
 			code: `
-			const a = ( ) => {
+			const a = () => {
 				( <div>
 					{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {
 						a: <a target="_blank"/>,
@@ -82,7 +82,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Invalid usage of createInterpolateElement, ignored by the this rule`,
 			code: `
-			const a = ( ) => {
+			const a = () => {
 				( <div>
 					{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {} ) }
 				   </div>
@@ -96,7 +96,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				createInterpolateElement,
 			} from '@wordpress/element';
 			import { __ } from '@wordpress/i18n';
-			const withTranslate = ( ) => {
+			const withTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'I am a <a>good anchor</a>.' ), {
@@ -105,7 +105,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			}
-			const usesWithTranslate = ( ) => {
+			const usesWithTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'A <a>good anchor</a>. <withTranslate/>' ), {
@@ -116,7 +116,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				)
 			};
 
-			const withoutTranslateTwoLevels = ( ) => {
+			const withoutTranslateTwoLevels = () => {
 				return (
 					<div>
 						{ createInterpolateElement(
@@ -171,7 +171,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Empty anchor content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
-			const a = ( ) => {
+			const a = () => {
 				( <div>
 					{ createInterpolateElement( __( 'help me <a></a>.' ), {
 						a: <a href="https://example.com" />,
@@ -188,7 +188,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Invalid anchor markup, with empty content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
-			const a = ( ) => {
+			const a = () => {
 				( <div>
 					{ createInterpolateElement( __( 'help me <a>.' ), {
 						a: <a href="https://example.com" />,
@@ -205,7 +205,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		{
 			name: `Invalid anchor markup, with content (@wordpress/jsx-a11y-anchor-has-content)`,
 			code: `
-			const a = ( ) => {
+			const a = () => {
 				( <div>
 					{ createInterpolateElement( __( 'help me </a>ErrInvalidMarkup<a>.' ), {
 						a: <a href="https://example.com" />,
@@ -226,7 +226,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				createInterpolateElement,
 			} from '@wordpress/element';
 			import { __ } from '@wordpress/i18n';
-			const failWithTranslate = ( ) => {
+			const failWithTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'My content is empty <a></a>.' ), {
@@ -235,10 +235,10 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			}
-			const okUsesWithTranslate = ( ) => {
+			const okUsesWithTranslate = () => {
 				return (
 					<div>
-						{ createInterpolateElement( __( 'This one anchor <a> has content</a>. <failWithTranslate/>' ), {
+						{ createInterpolateElement( __( 'This one anchor <a>has content</a>. <failWithTranslate/>' ), {
 							a: <a href="hello.com"/>,
 							failWithTranslate: <failWithTranslate />
 						} ) }

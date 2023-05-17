@@ -25,8 +25,9 @@ const {
 const meta = {
 	type: 'problem',
 	docs: {
+		url: 'https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/jsx-a11y-anchor-has-content.md',
 		description:
-			'Checks that anchors are not empty and have an href, relies on eslint-plugin-jsx-a11y/anchor-has-content under the hood. Supports usage of createInterpolateElement.',
+			'Checks that anchors are not empty and have an href, relies on jsx-a11y/anchor-has-content under the hood. Supports usage of createInterpolateElement.',
 	},
 	fixable: 'code',
 	messages: {
