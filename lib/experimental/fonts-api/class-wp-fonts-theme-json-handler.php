@@ -15,35 +15,8 @@ class WP_Fonts_Theme_Json_Handler
 	 * Register fonts defined in theme.json.
 	 */
 	public static function register_fonts_from_theme_json() {
-		// Get settings.
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
-		// If in the editor, add webfonts defined in variations.
-		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-			$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
-
-			foreach ( $variations as $variation ) {
-
-				// Sanity check: Skip if fontFamilies are not defined in the variation.
-				if (
-					empty( $variation['settings'] ) ||
-					empty( $variation['settings']['typography'] ) ||
-					empty( $variation['settings']['typography']['fontFamilies'] )
-				) {
-					continue;
-				}
-
-				// Merge the variation settings with the global settings.
-				$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
-				$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
-				$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
-				$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
-
-				// Make sure there are no duplicates.
-				$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
-			}
-		}
-
+		$settings = static::get_settings();
 		// Bail out early if there are no settings for webfonts.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 			return;
@@ -53,6 +26,42 @@ class WP_Fonts_Theme_Json_Handler
 
 		wp_register_fonts( $fonts );
 		wp_enqueue_fonts( $handles );
+	}
+
+	private static function get_settings()
+	{
+		// Get settings.
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+
+		if ( ! is_admin() && ! (defined( 'REST_REQUEST' ) && REST_REQUEST )) {
+			return $settings;
+		}
+
+		// If in the editor, add webfonts defined in variations.
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+
+		foreach ( $variations as $variation ) {
+
+			// Sanity check: Skip if fontFamilies are not defined in the variation.
+			if (
+				empty( $variation['settings'] ) ||
+				empty( $variation['settings']['typography'] ) ||
+				empty( $variation['settings']['typography']['fontFamilies'] )
+			) {
+				continue;
+			}
+
+			// Merge the variation settings with the global settings.
+			$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
+			$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+			$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
+			$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+
+			// Make sure there are no duplicates.
+			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+		}
+
+		return $settings;
 	}
 
 	private static function parse_font_families( array $settings )
@@ -125,8 +134,8 @@ class WP_Fonts_Theme_Json_Handler
 	/**
 	 * Add missing fonts data to the global styles.
 	 *
-	 * @param array $data The global styles.
-	 * @return array The global styles with missing fonts data.
+	 * @param  WP_Theme_JSON_Gutenberg $data The global styles.
+	 * @return WP_Theme_JSON_Gutenberg       The global styles with missing fonts data.
 	 */
 	public static function add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
