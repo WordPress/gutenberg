@@ -45,18 +45,18 @@ With `createInterpolateElement`, without `__`:
 		   };
 ```
 
-Without createInterpolateElement:
+Without `createInterpolateElement`:
 
 ```jsx
-( ) => {
+() => {
 				( <div>
-					   This is an <a href="https://wordpress.org"> anchor with content </a>
+					   This is an <a href="https://wordpress.org">anchor with content</a>
 				   </div>
 			   )
 		   };
 ```
 
-With custom components configured (works with and without createInterpolateElement)
+With custom components configured (works with and without `createInterpolateElement`)
 
 ```jsx
 // MyAnchor.js
