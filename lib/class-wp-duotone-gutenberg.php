@@ -715,7 +715,7 @@ class WP_Duotone_Gutenberg {
 		if ( ! array_key_exists( $filter_id, self::$global_styles_presets ) ) {
 			$error_message = sprintf(
 				/* translators: %s: duotone filter ID */
-				__( 'The duotone id "%s" is not registered in theme.json settings' ),
+				__( 'The duotone id "%s" is not registered in theme.json settings', 'gutenberg' ),
 				$filter_id
 			);
 			trigger_error( $error_message );
