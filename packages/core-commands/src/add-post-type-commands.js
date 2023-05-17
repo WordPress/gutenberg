@@ -14,7 +14,7 @@ const { useCommand } = unlock( privateApis );
 
 export function useAddPostTypeCommands() {
 	useCommand( {
-		name: 'add new post',
+		name: 'core/add-new-post',
 		label: __( 'Add new post' ),
 		icon: plus,
 		callback: () => {
@@ -22,7 +22,7 @@ export function useAddPostTypeCommands() {
 		},
 	} );
 	useCommand( {
-		name: 'add new page',
+		name: 'core/add-new-page',
 		label: __( 'Add new page' ),
 		icon: plus,
 		callback: () => {

@@ -105,4 +105,27 @@ describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			);
 		} );
 	} );
+	describe( 'Slash inserter', () => {
+		it( 'uses the priority ordering if prioritzed blocks setting is set', async () => {
+			await insertBlock( 'Prioritized Inserter Blocks Set' );
+			await page.click( '[data-type="core/image"]' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( '/' );
+			// Wait for the results to display.
+			await page.waitForSelector( '.components-autocomplete__result' );
+			const inserterItemTitles = await page.evaluate( () => {
+				return Array.from(
+					document.querySelectorAll(
+						'.components-autocomplete__result'
+					)
+				).map( ( { innerText } ) => innerText );
+			} );
+			expect( inserterItemTitles ).toHaveLength( 9 ); // Default suggested blocks number.
+			expect( inserterItemTitles.slice( 0, 3 ) ).toEqual( [
+				'Audio',
+				'Spacer',
+				'Code',
+			] );
+		} );
+	} );
 } );

@@ -28,34 +28,34 @@ const icons = {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const supportsSearch = ! [
-			'wp_template',
-			'wp_template_part',
-			'page',
-		].includes( postType );
-		const deps = supportsSearch ? [ search ] : [];
-		const { records, isLoading } = useSelect( ( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const query = supportsSearch
-				? {
-						search: !! search ? search : undefined,
-						per_page: 10,
-						orderby: search ? 'relevance' : 'date',
-				  }
-				: {
-						per_page: -1,
-				  };
-			return {
-				records: getEntityRecords( 'postType', postType, query ),
-				isLoading: ! select( coreStore ).hasFinishedResolution(
-					'getEntityRecords',
-					[ 'postType', postType, query ]
-				),
-				// We're using the string literal to check whether we're in the site editor.
-				/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
-				isSiteEditor: !! select( 'edit-site' ),
-			};
-		}, deps );
+		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
+			postType
+		);
+		const { records, isLoading } = useSelect(
+			( select ) => {
+				const { getEntityRecords } = select( coreStore );
+				const query = supportsSearch
+					? {
+							search: !! search ? search : undefined,
+							per_page: 10,
+							orderby: search ? 'relevance' : 'date',
+					  }
+					: {
+							per_page: -1,
+					  };
+				return {
+					records: getEntityRecords( 'postType', postType, query ),
+					isLoading: ! select( coreStore ).hasFinishedResolution(
+						'getEntityRecords',
+						[ 'postType', postType, query ]
+					),
+					// We're using the string literal to check whether we're in the site editor.
+					/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
+					isSiteEditor: !! select( 'edit-site' ),
+				};
+			},
+			[ supportsSearch, search ]
+		);
 
 		const commands = useMemo( () => {
 			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
@@ -66,7 +66,8 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
 					: {};
 				return {
-					name: record.title?.rendered + ' ' + record.id,
+					name: postType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),
@@ -110,22 +111,18 @@ const useTemplatePartNavigationCommandLoader =
 export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
-		group: __( 'Pages' ),
 		hook: usePageNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-posts',
-		group: __( 'Posts' ),
 		hook: usePostNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
-		group: __( 'Templates' ),
 		hook: useTemplateNavigationCommandLoader,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',
-		group: __( 'Template Parts' ),
 		hook: useTemplatePartNavigationCommandLoader,
 	} );
 }

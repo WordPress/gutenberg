@@ -145,6 +145,7 @@ export default function BlockEditor() {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
+
 	const hasBlocks = blocks.length !== 0;
 	const enableResizing =
 		isTemplatePart &&
@@ -171,9 +172,7 @@ export default function BlockEditor() {
 				{ ( [ editorCanvasView ] ) =>
 					editorCanvasView ? (
 						<div className="edit-site-visual-editor is-focus-mode">
-							<ResizableEditor enableResizing>
-								{ editorCanvasView }
-							</ResizableEditor>
+							{ editorCanvasView }
 						</div>
 					) : (
 						<BlockTools
