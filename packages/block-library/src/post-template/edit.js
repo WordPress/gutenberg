@@ -12,12 +12,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
+	InspectorControls,
 	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner, ToolbarGroup } from '@wordpress/components';
+import { SelectControl, Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
 
@@ -27,12 +28,12 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function PostTemplateInnerBlocks( { tagName: TagName = 'li' } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-post' },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
-	return <li { ...innerBlocksProps } />;
+	return <TagName { ...innerBlocksProps } />;
 }
 
 function PostTemplateBlockPreview( {
@@ -40,6 +41,7 @@ function PostTemplateBlockPreview( {
 	blockContextId,
 	isHidden,
 	setActiveBlockContextId,
+	tagName: TagName = 'li',
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
@@ -57,7 +59,7 @@ function PostTemplateBlockPreview( {
 	};
 
 	return (
-		<li
+		<TagName
 			{ ...blockPreviewProps }
 			tabIndex={ 0 }
 			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
@@ -100,7 +102,7 @@ export default function PostTemplateEdit( {
 		templateSlug,
 		previewPostType,
 	},
-	attributes: { layout },
+	attributes: { layout, tagName: TagName = 'ul' },
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
@@ -273,8 +275,22 @@ export default function PostTemplateEdit( {
 			<BlockControls>
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Posts HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<ul>)' ), value: 'ul' },
+						{ label: '<div>', value: 'div' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorControls>
 
-			<ul { ...blockProps }>
+			<TagName { ...blockProps }>
 				{ blockContexts &&
 					blockContexts.map( ( blockContext ) => (
 						<BlockContextProvider
@@ -284,7 +300,9 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									tagName={ TagName === 'ul' ? 'li' : 'div' }
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
@@ -297,10 +315,11 @@ export default function PostTemplateEdit( {
 									( activeBlockContextId ||
 										blockContexts[ 0 ]?.postId )
 								}
+								tagName={ TagName === 'ul' ? 'li' : 'div' }
 							/>
 						</BlockContextProvider>
 					) ) }
-			</ul>
+			</TagName>
 		</>
 	);
 }

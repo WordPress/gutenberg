@@ -79,6 +79,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$classnames .= ' ' . sanitize_title( 'columns-' . $attributes['layout']['columnCount'] );
 	}
 
+	$wrapper_tag_name   = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'ul';
+	$item_tag_name      = 'ul' === $wrapper_tag_name ? 'li' : 'div';
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
 	$content = '';
@@ -107,9 +109,9 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
-		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
+		// Wrap the render inner blocks in a `li`or `div` element with the appropriate post classes.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
-		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+		$content     .= '<' . $item_tag_name . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</' . $item_tag_name . '>';
 	}
 
 	/*
@@ -120,7 +122,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	wp_reset_postdata();
 
 	return sprintf(
-		'<ul %1$s>%2$s</ul>',
+		'<%1$s %2$s>%3$s</%1$s>',
+		tag_escape( $wrapper_tag_name ),
 		$wrapper_attributes,
 		$content
 	);
