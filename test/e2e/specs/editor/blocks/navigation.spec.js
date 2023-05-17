@@ -483,7 +483,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -494,7 +494,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
@@ -505,7 +505,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
@@ -588,7 +588,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 3 of 3, Level 1', // proxy for filtering by description.
@@ -616,7 +616,7 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			const submenuOptions = listView.getByRole( 'button', {
-				name: 'Options for Submenu block',
+				name: 'Options for Submenu',
 			} );
 
 			// Open the options menu.
@@ -626,7 +626,7 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const removeBlockOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Submenu block',
+					name: 'Options for Submenu',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Remove Top Level Item 2',
@@ -638,7 +638,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
@@ -666,10 +666,12 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			// Click on the first menu item to open its settings.
-			const firstMenuItemAnchor = listView.getByRole( 'link', {
-				name: 'Top Level Item 1',
-				includeHidden: true,
-			} );
+			const firstMenuItemAnchor = listView
+				.getByRole( 'link', {
+					name: 'Page',
+					includeHidden: true,
+				} )
+				.getByText( 'Top Level Item 1' );
 			await firstMenuItemAnchor.click();
 
 			// Get the settings panel.
@@ -730,7 +732,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listViewPanel
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -761,7 +763,7 @@ test.describe( 'Navigation block', () => {
 			// click on options menu for the first menu item and select remove.
 			const firstMenuItem = listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link link',
+					name: 'Page Link',
 				} )
 				.filter( {
 					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -771,7 +773,7 @@ test.describe( 'Navigation block', () => {
 			const firstItemOptions = firstMenuItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} );
 
 			// Open the options menu.
@@ -782,10 +784,10 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const addSubmenuOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} )
 				.getByRole( 'menuitem', {
-					name: 'Add submenu link',
+					name: 'Add submenu',
 				} );
 
 			await addSubmenuOption.click();
@@ -798,7 +800,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Custom Link link',
+						name: 'Custom Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
@@ -811,7 +813,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -1030,6 +1032,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Simple Submenu Link 1',
+				includeHidden: true,
 			} );
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();

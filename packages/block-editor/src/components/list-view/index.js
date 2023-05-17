@@ -264,18 +264,23 @@ function ListViewComponent(
 		</AsyncModeProvider>
 	);
 }
+
+// This is the private API for the ListView component.
+// It allows access to all props, not just the public ones.
 export const PrivateListView = forwardRef( ListViewComponent );
 
+// This is the public API for the ListView component.
+// We wrap the PrivateListView component to hide some props from the public API.
 export default forwardRef( ( props, ref ) => {
 	return (
 		<PrivateListView
 			ref={ ref }
 			{ ...props }
 			showAppender={ false }
-			blockSettingsMenu={ BlockSettingsDropdown }
 			rootClientId={ null }
 			onSelect={ null }
-			renderAdditionalBlockUICallback={ null }
+			renderAdditionalBlockUI={ null }
+			blockSettingsMenu={ undefined }
 		/>
 	);
 } );
