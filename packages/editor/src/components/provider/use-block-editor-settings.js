@@ -194,6 +194,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			behaviors: settings.behaviors,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
