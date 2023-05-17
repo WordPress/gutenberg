@@ -148,7 +148,7 @@ A human-readable label to present as accessibility text on the focused collapsed
 
 #### `controls:` `DropdownOption[] | DropdownOption[][]`
 
-An array of objects describing the options to be shown in the expanded menu.
+An array or nested array of objects describing the options to be shown in the expanded menu.
 
 Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 

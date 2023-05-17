@@ -135,10 +135,10 @@ export type DropdownMenuProps = {
 	 */
 	children?: ( callbackProps: DropdownCallbackProps ) => ReactNode;
 	/**
-	 * An array of objects describing the options to be shown in the expanded
-	 * menu. Each object should include an `icon` Dashicon slug string, a
-	 * human-readable `title` string, `isDisabled` boolean flag, and an `onClick`
-	 * function callback to invoke when the option is selected.
+	 * An array or nested array of objects describing the options to be shown in
+	 * the expanded menu. Each object should include an `icon` Dashicon slug
+	 * string, a human-readable `title` string, `isDisabled` boolean flag, and
+	 * an `onClick` function callback to invoke when the option is selected.
 	 *
 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
 	 */
