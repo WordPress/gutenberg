@@ -25,6 +25,7 @@ function FontLibraryProvider( { children } ) {
 
 	// Library Fonts
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
+	const [ libraryFontsBackup, setLibraryFontsBackup ] = useState( [] );
 
 	// Installed fonts
 	const installedFonts = useMemo( () => (
@@ -42,6 +43,7 @@ function FontLibraryProvider( { children } ) {
 	useEffect( () => {
 		getFontLibrary().then( ( response ) => {
 			setLibraryFonts( response );
+			setLibraryFontsBackup( response );
 		} );
 		getGoogleFonts().then( ( { fontFamilies, categories } ) => {
 			setGoogleFonts( fontFamilies );
@@ -79,7 +81,12 @@ function FontLibraryProvider( { children } ) {
     async function updateLibrary () {
         const newLibraryFonts = await updateFontsLibrary( libraryFonts );
 		setLibraryFonts( newLibraryFonts );
+		setLibraryFontsBackup( newLibraryFonts );
     }
+
+	const discardLibraryFontsChanges = () => {
+		setLibraryFonts( libraryFontsBackup );
+	}
 
 	const toggleInstallFont = ( name, fontFace ) => {
 		console.log("libraryFonts", libraryFonts);
@@ -146,7 +153,6 @@ function FontLibraryProvider( { children } ) {
 		console.log("newLibraryFonts", newLibraryFonts);
 		setLibraryFonts( newLibraryFonts );
 	}
-
 
 
 	const toggleActivateFont = ( name, style, weight ) => {
@@ -229,6 +235,7 @@ function FontLibraryProvider( { children } ) {
                 updateLibrary,
 				toggleActivateFont,
 				toggleInstallFont,
+				discardLibraryFontsChanges
 			} }
 		>
 			{ children }
