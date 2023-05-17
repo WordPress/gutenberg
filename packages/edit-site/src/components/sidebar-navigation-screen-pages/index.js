@@ -5,12 +5,14 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalText as Text,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { layout, page, home, loop } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { layout, page, home, loop, edit, settings } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -18,14 +20,75 @@ import { useSelect } from '@wordpress/data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { params } = useLocation();
+
+	const { useHistory } = unlock( routerPrivateApis );
+	const history = useHistory();
 	const linkInfo = useLink( {
 		postType,
 		postId,
 		backToPreviousScreen: true,
 	} );
-	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+	const handleNavigationItemHover = ( event ) => {
+		event.stopPropagation();
+		history.replace( {
+			path: '/' + 'page',
+			postId,
+			postType: 'page',
+		} );
+	};
+
+	const handleInfoClick = ( event ) => {
+		event.stopPropagation();
+		history.push( {
+			postId,
+			postType: 'page',
+		} );
+	};
+
+	const handleEditClick = ( event ) => {
+		event.stopPropagation();
+		setCanvasMode( 'edit' );
+		history.push( {
+			postId,
+			postType: 'page',
+		} );
+	};
+
+	console.log( 'params:', params, postId );
+
+	return (
+		<SidebarNavigationItem
+			onClick={ handleNavigationItemHover }
+			onFocus={ handleNavigationItemHover }
+			linkInfo={ linkInfo }
+			isActive={ params.postId === String( postId ) }
+			actions={
+				<>
+					<Button
+						isSmall
+						variant="tertiary"
+						icon={ settings }
+						onClick={ handleInfoClick }
+					/>
+					<Button
+						isSmall
+						variant="primary"
+						icon={ edit }
+						onClick={ handleEditClick }
+					/>
+				</>
+			}
+			{ ...props }
+		/>
+	);
 };
 
 export default function SidebarNavigationScreenPages() {
@@ -104,7 +167,6 @@ export default function SidebarNavigationScreenPages() {
 									postId={ homeTemplate.id }
 									key={ homeTemplate.id }
 									icon={ home }
-									withChevron
 								>
 									{ decodeEntities(
 										homeTemplate.title?.rendered
@@ -130,7 +192,6 @@ export default function SidebarNavigationScreenPages() {
 										postId={ item.id }
 										key={ item.id }
 										icon={ itemIcon }
-										withChevron
 									>
 										{ decodeEntities(
 											item.title?.rendered
@@ -154,7 +215,6 @@ export default function SidebarNavigationScreenPages() {
 									postId={ item.id }
 									key={ item.id }
 									icon={ layout }
-									withChevron
 								>
 									{ decodeEntities( item.title?.rendered ) ??
 										__( '(no title)' ) }
