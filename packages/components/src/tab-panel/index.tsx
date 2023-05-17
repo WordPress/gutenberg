@@ -88,7 +88,6 @@ const UnforwardedTabPanel = (
 		orientation = 'horizontal',
 		activeClass = 'is-active',
 		onSelect,
-		itemRef,
 	}: WordPressComponentProps< TabPanelProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) => {
@@ -196,7 +195,6 @@ const UnforwardedTabPanel = (
 					role="tabpanel"
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
-					ref={ itemRef || undefined }
 				>
 					{ children( selectedTab ) }
 				</div>
