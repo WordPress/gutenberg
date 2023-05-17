@@ -51,20 +51,6 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 }
 
-function GlobalStylesStyleBook( { onClick, onSelect } ) {
-	return (
-		<StyleBook
-			isSelected={ () => false }
-			onClick={ onClick }
-			onSelect={ async ( blockName ) => {
-				await onSelect( blockName );
-			} }
-			showCloseButton={ false }
-			showTabs={ false }
-		/>
-	);
-}
-
 export default function SidebarNavigationScreenGlobalStyles() {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -87,11 +73,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
 
-	const openStyleBook = async ( event ) => {
-		if ( event.defaultPrevented ) {
-			return;
-		}
-		event.preventDefault();
+	const openStyleBook = async () => {
 		await openGlobalStyles();
 		// Open the Style Book once the canvas mode is set to edit,
 		// and the global styles sidebar is open. This ensures that
@@ -136,9 +118,13 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				}
 			/>
 			{ isStyleBookOpened && ! isMobileViewport && (
-				<GlobalStylesStyleBook
+				<StyleBook
+					enableResizing={ false }
+					isSelected={ () => false }
 					onClick={ openStyleBook }
 					onSelect={ openStyleBook }
+					showCloseButton={ false }
+					showTabs={ false }
 				/>
 			) }
 		</>

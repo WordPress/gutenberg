@@ -164,6 +164,7 @@ function getExamples() {
 }
 
 function StyleBook( {
+	enableResizing = true,
 	isSelected,
 	onClick,
 	onSelect,
@@ -201,7 +202,7 @@ function StyleBook( {
 
 	return (
 		<EditorCanvasContainer
-			enableResizing={ true }
+			enableResizing={ enableResizing }
 			closeButtonLabel={
 				showCloseButton ? __( 'Close Style Book' ) : null
 			}
@@ -261,21 +262,28 @@ const StyleBookBody = ( {
 } ) => {
 	const [ isFocused, setIsFocused ] = useState( false );
 
-	// The presence of an `onClick` prop indicates that the Style Book is being used
-	// as a button. In this case, we need to add additional props to the iframe to
-	// make it behave like a button.
+	// The presence of an `onClick` prop indicates that the Style Book is being used as a button.
+	// In this case, add additional props to the iframe to make it behave like a button.
 	const buttonModeProps = {
 		role: 'button',
 		onFocus: () => setIsFocused( true ),
 		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
 			const { keyCode } = event;
 			if ( onClick && ( keyCode === ENTER || keyCode === SPACE ) ) {
+				event.preventDefault();
 				onClick( event );
 			}
 		},
 		onClick: ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
 			if ( onClick ) {
+				event.preventDefault();
 				onClick( event );
 			}
 		},
