@@ -129,6 +129,6 @@ const MyAnchor = props => {
 // Something.js - empty content
 ...
 return (
-  <MyAnchor></Anchor>
+  <MyAnchor></MyAnchor>
 );
 ```
