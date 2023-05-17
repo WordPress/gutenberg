@@ -5,13 +5,11 @@ import { store } from '../utils/interactivity';
 import { browserSupportsPdfs } from './utils';
 
 store( {
-	effects: {
+	selectors: {
 		core: {
 			file: {
-				init( { ref } ) {
-					if ( browserSupportsPdfs() ) {
-						ref.removeAttribute( 'hidden' );
-					}
+				hasNoPdfPreview() {
+					return ! browserSupportsPdfs();
 				},
 			},
 		},
