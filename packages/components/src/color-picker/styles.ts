@@ -30,7 +30,7 @@ export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
 	width: 5em;
 	${ BackdropUI } {
-		display: none;
+		display: flex;
 	}
 `;
 
