@@ -96,7 +96,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				createInterpolateElement,
 			} from '@wordpress/element';
 			import { __ } from '@wordpress/i18n';
-			const withTranslate = () => {
+			const WithTranslate = ( ) => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'I am a <a>good anchor</a>.' ), {
@@ -105,23 +105,23 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			}
-			const usesWithTranslate = () => {
+			const UsesWithTranslate = ( ) => {
 				return (
 					<div>
-						{ createInterpolateElement( __( 'A <a>good anchor</a>. <withTranslate/>' ), {
+						{ createInterpolateElement( __( 'A <a>good anchor</a>. <WithTranslate/>' ), {
 							a: <a href="example.com"/>,
-							withTranslate: <withTranslate />
+							WithTranslate: <WithTranslate />
 						} ) }
 					</div>
 				)
 			};
 
-			const withoutTranslateTwoLevels = () => {
+			const WithoutTranslateTwoLevels = ( ) => {
 				return (
 					<div>
 						{ createInterpolateElement(
-								'I have <usesWithTranslate />. And <a>Non empty anchor</a>', {
-								usesWithTranslate: <usesWithTranslate />,
+								'I have <UsesWithTranslate />. And <a>Non empty anchor</a>', {
+								UsesWithTranslate: <UsesWithTranslate />,
 								a: <a href="hello.com"/>,
 							} )
 						}
@@ -132,7 +132,7 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			export default function hello( {
 			} ) {
 				return (
-					<withoutTranslateTwoLevels></withoutTranslateTwoLevels>
+					<WithoutTranslateTwoLevels></WithoutTranslateTwoLevels>
 				);
 			}
 			`,
