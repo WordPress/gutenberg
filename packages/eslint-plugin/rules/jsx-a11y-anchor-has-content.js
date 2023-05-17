@@ -12,6 +12,7 @@
 const anchorRule = require( 'eslint-plugin-jsx-a11y' ).rules[
 	'anchor-has-content'
 ];
+
 /**
  * Internal dependencies
  */
@@ -53,20 +54,27 @@ const meta = {
 };
 
 /**
+ *
  * Get content of anchors - this can be from <a> or other tags that are configured in the eslint 'component' rules (e.g. <MyAnchor>)
  *
- * @param {*} tags     markup used in createInterpolateElement
- * @param {*} tagNames names that we recognize as anchors, as configured in the eslint rules
- * @return {Array} tagNames an array of the content of the <a> (or other) tags
+ * @param {string} markup   markup used in createInterpolateElement
+ * @param {string} tagNames names that we recognize as anchors, as configured in the eslint rules
+ * @throws Error              an error if the markup does not contain a valid anchor or is empty
  */
-const getATagsContent = ( tags, tagNames ) => {
+const validateAnchors = ( markup, tagNames ) => {
 	const tagText = tagNames.join( '|' );
 	const regex = new RegExp( `<(${ tagText })>(.*?)</(${ tagText })>`, 'g' );
-	const tagParts = [ ...tags.matchAll( regex ) ];
-	return tagParts.map( ( element ) => {
+	const tagParts = [ ...markup.matchAll( regex ) ];
+	// if the string does not contain a valid anchor,
+	// we need to report an error like anchor-has-content does.
+	tagParts.forEach( ( element ) => {
 		// `<a> </a>` should not be valid, so we trim the content which would result in an empty string
-		return element[ 2 ].trim();
+		const contentIsEmpty = element[ 2 ].trim() === '';
+		if ( contentIsEmpty ) throw new Error( 'anchorIsEmpty' );
 	} );
+	// If the string does not contain a valid anchor,
+	// we need to report an error like anchor-has-content does.
+	if ( tagParts.length === 0 ) throw new Error( 'invalidMarkup' );
 };
 
 /**
@@ -74,8 +82,8 @@ const getATagsContent = ( tags, tagNames ) => {
  * @param {Node} node the first param of createInterpolateElement
  * @return {string|null} a string of the content of the node
  */
-const getValueFromInterpolateElement = ( node ) => {
-	let nodeStr = null;
+const getInterpolatedNodeText = ( node ) => {
+	let text = null;
 	let args = [];
 	if ( node.type === 'CallExpression' ) {
 		const argFunctionName = getTranslateFunctionName( node.callee );
@@ -88,13 +96,13 @@ const getValueFromInterpolateElement = ( node ) => {
 		// An unknown function call in a translate function may produce a valid string
 		// but verifying it is not straight-forward, so we bail
 		if ( args.filter( Boolean ).length === 0 ) {
-			nodeStr = null;
+			text = null;
 		}
-		nodeStr = args.join( '' );
+		text = args.join( '' );
 	} else if ( node.type === 'Literal' ) {
-		nodeStr = getTextContentFromNode( node );
+		text = getTextContentFromNode( node );
 	}
-	return nodeStr;
+	return text;
 };
 
 const rule = function ( context ) {
@@ -114,7 +122,7 @@ const rule = function ( context ) {
 				return;
 			}
 
-			const interpolatedEl = context
+			const interpolatedNode = context
 				.getAncestors()
 				.find(
 					( n ) =>
@@ -122,35 +130,24 @@ const rule = function ( context ) {
 						n.callee.name === 'createInterpolateElement'
 				);
 
-			if ( ! interpolatedEl ) {
+			if ( ! interpolatedNode ) {
 				// wrap - not interpolated, carry on with the normal a11y anchor-has-content rule
 				return anchorRule.create( context ).JSXOpeningElement( node );
 			}
 			// createInterpolateElement's 1st argument, which is the text to be interpolated
 			// we may get a CallExpression, e.g: __('some text'), or a Literal e.g: 'some text'
-			const textParam = interpolatedEl.arguments[ 0 ] ?? [];
-			const nodeStr = getValueFromInterpolateElement( textParam );
+			const textParam = interpolatedNode.arguments[ 0 ] ?? [];
+			const interpolatedText = getInterpolatedNodeText( textParam );
 			// bail if we can't get a string value, or if the string is empty
-			if ( null === nodeStr ) {
+			if ( null === interpolatedText ) {
 				return;
 			}
-			const tags = getATagsContent( nodeStr, typeCheck );
-			// if any of the anchors do not have content,
-			// we need to report an error like anchor-has-content does
-			tags.forEach( ( content ) => {
-				if ( content.length === 0 ) {
-					context.report( {
-						node: textParam,
-						messageId: 'anchorHasContent',
-					} );
-				}
-			} );
-			// If the string does not contain a valid anchor,
-			// we need to report an error like anchor-has-content does.
-			if ( tags.length === 0 ) {
+			try {
+				validateAnchors( interpolatedText, typeCheck );
+			} catch ( e ) {
 				context.report( {
-					node: interpolatedEl,
-					messageId: 'invalidMarkup',
+					node: textParam,
+					messageId: e.message,
 				} );
 			}
 		},
