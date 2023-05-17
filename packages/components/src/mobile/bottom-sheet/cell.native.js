@@ -229,6 +229,12 @@ class BottomSheetCell extends Component {
 				...valueStyle,
 				...styleRTL,
 			};
+			const placeholderTextColor = disabled
+				? this.props.getStylesFromColorScheme(
+						styles.placeholderColorDisabled,
+						styles.placeholderColorDisabledDark
+				  ).color
+				: styles.placeholderColor.color;
 			const textStyle = {
 				...( disabled && styles.cellDisabled ),
 				...cellValueStyle,
@@ -247,7 +253,7 @@ class BottomSheetCell extends Component {
 					style={ textInputStyle }
 					value={ value }
 					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
+					placeholderTextColor={ placeholderTextColor }
 					onChangeText={ onChangeValue }
 					editable={ isValueEditable }
 					pointerEvents={

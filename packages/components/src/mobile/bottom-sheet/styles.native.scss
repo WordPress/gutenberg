@@ -284,7 +284,15 @@
 
 // used in both light and dark modes
 .placeholderColor {
-	color: #87a6bc;
+	color: $gray;
+}
+
+.placeholderColorDisabled {
+	color: lighten($gray, 20%);
+}
+
+.placeholderColorDisabledDark {
+	color: lighten($gray-dark, 10%);
 }
 
 .applyButton {
