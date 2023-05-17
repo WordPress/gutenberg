@@ -32,9 +32,11 @@ export default function SidebarNavigationScreenPages() {
 	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
-		{ status: 'any' }
+		{
+			status: 'any',
+			per_page: -1,
+		}
 	);
-
 	const { records: templates, isResolving: isLoadingTemplates } =
 		useEntityRecords( 'postType', 'wp_template', {
 			per_page: -1,
