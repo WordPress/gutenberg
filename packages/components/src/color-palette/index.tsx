@@ -277,6 +277,11 @@ function UnforwardedColorPalette(
 										? buttonLabelName
 										: 'No color selected' }
 								</Truncate>
+								{ /*
+								This `Truncate` is always rendered, even if
+								there is no `displayValue`, to ensure the layout
+								does not shift
+								*/ }
 								<Truncate
 									className={ classnames(
 										'components-color-palette__custom-color-value',
