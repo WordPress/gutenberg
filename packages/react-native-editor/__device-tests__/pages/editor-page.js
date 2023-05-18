@@ -499,7 +499,7 @@ class EditorPage {
 		await toolBarButton.click();
 	}
 
-	async navigateUp() {
+	async moveBlockSelectionUp( options = { toRoot: false } ) {
 		let navigateUpElements = [];
 		do {
 			await this.driver.sleep( 2000 );
@@ -508,6 +508,9 @@ class EditorPage {
 			);
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
+			}
+			if ( ! options.toRoot ) {
+				break;
 			}
 		} while ( navigateUpElements.length > 0 );
 	}
