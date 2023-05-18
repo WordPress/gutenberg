@@ -26,7 +26,8 @@ export default function useEditedEntityRecord( postType, postId ) {
 				usedPostType,
 				usedPostId
 			);
-			const _isLoaded = !! usedPostId;
+			const _isLoaded =
+				!! usedPostId && _record && Object.keys( _record ).length > 0;
 			const templateInfo = getTemplateInfo( _record );
 
 			return {
