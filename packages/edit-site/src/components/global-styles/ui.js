@@ -18,8 +18,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
-import { usePrevious } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -204,56 +203,38 @@ function GlobalStylesStyleBook() {
 
 function GlobalStylesBlockLink() {
 	const navigator = useNavigator();
-	const isMounted = useRef();
-	const { selectedBlockName, selectedBlockClientId, editorMode } = useSelect(
+	const { selectedBlockName, selectedBlockClientId } = useSelect(
 		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getBlockName,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+			const { getSelectedBlockClientId, getBlockName } =
+				select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
 				selectedBlockName: getBlockName( clientId ),
 				selectedBlockClientId: clientId,
-				editorMode: __unstableGetEditorMode(),
 			};
 		},
 		[]
 	);
-	const previousEditorMode = usePrevious( editorMode );
 	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
+	// When we're in the `Blocks` screen enable deep linking to the selected block.
 	useEffect( () => {
-		// Avoid navigating to the block screen on mount.
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
-			return;
-		}
 		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
 			return;
 		}
-		// In zoom out mode we select the parent block based on the current selection
-		// programmatically. We want to avoid navigating to the block screen when we
-		// enter, exit the zoom out mode, and while it's active.
+		const currentPath = navigator.location.path;
 		if (
-			[ editorMode, previousEditorMode ].some(
-				( mode ) => ! mode || mode === 'zoom-out'
-			)
+			currentPath !== '/blocks' &&
+			! currentPath.startsWith( '/blocks/' )
 		) {
 			return;
 		}
-		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
+		const newPath = '/blocks/' + encodeURIComponent( selectedBlockName );
 		// Avoid navigating to the same path. This can happen when selecting
 		// a new block of the same type.
-		if ( path !== navigator.location.path ) {
-			navigator.goTo( path, { skipFocus: true } );
+		if ( newPath !== currentPath ) {
+			navigator.goTo( newPath, { skipFocus: true } );
 		}
-	}, [
-		selectedBlockClientId,
-		selectedBlockName,
-		blockHasGlobalStyles,
-		editorMode,
-	] );
+	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
 function GlobalStylesUI() {
