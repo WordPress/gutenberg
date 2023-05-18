@@ -22,5 +22,5 @@ add_filter(
 		// TODO: Make sure to also get the value from the core theme.json file.
 		return $settings;
 	},
-	'post-editor'
+	PHP_INT_MAX
 );
