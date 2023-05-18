@@ -55,25 +55,24 @@ const meta = {
 
 /**
  *
- * Get content of anchors - this can be from <a> or other tags that are configured in the eslint 'component' rules (e.g. <MyAnchor>)
+ * Verify that the content of anchors is not empty, and that we find an anchor in the markup. The anchors' content
+ * can be from an <a> or other tags that are configured in the eslint 'component' rules (e.g. <MyAnchor>)
  *
  * @param {string} markup   markup used in createInterpolateElement
  * @param {string} tagNames names that we recognize as anchors, as configured in the eslint rules
  * @throws Error              an error if the markup does not contain a valid anchor or is empty
  */
-const validateAnchors = ( markup, tagNames ) => {
+const validateAnchorsContent = ( markup, tagNames ) => {
 	const tagText = tagNames.join( '|' );
 	const regex = new RegExp( `<(${ tagText })>(.*?)</(${ tagText })>`, 'g' );
 	const tagParts = [ ...markup.matchAll( regex ) ];
-	// if the string does not contain a valid anchor,
-	// we need to report an error like anchor-has-content does.
+	// if the string does not contain a valid anchor, we throw with an error message matching our rule's messageId
 	tagParts.forEach( ( element ) => {
 		// `<a> </a>` should not be valid, so we trim the content which would result in an empty string
 		const contentIsEmpty = element[ 2 ].trim() === '';
 		if ( contentIsEmpty ) throw new Error( 'anchorIsEmpty' );
 	} );
-	// If the string does not contain a valid anchor,
-	// we need to report an error like anchor-has-content does.
+	// For some reason the markup does not contain a valid anchor, and we throw an Error with the message matching our rule's messageIds
 	if ( tagParts.length === 0 ) throw new Error( 'invalidMarkup' );
 };
 
@@ -151,7 +150,7 @@ const rule = function ( context ) {
 				return;
 			}
 			try {
-				validateAnchors( interpolatedText, typeCheck );
+				validateAnchorsContent( interpolatedText, typeCheck );
 			} catch ( e ) {
 				// if the error is not what we expect, something else went wrong and we should re-throw
 				if ( ! meta.messages.hasOwnProperty( e.message ) ) {
