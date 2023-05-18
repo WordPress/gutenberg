@@ -1,0 +1,20 @@
+.edit-site-page {
+	color: $gray-400;
+}
+
+.edit-site-page-header {
+	padding: $grid-unit-40;
+	.components-text {
+		color: $gray-400;
+	}
+	.components-heading {
+		color: $gray-100;
+	}
+	.edit-site-page-header__sub-title {
+		margin-top: $grid-unit-10;
+	}
+}
+
+.edit-site-page-content {
+	padding: 0 $grid-unit-40 $grid-unit-40;
+}

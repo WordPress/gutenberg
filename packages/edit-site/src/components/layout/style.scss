@@ -81,6 +81,11 @@
 	}
 }
 
+.edit-site-layout__main {
+	flex-grow: 1;
+	border-left: 1px solid $gray-800;
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;

@@ -35,7 +35,7 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import Sidebar from '../sidebar';
 import Editor from '../editor';
-import ListPage from '../list';
+import PageMainTemplates from '../page-main-templates';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
@@ -275,76 +275,90 @@ export default function Layout() {
 					<SavePanel />
 
 					{ showCanvas && (
-						<div
-							className={ classnames(
-								'edit-site-layout__canvas-container',
-								{
-									'is-resizing': isResizing,
-								}
+						<>
+							{ isListPage && (
+								<div className="edit-site-layout__main">
+									<PageMainTemplates />
+								</div>
 							) }
-							style={ {
-								paddingTop: showFrame ? canvasPadding : 0,
-								paddingBottom: showFrame ? canvasPadding : 0,
-							} }
-						>
-							{ canvasResizer }
-							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										isEditorPage && canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration:
-															disableMotion ||
-															isResizing
-																? 0
-																: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
-									className="edit-site-layout__canvas"
-									transition={ {
-										type: 'tween',
-										duration:
-											disableMotion || isResizing
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
+							{ isEditorPage && (
+								<div
+									className={ classnames(
+										'edit-site-layout__canvas-container',
+										{
+											'is-resizing': isResizing,
+										}
+									) }
+									style={ {
+										paddingTop: showFrame
+											? canvasPadding
+											: 0,
+										paddingBottom: showFrame
+											? canvasPadding
+											: 0,
 									} }
 								>
-									<motion.div
-										style={ {
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											bottom: 0,
-										} }
-										initial={ false }
-										animate={ {
-											width: canvasWidth,
-										} }
-										transition={ {
-											type: 'tween',
-											duration:
-												disableMotion || isResizing
-													? 0
-													: ANIMATION_DURATION,
-											ease: 'easeOut',
-										} }
-									>
-										<ErrorBoundary>
-											{ isEditorPage && <Editor /> }
-											{ isListPage && <ListPage /> }
-										</ErrorBoundary>
-									</motion.div>
-								</motion.div>
+									{ canvasResizer }
+									{ !! canvasSize.width && (
+										<motion.div
+											whileHover={
+												isEditorPage &&
+												canvasMode === 'view'
+													? {
+															scale: 1.005,
+															transition: {
+																duration:
+																	disableMotion ||
+																	isResizing
+																		? 0
+																		: 0.5,
+																ease: 'easeOut',
+															},
+													  }
+													: {}
+											}
+											initial={ false }
+											layout="position"
+											className="edit-site-layout__canvas"
+											transition={ {
+												type: 'tween',
+												duration:
+													disableMotion || isResizing
+														? 0
+														: ANIMATION_DURATION,
+												ease: 'easeOut',
+											} }
+										>
+											<motion.div
+												style={ {
+													position: 'absolute',
+													top: 0,
+													left: 0,
+													bottom: 0,
+												} }
+												initial={ false }
+												animate={ {
+													width: canvasWidth,
+												} }
+												transition={ {
+													type: 'tween',
+													duration:
+														disableMotion ||
+														isResizing
+															? 0
+															: ANIMATION_DURATION,
+													ease: 'easeOut',
+												} }
+											>
+												<ErrorBoundary>
+													<Editor />
+												</ErrorBoundary>
+											</motion.div>
+										</motion.div>
+									) }
+								</div>
 							) }
-						</div>
+						</>
 					) }
 				</div>
 			</div>

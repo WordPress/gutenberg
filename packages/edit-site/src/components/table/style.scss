@@ -1,0 +1,28 @@
+.edit-site-table {
+	width: 100%;
+	text-indent: 0;
+	border-color: inherit;
+	border-collapse: collapse;
+	th {
+		text-align: left;
+		color: $gray-600;
+		font-weight: normal;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+	}
+	td {
+		padding: $grid-unit-20;
+	}
+	td,
+	th {
+		vertical-align: middle;
+		&:first-child {
+			padding-left: 0;
+		}
+		&:last-child {
+			padding-right: 0;
+		}
+	}
+	tr {
+		border-bottom: 1px solid $gray-800;
+	}
+}
