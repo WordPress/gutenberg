@@ -10,7 +10,7 @@ add_filter(
 	function( $settings ) {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_data();
 		if ( array_key_exists( 'behaviors', $theme_data ) ) {
-			$settings['behaviors'] = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_data()['behaviors'];
+			$settings['behaviors'] = $theme_data['behaviors'];
 		}
 		// TODO: Make sure to also get the value from the core theme.json file.
 		return $settings;
