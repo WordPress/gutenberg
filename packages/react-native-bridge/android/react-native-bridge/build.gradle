@@ -69,13 +69,13 @@ dependencies {
     def packageJson = '../../../react-native-editor/package.json'
 
     implementation "com.facebook.react:react-native:$rnVersion"
-    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-video:update~android-13-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-linear-gradient:update~android-13-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-slider:update~android-13-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-reanimated:update~android-13-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-prompt-android:update~android-13-SNAPSHOT"
 
-    implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
+    implementation("com.github.wordpress-mobile:react-native-gesture-handler:update~android-13-SNAPSHOT", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
     })
