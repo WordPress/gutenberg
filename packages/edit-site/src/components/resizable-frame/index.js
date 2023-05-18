@@ -32,7 +32,16 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-const MIN_FRAME_SIZE = 340;
+// The minimum width of the frame (in px) while resizing.
+const FRAME_MIN_WIDTH = 340;
+// The reference width of the frame (in px) used to calculate the aspect ratio.
+const FRAME_REFERENCE_WIDTH = 1300;
+// 9 : 19.5 is the target aspect ratio enforced (when possible) while resizing.
+const FRAME_TARGET_ASPECT_RATIO = 9 / 19.5;
+// The minimum distance (in px) between the frame resize handle and the
+// viewport's edge. If the frame is resized to be closer to the viewport's edge
+// than this distance, then "canvas mode" will be enabled.
+const SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD = 200;
 
 function calculateNewHeight( width, initialAspectRatio ) {
 	const lerp = ( a, b, amount ) => {
@@ -46,15 +55,16 @@ function calculateNewHeight( width, initialAspectRatio ) {
 			0,
 			Math.min(
 				1,
-				( width - MIN_FRAME_SIZE ) / ( 1300 - MIN_FRAME_SIZE )
+				( width - FRAME_MIN_WIDTH ) /
+					( FRAME_REFERENCE_WIDTH - FRAME_MIN_WIDTH )
 			)
 		);
 
 	// Calculate the height based on the intermediate aspect ratio
-	// ensuring the frame arrives at a 9:19.5 aspect ratio.
+	// ensuring the frame arrives at the target aspect ratio.
 	const intermediateAspectRatio = lerp(
 		initialAspectRatio,
-		9 / 19.5,
+		FRAME_TARGET_ASPECT_RATIO,
 		lerpFactor
 	);
 
@@ -140,7 +150,7 @@ function ResizableFrame( {
 		const remainingWidth =
 			ref.ownerDocument.documentElement.offsetWidth - ref.offsetWidth;
 
-		if ( remainingWidth > 200 ) {
+		if ( remainingWidth > SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD ) {
 			// Reset the initial aspect ratio if the frame is resized slightly
 			// above the sidebar but not far enough to trigger full screen.
 			setFrameSize( { width: '100%', height: '100%' } );
@@ -191,7 +201,7 @@ function ResizableFrame( {
 				left: HANDLE_STYLES_OVERRIDE,
 				right: HANDLE_STYLES_OVERRIDE,
 			} }
-			minWidth={ MIN_FRAME_SIZE }
+			minWidth={ FRAME_MIN_WIDTH }
 			maxWidth={ isFullWidth ? '100%' : '150%' }
 			maxHeight={ '100%' }
 			onMouseOver={ () => setIsHovering( true ) }
