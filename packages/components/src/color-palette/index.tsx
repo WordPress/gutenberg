@@ -37,7 +37,6 @@ import {
 	extractColorNameFromCurrentValue,
 	isMultiplePaletteArray,
 	normalizeColorValue,
-	showTransparentBackground,
 } from './utils';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -252,7 +251,10 @@ function UnforwardedColorPalette(
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<VStack spacing={ 0 }>
+						<VStack
+							className="components-color-palette__custom-color-wrapper"
+							spacing={ 0 }
+						>
 							<button
 								ref={ customColorPaletteCallbackRef }
 								className="components-color-palette__custom-color-button"
@@ -260,13 +262,9 @@ function UnforwardedColorPalette(
 								aria-haspopup="true"
 								onClick={ onToggle }
 								aria-label={ customColorAccessibleLabel }
-								style={
-									showTransparentBackground( value )
-										? {}
-										: {
-												background: value,
-										  }
-								}
+								style={ {
+									background: value,
+								} }
 							/>
 							<VStack
 								className="components-color-palette__custom-color-text-wrapper"
