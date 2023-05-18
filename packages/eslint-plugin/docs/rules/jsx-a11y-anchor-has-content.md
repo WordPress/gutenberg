@@ -22,23 +22,17 @@ To use the optional object argument of type object (as in [jsx-a11y/anchor-has-c
 With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-createInterpolateElement(
-	__( 'This is an <a>anchor with content</a>' ),
-	{
-		a: <a href="https://wordpress.org" />,
-	}
-)
+createInterpolateElement( __( 'This is an <a>anchor with content</a>' ), {
+	a: <a href="https://wordpress.org" />,
+} );
 ```
 
 With `createInterpolateElement`, without `__`:
 
 ```jsx
-createInterpolateElement(
-	'This is an <a>anchor with content</a>.',
-	{
-		a: <a href="https://wordpress.org" />,
-	}
-)
+createInterpolateElement( 'This is an <a>anchor with content</a>.', {
+	a: <a href="https://wordpress.org" />,
+} );
 ```
 
 Without `createInterpolateElement`:
@@ -71,23 +65,17 @@ return (
 With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-createInterpolateElement(
-	__( 'This is an <a></a>.' ),
-	{
-		a: <a href="https://wordpress.org" />,
-	}
-)
+createInterpolateElement( __( 'This is an <a></a>.' ), {
+	a: <a href="https://wordpress.org" />,
+} );
 ```
 
 With `createInterpolateElement`, without `__`:
 
 ```jsx
-createInterpolateElement(
-	'This is an <a></a>.',
-	{
-		a: <a href="https://wordpress.org" />,
-	}
-)
+createInterpolateElement( 'This is an <a></a>.', {
+	a: <a href="https://wordpress.org" />,
+} );
 ```
 
 Without `createInterpolateElement`:
