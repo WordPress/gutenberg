@@ -71,8 +71,6 @@ function UnforwardedDateTimePicker(
  *       currentDate={ date }
  *       onChange={ ( newDate ) => setDate( newDate ) }
  *       is12Hour
- *       __nextRemoveHelpButton
- *       __nextRemoveResetButton
  *     />
  *   );
  * };
