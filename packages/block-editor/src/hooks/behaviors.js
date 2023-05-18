@@ -65,14 +65,14 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 							} ) )
 							.concat( {
 								value: '',
-								label: __( 'No behavior' ),
+								label: __( 'No behaviors' ),
 							} ) }
 						onChange={ ( nextValue ) => {
 							// If the user selects something, it means that they want to
 							// change the default value (true) so we save it in the attributes.
 							props.setAttributes( {
 								behaviors: {
-									lightbox: nextValue === '' ? false : true,
+									lightbox: nextValue === 'lightbox',
 								},
 							} );
 						} }
