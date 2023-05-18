@@ -18,7 +18,7 @@ store( {
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
 				},
-				hideLightbox: ( { context, event } ) => {
+				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
 						// If scrolling, wait a moment before closing the lightbox.
 						if (
@@ -31,32 +31,16 @@ store( {
 							return;
 						}
 						context.core.image.lightboxEnabled = false;
-
-						// We only want to focus the last focused element
-						// if the lightbox was closed by the keyboard.
-						// Note: Pressing Enter on a button will trigger
-						// a click event with a blank pointerType.
-						if (
-							( event.key && event.type === 'keydown' ) ||
-							( event.type === 'click' &&
-								event.pointerType === '' )
-						) {
-							context.core.image.lastFocusedElement.focus();
-						}
+						context.core.image.lastFocusedElement.focus();
 					}
 				},
 				handleKeydown: ( { context, actions, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
-						const isTabKeyPressed =
-							event.key === 'Tab' || event.keyCode === 9;
-						const escapeKeyPressed =
-							event.key === 'Escape' || event.keyCode === 27;
-
-						if ( isTabKeyPressed ) {
+						if ( event.key === 'Tab' || event.keyCode === 9 ) {
 							event.preventDefault();
 						}
 
-						if ( escapeKeyPressed || isTabKeyPressed ) {
+						if ( event.key === 'Escape' || event.keyCode === 27 ) {
 							actions.core.image.hideLightbox( {
 								context,
 								event,

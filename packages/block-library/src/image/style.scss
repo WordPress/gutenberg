@@ -153,10 +153,25 @@
 }
 
 .wp-lightbox-container {
+
+	.img-container {
+		position: relative;
+	}
+
 	button {
 		border: none;
 		background: none;
 		cursor: zoom-in;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 100;
+
+		&:focus-visible {
+			outline: 5px auto #212121;
+			outline: 5px auto -webkit-focus-ring-color;
+			outline-offset: 5px;
+		}
 	}
 }
 
@@ -187,6 +202,7 @@
 		height: 100%;
 		z-index: 3000000;
 		position: absolute;
+		flex-direction: column;
 	}
 
 	button {
