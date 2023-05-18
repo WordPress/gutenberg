@@ -21,7 +21,7 @@ import { store as noticesStore } from '@wordpress/notices';
 
 const DEFAULT_TITLE = __( 'Untitled page' );
 
-export default function AddNewPageModal( { onSave, onCancel } ) {
+export default function AddNewPageModal( { onSave, onClose } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 	const [ title, setTitle ] = useState( DEFAULT_TITLE );
 
@@ -75,7 +75,7 @@ export default function AddNewPageModal( { onSave, onCancel } ) {
 	}
 
 	return (
-		<Modal title="Draft a new page" onRequestClose={ onCancel }>
+		<Modal title="Draft a new page" onRequestClose={ onClose }>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
@@ -85,7 +85,7 @@ export default function AddNewPageModal( { onSave, onCancel } ) {
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ onCancel }>
+						<Button variant="tertiary" onClick={ onClose }>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button

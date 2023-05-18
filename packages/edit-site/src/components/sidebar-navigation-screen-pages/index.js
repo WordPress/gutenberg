@@ -47,9 +47,6 @@ export default function SidebarNavigationScreenPages() {
 	const { setPage } = unlock( useDispatch( editSiteStore ) );
 
 	const handleNewPage = ( { type, id } ) => {
-		setPage( {
-			context: { postType: type, postId: id },
-		} );
 		// Navigate to the created template editor.
 		history.push( {
 			postId: id,
@@ -64,7 +61,7 @@ export default function SidebarNavigationScreenPages() {
 			{ showAddPage && (
 				<AddNewPageModal
 					onSave={ handleNewPage }
-					onCancel={ () => setShowAddPage( false ) }
+					onClose={ () => setShowAddPage( false ) }
 				/>
 			) }
 			<SidebarNavigationScreen
