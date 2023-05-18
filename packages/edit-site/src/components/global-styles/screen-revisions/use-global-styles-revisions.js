@@ -20,7 +20,7 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 	context: 'view',
 	capabilities: [ 'edit_theme_options' ],
 };
-
+const EMPTY_ARRAY = [];
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 export default function useGlobalStylesRevisions() {
 	const { user: userConfig } = useContext( GlobalStylesContext );
@@ -36,8 +36,9 @@ export default function useGlobalStylesRevisions() {
 			const _currentUser = getCurrentUser();
 			const _isDirty = dirtyEntityRecords.length > 0;
 			const globalStylesRevisions =
-				getCurrentThemeGlobalStylesRevisions() || [];
-			const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || [];
+				getCurrentThemeGlobalStylesRevisions() || EMPTY_ARRAY;
+			const _authors =
+				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 
 			return {
 				authors: _authors,
