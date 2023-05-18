@@ -20,8 +20,8 @@ function FontLibraryProvider( { children } ) {
 	// Global settings fonts
     const [ fontFamilies, setFontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 
-	const themeFonts = fontFamilies.theme || [];
-	const customFonts = fontFamilies.custom || [];
+	let themeFonts = fontFamilies.theme || null;
+	let customFonts = fontFamilies.custom || null;
 
 	// Library Fonts
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
@@ -29,7 +29,7 @@ function FontLibraryProvider( { children } ) {
 
 	// Installed fonts
 	const installedFonts = useMemo( () => (
-		[ ...themeFonts, ...libraryFonts ]
+		[ ...( themeFonts || [] ), ...( libraryFonts || [] ) ]
 	), [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
@@ -76,6 +76,17 @@ function FontLibraryProvider( { children } ) {
 			return !!installedFontsOutline[ name ];
 		}
 		return installedFontsOutline[ name ]?.includes( style + weight );
+	}
+
+	const activatedFontsOutline = useMemo( () => {
+		return getAvailableFontsOutline( customFonts === null ? themeFonts : customFonts );
+	}, [ customFonts ] );
+
+	const isFontActivated = ( name, style, weight ) => {
+		if (!style && !weight) {
+			return !!activatedFontsOutline[ name ];
+		}
+		return activatedFontsOutline[ name ]?.includes( style + weight );
 	}
 	
     async function updateLibrary () {
@@ -156,19 +167,23 @@ function FontLibraryProvider( { children } ) {
 
 
 	const toggleActivateFont = ( name, style, weight ) => {
-		console.log("toggleActivateFont", name, style, weight);
+
+		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
+		// We want to save as active all the theme fonts at the beginning
+		const initialCustomFonts = customFonts !== null ? customFonts : themeFonts;
+
 		const installedFont = installedFonts.find( ( font ) => font.name === name );
-		const activatedFont = customFonts.find( ( font ) => font.name === name );
+		const activatedFont = initialCustomFonts.find( ( font ) => font.name === name );
 		let newCustomFonts;
 	
 		// Entire font family
 		if ( !style || !weight ) {
 			if ( !activatedFont ) { 
 				// If the font is not active, activate the entire font family
-				newCustomFonts = [ ...customFonts, installedFont ];
+				newCustomFonts = [ ...initialCustomFonts, installedFont ];
 			} else {
 				// If the font is already active, deactivate the entire font family
-				newCustomFonts = customFonts.filter( ( font ) => font.name !== name );
+				newCustomFonts = initialCustomFonts.filter( ( font ) => font.name !== name );
 			}
 		} else { //single font variant
 			let newFontFaces;
@@ -193,7 +208,7 @@ function FontLibraryProvider( { children } ) {
 			}
 	
 			// set the newFontFaces in the newCustomFonts
-			newCustomFonts = customFonts.map( font => font.name === name ? { ...font, fontFace: newFontFaces } : font);
+			newCustomFonts = initialCustomFonts.map( font => font.name === name ? { ...font, fontFace: newFontFaces } : font);
 		}
 
 		setFontFamilies( {
@@ -229,6 +244,7 @@ function FontLibraryProvider( { children } ) {
 				libraryFonts,
 				installedFonts,
 				isFontInstalled,
+				isFontActivated,
 				googleFonts,
 				googleFontsCategories,
 				loadFontFaceAsset,

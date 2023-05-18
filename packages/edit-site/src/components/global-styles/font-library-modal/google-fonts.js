@@ -138,26 +138,24 @@ function GoogleFonts() {
 
 			{ ( fonts && fonts.length >= 0 && !fontSelected ) && (
 				<>
-					<HStack justify='flex-start' alignment='center'>
-						<HStack justify='flex-start'>
-							<InputControl
-								value={ filters.search }
-								placeholder={ __('Font name...') }
-								label={ __( 'Search' ) }
-								onChange={ debouncedUpdateSearchInput }
-							/>
-							<SelectControl
-								label={ __( 'Category' ) }
-								value={ filters.category }
-								onChange={ handleCategoryFilter }
-							>
-								{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
-									<option value={category}>
-										{ category }
-									</option>
-								) ) }
-							</SelectControl>
-						</HStack>
+					<HStack justify='flex-start' alignment='flex-start'>
+						<InputControl
+							value={ filters.search }
+							placeholder={ __('Font name...') }
+							label={ __( 'Search' ) }
+							onChange={ debouncedUpdateSearchInput }
+						/>
+						<SelectControl
+							label={ __( 'Category' ) }
+							value={ filters.category }
+							onChange={ handleCategoryFilter }
+						>
+							{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
+								<option value={category}>
+									{ category }
+								</option>
+							) ) }
+						</SelectControl>
 					</HStack>
 
 					<Spacer margin={ 8 } />

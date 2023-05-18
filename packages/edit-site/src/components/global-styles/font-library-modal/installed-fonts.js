@@ -21,7 +21,7 @@ import SaveButton from '../../save-button';
 
 
 function InstalledFonts () {
-	const { installedFonts } = useContext( FontLibraryContext );
+	const { installedFonts, customFonts } = useContext( FontLibraryContext );
     const [ fontSelected, setFontSelected ] = useState( null );
 
     const handleUnselectFont = () => {
@@ -31,7 +31,7 @@ function InstalledFonts () {
     const handleSelectFont = ( font ) => {
         setFontSelected( font );
     };
-    
+
     return (
         <TabLayout
             title={ fontSelected?.name || '' }
