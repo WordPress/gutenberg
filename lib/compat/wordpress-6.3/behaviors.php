@@ -16,7 +16,7 @@ add_filter(
 			isset( $_GET['context'] ) &&
 			'mobile' === $_GET['context']
 		);
-		if (! $is_mobile_context) {
+		if ( ! $is_mobile_context ) {
 			$settings['behaviors'] = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_data()['behaviors'];
 		}
 		// TODO: Make sure to also get the value from the core theme.json file.
