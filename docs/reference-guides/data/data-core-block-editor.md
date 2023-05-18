@@ -170,7 +170,18 @@ _Returns_
 
 ### getBehaviors
 
-Returns the behaviors.
+Returns the behaviors registered with the editor.
+
+Behaviors are named, reusable pieces of functionality that can be attached to blocks. They are registered with the editor using the `theme.json` file.
+
+_Usage_
+
+```js
+const behaviors = select( blockEditorStore ).getBehaviors();
+if ( behaviors?.lightbox ) {
+	// Do something with the lightbox.
+}
+```
 
 _Parameters_
 
