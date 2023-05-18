@@ -16,7 +16,8 @@ export default function useEditedEntityRecord( postType, postId ) {
 		( select ) => {
 			const { getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
 			const { __experimentalGetTemplateInfo: getTemplateInfo } =
 				select( editorStore );
 			const usedPostType = postType ?? getEditedPostType();
@@ -26,7 +27,13 @@ export default function useEditedEntityRecord( postType, postId ) {
 				usedPostType,
 				usedPostId
 			);
-			const _isLoaded = !! usedPostId;
+			const _isLoaded =
+				usedPostId &&
+				hasFinishedResolution( 'getEditedEntityRecord', [
+					'postType',
+					usedPostType,
+					usedPostId,
+				] );
 			const templateInfo = getTemplateInfo( _record );
 
 			return {

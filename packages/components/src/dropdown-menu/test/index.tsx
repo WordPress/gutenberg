@@ -12,19 +12,19 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../';
-import { MenuItem } from '../../';
+import DropdownMenu from '..';
+import { MenuItem } from '../..';
 
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {
-		render( <DropdownMenu /> );
+		render( <DropdownMenu label="Open dropdown" /> );
 
 		// The button toggle should not even be rendered
 		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render when controls are empty and children is not specified', () => {
-		render( <DropdownMenu controls={ [] } /> );
+		render( <DropdownMenu label="Open dropdown" controls={ [] } /> );
 
 		// The button toggle should not even be rendered
 		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
@@ -56,7 +56,7 @@ describe( 'DropdownMenu', () => {
 			},
 		];
 
-		render( <DropdownMenu controls={ controls } /> );
+		render( <DropdownMenu label="Open dropdown" controls={ controls } /> );
 
 		// Move focus on the toggle button
 		await user.tab();
@@ -78,6 +78,7 @@ describe( 'DropdownMenu', () => {
 
 		render(
 			<DropdownMenu
+				label="Open dropdown"
 				children={ ( { onClose } ) => <MenuItem onClick={ onClose } /> }
 			/>
 		);

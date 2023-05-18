@@ -14,7 +14,11 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
-import { DEFAULT_BLOCK, ALLOWED_BLOCKS } from '../constants';
+import {
+	DEFAULT_BLOCK,
+	ALLOWED_BLOCKS,
+	PRIORITIZED_INSERTER_BLOCKS,
+} from '../constants';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -93,6 +97,7 @@ export default function NavigationInnerBlocks( {
 			onInput,
 			onChange,
 			allowedBlocks: ALLOWED_BLOCKS,
+			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,

@@ -2,12 +2,11 @@
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	Flex,
 	FlexItem,
-	Modal,
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
@@ -23,7 +22,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -179,36 +177,25 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModal( {
-	onClose,
-	onSelect,
-	entityForSuggestions,
-	isCreatingTemplate,
-} ) {
+function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
-	const baseCssClass = 'edit-site-custom-template-modal';
 	return (
-		<Modal
-			title={ sprintf(
-				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Add template: %s' ),
-				entityForSuggestions.labels.singular_name
-			) }
-			className={ baseCssClass }
-			onRequestClose={ onClose }
+		<VStack
+			spacing={ 4 }
+			className="edit-site-custom-template-modal__contents-wrapper"
+			alignment="left"
 		>
-			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
-				<VStack spacing={ 4 }>
+				<>
 					<Text as="p">
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
 						) }
 					</Text>
 					<Flex
-						className={ `${ baseCssClass }__contents` }
+						className="edit-site-custom-template-modal__contents"
 						gap="4"
 						align="initial"
 					>
@@ -272,10 +259,10 @@ function AddCustomTemplateModal( {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</VStack>
+				</>
 			) }
 			{ showSearchEntities && (
-				<VStack spacing={ 4 }>
+				<>
 					<Text as="p">
 						{ __(
 							'This template will be used only for the specific item chosen.'
@@ -285,10 +272,10 @@ function AddCustomTemplateModal( {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</VStack>
+				</>
 			) }
-		</Modal>
+		</VStack>
 	);
 }
 
-export default AddCustomTemplateModal;
+export default AddCustomTemplateModalContent;
