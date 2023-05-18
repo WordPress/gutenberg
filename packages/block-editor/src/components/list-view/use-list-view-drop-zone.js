@@ -359,9 +359,12 @@ export function getListViewDropTarget( blocksData, position ) {
 /**
  * A react hook for implementing a drop zone in list view.
  *
+ * @param {Object}                                 props               Named parameters.
+ * @param {import('react').RefObject<HTMLElement>} [props.dropZoneRef] Used to find the closest scroll container that contains element.
+ *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
-export default function useListViewDropZone() {
+export default function useListViewDropZone( { dropZoneRef } ) {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -378,7 +381,12 @@ export default function useListViewDropZone() {
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
-			( event, currentTarget ) => {
+			( event, currentTarget, action ) => {
+				if ( action === 'clear' ) {
+					setTarget( null );
+					return;
+				}
+
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 
@@ -432,7 +440,11 @@ export default function useListViewDropZone() {
 	);
 
 	const ref = useDropZone( {
+		dropZoneRef,
 		onDrop: onBlockDrop,
+		onDragLeave( event ) {
+			throttled( event, event.currentTarget, 'clear' );
+		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.

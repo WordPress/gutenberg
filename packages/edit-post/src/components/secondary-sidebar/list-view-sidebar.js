@@ -152,7 +152,7 @@ export default function ListViewSidebar() {
 			>
 				{ tab === 'list-view' && (
 					<div className="edit-post-editor__list-view-panel-content">
-						<ListView />
+						<ListView dropZoneRef={ listViewRef } />
 					</div>
 				) }
 				{ tab === 'outline' && <ListViewOutline /> }
