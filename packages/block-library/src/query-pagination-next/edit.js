@@ -13,7 +13,7 @@ const arrowMap = {
 export default function QueryPaginationNextEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow },
+	context: { paginationArrow, showLabel },
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
@@ -26,8 +26,8 @@ export default function QueryPaginationNextEdit( {
 				__experimentalVersion={ 2 }
 				tagName="span"
 				aria-label={ __( 'Next page link' ) }
-				placeholder={ __( 'Next Page' ) }
-				value={ label }
+				placeholder={ showLabel ? __( 'Next Page' ) : '' }
+				value={ showLabel ? label : '' }
 				onChange={ ( newLabel ) =>
 					setAttributes( { label: newLabel } )
 				}
