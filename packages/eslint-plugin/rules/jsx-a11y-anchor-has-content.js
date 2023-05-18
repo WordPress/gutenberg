@@ -60,7 +60,7 @@ const meta = {
  *
  * @param {string} markup   markup used in createInterpolateElement
  * @param {string} tagNames names that we recognize as anchors, as configured in the eslint rules
- * @throws Error              an error if the markup does not contain a valid anchor or is empty
+ * @throws {Error}              an error if the markup does not contain a valid anchor or is empty
  */
 const validateAnchorsContent = ( markup, tagNames ) => {
 	const tagText = tagNames.join( '|' );
