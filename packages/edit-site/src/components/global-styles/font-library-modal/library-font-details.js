@@ -10,6 +10,7 @@ import {
     __experimentalSpacer as Spacer,
     __experimentalHeading as Heading,
     __experimentalText as Text,
+    __experimentalGrid as Grid,
 } from '@wordpress/components';
 
 
@@ -26,11 +27,11 @@ function LibraryFontDetails ({ font }) {
 
     const fontFaces = ( font.fontFace && font.fontFace.length )
         ? font.fontFace
-        : [ { fontFamily: font.name, fontStyle: 'normal', fontWeight: 'normal' } ];
+        : [ { fontFamily: font.fontFamily, fontStyle: 'normal', fontWeight: '400' } ];
 
     return (
-        <>  
-            <HStack>
+        <div>  
+            <Grid columns={2}>
                 
                 <VStack spacing={ 4 }>
                     <Spacer margin={ 8 } />
@@ -47,8 +48,8 @@ function LibraryFontDetails ({ font }) {
                     <Button isDestructive onClick={ () => toggleInstallFont( font.name ) }>Delete Font</Button>
                 </VStack>
 
-            </HStack>
-        </>
+            </Grid>
+        </div>
     );
 }
 

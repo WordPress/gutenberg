@@ -32,10 +32,14 @@ function InstalledFonts () {
         setFontSelected( font );
     };
 
+    const tabDescription = !!fontSelected
+        ?  __(`${fontSelected.name} variants.`)
+        :  __("Fonts installed in your WordPress, activate them to use in your site."); 
+
     return (
         <TabLayout
             title={ fontSelected?.name || '' }
-            description={ __("Fonts installed in your WordPress, activate them to use in your site.") }
+            description={ tabDescription }
             handleBack={ !! fontSelected && handleUnselectFont }
             footer={<Footer />}
         >

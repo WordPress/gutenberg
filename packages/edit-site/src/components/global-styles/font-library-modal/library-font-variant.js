@@ -13,23 +13,14 @@ import FontVariant from './font-variant';
 
 function LibraryFontVariant ({ face, font }) {
 
-    const { customFonts, toggleActivateFont } = useContext( FontLibraryContext );
+    const { isFontActivated, toggleActivateFont } = useContext( FontLibraryContext );
 
-    const isIstalled = () => {
-        if ( font.shouldBeRemoved ) {
-            return false;
-        }
-        const activeFont = customFonts.find( family => family.name === font.name );
-        if ( ! activeFont ) {
-            return false;
-        }
-        return !!activeFont?.fontFace.find( ff => ff.fontStyle === face.fontStyle && ff.fontWeight === face.fontWeight );
-    }
+    const isIstalled = isFontActivated( font.name, face.fontStyle, face.fontWeight );
 
     return (
         <FontVariant
             fontFace={ face }
-            checked={ isIstalled() }
+            checked={ isIstalled }
             onClick={ () => toggleActivateFont( font.name, face.fontStyle, face.fontWeight ) }
         />
     );

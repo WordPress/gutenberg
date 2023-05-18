@@ -1,12 +1,26 @@
-.font-library-modal__tab-layout footer{
-    border-top: 1px solid #e5e5e5;
-    margin: 0 -32px -32px;
-    padding: 16px 32px;
-    position: absolute;
-    bottom: 32px;
-    width: 100%;
-    background-color: #fff;
+.font-library-modal {
+    .components-modal__header {
+        border-bottom: none;
+    }
 }
+
+.font-library-modal__tab-layout{
+
+    main {
+        padding-bottom: 4rem;
+    }
+
+    footer{
+        border-top: 1px solid #e5e5e5;
+        margin: 0 -32px -32px;
+        padding: 16px 32px;
+        position: absolute;
+        bottom: 32px;
+        width: 100%;
+        background-color: #fff;
+    }
+
+} 
 
 .font-library-modal__font-card__name {
     font-weight: bold;
@@ -19,4 +33,17 @@
 .font-library-modal__font-variant {
     border-bottom: 1px solid #e5e5e5;
     padding-bottom: 1rem;
+}
+
+.font-library-modal__tab-panel {
+    [role="tablist"] {
+        position: sticky;
+        top: 0;
+        width: calc(100% + 64px);
+        border-bottom: 1px solid #e6e6e6;
+        z-index: 99;
+        background: #fff;
+        margin: 0 -32px;
+        padding: 0 16px;
+    }
 }

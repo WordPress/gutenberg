@@ -19,7 +19,7 @@ function GoogleFontCard ( { font, onClick } ) {
 
     const {
         isFontInstalled,
-        demoText,
+        demoConfig,
         toggleInstallFont,
     } = useContext( FontLibraryContext );
 
@@ -52,7 +52,6 @@ function GoogleFontCard ( { font, onClick } ) {
     return (
         <FontCard
             font={ font }
-            demoText={ demoText }
             onClick={ () =>
                 onClick( font.name )
             }

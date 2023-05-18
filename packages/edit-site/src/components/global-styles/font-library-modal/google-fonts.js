@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useContext } from '@wordpress/element';
+import { useMemo, useState, useContext, useEffect } from '@wordpress/element';
 import {
 	Spinner,
 	__experimentalHeading as Heading,
@@ -25,7 +25,8 @@ import FontsGrid from './fonts-grid';
 import { FontLibraryContext } from './context';
 import GoogleFontCard from './google-font-card';
 import GoolgeFontDetails from './google-font-details';
-import { useEffect } from 'react';
+import PreviewControls from './preview-controls';
+
 
 const filterFonts = ( fonts, filters ) => {
 	const { category, search } = filters;
@@ -156,6 +157,9 @@ function GoogleFonts() {
 								</option>
 							) ) }
 						</SelectControl>
+
+						<PreviewControls />
+
 					</HStack>
 
 					<Spacer margin={ 8 } />

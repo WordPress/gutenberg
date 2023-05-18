@@ -5,6 +5,7 @@
 import { createContext, useState, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { debounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { getFontLibrary, getGoogleFonts, updateFontsLibrary } from './resolvers';
 import { unlock } from '../../../private-apis';
-import { DEMO_TEXT } from './constants';
+import { DEFAULT_DEMO_CONFIG } from './constants';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 export const FontLibraryContext = createContext( {} );
@@ -39,7 +40,20 @@ function FontLibraryProvider( { children } ) {
 	
 	// Demo
 	const loadedFontUrls = new Set();
-	const [ demoText, setDemoText ] = useState( DEMO_TEXT );
+	const [ demoConfig, setDemoConfig ] = useState( DEFAULT_DEMO_CONFIG );
+	const updateDemoConfig = ( key, value ) => {
+		setDemoConfig( {
+			...demoConfig,
+			[ key ]: value,
+		} )
+	};
+	const setDefaultDemoConfig = ( key ) => {
+		if ( key ) {
+			setDemoConfig( { ...demoConfig, [ key ]: DEFAULT_DEMO_CONFIG[ key ] } );
+		} else {
+			setDemoConfig( DEFAULT_DEMO_CONFIG );
+		}
+	};
 
 	// Theme data
 	const { site, currentTheme } = useSelect( (select) => {
@@ -264,7 +278,9 @@ function FontLibraryProvider( { children } ) {
 	return (
 		<FontLibraryContext.Provider
 			value={ {
-				demoText,
+				demoConfig,
+				updateDemoConfig,
+				setDefaultDemoConfig,
                 themeFonts,
 				customFonts,
 				libraryFonts,

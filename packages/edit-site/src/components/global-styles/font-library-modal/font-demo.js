@@ -18,14 +18,14 @@ function FontFaceDemo ( { fontFace, style={} } ) {
     const ref = useRef(null);
     const [isIntersecting, setIsIntersecting] = useState(false);
     const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
-    const { demoText, loadFontFaceAsset } = useContext( FontLibraryContext );
+    const { demoConfig, loadFontFaceAsset } = useContext( FontLibraryContext );
     const { fontFamily, fontStyle, fontWeight } = fontFace;
 
     const demoStyle = {
         fontWeight,
         fontStyle,
         fontFamily,
-        fontSize: 'large',
+        fontSize: `${demoConfig.fontSize}px`,
         opacity: isAssetLoaded ? '1' : '0',
         transition: 'opacity 0.3s ease-in-out',
         ...style,
@@ -55,7 +55,7 @@ function FontFaceDemo ( { fontFace, style={} } ) {
     }, [ fontFace, isIntersecting ] );
 
     return (
-        <Text style={ demoStyle } ref={ref}>{ demoText }</Text>
+        <Text style={ demoStyle } ref={ref}>{ demoConfig.text }</Text>
     );
 }
 

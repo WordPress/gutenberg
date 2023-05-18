@@ -34,9 +34,10 @@ function FontLibraryModal( { onRequestClose, initialTabName = "installed-fonts" 
             title={ __("Fonts Library") }
             onRequestClose={ onRequestClose }
             isFullScreen={ true }
+            className='font-library-modal'
         >
             <TabPanel
-                className="fonts-library-panel"
+                className="font-library-modal__tab-panel"
                 initialTabName={ initialTabName }
                 tabs={ MODAL_TABS }
                 onSelect={ handleSelectTab }

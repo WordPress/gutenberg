@@ -32,3 +32,8 @@ export const GOOGLE_FONT_FALLBACKS = {
     'handwriting': 'cursive',
     'monospace': 'monospace',
 };
+
+export const DEFAULT_DEMO_CONFIG = {
+    text: DEMO_TEXT,
+    fontSize: 18,
+};
