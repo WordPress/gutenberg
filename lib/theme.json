@@ -455,9 +455,7 @@
 				}
 			},
 			"core/image": {
-				"behaviors": {
-					"lightbox": true
-				}
+				"behaviorsUIEnabled": true
 			}
 		}
 	},

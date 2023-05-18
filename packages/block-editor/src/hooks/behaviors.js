@@ -30,12 +30,12 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 			return <BlockEdit { ...props } />;
 		}
 
-		// Check the value of `settings.blocks.core/image.behavior.lightbox` in the
+		// Check the value of `settings.blocks.core/image.behaviorsUIEnabled` in the
 		// theme.json. If false, do not add the behaviors inspector control.
 		const settings = select( blockEditorStore ).getSettings();
 		if (
 			! settings?.__experimentalFeatures?.blocks?.[ props.name ]
-				?.behaviors?.lightbox
+				?.behaviorsUIEnabled
 		) {
 			return <BlockEdit { ...props } />;
 		}
