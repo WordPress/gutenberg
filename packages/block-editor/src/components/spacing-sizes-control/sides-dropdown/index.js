@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, Icon, MenuGroup, MenuItem } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 /**
@@ -9,15 +9,16 @@ import { check } from '@wordpress/icons';
  */
 import { getSupportedMenuItems, VIEWS } from '../utils';
 
+const checkIcon = <Icon icon={ check } size={ 24 } />;
+
 export default function SidesDropdown( { onChange, sides, value } ) {
 	if ( ! sides || ! sides.length ) {
 		return;
 	}
 
-	const menuGroups = getSupportedMenuItems( sides );
-	const sideIcon = [ VIEWS.linked, VIEWS.custom ].includes( value )
-		? menuGroups.secondaryItems[ value ].icon
-		: menuGroups.primaryItems[ value ].icon;
+	const supportedItems = getSupportedMenuItems( sides );
+	const sideIcon = supportedItems[ value ].icon;
+	const { custom: customItem, ...menuItems } = supportedItems;
 
 	return (
 		<DropdownMenu
@@ -28,36 +29,53 @@ export default function SidesDropdown( { onChange, sides, value } ) {
 			{ ( { onClose } ) => {
 				return (
 					<>
-						{ Object.entries( menuGroups ).map(
-							( [ groupName, menuItems ] ) => (
-								<MenuGroup key={ groupName }>
-									{ Object.entries( menuItems ).map(
-										( [ slug, { label, icon } ] ) => {
-											const isSelected = value === slug;
-											return (
-												<MenuItem
-													key={ slug }
-													icon={ icon }
-													iconPosition="left"
-													isSelected={ isSelected }
-													role="menuitemradio"
-													onClick={ () => {
-														onChange( slug );
-														onClose();
-													} }
-													suffix={
-														isSelected
-															? check
-															: undefined
-													}
-												>
-													{ label }
-												</MenuItem>
-											);
-										}
-									) }
-								</MenuGroup>
-							)
+						<MenuGroup>
+							{ Object.entries( menuItems ).map(
+								( [ slug, { label, icon } ] ) => {
+									const isSelected = value === slug;
+									return (
+										<MenuItem
+											key={ slug }
+											icon={ icon }
+											iconPosition="left"
+											isSelected={ isSelected }
+											role="menuitemradio"
+											onClick={ () => {
+												onChange( slug );
+												onClose();
+											} }
+											suffix={
+												isSelected
+													? checkIcon
+													: undefined
+											}
+										>
+											{ label }
+										</MenuItem>
+									);
+								}
+							) }
+						</MenuGroup>
+						{ !! customItem && (
+							<MenuGroup>
+								<MenuItem
+									icon={ customItem.icon }
+									iconPosition="left"
+									isSelected={ value === VIEWS.custom }
+									role="menuitemradio"
+									onClick={ () => {
+										onChange( VIEWS.custom );
+										onClose();
+									} }
+									suffix={
+										value === VIEWS.custom
+											? checkIcon
+											: undefined
+									}
+								>
+									{ customItem.label }
+								</MenuItem>
+							</MenuGroup>
 						) }
 					</>
 				);

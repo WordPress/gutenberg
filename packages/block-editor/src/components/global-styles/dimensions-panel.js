@@ -583,13 +583,7 @@ export default function DimensionsPanel( {
 						) ) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
-							labels={ {
-								default: __( 'Block spacing' ),
-								top: __( 'Block spacing top' ),
-								right: __( 'Block spacing right' ),
-								bottom: __( 'Block spacing bottom' ),
-								left: __( 'Block spacing left' ),
-							} }
+							labels={ { default: __( 'Block spacing' ) } }
 							min={ 0 }
 							onChange={ setGapValues }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.

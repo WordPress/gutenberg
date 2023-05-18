@@ -12,6 +12,7 @@ import {
 	getSpacingPresetSlug,
 	getSupportedMenuItems,
 	hasAxisSupport,
+	hasBalancedSidesSupport,
 	isValuesDefined,
 	isValuesMixed,
 	isValueSpacingPreset,
@@ -239,7 +240,7 @@ describe( 'getSupportedMenuItems', () => {
 		'should include %s axial menu with %s sides',
 		( label, sides ) => {
 			expect( getSupportedMenuItems( sides ) ).toHaveProperty(
-				'primaryItems.axial.label',
+				'axial.label',
 				label
 			);
 		}
@@ -247,144 +248,164 @@ describe( 'getSupportedMenuItems', () => {
 
 	it( 'returns no axial item when not not supported', () => {
 		expect( getSupportedMenuItems( [ 'left', 'top' ] ) ).not.toHaveProperty(
-			'primaryItems.axial'
+			'axial'
 		);
 	} );
 
 	it( 'should include the correct individual side options', () => {
 		expect( getSupportedMenuItems( [ 'top' ] ) ).toHaveProperty(
-			'primaryItems.top.label',
+			'top.label',
 			LABELS.top
 		);
 		expect( getSupportedMenuItems( [ 'right' ] ) ).toHaveProperty(
-			'primaryItems.right.label',
+			'right.label',
 			LABELS.right
 		);
 		expect( getSupportedMenuItems( [ 'bottom' ] ) ).toHaveProperty(
-			'primaryItems.bottom.label',
+			'bottom.label',
 			LABELS.bottom
 		);
 		expect( getSupportedMenuItems( [ 'left' ] ) ).toHaveProperty(
-			'primaryItems.left.label',
+			'left.label',
 			LABELS.left
 		);
 	} );
 	it( 'should include the custom option only when applicable', () => {
 		expect( getSupportedMenuItems( [ 'top', 'left' ] ) ).toHaveProperty(
-			'secondaryItems.custom.label',
+			'custom.label',
 			LABELS.custom
 		);
 		expect( getSupportedMenuItems( [ 'top' ] ) ).not.toHaveProperty(
-			'secondaryItems.custom'
+			'custom'
 		);
 		expect(
 			getSupportedMenuItems( [ 'horizontal', 'vertical' ] )
-		).not.toHaveProperty( 'secondaryItems.custom.label' );
+		).not.toHaveProperty( 'custom.label' );
 	} );
-	it( 'should include the linked option', () => {
-		expect(
-			getSupportedMenuItems( [ 'top', 'right', 'bottom' ] )
-		).toHaveProperty( 'secondaryItems.linked.label', LABELS.linked );
-		expect( getSupportedMenuItems( [ 'top' ] ) ).toHaveProperty(
-			'secondaryItems.linked.label',
-			LABELS.linked
-		);
+} );
+
+describe( 'hasBalancedSidesSupport', () => {
+	it( 'should determine balanced sides', () => {
+		expect( hasBalancedSidesSupport( ALL_SIDES ) ).toBe( true );
+		expect( hasBalancedSidesSupport( [ 'top', 'bottom' ] ) ).toBe( true );
+		expect( hasBalancedSidesSupport( [ 'left', 'right' ] ) ).toBe( true );
+		expect( hasBalancedSidesSupport() ).toBe( true );
+	} );
+	it( 'should determine unbalanced sides', () => {
+		expect( hasBalancedSidesSupport( [ 'top' ] ) ).toBe( false );
+		expect( hasBalancedSidesSupport( [ 'left' ] ) ).toBe( false );
+		expect( hasBalancedSidesSupport( [ 'top', 'right' ] ) ).toBe( false );
 	} );
 } );
 
 describe( 'getInitialView', () => {
-	// Primary / linked / All sides view.
-	it( 'should return initial view for all sides (linked) when only single side supported', () => {
-		expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
-			VIEWS.linked
-		);
-	} );
-	it( 'should return all sides view when no values defined', () => {
-		expect( getInitialView( {}, ALL_SIDES ) ).toBe( VIEWS.linked );
-		expect( getInitialView( undefined, ALL_SIDES ) ).toBe( VIEWS.linked );
-	} );
-	it( 'should return all sides view when all values match', () => {
-		expect(
-			getInitialView(
-				{ top: '1em', right: '1em', bottom: '1em', left: '1em' },
-				ALL_SIDES
-			)
-		).toBe( VIEWS.linked );
-	} );
-
-	// Axial view ( Horizontal & vertical, Horizontal, or Vertical ).
-	it( 'should return axial view when horizontal & vertical axes are supported and have axial values', () => {
-		expect(
-			getInitialView(
-				{ top: '1em', right: '2em', bottom: '1em', left: '2em' },
-				ALL_SIDES
-			)
-		).toBe( VIEWS.axial );
-	} );
-	it( 'should return axial view when horizontal axis is supported, horizontal values set and no vertical supported or values', () => {
-		expect(
-			getInitialView( { left: '1em', right: '1em' }, ALL_SIDES )
-		).toBe( VIEWS.axial );
-	} );
-	it( 'should return axial view when vertical axis is supported and vertical values are set without horizontal values', () => {
-		expect(
-			getInitialView( { top: '1em', bottom: '1em' }, ALL_SIDES )
-		).toBe( VIEWS.axial );
-	} );
-	it( 'should not return axial view when axial vales do not match', () => {
-		expect(
-			getInitialView(
-				{ top: '1em', bottom: '1.5em', left: '1em', right: '1em' },
-				ALL_SIDES
-			)
-		).not.toBe( VIEWS.axial );
+	describe( 'Axial view (Horizontal & vertical, Horizontal, or Vertical)', () => {
+		it( 'should return axial view when no values defined with balanced sides config', () => {
+			expect( getInitialView( {}, ALL_SIDES ) ).toBe( VIEWS.axial );
+			expect( getInitialView( undefined, ALL_SIDES ) ).toBe(
+				VIEWS.axial
+			);
+		} );
+		it( 'should return axial view when horizontal & vertical axes are supported and have axial values', () => {
+			expect(
+				getInitialView(
+					{ top: '1em', right: '2em', bottom: '1em', left: '2em' },
+					ALL_SIDES
+				)
+			).toBe( VIEWS.axial );
+		} );
+		it( 'should return axial view when horizontal axis is supported, horizontal values set and no vertical supported or values', () => {
+			expect(
+				getInitialView( { left: '1em', right: '1em' }, ALL_SIDES )
+			).toBe( VIEWS.axial );
+		} );
+		it( 'should return axial view when vertical axis is supported and vertical values are set without horizontal values', () => {
+			expect(
+				getInitialView( { top: '1em', bottom: '1em' }, ALL_SIDES )
+			).toBe( VIEWS.axial );
+		} );
+		it( 'should not return axial view when axial values do not match', () => {
+			expect(
+				getInitialView(
+					{ top: '1em', bottom: '1.5em', left: '1em', right: '1em' },
+					ALL_SIDES
+				)
+			).not.toBe( VIEWS.axial );
+		} );
 	} );
 
-	// Custom (separated sides) view.
-	it( 'should return custom view if there is more than one side with differing values', () => {
-		expect(
-			getInitialView(
-				{ top: '1em', bottom: '1.5em', left: '1em', right: '1em' },
-				ALL_SIDES
-			)
-		).toBe( VIEWS.custom );
-	} );
-	it( 'should return custom view if mixed partial subset of values is provided', () => {
-		expect(
-			getInitialView( { top: '1em', right: '10px' }, ALL_SIDES )
-		).toBe( VIEWS.custom );
-	} );
-	it( 'should not return custom view if there is only a single side value', () => {
-		expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).not.toBe(
-			VIEWS.custom
-		);
+	describe( 'Custom sides view', () => {
+		it( 'should return custom view when no values and unbalanced sides config with > 1 side', () => {
+			expect( getInitialView( {}, [ 'top', 'left' ] ) ).toBe(
+				VIEWS.custom
+			);
+			expect(
+				getInitialView( undefined, [ 'right', 'bottom', 'left' ] )
+			).toBe( VIEWS.custom );
+		} );
+		it( 'should return custom sides view when all values match and unbalanced sides config', () => {
+			expect(
+				getInitialView( { top: '1em', right: '1em', bottom: '1em' }, [
+					'top',
+					'right',
+					'bottom',
+				] )
+			).toBe( VIEWS.custom );
+		} );
+		it( 'should return custom view if there is more than one side with differing values', () => {
+			expect(
+				getInitialView(
+					{ top: '1em', bottom: '1.5em', left: '1em', right: '1em' },
+					ALL_SIDES
+				)
+			).toBe( VIEWS.custom );
+		} );
+		it( 'should return custom view if mixed partial subset of values is provided', () => {
+			expect(
+				getInitialView( { top: '1em', right: '10px' }, ALL_SIDES )
+			).toBe( VIEWS.custom );
+		} );
+		it( 'should not return custom view if there is only a single side value', () => {
+			expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).not.toBe(
+				VIEWS.custom
+			);
+		} );
 	} );
 
-	// Single side views.
-	it( 'should return the single side view if there is only a single side value set and supported sides > 1', () => {
-		expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).toBe( VIEWS.top );
-		expect( getInitialView( { right: '1em' }, ALL_SIDES ) ).toBe(
-			VIEWS.right
-		);
-		expect( getInitialView( { bottom: '1em' }, ALL_SIDES ) ).toBe(
-			VIEWS.bottom
-		);
-		expect( getInitialView( { left: '1em' }, ALL_SIDES ) ).toBe(
-			VIEWS.left
-		);
-	} );
-	it( 'should not return single side view when only one side is supported', () => {
-		expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).not.toBe(
-			VIEWS.top
-		);
-		expect( getInitialView( { right: '1em' }, [ 'right' ] ) ).not.toBe(
-			VIEWS.right
-		);
-		expect( getInitialView( { bottom: '1em' }, [ 'bottom' ] ) ).not.toBe(
-			VIEWS.bottom
-		);
-		expect( getInitialView( { left: '1em' }, [ 'left' ] ) ).not.toBe(
-			VIEWS.left
-		);
+	describe( 'Single side view', () => {
+		it( 'should return single side when only single side supported', () => {
+			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
+				VIEWS.top
+			);
+		} );
+
+		it( 'should return the single side view if there is only a single side value set and supported sides > 1', () => {
+			expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).toBe(
+				VIEWS.top
+			);
+			expect( getInitialView( { right: '1em' }, ALL_SIDES ) ).toBe(
+				VIEWS.right
+			);
+			expect( getInitialView( { bottom: '1em' }, ALL_SIDES ) ).toBe(
+				VIEWS.bottom
+			);
+			expect( getInitialView( { left: '1em' }, ALL_SIDES ) ).toBe(
+				VIEWS.left
+			);
+		} );
+		it( 'should return single side view when only one side is supported', () => {
+			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
+				VIEWS.top
+			);
+			expect( getInitialView( { right: '1em' }, [ 'right' ] ) ).toBe(
+				VIEWS.right
+			);
+			expect( getInitialView( { bottom: '1em' }, [ 'bottom' ] ) ).toBe(
+				VIEWS.bottom
+			);
+			expect( getInitialView( { left: '1em' }, [ 'left' ] ) ).toBe(
+				VIEWS.left
+			);
+		} );
 	} );
 } );

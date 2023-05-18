@@ -10,7 +10,6 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AllInputControl from './input-controls/all';
 import AxialInputControls from './input-controls/axial';
 import SeparatedInputControls from './input-controls/separated';
 import SingleInputControl from './input-controls/single';
@@ -38,9 +37,13 @@ export default function SpacingSizesControl( {
 	const spacingSizes = useSpacingSizes();
 	const inputValues = values || DEFAULT_VALUES;
 	const hasOneSide = sides?.length === 1;
+	const hasOnlyAxialSides =
+		sides?.includes( 'horizontal' ) &&
+		sides?.includes( 'vertical' ) &&
+		sides?.length === 2;
 
 	const [ view, setView ] = useState( getInitialView( inputValues, sides ) );
-	const label = ALL_SIDES.includes( view ) ? labels[ view ] : labels.default;
+	const label = labels[ view ] || labels.default;
 
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
@@ -61,21 +64,13 @@ export default function SpacingSizesControl( {
 	};
 
 	const renderControls = () => {
-		switch ( view ) {
-			case VIEWS.axial:
-				return <AxialInputControls { ...inputControlProps } />;
-			case VIEWS.custom:
-				return <SeparatedInputControls { ...inputControlProps } />;
-			case VIEWS.linked:
-				return <AllInputControl { ...inputControlProps } />;
-			default:
-				return (
-					<SingleInputControl
-						side={ view }
-						{ ...inputControlProps }
-					/>
-				);
+		if ( view === VIEWS.axial ) {
+			return <AxialInputControls { ...inputControlProps } />;
 		}
+		if ( view === VIEWS.custom ) {
+			return <SeparatedInputControls { ...inputControlProps } />;
+		}
+		return <SingleInputControl side={ view } { ...inputControlProps } />;
 	};
 
 	return (
@@ -84,7 +79,7 @@ export default function SpacingSizesControl( {
 				<BaseControl.VisualLabel as="legend">
 					{ label }
 				</BaseControl.VisualLabel>
-				{ ! hasOneSide && (
+				{ ! hasOneSide && ! hasOnlyAxialSides && (
 					<SidesDropdown
 						onChange={ setView }
 						sides={ sides }

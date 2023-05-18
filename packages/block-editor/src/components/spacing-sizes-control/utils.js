@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	link,
 	sidesAll,
 	sidesAxial,
 	sidesBottom,
@@ -25,7 +24,6 @@ export const DEFAULT_VALUES = {
 
 export const ICONS = {
 	custom: sidesAll,
-	linked: link,
 	axial: sidesAxial,
 	horizontal: sidesHorizontal,
 	vertical: sidesVertical,
@@ -37,7 +35,6 @@ export const ICONS = {
 
 export const LABELS = {
 	default: __( 'Spacing control' ),
-	linked: __( 'All sides' ),
 	top: __( 'Top' ),
 	bottom: __( 'Bottom' ),
 	left: __( 'Left' ),
@@ -50,7 +47,6 @@ export const LABELS = {
 };
 
 export const VIEWS = {
-	linked: 'linked',
 	axial: 'axial',
 	top: 'top',
 	right: 'right',
@@ -283,31 +279,25 @@ export function hasAxisSupport( sides, axis ) {
  *
  * @param {Array} sides Supported sides.
  *
- * @return {Object} Menu options split into two groups.
- *                  - Primary for more specific side options
- *                  - Secondary for general options like custom or linked
+ * @return {Object} Menu options with each option containing label & icon.
  */
 export function getSupportedMenuItems( sides ) {
 	if ( ! sides || ! sides.length ) {
 		return {};
 	}
 
-	const primaryItems = {};
-	const secondaryItems = {};
+	const menuItems = {};
 
 	// Determine the primary "side" menu options.
 	const hasHorizontalSupport = hasAxisSupport( sides, 'horizontal' );
 	const hasVerticalSupport = hasAxisSupport( sides, 'vertical' );
 
 	if ( hasHorizontalSupport && hasVerticalSupport ) {
-		primaryItems.axial = { label: LABELS.axial, icon: ICONS.axial };
+		menuItems.axial = { label: LABELS.axial, icon: ICONS.axial };
 	} else if ( hasHorizontalSupport ) {
-		primaryItems.axial = {
-			label: LABELS.horizontal,
-			icon: ICONS.horizontal,
-		};
+		menuItems.axial = { label: LABELS.horizontal, icon: ICONS.horizontal };
 	} else if ( hasVerticalSupport ) {
-		primaryItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
+		menuItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
 	}
 
 	// Track whether we have any individual sides so we can omit the custom
@@ -317,66 +307,87 @@ export function getSupportedMenuItems( sides ) {
 	ALL_SIDES.forEach( ( side ) => {
 		if ( sides.includes( side ) ) {
 			numberOfIndividualSides += 1;
-			primaryItems[ side ] = {
+			menuItems[ side ] = {
 				label: LABELS[ side ],
 				icon: ICONS[ side ],
 			};
 		}
 	} );
 
-	// Add secondary menu items.
+	// Add custom item if there are enough sides to warrant a separated view.
 	if ( numberOfIndividualSides > 1 ) {
-		secondaryItems.custom = { label: LABELS.custom, icon: ICONS.custom };
+		menuItems.custom = { label: LABELS.custom, icon: ICONS.custom };
 	}
 
-	secondaryItems.linked = { label: LABELS.linked, icon: ICONS.linked };
+	return menuItems;
+}
 
-	return { primaryItems, secondaryItems };
+/**
+ * Checks if the supported sides are balanced for each axis.
+ * - Horizontal - both left and right sides are supported.
+ * - Vertical - both top and bottom are supported.
+ *
+ * @param {Array} sides The supported sides which may axes as well.
+ *
+ * @return {boolean} Whether or not the supported sides are balanced.
+ */
+export function hasBalancedSidesSupport( sides = [] ) {
+	const counts = { top: 0, right: 0, bottom: 0, left: 0 };
+	sides.forEach( ( side ) => ( counts[ side ] += 1 ) );
+
+	return (
+		( counts.top + counts.bottom ) % 2 === 0 &&
+		( counts.left + counts.right ) % 2 === 0
+	);
 }
 
 /**
  * Determines which view the SpacingSizesControl should default to on its
- * first render.
- *
- * Linked: No defined values, only one side supported, or mixed values.
- * Axial: Horizontal or vertical axis support and only those axial values set.
- * Custom: Mixed values requiring all supported sides to be displayed.
- * Single: Only an individual side has a value.
+ * first render; Axial, Custom, or Single side.
  *
  * @param {Object} values Current side values.
  * @param {Array}  sides  Supported sides.
  *
  * @return {string} View to display.
  */
-export function getInitialView( values, sides ) {
-	// Primary "linked" view, formerly the "all" values version of the control.
-	if (
-		sides?.length === 1 ||
-		! isValuesDefined( values ) ||
-		! isValuesMixed( values, sides )
-	) {
-		return VIEWS.linked;
-	}
+export function getInitialView( values = {}, sides ) {
 	const { top, right, bottom, left } = values;
+	const sideValues = [ top, right, bottom, left ].filter( Boolean );
 
-	// Horizontal & vertical are supported and have matching values.
+	// Axial ( Horizontal & vertical ).
+	// - Has axial side support
+	// - Has axial side values which match
+	// - Has no values and the supported sides are balanced
+	const hasMatchingAxialValues =
+		top === bottom && left === right && ( !! top || !! left );
+	const hasNoValuesAndBalancedSides =
+		! sideValues.length && hasBalancedSidesSupport( sides );
+
 	if (
 		hasAxisSupport( sides ) &&
-		top === bottom &&
-		left === right &&
-		( !! top || !! left )
+		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
 	) {
 		return VIEWS.axial;
 	}
 
-	// Custom (separated sides) view check.
-	const sideValues = [ top, right, bottom, left ].filter( Boolean );
+	// Single side.
+	// - Ensure the side returned is the first side that has a value.
+	if ( sideValues.length === 1 ) {
+		let side;
 
-	if ( sideValues.length > 1 ) {
-		return VIEWS.custom;
+		Object.entries( values ).some( ( [ key, value ] ) => {
+			side = key;
+			return value !== undefined;
+		} );
+
+		return side;
 	}
 
-	// Single (all values set to undefined is covered by linked view check).
-	// TODO: Do we need to ensure its the first key with a defined value?
-	return Object.keys( values )[ 0 ];
+	// Only single side supported and no value defined.
+	if ( sides?.length === 1 && ! sideValues.length ) {
+		return sides[ 0 ];
+	}
+
+	// Default to the Custom (separated sides) view.
+	return VIEWS.custom;
 }
