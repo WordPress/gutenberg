@@ -27,11 +27,13 @@ export default function useEditedEntityRecord( postType, postId ) {
 				usedPostType,
 				usedPostId
 			);
-			const _isLoaded = hasFinishedResolution( 'getEditedEntityRecord', [
-				'postType',
-				usedPostType,
-				usedPostId,
-			] );
+			const _isLoaded =
+				usedPostId &&
+				hasFinishedResolution( 'getEditedEntityRecord', [
+					'postType',
+					usedPostType,
+					usedPostId,
+				] );
 			const templateInfo = getTemplateInfo( _record );
 
 			return {
