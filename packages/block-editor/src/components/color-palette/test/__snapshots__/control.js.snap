@@ -192,6 +192,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                       class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
+                      style="min-height: 18px;"
                     >
                       #f00
                     </span>

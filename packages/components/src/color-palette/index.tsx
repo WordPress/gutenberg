@@ -290,6 +290,7 @@ function UnforwardedColorPalette(
 												displayValue?.startsWith( '#' ),
 										}
 									) }
+									style={ { minHeight: '18px' } }
 								>
 									{ displayValue }
 								</Truncate>
