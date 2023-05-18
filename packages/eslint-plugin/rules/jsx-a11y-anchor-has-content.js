@@ -77,29 +77,31 @@ const validateAnchorsContent = ( markup, tagNames ) => {
 };
 
 /**
- * Get the content of the first parameter to `createInterpolateElement
+ * Get the content of the first parameter to `createInterpolateElement`
  *
  * @param {Node} node the first param of `createInterpolateElement`
- * @return {string|null} the content of the element, or null if we can't verify it
+ * @return {string|false} the content of the element, or false if we can't verify it
  */
 const getInterpolatedNodeText = ( node ) => {
-	let text = null;
+	let text = false;
 	let args = [];
 	if ( node.type === 'CallExpression' ) {
-		const argFunctionName = getTranslateFunctionName( node.callee );
+		const translateFunctionName = getTranslateFunctionName( node.callee );
 		// get text if we are going through a translate function
 		args = getTranslateFunctionArgs(
-			argFunctionName,
+			translateFunctionName,
 			node.arguments,
 			false
 		).map( getTextContentFromNode );
+		const hasUnknownFunction = args.filter( Boolean ).length === 0;
 		// An unknown function call in a translate function may produce a valid string
-		// but verifying it is not straight-forward, so we bail
-		if ( args.filter( Boolean ).length === 0 ) {
-			return null;
+		// but verifying it is not straight-forward, so we keep `text` as false to indicate we should bail
+		if ( ! hasUnknownFunction ) {
+			// we think we have a valid string in args, so we join them
+			text = args.join( '' );
 		}
-		text = args.join( '' );
-	} else if ( node.type === 'Literal' ) {
+	} else {
+		// if this `getTextContentFromNode` doesn't find a text it'll return false, which is what we want when we need to bail
 		text = getTextContentFromNode( node );
 	}
 	return text;
@@ -145,8 +147,8 @@ const rule = function ( context ) {
 			// we may get a CallExpression, e.g: __('some text'), or a Literal e.g: 'some text'
 			const textParam = interpolatedNode.arguments[ 0 ] ?? [];
 			const interpolatedText = getInterpolatedNodeText( textParam );
-			// bail if we can't get a string value, or if the string is empty
-			if ( null === interpolatedText ) {
+			// bail if we can't get a string value from the first param of `createInterpolateElement`
+			if ( false === interpolatedText ) {
 				return;
 			}
 			try {
