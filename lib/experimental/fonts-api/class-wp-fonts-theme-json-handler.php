@@ -67,8 +67,8 @@ class WP_Fonts_Theme_Json_Handler
 	/**
 	 * Helper to get an array of the font-families.
 	 *
-	 * @param array $families_data The font-families data.
-	 * @return array The font-families array.
+	 * @param  array $families_data The font-families data.
+	 * @return array                The font-families array.
 	 */
 	private static function get_families( $families_data ) {
 		$families = array();
