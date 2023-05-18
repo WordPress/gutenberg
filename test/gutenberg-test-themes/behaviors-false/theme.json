@@ -1,8 +1,6 @@
 {
 	"version": 2,
-	"settings": {
-		"behaviors": {
-			"lightbox": false
-		}
+	"behaviors": {
+		"lightbox": false
 	}
 }
