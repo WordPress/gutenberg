@@ -79,4 +79,4 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', PHP_INT_MAX );
+add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
