@@ -22,38 +22,29 @@ To use the optional object argument of type object (as in [jsx-a11y/anchor-has-c
 With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-() => {
-				( <div>
-					   { createInterpolateElement( __( 'This is an <a>anchor with content</a>.' ), {
-							   a: <a href="https://wordpress.org" />,
-					   } ) }
-				   </div>
-			   )
-		   };
+createInterpolateElement(
+	__( 'This is an <a>anchor with content</a>' ),
+	{
+		a: <a href="https://wordpress.org" />,
+	}
+)
 ```
 
 With `createInterpolateElement`, without `__`:
 
 ```jsx
-() => {
-				( <div>
-					   { createInterpolateElement( 'This is an <a>anchor with content</a>.', {
-							   a: <a href="https://wordpress.org" />,
-					   } ) }
-				   </div>
-			   )
-		   };
+createInterpolateElement(
+	'This is an <a>anchor with content</a>.',
+	{
+		a: <a href="https://wordpress.org" />,
+	}
+)
 ```
 
 Without `createInterpolateElement`:
 
 ```jsx
-() => {
-				( <div>
-					   This is an <a href="https://wordpress.org">anchor with content</a>
-				   </div>
-			   )
-		   };
+This is an <a href="https://wordpress.org">anchor with content</a>
 ```
 
 With custom components configured (works with and without `createInterpolateElement`)
@@ -80,38 +71,29 @@ return (
 With `createInterpolateElement` and a translate `__` function call:
 
 ```jsx
-() => {
-				( <div>
-					   { createInterpolateElement( __( 'This is an <a></a>.' ), {
-							   a: <a href="https://wordpress.org" />,
-					   } ) }
-				   </div>
-			   )
-		   };
+createInterpolateElement(
+	__( 'This is an <a></a>.' ),
+	{
+		a: <a href="https://wordpress.org" />,
+	}
+)
 ```
 
 With `createInterpolateElement`, without `__`:
 
 ```jsx
-() => {
-				( <div>
-					   { createInterpolateElement( 'This is an <a></a>.', {
-							   a: <a href="https://wordpress.org" />,
-					   } ) }
-				   </div>
-			   )
-		   };
+createInterpolateElement(
+	'This is an <a></a>.',
+	{
+		a: <a href="https://wordpress.org" />,
+	}
+)
 ```
 
 Without `createInterpolateElement`:
 
 ```jsx
-() => {
-				( <div>
-					   This is an <a href="https://wordpress.org"></a>
-				   </div>
-			   )
-		   };
+This is an <a href="https://wordpress.org"></a> empty anchor
 ```
 
 With custom components configured (works with and without `createInterpolateElement`)
