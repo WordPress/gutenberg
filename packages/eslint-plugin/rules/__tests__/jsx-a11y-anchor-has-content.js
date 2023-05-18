@@ -66,43 +66,44 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				createInterpolateElement,
 			} from '@wordpress/element';
 			import { __ } from '@wordpress/i18n';
-			const WithTranslate = ( ) => {
+			const WithTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'I am a <a>good anchor</a>.' ), {
-							a: <a href="example.com"/>,
+							a: <a href="example.com" />,
 						} ) }
 					</div>
-				)
-			}
-			const UsesWithTranslate = ( ) => {
-				return (
-					<div>
-						{ createInterpolateElement( __( 'A <a>good anchor</a>. <WithTranslate/>' ), {
-							a: <a href="example.com"/>,
-							WithTranslate: <WithTranslate />
-						} ) }
-					</div>
-				)
+				);
 			};
-			const WithoutTranslateTwoLevels = ( ) => {
+			const UsesWithTranslate = () => {
 				return (
 					<div>
 						{ createInterpolateElement(
-								'I have <UsesWithTranslate />. And <a>Non empty anchor</a>', {
-								UsesWithTranslate: <UsesWithTranslate />,
-								a: <a href="hello.com"/>,
-							} )
-						}
+							__( 'A <a>good anchor</a>. <WithTranslate/>' ),
+							{
+								a: <a href="example.com" />,
+								WithTranslate: <WithTranslate />,
+							}
+						) }
 					</div>
-				)
-			};
-			export default function hello( {
-			} ) {
-				return (
-					<WithoutTranslateTwoLevels></WithoutTranslateTwoLevels>
 				);
-			}
+			};
+			const WithoutTranslateTwoLevels = () => {
+				return (
+					<div>
+						{ createInterpolateElement(
+							'I have <UsesWithTranslate />. And <a>Non empty anchor</a>',
+							{
+								UsesWithTranslate: <UsesWithTranslate />,
+								a: <a href="hello.com" />,
+							}
+						) }
+					</div>
+				);
+			};
+			export default function hello( {} ) {
+				return <WithoutTranslateTwoLevels></WithoutTranslateTwoLevels>;
+			};
 			`,
 		},
 	],
@@ -183,41 +184,43 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 				return (
 					<div>
 						{ createInterpolateElement( __( 'My content is empty <a></a>.' ), {
-							a: <a href="hello.com"/>,
+							a: <a href="hello.com" />,
 						} ) }
 					</div>
-				)
-			}
+				);
+			};
 			const OkUsesWithTranslate = () => {
 				return (
 					<div>
-						{ createInterpolateElement( __( 'This one anchor <a>has content</a>. <FailWithTranslate/>' ), {
-							a: <a href="hello.com"/>,
-							FailWithTranslate: <FailWithTranslate />
-						} ) }
+						{ createInterpolateElement(
+							__(
+								'This one anchor <a>has content</a>. <FailWithTranslate/>'
+							),
+							{
+								a: <a href="hello.com" />,
+								FailWithTranslate: <FailWithTranslate />,
+							}
+						) }
 					</div>
-				)
+				);
 			};
-
-			const FailWithoutTranslateTwoLevels = ( ) => {
+			const FailWithoutTranslateTwoLevels = () => {
 				return (
 					<div>
 						{ createInterpolateElement(
-								'This one with <OkUsesWithTranslate /> has an empty anchor <a></a>', {
+							'This one with <OkUsesWithTranslate /> has an empty anchor <a></a>',
+							{
 								OkUsesWithTranslate: <OkUsesWithTranslate />,
-								a: <a href="hello.com"/>,
-							} )
-						}
+								a: <a href="hello.com" />,
+							}
+						) }
 					</div>
-				)
+				);
 			};
 
-			export default function hello( {
-			} ) {
-				return (
-					<FailWithoutTranslateTwoLevels></FailWithoutTranslateTwoLevels>
-				);
-			}
+			export default function hello( {} ) {
+				return <FailWithoutTranslateTwoLevels></FailWithoutTranslateTwoLevels>;
+			};
 			`,
 			errors: [
 				{
@@ -236,23 +239,15 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			//MyAnchor.js
 			import MyAnchor from './MyAnchor';
 			//some other file
-			export default function hello( {
-			} ) {
+			export function hello( {} ) {
 				return (
 					<div>
-					{
-						createInterpolateElement(
-							'<MyAnchor></MyAnchor>',
-							{
-								MyAnchor: (
-									<MyAnchor href="https://gravatar.com/" />
-								),
-							}
-						)
-					}
+						{ createInterpolateElement( '<MyAnchor></MyAnchor>', {
+							MyAnchor: <MyAnchor href="https://gravatar.com/" />,
+						} ) }
 					</div>
 				);
-			}`,
+			};`,
 			errors: [
 				{
 					messageId: 'anchorIsEmpty',
@@ -266,12 +261,11 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 			import MyAnchor from './MyAnchor';
 			//some other file
 
-			export default function hello( {
-			} ) {
+			export default function hello( {} ) {
 				return (
 					<MyAnchor></MyAnchor>
 				);
-			}`,
+			};`,
 			errors: [
 				{
 					message:
