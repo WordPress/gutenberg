@@ -67,7 +67,7 @@ function EditableContent( { context = {} } ) {
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
-			value: blocks,
+			value: hasInnerBlocks ? blocks : undefined,
 			onInput,
 			onChange,
 			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
