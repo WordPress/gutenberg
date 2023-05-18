@@ -57,10 +57,6 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		return;
 	}
 
-	if ( scripts ) {
-		await executeLifecycleScript( 'beforeDestroy', config, spinner );
-	}
-
 	spinner.text = 'Removing docker images, volumes, and networks.';
 
 	await dockerCompose.down( {
@@ -75,6 +71,10 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 	// but using 10s in case it's dependant on the machine.
 	await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 	await rimraf( config.workDirectoryPath );
+
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterDestroy', config, spinner );
+	}
 
 	spinner.text = 'Removed WordPress environment.';
 };

@@ -569,7 +569,7 @@ build won't break on subsequent executions.
 
 * `afterStart`: Runs after `wp-env start` has finished setting up the environment.
 * `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
-* `beforeDestroy`: Runs before `wp-env destroy` begins destroying anything.
+* `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 
 ## Examples
 

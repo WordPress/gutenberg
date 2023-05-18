@@ -8,7 +8,7 @@
 
 ### New feature
 
--   Add `afterStart`, `afterClean`, and `beforeDestroy` lifecycle scripts to a new `lifecycleScripts` key in `.wp-env.json`.
+-   Add `afterStart`, `afterClean`, and `afterDestroy` lifecycle scripts to a new `lifecycleScripts` key in `.wp-env.json`.
 -   Add a series of `WP_ENV_LIFECYCLE_SCRIPT_` environment variables for the various lifecycle scripts.
 
 ### Enhancement
