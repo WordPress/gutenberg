@@ -1,4 +1,4 @@
-# Theme.json Version 2 (living reference)
+# Theme.json Version 2
 
 > This is the living specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
 >
@@ -10,13 +10,13 @@ This reference guide lists the settings and style properties defined in the `the
 
 ## Schema
 
-It can be difficult to remember the `theme.json` settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+Remembering the `theme.json` settings and properties while you develop can be difficult, so a [JSON schema](https://schemas.wp.org/trunk/theme.json) was created to help.
 
-Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add "$schema": "https://schemas.wp.org/trunk/theme.json" to the beginning of your theme.json file together with a "version" corresponding to the version you wish to use, e.g.:
+Code editors can pick up the schema and can provide helpful hints and suggestions such as tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `$schema`: "https://schemas.wp.org/trunk/theme.json" to the beginning of your theme.json file together with a `version` corresponding to the version you wish to use, e.g.:
 
 ```
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 2,
   ...
 }
