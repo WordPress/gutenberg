@@ -4,6 +4,7 @@
  */
 import { createContext, useState, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,6 +40,17 @@ function FontLibraryProvider( { children } ) {
 	// Demo
 	const loadedFontUrls = new Set();
 	const [ demoText, setDemoText ] = useState( DEMO_TEXT );
+
+	// Theme data
+	const { site, currentTheme } = useSelect( (select) => {
+	const site = select( 'core' ).getSite();
+	const currentTheme = select( 'core' ).getCurrentTheme();
+	return {
+			site,
+			currentTheme,
+		};
+	});
+	const themeUrl = site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
 
 	useEffect( () => {
 		getFontLibrary().then( ( response ) => {
@@ -217,9 +229,23 @@ function FontLibraryProvider( { children } ) {
 		} );
 	}
 
-	// Load a font asset from a url
+
+
 	const loadFontFaceAsset = async ( fontFace ) => {
-		const src = Array.isArray( fontFace.src ) ? fontFace.src[ 0 ] : fontFace.src;
+		
+		if ( !fontFace.src ) {
+			return;
+		}
+
+		let src = fontFace.src;
+		if ( Array.isArray( src ) ) {
+			src = src[ 0 ];
+		}
+
+		// If it is a theme font, we need to make the url absolute
+		if ( src.startsWith( "file:." ) ) {
+			src = src.replace( "file:.", themeUrl );
+		}
 
 		if ( loadedFontUrls.has( src ) ) {
 			return;
