@@ -76,6 +76,72 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
+	// These settings may need to be updated based on data coming from theme.json sources.
+	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
+		$colors_by_origin          = $settings['__experimentalFeatures']['color']['palette'];
+		$settings['colors'] = isset( $colors_by_origin['custom'] ) ?
+			$colors_by_origin['custom'] : (
+				isset( $colors_by_origin['theme'] ) ?
+					$colors_by_origin['theme'] :
+					$colors_by_origin['default']
+			);
+	}
+	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
+		$gradients_by_origin          = $settings['__experimentalFeatures']['color']['gradients'];
+		$settings['gradients'] = isset( $gradients_by_origin['custom'] ) ?
+			$gradients_by_origin['custom'] : (
+				isset( $gradients_by_origin['theme'] ) ?
+					$gradients_by_origin['theme'] :
+					$gradients_by_origin['default']
+			);
+	}
+	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
+		$font_sizes_by_origin         = $settings['__experimentalFeatures']['typography']['fontSizes'];
+		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
+			$font_sizes_by_origin['custom'] : (
+				isset( $font_sizes_by_origin['theme'] ) ?
+					$font_sizes_by_origin['theme'] :
+					$font_sizes_by_origin['default']
+			);
+	}
+	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
+		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
+		unset( $settings['__experimentalFeatures']['color']['custom'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['color']['customGradient'] ) ) {
+		$settings['disableCustomGradients'] = ! $settings['__experimentalFeatures']['color']['customGradient'];
+		unset( $settings['__experimentalFeatures']['color']['customGradient'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['typography']['customFontSize'] ) ) {
+		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
+		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['typography']['lineHeight'] ) ) {
+		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['lineHeight'];
+		unset( $settings['__experimentalFeatures']['typography']['lineHeight'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
+		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
+		unset( $settings['__experimentalFeatures']['spacing']['units'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
+		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
+		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
+	}
+	if ( isset( $settings['__experimentalFeatures']['spacing']['customSpacingSize'] ) ) {
+		$settings['disableCustomSpacingSizes'] = ! $settings['__experimentalFeatures']['spacing']['customSpacingSize'];
+		unset( $settings['__experimentalFeatures']['spacing']['customSpacingSize'] );
+	}
+
+	if ( isset( $settings['__experimentalFeatures']['spacing']['spacingSizes'] ) ) {
+		$spacing_sizes_by_origin         = $settings['__experimentalFeatures']['spacing']['spacingSizes'];
+		$settings['spacingSizes'] = isset( $spacing_sizes_by_origin['custom'] ) ?
+			$spacing_sizes_by_origin['custom'] : (
+				isset( $spacing_sizes_by_origin['theme'] ) ?
+					$spacing_sizes_by_origin['theme'] :
+					$spacing_sizes_by_origin['default']
+			);
+	}
 
 	return $settings;
 }
