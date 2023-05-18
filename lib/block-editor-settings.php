@@ -6,7 +6,12 @@
  */
 
 /**
- * Adds styles and __experimentalFeatures to the block editor settings.
+ * Replaces core 'styles' and '__experimentalFeatures' block editor settings from
+ * wordpress-develop/block-editor.php with the Gutenberg versions. Much of the
+ * code is copied from get_block_editor_settings() in that file.
+ *
+ * This hook should run first as it completely replaces the core settings that
+ * other hooks may need to update.
  *
  * Note: The settings that are WP version specific should be handled inside the `compat` directory.
  *
@@ -15,7 +20,6 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings( $settings ) {
-	// Recreate global styles.
 	$global_styles = array();
 	$presets       = array(
 		array(
@@ -74,7 +78,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );
 
-	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 	// These settings may need to be updated based on data coming from theme.json sources.
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
