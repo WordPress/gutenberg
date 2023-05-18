@@ -65,7 +65,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 							} ) )
 							.concat( {
 								value: '',
-								label: __( 'No behaviors' ),
+								label: __( 'No behavior' ),
 							} ) }
 						onChange={ ( nextValue ) => {
 							// If the user selects something, it means that they want to
