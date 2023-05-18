@@ -10,13 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { plus } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
@@ -44,7 +42,6 @@ export default function SidebarNavigationScreenPages() {
 	const [ showAddPage, setShowAddPage ] = useState( false );
 
 	const history = useHistory();
-	const { setPage } = unlock( useDispatch( editSiteStore ) );
 
 	const handleNewPage = ( { type, id } ) => {
 		// Navigate to the created template editor.
