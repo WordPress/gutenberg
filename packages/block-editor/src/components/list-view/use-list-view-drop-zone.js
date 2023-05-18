@@ -152,7 +152,8 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * inner block.
  *
  * Determined based on nesting level indentation of the current block, plus
- * the indentation of the next level of nesting.
+ * the indentation of the next level of nesting. The vertical position of the
+ * cursor must also be within the block.
  *
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
@@ -161,7 +162,10 @@ function getNextNonDraggedBlock( blocksData, index ) {
 function isNestingGesture( point, rect, nestingLevel = 1 ) {
 	const blockIndentPosition =
 		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
-	return point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
+	return (
+		point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION &&
+		point.y < rect.bottom
+	);
 }
 
 // Block navigation is always a vertical list, so only allow dropping
