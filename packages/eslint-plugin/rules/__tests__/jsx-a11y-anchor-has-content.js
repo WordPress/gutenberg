@@ -22,84 +22,42 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 	valid: [
 		{
 			name: `Valid anchor with text content`,
-			code: `
-			() => {
-				( <div>
-					   { createInterpolateElement( __( 'This is a <a>link</a>.' ), {
-							   a: <a href="https://wordpress.org" />,
-					   } ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( 'This is a <a>link</a>.' ), {
+					   a: <a href="https://wordpress.org" />,
+					} );`,
 			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 		{
 			name: `Valid anchor with text content with trailing spaces, and an extra attribute`,
-			code: `
-			() => {
-				( <div>
-					   { createInterpolateElement( __( 'help me <a> test with multiple words</a>.' ), {
-							   a: <a href="https://example.com" target="_blank" />,
-					   } ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( 'help me <a> test with multiple words</a>.' ), {
+						a: <a href="https://example.com" target="_blank" />,
+					} );`,
 		},
 		{
 			name: `Valid anchor with a custom component as content.`,
-			code: `
-			() => {
-				( <div>
-					   { createInterpolateElement( __( 'help me <a><TextWrapper /></a>.' ), {
-							   a: <a href="https://example.com" target="_blank" />,
-					   } ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( 'help me <a><TextWrapper /></a>.' ), {
+						a: <a href="https://example.com" target="_blank" />,
+					} );`,
 		},
 		{
 			name: `Presumably valid anchor with a call to another function in the translation text (we bail).`,
-			code: `
-			() => {
-				( <div>
-					   { createInterpolateElement( __( callMe() ), {
-							   a: <a href="https://example.com" target="_blank" />,
-					   } ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( callMe() ), {
+						a: <a href="https://example.com" target="_blank" />,
+					} );`,
 		},
 		{
 			name: `Valid anchor without using createInterpolateElement`,
-			code: `
-			() => {
-				( <div>
-					   <a href="https://example.com">test with multiple words</a>.
-				   </div>
-			   )
-		   };`,
+			code: `() => <a href="https://example.com">test with multiple words</a>;`,
 		},
 		{
 			name: `Invalid code, but out of scope for this rule (caught by jsx-a11y/anchor-has-content)`,
-			code: `
-			const a = () => {
-				( <div>
-					{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {
+			code: `createInterpolateElement( __( 'help me <a>Err</a>.' ), {
 						a: <a target="_blank"/>,
-				} ) }
-				   </div>
-			   )
-		   };`,
+					} );`,
 		},
 		{
 			name: `Invalid usage of createInterpolateElement, ignored by the this rule`,
-			code: `
-			const a = () => {
-				( <div>
-					{ createInterpolateElement( __( 'help me <a>Err</a>.' ), {} ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( 'help me <a>Err</a>.' ), {} )`,
 		},
 		{
 			name: `3 custom components through createInterpolateElement, all with valid anchors`,
@@ -127,7 +85,6 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			};
-
 			const WithoutTranslateTwoLevels = ( ) => {
 				return (
 					<div>
@@ -140,7 +97,6 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 					</div>
 				)
 			};
-
 			export default function hello( {
 			} ) {
 				return (
@@ -153,26 +109,18 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 	invalid: [
 		{
 			name: `Empty anchor without using createInterpolateElement (error comes from eslint-plugin-jsx-a11y/anchor-has-content)`,
-			code: `
-			<a></a>`,
+			code: `() => <a></a>`,
 			errors: [
 				{
 					message:
 						'Anchors must have content and the content must be accessible by a screen reader.',
 				},
 			],
-
 			options: [ { components: [ 'MyAnchor' ] } ],
 		},
 		{
 			name: `Empty anchor wrapped in another element (error comes from eslint-plugin-jsx-a11y/anchor-has-content)`,
-			code: `
-			const a = ( ) => {
-				( <div>
-					   <a></a>.
-				   </div>
-			   )
-		   };`,
+			code: `() => <div><a></a>some text outside the anchor</div>;`,
 			errors: [
 				{
 					message:
@@ -182,15 +130,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		},
 		{
 			name: `Empty anchor content (@wordpress/jsx-a11y-anchor-has-content)`,
-			code: `
-			const a = () => {
-				( <div>
-					{ createInterpolateElement( __( 'help me <a></a>.' ), {
-						a: <a href="https://example.com" />,
-				} ) }
-				   </div>
-			   )
-		   };`,
+			code: `createInterpolateElement( __( 'help me <a></a>.' ), {
+					a: <a href="https://example.com" />,
+					} );`,
 			errors: [
 				{
 					messageId: 'anchorIsEmpty',
@@ -199,15 +141,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		},
 		{
 			name: `Invalid anchor markup, with empty content (@wordpress/jsx-a11y-anchor-has-content)`,
-			code: `
-			const a = () => {
-				( <div>
-					{ createInterpolateElement( __( 'help me <a>.' ), {
+			code: `createInterpolateElement( __( 'help me <a>.' ), {
 						a: <a href="https://example.com" />,
-				} ) }
-				   </div>
-			   )
-		   };`,
+					} );`,
 			errors: [
 				{
 					messageId: 'invalidMarkup',
@@ -216,15 +152,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		},
 		{
 			name: `Invalid anchor markup, with content (@wordpress/jsx-a11y-anchor-has-content)`,
-			code: `
-			const a = () => {
-				( <div>
-					{ createInterpolateElement( __( 'help me </a>ErrInvalidMarkup<a>.' ), {
+			code: `createInterpolateElement( __( 'help me </a>ErrInvalidMarkup<a>.' ), {
 						a: <a href="https://example.com" />,
-				} ) }
-				   </div>
-			   )
-		   };`,
+					} );`,
 			errors: [
 				{
 					messageId: 'invalidMarkup',
@@ -233,13 +163,9 @@ ruleTester.run( '@wordpress/jsx-a11y-anchor-has-content', rule, {
 		},
 		{
 			name: `Anchor with a call to another function within a TemplateLiteral (we do not bail).`,
-			code: `
-			() => {
-				( <div>
-					{ createInterpolateElement( __( \`hello \${ hello }\` ), {a: <a href="https://example.com" target="_blank" />,} ) }
-					</div>
-				)
-			};`,
+			code: `createInterpolateElement( __( \`hello \${ hello }\` ), {
+						a: <a href="https://example.com" target="_blank" />,
+					} );`,
 			errors: [
 				{
 					messageId: 'invalidMarkup',
