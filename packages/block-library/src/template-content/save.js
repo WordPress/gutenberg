@@ -3,6 +3,6 @@
  */
 import { RawHTML } from '@wordpress/element';
 
-export default function save( { attributes: { content } } ) {
+export default function templateContentSave( { attributes: { content } } ) {
 	return <RawHTML>{ content }</RawHTML>;
 }

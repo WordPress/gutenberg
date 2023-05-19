@@ -14,7 +14,7 @@ register_block_pattern(
 			'',
 			array(
 				'<!-- wp:paragraph {"fontSize":"huge"} -->',
-				'<p class="has-huge-font-size"></$wp:template-slot name="getInTouch"></p>',
+				'<p class="has-huge-font-size"></$wp:template-content name="getInTouch"></p>',
 				'<!-- /wp:paragraph -->',
 				'<!-- wp:columns -->',
 				'<div class="wp-block-columns"><!-- wp:column -->',
@@ -33,9 +33,9 @@ register_block_pattern(
 				'<div class="wp-block-button"><a class="wp-block-button__link has-dark-gray-background-color has-background">' . esc_html__( 'Contact Us', 'default' ) . '</a></div>',
 				'<!-- /wp:button --></div>',
 				'<!-- /wp:buttons -->',
-				'<!-- wp:template-fill {"name":"getInTouch"} -->',
+				'<!-- wp:template-content {"name":"getInTouch"} -->',
 				esc_html__( 'Get In Touch', 'default' ),
-				'<!-- /wp:template-fill -->',
+				'<!-- /wp:template-content -->',
 			)
 		),
 	)

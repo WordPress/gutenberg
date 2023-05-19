@@ -2,10 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"__experimental": true,
-	"name": "core/template-fill",
-	"title": "Template Fill",
+	"name": "core/template-content",
+	"title": "Template Content",
 	"category": "widgets",
-	"description": "Add custom template fill to use with the template slot.",
+	"description": "Use template content to replace the template placeholder.",
 	"textdomain": "default",
 	"attributes": {
 		"content": {

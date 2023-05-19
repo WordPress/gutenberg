@@ -827,11 +827,11 @@ A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg
 -	**Supports:** align, anchor, spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
-## Template Fill
+## Template Content
 
-Add custom template fill to use with the template slot. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-fill))
+Use template content to replace the template placeholder. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-content))
 
--	**Name:** core/template-fill
+-	**Name:** core/template-content
 -	**Category:** widgets
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~
 -	**Attributes:** content, name

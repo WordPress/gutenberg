@@ -576,9 +576,9 @@ function getHTMLTokens( html, logger = createLogger() ) {
 	let temp = html;
 	try {
 		// Quick way to ensure that the template slot is correctly validated as HTML comment.
-		if ( temp.includes( '</$wp:template-slot' ) ) {
+		if ( temp.includes( '</$wp:template-content' ) ) {
 			temp = temp.replace(
-				/<\/(\$wp\:template-slot[^>]*)>/gi,
+				/<\/(\$wp\:template-content[^>]*)>/gi,
 				'<!-- $1 -->'
 			);
 		}

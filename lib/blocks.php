@@ -40,7 +40,7 @@ function gutenberg_reregister_core_block_types() {
 				'spacer',
 				'table',
 				'table-of-contents',
-				'template-fill',
+				'template-content',
 				'text-columns',
 				'verse',
 				'video',

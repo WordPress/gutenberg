@@ -111,7 +111,7 @@ import * as spacer from './spacer';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
-import * as templateFill from './template-fill';
+import * as templateContent from './template-content';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
@@ -161,7 +161,7 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
-		templateFill,
+		templateContent,
 		preformatted,
 		pullquote,
 		reusableBlock,

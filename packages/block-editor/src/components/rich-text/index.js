@@ -46,6 +46,7 @@ import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
+import TemplateContent from '../template-content';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -318,7 +319,7 @@ function RichTextWrapper(
 	}
 
 	const TagName = tagName;
-	return (
+	const result = (
 		<>
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
@@ -414,6 +415,17 @@ function RichTextWrapper(
 				) }
 			/>
 		</>
+	);
+
+	if ( ! originalValue.startsWith( '<!--$wp:template-content' ) ) {
+		return result;
+	}
+
+	return (
+		<div { ...props }>
+			<TemplateContent.Slot bubblesVirtually />
+			Hello!
+		</div>
 	);
 }
 
