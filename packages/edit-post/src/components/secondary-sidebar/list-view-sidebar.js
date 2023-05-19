@@ -43,6 +43,12 @@ export default function ListViewSidebar() {
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
 
+	const listViewContainerRef = useMergeRefs( [
+		contentFocusReturnRef,
+		focusOnMountRef,
+		listViewRef,
+	] );
+
 	/*
 	 * Callback function to handle list view or outline focus.
 	 *
@@ -113,11 +119,6 @@ export default function ListViewSidebar() {
 			<TabPanel
 				ref={ tabPanelRef }
 				selectOnMove={ false }
-				itemRef={ useMergeRefs( [
-					contentFocusReturnRef,
-					focusOnMountRef,
-					listViewRef,
-				] ) }
 				tabs={ [
 					{
 						name: 'list-view',
@@ -132,7 +133,10 @@ export default function ListViewSidebar() {
 				] }
 			>
 				{ ( tab ) => (
-					<div className="edit-post-editor__list-view-container">
+					<div
+						className="edit-post-editor__list-view-container"
+						ref={ listViewContainerRef }
+					>
 						{ renderTabContent( tab.name ) }
 					</div>
 				) }
