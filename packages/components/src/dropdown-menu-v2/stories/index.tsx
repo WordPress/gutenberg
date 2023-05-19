@@ -60,11 +60,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 		( Story ) => (
 			<div
 				style={ {
-					width: '100%',
 					minHeight: '300px',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
 				} }
 			>
 				<Story />
