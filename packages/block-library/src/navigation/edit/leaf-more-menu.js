@@ -24,7 +24,13 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-submenu',
 ];
 
-function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
+function AddSubmenuItem( {
+	block,
+	onClose,
+	expandedState,
+	expand,
+	setInsertedBlock,
+} ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -69,6 +75,9 @@ function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
 						updateSelectionOnInsert
 					);
 				}
+
+				setInsertedBlock( newLink );
+
 				if ( ! expandedState[ block.clientId ] ) {
 					expand( block.clientId );
 				}
@@ -81,6 +90,7 @@ function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
 }
 
 export default function LeafMoreMenu( props ) {
+	console.log( { props } );
 	const { block } = props;
 	const { clientId } = block;
 
@@ -138,6 +148,7 @@ export default function LeafMoreMenu( props ) {
 							expanded
 							expandedState={ props.expandedState }
 							expand={ props.expand }
+							setInsertedBlock={ props.setInsertedBlock }
 						/>
 					</MenuGroup>
 					<MenuGroup>

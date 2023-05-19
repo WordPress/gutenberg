@@ -135,6 +135,7 @@ function ListViewBlock( {
 		BlockSettingsMenu,
 		listViewInstanceId,
 		expandedState,
+		setInsertedBlock,
 	} = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
@@ -339,6 +340,7 @@ function ListViewBlock( {
 							__experimentalSelectBlock={ updateSelection }
 							expand={ expand }
 							expandedState={ expandedState }
+							setInsertedBlock={ setInsertedBlock }
 						/>
 					) }
 				</TreeGridCell>
