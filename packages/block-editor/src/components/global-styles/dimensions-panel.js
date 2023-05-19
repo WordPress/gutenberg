@@ -484,13 +484,7 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ paddingValues }
 							onChange={ setPaddingValues }
-							labels={ {
-								default: __( 'Padding' ),
-								top: __( 'Padding top' ),
-								right: __( 'Padding right' ),
-								bottom: __( 'Padding bottom' ),
-								left: __( 'Padding left' ),
-							} }
+							label={ __( 'Padding' ) }
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
@@ -530,13 +524,7 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ marginValues }
 							onChange={ setMarginValues }
-							labels={ {
-								default: __( 'Margin' ),
-								top: __( 'Margin top' ),
-								right: __( 'Margin right' ),
-								bottom: __( 'Margin bottom' ),
-								left: __( 'Margin left' ),
-							} }
+							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
@@ -583,7 +571,7 @@ export default function DimensionsPanel( {
 						) ) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
-							labels={ { default: __( 'Block spacing' ) } }
+							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.

@@ -6,6 +6,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ import {
 
 export default function SpacingSizesControl( {
 	inputProps,
-	labels = LABELS,
+	label: labelProp,
 	minimumCustomValue = 0,
 	onChange,
 	onMouseOut,
@@ -43,7 +44,6 @@ export default function SpacingSizesControl( {
 		sides?.length === 2;
 
 	const [ view, setView ] = useState( getInitialView( inputValues, sides ) );
-	const label = labels[ view ] || labels.default;
 
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
@@ -58,7 +58,7 @@ export default function SpacingSizesControl( {
 		onMouseOver,
 		sides,
 		spacingSizes,
-		type: labels.default,
+		type: labelProp,
 		useSelect,
 		values: inputValues,
 	};
@@ -73,6 +73,20 @@ export default function SpacingSizesControl( {
 		return <SingleInputControl side={ view } { ...inputControlProps } />;
 	};
 
+	const sideLabel = ALL_SIDES.includes( view ) ? LABELS[ view ] : '';
+	const label = sprintf(
+		// translators: 2. Type of spacing being modified (Padding, margin, etc). 1: The side of the block being modified (top, bottom, left etc.).
+		__( '%1$s %2$s' ),
+		labelProp,
+		sideLabel
+	);
+
+	const dropdownLabelText = sprintf(
+		// translators: %s: The current spacing property e.g. "Padding", "Margin".
+		_x( '%s options', 'Button label to reveal side configuration options' ),
+		labelProp
+	);
+
 	return (
 		<fieldset className="components-spacing-sizes-control">
 			<HStack className="components-spacing-sizes-control__header">
@@ -81,6 +95,7 @@ export default function SpacingSizesControl( {
 				</BaseControl.VisualLabel>
 				{ ! hasOneSide && ! hasOnlyAxialSides && (
 					<SidesDropdown
+						label={ dropdownLabelText }
 						onChange={ setView }
 						sides={ sides }
 						value={ view }

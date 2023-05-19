@@ -11,7 +11,12 @@ import { getSupportedMenuItems, VIEWS } from '../utils';
 
 const checkIcon = <Icon icon={ check } size={ 24 } />;
 
-export default function SidesDropdown( { onChange, sides, value } ) {
+export default function SidesDropdown( {
+	label: labelProp,
+	onChange,
+	sides,
+	value,
+} ) {
 	if ( ! sides || ! sides.length ) {
 		return;
 	}
@@ -23,6 +28,7 @@ export default function SidesDropdown( { onChange, sides, value } ) {
 	return (
 		<DropdownMenu
 			icon={ sideIcon }
+			label={ labelProp }
 			className="component-spacing-sizes-control__dropdown"
 			toggleProps={ { isSmall: true } }
 		>
