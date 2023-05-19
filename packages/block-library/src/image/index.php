@@ -94,17 +94,10 @@ HTML;
 	return $processor->get_updated_html();
 }
 
-
 /**
  * Registers the `core/image` block on server.
  */
 function register_block_core_image() {
-
-	wp_enqueue_script(
-		'wp-interactivity-image',
-		plugins_url( '../interactive-blocks/image.min.js', __FILE__ ),
-		array( 'wp-interactivity-runtime' )
-	);
 
 	register_block_type_from_metadata(
 		__DIR__ . '/image',
