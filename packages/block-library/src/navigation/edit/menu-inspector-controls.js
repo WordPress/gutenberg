@@ -12,7 +12,7 @@ import {
 	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -25,7 +25,6 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
-import { useInsertedBlock } from '../../navigation-link/use-inserted-block';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -53,20 +52,13 @@ const MainContent = ( {
 		[ clientId ]
 	);
 
-	const { lastInsertedBlockClientId } = useSelect( ( select ) => {
-		const { getLastInsertedBlocksClientIds } = unlock(
-			select( blockEditorStore )
-		);
-		const lastInsertedBlocksClientIds = getLastInsertedBlocksClientIds();
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-		return {
-			lastInsertedBlockClientId:
-				lastInsertedBlocksClientIds && lastInsertedBlocksClientIds[ 0 ],
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) return;
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
-	}, [] );
-
-	const { insertedBlockAttributes, setInsertedBlockAttributes } =
-		useInsertedBlock( lastInsertedBlockClientId );
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
@@ -108,8 +100,8 @@ const MainContent = ( {
 		return (
 			shouldShowLinkUIForBlock && (
 				<LinkUI
-					clientId={ lastInsertedBlockClientId }
-					link={ insertedBlockAttributes }
+					clientId={ lastInsertedBlock?.clientId }
+					link={ lastInsertedBlock?.attributes }
 					onClose={ () => {
 						setLastInsertedBlock( null );
 					} }
@@ -117,8 +109,10 @@ const MainContent = ( {
 					onChange={ ( updatedValue ) => {
 						updateAttributes(
 							updatedValue,
-							setInsertedBlockAttributes,
-							insertedBlockAttributes
+							setInsertedBlockAttributes(
+								lastInsertedBlock?.clientId
+							),
+							lastInsertedBlock?.attributes
 						);
 						setLastInsertedBlock( null );
 					} }
