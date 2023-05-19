@@ -127,26 +127,23 @@ export default function SidebarNavigationScreenTemplates() {
 								<>
 									<SidebarNavigationItem
 										className="edit-site-sidebar-navigation-screen-templates__see-all"
-										{ ...browseAllLink }
-										children={
-											config[ postType ].labels.manage
-										}
 										withChevron
-									/>
+										{ ...browseAllLink }
+									>
+										{ config[ postType ].labels.manage }
+									</SidebarNavigationItem>
 									{ !! config[ postType ].labels
 										.reusableBlocks && (
 										<SidebarNavigationItem
+											as="a"
 											href="edit.php?post_type=wp_block"
-											onClick={ () => {
-												document.location =
-													'edit.php?post_type=wp_block';
-											} }
-											children={
+											withChevron
+										>
+											{
 												config[ postType ].labels
 													.reusableBlocks
 											}
-											withChevron
-										/>
+										</SidebarNavigationItem>
 									) }
 								</>
 							) }
