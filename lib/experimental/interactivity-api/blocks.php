@@ -23,7 +23,7 @@ function gutenberg_block_core_file_add_directives_to_content( $block_content, $b
 	$processor->next_tag();
 	$processor->set_attribute( 'data-wp-island', '' );
 	$processor->next_tag( 'object' );
-	$processor->set_attribute( 'data-wp-bind.hidden', 'selectors.core.file.hasNoPdfPreview' );
+	$processor->set_attribute( 'data-wp-bind.hidden', '!selectors.core.file.hasPdfPreview' );
 	$processor->set_attribute( 'hidden', true );
 	return $processor->get_updated_html();
 }
