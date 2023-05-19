@@ -7,12 +7,14 @@
 	justify-content: center;
 	align-items: center;
 	text-align: center;
+	margin-bottom: $grid-unit-10;
 }
 
 .aspect-ratio-wrapper-item {
 	display: block;
 	width: 70%;
 	background: $gray-900;
+	transition: all 200ms;
 }
 
 // Provide special styling for the placeholder.
