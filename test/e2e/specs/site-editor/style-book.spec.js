@@ -41,9 +41,6 @@ test.describe( 'Style Book', () => {
 			page.locator( 'role=button[name="Redo"i]' )
 		).not.toBeVisible();
 		await expect(
-			page.locator( 'role=button[name="Show template details"i]' )
-		).not.toBeVisible();
-		await expect(
 			page.locator( 'role=button[name="View"i]' )
 		).not.toBeVisible();
 	} );

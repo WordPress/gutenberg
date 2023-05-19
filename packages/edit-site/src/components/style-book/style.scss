@@ -1,3 +1,22 @@
+.edit-site-style-book {
+	// Ensure the style book fills the available vertical space.
+	// This is useful when the style book is used to fill a frame.
+	height: 100%;
+	&.is-button {
+		border-radius: $radius-block-ui * 4;
+	}
+}
+
+.edit-site-style-book__iframe {
+	&.is-button {
+		border-radius: $radius-block-ui * 4;
+	}
+	&.is-focused {
+		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
+	}
+}
+
 .edit-site-style-book__tab-panel {
 	.components-tab-panel__tabs {
 		background: $white;

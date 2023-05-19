@@ -45,29 +45,4 @@ test.describe( 'Site editor title', () => {
 
 		await expect( title ).toHaveText( 'Editing template part: header' );
 	} );
-
-	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
-		admin,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-			canvas: 'edit',
-		} );
-		// Select the header template part via list view.
-		await page.click( 'role=button[name="List View"i]' );
-		const listView = page.locator(
-			'role=treegrid[name="Block navigation structure"i]'
-		);
-		await listView.locator( 'role=gridcell >> text="header"' ).click();
-		await page.click( 'role=button[name="Close"i]' );
-
-		// Evaluate the document settings secondary title.
-		const secondaryTitle = page.locator(
-			'.edit-site-document-actions__secondary-item'
-		);
-
-		await expect( secondaryTitle ).toHaveText( 'header' );
-	} );
 } );
