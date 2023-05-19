@@ -134,21 +134,21 @@ function FontLibraryProvider( { children } ) {
 		
 		if ( !fontFace ) { // Entire font family
 			if ( libraryFont ){ // If the font is already installed
-				newLibraryFonts = libraryFonts.map( font => {
-					if ( font.name === name ) {
+				newLibraryFonts = libraryFonts.map( f => {
+					if ( f.name === name ) {
 						// This logic handles several sucesive install/remove calls for a font family in the client
-						const { shouldBeRemoved, fontFace: familyFaces, ...restFont } = font;
+						const { shouldBeRemoved: fontFamilyShouldBeRemoved, fontFace: familyFaces, ...restFont } = f;
 						const newFont = {
 							...restFont,
-							fontFace: familyFaces.map( face => {
+							fontFace: (font?.fontFace || []).map( face => {
 								const { shouldBeRemoved, ...restFace } = face;
-								return { ...restFace, ...(!shouldBeRemoved ? { shouldBeRemoved: true } : {}) };
+								return { ...restFace, ...(!fontFamilyShouldBeRemoved ? { shouldBeRemoved: true } : {}) };
 							} ),
-							...(!shouldBeRemoved ? { shouldBeRemoved: true } : {}),
+							...(!fontFamilyShouldBeRemoved ? { shouldBeRemoved: true } : {}),
 						};
 						return newFont;
 					}
-					return font;
+					return f;
 				});
 			} else { // If the font is not installed
 				newLibraryFonts = [ ...libraryFonts, font ];
@@ -178,7 +178,6 @@ function FontLibraryProvider( { children } ) {
 						return {
 							...restFont,
 							fontFace: newFontFaces,
-							...(!shouldBeRemoved ? { shouldBeRemoved: true } : {})
 						};
 					}
 					return font;
