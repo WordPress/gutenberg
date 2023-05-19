@@ -1,14 +1,29 @@
 .edit-site-page {
 	color: $gray-800;
-	margin: $grid-unit-30 $grid-unit-30 $grid-unit-30 0;
 	background: #fff;
-	border-radius: 8px;
 	flex-grow: 1;
 	overflow: auto;
+	margin: 0;
+	@include break-medium() {
+		border-radius: 0;
+		border-radius: 8px;
+		margin: $grid-unit-30 $grid-unit-30 $grid-unit-30 0;
+	}
 }
 
 .edit-site-page-header {
-	padding: $grid-unit-40 $grid-unit-40 $grid-unit-30;
+	padding: 0 $grid-unit-40;
+	height: $header-height;
+	padding-left: $header-height + $grid-unit-40;
+	margin-bottom: $grid-unit-40;
+	border-bottom: 1px solid $gray-100;
+	background: #fff;
+	position: sticky;
+	z-index: 2;
+	top: 0;
+	@include break-medium() {
+		padding-left: $grid-unit-40;
+	}
 	.components-text {
 		color: $gray-800;
 	}

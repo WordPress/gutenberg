@@ -35,7 +35,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import Sidebar from '../sidebar';
 import Editor from '../editor';
-import PageMainTemplates from '../page-main-templates';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
@@ -49,6 +48,7 @@ import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
+import PageMain from '../page-main';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -276,11 +276,7 @@ export default function Layout() {
 
 					{ showCanvas && (
 						<>
-							{ isListPage && (
-								<div className="edit-site-layout__main">
-									<PageMainTemplates />
-								</div>
-							) }
+							{ isListPage && <PageMain /> }
 							{ isEditorPage && (
 								<div
 									className={ classnames(
