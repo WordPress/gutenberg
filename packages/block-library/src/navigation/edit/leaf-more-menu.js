@@ -90,7 +90,6 @@ function AddSubmenuItem( {
 }
 
 export default function LeafMoreMenu( props ) {
-	console.log( { props } );
 	const { block } = props;
 	const { clientId } = block;
 
