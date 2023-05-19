@@ -19,8 +19,7 @@ const useRevisionData = () => {
 		currentTemplate?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
 
 	const revisionsCount =
-		( currentTemplate?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0 ) +
-		1;
+		currentTemplate?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 
 	return {
 		currentTemplate,
