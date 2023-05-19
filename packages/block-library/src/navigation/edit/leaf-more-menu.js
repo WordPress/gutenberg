@@ -76,6 +76,9 @@ function AddSubmenuItem( {
 					);
 				}
 
+				// This call sets the local List View state for the "last inserted block".
+				// This is required for the Nav Block to determine whether or not to display
+				// the Link UI for this new block.
 				setInsertedBlock( newLink );
 
 				if ( ! expandedState[ block.clientId ] ) {
