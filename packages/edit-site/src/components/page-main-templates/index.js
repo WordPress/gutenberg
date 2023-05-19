@@ -89,13 +89,10 @@ export default function PageMainTemplates() {
 							) }
 						</Link>
 					</Heading>
+					<Text variant="muted">
+						{ decodeEntities( template.description ) }
+					</Text>
 				</VStack>
-			),
-		},
-		{
-			header: __( 'Applied to' ),
-			cell: ( template ) => (
-				<Text>{ decodeEntities( template.description ) }</Text>
 			),
 			maxWidth: 400,
 		},
