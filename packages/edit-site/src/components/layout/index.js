@@ -232,8 +232,9 @@ export default function Layout() {
 									// To avoid the snackbars jumping about we need to ensure that a transform property is always set.
 									// Setting a scale of 1 is interpred by framer as no change, so once the animation completes
 									// the transform property of this element is set to none, thus removing its role as a container block.
-									// Instead we set the initial scale of this element to 1.000000000000001 so that there is always a transform property set.
-									initial={ { scale: 1.000000000000001 } }
+									// Instead we set the initial scale of this element to 1.0001 so that there is always a transform property set.
+									// If we set the initial scale to less than 1.001 then JavaScript rounds it to 1 and the problem reoccurs.
+									initial={ { scale: 1.001 } }
 									layout="position"
 									className="edit-site-layout__canvas"
 									transition={ {
