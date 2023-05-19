@@ -48,7 +48,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 			if ( ! media ) {
 				return;
 			}
-			// Todo: Solve issue with multiple uploads in the replace flow.
+
 			if ( ! Array.isArray( media ) ) {
 				const currentIds = [ ...ids ];
 				media = [ ...currentIds, media ];
@@ -132,7 +132,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					mediaIds={ ids
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
-					multiple={ true }
+					multiple={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
