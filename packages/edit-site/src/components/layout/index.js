@@ -227,7 +227,7 @@ export default function Layout() {
 											  }
 											: {}
 									}
-									// Setting a transform property (in this case scale) on an element makes it act as a containing block for its descendents.
+									// Setting a transform property (in this case scale) on an element makes it act as a containing block for its descendants.
 									// This means that the snackbar notices inside this component are repositioned to be relative to this element.
 									// To avoid the snackbars jumping about we need to ensure that a transform property is always set.
 									// Setting a scale of 1 is interpred by framer as no change, so once the animation completes
