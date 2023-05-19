@@ -173,7 +173,10 @@ class StyleBook {
 
 	async open() {
 		await this.disableWelcomeGuide();
-		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Style Book"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+		await this.page.getByRole( 'button', { name: 'Style Book' } ).click();
 	}
 }
