@@ -19,7 +19,7 @@ export default function Header( { title, subTitle, actions } ) {
 			<FlexBlock className="edit-site-page-header__page-title">
 				<Heading
 					has="h1"
-					level={ 3 }
+					level={ 4 }
 					className="edit-site-page-header__title"
 				>
 					{ title }
