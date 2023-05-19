@@ -11,6 +11,9 @@
 -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
 -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
 
+### Bug Fix
+
+-   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
 
 ## 24.0.0 (2023-05-10)
 
@@ -21,7 +24,7 @@
 ### Bug Fix
 
 -   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
--   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state.  ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
+-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state. ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
 
 ### Internal
 
