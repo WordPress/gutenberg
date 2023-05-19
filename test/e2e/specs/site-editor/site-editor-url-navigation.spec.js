@@ -62,7 +62,7 @@ test.describe( 'Site editor url navigation', () => {
 			page,
 		} ) => {
 			await admin.visitSiteEditor();
-			await page.click( 'role=button[name="Template Parts"i]' );
+			await page.click( 'role=button[name="Library"i]' );
 			await page.click( 'role=button[name="Add New"i]' );
 			// Fill in a name in the dialog that pops up.
 			await page.type(
