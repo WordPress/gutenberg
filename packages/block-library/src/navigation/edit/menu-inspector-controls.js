@@ -85,7 +85,6 @@ const MainContent = ( {
 		lastInsertedBlock,
 		setLastInsertedBlock
 	) => {
-		const blockHasExistingLinkValue = !! lastInsertedBlock?.url;
 		const blockSupportsLinkUI = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
 			lastInsertedBlock?.name
 		);
@@ -93,9 +92,7 @@ const MainContent = ( {
 			lastInsertedBlock?.clientId === currentBlock.clientId;
 
 		const shouldShowLinkUIForBlock =
-			blockSupportsLinkUI &&
-			! blockHasExistingLinkValue && // don't re-show the Link UI if the block already has a link value.
-			currentBlockWasJustInserted;
+			blockSupportsLinkUI && currentBlockWasJustInserted;
 
 		return (
 			shouldShowLinkUIForBlock && (
