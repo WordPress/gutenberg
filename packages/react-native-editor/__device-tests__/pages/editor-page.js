@@ -499,6 +499,22 @@ class EditorPage {
 		await toolBarButton.click();
 	}
 
+	async moveBlockSelectionUp( options = { toRoot: false } ) {
+		let navigateUpElements = [];
+		do {
+			await this.driver.sleep( 2000 );
+			navigateUpElements = await this.driver.elementsByAccessibilityId(
+				'Navigate Up'
+			);
+			if ( navigateUpElements.length > 0 ) {
+				await navigateUpElements[ 0 ].click();
+			}
+			if ( ! options.toRoot ) {
+				break;
+			}
+		} while ( navigateUpElements.length > 0 );
+	}
+
 	// =========================
 	// Inline toolbar functions
 	// =========================
