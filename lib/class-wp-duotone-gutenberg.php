@@ -718,7 +718,7 @@ class WP_Duotone_Gutenberg {
 				__( 'The duotone id "%s" is not registered in theme.json settings', 'gutenberg' ),
 				$filter_id
 			);
-			trigger_error( $error_message );
+			_doing_it_wrong( __METHOD__, $error_message, '6.3.0' );
 			return;
 		}
 		self::$used_global_styles_presets[ $filter_id ] = self::$global_styles_presets[ $filter_id ];
