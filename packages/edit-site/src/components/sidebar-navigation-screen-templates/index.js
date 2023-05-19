@@ -36,12 +36,13 @@ const config = {
 	},
 	wp_template_part: {
 		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
-			manage: __( 'Manage all template parts' ),
+			title: __( 'Library' ),
+			loading: __( 'Loading library' ),
+			notFound: __( 'No patterns found' ),
+			manage: __( 'Manage all patterns' ),
+			reusableBlocks: __( 'Manage reusable blocks' ),
 			description: __(
-				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
+				'Manage what patterns are available when editing your site.'
 			),
 		},
 	},
@@ -123,14 +124,31 @@ export default function SidebarNavigationScreenTemplates() {
 								</TemplateItem>
 							) ) }
 							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-									withChevron
-								/>
+								<>
+									<SidebarNavigationItem
+										className="edit-site-sidebar-navigation-screen-templates__see-all"
+										{ ...browseAllLink }
+										children={
+											config[ postType ].labels.manage
+										}
+										withChevron
+									/>
+									{ !! config[ postType ].labels
+										.reusableBlocks && (
+										<SidebarNavigationItem
+											href="edit.php?post_type=wp_block"
+											onClick={ () => {
+												document.location =
+													'edit.php?post_type=wp_block';
+											} }
+											children={
+												config[ postType ].labels
+													.reusableBlocks
+											}
+											withChevron
+										/>
+									) }
+								</>
 							) }
 						</ItemGroup>
 					) }
