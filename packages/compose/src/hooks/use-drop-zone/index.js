@@ -34,7 +34,7 @@ function useFreshRef( value ) {
  * A hook to facilitate drag and drop handling.
  *
  * @param {Object}                                 props               Named parameters.
- * @param {import('react').RefObject<HTMLElement>} [props.dropZoneRef] Used to find the closest scroll container that contains element.
+ * @param {import('react').RefObject<HTMLElement>} [props.dropZoneRef] Optional ref to be used as the drop zone.
  * @param {boolean}                                [props.isDisabled]  Whether or not to disable the drop zone.
  * @param {(e: DragEvent) => void}                 [props.onDragStart] Called when dragging has started.
  * @param {(e: DragEvent) => void}                 [props.onDragEnter] Called when the zone is entered.
