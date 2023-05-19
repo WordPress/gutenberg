@@ -20,6 +20,7 @@ import {
 	DropdownMenuRadioItem,
 	DropdownSubMenuTrigger,
 } from '..';
+import Button from '../../button';
 
 /**
  * WordPress dependencies
@@ -104,33 +105,6 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const MenuButton = styled.button`
-	all: unset;
-	font-family: inherit;
-	border-radius: 100%;
-	height: 35px;
-	width: 35px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	color: ${ COLORS.gray[ 900 ] };
-	background-color: white;
-	box-shadow: 0 2px 10px hsla( 0, 0%, 0%, 0.141 );
-
-	&:hover,
-	&:focus {
-		color: ${ COLORS.ui.theme };
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px ${ COLORS.ui.theme };
-	}
-
-	svg {
-		fill: currentColor;
-	}
-`;
-
 const ItemHelpText = styled.span`
 	font-size: 10px;
 	color: #777;
@@ -198,11 +172,7 @@ const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
 );
 export const Default = Template.bind( {} );
 Default.args = {
-	trigger: (
-		<MenuButton aria-label="Customize options">
-			<Icon icon={ menu } size={ 20 } />
-		</MenuButton>
-	),
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 	sideOffset: 12,
 	children: (
 		<>
