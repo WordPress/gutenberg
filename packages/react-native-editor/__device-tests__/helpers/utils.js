@@ -529,6 +529,8 @@ const setThemeJSONFromClipboard = async ( driver, theme ) => {
 			'//XCUIElementTypeButton[@name="Set theme.json from Clipboard"]'
 		);
 	}
+	// Wait for styles to be set
+	await driver.sleep( 3000 );
 };
 
 const toggleOrientation = async ( driver ) => {
