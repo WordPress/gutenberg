@@ -22,7 +22,8 @@
 	.components-external-link {
 		flex-grow: 0;
 		@include break-mobile() {
-			display: none;
+			opacity: 0;
+			transition: opacity 0.2s ease-in-out;
 		}
 		&:focus {
 			outline: none;
@@ -37,6 +38,7 @@
 	&:hover {
 		.components-external-link {
 			display: inline-block;
+			opacity: 1;
 		}
 	}
 }
