@@ -205,7 +205,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.openMenu' );
+			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenu' );
 			$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.core.navigation.isMenuOpen' );
 			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 			$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
