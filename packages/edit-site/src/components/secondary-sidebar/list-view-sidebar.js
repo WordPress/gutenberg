@@ -8,8 +8,8 @@ import {
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
