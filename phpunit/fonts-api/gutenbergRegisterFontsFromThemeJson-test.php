@@ -10,7 +10,7 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
  *
  * @since X.X.X
  * @group fontsapi
- * @covers ::WP_Fonts_Theme_Json_Handler::register_fonts_from_theme_json
+ * @covers WP_Fonts_Theme_Json_Handler::register_fonts_from_theme_json
  */
 class Tests_Fonts_RegisterFontsFromThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME   = 'fonts-block-theme';
