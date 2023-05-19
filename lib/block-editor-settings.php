@@ -81,7 +81,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 	// These settings may need to be updated based on data coming from theme.json sources.
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
-		$colors_by_origin          = $settings['__experimentalFeatures']['color']['palette'];
+		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
 		$settings['colors'] = isset( $colors_by_origin['custom'] ) ?
 			$colors_by_origin['custom'] : (
 				isset( $colors_by_origin['theme'] ) ?
@@ -90,7 +90,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
-		$gradients_by_origin          = $settings['__experimentalFeatures']['color']['gradients'];
+		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
 		$settings['gradients'] = isset( $gradients_by_origin['custom'] ) ?
 			$gradients_by_origin['custom'] : (
 				isset( $gradients_by_origin['theme'] ) ?
@@ -99,7 +99,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
-		$font_sizes_by_origin         = $settings['__experimentalFeatures']['typography']['fontSizes'];
+		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
 		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
 			$font_sizes_by_origin['custom'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
@@ -137,7 +137,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	}
 
 	if ( isset( $settings['__experimentalFeatures']['spacing']['spacingSizes'] ) ) {
-		$spacing_sizes_by_origin         = $settings['__experimentalFeatures']['spacing']['spacingSizes'];
+		$spacing_sizes_by_origin  = $settings['__experimentalFeatures']['spacing']['spacingSizes'];
 		$settings['spacingSizes'] = isset( $spacing_sizes_by_origin['custom'] ) ?
 			$spacing_sizes_by_origin['custom'] : (
 				isset( $spacing_sizes_by_origin['theme'] ) ?
