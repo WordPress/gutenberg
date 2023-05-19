@@ -189,9 +189,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 					{ ...props }
 				>
 					<ErrorBoundary>
-						{ window?.__experimentalEnableCommandCenter && (
-							<CommandMenu />
-						) }
+						<CommandMenu />
 						<EditorInitialization postId={ postId } />
 						<Layout styles={ styles } />
 					</ErrorBoundary>
