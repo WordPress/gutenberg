@@ -4,7 +4,7 @@
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { trash, backup } from '@wordpress/icons';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -16,7 +16,6 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { unlock } from '../../private-apis';
 
-const { useCommandLoader } = unlock( commandsPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function useEditModeCommandLoader() {
@@ -35,7 +34,7 @@ function useEditModeCommandLoader() {
 				? __( 'Delete template' )
 				: __( 'Delete template part' );
 		commands.push( {
-			name: label,
+			name: 'core/remove-template',
 			label,
 			icon: trash,
 			context: 'site-editor-edit',
@@ -55,7 +54,7 @@ function useEditModeCommandLoader() {
 				? __( 'Reset template' )
 				: __( 'Reset template part' );
 		commands.push( {
-			name: label,
+			name: 'core/reset-template',
 			label,
 			icon: backup,
 			callback: ( { close } ) => {

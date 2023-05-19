@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -15,7 +15,6 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  */
 import { unlock } from './lock-unlock';
 
-const { useCommandLoader } = unlock( privateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
@@ -66,7 +65,8 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
 					: {};
 				return {
-					name: record.title?.rendered + ' ' + record.id,
+					name: postType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),

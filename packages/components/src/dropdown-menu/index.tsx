@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,9 +14,12 @@ import { menu } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
+import type { DropdownMenuProps, DropdownOption } from './types';
 
-function mergeProps( defaultProps = {}, props = {} ) {
-	const mergedProps = {
+function mergeProps<
+	T extends { className?: string; [ key: string ]: unknown }
+>( defaultProps: Partial< T > = {}, props: T = {} as T ) {
+	const mergedProps: T = {
 		...defaultProps,
 		...props,
 	};
@@ -32,17 +34,92 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-/**
- * Whether the argument is a function.
- *
- * @param {*} maybeFunc The argument to check.
- * @return {boolean} True if the argument is a function, false otherwise.
- */
-function isFunction( maybeFunc ) {
+function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
 	return typeof maybeFunc === 'function';
 }
 
-function DropdownMenu( dropdownMenuProps ) {
+/**
+ *
+ * The DropdownMenu displays a list of actions (each contained in a MenuItem,
+ * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
+ * after the user has interacted with an element (a button or icon) or when
+ * they perform a specific action.
+ *
+ * Render a Dropdown Menu with a set of controls:
+ *
+ * ```jsx
+ * import { DropdownMenu } from '@wordpress/components';
+ * import {
+ * 	more,
+ * 	arrowLeft,
+ * 	arrowRight,
+ * 	arrowUp,
+ * 	arrowDown,
+ * } from '@wordpress/icons';
+ *
+ * const MyDropdownMenu = () => (
+ * 	<DropdownMenu
+ * 		icon={ more }
+ * 		label="Select a direction"
+ * 		controls={ [
+ * 			{
+ * 				title: 'Up',
+ * 				icon: arrowUp,
+ * 				onClick: () => console.log( 'up' ),
+ * 			},
+ * 			{
+ * 				title: 'Right',
+ * 				icon: arrowRight,
+ * 				onClick: () => console.log( 'right' ),
+ * 			},
+ * 			{
+ * 				title: 'Down',
+ * 				icon: arrowDown,
+ * 				onClick: () => console.log( 'down' ),
+ * 			},
+ * 			{
+ * 				title: 'Left',
+ * 				icon: arrowLeft,
+ * 				onClick: () => console.log( 'left' ),
+ * 			},
+ * 		] }
+ * 	/>
+ * );
+ * ```
+ *
+ * Alternatively, specify a `children` function which returns elements valid for
+ * use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
+ *
+ * ```jsx
+ * import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+ * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
+ *
+ * const MyDropdownMenu = () => (
+ * 	<DropdownMenu icon={ more } label="Select a direction">
+ * 		{ ( { onClose } ) => (
+ * 			<>
+ * 				<MenuGroup>
+ * 					<MenuItem icon={ arrowUp } onClick={ onClose }>
+ * 						Move Up
+ * 					</MenuItem>
+ * 					<MenuItem icon={ arrowDown } onClick={ onClose }>
+ * 						Move Down
+ * 					</MenuItem>
+ * 				</MenuGroup>
+ * 				<MenuGroup>
+ * 					<MenuItem icon={ trash } onClick={ onClose }>
+ * 						Remove
+ * 					</MenuItem>
+ * 				</MenuGroup>
+ * 			</>
+ * 		) }
+ * 	</DropdownMenu>
+ * );
+ * ```
+ *
+ */
+
+function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const {
 		children,
 		className,
@@ -62,13 +139,18 @@ function DropdownMenu( dropdownMenuProps ) {
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets;
+	let controlSets: DropdownOption[][];
 	if ( controls?.length ) {
+		// @ts-expect-error The check below is needed because `DropdownMenus`
+		// rendered by `ToolBarGroup` receive controls as a nested array.
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-			controlSets = [ controlSets ];
+			// This is not ideal, but at this point we know that `controls` is
+			// not a nested array, even if TypeScript doesn't.
+			controlSets = [ controls as DropdownOption[] ];
 		}
 	}
+
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
@@ -81,7 +163,7 @@ function DropdownMenu( dropdownMenuProps ) {
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
+				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
 					if ( disableOpenOnArrowDown ) {
 						return;
 					}
@@ -110,18 +192,22 @@ function DropdownMenu( dropdownMenuProps ) {
 					<Toggle
 						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ ( event ) => {
-							onToggle( event );
-							if ( mergedToggleProps.onClick ) {
-								mergedToggleProps.onClick( event );
-							}
-						} }
-						onKeyDown={ ( event ) => {
-							openOnArrowDown( event );
-							if ( mergedToggleProps.onKeyDown ) {
-								mergedToggleProps.onKeyDown( event );
-							}
-						} }
+						onClick={
+							( ( event ) => {
+								onToggle();
+								if ( mergedToggleProps.onClick ) {
+									mergedToggleProps.onClick( event );
+								}
+							} ) as React.MouseEventHandler< HTMLButtonElement >
+						}
+						onKeyDown={
+							( ( event ) => {
+								openOnArrowDown( event );
+								if ( mergedToggleProps.onKeyDown ) {
+									mergedToggleProps.onKeyDown( event );
+								}
+							} ) as React.KeyboardEventHandler< HTMLButtonElement >
+						}
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }

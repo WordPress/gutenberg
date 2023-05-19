@@ -49,7 +49,6 @@ describe( 'useGlobalStylesRevisions', () => {
 				styles: {},
 			},
 		],
-		isLoading: false,
 	};
 
 	it( 'returns loaded revisions with no unsaved changes', () => {
@@ -109,10 +108,24 @@ describe( 'useGlobalStylesRevisions', () => {
 		] );
 	} );
 
-	it( 'returns empty revisions when still loading', () => {
+	it( 'returns empty revisions', () => {
 		useSelect.mockImplementation( () => ( {
 			...selectValue,
-			isLoading: true,
+			revisions: [],
+		} ) );
+
+		const { result } = renderHook( () => useGlobalStylesRevisions() );
+		const { revisions, isLoading, hasUnsavedChanges } = result.current;
+
+		expect( isLoading ).toBe( true );
+		expect( hasUnsavedChanges ).toBe( false );
+		expect( revisions ).toEqual( [] );
+	} );
+
+	it( 'returns empty revisions when authors are not yet available', () => {
+		useSelect.mockImplementation( () => ( {
+			...selectValue,
+			authors: [],
 		} ) );
 
 		const { result } = renderHook( () => useGlobalStylesRevisions() );

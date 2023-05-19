@@ -19,6 +19,7 @@ function commands( state = {}, action ) {
 				[ action.name ]: {
 					name: action.name,
 					label: action.label,
+					searchLabel: action.searchLabel,
 					context: action.context,
 					callback: action.callback,
 					icon: action.icon,
