@@ -137,7 +137,7 @@ RUN groupadd -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Make media uploads writeable by the host user.
-RUN mkdir /var/www/html/wp-content/uploads/
+RUN mkdir -p /var/www/html/wp-content/uploads/
 RUN chown -R $HOST_UID:$HOST_GID /var/www/html/wp-content/uploads/
 
 # Install any dependencies we need in the container.
