@@ -109,6 +109,9 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'Playlist' ),
+						instructions: __(
+							'Upload an audio file or pick one from your media library.'
+						),
 					} }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
