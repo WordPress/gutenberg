@@ -35,7 +35,7 @@ import {
 	ToolbarItem,
 	ToolbarDropdownMenu,
 } from '..';
-import DropdownMenu from '../../dropdown-menu/v1';
+import DropdownMenu from '../../dropdown-menu';
 
 const meta: ComponentMeta< typeof Toolbar > = {
 	title: 'Components/Toolbar',

@@ -8,7 +8,7 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../../dropdown-menu/v1';
+import DropdownMenu from '../../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
 import ToolbarItem from '../toolbar-item';
 

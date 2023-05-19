@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../../../utils';
+import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -30,7 +30,7 @@ import { menu, wordpress } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Icon from '../../../icon';
+import Icon from '../../icon';
 
 const DropdownMenuStoryContext = createContext< {
 	itemOneChecked?: boolean;

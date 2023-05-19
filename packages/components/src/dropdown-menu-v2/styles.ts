@@ -8,9 +8,9 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
-import Icon from '../../icon';
+import { COLORS, font, rtl } from '../utils';
+import { space } from '../ui/utils/space';
+import Icon from '../icon';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',

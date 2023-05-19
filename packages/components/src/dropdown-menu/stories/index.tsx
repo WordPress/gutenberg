@@ -6,8 +6,8 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  * Internal dependencies
  */
 import DropdownMenu from '../';
-import MenuItem from '../../../menu-item';
-import MenuGroup from '../../../menu-group';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
 
 /**
  * WordPress dependencies

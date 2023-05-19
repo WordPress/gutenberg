@@ -14,7 +14,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import Icon from '../../icon';
+import Icon from '../icon';
 import * as DropdownMenuStyled from './styles';
 import type {
 	DropdownMenuProps,
