@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { NEW_TAB_REL } from './constants';
@@ -11,21 +6,19 @@ import { NEW_TAB_REL } from './constants';
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
 
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			NEW_TAB_REL.forEach( ( relVal ) => {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
+	if ( currentRel !== undefined && newRel ) {
+		NEW_TAB_REL.forEach( ( relVal ) => {
+			const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
+			newRel = newRel.replace( regExp, '' );
+		} );
 
-			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
-				newRel = newRel.trim();
-			}
+		// Only trim if NEW_TAB_REL values was replaced.
+		if ( newRel !== currentRel ) {
+			newRel = newRel.trim();
+		}
 
-			if ( isEmpty( newRel ) ) {
-				newRel = undefined;
-			}
+		if ( ! newRel ) {
+			newRel = undefined;
 		}
 	}
 

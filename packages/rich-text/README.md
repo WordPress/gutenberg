@@ -269,11 +269,13 @@ Check if the selection of a Rich Text value is collapsed or not. Collapsed means
 
 _Parameters_
 
--   _value_ `RichTextValue`: The rich text value to check.
+-   _props_ `RichTextValue`: The rich text value to check.
+-   _props.start_ `RichTextValue[ 'start' ]`:
+-   _props.end_ `RichTextValue[ 'end' ]`:
 
 _Returns_
 
--   `boolean|undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
+-   `boolean | undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
 
 ### isEmpty
 
@@ -356,6 +358,10 @@ _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
 
+### RichTextValue
+
+An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
+
 ### slice
 
 Slice a Rich Text value from `startIndex` to `endIndex`. Indices are retrieved from the selection if none are provided. This is similar to `String.prototype.slice`.
@@ -433,7 +439,7 @@ _Parameters_
 
 _Returns_
 
--   `RichTextFormatType|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
@@ -443,7 +449,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named parameters.
 -   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `RichTextFormatType`: The format type's settings.
+-   _$1.settings_ `WPFormat=`: The format type's settings.
 
 _Returns_
 
@@ -458,7 +464,7 @@ _Parameters_
 -   _$1_ `Object`: Named parameters.
 -   _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
 -   _$1.value_ `RichTextValue`: Value to check for selection.
--   _$1.settings_ `RichTextFormatType`: The format type's settings.
+-   _$1.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 

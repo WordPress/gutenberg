@@ -107,7 +107,7 @@ const UnforwardedTabPanel = (
 	// to show the `tab-panel` associated with the clicked tab.
 	const activateTabAutomatically = (
 		_childIndex: number,
-		child: HTMLButtonElement
+		child: HTMLElement
 	) => {
 		child.click();
 	};

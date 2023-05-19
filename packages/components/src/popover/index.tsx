@@ -109,20 +109,11 @@ const AnimatedWrapper = forwardRef(
 		}: HTMLMotionProps< 'div' > & AnimatedWrapperProps,
 		forwardedRef: ForwardedRef< any >
 	) => {
-		// When animating, animate only once (i.e. when the popover is opened), and
-		// do not animate on subsequent prop changes (as it conflicts with
-		// floating-ui's positioning updates).
-		const [ hasAnimatedOnce, setHasAnimatedOnce ] = useState( false );
 		const shouldReduceMotion = useReducedMotion();
 
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 			() => placementToMotionAnimationProps( placement ),
 			[ placement ]
-		);
-
-		const onAnimationComplete = useCallback(
-			() => setHasAnimatedOnce( true ),
-			[]
 		);
 
 		const computedAnimationProps: HTMLMotionProps< 'div' > =
@@ -133,10 +124,6 @@ const AnimatedWrapper = forwardRef(
 							...receivedInlineStyles,
 						},
 						...otherMotionProps,
-						onAnimationComplete,
-						animate: hasAnimatedOnce
-							? false
-							: otherMotionProps.animate,
 				  }
 				: {
 						animate: false,
@@ -160,8 +147,8 @@ const UnforwardedPopover = (
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate`, which is re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' >
+		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
+		keyof Omit< MotionProps, 'animate' | 'children' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {

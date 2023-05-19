@@ -1,10 +1,11 @@
+'use strict';
 /**
  * Internal dependencies
  */
 const addOrReplacePort = require( '../add-or-replace-port.js' );
 
 describe( 'addOrReplacePort', () => {
-	beforeEach( () => {
+	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 
@@ -35,6 +36,33 @@ describe( 'addOrReplacePort', () => {
 
 		for ( const test of testMap ) {
 			const result = addOrReplacePort( test.in, '101' );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
+	it( 'should support number ports', () => {
+		const testMap = [ { in: 'test', expect: 'test:104' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 104, false );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
+	it( 'should not add default HTTP port', () => {
+		const testMap = [ { in: 'test', expect: 'test' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 80, false );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
+	it( 'should not add default HTTPS port', () => {
+		const testMap = [ { in: 'test', expect: 'test' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 443, false );
 			expect( result ).toEqual( test.expect );
 		}
 	} );

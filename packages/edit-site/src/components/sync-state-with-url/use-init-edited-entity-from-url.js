@@ -4,12 +4,15 @@
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, postType } = {} } = useLocation();

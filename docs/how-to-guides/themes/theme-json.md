@@ -1174,7 +1174,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ### patterns
 
-<div class="callout callout-alert">Supported in WordPress from version 6.0 using [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.</div>
+<div class="callout callout-alert">Supported in WordPress from version 6.0 using <a href="https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/">version 2</a> of <code>theme.json</code>.</div>
 
 Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
 

@@ -5,28 +5,29 @@
 	"name": "core/details",
 	"title": "Details",
 	"category": "text",
-	"description": "A block that displays a summary and shows or hides additional content.",
-	"keywords": [ "disclosure", "summary", "hide", "transcript" ],
+	"description": "Hide and show additional content.",
+	"keywords": [ "disclosure", "summary", "hide", "accordion" ],
 	"textdomain": "default",
 	"attributes": {
 		"showContent": {
 			"type": "boolean",
 			"default": false
+		},
+		"summary": {
+			"type": "string"
 		}
 	},
 	"supports": {
-		"align": true,
+		"align": [ "wide", "full" ],
 		"color": {
 			"gradients": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
-				"text": true,
-				"link": true
+				"text": true
 			}
 		},
 		"__experimentalBorder": {
-			"radius": true,
 			"color": true,
 			"width": true,
 			"style": true
@@ -50,5 +51,6 @@
 			}
 		}
 	},
+	"editorStyle": "wp-block-details-editor",
 	"style": "wp-block-details"
 }

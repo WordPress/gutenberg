@@ -55,7 +55,9 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 	- _Return_
 		- `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
 
-It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+<div class="callout callout-alert">
+It's important to note that <code>attributes</code>, <code>supports</code>, and <code>save</code> are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+</div>
 
 ### Example:
 

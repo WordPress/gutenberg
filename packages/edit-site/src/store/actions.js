@@ -146,7 +146,7 @@ export const removeTemplate =
 					__( '"%s" deleted.' ),
 					template.title.rendered
 				),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
 		} catch ( error ) {
 			const errorMessage =
@@ -365,6 +365,8 @@ export function setIsSaveViewOpened( isOpen ) {
 export const revertTemplate =
 	( template, { allowUndo = true } = {} ) =>
 	async ( { registry } ) => {
+		const noticeId = 'edit-site-template-reverted';
+		registry.dispatch( noticesStore ).removeNotice( noticeId );
 		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
@@ -466,6 +468,7 @@ export const revertTemplate =
 					.dispatch( noticesStore )
 					.createSuccessNotice( __( 'Template reverted.' ), {
 						type: 'snackbar',
+						id: noticeId,
 						actions: [
 							{
 								label: __( 'Undo' ),
@@ -473,10 +476,6 @@ export const revertTemplate =
 							},
 						],
 					} );
-			} else {
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ) );
 			}
 		} catch ( error ) {
 			const errorMessage =
