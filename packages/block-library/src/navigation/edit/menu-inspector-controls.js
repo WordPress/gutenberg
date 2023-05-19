@@ -13,7 +13,6 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -54,7 +53,6 @@ const MainContent = ( {
 		[ clientId ]
 	);
 
-	const [ clientIdWithOpenLinkUI, setClientIdWithOpenLinkUI ] = useState();
 	const { lastInsertedBlockClientId } = useSelect( ( select ) => {
 		const { getLastInsertedBlocksClientIds } = unlock(
 			select( blockEditorStore )
@@ -67,28 +65,8 @@ const MainContent = ( {
 		};
 	}, [] );
 
-	const {
-		insertedBlockAttributes,
-		insertedBlockName,
-		setInsertedBlockAttributes,
-	} = useInsertedBlock( lastInsertedBlockClientId );
-
-	const hasExistingLinkValue = insertedBlockAttributes?.url;
-
-	useEffect( () => {
-		if (
-			lastInsertedBlockClientId &&
-			BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
-			! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
-		) {
-			setClientIdWithOpenLinkUI( lastInsertedBlockClientId );
-		}
-	}, [
-		lastInsertedBlockClientId,
-		clientId,
-		insertedBlockName,
-		hasExistingLinkValue,
-	] );
+	const { insertedBlockAttributes, setInsertedBlockAttributes } =
+		useInsertedBlock( lastInsertedBlockClientId );
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
@@ -115,14 +93,24 @@ const MainContent = ( {
 		lastInsertedBlock,
 		setLastInsertedBlock
 	) => {
+		const blockHasExistingLinkValue = !! lastInsertedBlock?.url;
+		const blockSupportsLinkUI = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+			lastInsertedBlock?.name
+		);
+		const currentBlockWasJustInserted =
+			lastInsertedBlock?.clientId === currentBlock.clientId;
+
+		const shouldShowLinkUIForBlock =
+			blockSupportsLinkUI &&
+			! blockHasExistingLinkValue && // don't re-show the Link UI if the block already has a link value.
+			currentBlockWasJustInserted;
+
 		return (
-			clientIdWithOpenLinkUI &&
-			lastInsertedBlock?.clientId === currentBlock.clientId && (
+			shouldShowLinkUIForBlock && (
 				<LinkUI
 					clientId={ lastInsertedBlockClientId }
 					link={ insertedBlockAttributes }
 					onClose={ () => {
-						setClientIdWithOpenLinkUI( null );
 						setLastInsertedBlock( null );
 					} }
 					hasCreateSuggestion={ false }
@@ -132,11 +120,9 @@ const MainContent = ( {
 							setInsertedBlockAttributes,
 							insertedBlockAttributes
 						);
-						setClientIdWithOpenLinkUI( null );
 						setLastInsertedBlock( null );
 					} }
 					onCancel={ () => {
-						setClientIdWithOpenLinkUI( null );
 						setLastInsertedBlock( null );
 					} }
 				/>
