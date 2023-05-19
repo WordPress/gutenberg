@@ -12,8 +12,7 @@ import {
 	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -26,7 +25,6 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
-import { useInsertedBlock } from '../../navigation-link/use-inserted-block';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -54,40 +52,13 @@ const MainContent = ( {
 		[ clientId ]
 	);
 
-	const [ clientIdWithOpenLinkUI, setClientIdWithOpenLinkUI ] = useState();
-	const { lastInsertedBlockClientId } = useSelect( ( select ) => {
-		const { getLastInsertedBlocksClientIds } = unlock(
-			select( blockEditorStore )
-		);
-		const lastInsertedBlocksClientIds = getLastInsertedBlocksClientIds();
-		return {
-			lastInsertedBlockClientId:
-				lastInsertedBlocksClientIds && lastInsertedBlocksClientIds[ 0 ],
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) return;
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
-	}, [] );
-
-	const {
-		insertedBlockAttributes,
-		insertedBlockName,
-		setInsertedBlockAttributes,
-	} = useInsertedBlock( lastInsertedBlockClientId );
-
-	const hasExistingLinkValue = insertedBlockAttributes?.url;
-
-	useEffect( () => {
-		if (
-			lastInsertedBlockClientId &&
-			BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
-			! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
-		) {
-			setClientIdWithOpenLinkUI( lastInsertedBlockClientId );
-		}
-	}, [
-		lastInsertedBlockClientId,
-		clientId,
-		insertedBlockName,
-		hasExistingLinkValue,
-	] );
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
@@ -109,23 +80,42 @@ const MainContent = ( {
 				'You have not yet created any menus. Displaying a list of your Pages'
 		  );
 
-	const renderLinkUI = ( block ) => {
+	const renderLinkUI = (
+		currentBlock,
+		lastInsertedBlock,
+		setLastInsertedBlock
+	) => {
+		const blockSupportsLinkUI = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+			lastInsertedBlock?.name
+		);
+		const currentBlockWasJustInserted =
+			lastInsertedBlock?.clientId === currentBlock.clientId;
+
+		const shouldShowLinkUIForBlock =
+			blockSupportsLinkUI && currentBlockWasJustInserted;
+
 		return (
-			clientIdWithOpenLinkUI === block.clientId && (
+			shouldShowLinkUIForBlock && (
 				<LinkUI
-					clientId={ lastInsertedBlockClientId }
-					link={ insertedBlockAttributes }
-					onClose={ () => setClientIdWithOpenLinkUI( null ) }
+					clientId={ lastInsertedBlock?.clientId }
+					link={ lastInsertedBlock?.attributes }
+					onClose={ () => {
+						setLastInsertedBlock( null );
+					} }
 					hasCreateSuggestion={ false }
 					onChange={ ( updatedValue ) => {
 						updateAttributes(
 							updatedValue,
-							setInsertedBlockAttributes,
-							insertedBlockAttributes
+							setInsertedBlockAttributes(
+								lastInsertedBlock?.clientId
+							),
+							lastInsertedBlock?.attributes
 						);
-						setClientIdWithOpenLinkUI( null );
+						setLastInsertedBlock( null );
 					} }
-					onCancel={ () => setClientIdWithOpenLinkUI( null ) }
+					onCancel={ () => {
+						setLastInsertedBlock( null );
+					} }
 				/>
 			)
 		);
