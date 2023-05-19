@@ -12,7 +12,7 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../';
+import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 
 describe( 'DropdownMenu', () => {
