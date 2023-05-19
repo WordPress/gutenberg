@@ -46,7 +46,7 @@ class WP_Fonts_Theme_Json_Handler
 		// Find missing fonts that are not in the theme's theme.json.
 		$to_add = array();
 		if ( ! empty( $font_families_registered ) ) {
-			$to_add = array_diff( $font_families_registered, static::get_families( $font_families_from_theme ) );
+			$to_add = array_diff( $font_families_registered, static::get_font_families( $font_families_from_theme ) );
 		}
 
 		// Bail out early if there are no missing fonts.
@@ -76,6 +76,11 @@ class WP_Fonts_Theme_Json_Handler
 		return new WP_Theme_JSON_Gutenberg( $raw_data );
 	}
 
+	/**
+	 * Helper function that returns an array of settings for parsing font families.
+	 *
+	 * @return array
+	 */
 	private static function get_settings()
 	{
 		// Get settings.
@@ -118,7 +123,7 @@ class WP_Fonts_Theme_Json_Handler
 	 * @param  array $families_data The font-families data.
 	 * @return array                The font-families array.
 	 */
-	private static function get_families( $families_data ) {
+	private static function get_font_families( $families_data ) {
 		$families = array();
 		foreach ( $families_data as $family ) {
 			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $family );
@@ -131,6 +136,11 @@ class WP_Fonts_Theme_Json_Handler
 		return ! empty( $families ) ? array_keys( $families ) : array();
 	}
 
+	/**
+	 * @param array $settings
+	 *
+	 * @return array
+	 */
 	private static function parse_font_families( array $settings )
 	{
 		$handles = array();
