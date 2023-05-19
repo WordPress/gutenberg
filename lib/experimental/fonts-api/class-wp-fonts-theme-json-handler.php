@@ -28,6 +28,54 @@ class WP_Fonts_Theme_Json_Handler
 		wp_enqueue_fonts( $handles );
 	}
 
+	/**
+	 * Add missing fonts data to the global styles.
+	 *
+	 * @param  WP_Theme_JSON_Gutenberg $data The global styles.
+	 * @return WP_Theme_JSON_Gutenberg       The global styles with missing fonts data.
+	 */
+	public static function add_registered_fonts_to_theme_json( $data ) {
+		$font_families_registered = wp_fonts()->get_registered_font_families();
+
+		$raw_data = $data->get_raw_data();
+
+		$font_families_from_theme = ! empty( $raw_data['settings']['typography']['fontFamilies']['theme'] )
+			? $raw_data['settings']['typography']['fontFamilies']['theme']
+			: array();
+
+		// Find missing fonts that are not in the theme's theme.json.
+		$to_add = array();
+		if ( ! empty( $font_families_registered ) ) {
+			$to_add = array_diff( $font_families_registered, static::get_families( $font_families_from_theme ) );
+		}
+
+		// Bail out early if there are no missing fonts.
+		if ( empty( $to_add ) ) {
+			return $data;
+		}
+
+		// Make sure the path to settings.typography.fontFamilies.theme exists
+		// before adding missing fonts.
+		if ( empty( $raw_data['settings'] ) ) {
+			$raw_data['settings'] = array();
+		}
+		if ( empty( $raw_data['settings']['typography'] ) ) {
+			$raw_data['settings']['typography'] = array();
+		}
+		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
+			$raw_data['settings']['typography']['fontFamilies'] = array();
+		}
+		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
+			$raw_data['settings']['typography']['fontFamilies']['theme'] = array();
+		}
+
+		foreach ( $to_add as $font_family_handle ) {
+			$raw_data['settings']['typography']['fontFamilies']['theme'][] = wp_fonts()->to_theme_json( $font_family_handle );
+		}
+
+		return new WP_Theme_JSON_Gutenberg( $raw_data );
+	}
+
 	private static function get_settings()
 	{
 		// Get settings.
@@ -148,54 +196,6 @@ class WP_Fonts_Theme_Json_Handler
 		}
 
 		return array( $fonts, $handles );
-	}
-
-	/**
-	 * Add missing fonts data to the global styles.
-	 *
-	 * @param  WP_Theme_JSON_Gutenberg $data The global styles.
-	 * @return WP_Theme_JSON_Gutenberg       The global styles with missing fonts data.
-	 */
-	public static function add_registered_fonts_to_theme_json( $data ) {
-		$font_families_registered = wp_fonts()->get_registered_font_families();
-
-		$raw_data = $data->get_raw_data();
-
-		$font_families_from_theme = ! empty( $raw_data['settings']['typography']['fontFamilies']['theme'] )
-			? $raw_data['settings']['typography']['fontFamilies']['theme']
-			: array();
-
-		// Find missing fonts that are not in the theme's theme.json.
-		$to_add = array();
-		if ( ! empty( $font_families_registered ) ) {
-			$to_add = array_diff( $font_families_registered, static::get_families( $font_families_from_theme ) );
-		}
-
-		// Bail out early if there are no missing fonts.
-		if ( empty( $to_add ) ) {
-			return $data;
-		}
-
-		// Make sure the path to settings.typography.fontFamilies.theme exists
-		// before adding missing fonts.
-		if ( empty( $raw_data['settings'] ) ) {
-			$raw_data['settings'] = array();
-		}
-		if ( empty( $raw_data['settings']['typography'] ) ) {
-			$raw_data['settings']['typography'] = array();
-		}
-		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
-			$raw_data['settings']['typography']['fontFamilies'] = array();
-		}
-		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
-			$raw_data['settings']['typography']['fontFamilies']['theme'] = array();
-		}
-
-		foreach ( $to_add as $font_family_handle ) {
-			$raw_data['settings']['typography']['fontFamilies']['theme'][] = wp_fonts()->to_theme_json( $font_family_handle );
-		}
-
-		return new WP_Theme_JSON_Gutenberg( $raw_data );
 	}
 }
 
