@@ -13,7 +13,7 @@
 -   Added experimental v2 of `DropdownMenu` ([#49473](https://github.com/WordPress/gutenberg/pull/49473)).
 
 ### Bug Fix
--   `ColorPicker`: Add an outline when the color picker select box is focused([#50609]https://github.com/WordPress/gutenberg/pull/50609)
+-   `ColorPicker`: Add an outline when the color picker select box is focused([#50609](https://github.com/WordPress/gutenberg/pull/50609)).
 -   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
 
 ## 24.0.0 (2023-05-10)
