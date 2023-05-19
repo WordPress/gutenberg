@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": true,
+	"name": "core/template-fill",
+	"title": "Template Fill",
+	"category": "widgets",
+	"description": "Add custom template fill to use with the template slot.",
+	"textdomain": "default",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "html"
+		},
+		"name": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false,
+		"inserter": false
+	}
+}
