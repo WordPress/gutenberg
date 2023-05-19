@@ -369,7 +369,10 @@ class RCTAztecView: Aztec.TextView {
             self.text = text.replacingOccurrences(of: objectPlaceholder, with: "")
         }
         
-        self.insertText(dictationText)
+        // Get current position of cursor and add dictated text to it
+        if let range = self.selectedTextRange {
+            self.replace(range, withText: dictationText)
+        }
     }
 
     // MARK: - Custom Edit Intercepts
