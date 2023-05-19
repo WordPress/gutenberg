@@ -588,11 +588,12 @@ test.describe( 'Navigation block', () => {
 			// Expect to see the Link creation UI be focused.
 			const linkUIInput = linkControl.getSearchInput();
 
-			await expect( linkUIInput ).toBeFocused();
-
-			// Coverage for bug whereby Link UI input would be incorrectly
-			// prepopulated. It should be empty.
+			// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
+			// It should:
+			// - be empty - not pre-populated
+			// - focused - should not be in "preview" mode but rather ready to accept input.
 			// See: https://github.com/WordPress/gutenberg/issues/50733
+			await expect( linkUIInput ).toBeFocused();
 			await expect( linkUIInput ).toBeEmpty();
 
 			const firstResult = await linkControl.getNthSearchResult( 0 );
