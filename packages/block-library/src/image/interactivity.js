@@ -31,6 +31,20 @@ store( {
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
+
+					context.core.image.documentElement.classList.add(
+						'has-lightbox-open'
+					);
+
+					context.core.image.adminElement.setAttribute(
+						'inert',
+						true
+					);
+
+					context.core.image.siteBlocksElement.setAttribute(
+						'inert',
+						true
+					);
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
@@ -44,6 +58,18 @@ store( {
 						) {
 							return;
 						}
+						document.documentElement.classList.remove(
+							'has-lightbox-open'
+						);
+
+						context.core.image.adminElement.removeAttribute(
+							'inert'
+						);
+
+						context.core.image.siteBlocksElement.removeAttribute(
+							'inert'
+						);
+
 						context.core.image.lightboxEnabled = false;
 						context.core.image.lastFocusedElement.focus();
 					}
@@ -55,8 +81,7 @@ store( {
 							if (
 								event.shiftKey &&
 								window.document.activeElement ===
-									context.core.navigation
-										.firstFocusableElement
+									context.core.image.firstFocusableElement
 							) {
 								event.preventDefault();
 								context.core.image.lastFocusableElement.focus();
@@ -85,18 +110,25 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
+					context.core.image.documentElement =
+						document.documentElement;
+					context.core.image.adminElement =
+						document.querySelector( '#wpadminbar' );
+					context.core.image.siteBlocksElement =
+						document.querySelector( '.wp-site-blocks' );
+
+					const focusableElements =
+						ref.querySelectorAll( focusableSelectors );
+					context.core.image.firstFocusableElement =
+						focusableElements[ 0 ];
+					context.core.image.lastFocusableElement =
+						focusableElements[ focusableElements.length - 1 ];
+
 					if ( context.core.image.lightboxEnabled ) {
 						// We need to wait until the DOM is able
 						// to receive focus updates for accessibility
 						await tick();
 						ref.querySelector( '.close-button' ).focus();
-
-						const focusableElements =
-							ref.querySelectorAll( focusableSelectors );
-						context.core.image.firstFocusableElement =
-							focusableElements[ 0 ];
-						context.core.image.lastFocusableElement =
-							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
 			},

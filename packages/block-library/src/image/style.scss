@@ -265,3 +265,7 @@
 		visibility: hidden;
 	}
 }
+
+html.has-lightbox-open {
+	overflow: hidden;
+}
