@@ -590,7 +590,7 @@ test.describe( 'Navigation block', () => {
 
 			// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
 			// It should:
-			// - focused - should not be in "preview" mode but rather ready to accept input.
+			// - be focused - should not be in "preview" mode but rather ready to accept input.
 			// - be empty - not pre-populated
 			// See: https://github.com/WordPress/gutenberg/issues/50733
 			await expect( linkUIInput ).toBeFocused();
@@ -851,7 +851,7 @@ test.describe( 'Navigation block', () => {
 			requestUtils,
 			linkControl,
 		} ) => {
-			// Provides coverage bug whereby the Link UI would be unexpectedly displayed for the last
+			// Provides coverage for a bug whereby the Link UI would be unexpectedly displayed for the last
 			// inserted block even if the block had been deselected and then reselected.
 			// See: https://github.com/WordPress/gutenberg/issues/50601
 
