@@ -227,7 +227,13 @@ export default function Layout() {
 											  }
 											: {}
 									}
-									initial={ false }
+									// Setting a transform property (in this case scale) on an element makes it act as a containing block for its descendents.
+									// This means that the snackbar notices inside this component are repositioned to be relative to this element.
+									// To avoid the snackbars jumping about we need to ensure that a transform property is always set.
+									// Setting a scale of 1 is interpred by framer as no change, so once the animation completes
+									// the transform property of this element is set to none, thus removing its role as a container block.
+									// Instead we set the initial scale of this element to 1.000000000000001 so that there is always a transform property set.
+									initial={ { scale: 1.000000000000001 } }
 									layout="position"
 									className="edit-site-layout__canvas"
 									transition={ {
