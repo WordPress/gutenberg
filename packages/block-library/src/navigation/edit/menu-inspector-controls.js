@@ -60,6 +60,7 @@ const MainContent = ( {
 			select( blockEditorStore )
 		);
 		const lastInsertedBlocksClientIds = getLastInsertedBlocksClientIds();
+
 		return {
 			lastInsertedBlockClientId:
 				lastInsertedBlocksClientIds && lastInsertedBlocksClientIds[ 0 ],
@@ -109,13 +110,21 @@ const MainContent = ( {
 				'You have not yet created any menus. Displaying a list of your Pages'
 		  );
 
-	const renderLinkUI = ( block ) => {
+	const renderLinkUI = (
+		currentBlock,
+		lastInsertedBlock,
+		setLastInsertedBlock
+	) => {
 		return (
-			clientIdWithOpenLinkUI === block.clientId && (
+			clientIdWithOpenLinkUI &&
+			lastInsertedBlock?.clientId === currentBlock.clientId && (
 				<LinkUI
 					clientId={ lastInsertedBlockClientId }
 					link={ insertedBlockAttributes }
-					onClose={ () => setClientIdWithOpenLinkUI( null ) }
+					onClose={ () => {
+						setClientIdWithOpenLinkUI( null );
+						setLastInsertedBlock( null );
+					} }
 					hasCreateSuggestion={ false }
 					onChange={ ( updatedValue ) => {
 						updateAttributes(
@@ -124,8 +133,12 @@ const MainContent = ( {
 							insertedBlockAttributes
 						);
 						setClientIdWithOpenLinkUI( null );
+						setLastInsertedBlock( null );
 					} }
-					onCancel={ () => setClientIdWithOpenLinkUI( null ) }
+					onCancel={ () => {
+						setClientIdWithOpenLinkUI( null );
+						setLastInsertedBlock( null );
+					} }
 				/>
 			)
 		);
