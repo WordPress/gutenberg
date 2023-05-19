@@ -7,17 +7,17 @@ import { __ } from '@wordpress/i18n';
 export const MODAL_TABS = [
     {
         name: 'installed-fonts',
-        title: __('Installed Fonts'),
+        title: __('Activate Fonts'),
         className: 'installed-fonts',
     },
     {
         name: 'google-fonts',
-        title: __('Add Google Fonts'),
+        title: __('Install Google Fonts'),
         className: 'google-fonts',
     },
     {
         name: 'local-fonts',
-        title: __('Add Local Fonts'),
+        title: __('Install Local Fonts'),
         className: 'local-fonts',
     },
 ];
@@ -35,5 +35,5 @@ export const GOOGLE_FONT_FALLBACKS = {
 
 export const DEFAULT_DEMO_CONFIG = {
     text: DEMO_TEXT,
-    fontSize: 18,
+    fontSize: 24,
 };

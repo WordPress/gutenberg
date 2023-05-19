@@ -117,7 +117,7 @@ function GoogleFonts() {
 		return (
 			<HStack justify="flex-end">
 				<Button variant="primary" onClick={ handleSaveChanges } disabled={ !hasChanges || isSaving }>
-					{ isSaving && <Spinner/> } { __("Save Installed Fonts") }
+					{ isSaving && <Spinner/> } { __("Install Google Fonts") }
 				</Button>
 			</HStack>
 		);

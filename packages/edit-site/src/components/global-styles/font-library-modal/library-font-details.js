@@ -28,7 +28,7 @@ function LibraryFontDetails ({ font }) {
     const fontFaces = ( font.fontFace && font.fontFace.length )
         ? font.fontFace
         : [ { fontFamily: font.fontFamily, fontStyle: 'normal', fontWeight: '400' } ];
-
+    
     return (
         <div>  
             <Grid columns={2}>
