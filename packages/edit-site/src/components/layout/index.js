@@ -143,7 +143,7 @@ export default function Layout() {
 
 	return (
 		<>
-			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
+			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }

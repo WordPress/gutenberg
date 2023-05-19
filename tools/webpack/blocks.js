@@ -251,7 +251,7 @@ module.exports = [
 					},
 					runtime: {
 						name: 'runtime',
-						test: /[\\/]utils\/interactivity[\\/]/,
+						test: /[\\/]utils[\\/]interactivity[\\/]/,
 						filename: './interactivity/[name].min.js',
 						chunks: 'all',
 						minSize: 0,

@@ -1,6 +1,11 @@
 == Changelog ==
 
-= 15.8.0-rc.1 =
+= 15.8.0 =
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
 
 ## Changelog
 
@@ -103,6 +108,8 @@
 - Fix/wp get global styles for custom props returns internal variable. ([50366](https://github.com/WordPress/gutenberg/pull/50366))
 - Revisions controller: Fix author and date fields. ([50117](https://github.com/WordPress/gutenberg/pull/50117))
 - Fix hover/focus styles for `style variation` buttons. ([50056](https://github.com/WordPress/gutenberg/pull/50056))
+- Use bundled files for enqueuing global styles. ([50310](https://github.com/WordPress/gutenberg/pull/50310))
+
 
 #### Block Editor
 - Fix issue with margin collapsing when selecting blocks. ([50215](https://github.com/WordPress/gutenberg/pull/50215))
@@ -158,6 +165,7 @@
 #### Interactivity API
 - Add Interactivity API runtime. ([49994](https://github.com/WordPress/gutenberg/pull/49994))
 - Navigation block with the Interactivity API. ([50041](https://github.com/WordPress/gutenberg/pull/50041))
+- Fix building plugin zip to include interactive blocks. ([50598](https://github.com/WordPress/gutenberg/pull/50598))
 
 #### Command Center
 - Update the experiment label. ([50467](https://github.com/WordPress/gutenberg/pull/50467))
@@ -296,6 +304,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @ajlende @alexstine @andrewserong @apeatling @artemiomorales @aurooba @bph @chad1008 @ciampo @DAreRodz @dcalhoun @draganescu @ecgan @fluiddot @fullofcaffeine @geriux @getdave @glendaviesnz @gziolo @hellofromtonya @ironprogrammer @jameskoster @jasmussen @jeryj @jhnstn @johnhooks @jsnajdr @juanfra @kevin940726 @kienstra @Mamaduka @margolisj @mburridge @mirka @mokagio @mtias @n2erjo00 @ndiego @noahtallen @noisysocks @ntsekouras @oandregal @ObliviousHarmony @ocean90 @ockham @pavanpatil1 @pooja-muchandikar @priethor @ramonjd @richtabor @samnajian @SantosGuillamot @scruffian @SiobhyB @t-hamano @talldan @tellthemachines @torounit @tyxla @westonruter @youknowriad
+
+
 
 
 = 15.7.1 =

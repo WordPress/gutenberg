@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Validate whether or not config options exist to prevent accidentally including ones that don't.
+
 ## 7.0.0 (2023-05-10)
 
 ### Breaking Change
