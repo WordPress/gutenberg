@@ -573,10 +573,18 @@ export function getNextNonWhitespaceToken( tokens ) {
  * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
  */
 function getHTMLTokens( html, logger = createLogger() ) {
+	let temp = html;
 	try {
-		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
+		// Quick way to ensure that the template slot is correctly validated as HTML comment.
+		if ( temp.includes( '</$wp:template-slot' ) ) {
+			temp = temp.replace(
+				/<\/(\$wp\:template-slot[^>]*)>/gi,
+				'<!-- $1 -->'
+			);
+		}
+		return new Tokenizer( new DecodeEntityParser() ).tokenize( temp );
 	} catch ( e ) {
-		logger.warning( 'Malformed HTML detected: %s', html );
+		logger.warning( 'Malformed HTML detected: %s', temp );
 	}
 
 	return null;
