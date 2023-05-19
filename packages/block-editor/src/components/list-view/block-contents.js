@@ -47,7 +47,8 @@ const ListViewBlockContents = forwardRef(
 			[ clientId ]
 		);
 
-		const { renderAdditionalBlockUI } = useListViewContext();
+		const { renderAdditionalBlockUI, insertedBlock, setInsertedBlock } =
+			useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -66,7 +67,12 @@ const ListViewBlockContents = forwardRef(
 
 		return (
 			<>
-				{ renderAdditionalBlockUI && renderAdditionalBlockUI( block ) }
+				{ renderAdditionalBlockUI &&
+					renderAdditionalBlockUI(
+						block,
+						insertedBlock,
+						setInsertedBlock
+					) }
 				<BlockDraggable clientIds={ draggableClientIds }>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
