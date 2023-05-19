@@ -15,6 +15,7 @@
 ### Bug Fix
 
 -   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
+-   `ToggleGroupControl`: Fix focus and selected style to support Windows High Contrast mode ([#50785](https://github.com/WordPress/gutenberg/pull/50785)).
 
 ## 24.0.0 (2023-05-10)
 
