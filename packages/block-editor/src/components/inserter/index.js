@@ -150,7 +150,6 @@ class PrivateInserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
-			orderInitialBlockItems,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -174,7 +173,6 @@ class PrivateInserter extends Component {
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
-					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 			);
 		}
@@ -426,13 +424,7 @@ export const ComposedPrivateInserter = compose( [
 ] )( PrivateInserter );
 
 const Inserter = forwardRef( ( props, ref ) => {
-	return (
-		<ComposedPrivateInserter
-			ref={ ref }
-			{ ...props }
-			orderInitialBlockItems={ undefined }
-		/>
-	);
+	return <ComposedPrivateInserter ref={ ref } { ...props } />;
 } );
 
 export default Inserter;

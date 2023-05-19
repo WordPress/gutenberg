@@ -1,34 +1,22 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	Tooltip,
-	VisuallyHidden,
+	Button,
+	Modal,
+	__experimentalGrid as Grid,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	archive,
-	blockMeta,
-	category,
-	home,
-	list,
-	media,
-	notFound,
-	page,
-	plus,
-	post,
-	postAuthor,
-	postDate,
-	postList,
-	search,
-	tag,
-	layout as customGenericTemplateIcon,
-} from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -36,7 +24,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import AddCustomTemplateModal from './add-custom-template-modal';
+import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
 	useDefaultTemplateTypes,
@@ -45,7 +33,7 @@ import {
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
 } from './utils';
-import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
+import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
@@ -68,21 +56,35 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'404',
 ];
 
-const TEMPLATE_ICONS = {
-	'front-page': home,
-	home: postList,
-	single: post,
-	page,
-	archive,
-	search,
-	404: notFound,
-	index: list,
-	category,
-	author: postAuthor,
-	taxonomy: blockMeta,
-	date: postDate,
-	tag,
-	attachment: media,
+function TemplateListItem( { title, description, onClick } ) {
+	return (
+		<Button onClick={ onClick }>
+			<VStack
+				as="span"
+				spacing={ 2 }
+				justify="flex-start"
+				style={ { width: '100%' } }
+			>
+				<Text
+					weight={ 500 }
+					lineHeight={ 1.53846153846 } // 20px
+				>
+					{ title }
+				</Text>
+				<Text
+					lineHeight={ 1.53846153846 } // 20px
+				>
+					{ description }
+				</Text>
+			</VStack>
+		</Button>
+	);
+}
+
+const modalContentMap = {
+	templatesList: 1,
+	customTemplate: 2,
+	customGenericTemplate: 3,
 };
 
 export default function NewTemplate( {
@@ -90,8 +92,10 @@ export default function NewTemplate( {
 	toggleProps,
 	showIcon = true,
 } ) {
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
-		useState( false );
+	const [ showModal, setShowModal ] = useState( false );
+	const [ modalContent, setModalContent ] = useState(
+		modalContentMap.templatesList
+	);
 	const [
 		showCustomGenericTemplateModal,
 		setShowCustomGenericTemplateModal,
@@ -159,130 +163,114 @@ export default function NewTemplate( {
 			setIsCreatingTemplate( false );
 		}
 	}
+	const onModalClose = () => {
+		setShowModal( false );
+		setModalContent( modalContentMap.templatesList );
+	};
 
-	const missingTemplates = useMissingTemplates(
-		setEntityForSuggestions,
-		setShowCustomTemplateModal
+	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
+		setModalContent( modalContentMap.customTemplate )
 	);
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
 
-	const customTemplateDescription = __(
-		'A custom template can be manually applied to any post or page.'
-	);
-
+	let modalTitle = __( 'Add template' );
+	if ( modalContent === modalContentMap.customTemplate ) {
+		modalTitle = sprintf(
+			// translators: %s: Name of the post type e.g: "Post".
+			__( 'Add template: %s' ),
+			entityForSuggestions.labels.singular_name
+		);
+	} else if ( showCustomGenericTemplateModal ) {
+		modalTitle = __( 'Create custom template' );
+	}
 	return (
 		<>
-			<DropdownMenu
-				className="edit-site-new-template-dropdown"
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
+			<Toggle
+				{ ...restToggleProps }
+				onClick={ () => setShowModal( true ) }
 				icon={ showIcon ? plus : null }
-				text={ showIcon ? null : postType.labels.add_new }
 				label={ postType.labels.add_new_item }
-				popoverProps={ {
-					noArrow: false,
-				} }
-				toggleProps={ toggleProps }
 			>
-				{ () => (
-					<>
-						{ isCreatingTemplate && (
-							<TemplateActionsLoadingScreen />
-						) }
-						<div className="edit-site-new-template-dropdown__menu-groups">
-							<MenuGroup label={ postType.labels.add_new_item }>
-								{ missingTemplates.map( ( template ) => {
-									const {
-										title,
-										description,
-										slug,
-										onClick,
-										icon,
-									} = template;
-									return (
-										<Tooltip
-											key={ slug }
-											position="top right"
-											text={ description }
-											className="edit-site-new-template-dropdown__menu-item-tooltip"
-										>
-											<MenuItem
-												icon={
-													icon ||
-													TEMPLATE_ICONS[ slug ] ||
-													post
-												}
-												iconPosition="left"
-												onClick={ () =>
-													onClick
-														? onClick( template )
-														: createTemplate(
-																template
-														  )
-												}
-											>
-												{ title }
-												{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-												 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-												<VisuallyHidden>
-													{ description }
-												</VisuallyHidden>
-											</MenuItem>
-										</Tooltip>
-									);
-								} ) }
-							</MenuGroup>
-							<MenuGroup>
-								<Tooltip
-									position="top right"
-									text={ customTemplateDescription }
-									className="edit-site-new-template-dropdown__menu-item-tooltip"
-								>
-									<MenuItem
-										icon={ customGenericTemplateIcon }
-										iconPosition="left"
+				{ showIcon ? null : postType.labels.add_new_item }
+			</Toggle>
+			{ showModal && (
+				<Modal
+					title={ modalTitle }
+					className={ classnames(
+						'edit-site-add-new-template__modal',
+						{
+							'edit-site-add-new-template__modal_template_list':
+								modalContent === modalContentMap.templatesList,
+							'edit-site-custom-template-modal':
+								modalContent === modalContentMap.customTemplate,
+						}
+					) }
+					onRequestClose={ onModalClose }
+					overlayClassName={
+						modalContent === modalContentMap.customGenericTemplate
+							? 'edit-site-custom-generic-template__modal'
+							: undefined
+					}
+				>
+					{ modalContent === modalContentMap.templatesList && (
+						<Grid
+							columns={ 3 }
+							gap={ 4 }
+							align="flex-start"
+							justify="center"
+							className="edit-site-add-new-template__template-list__contents"
+						>
+							{ missingTemplates.map( ( template ) => {
+								const { title, description, slug, onClick } =
+									template;
+								return (
+									<TemplateListItem
+										key={ slug }
+										title={ title }
+										description={ description }
 										onClick={ () =>
-											setShowCustomGenericTemplateModal(
-												true
-											)
+											onClick
+												? onClick( template )
+												: createTemplate( template )
 										}
-									>
-										{ __( 'Custom template' ) }
-										{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-										 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-										<VisuallyHidden>
-											{ customTemplateDescription }
-										</VisuallyHidden>
-									</MenuItem>
-								</Tooltip>
-							</MenuGroup>
-						</div>
-					</>
-				) }
-			</DropdownMenu>
-			{ showCustomTemplateModal && (
-				<AddCustomTemplateModal
-					onClose={ () => setShowCustomTemplateModal( false ) }
-					onSelect={ createTemplate }
-					entityForSuggestions={ entityForSuggestions }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
-			) }
-			{ showCustomGenericTemplateModal && (
-				<AddCustomGenericTemplateModal
-					onClose={ () => setShowCustomGenericTemplateModal( false ) }
-					createTemplate={ createTemplate }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
+									/>
+								);
+							} ) }
+							<TemplateListItem
+								title={ __( 'Custom template' ) }
+								description={ __(
+									'A custom template can be manually applied to any post or page.'
+								) }
+								onClick={ () =>
+									setShowCustomGenericTemplateModal( true )
+								}
+							/>
+						</Grid>
+					) }
+					{ modalContent === modalContentMap.customTemplate && (
+						<AddCustomTemplateModalContent
+							onSelect={ createTemplate }
+							entityForSuggestions={ entityForSuggestions }
+						/>
+					) }
+					{ modalContent ===
+						modalContentMap.customGenericTemplate && (
+						<AddCustomGenericTemplateModalContent
+							onClose={ onModalClose }
+							createTemplate={ createTemplate }
+						/>
+					) }
+				</Modal>
 			) }
 		</>
 	);
 }
 
-function useMissingTemplates(
-	setEntityForSuggestions,
-	setShowCustomTemplateModal
-) {
+function useMissingTemplates( setEntityForSuggestions, onClick ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -294,7 +282,7 @@ function useMissingTemplates(
 			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
-		setShowCustomTemplateModal( true );
+		onClick?.();
 		setEntityForSuggestions( _entityForSuggestions );
 	};
 	// We need to replace existing default template types with

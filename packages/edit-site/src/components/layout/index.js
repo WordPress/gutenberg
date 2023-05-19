@@ -22,10 +22,13 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { CommandMenu } from '@wordpress/commands';
+import {
+	CommandMenu,
+	privateApis as commandsPrivateApis,
+} from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as coreCmmandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -45,9 +48,10 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 
-const { useCommands } = unlock( coreCmmandsPrivateApis );
-
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
@@ -68,6 +72,7 @@ export default function Layout() {
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
 	useCommands();
+	useEditModeCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
@@ -121,6 +126,13 @@ export default function Layout() {
 	if ( showFrame && ! isResizing ) {
 		canvasWidth = canvasSize.width - canvasPadding;
 	}
+
+	// Sets the right context for the command center
+	const commandContext =
+		canvasMode === 'edit' && isEditorPage
+			? 'site-editor-edit'
+			: 'site-editor';
+	useCommandContext( commandContext );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens

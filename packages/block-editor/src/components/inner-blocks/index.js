@@ -45,6 +45,7 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		template,
@@ -62,6 +63,7 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,

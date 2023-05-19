@@ -59,7 +59,4 @@
 @import "./components/preview-options/style.scss";
 @import "./components/spacing-sizes-control/style.scss";
 
-// Experiments.
-@import "./components/off-canvas-editor/style.scss";
-
 @include wordpress-admin-schemes();

@@ -1,28 +1,27 @@
+$actions-height: 92px;
+
 .edit-site-start-template-options__modal {
-	.components-modal__content {
-		padding-bottom: 0;
-	}
-
-	.components-modal__children-container {
-		display: flex;
-		height: 100%;
-		flex-direction: column;
-
-		.edit-site-start-template-options__modal__actions {
-			margin-top: auto;
-			position: sticky;
-			bottom: 0;
-			background-color: $white;
-			margin-left: - $grid-unit-40;
-			margin-right: - $grid-unit-40;
-			padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
-			border-top: 1px solid $gray-300;
-			z-index: z-index(".edit-site-start-template-options__modal__actions");
-		}
+	.edit-site-start-template-options__modal__actions {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		height: $actions-height;
+		background-color: $white;
+		margin-left: - $grid-unit-40;
+		margin-right: - $grid-unit-40;
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
+		border-top: 1px solid $gray-300;
+		z-index: z-index(".edit-site-start-template-options__modal__actions");
 	}
 
 	.block-editor-block-patterns-list {
-		padding-bottom: $grid-unit-40;
+		// Since the actions container is positioned absolutely,
+		// this padding bottom ensures that the content wrapper will properly
+		// detect overflowing content and start showing scrollbars at the right
+		// moment. Without this padding, the content would render under the actions
+		// bar without causing the wrapper to show a scrollbar.
+		padding-bottom: $actions-height;
 	}
 }
 
