@@ -144,7 +144,20 @@ export default () => {
 						// This seems necessary because Preact doesn't change the attributes
 						// on the hydration, so we have to do it manually. It doesn't need
 						// deps because it only needs to do it the first time.
-						if ( result === false ) {
+						if (
+							// Enumerated attributes that can contain `"true"` and/or `"false"`.
+							attribute.startsWith( 'aria-' ) ||
+							[
+								'contenteditable',
+								'draggable',
+								'spellcheck',
+							].includes( attribute )
+						) {
+							element.ref.current.setAttribute(
+								attribute,
+								result
+							);
+						} else if ( result === false ) {
 							element.ref.current.removeAttribute( attribute );
 						} else {
 							element.ref.current.setAttribute(
