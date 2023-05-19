@@ -11,7 +11,8 @@ export default function BackToTopEdit( { attributes, setAttributes } ) {
 			<RichText
 				tagName="a"
 				href="#top"
-				value={ text ? text : __( 'Back to Top' ) }
+				aria-label={ __( 'Back to top link text' ) }
+				value={ text ? text : __( 'Back to top' ) }
 				withoutInteractiveFormatting={ true }
 				onChange={ ( newLinkText ) =>
 					setAttributes( { text: newLinkText } )
