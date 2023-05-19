@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { Popover } from '@wordpress/components';
+import { Popover, VisuallyHidden } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -191,11 +191,11 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
 			) }
-			<div style={ { visibility: 'hidden' } }>
+			<VisuallyHidden aria-hidden="true">
 				<BlockTools>
 					<BlockList />
 				</BlockTools>
-			</div>
+			</VisuallyHidden>
 		</>
 	);
 }

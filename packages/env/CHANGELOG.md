@@ -9,6 +9,7 @@
 ### Enhancement
 
 -   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
+-   Validate whether or not config options exist to prevent accidentally including ones that don't.
 
 ## 7.0.0 (2023-05-10)
 

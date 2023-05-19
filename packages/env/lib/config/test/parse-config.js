@@ -338,5 +338,66 @@ describe( 'parseConfig', () => {
 			);
 		}
 	} );
+
+	it( 'throws for unknown config options', async () => {
+		const configFileLocation = path.resolve( './.wp-env.json' );
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === path.resolve( './.wp-env.json' ) ) {
+				return {
+					test: 'test',
+				};
+			}
+
+			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		expect.assertions( 1 );
+		try {
+			await parseConfig( './', '/cache' );
+		} catch ( error ) {
+			expect( error ).toEqual(
+				new ValidationError(
+					`Invalid ${ configFileLocation }: "test" is not a configuration option.`
+				)
+			);
+		}
+	} );
+
+	it( 'throws for root-only config options', async () => {
+		const configFileLocation = path.resolve( './.wp-env.json' );
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === configFileLocation ) {
+				return {
+					env: {
+						development: {
+							// Only the root can have environment-specific configurations.
+							env: {},
+						},
+					},
+				};
+			}
+
+			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		expect.assertions( 1 );
+		try {
+			await parseConfig( './', '/cache' );
+		} catch ( error ) {
+			expect( error ).toEqual(
+				new ValidationError(
+					`Invalid ${ configFileLocation }: "development.env" is not a configuration option.`
+				)
+			);
+		}
+	} );
 } );
 /* eslint-enable jest/no-conditional-expect */
