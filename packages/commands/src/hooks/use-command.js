@@ -26,6 +26,7 @@ export default function useCommand( command ) {
 			name: command.name,
 			context: command.context,
 			label: command.label,
+			searchLabel: command.searchLabel,
 			icon: command.icon,
 			callback: currentCallback.current,
 		} );
@@ -35,6 +36,7 @@ export default function useCommand( command ) {
 	}, [
 		command.name,
 		command.label,
+		command.searchLabel,
 		command.icon,
 		command.context,
 		registerCommand,

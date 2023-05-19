@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export const useInsertedBlock = ( insertedBlockClientId ) => {
 	const { insertedBlockAttributes, insertedBlockName } = useSelect(

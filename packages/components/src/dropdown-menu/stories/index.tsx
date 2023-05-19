@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+/**
  * Internal dependencies
  */
-import DropdownMenu from '../';
-import { MenuGroup, MenuItem } from '../../';
+import DropdownMenu from '..';
+import { MenuGroup, MenuItem } from '../..';
 
 /**
  * WordPress dependencies
@@ -16,37 +20,24 @@ import {
 	trash,
 } from '@wordpress/icons';
 
-export default {
+const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 	argTypes: {
-		className: { control: { type: 'text' } },
-		children: { control: { type: null } },
-		disableOpenOnArrowDown: { control: { type: 'boolean' } },
 		icon: {
 			options: [ 'menu', 'chevronDown', 'more' ],
 			mapping: { menu, chevronDown, more },
 			control: { type: 'select' },
 		},
-		menuProps: {
-			control: { type: 'object' },
-		},
-		noIcons: { control: { type: 'boolean' } },
-		popoverProps: {
-			control: { type: 'object' },
-		},
-		text: { control: { type: 'text' } },
-		toggleProps: {
-			control: { type: 'object' },
-		},
-	},
-	parameters: {
-		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const Template = ( props ) => (
+const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
 	<div style={ { height: 150 } }>
 		<DropdownMenu { ...props } />
 	</div>
