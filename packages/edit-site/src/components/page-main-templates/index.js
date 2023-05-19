@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	VisuallyHidden,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
@@ -26,7 +23,8 @@ import Table from '../table';
 import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import Actions from '../list/actions';
-import { menu, grid } from '@wordpress/icons';
+import AddNewTemplate from '../add-new-template';
+import { store as editSiteStore } from '../../store';
 
 export default function PageMainTemplates() {
 	const [ filteredRecords, setFilteredRecords ] = useState( [] );
@@ -55,6 +53,19 @@ export default function PageMainTemplates() {
 	useEffect( () => {
 		setFilteredRecords( templates );
 	}, [ templates ] );
+
+	const { canCreate, postType } = useSelect( ( select ) => {
+		const { supportsTemplatePartsMode } =
+			select( editSiteStore ).getSettings();
+		return {
+			postType: select( coreStore ).getPostType( 'wp_template' ),
+			canCreate: ! supportsTemplatePartsMode,
+		};
+	} );
+
+	if ( ! postType ) {
+		return null;
+	}
 
 	const handleFilter = ( newRecords ) => {
 		setFilteredRecords( newRecords );
@@ -103,8 +114,15 @@ export default function PageMainTemplates() {
 	return (
 		<Page
 			title="Templates"
-			subTitle="Manage all your templates"
-			actions={ <Button variant="primary">New Template</Button> }
+			actions={
+				canCreate && (
+					<AddNewTemplate
+						templateType={ 'wp_template' }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
+				)
+			}
 		>
 			<HStack>
 				<FilterBar
@@ -119,7 +137,7 @@ export default function PageMainTemplates() {
 						},
 					] }
 				/>
-				<ToggleGroupControl
+				{ /* <ToggleGroupControl
 					__nextHasNoMarginBottom
 					label="view type"
 					value="list"
@@ -137,7 +155,7 @@ export default function PageMainTemplates() {
 						value="grid"
 						label="Grid"
 					/>
-				</ToggleGroupControl>
+				</ToggleGroupControl> */ }
 			</HStack>
 			<Table data={ filteredRecords } columns={ columns } />
 		</Page>

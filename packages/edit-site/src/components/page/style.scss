@@ -1,6 +1,6 @@
 .edit-site-page {
 	color: $gray-800;
-	margin: $grid-unit-20;
+	margin: $grid-unit-30 $grid-unit-30 $grid-unit-30 0;
 	background: #fff;
 	border-radius: 8px;
 	flex-grow: 1;
@@ -8,7 +8,7 @@
 }
 
 .edit-site-page-header {
-	padding: $grid-unit-40;
+	padding: $grid-unit-40 $grid-unit-40 $grid-unit-30;
 	.components-text {
 		color: $gray-800;
 	}
