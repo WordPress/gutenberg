@@ -9,8 +9,7 @@ if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
 	return;
 }
 
-class WP_Fonts_Theme_Json_Handler
-{
+class WP_Fonts_Theme_Json_Handler {
 	/**
 	 * Register fonts defined in theme.json.
 	 */
@@ -31,8 +30,9 @@ class WP_Fonts_Theme_Json_Handler
 	/**
 	 * Add missing fonts data to the global styles.
 	 *
-	 * @param  WP_Theme_JSON_Gutenberg $data The global styles.
-	 * @return WP_Theme_JSON_Gutenberg       The global styles with missing fonts data.
+	 * @param WP_Theme_JSON_Gutenberg $data The global styles.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg      The global styles with missing fonts data.
 	 */
 	public static function add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
@@ -81,12 +81,11 @@ class WP_Fonts_Theme_Json_Handler
 	 *
 	 * @return array
 	 */
-	private static function get_settings()
-	{
+	private static function get_settings() {
 		// Get settings.
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
-		if ( ! is_admin() && ! (defined( 'REST_REQUEST' ) && REST_REQUEST )) {
+		if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 			return $settings;
 		}
 
@@ -120,8 +119,9 @@ class WP_Fonts_Theme_Json_Handler
 	/**
 	 * Helper to get an array of the font-families.
 	 *
-	 * @param  array $families_data The font-families data.
-	 * @return array                The font-families array.
+	 * @param array $families_data The font-families data.
+	 *
+	 * @return array               The font-families array.
 	 */
 	private static function get_font_families( $families_data ) {
 		$families = array();
@@ -141,10 +141,9 @@ class WP_Fonts_Theme_Json_Handler
 	 *
 	 * @return array
 	 */
-	private static function parse_font_families( array $settings )
-	{
+	private static function parse_font_families( array $settings ) {
 		$handles = array();
-		$fonts = array();
+		$fonts   = array();
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $font_family ) {
