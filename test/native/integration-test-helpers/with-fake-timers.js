@@ -18,6 +18,18 @@ export async function withFakeTimers( fn ) {
 		jest.useFakeTimers( { legacyFakeTimers: true } );
 	}
 
+	// `Date.now` returns the real-time even when using fake timers.
+	// Some functions like `debounce` relies on the time returned by this function
+	// for its calculations, which can lead to wrong behaviors when executing timers.
+	// To avoid this, we mock this function and return the time provided Jest fake timers.
+	// Reference: https://jestjs.io/docs/jest-object#jestnow
+	let dateNowSpy;
+	if ( ! jest.isMockFunction( Date.now ) ) {
+		dateNowSpy = jest
+			.spyOn( Date, 'now' )
+			.mockImplementation( () => jest.now() );
+	}
+
 	const result = await fn();
 
 	if ( ! usingFakeTimers ) {
@@ -25,6 +37,10 @@ export async function withFakeTimers( fn ) {
 
 		global.requestAnimationFrame = requestAnimationFrameCopy;
 		global.cancelAnimationFrame = cancelAnimationFrameCopy;
+	}
+
+	if ( dateNowSpy ) {
+		dateNowSpy.mockRestore();
 	}
 	return result;
 }
