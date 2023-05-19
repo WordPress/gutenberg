@@ -52,6 +52,10 @@ export default function QueryPaginationEdit( {
 		template: TEMPLATE,
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
+	// Always show label text if paginationArrow is set to 'none'.
+	if ( paginationArrow === 'none' ) {
+		setAttributes( { showLabel: true } );
+	}
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
