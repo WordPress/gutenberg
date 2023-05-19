@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `ColorPicker`: its private `SelectControl` component no longer hides BackdropUI, thus making its focus state visible for keyboard users ([50703](https://github.com/WordPress/gutenberg/pull/50703)).
+
 ## 24.0.0 (2023-05-10)
 
 ### Breaking Changes
