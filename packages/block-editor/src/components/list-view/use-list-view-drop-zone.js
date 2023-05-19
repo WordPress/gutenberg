@@ -360,11 +360,13 @@ export function getListViewDropTarget( blocksData, position ) {
 	};
 }
 
+/** @typedef {import('react').RefObject} RefObject */
+
 /**
  * A react hook for implementing a drop zone in list view.
  *
- * @param {Object}                                 props               Named parameters.
- * @param {import('react').RefObject<HTMLElement>} [props.dropZoneRef] Optional ref to be used as the drop zone.
+ * @param {Object}                  props               Named parameters.
+ * @param {?RefObject<HTMLElement>} [props.dropZoneRef] Optional ref to be used as the drop zone.
  *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
