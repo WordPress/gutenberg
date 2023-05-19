@@ -7,6 +7,20 @@ const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
 const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
 
+const focusableSelectors = [
+	'a[href]',
+	'area[href]',
+	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
+	'select:not([disabled]):not([aria-hidden])',
+	'textarea:not([disabled]):not([aria-hidden])',
+	'button:not([disabled]):not([aria-hidden])',
+	'iframe',
+	'object',
+	'embed',
+	'[contenteditable]',
+	'[tabindex]:not([tabindex^="-"])',
+];
+
 store( {
 	actions: {
 		core: {
@@ -37,7 +51,23 @@ store( {
 				handleKeydown: ( { context, actions, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
 						if ( event.key === 'Tab' || event.keyCode === 9 ) {
-							event.preventDefault();
+							// If shift + tab it change the direction
+							if (
+								event.shiftKey &&
+								window.document.activeElement ===
+									context.core.navigation
+										.firstFocusableElement
+							) {
+								event.preventDefault();
+								context.core.image.lastFocusableElement.focus();
+							} else if (
+								! event.shiftKey &&
+								window.document.activeElement ===
+									context.core.image.lastFocusableElement
+							) {
+								event.preventDefault();
+								context.core.image.firstFocusableElement.focus();
+							}
 						}
 
 						if ( event.key === 'Escape' || event.keyCode === 27 ) {
@@ -60,6 +90,13 @@ store( {
 						// to receive focus updates for accessibility
 						await tick();
 						ref.querySelector( '.close-button' ).focus();
+
+						const focusableElements =
+							ref.querySelectorAll( focusableSelectors );
+						context.core.image.firstFocusableElement =
+							focusableElements[ 0 ];
+						context.core.image.lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
 			},
