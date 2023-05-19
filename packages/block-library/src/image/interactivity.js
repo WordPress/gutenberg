@@ -32,14 +32,23 @@ store( {
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
 
+					context.core.image.documentElement =
+						document.documentElement;
+					context.core.image.adminElement =
+						document.querySelector( '#wpadminbar' );
+					context.core.image.siteBlocksElement =
+						document.querySelector( '.wp-site-blocks' );
+
 					context.core.image.documentElement.classList.add(
 						'has-lightbox-open'
 					);
 
-					context.core.image.adminElement.setAttribute(
-						'inert',
-						true
-					);
+					if ( context.core.image.adminElement ) {
+						context.core.image.adminElement.setAttribute(
+							'inert',
+							true
+						);
+					}
 
 					context.core.image.siteBlocksElement.setAttribute(
 						'inert',
@@ -62,9 +71,11 @@ store( {
 							'has-lightbox-open'
 						);
 
-						context.core.image.adminElement.removeAttribute(
-							'inert'
-						);
+						if ( context.core.image.adminElement ) {
+							context.core.image.adminElement.removeAttribute(
+								'inert'
+							);
+						}
 
 						context.core.image.siteBlocksElement.removeAttribute(
 							'inert'
@@ -110,13 +121,6 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
-					context.core.image.documentElement =
-						document.documentElement;
-					context.core.image.adminElement =
-						document.querySelector( '#wpadminbar' );
-					context.core.image.siteBlocksElement =
-						document.querySelector( '.wp-site-blocks' );
-
 					const focusableElements =
 						ref.querySelectorAll( focusableSelectors );
 					context.core.image.firstFocusableElement =
