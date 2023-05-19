@@ -58,7 +58,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		// { "lightbox": true } is the default behavior, so we activate the
 		// `behaviors` theme where it is disabled by default. Change if we change
 		// the default value in the core theme.json file.
-		await requestUtils.activateTheme( 'behaviors-disabled' );
+		await requestUtils.activateTheme( 'behaviors-ui-disabled' );
 		const media = await createMedia( { admin, requestUtils } );
 
 		await editor.insertBlock( {
