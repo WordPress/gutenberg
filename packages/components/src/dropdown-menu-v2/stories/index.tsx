@@ -7,7 +7,6 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -25,22 +24,13 @@ import Button from '../../button';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { menu, wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Icon from '../../icon';
-
-const DropdownMenuStoryContext = createContext< {
-	itemOneChecked?: boolean;
-	setItemOneChecked?: ( v: boolean ) => void;
-	itemTwoChecked?: boolean;
-	setItemTwoChecked?: ( v: boolean ) => void;
-	radioValue?: string;
-	setRadioValue?: ( v: string ) => void;
-} >( {} );
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
@@ -66,27 +56,6 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 		docs: { source: { state: 'open', excludeDecorators: true } },
 	},
 	decorators: [
-		// Shared story state
-		( Story ) => {
-			const [ itemOneChecked, setItemOneChecked ] = useState( true );
-			const [ itemTwoChecked, setItemTwoChecked ] = useState( false );
-			const [ radioValue, setRadioValue ] = useState( 'radio-one' );
-
-			return (
-				<DropdownMenuStoryContext.Provider
-					value={ {
-						itemOneChecked,
-						setItemOneChecked,
-						itemTwoChecked,
-						setItemTwoChecked,
-						radioValue,
-						setRadioValue,
-					} }
-				>
-					<Story />
-				</DropdownMenuStoryContext.Provider>
-			);
-		},
 		// Layout wrapper
 		( Story ) => (
 			<div
@@ -118,12 +87,8 @@ const ItemHelpText = styled.span`
 `;
 
 const CheckboxItemsGroup = () => {
-	const {
-		itemOneChecked,
-		setItemOneChecked,
-		itemTwoChecked,
-		setItemTwoChecked,
-	} = useContext( DropdownMenuStoryContext );
+	const [ itemOneChecked, setItemOneChecked ] = useState( true );
+	const [ itemTwoChecked, setItemTwoChecked ] = useState( false );
 
 	return (
 		<DropdownMenuGroup>
@@ -147,9 +112,7 @@ const CheckboxItemsGroup = () => {
 };
 
 const RadioItemsGroup = () => {
-	const { radioValue, setRadioValue } = useContext(
-		DropdownMenuStoryContext
-	);
+	const [ radioValue, setRadioValue ] = useState( 'radio-one' );
 
 	return (
 		<DropdownMenuRadioGroup
