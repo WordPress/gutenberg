@@ -33,7 +33,7 @@ function render_block_core_image( $attributes, $content ) {
 	$link_destination = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$enable_lightbox  = isset( $attributes['enableLightbox'] ) ? $attributes['enableLightbox'] : false;
 
-	if ( 'none' === $link_destination && $enable_lightbox ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) && 'none' === $link_destination && $enable_lightbox ) {
 
 		$aria_label = 'Open image lightbox';
 		if ( $processor->get_attribute( 'alt' ) ) {
