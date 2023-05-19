@@ -83,7 +83,9 @@
 
 .edit-site-layout__main {
 	flex-grow: 1;
-	border-left: 1px solid $gray-800;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
 }
 
 .edit-site-layout__canvas-container {

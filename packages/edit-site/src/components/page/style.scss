@@ -1,17 +1,23 @@
 .edit-site-page {
-	color: $gray-400;
+	color: $gray-800;
+	margin: $grid-unit-20;
+	background: #fff;
+	border-radius: 8px;
+	flex-grow: 1;
+	overflow: auto;
 }
 
 .edit-site-page-header {
 	padding: $grid-unit-40;
 	.components-text {
-		color: $gray-400;
+		color: $gray-800;
 	}
 	.components-heading {
-		color: $gray-100;
+		color: $gray-900;
 	}
 	.edit-site-page-header__sub-title {
 		margin-top: $grid-unit-10;
+		color: $gray-700;
 	}
 }
 
