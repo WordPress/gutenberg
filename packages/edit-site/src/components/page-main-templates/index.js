@@ -54,7 +54,7 @@ export default function PageMainTemplates() {
 		setFilteredRecords( templates );
 	}, [ templates ] );
 
-	const { canCreate, postType } = useSelect( ( select ) => {
+	const { canCreate } = useSelect( ( select ) => {
 		const { supportsTemplatePartsMode } =
 			select( editSiteStore ).getSettings();
 		return {
@@ -62,10 +62,6 @@ export default function PageMainTemplates() {
 			canCreate: ! supportsTemplatePartsMode,
 		};
 	} );
-
-	if ( ! postType ) {
-		return null;
-	}
 
 	const handleFilter = ( newRecords ) => {
 		setFilteredRecords( newRecords );
@@ -110,7 +106,7 @@ export default function PageMainTemplates() {
 
 	return (
 		<Page
-			title="Templates"
+			title={ __( 'Templates' ) }
 			actions={
 				canCreate && (
 					<AddNewTemplate
