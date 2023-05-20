@@ -13,7 +13,7 @@ import BubblesVirtuallyFill from './bubbles-virtually/fill';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
-import useSlot from './bubbles-virtually/use-slot';
+export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 
 export function Fill( props ) {
@@ -65,5 +65,3 @@ export const createPrivateSlotFill = ( name ) => {
 
 	return { privateKey, ...privateSlotFill };
 };
-
-export { useSlot };

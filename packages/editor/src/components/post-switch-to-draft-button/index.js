@@ -3,11 +3,12 @@
  */
 import {
 	Button,
+	FlexItem,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useViewportMatch } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
 /**
@@ -21,7 +22,6 @@ function PostSwitchToDraftButton( {
 	isScheduled,
 	onClick,
 } ) {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	if ( ! isPublished && ! isScheduled ) {
@@ -41,16 +41,17 @@ function PostSwitchToDraftButton( {
 	};
 
 	return (
-		<>
+		<FlexItem isBlock>
 			<Button
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
 					setShowConfirmDialog( true );
 				} }
 				disabled={ isSaving }
-				variant="tertiary"
+				variant="secondary"
+				style={ { width: '100%', display: 'block' } }
 			>
-				{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
+				{ __( 'Switch to draft' ) }
 			</Button>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
@@ -59,7 +60,7 @@ function PostSwitchToDraftButton( {
 			>
 				{ alertMessage }
 			</ConfirmDialog>
-		</>
+		</FlexItem>
 	);
 }
 

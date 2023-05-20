@@ -12,16 +12,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import BlockEditorProvider from '../../components/provider';
-import { cleanEmptyObject } from '../utils';
 import { withColorPaletteStyles } from '../color';
-
-describe( 'cleanEmptyObject', () => {
-	it( 'should remove nested keys', () => {
-		expect( cleanEmptyObject( { color: { text: undefined } } ) ).toEqual(
-			undefined
-		);
-	} );
-} );
 
 describe( 'withColorPaletteStyles', () => {
 	const settings = {

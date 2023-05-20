@@ -20,7 +20,7 @@ Alongside the ability to lock moving or removing blocks, the [Navigation Block](
 
 **Apply block locking to patterns or templates**
 
-When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
+When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](/docs/reference-guides/block-api/block-patterns.md).
 
 **Apply content only editing in patterns or templates**
 
@@ -33,7 +33,7 @@ This functionality was introduced in WordPress 6.1. In contrast to block locking
 - Additional child blocks cannot be inserted, further preserving the design and layout.
 - There is a link in the block toolbar to ‘Modify’ that a user can toggle on/off to have access to the broader design tools. Currently, it's not possibly to programmatically remove this option.
 
-This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-templates/#locking). 
+This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](/docs/reference-guides/block-api/block-templates.md#locking). 
 
 Note: There is no UI in place to manage content locking and it must be managed at the code level. 
 
@@ -232,7 +232,7 @@ Continuing the examples with duotone, this means you could allow full access to 
 }
 ```
 
-You can read more about how best to [turn on/off options with theme.json here](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/). 
+You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/theme-json.md). 
 
 **Disable inherit default layout**
 
@@ -326,7 +326,62 @@ add_filter( 'wp_theme_json_data_theme', 'example_filter_theme_json_data_theme' )
 
 The filter receives an instance of the `WP_Theme_JSON_Data class` with the data for the respective layer. Then, you pass new data in a valid theme.json-like structure to the `update_with( $new_data )` method. A theme.json version number is required in `$new_data`. 
 
-Read more about this functionality in the [Filters for theme.json data dev note](https://make.wordpress.org/core/2022/10/10/filters-for-theme-json-data/).
+
+## Limiting interface options with client-side filters
+
+WordPress 6.2 introduced a new client-side filter allowing you to modify block-level [theme.json settings](/docs/reference-guides/theme-json-reference/theme-json-living.md#settings) before the editor is rendered.
+
+The filter is called `blockEditor.useSetting.before` and can be used in the JavaScript code as follows:
+
+```
+import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Limit the Column block's spacing options to pixels.
+ */
+addFilter(
+	'blockEditor.useSetting.before',
+	'example/useSetting.before',
+	( settingValue, settingName, clientId, blockName ) => {
+		if ( blockName === Media & Text block'core/column' && settingName === 'spacing.units' ) {
+			return [ 'px' ];
+		}
+		return settingValue;
+	}
+);
+```
+
+This example will restrict the available spacing units for the Column block to just pixels. As discussed above, a similar restriction could be applied using theme.json filters or directly in a theme’s theme.json file using block-level settings.
+
+However, the `blockEditor.useSetting.before` filter is unique because it allows you to modify settings according to the block’s location, neighboring blocks, the current user’s role, and more. The possibilities for customization are extensive.
+
+In the following example, text color controls are disabled for the Heading block whenever the block is placed inside of a Media & Text block.
+
+```
+import { select } from  '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Disable text color controls on Heading blocks when placed inside of Media & Text blocks.
+ */
+addFilter(
+	'blockEditor.useSetting.before',
+	'example/useSetting.before',
+	( settingValue, settingName, clientId, blockName ) => {
+		if ( blockName === 'core/heading' ) {
+			const { getBlockParents, getBlockName } = select( 'core/block-editor' );
+			const blockParents = getBlockParents( clientId, true );
+			const inMediaText = blockParents.some( ( ancestorId ) => getBlockName( ancestorId ) === 'core/media-text' );
+
+			if ( inMediaText && settingName === 'color.text' ) {
+			    return false;
+			}
+		}
+
+		return settingValue;
+	}
+);
+```
 
 ## Remove access to functionality
 
@@ -340,7 +395,7 @@ This prevents both the ability to both create new block templates or edit them f
 
 **Create an allow or disallow list to limit block options**
 
-There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#using-a-deny-list). 
+There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](/docs/reference-guides/filters/block-filters.md#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](/docs/reference-guides/filters/block-filters.md#using-a-deny-list). 
 
 **Disable pattern directory**
 
@@ -360,7 +415,7 @@ Read more about this functionality in the [Page creation patterns in WordPress 6
 
 **Lock patterns**
 
-As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/). 
+As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](/docs/reference-guides/block-api/block-patterns.md). 
 
 **Prioritize specific patterns from the Pattern Directory**
 
@@ -372,7 +427,7 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 }
 ```
 
-Note that this field requires using [version 2 of theme.json](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
+Note that this field requires using [version 2 of theme.json](/docs/reference-guides/theme-json-reference/theme-json-living.md). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
 
 ## Combining approaches
 

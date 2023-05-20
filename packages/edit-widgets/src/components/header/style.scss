@@ -5,6 +5,7 @@
 	height: $header-height;
 	padding: 0 $grid-unit-20;
 	overflow: auto;
+	background: #fff;
 
 	@include break-small {
 		overflow: visible;

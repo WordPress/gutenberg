@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -22,14 +21,9 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-
-function compareVariations( a, b ) {
-	return (
-		fastDeepEqual( a.styles, b.styles ) &&
-		fastDeepEqual( a.settings, b.settings )
-	);
-}
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
+	blockEditorPrivateApis
+);
 
 function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -63,7 +57,7 @@ function Variation( { variation } ) {
 	};
 
 	const isActive = useMemo( () => {
-		return compareVariations( user, variation );
+		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
 
 	return (
@@ -97,13 +91,10 @@ function Variation( { variation } ) {
 }
 
 export default function StyleVariationsContainer() {
-	const { variations } = useSelect( ( select ) => {
-		return {
-			variations:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations() || [],
-		};
+	const variations = useSelect( ( select ) => {
+		return select(
+			coreStore
+		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
 	const withEmptyVariation = useMemo( () => {
@@ -113,7 +104,7 @@ export default function StyleVariationsContainer() {
 				settings: {},
 				styles: {},
 			},
-			...variations.map( ( variation ) => ( {
+			...( variations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
@@ -122,15 +113,13 @@ export default function StyleVariationsContainer() {
 	}, [ variations ] );
 
 	return (
-		<>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ withEmptyVariation?.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } />
-				) ) }
-			</Grid>
-		</>
+		<Grid
+			columns={ 2 }
+			className="edit-site-global-styles-style-variations-container"
+		>
+			{ withEmptyVariation.map( ( variation, index ) => (
+				<Variation key={ index } variation={ variation } />
+			) ) }
+		</Grid>
 	);
 }

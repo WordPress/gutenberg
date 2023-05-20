@@ -1,3 +1,8 @@
+/**
+ * Note that this CSS file should be in sync with its counterpart in the other editor:
+ * packages/edit-site/src/components/secondary-sidebar/style.scss
+ */
+
 .edit-post-editor__inserter-panel,
 .edit-post-editor__document-overview-panel {
 	height: 100%;
@@ -6,10 +11,11 @@
 }
 
 .edit-post-editor__document-overview-panel {
-	// Same width as the Inserter.
-	// @see packages/block-editor/src/components/inserter/style.scss
-	// Width of the list view panel.
-	width: 350px;
+	@include break-medium() {
+		// Same width as the Inserter.
+		// @see packages/block-editor/src/components/inserter/style.scss
+		width: 350px;
+	}
 
 	.edit-post-sidebar__panel-tabs {
 		flex-direction: row-reverse;
@@ -62,8 +68,17 @@
 .edit-post-editor__list-view-panel-content,
 .edit-post-editor__list-view-container > .document-outline,
 .edit-post-editor__list-view-empty-headings {
-	overflow: auto;
 	height: 100%;
+
+	// Include custom scrollbars, invisible until hovered.
+	@include custom-scrollbars-on-hover(transparent, $gray-600);
+	overflow: auto;
+
+	// Only reserve space for scrollbars when there is content to scroll.
+	// This allows items in the list view to have equidistant padding left and right
+	// right up until a scrollbar is present.
+	scrollbar-gutter: auto;
+
 	// The table cells use an extra pixels of space left and right. We compensate for that here.
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
 }
