@@ -266,7 +266,7 @@
 							"type": "string"
 						},
 						"wideSize": {
-							"description": "Sets the max-width of wide (`.alignwide`) content.",
+							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
 						}
 					},
@@ -708,11 +708,11 @@
 							"type": "object",
 							"properties": {
 								"border": {
-									"description": "Settings related to borders.\nGutenberg plugin required.",
+									"description": "Settings related to borders.",
 									"type": "object",
 									"properties": {
 										"radius": {
-											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
+											"description": "Allow users to set custom border radius.",
 											"type": "boolean",
 											"default": false
 										}

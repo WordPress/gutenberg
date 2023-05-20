@@ -27,3 +27,17 @@ export const setCanvasMode =
 			dispatch.setIsListViewOpened( true );
 		}
 	};
+
+/**
+ * Action that switches the editor canvas container view.
+ *
+ * @param {?string} view Editor canvas container view.
+ */
+export const setEditorCanvasContainerView =
+	( view ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'SET_EDITOR_CANVAS_CONTAINER_VIEW',
+			view,
+		} );
+	};

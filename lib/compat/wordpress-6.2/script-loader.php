@@ -129,28 +129,11 @@ function gutenberg_resolve_assets_override() {
 
 	$scripts = ob_get_clean();
 
-	/*
-	 * Generate font @font-face styles for the site editor iframe.
-	 * Use the registered font families for printing.
-	 */
-	if ( class_exists( 'WP_Fonts' ) ) {
-		$wp_fonts   = wp_fonts();
-		$registered = $wp_fonts->get_registered_font_families();
-		if ( ! empty( $registered ) ) {
-			$queue = $wp_fonts->queue;
-			$done  = $wp_fonts->done;
-
-			$wp_fonts->done  = array();
-			$wp_fonts->queue = $registered;
-
-			ob_start();
-			$wp_fonts->do_items();
-			$styles .= ob_get_clean();
-
-			// Reset the Web Fonts API.
-			$wp_fonts->done  = $done;
-			$wp_fonts->queue = $queue;
-		}
+	// Generate font @font-face styles.
+	if ( function_exists( 'wp_print_fonts' ) ) {
+		ob_start();
+		wp_print_fonts( true );
+		$styles .= ob_get_clean();
 	}
 
 	return array(
@@ -169,25 +152,3 @@ add_filter(
 	},
 	100
 );
-
-/**
- * Enqueues the global styles custom css.
- *
- * @since 6.2.0
- */
-function gutenberg_enqueue_global_styles_custom_css() {
-	if ( ! wp_is_block_theme() ) {
-		return;
-	}
-
-	// Don't enqueue Customizer's custom CSS separately.
-	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
-
-	$custom_css  = wp_get_custom_css();
-	$custom_css .= gutenberg_get_global_styles_custom_css();
-
-	if ( ! empty( $custom_css ) ) {
-		wp_add_inline_style( 'global-styles', $custom_css );
-	}
-}
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );

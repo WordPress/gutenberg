@@ -275,7 +275,7 @@ describe( 'Multi-entity save flow', () => {
 				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);
 			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close List View Sidebar"]' );
+			await page.click( 'button[aria-label="Close"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

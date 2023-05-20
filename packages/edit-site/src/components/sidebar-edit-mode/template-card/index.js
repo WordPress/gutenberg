@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { PanelRow, Icon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -14,7 +13,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
-import LastRevision from './last-revision';
 
 export default function TemplateCard() {
 	const {
@@ -56,12 +54,6 @@ export default function TemplateCard() {
 					<TemplateAreas />
 				</div>
 			</div>
-			<PanelRow
-				header={ __( 'Editing history' ) }
-				className="edit-site-template-revisions"
-			>
-				<LastRevision />
-			</PanelRow>
 		</>
 	);
 }

@@ -11,18 +11,20 @@ const ios = {
 	},
 };
 
-exports.iosLocal = {
+exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
-	deviceName: 'iPhone 13',
+	deviceName: ! iPadDevice ? 'iPhone 13' : 'iPad Pro (9.7-inch)',
 	wdaLaunchTimeout: 240000,
 	usePrebuiltWDA: true,
-};
+} );
 
-exports.iosServer = {
+exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
 	platformVersion: '15.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
-	deviceName: 'iPhone 13 Simulator',
-};
+	deviceName: ! iPadDevice
+		? 'iPhone 13 Simulator'
+		: 'iPad Pro (9.7 inch) Simulator',
+} );
 
 exports.android = {
 	browserName: '',

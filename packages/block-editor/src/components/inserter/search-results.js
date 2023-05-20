@@ -6,6 +6,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,8 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
+import { store as blockEditorStore } from '../../store';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -46,9 +49,21 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
-	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
+
+	const { prioritizedBlocks } = useSelect(
+		( select ) => {
+			const blockListSettings =
+				select( blockEditorStore ).getBlockListSettings( rootClientId );
+
+			return {
+				prioritizedBlocks:
+					blockListSettings?.prioritizedInserterBlocks || EMPTY_ARRAY,
+			};
+		},
+		[ rootClientId ]
+	);
 
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
@@ -89,10 +104,16 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+
 		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
-		if ( ! filterValue && orderInitialBlockItems ) {
-			orderedItems = orderInitialBlockItems( orderedItems );
+
+		if ( ! filterValue && prioritizedBlocks.length ) {
+			orderedItems = orderInserterBlockItems(
+				orderedItems,
+				prioritizedBlocks
+			);
 		}
+
 		const results = searchBlockItems(
 			orderedItems,
 			blockTypeCategories,
@@ -108,8 +129,8 @@ function InserterSearchResults( {
 		blockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
-		maxBlockTypes,
-		orderInitialBlockItems,
+		maxBlockTypesToShow,
+		prioritizedBlocks,
 	] );
 
 	// Announce search results on change.
@@ -124,7 +145,12 @@ function InserterSearchResults( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [
+		filterValue,
+		debouncedSpeak,
+		filteredBlockTypes,
+		filteredBlockPatterns,
+	] );
 
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,

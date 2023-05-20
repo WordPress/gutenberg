@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,9 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { ENTER, SPACE } from '@wordpress/keycodes';
+import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,6 +39,30 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const mouseMoveTypingRef = useMouseMoveTypingReset();
+	const [ isFocused, setIsFocused ] = useState( false );
+
+	useEffect( () => {
+		if ( canvasMode === 'edit' ) {
+			setIsFocused( false );
+		}
+	}, [ canvasMode ] );
+
+	const viewModeProps = {
+		'aria-label': __( 'Editor Canvas' ),
+		role: 'button',
+		tabIndex: 0,
+		onFocus: () => setIsFocused( true ),
+		onBlur: () => setIsFocused( false ),
+		onKeyDown: ( event ) => {
+			const { keyCode } = event;
+			if ( keyCode === ENTER || keyCode === SPACE ) {
+				event.preventDefault();
+				setCanvasMode( 'edit' );
+			}
+		},
+		onClick: () => setCanvasMode( 'edit' ),
+		readonly: true,
+	};
 
 	return (
 		<Iframe
@@ -40,15 +72,11 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			style={ enableResizing ? {} : deviceStyles }
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
-			className="edit-site-visual-editor__editor-canvas"
+			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
+				'is-focused': isFocused && canvasMode === 'view',
+			} ) }
 			{ ...props }
-			role={ canvasMode === 'view' ? 'button' : undefined }
-			onClick={
-				canvasMode === 'view'
-					? () => setCanvasMode( 'edit' )
-					: undefined
-			}
-			readonly={ canvasMode === 'view' }
+			{ ...( canvasMode === 'view' ? viewModeProps : {} ) }
 		>
 			<EditorStyles styles={ settings.styles } />
 			<style>{

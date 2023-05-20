@@ -1,3 +1,4 @@
+'use strict';
 // See https://xdebug.org/docs/all_settings#mode
 const XDEBUG_MODES = [
 	'develop',

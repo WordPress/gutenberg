@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -11,12 +12,11 @@ const inquirer = require( 'inquirer' );
  * Promisified dependencies
  */
 const rimraf = util.promisify( require( 'rimraf' ) );
-const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
  */
-const { readConfig } = require( '../../lib/config' );
+const { loadConfig } = require( '../config' );
 
 /**
  * Destroy the development server.
@@ -26,9 +26,8 @@ const { readConfig } = require( '../../lib/config' );
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
 module.exports = async function destroy( { spinner, debug } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
-		configPath
+	const { dockerComposeConfigPath, workDirectoryPath } = await loadConfig(
+		path.resolve( '.' )
 	);
 
 	try {
@@ -39,7 +38,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	}
 
 	spinner.info(
-		'WARNING! This will remove Docker containers, volumes, and networks associated with the WordPress instance.'
+		'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
 	);
 
 	const { yesDelete } = await inquirer.prompt( [
@@ -58,44 +57,20 @@ module.exports = async function destroy( { spinner, debug } ) {
 		return;
 	}
 
-	spinner.text = 'Removing WordPress docker containers.';
+	spinner.text = 'Removing docker images, volumes, and networks.';
 
-	await dockerCompose.rm( {
+	await dockerCompose.down( {
 		config: dockerComposeConfigPath,
-		commandOptions: [ '--stop', '-v' ],
+		commandOptions: [ '--volumes', '--remove-orphans', '--rmi', 'all' ],
 		log: debug,
 	} );
 
-	const directoryHash = path.basename( workDirectoryPath );
-
-	spinner.text = 'Removing docker volumes.';
-	await removeDockerItems( 'volume', directoryHash );
-
-	spinner.text = 'Removing docker networks.';
-	await removeDockerItems( 'network', directoryHash );
-
 	spinner.text = 'Removing local files.';
-
+	// Note: there is a race condition where docker compose actually hasn't finished
+	// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+	// but using 10s in case it's dependant on the machine.
+	await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 	await rimraf( workDirectoryPath );
 
 	spinner.text = 'Removed WordPress environment.';
 };
-
-/**
- * Removes docker items, like networks or volumes, matching the given name.
- *
- * @param {string} itemType The item type, like "network" or "volume"
- * @param {string} name     Remove items whose name match this string.
- */
-async function removeDockerItems( itemType, name ) {
-	const { stdout: items } = await exec(
-		`docker ${ itemType } ls -q --filter name=${ name }`
-	);
-	if ( items ) {
-		await exec(
-			`docker ${ itemType } rm ${ items
-				.split( '\n' ) // TODO: use os.EOL?
-				.join( ' ' ) }`
-		);
-	}
-}
