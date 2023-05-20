@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback, View, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,9 +62,7 @@ class LatestPostsEdit extends Component {
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( {
-						categoriesList: isEmpty( categoriesList )
-							? []
-							: categoriesList,
+						categoriesList,
 					} );
 				}
 			} )

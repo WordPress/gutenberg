@@ -138,8 +138,7 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'two' );
 			// Navigate to the citation to select the block.
 			await page.keyboard.press( 'ArrowRight' );
-			// Unwrap the block.
-			await editor.transformBlockTo( '*' );
+			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
 <p>one</p>
@@ -161,8 +160,7 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'two' );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			// Unwrap the block.
-			await editor.transformBlockTo( '*' );
+			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
 <p>one</p>
@@ -185,8 +183,7 @@ test.describe( 'Quote', () => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			// Unwrap the block.
-			await editor.transformBlockTo( '*' );
+			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
 <p></p>
@@ -205,8 +202,7 @@ test.describe( 'Quote', () => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
 			await page.keyboard.press( 'ArrowRight' );
-			// Unwrap the block.
-			await editor.transformBlockTo( '*' );
+			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
 	} );

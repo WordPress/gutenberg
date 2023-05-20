@@ -45,6 +45,8 @@ import {
 } from '../editor-canvas-container';
 import { unlock } from '../../private-apis';
 
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
@@ -126,7 +128,6 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 	const {
 		shouldShowContextualToolbar,
 		canFocusHiddenToolbar,

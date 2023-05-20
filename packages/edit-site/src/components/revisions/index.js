@@ -74,6 +74,7 @@ function Revisions( { onClose, userConfig, blocks } ) {
 			title={ __( 'Revisions' ) }
 			onClose={ onClose }
 			closeButtonLabel={ __( 'Close revisions' ) }
+			enableResizing={ true }
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"

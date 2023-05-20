@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -122,7 +121,7 @@ const deprecated = [
 				title,
 			} = attributes;
 
-			const newRel = isEmpty( rel ) ? undefined : rel;
+			const newRel = ! rel ? undefined : rel;
 
 			const classes = classnames( {
 				[ `align${ align }` ]: align,
@@ -202,7 +201,7 @@ const deprecated = [
 				title,
 			} = attributes;
 
-			const newRel = isEmpty( rel ) ? undefined : rel;
+			const newRel = ! rel ? undefined : rel;
 
 			const classes = classnames( {
 				[ `align${ align }` ]: align,

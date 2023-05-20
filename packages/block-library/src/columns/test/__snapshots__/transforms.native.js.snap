@@ -34,7 +34,7 @@ exports[`Columns block transforms to Group block 1`] = `
 <!-- /wp:group -->"
 `;
 
-exports[`Columns block transforms unwraps content 1`] = `
+exports[`Columns block transforms ungroups block 1`] = `
 "<!-- wp:paragraph {"align":"left"} -->
 <p class="has-text-align-left"><strong>Built with modern technology.</strong></p>
 <!-- /wp:paragraph -->
