@@ -135,7 +135,7 @@ function render_block_core_template_part( $attributes ) {
 	unset( $seen_ids[ $template_part_id ] );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
-	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
+	$content = wp_filter_content_tags( $content );
 
 	// Handle embeds for block template parts.
 	global $wp_embed;
