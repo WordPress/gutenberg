@@ -86,7 +86,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 
 -	**Name:** core/code
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** align (wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Column
@@ -465,7 +465,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug
+-	**Attributes:** slug, syncStatus
 
 ## Post Author
 

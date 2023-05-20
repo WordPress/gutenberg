@@ -29,8 +29,6 @@ function PublishDateTimePicker(
 			/>
 			<DateTimePicker
 				startOfWeek={ getSettings().l10n.startOfWeek }
-				__nextRemoveHelpButton
-				__nextRemoveResetButton
 				onChange={ onChange }
 				{ ...additionalProps }
 			/>

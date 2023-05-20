@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { Popover } from '@wordpress/components';
+import { Popover, VisuallyHidden } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,8 +19,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-
-const { PrivateListView, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+import LeafMoreMenu from './leaf-more-menu';
 
 function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -145,6 +144,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		};
 	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
 
+	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	const offCanvasOnselect = useCallback(
 		( block ) => {
 			if (
@@ -191,11 +191,11 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
 			) }
-			<div style={ { visibility: 'hidden' } }>
+			<VisuallyHidden aria-hidden="true">
 				<BlockTools>
 					<BlockList />
 				</BlockTools>
-			</div>
+			</VisuallyHidden>
 		</>
 	);
 }

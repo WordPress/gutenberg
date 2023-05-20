@@ -18,13 +18,6 @@
  */
 
 /**
- * When backporting to core, the existing filters hooked to WP_Theme_JSON_Resolver::clean_cached_data()
- * need to be removed.
- */
-add_action( 'start_previewing_theme', '_gutenberg_clean_theme_json_caches' );
-add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
-
-/**
  * This is a temporary fix to ensure that the block editor styles are enqueued
  * in the order the iframe expects.
  *

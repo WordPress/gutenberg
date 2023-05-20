@@ -18,9 +18,8 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
  */
 function getRevisionLabel( revision ) {
 	const authorDisplayName = revision?.author?.name || __( 'User' );
-	const isUnsaved = 'unsaved' === revision?.id;
 
-	if ( isUnsaved ) {
+	if ( 'unsaved' === revision?.id ) {
 		return sprintf(
 			/* translators: %(name)s author display name */
 			__( 'Unsaved changes by %(name)s' ),
@@ -57,45 +56,42 @@ function getRevisionLabel( revision ) {
  * Returns a rendered list of revisions buttons.
  *
  * @typedef {Object} props
- * @property {Array<Object>} userRevisions     A collection of user revisions.
- * @property {number}        currentRevisionId Callback fired when the modal is closed or action cancelled.
- * @property {Function}      onChange          Callback fired when a revision is selected.
+ * @property {Array<Object>} userRevisions      A collection of user revisions.
+ * @property {number}        selectedRevisionId The id of the currently-selected revision.
+ * @property {Function}      onChange           Callback fired when a revision is selected.
  *
- * @param    {props}         Component         props.
+ * @param    {props}         Component          props.
  * @return {JSX.Element} The modal component.
  */
-function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
+function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
 			aria-label={ __( 'Global styles revisions' ) }
 			role="group"
 		>
-			{ userRevisions.map( ( revision ) => {
-				const { id, author, isLatest, modified } = revision;
+			{ userRevisions.map( ( revision, index ) => {
+				const { id, author, modified } = revision;
 				const authorDisplayName = author?.name || __( 'User' );
 				const authorAvatar = author?.avatar_urls?.[ '48' ];
-				/*
-				 * If the currentId hasn't been selected yet, the first revision is
-				 * the current one so long as the API returns revisions in descending order.
-				 */
-				const isActive = !! currentRevisionId
-					? id === currentRevisionId
-					: isLatest;
+				const isUnsaved = 'unsaved' === revision?.id;
+				const isSelected = selectedRevisionId
+					? selectedRevisionId === revision?.id
+					: index === 0;
 
 				return (
 					<li
 						className={ classnames(
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
-								'is-current': isActive,
+								'is-selected': isSelected,
 							}
 						) }
 						key={ id }
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
-							disabled={ isActive }
+							disabled={ isSelected }
 							onClick={ () => {
 								onChange( revision );
 							} }
@@ -106,13 +102,25 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 									{ humanTimeDiff( modified ) }
 								</time>
 								<span className="edit-site-global-styles-screen-revisions__meta">
-									{ sprintf(
-										/* translators: %(name)s author display name */
-										__( 'Changes saved by %(name)s' ),
-										{
-											name: authorDisplayName,
-										}
-									) }
+									{ isUnsaved
+										? sprintf(
+												/* translators: %(name)s author display name */
+												__(
+													'Unsaved changes by %(name)s'
+												),
+												{
+													name: authorDisplayName,
+												}
+										  )
+										: sprintf(
+												/* translators: %(name)s author display name */
+												__(
+													'Changes saved by %(name)s'
+												),
+												{
+													name: authorDisplayName,
+												}
+										  ) }
 
 									<img
 										alt={ author?.name }
