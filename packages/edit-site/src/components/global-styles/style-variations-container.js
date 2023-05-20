@@ -10,11 +10,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	__experimentalGrid as Grid,
-	VisuallyHidden,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __experimentalGrid as Grid } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -27,7 +24,6 @@ import { unlock } from '../../private-apis';
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
-let uniqueId = 0;
 
 function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -64,7 +60,15 @@ function Variation( { variation } ) {
 		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
 
-	const describedbyID = `style-variations-item-${ ++uniqueId }`;
+	let label = variation?.title;
+	if ( variation?.description ) {
+		label = sprintf(
+			/* translators: %1$s: variation title. %2$s variation description. */
+			__( '%1$s (%2$s)' ),
+			variation?.title,
+			variation?.description
+		);
+	}
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
@@ -79,11 +83,8 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.title }
+				aria-label={ label }
 				aria-current={ isActive }
-				aria-describedby={
-					!! variation?.description ? describedbyID : undefined
-				}
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -93,11 +94,6 @@ function Variation( { variation } ) {
 						isFocused={ isFocused }
 						withHoverView
 					/>
-					{ variation?.description && (
-						<VisuallyHidden id={ describedbyID }>
-							{ variation?.description }
-						</VisuallyHidden>
-					) }
 				</div>
 			</div>
 		</GlobalStylesContext.Provider>
