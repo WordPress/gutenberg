@@ -20,7 +20,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasVariationsPanel } from './variations-panel';
+import { useBlockVariations } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../private-apis';
@@ -65,7 +65,7 @@ export function useBlockHasGlobalStyles( blockName ) {
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
-	const hasVariationsPanel = useHasVariationsPanel( blockName );
+	const hasVariationsPanel = !! useBlockVariations( blockName )?.length;
 	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||

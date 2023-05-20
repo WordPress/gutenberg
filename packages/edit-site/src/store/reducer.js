@@ -140,6 +140,23 @@ function canvasMode( state = 'init', action ) {
 	return state;
 }
 
+/**
+ * Reducer used to track the site editor canvas container view.
+ * Default is `undefined`, denoting the default, visual block editor.
+ * This could be, for example, `'style-book'` (the style book).
+ *
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
+ */
+function editorCanvasContainerView( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
+			return action.view;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -148,4 +165,5 @@ export default combineReducers( {
 	listViewPanel,
 	saveViewPanel,
 	canvasMode,
+	editorCanvasContainerView,
 } );

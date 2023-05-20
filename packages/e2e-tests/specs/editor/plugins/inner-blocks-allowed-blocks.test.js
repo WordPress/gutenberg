@@ -50,7 +50,8 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await page.waitForSelector( childParagraphSelector );
 		await page.click( childParagraphSelector );
 		await openGlobalBlockInserter();
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+		const allowedBlocks = await getAllBlockInserterItemTitles();
+		expect( allowedBlocks.sort() ).toEqual( [
 			'Button',
 			'Gallery',
 			'List',
@@ -75,7 +76,7 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 			await page.$x( `//button//span[contains(text(), 'List')]` )
 		 )[ 0 ];
 		await insertButton.click();
-		// Select the list wrapper so the image is inserable.
+		// Select the list wrapper so the image is insertable.
 		await page.keyboard.press( 'ArrowUp' );
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();

@@ -168,6 +168,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestEmbedFullscreenPreview(String content, String title) {
+
+            }
+
+            @Override
             public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
 
             }
