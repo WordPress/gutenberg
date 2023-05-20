@@ -1,0 +1,6 @@
+// Add low specificity default padding to lists with backgrounds.
+:where(ol.has-background),
+:where(ul.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
