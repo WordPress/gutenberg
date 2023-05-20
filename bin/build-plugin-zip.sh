@@ -83,6 +83,7 @@ build_files=$(
 	build/block-library/blocks/*.php \
 	build/block-library/blocks/*/block.json \
 	build/block-library/blocks/*/*.{js,js.map,css,asset.php} \
+	build/block-library/interactivity/*.{js,js.map,asset.php} \
 	build/edit-widgets/blocks/*/block.json \
 	build/widgets/blocks/*.php \
 	build/widgets/blocks/*/block.json \

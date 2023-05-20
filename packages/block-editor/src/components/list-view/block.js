@@ -134,6 +134,7 @@ function ListViewBlock( {
 		collapse,
 		BlockSettingsMenu,
 		listViewInstanceId,
+		expandedState,
 	} = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
@@ -336,6 +337,8 @@ function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ updateSelection }
+							expand={ expand }
+							expandedState={ expandedState }
 						/>
 					) }
 				</TreeGridCell>

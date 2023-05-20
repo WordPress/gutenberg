@@ -10,8 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+
+## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
--   [**] Tapping on a nested block now gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
 -   [*] Use host app namespace in reusable block message [#50478]
 
 ## 1.94.0

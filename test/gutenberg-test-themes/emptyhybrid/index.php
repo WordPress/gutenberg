@@ -1,3 +1,11 @@
+<?php
+/**
+ * Empty-Hybrid theme index.php file.
+ *
+ * @package Gutenberg
+ */
+
+?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
