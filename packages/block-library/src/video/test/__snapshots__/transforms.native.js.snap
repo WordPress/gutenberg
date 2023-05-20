@@ -34,7 +34,7 @@ exports[`Video block transforms to Group block 1`] = `
 
 exports[`Video block transforms to Media & Text block 1`] = `
 "<!-- wp:media-text {"mediaType":"video"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"

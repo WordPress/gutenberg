@@ -111,9 +111,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_link_when_post_is_published() {
 		$page_id = self::$page->ID;
+		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
@@ -133,9 +134,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_empty_when_label_is_missing() {
 		$page_id = self::$page->ID;
+		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
@@ -152,9 +154,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_empty_when_draft() {
 		$page_id = self::$draft->ID;
+		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Draft Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Draft Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
@@ -172,9 +175,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_link_for_category() {
 		$category_id = self::$category->term_id;
+		$url         = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Cats\",\"type\":\"category\",\"id\":{$category_id},\"url\":\"http://localhost:8888/?cat={$category_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Cats\",\"type\":\"category\",\"id\":{$category_id},\"url\":\"{$url}/?cat={$category_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
@@ -247,9 +251,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_empty_when_custom_post_type_draft() {
 		$page_id = self::$custom_draft->ID;
+		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Draft Custom Post Type\",\"type\":\"cats\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Draft Custom Post Type\",\"type\":\"cats\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
@@ -267,9 +272,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_link_when_custom_post_is_published() {
 		$page_id = self::$custom_post->ID;
+		$url     = 'http://' . WP_TESTS_DOMAIN;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 

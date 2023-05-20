@@ -25,13 +25,14 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 
 	$content = '';
 	foreach ( $comments as $comment ) {
-
-		$block_content = ( new WP_Block(
-			$block->parsed_block,
-			array(
-				'commentId' => $comment->comment_ID,
-			)
-		) )->render( array( 'dynamic' => false ) );
+		$comment_id           = $comment->comment_ID;
+		$filter_block_context = static function( $context ) use ( $comment_id ) {
+			$context['commentId'] = $comment_id;
+			return $context;
+		};
+		add_filter( 'render_block_context', $filter_block_context );
+		$block_content = $block->render( array( 'dynamic' => false ) );
+		remove_filter( 'render_block_context', $filter_block_context );
 
 		$children = $comment->get_children();
 
@@ -58,11 +59,10 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 				$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 				--$comment_depth;
 			} else {
-				$inner_content  = block_core_comment_template_render_comments(
+				$block_content .= block_core_comment_template_render_comments(
 					$children,
 					$block
 				);
-				$block_content .= sprintf( $inner_content );
 			}
 		}
 

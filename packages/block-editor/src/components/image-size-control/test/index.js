@@ -334,7 +334,7 @@ describe( 'ImageSizeControl', () => {
 			);
 
 			expect(
-				screen.getByRole( 'combobox', { name: 'Image size' } )
+				screen.getByRole( 'combobox', { name: 'Resolution' } )
 			).toHaveValue( 'medium' );
 		} );
 
@@ -351,7 +351,7 @@ describe( 'ImageSizeControl', () => {
 			);
 
 			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Image size' } ),
+				screen.getByRole( 'combobox', { name: 'Resolution' } ),
 				'thumbnail'
 			);
 

@@ -30,7 +30,7 @@ exports[`Cover block transformations with Image to Image block 1`] = `
 
 exports[`Cover block transformations with Image to Media & Text block 1`] = `
 "<!-- wp:media-text {"mediaId":890,"mediaType":"image","backgroundColor":"luminous-vivid-orange"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile has-luminous-vivid-orange-background-color has-background"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-890 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
+<div class="wp-block-media-text is-stacked-on-mobile has-luminous-vivid-orange-background-color has-background"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-890 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
 <p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -60,7 +60,7 @@ exports[`Cover block transformations with Video to Group block 1`] = `
 
 exports[`Cover block transformations with Video to Media & Text block 1`] = `
 "<!-- wp:media-text {"mediaId":891,"mediaType":"video","backgroundColor":"luminous-vivid-orange"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile has-luminous-vivid-orange-background-color has-background"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
+<div class="wp-block-media-text is-stacked-on-mobile has-luminous-vivid-orange-background-color has-background"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
 <p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"

@@ -71,7 +71,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'dragover' ];
+	const eventTypes = [ 'dragover', 'mousemove' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
@@ -260,15 +260,18 @@ function Iframe( {
 				style={ {
 					...props.style,
 					height: expand ? contentHeight : props.style?.height,
-					marginTop: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginTop,
-					marginBottom: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginBottom,
-					transform: scale
-						? `scale( ${ scale } )`
-						: props.style?.transform,
+					marginTop:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginTop,
+					marginBottom:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginBottom,
+					transform:
+						scale !== 1
+							? `scale( ${ scale } )`
+							: props.style?.transform,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }

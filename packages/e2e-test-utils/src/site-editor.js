@@ -10,6 +10,7 @@ import { addQueryArgs } from '@wordpress/url';
 
 const SELECTORS = {
 	visualEditor: '.edit-site-visual-editor iframe',
+	loadingSpinner: '.edit-site-canvas-spinner',
 };
 
 /**
@@ -128,6 +129,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 
 	await visitAdminPage( 'site-editor.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
+	await page.waitForSelector( SELECTORS.loadingSpinner, { hidden: true } );
 
 	if ( skipWelcomeGuide ) {
 		await disableSiteEditorWelcomeGuide();

@@ -6,15 +6,19 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled, navigation } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
 
 export default function SidebarNavigationScreenMain() {
 	const hasNavigationMenus = useSelect( ( select ) => {
@@ -30,13 +34,27 @@ export default function SidebarNavigationScreenMain() {
 				orderby: 'date',
 			}
 		);
-
-		return navigationMenus?.length > 0;
-	} );
-
+		return !! navigationMenus?.length;
+	}, [] );
 	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
 		? hasNavigationMenus
 		: false;
+
+	const editorCanvasContainerView = useSelect( ( select ) => {
+		return unlock( select( editSiteStore ) ).getEditorCanvasContainerView();
+	}, [] );
+
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
+	// Clear the editor canvas container view when accessing the main navigation screen.
+	useEffect( () => {
+		if ( editorCanvasContainerView ) {
+			setEditorCanvasContainerView( undefined );
+		}
+	}, [ editorCanvasContainerView, setEditorCanvasContainerView ] );
+
 	return (
 		<SidebarNavigationScreen
 			isRoot
@@ -56,6 +74,20 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
+					<SidebarNavigationItemGlobalStyles
+						withChevron
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/page"
+						withChevron
+						icon={ page }
+					>
+						{ __( 'Pages' ) }
+					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/wp_template"
@@ -68,7 +100,7 @@ export default function SidebarNavigationScreenMain() {
 						as={ SidebarNavigationItem }
 						path="/wp_template_part"
 						withChevron
-						icon={ symbolFilled }
+						icon={ symbol }
 					>
 						{ __( 'Template Parts' ) }
 					</NavigatorButton>

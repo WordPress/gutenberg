@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	isBlockInterfaceHidden,
-	getLastInsertedBlocksClientIds,
-} from '../private-selectors';
+import { isBlockInterfaceHidden } from '../private-selectors';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -22,31 +19,6 @@ describe( 'private selectors', () => {
 			};
 
 			expect( isBlockInterfaceHidden( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getLastInsertedBlocksClientIds', () => {
-		it( 'should return undefined if no blocks have been inserted', () => {
-			const state = {
-				lastBlockInserted: {},
-			};
-
-			expect( getLastInsertedBlocksClientIds( state ) ).toEqual(
-				undefined
-			);
-		} );
-
-		it( 'should return clientIds if blocks have been inserted', () => {
-			const state = {
-				lastBlockInserted: {
-					clientIds: [ '123456', '78910' ],
-				},
-			};
-
-			expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
-				'123456',
-				'78910',
-			] );
 		} );
 	} );
 } );

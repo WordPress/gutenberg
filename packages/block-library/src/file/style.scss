@@ -20,6 +20,11 @@
 	}
 }
 
+// Lowest specificity to avoid overriding layout styles.
+:where(.wp-block-file) {
+	margin-bottom: 1.5em;
+}
+
 .wp-block-file__embed {
 	margin-bottom: 1em;
 }

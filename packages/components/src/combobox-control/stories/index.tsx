@@ -36,7 +36,7 @@ const meta: ComponentMeta< typeof ComboboxControl > = {
 };
 export default meta;
 
-const mapCountryOption = ( country: typeof countries[ number ] ) => ( {
+const mapCountryOption = ( country: ( typeof countries )[ number ] ) => ( {
 	value: country.code,
 	label: country.name,
 } );
@@ -65,7 +65,6 @@ const Template: ComponentStory< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__next36pxDefaultSize: false,
 	allowReset: false,
 	label: 'Select a country',
 	options: countryOptions,
