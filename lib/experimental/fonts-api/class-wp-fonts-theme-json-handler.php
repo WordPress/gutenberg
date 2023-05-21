@@ -9,6 +9,11 @@ if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
 	return;
 }
 
+/**
+ * Class WP_Fonts_Theme_Json_Handler
+ *
+ * @since X.X.X
+ */
 class WP_Fonts_Theme_Json_Handler {
 	/**
 	 * Register fonts defined in theme.json.
@@ -137,7 +142,9 @@ class WP_Fonts_Theme_Json_Handler {
 	}
 
 	/**
-	 * @param array $settings
+	 * Parse font families from theme.json.
+	 *
+	 * @param array $settings Font settings to parse.
 	 *
 	 * @return array
 	 */
