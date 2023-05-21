@@ -131,11 +131,11 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 					name={ __( 'Edit' ) }
 					onSelect={ ( value ) => onSelectTracks( value ) }
 					accept="audio/*"
-					addToPlaylist={ true } // Without this, the replace flow does not fetch all the audio file data.
+					addToPlaylist={ true }
 					mediaIds={ ids
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
-					multiple={ false }
+					multiple={ true }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
@@ -149,18 +149,22 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 						onChange={ toggleAttribute( 'tracklist' ) }
 						checked={ tracklist }
 					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show artists in Tracklist' ) }
-						onChange={ toggleAttribute( 'artists' ) }
-						checked={ artists }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show number in Tracklist' ) }
-						onChange={ toggleAttribute( 'tracknumbers' ) }
-						checked={ tracknumbers }
-					/>
+					{ tracklist && (
+						<>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show artists in Tracklist' ) }
+								onChange={ toggleAttribute( 'artists' ) }
+								checked={ artists }
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show number in Tracklist' ) }
+								onChange={ toggleAttribute( 'tracknumbers' ) }
+								checked={ tracknumbers }
+							/>
+						</>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show images' ) }
