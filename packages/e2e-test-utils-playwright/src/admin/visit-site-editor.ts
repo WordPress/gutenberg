@@ -34,7 +34,6 @@ export async function visitSiteEditor(
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'site-editor.php', path );
-	await this.page.waitForSelector( CANVAS_SELECTOR );
 
 	if ( skipWelcomeGuide ) {
 		await this.page.evaluate( () => {
@@ -47,4 +46,17 @@ export async function visitSiteEditor(
 				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
 		} );
 	}
+
+	// The site editor initially loads with an empty body,
+	// we need to wait for the editor canvas to be rendered.
+	await this.page
+		.frameLocator( CANVAS_SELECTOR )
+		.locator( 'body > *' )
+		.first()
+		.waitFor();
+
+	// TODO: Ideally the content underneath the spinner should be marked inert until it's ready.
+	await this.page
+		.locator( '.edit-site-canvas-spinner' )
+		.waitFor( { state: 'hidden' } );
 }

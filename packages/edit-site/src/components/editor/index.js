@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -37,6 +42,7 @@ import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -49,7 +55,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor() {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -152,12 +158,9 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
-
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -170,8 +173,19 @@ export default function Editor() {
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
-							className={ showIconLabels && 'show-icon-labels' }
-							notices={ isEditMode && <EditorSnackbars /> }
+							className={ classnames(
+								'edit-site-editor__interface-skeleton',
+								{
+									'show-icon-labels': showIconLabels,
+									'is-loading': isLoading,
+								}
+							) }
+							notices={
+								( isEditMode ||
+									window?.__experimentalEnableThemePreviews ) && (
+									<EditorSnackbars />
+								)
+							}
 							content={
 								<>
 									<GlobalStylesRenderer />
@@ -209,7 +223,10 @@ export default function Editor() {
 							sidebar={
 								isEditMode &&
 								isRightSidebarOpen && (
-									<ComplementaryArea.Slot scope="core/edit-site" />
+									<>
+										<ComplementaryArea.Slot scope="core/edit-site" />
+										<SidebarFixedBottomSlot />
+									</>
 								)
 							}
 							footer={

@@ -6,12 +6,15 @@ import {
 	InnerBlocks,
 	useInnerBlocksProps,
 	useBlockProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import cleanEmptyObject from '../utils/clean-empty-object';
+import { unlock } from '../private-apis';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;

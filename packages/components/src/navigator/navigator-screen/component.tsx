@@ -43,7 +43,7 @@ const animationExitDelay = 0;
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
 type Props = Omit<
 	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	Exclude< keyof MotionProps, 'style' >
+	Exclude< keyof MotionProps, 'style' | 'children' >
 >;
 
 function UnconnectedNavigatorScreen(

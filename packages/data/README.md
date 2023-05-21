@@ -499,11 +499,11 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the action creators.
+-   `ActionCreatorsOf< ConfigOf< T > >`: Object containing the action creators.
 
 ### plugins
 
@@ -638,11 +638,11 @@ select( myCustomStore ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the store's selectors.
+-   `CurriedSelectorsOf< T >`: Object containing the store's selectors.
 
 ### subscribe
 
@@ -1006,7 +1006,7 @@ As a response of `dispatch` calls, WordPress data based applications updates the
 -   The selectors are called with the update state.
 -   If the selectors return values that are different than the previous (strict equality), the component rerenders.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consisecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
 
 _Usage_
 

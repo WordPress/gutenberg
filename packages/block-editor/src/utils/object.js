@@ -42,16 +42,16 @@ function cloneObject( object ) {
 }
 
 /**
- * Perform an immutable set.
- * Handles nullish initial values.
- * Clones all nested objects in the specified object.
+ * Immutably sets a value inside an object. Like `lodash#set`, but returning a
+ * new object. Treats nullish initial values as empty objects. Clones any
+ * nested objects.
  *
  * @param {Object}              object Object to set a value in.
  * @param {number|string|Array} path   Path in the object to modify.
  * @param {*}                   value  New value to set.
  * @return {Object} Cloned object with the new value set.
  */
-export function immutableSet( object, path, value ) {
+export function setImmutably( object, path, value ) {
 	const normalizedPath = normalizePath( path );
 	const newObject = object ? cloneObject( object ) : {};
 

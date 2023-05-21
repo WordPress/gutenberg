@@ -606,8 +606,15 @@ class WP_Theme_JSON_Gutenberg {
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
-		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
+		$valid_variations    = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
+		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -685,9 +692,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
 	 * @param array $valid_element_names List of valid element names.
+	 * @param array $valid_variations    List of valid variations per block.
 	 * @return array The sanitized output.
 	 */
-	protected static function sanitize( $input, $valid_block_names, $valid_element_names ) {
+	protected static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
 
 		$output = array();
 
@@ -745,9 +753,13 @@ class WP_Theme_JSON_Gutenberg {
 			$style_variation_names = array();
 			if (
 				! empty( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				is_array( $input['styles']['blocks'][ $block ]['variations'] )
+				is_array( $input['styles']['blocks'][ $block ]['variations'] ) &&
+				isset( $valid_variations[ $block ] )
 			) {
-				$style_variation_names = array_keys( $input['styles']['blocks'][ $block ]['variations'] );
+				$style_variation_names = array_intersect(
+					array_keys( $input['styles']['blocks'][ $block ]['variations'] ),
+					$valid_variations[ $block ]
+				);
 			}
 
 			$schema_styles_variations = array();
@@ -783,7 +795,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
 			} else {
-				$output[ $subtree ] = $result;
+				$output[ $subtree ] = static::resolve_custom_css_format( $result );
 			}
 		}
 
@@ -1916,10 +1928,6 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Returns the style property for the given path.
 	 *
-	 * It also converts CSS Custom Property stored as
-	 * "var:preset|color|secondary" to the form
-	 * "--wp--preset--color--secondary".
-	 *
 	 * It also converts references to a path to the value
 	 * stored at that location, e.g.
 	 * { "ref": "style.color.background" } => "#fff".
@@ -1975,20 +1983,6 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( is_array( $value ) ) {
 			return $value;
-		}
-
-		// Convert custom CSS properties.
-		$prefix     = 'var:';
-		$prefix_len = strlen( $prefix );
-		$token_in   = '|';
-		$token_out  = '--';
-		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
-			$unwrapped_name = str_replace(
-				$token_in,
-				$token_out,
-				substr( $value, $prefix_len )
-			);
-			$value          = "var(--wp--$unwrapped_name)";
 		}
 
 		return $value;
@@ -2824,8 +2818,15 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
+		$valid_variations    = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
 
-		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
@@ -3558,5 +3559,52 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $declarations;
+	}
+
+	/**
+	 * This is used to convert the internal representation of variables to the CSS representation.
+	 * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
+	 *
+	 * @since 6.3.0
+	 * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
+	 * @return string The converted variable.
+	 */
+	private static function convert_custom_properties( $value ) {
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strpos( $value, $prefix ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Given a tree, converts the internal representation of variables to the CSS representation.
+	 * It is recursive and modifies the input in-place.
+	 *
+	 * @since 6.3.0
+	 * @param array $tree   Input to process.
+	 * @return array The modified $tree.
+	 */
+	private static function resolve_custom_css_format( $tree ) {
+		$prefix = 'var:';
+
+		foreach ( $tree as $key => $data ) {
+			if ( is_string( $data ) && 0 === strpos( $data, $prefix ) ) {
+				$tree[ $key ] = self::convert_custom_properties( $data );
+			} elseif ( is_array( $data ) ) {
+				$tree[ $key ] = self::resolve_custom_css_format( $data );
+			}
+		}
+
+		return $tree;
 	}
 }

@@ -3,7 +3,8 @@
 	overflow-y: auto;
 
 	.components-navigator-screen {
-		@include custom-scrollbars-on-hover;
+		@include custom-scrollbars-on-hover(transparent, $gray-700);
+		scrollbar-gutter: stable;
 	}
 }
 

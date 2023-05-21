@@ -90,7 +90,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 
 -	**Name:** core/code
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** align (wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Column
@@ -237,7 +237,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 
 ## Cover
 
-Add an image or video with a text overlay — great for headers. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
+Add an image or video with a text overlay. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
 
 -	**Name:** core/cover
 -	**Category:** media
@@ -246,30 +246,12 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 ## Details
 
-A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+Hide and show additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
 
 -	**Name:** core/details
 -	**Category:** text
--	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** showContent
-
-## Details Content
-
-Add content that may be shown or hidden via a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
-
--	**Name:** core/details-content
--	**Category:** text
--	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** 
-
-## Details Summary
-
-Provide summary text used to toggle the display of content inside a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
-
--	**Name:** core/details-summary
--	**Category:** text
--	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** summary
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** showContent, summary
 
 ## Embed
 
@@ -314,7 +296,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/group
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, ariaLabel, color (background, gradients, link, text), dimensions (minHeight), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** tagName, templateLock
+-	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
 
@@ -396,7 +378,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 
 -	**Name:** core/loginout
 -	**Category:** theme
--	**Supports:** anchor, className, typography (~~fontSize~~)
+-	**Supports:** anchor, className, typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
 ## Media & Text
@@ -406,7 +388,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 -	**Name:** core/media-text
 -	**Category:** media
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
+-	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
 
 ## Unsupported
 
@@ -500,7 +482,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug
+-	**Attributes:** slug, syncStatus
 
 ## Post Author
 
@@ -793,7 +775,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 ## Site Logo
 
-Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
+Display an image to represent this site. Update this block and the changes apply everywhere. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
 
 -	**Name:** core/site-logo
 -	**Category:** theme

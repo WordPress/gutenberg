@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,23 +27,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import Image from './image';
-
-// Much of this description is duplicated from MediaPlaceholder.
-const placeholder = ( content ) => {
-	return (
-		<Placeholder
-			className="block-editor-media-placeholder"
-			withIllustration={ true }
-			icon={ icon }
-			label={ __( 'Image' ) }
-			instructions={ __(
-				'Upload an image file, pick one from your media library, or add one with a URL.'
-			) }
-		>
-			{ content }
-		</Placeholder>
-	);
-};
 
 /**
  * Module constants
@@ -337,13 +319,36 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 	} );
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className={ classnames( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSelected,
+				} ) }
+				withIllustration={ true }
+				icon={ icon }
+				label={ __( 'Image' ) }
+				instructions={ __(
+					'Upload an image file, pick one from your media library, or add one with a URL.'
+				) }
+				style={ isSelected ? undefined : borderProps.style }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	return (
 		<figure { ...blockProps }>

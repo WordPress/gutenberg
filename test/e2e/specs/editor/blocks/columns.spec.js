@@ -26,7 +26,7 @@ test.describe( 'Columns', () => {
 		// block column add
 		await page
 			.locator(
-				'role=treegrid[name="Block navigation structure"i] >> role=gridcell[name="Column link"i]'
+				'role=treegrid[name="Block navigation structure"i] >> role=gridcell[name="Column"i]'
 			)
 			.first()
 			.click();
@@ -81,5 +81,41 @@ test.describe( 'Columns', () => {
 		await page.fill( 'role=spinbutton[name="Columns"i]', '1' );
 		await pageUtils.pressKeys( 'Tab' );
 		await expect( columnsChangeInput ).toHaveValue( '3' );
+	} );
+	test( 'Ungroup properly', async ( { editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+			],
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Ungroup' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
 	} );
 } );

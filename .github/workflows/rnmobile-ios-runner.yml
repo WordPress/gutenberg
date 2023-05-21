@@ -14,11 +14,11 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-11
+        runs-on: macos-12
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                xcode: ['13.2.1']
+                xcode: ['13.3.1']
                 device: ['iPhone 13']
                 native-test-name: [gutenberg-editor-rendering]
 
@@ -61,8 +61,8 @@ jobs:
             - name: Build Web Driver Agent (if needed)
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
-            - name: Force update Launch Database to prevent issues when opening the Simulator app
-              run: /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer/Applications/Simulator.app
+            - name: Launch simulator
+              run: open -a Simulator && xcrun simctl boot '${{ matrix.device }}'
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
