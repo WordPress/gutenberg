@@ -17,6 +17,11 @@ export const unstyledButton = css`
 
 	&:hover {
 		color: ${ COLORS.ui.theme };
+
+		svg,
+		path {
+			fill: ${ COLORS.ui.theme };
+		}
 	}
 
 	&:focus {
