@@ -319,7 +319,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 										{ track?.length && (
 											<span className="screen-reader-text">
 												{
-													/* translators: %s: track length in "minutes:seconds" format */
+													/* translators: %s: Visually hidden label for the track length (screen reader text). */
 													__( 'Length:' )
 												}
 											</span>
