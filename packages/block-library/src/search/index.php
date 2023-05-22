@@ -133,7 +133,7 @@ function render_block_core_search( $attributes ) {
 			'<button type="submit" class="%s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
-			$aria_label .= $aria_expanded,
+			$aria_attributes,
 			$button_internal_markup
 		);
 	}
