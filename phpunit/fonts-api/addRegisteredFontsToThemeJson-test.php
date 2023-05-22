@@ -12,7 +12,7 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
  * @group fontsapi
  * @covers WP_Fonts_Theme_Json_Handler::add_registered_fonts_to_theme_json
  */
-class Tests_Fonts_GutenbergAddRegisteredFontsToThemeJson extends WP_Fonts_TestCase {
+class Tests_Fonts_AddRegisteredFontsToThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
 	/**
