@@ -63,6 +63,8 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
+	$aria_hidden = '';
+	$aria_expanded = '';
 	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
 		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
 			$aria_hidden   = 'aria-hidden="true"';
