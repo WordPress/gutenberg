@@ -40,7 +40,9 @@ test.describe( 'adding inline tokens', () => {
 		const filename = uuid();
 		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
-		await page.locator('.media-modal .moxie-shim input[type=file]').setInputFiles( tmpFileName );
+		await page
+			.locator( '.media-modal .moxie-shim input[type=file]' )
+			.setInputFiles( tmpFileName );
 
 		// Insert the uploaded image.
 		await page.click( 'role=button[name="Select"i]' );
