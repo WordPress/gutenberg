@@ -1,7 +1,8 @@
 .components-spacing-sizes-control {
 	.components-base-control__label {
-		height: $grid-unit-20;
+		margin-bottom: 0;
 	}
+
 	.components-base-control.components-range-control {
 		height: 40px;
 		/* Vertically center the RangeControl until it has true 40px height. */
@@ -42,9 +43,13 @@
 	}
 }
 
-.component-spacing-sizes-control__dropdown {
+.components-spacing-sizes-control__header {
+	height: $grid-unit-20;
+	margin-bottom: $grid-unit-10;
+}
+
+.components-spacing-sizes-control__dropdown {
 	height: $grid-unit-30;
-	margin-top: -$grid-unit-05;
 }
 
 .components-spacing-sizes-control__custom-select-control,
