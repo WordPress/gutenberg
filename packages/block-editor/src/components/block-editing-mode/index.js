@@ -2,15 +2,17 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useContext, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { BlockListBlockContext } from '../block-list/block';
 
-export function useBlockEditingMode( clientId, mode ) {
+export function useBlockEditingMode( mode ) {
+	const { clientId } = useContext( BlockListBlockContext );
 	const blockEditingMode = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getBlockEditingMode(
@@ -30,6 +32,6 @@ export function useBlockEditingMode( clientId, mode ) {
 				unsetBlockEditingMode( clientId );
 			}
 		};
-	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
+	}, [ clientId, mode ] );
 	return blockEditingMode;
 }

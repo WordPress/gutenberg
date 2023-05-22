@@ -33,7 +33,6 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
-	clientId,
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -63,7 +62,7 @@ export default function PostTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const blockEditingMode = useBlockEditingMode( clientId );
+	const blockEditingMode = useBlockEditingMode();
 
 	let titleElement = (
 		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>

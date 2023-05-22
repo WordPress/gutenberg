@@ -43,7 +43,7 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-import { useBlockEditingMode } from '../block-editing-mode';
+import { unlock } from '../../lock-unlock';
 
 export const BlockListBlockContext = createContext();
 
@@ -104,13 +104,15 @@ function BlockListBlock( {
 		hasContentLockedParent,
 		isContentBlock,
 		isTemporarilyEditingAsBlocks,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
 				__unstableGetContentLockingParent,
 				__unstableGetTemporarilyEditingAsBlocks,
-			} = select( blockEditorStore );
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 			const _hasContentLockedParent =
 				!! __unstableGetContentLockingParent( clientId );
 			return {
@@ -122,6 +124,7 @@ function BlockListBlock( {
 				hasContentLockedParent: _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ name, clientId ]
@@ -130,8 +133,6 @@ function BlockListBlock( {
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	const parentLayout = useLayout() || {};
-
-	const blockEditingMode = useBlockEditingMode( clientId );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces

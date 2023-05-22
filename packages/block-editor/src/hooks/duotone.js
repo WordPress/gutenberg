@@ -236,7 +236,7 @@ const withDuotoneControls = createHigherOrderComponent(
 			[ props.clientId ]
 		);
 
-		const blockEditingMode = useBlockEditingMode( props.clientId );
+		const blockEditingMode = useBlockEditingMode();
 
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added

@@ -142,7 +142,7 @@ export const withToolbarControls = createHigherOrderComponent(
 			},
 			[ props.clientId ]
 		);
-		const blockEditingMode = useBlockEditingMode( props.clientId );
+		const blockEditingMode = useBlockEditingMode();
 		if (
 			! validAlignments.length ||
 			isContentLocked ||
