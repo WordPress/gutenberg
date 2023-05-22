@@ -39,7 +39,7 @@ const config = {
 			title: __( 'Library' ),
 			loading: __( 'Loading library' ),
 			notFound: __( 'No patterns found' ),
-			manage: __( 'Manage all patterns' ),
+			manage: __( 'Manage all template parts' ),
 			reusableBlocks: __( 'Manage reusable blocks' ),
 			description: __(
 				'Manage what patterns are available when editing your site.'
