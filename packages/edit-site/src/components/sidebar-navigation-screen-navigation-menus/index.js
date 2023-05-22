@@ -23,8 +23,6 @@ const NAVIGATION_MENUS_QUERY = {
 };
 
 export default function SidebarNavigationScreenNavigationMenus() {
-	const postType = 'wp_navigation';
-
 	const { records: navigationMenus, isResolving: isLoading } =
 		useEntityRecords( 'postType', `wp_navigation`, NAVIGATION_MENUS_QUERY );
 
@@ -51,7 +49,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			<ItemGroup>
 				{ navigationMenus?.map( ( navMenu ) => (
 					<NavMenuItem
-						postType={ postType }
 						postId={ navMenu.id }
 						key={ navMenu.id }
 						withChevron
@@ -82,10 +79,10 @@ export function SidebarNavigationScreenWrapper( {
 	);
 }
 
-const NavMenuItem = ( { postType, postId, ...props } ) => {
+const NavMenuItem = ( { postId, ...props } ) => {
 	const linkInfo = useLink( {
-		postType,
 		postId,
+		postType: 'wp_navigation',
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
