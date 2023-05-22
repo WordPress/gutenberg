@@ -1843,8 +1843,11 @@ export function blockEditingModes( state = new Map(), action ) {
 			newState.delete( action.clientId );
 			return newState;
 		}
-		case 'RESET_BLOCKS':
-			return new Map();
+		case 'RESET_BLOCKS': {
+			return state.has( '' )
+				? new Map().set( '', state.get( '' ) )
+				: state;
+		}
 	}
 	return state;
 }

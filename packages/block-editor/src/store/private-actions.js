@@ -67,7 +67,7 @@ export function showBlockInterface() {
 	};
 }
 
-export function setBlockEditingMode( clientId, mode ) {
+export function setBlockEditingMode( clientId = '', mode ) {
 	return {
 		type: 'SET_BLOCK_EDITING_MODE',
 		clientId,
@@ -75,7 +75,7 @@ export function setBlockEditingMode( clientId, mode ) {
 	};
 }
 
-export function unsetBlockEditingMode( clientId ) {
+export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,

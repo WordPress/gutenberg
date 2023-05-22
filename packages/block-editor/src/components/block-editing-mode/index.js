@@ -12,7 +12,7 @@ import { unlock } from '../../lock-unlock';
 import { BlockListBlockContext } from '../block-list/block';
 
 export function useBlockEditingMode( mode ) {
-	const { clientId } = useContext( BlockListBlockContext );
+	const { clientId = '' } = useContext( BlockListBlockContext ) ?? {};
 	const blockEditingMode = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getBlockEditingMode(
