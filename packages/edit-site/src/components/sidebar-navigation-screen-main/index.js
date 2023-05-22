@@ -102,7 +102,7 @@ export default function SidebarNavigationScreenMain() {
 						withChevron
 						icon={ symbol }
 					>
-						{ __( 'Template Parts' ) }
+						{ __( 'Library' ) }
 					</NavigatorButton>
 				</ItemGroup>
 			}

@@ -10,7 +10,7 @@ export const getCommands = createSelector(
 				command.context && command.context === state.context;
 			return contextual ? isContextual : ! isContextual;
 		} ),
-	( state ) => [ state.commands ]
+	( state ) => [ state.commands, state.context ]
 );
 
 export const getCommandLoaders = createSelector(
@@ -20,7 +20,7 @@ export const getCommandLoaders = createSelector(
 				loader.context && loader.context === state.context;
 			return contextual ? isContextual : ! isContextual;
 		} ),
-	( state ) => [ state.commandLoaders ]
+	( state ) => [ state.commandLoaders, state.context ]
 );
 
 export function isOpen( state ) {
