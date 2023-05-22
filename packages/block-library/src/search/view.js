@@ -12,9 +12,14 @@ window.addEventListener( 'DOMContentLoaded', () => {
 
 		const toggleSearchField = ( showSearchField ) => {
 			if ( showSearchField ) {
+				searchField.setAttribute( 'aria-hidden', 'false' );
+				searchButton.setAttribute( 'aria-expanded', 'true' );
+
 				return block.classList.remove( hiddenClass );
 			}
 
+			searchField.setAttribute( 'aria-hidden', 'true' );
+			searchButton.setAttribute( 'aria-expanded', 'false' );
 			return block.classList.add( hiddenClass );
 		};
 

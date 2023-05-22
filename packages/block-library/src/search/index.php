@@ -63,6 +63,14 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
+	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
+		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+			$aria_hidden   = 'aria-hidden="true"';
+			$aria_expanded = sprintf( ' aria-expanded="false" aria-controls="wp-block-search__input-%s"', esc_attr( $input_id ) );
+			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
+		}
+	}
+
 	$input_classes = array( 'wp-block-search__input' );
 	if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 		$input_classes[] = $border_color_classes;
@@ -71,12 +79,13 @@ function render_block_core_search( $attributes ) {
 		$input_classes[] = $typography_classes;
 	}
 	$input_markup = sprintf(
-		'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required />',
+		'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required %s/>',
 		$input_id,
 		esc_attr( implode( ' ', $input_classes ) ),
 		get_search_query(),
 		esc_attr( $attributes['placeholder'] ),
-		$inline_styles['input']
+		$inline_styles['input'],
+		$aria_hidden
 	);
 
 	if ( count( $query_params ) > 0 ) {
@@ -119,11 +128,12 @@ function render_block_core_search( $attributes ) {
 
 		// Include the button element class.
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
+		$aria_attributes  = $aria_label .= $aria_expanded;
 		$button_markup    = sprintf(
 			'<button type="submit" class="%s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
-			$aria_label,
+			$aria_label .= $aria_expanded,
 			$button_internal_markup
 		);
 	}
@@ -138,12 +148,6 @@ function render_block_core_search( $attributes ) {
 	$wrapper_attributes   = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
 	);
-
-	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
-		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
-		}
-	}
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
