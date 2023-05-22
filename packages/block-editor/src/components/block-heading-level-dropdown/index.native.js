@@ -57,7 +57,7 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 			controls={ HEADING_LEVELS.map( ( index ) =>
 				createLevelControl( index, selectedLevel, onChange )
 			) }
-			label={ __( 'Change heading level' ) }
+			label={ __( 'Change level' ) }
 		/>
 	);
 }
