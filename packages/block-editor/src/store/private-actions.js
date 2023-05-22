@@ -67,6 +67,17 @@ export function showBlockInterface() {
 	};
 }
 
+/**
+ * Sets the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ * @param {string} mode     The block editing mode. One of `'disabled'`,
+ *                          `'contentOnly'`, or `'default'`.
+ *
+ * @return {Object} Action object.
+ */
 export function setBlockEditingMode( clientId = '', mode ) {
 	return {
 		type: 'SET_BLOCK_EDITING_MODE',
@@ -75,6 +86,15 @@ export function setBlockEditingMode( clientId = '', mode ) {
 	};
 }
 
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
 export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',

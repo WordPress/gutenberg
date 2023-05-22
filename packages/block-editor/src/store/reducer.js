@@ -1834,6 +1834,14 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of block client IDs to block editing modes.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
 export function blockEditingModes( state = new Map(), action ) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EDITING_MODE':
