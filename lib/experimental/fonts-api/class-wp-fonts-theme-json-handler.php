@@ -82,9 +82,9 @@ class WP_Fonts_Theme_Json_Handler {
 	}
 
 	/**
-	 * Helper function that returns an array of settings for parsing font families.
+	 * Returns theme's settings and adds webfonts defined in variations.
 	 *
-	 * @return array
+	 * @return array An array containing theme's settings.
 	 */
 	private static function get_settings() {
 		// Get settings.
@@ -122,11 +122,11 @@ class WP_Fonts_Theme_Json_Handler {
 	}
 
 	/**
-	 * Helper to get an array of the font-families.
+	 * Converts a list of font families into font handles and returns them as an array.
 	 *
-	 * @param array $families_data The font-families data.
+	 * @param array $families_data An array of font families data.
 	 *
-	 * @return array               The font-families array.
+	 * @return array               Am array containing font handles.
 	 */
 	private static function get_font_families( $families_data ) {
 		$families = array();
@@ -146,7 +146,7 @@ class WP_Fonts_Theme_Json_Handler {
 	 *
 	 * @param array $settings Font settings to parse.
 	 *
-	 * @return array
+	 * @return array Returns an array that contains font data and corresponding handles.
 	 */
 	private static function parse_font_families( array $settings ) {
 		$handles = array();
