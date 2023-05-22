@@ -41,6 +41,8 @@ test.describe( 'Site editor command center', () => {
 			.click();
 		await page.keyboard.type( 'index' );
 		await page.getByRole( 'option', { name: 'index' } ).click();
-		await expect( page.locator( 'h2' ) ).toHaveText( 'Index' );
+		await expect( page.getByRole( 'heading', { level: 2 } ) ).toHaveText(
+			'Index'
+		);
 	} );
 } );
