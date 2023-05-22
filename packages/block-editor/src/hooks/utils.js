@@ -135,6 +135,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const lineHeight = useSetting( 'typography.lineHeight' );
 	const textColumns = useSetting( 'typography.textColumns' );
 	const textDecoration = useSetting( 'typography.textDecoration' );
+	const textOrientation = useSetting( 'typography.textOrientation' );
 	const textTransform = useSetting( 'typography.textTransform' );
 	const letterSpacing = useSetting( 'typography.letterSpacing' );
 	const padding = useSetting( 'spacing.padding' );
@@ -208,6 +209,7 @@ export function useBlockSettings( name, parentLayout ) {
 				lineHeight,
 				textColumns,
 				textDecoration,
+				textOrientation,
 				textTransform,
 				letterSpacing,
 			},
@@ -241,6 +243,7 @@ export function useBlockSettings( name, parentLayout ) {
 		lineHeight,
 		textColumns,
 		textDecoration,
+		textOrientation,
 		textTransform,
 		letterSpacing,
 		padding,

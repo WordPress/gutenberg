@@ -32,9 +32,15 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 /**
  * Key within block settings' supports array indicating support for text
+ * orientation e.g. settings found in `block.json`.
+ */
+const TEXT_ORIENTATION_SUPPORT_KEY = 'typography.__experimentalTextOrientation';
+/**
+ * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+
 /**
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
@@ -50,6 +56,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
+	TEXT_ORIENTATION_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
 const SPACING_SUPPORT_KEY = 'spacing';

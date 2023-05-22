@@ -435,7 +435,8 @@
 			"lineHeight": false,
 			"textColumns": false,
 			"textDecoration": true,
-			"textTransform": true
+			"textTransform": true,
+			"textOrientation": false
 		},
 		"blocks": {
 			"core/button": {

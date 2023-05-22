@@ -19,6 +19,7 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import TextOrientationControl from '../text-orientation-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -32,6 +33,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasTextOrientation = useHasTextOrientationControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -43,6 +45,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasTextOrientation ||
 		hasTextColumns
 	);
 }
@@ -100,6 +103,10 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasTextOrientationControl( settings ) {
+	return settings?.typography?.textOrientation;
+}
+
 function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
@@ -135,6 +142,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	textOrientation: true,
 	textColumns: true,
 };
 
@@ -307,6 +315,23 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
+	// Text Orientation
+	const hasTextOrientationControl = useHasTextOrientationControl( settings );
+	const textOrientation = decodeValue(
+		inheritedValue?.typography?.textOrientation
+	);
+	const setTextOrientation = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textOrientation' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextOrientation = () => !! value?.typography?.textOrientation;
+	const resetTextOrientation = () => setTextOrientation( undefined );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -450,6 +475,23 @@ export default function TypographyPanel( {
 						onChange={ setTextDecoration }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextOrientationControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasTextOrientation }
+					onDeselect={ resetTextOrientation }
+					isShownByDefault={ defaultControls.textOrientation }
+					panelId={ panelId }
+				>
+					<TextOrientationControl
+						value={ textOrientation }
+						onChange={ setTextOrientation }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
