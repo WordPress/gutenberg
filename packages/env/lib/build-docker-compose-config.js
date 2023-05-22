@@ -56,8 +56,8 @@ function getMounts(
 
 	const userUploadsMount =
 		wordpressDefault === 'wordpress'
-			? `user-uploads:/var/www/html/wp-content/uploads/`
-			: `tests-user-uploads:/var/www/html/wp-content/uploads/`;
+			? `user-uploads:/var/www/html/wp-content/uploads`
+			: `tests-user-uploads:/var/www/html/wp-content/uploads`;
 
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
