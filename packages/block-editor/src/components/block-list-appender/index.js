@@ -85,6 +85,22 @@ function BlockListAppender( {
 	tagName: TagName = 'div',
 } ) {
 	const appender = useAppender( rootClientId, renderAppender );
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
+			);
+		},
+		[ rootClientId ]
+	);
 
 	if ( ! appender ) {
 		return null;
@@ -103,7 +119,8 @@ function BlockListAppender( {
 			tabIndex={ -1 }
 			className={ classnames(
 				'block-list-appender wp-block',
-				className
+				className,
+				isDragOver && 'is-drag-over'
 			) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
