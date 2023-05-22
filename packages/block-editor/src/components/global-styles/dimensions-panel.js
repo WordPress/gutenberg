@@ -574,6 +574,7 @@ export default function DimensionsPanel( {
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
+							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }

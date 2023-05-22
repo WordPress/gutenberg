@@ -31,6 +31,7 @@ export default function SpacingSizesControl( {
 	onChange,
 	onMouseOut,
 	onMouseOver,
+	showSideInLabel = true,
 	sides = ALL_SIDES,
 	useSelect,
 	values,
@@ -73,7 +74,9 @@ export default function SpacingSizesControl( {
 		return <SingleInputControl side={ view } { ...inputControlProps } />;
 	};
 
-	const sideLabel = ALL_SIDES.includes( view ) ? LABELS[ view ] : '';
+	const sideLabel =
+		ALL_SIDES.includes( view ) && showSideInLabel ? LABELS[ view ] : '';
+
 	const label = sprintf(
 		// translators: 2. Type of spacing being modified (Padding, margin, etc). 1: The side of the block being modified (top, bottom, left etc.).
 		__( '%1$s %2$s' ),
