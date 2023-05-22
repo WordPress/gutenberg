@@ -68,6 +68,9 @@ export default function useDropZone( {
 				return;
 			}
 
+			// If a custom dropZoneRef is passed, use that instead of the element.
+			// This allows the dropzone to cover an expanded area, rather than
+			// be restricted to the area of the ref returned by this hook.
 			const element = dropZoneRef?.current ?? elem;
 
 			let isDragging = false;
@@ -232,6 +235,6 @@ export default function useDropZone( {
 				);
 			};
 		},
-		[ isDisabled ]
+		[ isDisabled, dropZoneRef, dropZoneRef?.current ] // Refresh when the passed in dropZoneRef changes.
 	);
 }
