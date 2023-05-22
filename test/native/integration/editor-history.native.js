@@ -179,7 +179,7 @@ describe( 'Editor History', () => {
 	it( 'should preserve editor history when a link has been added and configured to open in a new tab', async () => {
 		// Arrange
 		const initialHtml = `
-			<!-- wp:paragraph --><p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog.</p><!-- /wp:paragraph -->
+			<!-- wp:paragraph --><p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p><!-- /wp:paragraph -->
 		`;
 		const screen = await initializeEditor( {
 			initialHtml,
@@ -201,7 +201,7 @@ describe( 'Editor History', () => {
 
 		typeInRichText(
 			paragraphTextInput,
-			'A quick brown fox jumps over the lazy dog.'
+			' A quick brown fox jumps over the lazy dog.'
 		);
 
 		// Assert
@@ -213,21 +213,23 @@ describe( 'Editor History', () => {
 
 		// Act
 		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p></p>
+		<p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
 		// Act
 		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog.</p>
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
