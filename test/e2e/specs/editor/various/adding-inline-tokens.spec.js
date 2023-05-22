@@ -9,33 +9,26 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import {
-	clickBlockAppender,
-	getEditedPostContent,
-	createNewPost,
-	clickBlockToolbarButton,
-	clickButton,
-	pressKeyWithModifier,
-} from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-describe( 'adding inline tokens', () => {
-	beforeEach( async () => {
-		await createNewPost();
+test.describe( 'adding inline tokens', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	it( 'should insert inline image', async () => {
+	test( 'should insert inline image', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
 		// Create a paragraph.
-		await clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'a ' );
 
-		await clickBlockToolbarButton( 'More' );
-		await clickButton( 'Inline image' );
+		await editor.showBlockToolbar();
+		await page.click( 'role=button[name="More"i]' );
+		await page.click( 'role=menuitem[name="Inline image"i]' );
 
-		// Wait for media modal to appear and upload image.
-		// Wait for media modal to appear and upload image.
-		const inputElement = await page.waitForSelector(
-			'.media-modal .moxie-shim input[type=file]'
-		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',
@@ -47,26 +40,19 @@ describe( 'adding inline tokens', () => {
 		const filename = uuid();
 		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
-		await inputElement.uploadFile( tmpFileName );
-
-		// Wait for upload.
-		await page.waitForSelector(
-			`.media-modal li[aria-label="${ filename }"]`
-		);
+		await page.locator('.media-modal .moxie-shim input[type=file]').setInputFiles( tmpFileName );
 
 		// Insert the uploaded image.
-		await page.click( '.media-modal button.media-button-select' );
+		await page.click( 'role=button[name="Select"i]' );
 
 		// Check the content.
 		const regex = new RegExp(
 			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
 		);
-		expect( await getEditedPostContent() ).toMatch( regex );
+		expect( await editor.getEditedPostContent() ).toMatch( regex );
 
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		await page.waitForSelector(
-			'.block-editor-format-toolbar__image-popover'
-		);
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '20' );
@@ -76,6 +62,6 @@ describe( 'adding inline tokens', () => {
 		const regex2 = new RegExp(
 			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
 		);
-		expect( await getEditedPostContent() ).toMatch( regex2 );
+		expect( await editor.getEditedPostContent() ).toMatch( regex2 );
 	} );
 } );
