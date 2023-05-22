@@ -1,6 +1,6 @@
 {
 	"version": 2,
 	"behaviors": {
-		"lightbox": false
+		"lightbox": true
 	}
 }

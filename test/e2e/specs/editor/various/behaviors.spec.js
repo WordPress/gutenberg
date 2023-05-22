@@ -27,7 +27,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'Lightbox behavior should be selected by default as defined in the core theme.json', async ( {
+	test( 'Lightbox behavior should be false by default as defined in the core theme.json', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -91,14 +91,17 @@ test.describe( 'Testing behaviors functionality', () => {
 				alt: filename,
 				id: media.id,
 				url: media.source_url,
-				// Explicitly set the value for behaviors to false.
-				behaviors: { lightbox: false },
+				// Explicitly set the value for behaviors to true.
+				behaviors: { lightbox: true },
 			},
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
+
+		// Here we should also check that the block renders on the frontend with the
+		// lightbox even though the theme.json has it set to false.
 	} );
 
 	test( 'You can set the default value for the behaviors in the theme.json', async ( {
@@ -107,8 +110,8 @@ test.describe( 'Testing behaviors functionality', () => {
 		requestUtils,
 		page,
 	} ) => {
-		// In this theme, the default value for settings.behaviors.lightbox is `false`.
-		await requestUtils.activateTheme( 'behaviors-false' );
+		// In this theme, the default value for settings.behaviors.lightbox is `true`.
+		await requestUtils.activateTheme( 'behaviors-enabled' );
 		const media = await createMedia( { admin, requestUtils } );
 
 		await editor.insertBlock( {
@@ -121,10 +124,16 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
 
-		// The default value for behaviors in `theme.json` is `false`, so the
-		// dropdown should be present, but the value should be `""` (None).
+		// The behaviors dropdown should be present and the value should be set to
+		// `lightbox`.
+		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
+		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( 'lightbox' );
+
+		// Check that we can change the value of the behaviors dropdown to `No behavior`.
+		await page
+			.getByLabel( 'Behavior' )
+			.selectOption( { label: 'No behaviors' } );
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
 	} );
 } );
