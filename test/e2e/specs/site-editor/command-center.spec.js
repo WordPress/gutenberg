@@ -20,28 +20,27 @@ test.describe( 'Site editor command center', () => {
 	test( 'Open the command center and navigate to the page create page', async ( {
 		page,
 	} ) => {
-		await page.focus( 'role=button[name="Open command center"i]' );
+		await page
+			.getByRole( 'button', { name: 'Open command center' } )
+			.focus();
 		await page.keyboard.press( 'Meta+k' );
 		await page.keyboard.type( 'new page' );
-		const newPageButton = page.locator(
-			'role=option[name="Add new page"i]'
-		);
-		await expect( newPageButton ).toBeVisible();
-		await newPageButton.click();
-
+		await page.getByRole( 'option', { name: 'Add new page' } ).click();
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 		const frame = page.frame( 'editor-canvas' );
 		await expect(
-			frame.locator( 'role=textbox[name=/Add title/i]' )
+			frame.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeVisible();
 	} );
 
 	test( 'Open the command center and navigate to a template', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Open command center"i]' );
+		await page
+			.getByRole( 'button', { name: 'Open command center' } )
+			.click();
 		await page.keyboard.type( 'index' );
-		await page.click( 'role=option[name="index"i]' );
+		await page.getByRole( 'option', { name: 'index' } ).click();
 		await expect( page.locator( 'h2' ) ).toHaveText( 'Index' );
 	} );
 } );
