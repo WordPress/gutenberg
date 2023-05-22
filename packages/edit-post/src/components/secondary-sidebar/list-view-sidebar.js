@@ -107,7 +107,7 @@ export default function ListViewSidebar() {
 			ref={ sidebarRef }
 		>
 			<div
-				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
+				className="edit-post-editor__document-overview-panel__close-button"
 				ref={ headerFocusReturnRef }
 			>
 				<Button
