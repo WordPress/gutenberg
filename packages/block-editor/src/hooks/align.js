@@ -13,14 +13,12 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
-import { store as blockEditorStore } from '../store';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
@@ -134,20 +132,8 @@ export const withToolbarControls = createHigherOrderComponent(
 		const validAlignments = useAvailableAlignments(
 			blockAllowedAlignments
 		).map( ( { name } ) => name );
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
 		const blockEditingMode = useBlockEditingMode();
-		if (
-			! validAlignments.length ||
-			isContentLocked ||
-			blockEditingMode !== 'default'
-		) {
+		if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
 			return blockEdit;
 		}
 

@@ -16,7 +16,6 @@ import {
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -36,7 +35,6 @@ import {
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockSettings } from './utils';
-import { store as blockEditorStore } from '../store';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -227,15 +225,6 @@ const withDuotoneControls = createHigherOrderComponent(
 			'filter.duotone'
 		);
 
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
-
 		const blockEditingMode = useBlockEditingMode();
 
 		// CAUTION: code added before this line will be executed
@@ -244,11 +233,9 @@ const withDuotoneControls = createHigherOrderComponent(
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport &&
-					! isContentLocked &&
-					blockEditingMode === 'default' && (
-						<DuotonePanel { ...props } />
-					) }
+				{ hasDuotoneSupport && blockEditingMode === 'default' && (
+					<DuotonePanel { ...props } />
+				) }
 				<BlockEdit { ...props } />
 			</>
 		);

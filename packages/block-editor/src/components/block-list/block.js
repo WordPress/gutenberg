@@ -18,7 +18,6 @@ import {
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
 	switchToBlockType,
-	store as blocksStore,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
 } from '@wordpress/blocks';
@@ -101,33 +100,23 @@ function BlockListBlock( {
 } ) {
 	const {
 		themeSupportsLayout,
-		hasContentLockedParent,
-		isContentBlock,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
-				__unstableGetContentLockingParent,
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
-			const _hasContentLockedParent =
-				!! __unstableGetContentLockingParent( clientId );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock:
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					),
-				hasContentLockedParent: _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
-		[ name, clientId ]
+		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
@@ -160,7 +149,7 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( hasContentLockedParent && ! isContentBlock ) {
+	if ( blockEditingMode === 'disabled' ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -234,9 +223,7 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-editing-disabled':
-					blockEditingMode === 'disabled' ||
-					( hasContentLockedParent && ! isContentBlock ),
+				'is-editing-disabled': blockEditingMode === 'disabled',
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

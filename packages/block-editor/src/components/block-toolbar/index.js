@@ -43,7 +43,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		isDistractionFree,
 		isValid,
 		isVisual,
-		isContentLocked,
+		blockEditingMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -52,7 +52,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
-			__unstableGetContentLockingParent,
 			getBlockEditingMode,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -75,9 +74,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			isContentLocked:
-				!! __unstableGetContentLockingParent( selectedBlockClientId ) ||
-				getBlockEditingMode( selectedBlockClientId ) !== 'default',
+			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -127,12 +124,12 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	return (
 		<div className={ classes }>
-			{ ! isMultiToolbar && isLargeViewport && ! isContentLocked && (
-				<BlockParentSelector />
-			) }
+			{ ! isMultiToolbar &&
+				isLargeViewport &&
+				blockEditingMode === 'default' && <BlockParentSelector /> }
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					! isContentLocked && (
+					blockEditingMode === 'default' && (
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockSwitcher clientIds={ blockClientIds } />
 							{ ! isMultiToolbar && (
@@ -177,7 +174,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				</>
 			) }
 			<BlockEditVisuallyButton clientIds={ blockClientIds } />
-			{ ! isContentLocked && (
+			{ blockEditingMode === 'default' && (
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			) }
 		</div>

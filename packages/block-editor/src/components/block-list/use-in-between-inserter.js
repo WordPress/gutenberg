@@ -76,7 +76,8 @@ export function useInBetweenInserter() {
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
-				// Don't set the insertion point if the root is locked.
+				// Don't show the in-between inserter if the container block is
+				// locked or disabled.
 				if (
 					getTemplateLock( rootClientId ) ||
 					getBlockEditingMode( rootClientId ) === 'disabled'

@@ -74,7 +74,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
-	isContentLocked,
+	blockEditingMode,
 } ) {
 	const {
 		url = '',
@@ -117,7 +117,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, clientId ]
+		[ id, isSelected ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -158,7 +158,7 @@ export default function Image( {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable =
 		allowResize &&
-		! isContentLocked &&
+		blockEditingMode === 'default' &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
@@ -327,13 +327,13 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ blockEditingMode === 'default' && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && (
+				{ blockEditingMode === 'default' && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
