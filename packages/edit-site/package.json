@@ -61,6 +61,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/widgets": "file:../widgets",
+		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.3.1",
 		"colord": "^2.9.2",
 		"downloadjs": "^1.4.7",

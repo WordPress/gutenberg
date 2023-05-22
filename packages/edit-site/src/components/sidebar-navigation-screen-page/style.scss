@@ -1,0 +1,110 @@
+.edit-site-sidebar-navigation-screen-page {
+	.edit-site-sidebar-navigation-screen__sticky-section {
+		padding: $grid-unit-40 0;
+		margin: $grid-unit-40 0;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-page__featured-image-wrapper {
+	padding: $grid-unit-10;
+	background-color: $gray-800;
+	margin-bottom: $grid-unit-20;
+	min-height: 128px;
+	.edit-site-sidebar-navigation-screen-page__featured-image {
+		border-radius: 2px;
+		height: 128px;
+		overflow: hidden;
+		width: 100%;
+		background-size: cover;
+		background-position: 50% 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $gray-600;
+	}
+
+	.edit-site-sidebar-navigation-screen-page__featured-image-description {
+		font-size: $helptext-font-size;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-page__excerpt {
+	font-size: $helptext-font-size;
+}
+
+.edit-site-sidebar-navigation-screen-page__modified {
+	margin: 0 0 $grid-unit-20 0;
+	color: $gray-600;
+	margin-left: $grid-unit-20;
+	.components-text {
+		color: $gray-600;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-page__status .components-text {
+	color: $white;
+}
+
+.edit-site-sidebar-navigation-screen-page__status-indicator {
+	display: none;
+	&.has-status {
+		border-radius: 999px;
+		height: 16px;
+		width: 16px;
+		display: flex;
+		align-items: center;
+		position: relative;
+		justify-content: center;
+
+		&::before {
+			height: 12px;
+			width: 12px;
+			border-radius: 60%;
+			border: 2px solid $gray-900;
+			display: block;
+			content: "";
+			position: absolute;
+		}
+	}
+
+	&.has-publish-status {
+		background-color: $alert-green;
+		&::before {
+			background-color: $alert-green;
+			border: none;
+			width: inherit;
+			height: inherit;
+			content: "\2713";
+			text-align: center;
+			color: $gray-900;
+			font-weight: 700;
+		}
+	}
+
+	&.has-future-status {
+		background-color: $alert-green;
+		&::before {
+			background-color: $alert-green;
+		}
+	}
+
+	&.has-pending-status {
+		background-color: $alert-yellow;
+		&::before {
+			background-color: $alert-yellow;
+		}
+	}
+
+	&.has-draft-status {
+		background-color: $alert-yellow;
+		&::before {
+			background-color: $gray-900;
+			border: 0;
+			border-radius: 0 0 8px 8px;
+			height: 8px;
+			left: -1px;
+			transform: rotate(90deg);
+			width: 13px;
+		}
+	}
+}

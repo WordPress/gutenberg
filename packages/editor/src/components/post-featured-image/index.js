@@ -43,7 +43,7 @@ const instructions = (
 	</p>
 );
 
-function getMediaDetails( media, postId ) {
+export function getMediaDetails( media, postId ) {
 	if ( ! media ) {
 		return {};
 	}

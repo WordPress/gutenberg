@@ -1,5 +1,7 @@
-.edit-site-sidebar-data-list {
-	.edit-site-sidebar-data-list__label {
-		color: $gray-600;
-	}
+.edit-site-sidebar-navigation_data-list__label {
+	color: $gray-600;
+}
+
+.edit-site-sidebar-navigation_data-list__item .edit-site-sidebar-navigation_data-list__value {
+	color: $white;
 }
