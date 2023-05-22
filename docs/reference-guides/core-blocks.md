@@ -86,7 +86,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 
 -	**Name:** core/code
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** align (wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Column
@@ -94,7 +94,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 A single column within a columns block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/column))
 
 -	**Name:** core/column
--	**Category:** text
+-	**Category:** design
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
@@ -465,7 +465,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug
+-	**Attributes:** slug, syncStatus
 
 ## Post Author
 

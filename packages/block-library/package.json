@@ -70,7 +70,7 @@
 		"fast-average-color": "^9.1.1",
 		"fast-deep-equal": "^3.1.3",
 		"lodash": "^4.17.21",
-		"memize": "^1.1.0",
+		"memize": "^2.1.0",
 		"micromodal": "^0.4.10",
 		"preact": "^10.13.2",
 		"remove-accents": "^0.4.2"
