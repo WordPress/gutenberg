@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
 	getBlock,
 	typeInRichText,
@@ -172,5 +173,73 @@ describe( 'Editor History', () => {
 		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should preserve editor history when a link has been added and configured to open in a new tab', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{
+				finalSelectionStart: 2,
+				finalSelectionEnd: 7,
+			}
+		);
+
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
+		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
+		await act( () =>
+			fireEvent.press(
+				screen.getByLabelText( 'Link to, Search or type URL' )
+			)
+		);
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Search or type URL' ),
+			'wordpress.org'
+		);
+		jest.useFakeTimers();
+		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		// Await link picker navigation delay
+		act( () => jest.runOnlyPendingTimers() );
+
+		const linkTargetButton = screen.getByText( 'Open in new tab' );
+		fireEvent.press( linkTargetButton );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		jest.useRealTimers();
 	} );
 } );
