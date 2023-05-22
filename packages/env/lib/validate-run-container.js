@@ -35,27 +35,7 @@ function validateRunContainer( value ) {
 	return value;
 }
 
-/**
- * Custom parsing and validation for the "run" command's command argument.
- *
- * @param {string[]} value The command to run.
- *
- * @return {string[]} The command to run.
- */
-function validateRunCommand( value ) {
-	// When the command is wrapped in double-quotes it will be given to us as a single argument. This will also happen
-	// if the tool is ran without a shell and is explicitly given the entire command in a single argument.
-	if ( value.length === 1 && value[ 0 ].includes( ' ' ) ) {
-		throw new Error(
-			"The entire 'command' argument should not be wrapped in double-quotes as it will be misinterpreted when executed."
-		);
-	}
-
-	return value;
-}
-
 module.exports = {
 	RUN_CONTAINERS,
 	validateRunContainer,
-	validateRunCommand,
 };

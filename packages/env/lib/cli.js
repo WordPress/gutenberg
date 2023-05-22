@@ -16,8 +16,7 @@ const parseXdebugMode = require( './parse-xdebug-mode' );
 const {
 	RUN_CONTAINERS,
 	validateRunContainer,
-	validateRunCommand,
-} = require( './validate-run-args' );
+} = require( './validate-run-container' );
 
 // Colors.
 const boldWhite = chalk.bold.white;
@@ -212,7 +211,6 @@ module.exports = function cli() {
 			args.positional( 'command', {
 				type: 'array',
 				describe: 'The command to run.',
-				coerce: validateRunCommand,
 			} );
 		},
 		withSpinner( env.run )
