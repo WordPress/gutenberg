@@ -38,7 +38,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		postId
 	);
 
-	const menuTitle = navigationMenu?.title?.rendered || navigationMenu.slug;
+	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
 	if ( isLoading ) {
 		return (
@@ -59,7 +59,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SidebarNavigationScreenWrapper
 			title={ decodeEntities( menuTitle ) }
-			description={ '...' }
+			description={ __(
+				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+			) }
 		>
 			<NavigationMenuEditor navigationMenu={ navigationMenu } />
 		</SidebarNavigationScreenWrapper>
