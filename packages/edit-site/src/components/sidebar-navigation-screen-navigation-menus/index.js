@@ -30,17 +30,17 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	if ( isLoading ) {
 		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'Loading Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
+			<SidebarNavigationScreenWrapper
+				description={ __( 'Loading Navigation Menus.' ) }
+			/>
 		);
 	}
 
 	if ( ! isLoading && ! hasNavigationMenus ) {
 		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'There are no Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
+			<SidebarNavigationScreenWrapper
+				description={ __( 'No Navigation Menus found.' ) }
+			/>
 		);
 	}
 

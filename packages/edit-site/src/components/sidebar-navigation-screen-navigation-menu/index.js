@@ -42,17 +42,17 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	if ( isLoading ) {
 		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'Loading Navigation Menu.' ) }
-			</SidebarNavigationScreenWrapper>
+			<SidebarNavigationScreenWrapper
+				description={ __( 'Loading Navigation Menu.' ) }
+			/>
 		);
 	}
 
 	if ( ! isLoading && ! navigationMenu ) {
 		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'Navigation Menu Missing.' ) }
-			</SidebarNavigationScreenWrapper>
+			<SidebarNavigationScreenWrapper
+				description={ __( 'Navigation Menu missing.' ) }
+			/>
 		);
 	}
 
