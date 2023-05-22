@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
@@ -480,7 +475,8 @@ export default function Image( {
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 	const hasCustomBorder =
-		!! borderProps.className || ! isEmpty( borderProps.style );
+		!! borderProps.className ||
+		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
