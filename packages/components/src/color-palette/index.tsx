@@ -218,16 +218,18 @@ function UnforwardedColorPalette(
 			/>
 		</DropdownContentWrapper>
 	);
+	const isHex = value?.startsWith( '#' );
+
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
 	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
-				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
 				__(
 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
 				),
 				buttonLabelName,
-				displayValue
+				isHex ? displayValue.split( '' ).join( '-' ) : displayValue
 		  )
 		: __( 'Custom color picker.' );
 
@@ -285,7 +287,7 @@ function UnforwardedColorPalette(
 										'components-color-palette__custom-color-value',
 										{
 											'components-color-palette__custom-color-value--is-hex':
-												displayValue?.startsWith( '#' ),
+												isHex,
 										}
 									) }
 									style={ { minHeight: '18px' } }
