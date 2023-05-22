@@ -6,6 +6,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { navigation } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 						postId={ navMenu.id }
 						key={ navMenu.id }
 						withChevron
+						icon={ navigation }
 					>
 						{ decodeEntities(
 							navMenu.title?.rendered || navMenu.slug
