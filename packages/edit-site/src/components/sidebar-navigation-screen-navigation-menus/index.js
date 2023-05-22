@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { BlockEditorProvider } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import {
+	store as coreStore,
+	EntityProvider,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
+
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,7 +27,6 @@ import {
 
 const { useHistory } = unlock( routerPrivateApis );
 
-const noop = () => {};
 const NAVIGATION_MENUS_QUERY = {
 	per_page: 1,
 	status: 'publish',
@@ -68,11 +71,14 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		}, [] );
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
-	const blocks = useMemo( () => {
-		return [
-			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
-		];
-	}, [ firstNavigationMenu ] );
+
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{
+			id: firstNavigationMenu,
+		}
+	);
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
@@ -115,20 +121,26 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	}
 
 	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			value={ blocks }
-			onChange={ noop }
-			onInput={ noop }
+		<EntityProvider
+			kind="postType"
+			type="wp_navigation"
+			id={ firstNavigationMenu }
 		>
-			<SidebarNavigationScreenWrapper>
-				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-					<NavigationMenuContent
-						rootClientId={ blocks[ 0 ].clientId }
-						onSelect={ onSelect }
-					/>
-				</div>
-			</SidebarNavigationScreenWrapper>
-		</BlockEditorProvider>
+			<BlockEditorProvider
+				settings={ storedSettings }
+				value={ blocks }
+				onChange={ onChange }
+				onInput={ onInput }
+			>
+				<SidebarNavigationScreenWrapper>
+					<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
+						<NavigationMenuContent
+							rootClientId={ blocks[ 0 ]?.clientId }
+							onSelect={ onSelect }
+						/>
+					</div>
+				</SidebarNavigationScreenWrapper>
+			</BlockEditorProvider>
+		</EntityProvider>
 	);
 }
