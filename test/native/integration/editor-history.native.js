@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	act,
 	addBlock,
 	dismissModal,
 	getBlock,
@@ -12,7 +11,6 @@ import {
 	initializeEditor,
 	setupCoreBlocks,
 	selectRangeInRichText,
-	waitFor,
 	within,
 } from 'test/helpers';
 
@@ -188,24 +186,18 @@ describe( 'Editor History', () => {
 		} );
 
 		// Act
-		const paragraphBlock = await waitFor( () =>
-			getBlock( screen, 'Paragraph' )
-		);
-
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		selectRangeInRichText( paragraphTextInput, 2, 7 );
-		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
-		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
 
-		const newTabButton = await waitFor( () =>
-			screen.getByText( 'Open in new tab' )
-		);
+		const newTabButton = screen.getByText( 'Open in new tab' );
 		fireEvent.press( newTabButton );
 
-		await dismissModal( screen.getByTestId( 'link-settings-modal' ) );
+		dismissModal( screen.getByTestId( 'link-settings-modal' ) );
 
 		typeInRichText(
 			paragraphTextInput,
