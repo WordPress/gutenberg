@@ -7,17 +7,17 @@ import { __ } from '@wordpress/i18n';
 export const MODAL_TABS = [
     {
         name: 'installed-fonts',
-        title: __('Activate Fonts'),
+        title: __('Installed Fonts'),
         className: 'installed-fonts',
     },
     {
         name: 'google-fonts',
-        title: __('Install Google Fonts'),
+        title: __('Google Fonts'),
         className: 'google-fonts',
     },
     {
         name: 'local-fonts',
-        title: __('Install Local Fonts'),
+        title: __('Local Fonts'),
         className: 'local-fonts',
     },
 ];

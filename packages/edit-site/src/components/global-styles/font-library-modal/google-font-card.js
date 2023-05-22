@@ -15,39 +15,16 @@ import { useContext } from '@wordpress/element';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 
-function GoogleFontCard ( { font, onClick } ) {
+function GoogleFontCard ( { font, onClick, toggleAddFont, isAdded } ) {
 
     const {
-        isFontInstalled,
-        demoConfig,
-        toggleInstallFont,
     } = useContext( FontLibraryContext );
 
-    const isInstalled = isFontInstalled( font.name );
-
-    const handleClick = ( event, fontName ) => {
+    const handleClick = ( event, font ) => {
         event.stopPropagation();
-        toggleInstallFont( fontName );
+        // toggleInstallFont( fontName );
+        toggleAddFont( font );
     };
-
-
-    const alternativeButtton = !isInstalled
-    ? (
-        <Button
-            icon={ download }
-            onClick={ ( event ) =>
-                handleClick( event, font.name )
-            }
-            variant="tertiary"
-        />
-    ) : (
-        <Button
-            icon={ check }
-            onClick={ ( event ) =>
-                handleClick( event, font.name )
-            }
-        />
-    )
 
     return (
         <FontCard
@@ -58,9 +35,9 @@ function GoogleFontCard ( { font, onClick } ) {
             actionHandler={
                 <CheckboxControl
                     onChange={ () => {} }
-                    checked={ isInstalled }
+                    checked={ isAdded }
                     onClick={ ( event ) =>
-                        handleClick( event, font.name )
+                        handleClick( event, font )
                     }
                 />
             }

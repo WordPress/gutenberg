@@ -30,9 +30,8 @@ function LibraryFontDetails ({ font }) {
         : [ { fontFamily: font.fontFamily, fontStyle: 'normal', fontWeight: '400' } ];
     
     return (
-        <div>  
-            <Grid columns={2}>
-                
+        <div className="font-library-modal__font_details">
+            <main>
                 <VStack spacing={ 4 }>
                     <Spacer margin={ 8 } />
                     { fontFaces.map( ( face, i ) => (
@@ -43,12 +42,22 @@ function LibraryFontDetails ({ font }) {
                         />
                     ) ) }
                 </VStack>
+            </main>
 
-                <VStack spacing={ 4 }>
-                    <Button isDestructive onClick={ () => toggleInstallFont( font.name ) }>Delete Font</Button>
+            <aside>
+                <VStack spacing={ 1 }>
+                    <Text>{ font.fontFamily }</Text>
                 </VStack>
 
-            </Grid>
+
+                <Button
+                    variant='tetriary'
+                    onClick={ () => toggleInstallFont( font.name ) }
+                >
+                    { __("Delete permanently") }
+                </Button>
+            </aside>
+
         </div>
     );
 }

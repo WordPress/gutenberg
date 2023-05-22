@@ -49,37 +49,31 @@ const filterFonts = ( fonts, filters ) => {
 
 function GoogleFonts() {
 	const {
-		libraryFonts,
         googleFonts,
         googleFontsCategories,
-		updateLibrary,
+		installFonts,
+		getAvailableFontsOutline,
     } = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
 	const [ filters, setFilters ] = useState( {} );
 	
-
-	const [ initialLibraryFonts, setInitialLibraryFonts ] = useState( [] );
-	const [ hasChanges,setHasChanges ] = useState( false );
+	const [ newFonts, setNewFonts ] = useState( [] );
 	const [ isSaving, setIsSaving ] = useState( false );
-
-	useEffect( () => {
-		if( initialLibraryFonts.length === 0 && libraryFonts.length > 0 ){
-			setInitialLibraryFonts( libraryFonts );
-		}
-		
-		if (
-			initialLibraryFonts.length !== 0 &&
-			libraryFonts !== initialLibraryFonts
-		) {
-			setHasChanges( true );
-		}
-	}, [ libraryFonts ] );
 
 	useEffect( () => {
 		if ( googleFontsCategories && googleFontsCategories.length > 0 ) {
 			setFilters( { category: googleFontsCategories[ 0 ] } );
 		}
 	}, [ googleFontsCategories ] );
+
+	const newFontsOutline = useMemo( () => getAvailableFontsOutline( newFonts ), [ newFonts ] );
+
+	const isFontAdded = ( font, fontFace ) => {
+		if ( !fontFace ) {
+			return !!newFontsOutline[font.name];
+		}
+		return !!(newFontsOutline[font.name] || []).includes(fontFace.fontStyle + fontFace.fontWeight)
+	}
 
 	const handleSelectFont = ( name ) => {
 		const font = googleFonts.find( font => font.name === name );
@@ -109,14 +103,65 @@ function GoogleFonts() {
 
 	const handleSaveChanges = async () => {
 		setIsSaving( true );
-		await updateLibrary();
+		await installFonts( newFonts );
 		setIsSaving( false );
+		setNewFonts( [] );
 	};
+
+	const toggleAddFont = ( font, fontFace ) => {
+		const existingFont = newFonts.find( f => f.name === font.name );
+		if( !fontFace ) {
+			if ( existingFont ) {
+				const fontsToAdd = newFonts.filter( f => f.name !== font.name );
+				setNewFonts( fontsToAdd );
+				return;
+			}
+			const fontsToAdd = [ ...newFonts, font ];
+			setNewFonts( fontsToAdd );
+			return;
+		}
+
+		if ( existingFont ) {
+			const existingFontFace = existingFont.fontFace.find( f => f.fontStyle === fontFace.fontStyle && f.fontWeight === fontFace.fontWeight );
+			if ( existingFontFace ) {
+				
+				const fontsToAdd = newFonts.map( f => {
+					if ( f.name === font.name ) {
+						const fontFaceToAdd = f.fontFace.filter( face => (
+							(face.fontStyle !== fontFace.fontStyle || face.fontWeight !== fontFace.fontWeight))
+						);
+						return {
+							...f,
+							fontFace: fontFaceToAdd,
+						};
+					}
+					return f;
+				} );
+				setNewFonts( fontsToAdd );
+				return;
+			}
+			const fontsToAdd = newFonts.map( f => {
+				if ( f.name === font.name ) {
+					return {
+						...f,
+						fontFace: [ ...f.fontFace, fontFace ],
+					};
+				}
+				return f;
+			} );
+			setNewFonts( fontsToAdd );
+			return;
+		}
+
+		const fontsToAdd = [ ...newFonts, { ...font, fontFace: [ fontFace ] } ];
+		setNewFonts( fontsToAdd );
+		return;
+	}
 
 	const Footer = () => {
 		return (
 			<HStack justify="flex-end">
-				<Button variant="primary" onClick={ handleSaveChanges } disabled={ !hasChanges || isSaving }>
+				<Button variant="primary" onClick={ handleSaveChanges } disabled={ !newFonts.length || isSaving }>
 					{ isSaving && <Spinner/> } { __("Install Google Fonts") }
 				</Button>
 			</HStack>
@@ -181,13 +226,19 @@ function GoogleFonts() {
 									key={ font.name }
 									font={ font }
 									onClick={ handleSelectFont }
+									toggleAddFont={ toggleAddFont }
+									isAdded={ !!newFontsOutline[font.name] }
 								/>
 							) ) }
 						</FontsGrid>
 					) }
 
 					{ fontSelected && (
-						<GoolgeFontDetails font={ fontSelected } />
+						<GoolgeFontDetails
+							font={ fontSelected }
+							toggleAddFont={ toggleAddFont }
+							isFontAdded={ isFontAdded }
+						/>
 					) }
 				</>
 			) }

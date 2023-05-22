@@ -12,7 +12,7 @@ import {
  */
 import GoogleFontVariant from './google-font-variant';
 
-function GoolgeFontDetails ({ font }) {
+function GoolgeFontDetails ({ font, toggleAddFont, isFontAdded }) {
     return (
         <>
             <Spacer margin={ 8 } />
@@ -22,6 +22,8 @@ function GoolgeFontDetails ({ font }) {
                         font={ font }
                         fontFace={ face }
                         key={`variant${i}`}
+                        toggleAddFont={ toggleAddFont }
+                        isFontAdded={ isFontAdded }
                     />
                 ) ) }
             </VStack>

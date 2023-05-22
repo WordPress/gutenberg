@@ -11,14 +11,13 @@ import { FontLibraryContext } from './context';
 import FontVariant from './font-variant';
 
 
-function GoogleFontVariant ({ font, fontFace }) {
-    const { isFontInstalled, toggleInstallFont } = useContext( FontLibraryContext );
-    const isInstalled = isFontInstalled( font.name, fontFace.fontStyle, fontFace.fontWeight );
+function GoogleFontVariant ({ font, fontFace, toggleAddFont, isFontAdded }) {
+    const isAdded = isFontAdded( font, fontFace );
     return (
         <FontVariant
             fontFace={ fontFace }         
-            checked={ isInstalled }
-            onClick={ () => toggleInstallFont( font.name, fontFace ) }
+            checked={ isAdded }
+            onClick={ () => toggleAddFont( font, fontFace ) }
             onChange={ () => {} }
         />
     );

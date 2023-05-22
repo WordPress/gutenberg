@@ -9,7 +9,8 @@ export async function getFontLibrary() {
     const config = {
         path: '/wp/v2/fonts_library',
     };
-    const { fontFamilies } = await apiFetch( config );
+    const response = await apiFetch( config );
+    const { fontFamilies } = await JSON.parse( response );
     return fontFamilies;
 }
 
@@ -24,12 +25,13 @@ export async function getGoogleFonts() {
     };
 }
 
-export async function updateFontsLibrary( data ) {
+export async function postInstallFonts( data ) {
     const config = {
-        path: '/wp/v2/fonts_library',
+        path: '/wp/v2/fonts_library/install',
         method: 'POST',
-        data: { fontFamilies: data },
+        data: data,
     };
-    const { fontFamilies } = await apiFetch( config );
+    const response = await apiFetch( config );
+    const { fontFamilies } = await JSON.parse( response );
     return fontFamilies;
 }
