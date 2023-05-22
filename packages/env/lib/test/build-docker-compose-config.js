@@ -46,6 +46,7 @@ describe( 'buildDockerComposeConfig', () => {
 			'wordpress:/var/www/html', // WordPress root.
 			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit', // WordPress test library,
 			'user-home:/home/test',
+			'user-uploads:/var/www/html/wp-content/uploads',
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root.
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin.
 		] );
