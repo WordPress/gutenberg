@@ -14,7 +14,6 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 import { useLink } from '../routes/link';
-import { SidebarNavigationMenu } from '../sidebar-navigation-screen-navigation-menu';
 
 const NAVIGATION_MENUS_QUERY = {
 	per_page: -1,
@@ -30,8 +29,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		useEntityRecords( 'postType', `wp_navigation`, NAVIGATION_MENUS_QUERY );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
-	const hasSingleNavigationMenu = navigationMenus?.length === 1;
-	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
 	if ( isLoading ) {
 		return (
@@ -45,16 +42,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SidebarNavigationScreenWrapper>
 				{ __( 'There are no Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
-		);
-	}
-
-	if ( hasSingleNavigationMenu ) {
-		return (
-			<SidebarNavigationScreenWrapper
-				title={ firstNavigationMenu?.title?.rendered }
-			>
-				<SidebarNavigationMenu navigationMenu={ firstNavigationMenu } />
 			</SidebarNavigationScreenWrapper>
 		);
 	}
@@ -79,12 +66,17 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	);
 }
 
-export function SidebarNavigationScreenWrapper( { children, actions, title } ) {
+export function SidebarNavigationScreenWrapper( {
+	children,
+	actions,
+	title,
+	description,
+} ) {
 	return (
 		<SidebarNavigationScreen
 			title={ title || __( 'Navigation' ) }
 			actions={ actions }
-			description={ __( 'Manage your Navigation menus.' ) }
+			description={ description || __( 'Manage your Navigation menus.' ) }
 			content={ children }
 		/>
 	);

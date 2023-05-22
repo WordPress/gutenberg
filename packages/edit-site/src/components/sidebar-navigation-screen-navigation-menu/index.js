@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -37,6 +38,8 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		postId
 	);
 
+	const menuTitle = navigationMenu?.title?.rendered || navigationMenu.slug;
+
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper>
@@ -54,13 +57,16 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	}
 
 	return (
-		<SidebarNavigationScreenWrapper>
-			<SidebarNavigationMenu navigationMenu={ navigationMenu } />
+		<SidebarNavigationScreenWrapper
+			title={ decodeEntities( menuTitle ) }
+			description={ '...' }
+		>
+			<NavigationMenuEditor navigationMenu={ navigationMenu } />
 		</SidebarNavigationScreenWrapper>
 	);
 }
 
-export function SidebarNavigationMenu( { navigationMenu } ) {
+function NavigationMenuEditor( { navigationMenu } ) {
 	const history = useHistory();
 
 	const onSelect = useCallback(
@@ -102,7 +108,7 @@ export function SidebarNavigationMenu( { navigationMenu } ) {
 	}, [] );
 
 	const blocks = useMemo( () => {
-		if ( ! SidebarNavigationMenu ) {
+		if ( ! NavigationMenuEditor ) {
 			return [];
 		}
 

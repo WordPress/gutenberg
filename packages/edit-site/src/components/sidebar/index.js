@@ -42,7 +42,7 @@ function SidebarScreens() {
 			<NavigatorScreen path="/wp_global_styles">
 				<SidebarNavigationScreenGlobalStyles />
 			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
+			<NavigatorScreen path="/navigation/:postId">
 				<SidebarNavigationScreenNavigationMenu />
 			</NavigatorScreen>
 			<NavigatorScreen path="/page">
