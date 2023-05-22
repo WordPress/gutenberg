@@ -140,7 +140,7 @@ export default function BlockEditor() {
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ resizeObserver ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
 
@@ -189,10 +189,7 @@ export default function BlockEditor() {
 						>
 							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
-							<ResizableEditor
-								enableResizing={ enableResizing }
-								height={ sizes.height ?? '100%' }
-							>
+							<ResizableEditor enableResizing={ enableResizing }>
 								<EditorCanvas
 									enableResizing={ enableResizing }
 									settings={ settings }
