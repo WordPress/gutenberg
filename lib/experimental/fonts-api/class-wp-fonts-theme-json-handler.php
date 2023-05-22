@@ -1,8 +1,10 @@
 <?php
 /**
- * Bootstraps Global Styles.
+ * Webfonts API: Provider for locally-hosted fonts.
  *
- * @package gutenberg
+ * @package    WordPress
+ * @subpackage Fonts API
+ * @since      X.X.X
  */
 
 if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
@@ -10,7 +12,8 @@ if ( class_exists( 'WP_Fonts_Theme_Json_Handler' ) ) {
 }
 
 /**
- * Class WP_Fonts_Theme_Json_Handler
+ * Wrapper class that contains several static methods
+ * to handle fonts defined in theme.json.
  *
  * @since X.X.X
  */
