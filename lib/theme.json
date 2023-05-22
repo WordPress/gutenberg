@@ -349,12 +349,6 @@
 								"flex-wrap": "wrap",
 								"align-items": "center"
 							}
-						},
-						{
-							"selector": " > *",
-							"rules": {
-								"margin": "0"
-							}
 						}
 					],
 					"spacingStyles": [
@@ -362,6 +356,12 @@
 							"selector": "",
 							"rules": {
 								"gap": null
+							}
+						},
+						{
+							"selector": " > *",
+							"rules": {
+								"margin": "0"
 							}
 						}
 					]
@@ -371,19 +371,18 @@
 					"slug": "grid",
 					"className": "is-layout-grid",
 					"displayMode": "grid",
-					"baseStyles": [
-						{
-							"selector": " > *",
-							"rules": {
-								"margin": "0"
-							}
-						}
-					],
+					"baseStyles": [],
 					"spacingStyles": [
 						{
 							"selector": "",
 							"rules": {
 								"gap": null
+							}
+						},
+						{
+							"selector": " > *",
+							"rules": {
+								"margin": "0"
 							}
 						}
 					]
