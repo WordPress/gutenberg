@@ -10,16 +10,23 @@ window.addEventListener( 'DOMContentLoaded', () => {
 		const searchButton = block.querySelector( '.wp-block-search__button' );
 		const activeElement = block.ownerDocument.activeElement;
 
+		const ariaLabel = searchButton.getAttribute( 'aria-label' );
+		const id = searchField.getAttribute( 'id' );
+
 		const toggleSearchField = ( showSearchField ) => {
 			if ( showSearchField ) {
 				searchField.setAttribute( 'aria-hidden', 'false' );
-				searchButton.setAttribute( 'aria-expanded', 'true' );
+				searchButton.removeAttribute( 'aria-expanded' );
+				searchButton.removeAttribute( 'aria-controls' );
+				searchButton.removeAttribute( 'aria-label' );
 
 				return block.classList.remove( hiddenClass );
 			}
 
 			searchField.setAttribute( 'aria-hidden', 'true' );
 			searchButton.setAttribute( 'aria-expanded', 'false' );
+			searchButton.setAttribute( 'aria-controls', id );
+			searchButton.setAttribute( 'aria-label', ariaLabel );
 			return block.classList.add( hiddenClass );
 		};
 

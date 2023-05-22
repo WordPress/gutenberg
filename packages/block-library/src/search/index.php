@@ -63,10 +63,12 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	$aria_hidden = '';
+	$aria_label    = '';
+	$aria_hidden   = '';
 	$aria_expanded = '';
 	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
 		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+			$aria_label    = sprintf( 'aria-label="%s"', __( 'Expand search form' ) );
 			$aria_hidden   = 'aria-hidden="true"';
 			$aria_expanded = sprintf( ' aria-expanded="false" aria-controls="wp-block-search__input-%s"', esc_attr( $input_id ) );
 			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
@@ -109,7 +111,6 @@ function render_block_core_search( $attributes ) {
 		if ( ! empty( $typography_classes ) ) {
 			$button_classes[] = $typography_classes;
 		}
-		$aria_label = '';
 
 		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 			$button_classes[] = $border_color_classes;
@@ -119,7 +120,9 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			$aria_label       = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
+			if ( 'expand-searchfield' != $attributes['buttonBehavior'] ) {
+				$aria_label = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
+			}
 			$button_classes[] = 'has-icon';
 
 			$button_internal_markup =
