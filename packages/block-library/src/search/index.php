@@ -120,7 +120,7 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			if ( 'expand-searchfield' != $attributes['buttonBehavior'] ) {
+			if ( 'expand-searchfield' !== $attributes['buttonBehavior'] ) {
 				$aria_label = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
 			}
 			$button_classes[] = 'has-icon';
