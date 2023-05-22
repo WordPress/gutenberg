@@ -99,7 +99,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support  = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support   = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 	$has_text_orientation_support = _wp_array_get( $typography_supports, array( '__experimentalTextOrientation' ), false );
-	
+
 	// Whether to skip individual block support features.
 	$should_skip_font_size        = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
 	$should_skip_font_family      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' );
