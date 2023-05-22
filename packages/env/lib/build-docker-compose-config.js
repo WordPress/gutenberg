@@ -54,10 +54,10 @@ function getMounts(
 			? `user-home:/home/${ hostUsername }`
 			: `tests-user-home:/home/${ hostUsername }`;
 
-	const userUploadsMount =
+	const wordpressUploadsMount =
 		wordpressDefault === 'wordpress'
-			? `user-uploads:/var/www/html/wp-content/uploads`
-			: `tests-user-uploads:/var/www/html/wp-content/uploads`;
+			? `wordpress-uploads:/var/www/html/wp-content/uploads`
+			: `tests-wordpress-uploads:/var/www/html/wp-content/uploads`;
 
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
@@ -77,7 +77,7 @@ function getMounts(
 			coreMount, // Must be first because of some operations later that expect it to be!
 			corePHPUnitMount,
 			userHomeMount,
-			userUploadsMount,
+			wordpressUploadsMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
@@ -275,8 +275,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'mysql-test': {},
 			'user-home': {},
 			'tests-user-home': {},
-			'user-uploads': {},
-			'tests-user-uploads': {},
+			'wordpress-uploads': {},
+			'tests-wordpress-uploads': {},
 		},
 	};
 };
