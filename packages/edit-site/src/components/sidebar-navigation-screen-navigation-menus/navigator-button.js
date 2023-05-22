@@ -30,7 +30,7 @@ export default function SidebarNavigationScreenNavigationMenuButton( {
 	// If there is a single menu then we can go directly to that menu.
 	// Otherwise we go to the navigation listing screen.
 	const path = hasSingleNavigationMenu
-		? `/navigation/${ firstNavigationMenu?.id }`
+		? `/navigation/wp_navigation/${ firstNavigationMenu?.id }`
 		: '/navigation';
 
 	if ( ! showNavigationScreen ) {
