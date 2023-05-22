@@ -20,17 +20,15 @@ window.addEventListener( 'DOMContentLoaded', () => {
 
 		const hideSearchField = ( e ) => {
 			if (
-				e.type === 'blur' &&
-				( e.relatedTarget !== searchButton ||
-					e.target === searchButton )
-			) {
-				return toggleSearchField( false );
-			}
-			if (
 				! e.target.closest( '.wp-block-search__inside-wrapper' ) &&
 				activeElement !== searchButton &&
 				activeElement !== searchField
 			) {
+				return toggleSearchField( false );
+			}
+
+			if ( e.key === 'Escape' ) {
+				searchButton.focus();
 				return toggleSearchField( false );
 			}
 		};
@@ -39,15 +37,15 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			if ( block.classList.contains( hiddenClass ) ) {
 				e.preventDefault();
 				searchField.focus();
+				toggleSearchField( true );
 			}
 		};
 
-		searchField.addEventListener( 'focus', () =>
-			toggleSearchField( true )
-		);
 		searchField.addEventListener( 'blur', hideSearchField );
+		searchField.addEventListener( 'keydown', ( e ) => {
+			hideSearchField( e );
+		} );
 		searchButton.addEventListener( 'click', handleButtonClick );
-		searchButton.addEventListener( 'blur', hideSearchField );
 		document.body.addEventListener( 'click', hideSearchField );
 	} );
 } );
