@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockIcon } from '@wordpress/block-editor';
+import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	Button,
 	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { layout } from '@wordpress/icons';
+import { layout, chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 
@@ -33,7 +33,8 @@ function DocumentTitle() {
 			isEditing: _isEditing,
 		};
 	}, [] );
-
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	if ( ! isEditing || ! template ) {
@@ -48,28 +49,40 @@ function DocumentTitle() {
 	}
 
 	return (
-		<Button
-			className="edit-post-document-title"
-			onClick={ () => openCommandCenter() }
-		>
-			<span className="edit-post-document-title__left"></span>
-			<HStack
-				spacing={ 1 }
-				justify="center"
-				className="edit-post-document-title__title"
-			>
-				<BlockIcon icon={ layout } />
-				<Text size="body" as="h1">
-					<VisuallyHidden as="span">
-						{ __( 'Editing template: ' ) }
-					</VisuallyHidden>
-					{ templateTitle }
-				</Text>
-			</HStack>
-			<span className="edit-post-document-title__shortcut">
-				{ displayShortcut.primary( 'k' ) }
+		<div className="edit-post-document-title">
+			<span className="edit-post-document-title__left">
+				<Button
+					onClick={ () => {
+						clearSelectedBlock();
+						setIsEditingTemplate( false );
+					} }
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+				>
+					{ __( 'Back' ) }
+				</Button>
 			</span>
-		</Button>
+
+			<Button
+				className="edit-post-document-title__title"
+				onClick={ () => openCommandCenter() }
+			>
+				<HStack spacing={ 1 } justify="center">
+					<BlockIcon icon={ layout } />
+					<Text size="body" as="h1">
+						<VisuallyHidden as="span">
+							{ __( 'Editing template: ' ) }
+						</VisuallyHidden>
+						{ templateTitle }
+					</Text>
+				</HStack>
+			</Button>
+			<Button
+				className="edit-post-document-title__shortcut"
+				onClick={ () => openCommandCenter() }
+			>
+				{ displayShortcut.primary( 'k' ) }
+			</Button>
+		</div>
 	);
 }
 
