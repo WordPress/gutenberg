@@ -197,7 +197,6 @@ export default function BlockEditor() {
 									enableResizing={ enableResizing }
 									settings={ settings }
 									contentRef={ mergedRefs }
-									readonly={ canvasMode === 'view' }
 								>
 									{ resizeObserver }
 									<BlockList
