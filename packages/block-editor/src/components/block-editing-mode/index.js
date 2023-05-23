@@ -9,7 +9,7 @@ import { useContext, useEffect } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { BlockListBlockContext } from '../block-list/block';
+import { BlockListBlockContext } from '../block-list/block-list-block-context';
 
 /**
  * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode

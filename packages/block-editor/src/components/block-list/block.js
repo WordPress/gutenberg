@@ -6,12 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useMemo,
-	useCallback,
-	RawHTML,
-} from '@wordpress/element';
+import { useMemo, useCallback, RawHTML } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -43,8 +38,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { unlock } from '../../lock-unlock';
-
-export const BlockListBlockContext = createContext();
+import { BlockListBlockContext } from './block-list-block-context';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
