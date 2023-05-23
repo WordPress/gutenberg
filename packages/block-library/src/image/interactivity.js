@@ -50,10 +50,12 @@ store( {
 						);
 					}
 
-					context.core.image.siteBlocksElement.setAttribute(
-						'inert',
-						true
-					);
+					if ( context.core.image.siteBlocksElement ) {
+						context.core.image.siteBlocksElement.setAttribute(
+							'inert',
+							true
+						);
+					}
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
@@ -77,9 +79,11 @@ store( {
 							);
 						}
 
-						context.core.image.siteBlocksElement.removeAttribute(
-							'inert'
-						);
+						if ( context.core.image.siteBlocksElement ) {
+							context.core.image.siteBlocksElement.removeAttribute(
+								'inert'
+							);
+						}
 
 						context.core.image.lightboxEnabled = false;
 						context.core.image.lastFocusedElement.focus();

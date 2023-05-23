@@ -737,7 +737,23 @@ test.describe( 'Image - interactivity', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
 	test.beforeEach( async ( { admin, page, editor, imageBlockUtils } ) => {
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( true );
+
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
+
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -756,8 +772,21 @@ test.describe( 'Image - interactivity', () => {
 		await editor.openDocumentSettingsSidebar();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { requestUtils, admin, page } ) => {
 		await requestUtils.deleteAllMedia();
+
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+
+		await page.locator( `input[name="submit"]` ).click();
+
+		await page.waitForLoadState();
 	} );
 
 	test( 'should toggle "enable lightbox" in saved attributes', async ( {
@@ -876,29 +905,19 @@ test.describe( 'Image - interactivity', () => {
 			await expect( openLightboxButton ).toBeFocused();
 		} );
 
-		test( 'should close and focus appropriately using tab', async ( {
-			page,
-		} ) => {
-			await openLightboxButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeVisible();
-			await expect( closeButton ).toBeFocused();
-			await page.keyboard.press( 'Tab' );
-			await expect( lightbox ).toBeHidden();
-			await expect( openLightboxButton ).toBeFocused();
-		} );
+		// TO DO: Add these tests, which will involve adding a caption
+		// to uploaded test images
+		// test( 'should trap focus appropriately when using tab', async ( {
+		// 	page,
+		// } ) => {
 
-		test( 'should close and focus appropriately using shift+tab', async ( {
-			page,
-		} ) => {
-			await openLightboxButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeVisible();
-			await expect( closeButton ).toBeFocused();
-			await page.keyboard.press( 'Shift+Tab' );
-			await expect( lightbox ).toBeHidden();
-			await expect( openLightboxButton ).toBeFocused();
-		} );
+		// } );
+
+		// test( 'should trap focus appropriately using shift+tab', async ( {
+		// 	page,
+		// } ) => {
+
+		// } );
 	} );
 } );
 
