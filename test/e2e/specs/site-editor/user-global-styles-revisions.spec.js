@@ -131,15 +131,6 @@ class UserGlobalStylesRevisions {
 		this.requestUtils = requestUtils;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async getGlobalStylesRevisions() {
 		const stylesPostId =
 			await this.requestUtils.getCurrentThemeGlobalStylesPostId();
@@ -159,7 +150,6 @@ class UserGlobalStylesRevisions {
 	}
 
 	async openStylesPanel() {
-		await this.disableWelcomeGuide();
 		await this.page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Styles' } )
