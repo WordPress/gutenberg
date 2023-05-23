@@ -41,21 +41,20 @@ function render_block_core_image( $attributes, $content ) {
 		}
 		$content = $processor->get_updated_html();
 
-		// Wrap the image in the body content with a button
-		$img;
-		preg_match('/<img[^>]+>/', $content, $img);
-		$button =
-			 '<div class="img-container">
-			 	<button aria-haspopup="dialog" aria-label="' . $aria_label . '" data-wp-on.click="actions.core.image.showLightbox"></button>'
-				. $img[0] .
-			'</div>';
-		$body_content = preg_replace('/<img[^>]+>/', $button, $content);
+		// Wrap the image in the body content with a button.
+		$img = null;
+		preg_match( '/<img[^>]+>/', $content, $img );
+		$button       = '<div class="img-container">
+			 					<button aria-haspopup="dialog" aria-label="' . $aria_label . '" data-wp-on.click="actions.core.image.showLightbox"></button>'
+									. $img[0] .
+								'</div>';
+		$body_content = preg_replace( '/<img[^>]+>/', $button, $content );
 
-		// For the modal, set an ID on the image to be used for an aria-labelledby attribute
+		// For the modal, set an ID on the image to be used for an aria-labelledby attribute.
 		$modal_content = new WP_HTML_Tag_Processor( $content );
-		$modal_content->next_tag('img');
+		$modal_content->next_tag( 'img' );
 		$image_lightbox_id = $modal_content->get_attribute( 'class' ) . '-lightbox';
-		$modal_content->set_attribute('id', $image_lightbox_id);
+		$modal_content->set_attribute( 'id', $image_lightbox_id );
 		$modal_content = $modal_content->get_updated_html();
 
 		$background_color  = wp_get_global_styles( array( 'color', 'background' ) );
