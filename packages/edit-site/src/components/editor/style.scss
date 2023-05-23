@@ -1,3 +1,13 @@
+.edit-site-editor__interface-skeleton {
+	opacity: 1;
+	transition: opacity 0.1s ease-out;
+	@include reduce-motion("transition");
+
+	&.is-loading {
+		opacity: 0;
+	}
+}
+
 .edit-site-editor__toggle-save-panel {
 	box-sizing: border-box;
 	width: $sidebar-width;

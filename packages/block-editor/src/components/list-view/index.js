@@ -16,6 +16,7 @@ import {
 	useRef,
 	useReducer,
 	forwardRef,
+	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -128,6 +129,9 @@ function ListViewComponent(
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
+
+	const [ insertedBlock, setInsertedBlock ] = useState( null );
+
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
 		setExpandedState,
@@ -212,6 +216,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			renderAdditionalBlockUI,
+			insertedBlock,
+			setInsertedBlock,
 		} ),
 		[
 			draggedClientIds,
@@ -221,6 +227,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			renderAdditionalBlockUI,
+			insertedBlock,
+			setInsertedBlock,
 		]
 	);
 
