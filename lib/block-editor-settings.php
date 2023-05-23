@@ -6,7 +6,7 @@
  */
 
 /**
- * Replaces core 'styles' and '__experimentalFeatures' block editor settings from
+ * Replaces core 'styles', '__experimentalFeatures' and 'behaviors' block editor settings from
  * wordpress-develop/block-editor.php with the Gutenberg versions. Much of the
  * code is copied from get_block_editor_settings() in that file.
  *
@@ -144,6 +144,12 @@ function gutenberg_get_block_editor_settings( $settings ) {
 					$spacing_sizes_by_origin['theme'] :
 					$spacing_sizes_by_origin['default']
 			);
+	}
+
+	// Add theme.json behaviors.
+	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+	if ( array_key_exists( 'behaviors', $theme_data ) ) {
+		$settings['behaviors'] = $theme_data['behaviors'];
 	}
 
 	return $settings;
