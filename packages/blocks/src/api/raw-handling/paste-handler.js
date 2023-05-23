@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
+import { escapeHTML } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -125,7 +126,7 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
-		HTML = plainText;
+		HTML = escapeHTML( plainText );
 
 		// The markdown converter (Showdown) trims whitespace.
 		if ( ! /^\s+$/.test( plainText ) ) {
