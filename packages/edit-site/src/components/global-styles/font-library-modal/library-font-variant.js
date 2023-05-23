@@ -15,13 +15,23 @@ function LibraryFontVariant ({ face, font }) {
 
     const { isFontActivated, toggleActivateFont } = useContext( FontLibraryContext );
 
-    const isIstalled = isFontActivated( font.name, face.fontStyle, face.fontWeight );
+    const isIstalled = font?.fontFace
+        ? isFontActivated( font.name, face.fontStyle, face.fontWeight )
+        : isFontActivated( font.name );
+
+    const handleToggleActivation = () => {
+        if ( font?.fontFace ) {
+            toggleActivateFont( font.name, face.fontStyle, face.fontWeight );
+            return;
+        }
+        toggleActivateFont( font.name );
+    }
     
     return (
         <FontVariant
             fontFace={ face }
             checked={ isIstalled }
-            onClick={ () => toggleActivateFont( font.name, face.fontStyle, face.fontWeight ) }
+            onClick={ handleToggleActivation }
         />
     );
 }

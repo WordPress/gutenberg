@@ -20,20 +20,14 @@ function LibraryFontCard ({ font, onClick }) {
         toggleActivateFont( font.name );
     }
 
-    const handleClick = font.shouldBeRemoved
-        ? null
-        : () => { onClick( font.name ) };
+    const handleClick = () => { onClick( font.name ) };
 
     const actionHandler = (
-        font.shouldBeRemoved
-        ? null
-        : (
-            <CheckboxControl
-                checked={ isActive }
-                onClick={ (e) => e.stopPropagation() }
-                onChange={ handleToggleFontActivation }
-            />
-        )
+        <CheckboxControl
+            checked={ isActive }
+            onClick={ (e) => e.stopPropagation() }
+            onChange={ handleToggleFontActivation }
+        />
     );
 
     return (

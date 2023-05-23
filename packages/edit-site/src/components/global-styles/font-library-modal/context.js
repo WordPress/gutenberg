@@ -77,17 +77,13 @@ function FontLibraryProvider( { children } ) {
 
 	const getAvailableFontsOutline = ( fontFamilies ) => {
 		const outline = fontFamilies.reduce( ( acc, font ) => {
-				if ( !font.shouldBeRemoved ) {
-					const availableFontFaces = (font?.fontFace || []).reduce( (faces, face) => (
-						!face.shouldBeRemoved ? [...faces, face.fontStyle + face.fontWeight] : faces
-					), [] );
-					if ( availableFontFaces.length ) {
-						acc[ font.name ] = availableFontFaces;
-					}
-				}
+				const availableFontFaces = (font?.fontFace || []).map( (face) => (
+					`${face.fontStyle + face.fontWeight}`
+				)); 
+				acc[ font.name ] = availableFontFaces;
 				return acc;
 			}
-		, {} );
+		, {});
 		return outline;
 	}
 
