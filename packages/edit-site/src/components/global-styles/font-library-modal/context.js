@@ -11,7 +11,7 @@ import { debounce } from '@wordpress/compose';
  * Internal dependencies
  *
  */
-import { getFontLibrary, getGoogleFonts, postInstallFonts } from './resolvers';
+import { fetchFontLibrary, fetchGoogleFonts, fetchInstallFonts, fetchUninstallFonts } from './resolvers';
 import { unlock } from '../../../private-apis';
 import { DEFAULT_DEMO_CONFIG } from './constants';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -66,10 +66,10 @@ function FontLibraryProvider( { children } ) {
 	const themeUrl = site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
 
 	useEffect( () => {
-		getFontLibrary().then( ( response ) => {
+		fetchFontLibrary().then( ( response ) => {
 			setLibraryFonts( response );
 		} );
-		getGoogleFonts().then( ( { fontFamilies, categories } ) => {
+		fetchGoogleFonts().then( ( { fontFamilies, categories } ) => {
 			setGoogleFonts( fontFamilies );
 			setGoogleFontsCategories( ['all', ...categories] );
 		} );
@@ -103,9 +103,15 @@ function FontLibraryProvider( { children } ) {
 	}
 	
     async function installFonts ( libraryFonts ) {
-        const newLibraryFonts = await postInstallFonts( libraryFonts );
+        const newLibraryFonts = await fetchInstallFonts( libraryFonts );
 		setLibraryFonts( newLibraryFonts );
     }
+
+	async function uninstallFont ( fontFamily ) {
+		console.log ( "uninstallFont", fontFamily );
+		const newLibraryFonts = await fetchUninstallFonts( fontFamily );
+		setLibraryFonts( newLibraryFonts );
+	}
 
 	const toggleInstallFont = ( name, fontFace ) => {
 		const libraryFont = libraryFonts.find( ( font ) => font.name === name );
@@ -250,6 +256,7 @@ function FontLibraryProvider( { children } ) {
 				googleFontsCategories,
 				loadFontFaceAsset,
                 installFonts,
+				uninstallFont,
 				toggleActivateFont,
 				toggleInstallFont,
 				getAvailableFontsOutline,

@@ -8,7 +8,6 @@ import {
     __experimentalHStack as HStack,
 } from '@wordpress/components';
 
-
 /**
  * Internal dependencies
  */
@@ -58,6 +57,7 @@ function InstalledFonts () {
             {fontSelected && (
                 <LibraryFontDetails
                     font={ fontSelected }
+                    handleUnselectFont={ handleUnselectFont }
                 />
             )}
             
