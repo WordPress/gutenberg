@@ -28,14 +28,12 @@ store( {
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
 
-					context.core.image.documentElement =
-						document.documentElement;
 					context.core.image.adminElement =
 						document.querySelector( '#wpadminbar' );
 					context.core.image.siteBlocksElement =
 						document.querySelector( '.wp-site-blocks' );
 
-					context.core.image.documentElement.classList.add(
+					document.documentElement.classList.add(
 						'has-lightbox-open'
 					);
 
@@ -121,14 +119,14 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
-					context.core.image.firstFocusableElement =
-						focusableElements[ 0 ];
-					context.core.image.lastFocusableElement =
-						focusableElements[ focusableElements.length - 1 ];
-
 					if ( context.core.image.lightboxEnabled ) {
+						const focusableElements =
+							ref.querySelectorAll( focusableSelectors );
+						context.core.image.firstFocusableElement =
+							focusableElements[ 0 ];
+						context.core.image.lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
+
 						ref.querySelector( '.close-button' ).focus();
 					}
 				},
