@@ -30,11 +30,13 @@ describe( 'executeLifecycleScript', () => {
 	it( 'should run event option and print output when debugging', async () => {
 		await executeLifecycleScript(
 			'test',
-			{ lifecycleScripts: { test: 'echo "Test \n"' }, debug: true },
+			{ lifecycleScripts: { test: 'node -v' }, debug: true },
 			spinner
 		);
 
-		expect( spinner.info ).toHaveBeenCalledWith( 'test Script:\nTest' );
+		expect( spinner.info ).toHaveBeenCalledWith(
+			expect.stringMatching( /test Script:\nv[0-9]/ )
+		);
 	} );
 
 	it( 'should throw LifecycleScriptError when process errors', async () => {
@@ -43,15 +45,14 @@ describe( 'executeLifecycleScript', () => {
 				'test',
 				{
 					lifecycleScripts: {
-						test: 'echo "test error" 1>&2 && false',
+						test: 'node -vvvvvvv',
 					},
 				},
 				spinner
 			);
 		} catch ( error ) {
-			expect( error ).toEqual(
-				new LifecycleScriptError( 'test', 'test error' )
-			);
+			expect( error ).toBeInstanceOf( LifecycleScriptError );
+			expect( error.message ).toMatch( /test Error:\n.*bad option/ );
 		}
 	} );
 } );
