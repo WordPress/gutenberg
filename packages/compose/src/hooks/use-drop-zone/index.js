@@ -235,6 +235,6 @@ export default function useDropZone( {
 				);
 			};
 		},
-		[ isDisabled, dropZoneRef, dropZoneRef?.current ] // Refresh when the passed in dropZoneRef changes.
+		[ isDisabled, dropZoneRef?.current ] // Refresh when the passed in dropZoneRef changes.
 	);
 }
