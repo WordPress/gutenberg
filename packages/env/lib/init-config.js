@@ -202,7 +202,7 @@ RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "$( whoami ) ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		case 'cli': {
@@ -215,7 +215,7 @@ RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "$( whoami ) ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		default: {
