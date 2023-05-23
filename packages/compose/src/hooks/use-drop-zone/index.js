@@ -34,7 +34,7 @@ function useFreshRef( value ) {
  * A hook to facilitate drag and drop handling.
  *
  * @param {Object}                  props                   Named parameters.
- * @param {HTMLElement}             [props.dropZoneElement] Optional element to be used as the drop zone.
+ * @param {?HTMLElement}            [props.dropZoneElement] Optional element to be used as the drop zone.
  * @param {boolean}                 [props.isDisabled]      Whether or not to disable the drop zone.
  * @param {(e: DragEvent) => void}  [props.onDragStart]     Called when dragging has started.
  * @param {(e: DragEvent) => void}  [props.onDragEnter]     Called when the zone is entered.
