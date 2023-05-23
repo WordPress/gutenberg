@@ -25,6 +25,10 @@
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
 
+	&:hover {
+		color: var(--wp-block-synced-color);
+	}
+
 	h1 {
 		color: var(--wp-block-synced-color);
 		white-space: nowrap;
