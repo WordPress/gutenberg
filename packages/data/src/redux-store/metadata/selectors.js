@@ -140,7 +140,7 @@ export function getCachedResolvers( state ) {
  * @return {boolean} True if one or more selectors are resolving, false otherwise.
  */
 export function hasResolvingSelectors( state ) {
-	return [ ...Object.values( state ) ].some( ( selectorState ) =>
+	return Object.values( state ).some( ( selectorState ) =>
 		[ ...selectorState._map.values() ].some(
 			( resolution ) => resolution[ 1 ]?.status === 'resolving'
 		)
