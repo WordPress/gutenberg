@@ -71,6 +71,8 @@ describe( 'Config Integration', () => {
 					port: 123,
 					lifecycleScripts: {
 						afterStart: 'test',
+						afterClean: null,
+						afterDestroy: null,
 					},
 				} );
 			}
@@ -94,6 +96,8 @@ describe( 'Config Integration', () => {
 					testsPort: 456,
 					lifecycleScripts: {
 						afterStart: 'test',
+						afterClean: null,
+						afterDestroy: null,
 					},
 				} );
 			}
@@ -103,6 +107,7 @@ describe( 'Config Integration', () => {
 					port: 999,
 					lifecycleScripts: {
 						afterStart: null,
+						afterClean: null,
 						afterDestroy: 'test',
 					},
 				} );
@@ -129,8 +134,10 @@ describe( 'Config Integration', () => {
 					core: 'WordPress/WordPress#trunk',
 					port: 123,
 					testsPort: 456,
-					lifecycleEvents: {
+					lifecycleScripts: {
 						afterStart: 'local',
+						afterClean: null,
+						afterDestroy: null,
 					},
 				} );
 			}

@@ -34,10 +34,13 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number}                               port       		 The port to use in the development environment.
- * @property {number}                               testsPort  		 The port to use in the tests environment.
- * @property {Object.<string, string|null>} 		lifecycleScripts The scripts to run at certain points in the command lifecycle.
- * @property {Object.<string, WPEnvironmentConfig>} env        		 The environment-specific configuration options.
+ * @property {number}                               port                          The port to use in the development environment.
+ * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterDestroy The script to run after the "destroy" command has completed.
+ * @property {Object.<string, WPEnvironmentConfig>} env                           The environment-specific configuration options.
  */
 
 /**
@@ -404,7 +407,7 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
-			case 'afterSetup':
+			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
 					continue;

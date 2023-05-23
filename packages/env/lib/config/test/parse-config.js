@@ -51,7 +51,11 @@ const DEFAULT_CONFIG = {
 		WP_HOME: 'http://localhost',
 	},
 	mappings: {},
-	lifecycleScripts: {},
+	lifecycleScripts: {
+		afterStart: null,
+		afterClean: null,
+		afterDestroy: null,
+	},
 	env: {
 		development: {},
 		tests: {
@@ -158,6 +162,9 @@ describe( 'parseConfig', () => {
 			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
 				return {
 					phpVersion: '2.0',
+					lifecycleScripts: {
+						afterDestroy: 'test',
+					},
 					env: {
 						tests: {
 							port: 1011,
@@ -184,7 +191,9 @@ describe( 'parseConfig', () => {
 			},
 			phpVersion: '2.0',
 			lifecycleScripts: {
+				...DEFAULT_CONFIG.lifecycleScripts,
 				afterStart: 'test',
+				afterDestroy: 'test',
 			},
 			env: {
 				development: {
@@ -293,6 +302,7 @@ describe( 'parseConfig', () => {
 			},
 			phpVersion: '3.0',
 			lifecycleScripts: {
+				...DEFAULT_CONFIG.lifecycleScripts,
 				afterStart: 'test after',
 			},
 			env: {
