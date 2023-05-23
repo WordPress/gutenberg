@@ -181,6 +181,17 @@ describe( 'validate-config', () => {
 					'Invalid test.json: "test.test" must be a object or string.'
 				)
 			);
+
+			expect( () =>
+				checkObjectWithValues( 'test.json', 'test', { test: null }, [
+					'empty',
+					'object',
+				] )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "test.test" must be a empty or object.'
+				)
+			);
 		} );
 
 		it( 'passes when type is allowed', () => {
@@ -209,6 +220,11 @@ describe( 'validate-config', () => {
 					{ test: [ 'test' ] },
 					[ 'array' ]
 				)
+			).not.toThrow();
+			expect( () =>
+				checkObjectWithValues( 'test.json', 'test', { test: null }, [
+					'null',
+				] )
 			).not.toThrow();
 		} );
 	} );
