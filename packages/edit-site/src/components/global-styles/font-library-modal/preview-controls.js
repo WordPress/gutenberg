@@ -6,6 +6,7 @@ import { useContext } from '@wordpress/element';
 import {
     RangeControl,
 	__experimentalInputControl as InputControl,
+    __experimentalHStack as HStack,
     Button,
     __experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -31,7 +32,7 @@ function PreviewControls () {
     }
 
     return (
-        <>
+        <HStack justify='flex-start' alignment='flex-start'>
             <InputControl
                 value={ demoConfig.text }
                 placeholder={ __('Demo Text...') }
@@ -49,17 +50,12 @@ function PreviewControls () {
                     max={ 72 }
                 />
             </div>
-
             <Button
-                variant='secondary'
                 onClick={ () => { setDefaultDemoConfig() } }
                 icon={ update }
                 style={ { marginTop: "20px" } }
-            >
-                { __( 'Reset' ) }
-            </Button>
-
-        </>
+            />
+        </HStack>
     )
 }
 

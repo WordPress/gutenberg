@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useMemo, useState } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import { 
-    Button,
     __experimentalHStack as HStack,
+    __experimentalSpacer as Spacer,
 } from '@wordpress/components';
 
 /**
@@ -17,10 +17,11 @@ import FontsGrid from './fonts-grid';
 import LibraryFontCard from './library-font-card';
 import LibraryFontDetails from './library-font-details';
 import SaveButton from '../../save-button';
+import PreviewControls from './preview-controls';
 
 
 function InstalledFonts () {
-	const { installedFonts, customFonts } = useContext( FontLibraryContext );
+	const { installedFonts } = useContext( FontLibraryContext );
     const [ fontSelected, setFontSelected ] = useState( null );
 
     const handleUnselectFont = () => {
@@ -42,16 +43,22 @@ function InstalledFonts () {
             handleBack={ !! fontSelected && handleUnselectFont }
             footer={<Footer />}
         >
+            
+
             {!fontSelected && (
-                <FontsGrid>
-                    {installedFonts.map( font => (
-                        <LibraryFontCard
-                            font={ font }
-                            key={ font.name }
-                            onClick={ () => { handleSelectFont( font ) } }
-                        />
-                    ) )}
-                </FontsGrid>
+                <>
+                    <PreviewControls />
+                    <Spacer margin={ 8 } />
+                    <FontsGrid>
+                        {installedFonts.map( font => (
+                            <LibraryFontCard
+                                font={ font }
+                                key={ font.name }
+                                onClick={ () => { handleSelectFont( font ) } }
+                            />
+                        ) )}
+                    </FontsGrid>
+                </>
             )}
 
             {fontSelected && (
