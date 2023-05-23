@@ -56,7 +56,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}         props                         Coprops.
+ * @param {Object}         props                         Components props.
  * @param {string}         props.id                      An HTML element id for the root element of ListView.
  * @param {Array}          props.blocks                  _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {?HTMLElement}   props.dropZoneElement         Optional element to be used as the drop zone.
