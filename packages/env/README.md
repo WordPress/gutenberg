@@ -319,40 +319,38 @@ Options:
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
-### `wp-env run [container] [command]`
+### `wp-env run <container> [command...]`
 
-The run command can be used to open shell sessions or invoke WP-CLI commands.
+The run command can be used to open shell sessions, invoke WP-CLI commands, or run any arbitrary commands inside of a container.
 
-<div class="callout callout-alert">In some cases, <code>wp-env</code> may consume options that you are attempting to pass to
-the container. This happens with options that <code>wp-env</code> has already declared,
-such as <code>--env-cwd</code>, <code>--debug</code>, <code>--help</code>, and <code>--version</code>. When this happens, you should fall
-back to using quotation marks; <code>wp-env</code> considers everything inside the
-quotation marks to be command argument.
+<div class="callout callout-alert">
+<p>
+In some cases <code class="language-sh">wp-env run</code> may conflict with options that you are passing to the container.
+When this happens, <code class="language-sh">wp-env</code> will treat the option as its own and take action accordingly.
+For example, if you try <code class="language-sh">wp-env run cli php --help</code>, you will receive the <code class="language-sh">wp-env</code> help text.
+</p>
 
-For example, to ask <code>WP-CLI</code> for its help text:
-
-<pre>sh
-<code class="language-sh">wp-env run cli "wp --help"</code></pre>
-
-Without the quotation marks, <code>wp-env</code> will print its own help text instead of
-passing it to the container. If you experience any problems where the command
-is not being passed correctly, fall back to using quotation marks.
-
+<p>
+You can get around this by passing any conflicting options after a double dash. <code class="language-sh">wp-env</code> will not process anything after
+the double dash and will simply pass it on to the container. To get the PHP help text you would use <code class="language-sh">wp-env run cli php -- --help</code>.
+</p>
 </div>
 
 ```sh
-wp-env run <container> [command..]
+wp-env run <container> [command...]
 
-Runs an arbitrary command in one of the underlying Docker containers. The
-"container" param should reference one of the underlying Docker services like
-"development", "tests", or "cli". To run a wp-cli command, use the "cli" or
-"tests-cli" service. You can also use this command to open shell sessions like
-bash and the WordPress shell in the WordPress instance. For example, `wp-env run
-cli bash` will open bash in the development WordPress instance.
+Runs an arbitrary command in one of the underlying Docker containers. A double
+dash can be used to pass arguments to the container without parsing them. This
+is necessary if you are using an option that is defined below. You can use
+`bash` to open a shell session and both `composer` and `phpunit` are available
+in all WordPress and CLI containers. WP-CLI is also available in the CLI
+containers.
 
 Positionals:
-  container  The container to run the command on.            [string] [required]
-  command    The command to run.                           [array] [default: []]
+  container  The Docker service to run the command on.
+              [string] [required] [choices: "mysql", "tests-mysql", "wordpress",
+                   "tests-wordpress", "cli", "tests-cli", "composer", "phpunit"]
+  command    The command to run.                                      [required]
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
