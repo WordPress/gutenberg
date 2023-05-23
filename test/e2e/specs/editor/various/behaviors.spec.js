@@ -129,7 +129,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		requestUtils,
 		page,
 	} ) => {
-		// In this theme, the default value for settings.behaviors.lightbox is `true`.
+		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
 		await requestUtils.activateTheme( 'behaviors-enabled' );
 		const media = await createMedia( { admin, requestUtils } );
 

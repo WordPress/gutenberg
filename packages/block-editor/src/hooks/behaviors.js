@@ -14,6 +14,11 @@ import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 /**
+ * External dependencies
+ */
+import merge from 'deepmerge';
+
+/**
  * Override the default edit UI to include a new block inspector control for
  * assigning behaviors to blocks if behaviors are enabled in the theme.json.
  *
@@ -44,12 +49,12 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 
 		const { behaviors: blockBehaviors } = props.attributes;
 
-		// Get the theme behaviors from the theme.json.
-		const themeBehaviors = select( blockEditorStore ).getBehaviors();
+		// Get the theme behaviors for the block from the theme.json.
+		const themeBehaviors =
+			select( blockEditorStore ).getBehaviors()?.blocks?.[ props.name ];
 
-		// By default, use the block behaviors.
-		// If the theme has behaviors, but the block does not, use the theme behaviors.
-		const behaviors = blockBehaviors || themeBehaviors || {};
+		// Block behaviors take precedence over theme behaviors.
+		const behaviors = merge( themeBehaviors, blockBehaviors || {} );
 
 		return (
 			<>

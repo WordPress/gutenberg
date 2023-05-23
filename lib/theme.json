@@ -1,7 +1,11 @@
 {
 	"version": 2,
 	"behaviors": {
-		"lightbox": false
+		"blocks": {
+			"core/image": {
+				"lightbox": false
+			}
+		}
 	},
 	"settings": {
 		"appearanceTools": false,
