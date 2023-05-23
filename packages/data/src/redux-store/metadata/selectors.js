@@ -141,6 +141,13 @@ export function getCachedResolvers( state ) {
  */
 export function hasResolvingSelectors( state ) {
 	return Object.values( state ).some( ( selectorState ) =>
+		/**
+		 * This uses the internal `_map` property of `EquivalentKeyMap` for
+		 * optimization purposes, since the `EquivalentKeyMap` implementation
+		 * does not support a `.some()` implementation.
+		 *
+		 * @see https://github.com/aduth/equivalent-key-map
+		 */
 		[ ...selectorState._map.values() ].some(
 			( resolution ) => resolution[ 1 ]?.status === 'resolving'
 		)
