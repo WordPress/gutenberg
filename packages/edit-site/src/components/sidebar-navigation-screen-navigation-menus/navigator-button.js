@@ -5,19 +5,21 @@
 import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 
-const NAVIGATION_MENUS_QUERY = {
-	per_page: -1,
-	status: 'publish',
-	order: 'desc',
-	orderby: 'date',
-};
+/**
+ * Internal dependencies
+ */
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function SidebarNavigationScreenNavigationMenuButton( {
 	children,
 	...props
 } ) {
 	const { records: navigationMenus, isResolving: isLoading } =
-		useEntityRecords( 'postType', `wp_navigation`, NAVIGATION_MENUS_QUERY );
+		useEntityRecords(
+			'postType',
+			`wp_navigation`,
+			PRELOADED_NAVIGATION_MENUS_QUERY
+		);
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasSingleNavigationMenu = navigationMenus?.length === 1;

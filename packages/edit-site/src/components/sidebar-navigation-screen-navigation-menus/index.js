@@ -16,18 +16,8 @@ import { navigation } from '@wordpress/icons';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
-
-// This requested is preloaded in `gutenberg_preload_navigation_posts`.
-// As unbounded queries are limited to 100 by `fetchAllMiddleware`
-// on apiFetch this query is limited to 100.
-const PRELOADED_NAVIGATION_MENUS_QUERY = {
-	per_page: 100,
-	status: 'publish',
-	order: 'desc',
-	orderby: 'date',
-};
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
