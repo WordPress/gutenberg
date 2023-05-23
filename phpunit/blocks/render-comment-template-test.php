@@ -77,8 +77,10 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_rendering_comment_template_sets_comment_id_context() {
+	public function test_rendering_comment_template_sets_comment_id_context() {.
 		$render_block_callback = static function( $block_content, $block ) {
+			// Insert a Comment Author Name block (which requires `commentId`
+			// block context to work) after the Comment Content block.
 			if ( 'core/comment-content' !== $block['blockName'] ) {
 				return $block_content;
 			}
@@ -92,13 +94,13 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
-		$block = new WP_Block(
+		$block         = new WP_Block(
 			$parsed_blocks[0],
 			array(
 				'postId' => self::$custom_post->ID,
 			)
 		);
-		$markup = $block->render();
+		$markup        = $block->render();
 		remove_filter( 'render_block', $render_block_callback );
 
 		$this->assertSame(
