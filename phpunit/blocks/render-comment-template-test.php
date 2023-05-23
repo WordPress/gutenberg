@@ -77,7 +77,7 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_rendering_comment_template_sets_comment_id_context() {.
+	public function test_rendering_comment_template_sets_comment_id_context() {
 		$render_block_callback = static function( $block_content, $block ) {
 			// Insert a Comment Author Name block (which requires `commentId`
 			// block context to work) after the Comment Content block.
