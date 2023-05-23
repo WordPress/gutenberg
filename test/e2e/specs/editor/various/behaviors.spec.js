@@ -27,7 +27,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'Lightbox behavior should be false by default as defined in the core theme.json', async ( {
+	test( 'By default, thel Lightbox behavior should be false as defined in the core theme.json', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -45,8 +45,15 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
+		const select = page.getByLabel( 'Behavior' );
+
+		// By default, no behaviors should be available.
+		await expect( select ).toHaveCount( 1 );
+		await expect( select ).toHaveValue( '' );
+
+		// By default, you cannot select any behaviors.
+		const options = select.locator( 'option' );
+		await expect( options ).toHaveCount( 1 );
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
@@ -97,8 +104,20 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
+		const select = page.getByLabel( 'Behavior' );
+
+		// The lightbox should be selected because the value from the block's
+		// attributes takes precedence over the theme's value.
+		await expect( select ).toHaveCount( 1 );
+		await expect( select ).toHaveValue( 'lightbox' );
+
+		// There should be 2 options available: `No behaviors` and `Lightbox`.
+		const options = select.locator( 'option' );
+		await expect( options ).toHaveCount( 2 );
+
+		// We can change the value of the behaviors dropdown to `No behavior`.
+		await select.selectOption( { label: 'No behaviors' } );
+		await expect( select ).toHaveValue( '' );
 
 		// Here we should also check that the block renders on the frontend with the
 		// lightbox even though the theme.json has it set to false.
@@ -124,16 +143,19 @@ test.describe( 'Testing behaviors functionality', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		const select = page.getByLabel( 'Behavior' );
 
 		// The behaviors dropdown should be present and the value should be set to
 		// `lightbox`.
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 1 );
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( 'lightbox' );
+		await expect( select ).toHaveCount( 1 );
+		await expect( select ).toHaveValue( 'lightbox' );
 
-		// Check that we can change the value of the behaviors dropdown to `No behavior`.
-		await page
-			.getByLabel( 'Behavior' )
-			.selectOption( { label: 'No behaviors' } );
-		await expect( page.getByLabel( 'Behavior' ) ).toHaveValue( '' );
+		// There should be 2 options available: `No behaviors` and `Lightbox`.
+		const options = select.locator( 'option' );
+		await expect( options ).toHaveCount( 2 );
+
+		// We can change the value of the behaviors dropdown to `No behavior`.
+		await select.selectOption( { label: 'No behaviors' } );
+		await expect( select ).toHaveValue( '' );
 	} );
 } );

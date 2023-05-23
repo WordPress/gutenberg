@@ -58,10 +58,11 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 						label={ __( 'Behaviors' ) }
 						// At the moment we are only supporting one behavior (lightbox)
 						value={ behaviors?.lightbox ? 'LIGHTBOX' : '' }
-						options={ Object.keys( behaviors )
-							.map( ( behavior ) => ( {
-								value: behavior,
-								label: behavior.toUpperCase(),
+						options={ Object.entries( behaviors )
+							.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out falsey values
+							.map( ( [ behaviorName ] ) => ( {
+								value: behaviorName,
+								label: behaviorName.toUpperCase(),
 							} ) )
 							.concat( {
 								value: '',
