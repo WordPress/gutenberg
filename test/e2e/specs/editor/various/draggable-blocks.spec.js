@@ -366,7 +366,7 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		// Deselect the block to hide th block toolbar.
+		// Deselect the block to hide the block toolbar.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
