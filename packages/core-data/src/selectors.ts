@@ -1506,6 +1506,7 @@ export function getNavigationMenuBySlug(
 ): Object | null {
 	const records = getEntityRecords( state, 'postType', 'wp_navigation', {
 		slug,
+		per_page: 1,
 	} );
 
 	if ( ! records?.length ) {
