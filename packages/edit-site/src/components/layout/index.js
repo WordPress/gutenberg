@@ -235,7 +235,6 @@ export default function Layout() {
 									// Instead we set the initial scale of this element to 1.0001 so that there is always a transform property set.
 									// If we set the initial scale to less than 1.001 then JavaScript rounds it to 1 and the problem reoccurs.
 									initial={ { scale: 1.001 } }
-									layout="position"
 									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
