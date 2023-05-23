@@ -215,7 +215,7 @@ export default function Layout() {
 									whileHover={
 										isEditorPage && canvasMode === 'view'
 											? {
-													scale: 1.005,
+													scale: 1.006,
 													transition: {
 														duration:
 															disableMotion ||
