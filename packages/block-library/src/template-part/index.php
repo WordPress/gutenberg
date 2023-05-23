@@ -67,22 +67,20 @@ function render_block_core_template_part( $attributes ) {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
 			if ( 0 === validate_file( $attributes['slug'] ) ) {
-				$child_theme_folders     = get_block_theme_folders( $stylesheet );
-				$template_part_file_path = get_theme_file_path( '/' . $child_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
-				$template                = get_template();
-
-				if ( $template !== $stylesheet ) {
-					$parent_theme_folders        = get_block_theme_folders( $template );
-					$parent_theme_part_file_path = get_theme_file_path( '/' . $parent_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
-					if ( file_exists( $parent_theme_part_file_path ) ) {
-						$template_part_file_path = $parent_theme_part_file_path;
-					}
+				$themes   = array( $stylesheet );
+				$template = get_template();
+				if ( $stylesheet !== $template ) {
+					$themes[] = $template;
 				}
-				if ( file_exists( $template_part_file_path ) ) {
-					$content = file_get_contents( $template_part_file_path );
-					$content = is_string( $content ) && '' !== $content
-						? _inject_theme_attribute_in_block_template_content( $content )
-						: '';
+
+				foreach ( $themes as $theme ) {
+					$theme_folders           = get_block_theme_folders( $theme );
+					$template_part_file_path = get_theme_file_path( '/' . $theme_folders['wp_template_part'] . '/' . $theme_folders['slug'] . '.html' );
+					if ( file_exists( $template_part_file_path ) ) {
+						$content = (string) file_get_contents( $template_part_file_path );
+						$content = '' !== $content ? _inject_theme_attribute_in_block_template_content( $content ) : '';
+						break;
+					}
 				}
 			}
 
