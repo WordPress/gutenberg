@@ -3,7 +3,6 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 
 /**
@@ -80,7 +79,7 @@ describe( 'Config Integration', () => {
 			throw { code: 'ENOENT' };
 		} );
 
-		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
+		const config = await loadConfig( '/test/gutenberg' );
 
 		expect( config.env.development.port ).toEqual( 123 );
 		expect( config.env.tests.port ).toEqual( 8889 );
@@ -116,7 +115,7 @@ describe( 'Config Integration', () => {
 			throw { code: 'ENOENT' };
 		} );
 
-		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
+		const config = await loadConfig( '/test/gutenberg' );
 
 		expect( config.env.development.port ).toEqual( 999 );
 		expect( config.env.tests.port ).toEqual( 456 );
@@ -151,7 +150,7 @@ describe( 'Config Integration', () => {
 			throw { code: 'ENOENT' };
 		} );
 
-		const config = await loadConfig( path.resolve( '/test/gutenberg' ) );
+		const config = await loadConfig( '/test/gutenberg' );
 
 		expect( config.env.development.port ).toEqual( 12345 );
 		expect( config.env.tests.port ).toEqual( 61234 );

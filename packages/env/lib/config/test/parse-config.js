@@ -1,11 +1,6 @@
 'use strict';
 /* eslint-disable jest/no-conditional-expect */
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * Internal dependencies
  */
 const { parseConfig } = require( '../parse-config' );
@@ -84,7 +79,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'should return default config', async () => {
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
 		expect( parsed ).toEqual( DEFAULT_CONFIG );
 	} );
@@ -92,56 +87,38 @@ describe( 'parseConfig', () => {
 	it( 'should infer a core mounting default when ran from a WordPress directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'core' );
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
-		expect( parsed ).toEqual( {
-			...DEFAULT_CONFIG,
-			coreSource: {
-				basename: 'gutenberg',
-				path: path.resolve( '.' ),
-				testsPath: '/cache/tests-gutenberg',
-				type: 'local',
-			},
-		} );
+		expect( parsed.pluginSources ).toHaveLength( 0 );
+		expect( parsed.themeSources ).toHaveLength( 0 );
+		expect( parsed.coreSource ).toMatchObject( { type: 'local' } );
 	} );
 
 	it( 'should infer a plugin mounting default when ran from a plugin directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'plugin' );
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
-		expect( parsed ).toEqual( {
-			...DEFAULT_CONFIG,
-			pluginSources: [
-				{
-					basename: 'gutenberg',
-					path: path.resolve( '.' ),
-					type: 'local',
-				},
-			],
-		} );
+		expect( parsed.coreSource ).toMatchObject( { type: 'git' } );
+		expect( parsed.themeSources ).toHaveLength( 0 );
+		expect( parsed.pluginSources ).toHaveLength( 1 );
+		expect( parsed.pluginSources[ 0 ] ).toMatchObject( { type: 'local' } );
 	} );
 
 	it( 'should infer a theme mounting default when ran from a theme directory', async () => {
 		detectDirectoryType.mockResolvedValue( 'theme' );
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
-		expect( parsed ).toEqual( {
-			...DEFAULT_CONFIG,
-			themeSources: [
-				{
-					basename: 'gutenberg',
-					path: path.resolve( '.' ),
-					type: 'local',
-				},
-			],
-		} );
+		expect( parsed.coreSource ).toMatchObject( { type: 'git' } );
+		expect( parsed.pluginSources ).toHaveLength( 0 );
+		expect( parsed.themeSources ).toHaveLength( 1 );
+		expect( parsed.themeSources[ 0 ] ).toMatchObject( { type: 'local' } );
 	} );
 
 	it( 'should merge configs with precedence', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === path.resolve( './.wp-env.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
 					core: 'WordPress/WordPress#Test',
 					phpVersion: '1.0',
@@ -159,7 +136,7 @@ describe( 'parseConfig', () => {
 				};
 			}
 
-			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
 				return {
 					phpVersion: '2.0',
 					lifecycleScripts: {
@@ -176,7 +153,7 @@ describe( 'parseConfig', () => {
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
 		const expected = {
 			...DEFAULT_CONFIG,
@@ -211,7 +188,7 @@ describe( 'parseConfig', () => {
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === path.resolve( '.', './.wp-env.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
 					core: 'WordPress/WordPress#Test',
 					plugins: [ 'WordPress/TestPlugin#Test' ],
@@ -223,16 +200,14 @@ describe( 'parseConfig', () => {
 				};
 			}
 
-			if (
-				configFile === path.resolve( '.', './.wp-env.override.json' )
-			) {
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
 				return {};
 			}
 
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
@@ -285,7 +260,7 @@ describe( 'parseConfig', () => {
 		process.env.WP_ENV_PHP_VERSION = '3.0';
 		process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START = 'test after';
 
-		const parsed = await parseConfig( './', '/cache' );
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
 		expect( parsed ).toEqual( {
 			...DEFAULT_CONFIG,
@@ -345,7 +320,7 @@ describe( 'parseConfig', () => {
 
 		expect.assertions( 1 );
 		try {
-			await parseConfig( './', '/cache' );
+			await parseConfig( '/test/gutenberg', '/cache' );
 		} catch ( error ) {
 			expect( error ).toEqual(
 				new ValidationError(
@@ -356,15 +331,14 @@ describe( 'parseConfig', () => {
 	} );
 
 	it( 'throws for unknown config options', async () => {
-		const configFileLocation = path.resolve( './.wp-env.json' );
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === path.resolve( './.wp-env.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
 					test: 'test',
 				};
 			}
 
-			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
 				return {};
 			}
 
@@ -373,20 +347,19 @@ describe( 'parseConfig', () => {
 
 		expect.assertions( 1 );
 		try {
-			await parseConfig( './', '/cache' );
+			await parseConfig( '/test/gutenberg', '/cache' );
 		} catch ( error ) {
 			expect( error ).toEqual(
 				new ValidationError(
-					`Invalid ${ configFileLocation }: "test" is not a configuration option.`
+					`Invalid /test/gutenberg/.wp-env.json: "test" is not a configuration option.`
 				)
 			);
 		}
 	} );
 
 	it( 'throws for root-only config options', async () => {
-		const configFileLocation = path.resolve( './.wp-env.json' );
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
-			if ( configFile === configFileLocation ) {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
 					env: {
 						development: {
@@ -397,7 +370,7 @@ describe( 'parseConfig', () => {
 				};
 			}
 
-			if ( configFile === path.resolve( './.wp-env.override.json' ) ) {
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
 				return {};
 			}
 
@@ -406,11 +379,11 @@ describe( 'parseConfig', () => {
 
 		expect.assertions( 1 );
 		try {
-			await parseConfig( './', '/cache' );
+			await parseConfig( '/test/gutenberg', '/cache' );
 		} catch ( error ) {
 			expect( error ).toEqual(
 				new ValidationError(
-					`Invalid ${ configFileLocation }: "development.env" is not a configuration option.`
+					`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
 				)
 			);
 		}
