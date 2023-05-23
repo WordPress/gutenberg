@@ -144,11 +144,11 @@ export function hasResolvingSelectors( state ) {
 		/**
 		 * This uses the internal `_map` property of `EquivalentKeyMap` for
 		 * optimization purposes, since the `EquivalentKeyMap` implementation
-		 * does not support a `.some()` implementation.
+		 * does not support a `.values()` implementation.
 		 *
 		 * @see https://github.com/aduth/equivalent-key-map
 		 */
-		Array.from( selectorState._map ).some(
+		Array.from( selectorState._map.values() ).some(
 			( resolution ) => resolution[ 1 ]?.status === 'resolving'
 		)
 	);
