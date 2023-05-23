@@ -705,7 +705,9 @@ This is useful for performing some actions after setting up the environment, suc
 
 ```json
 {
-	"afterStart": "node tests/e2e/bin/setup-env.js"
+	"lifecycleScripts": {
+		"afterStart": "node tests/e2e/bin/setup-env.js"
+	}
 }
 ```
 
