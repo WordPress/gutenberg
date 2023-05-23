@@ -43,6 +43,8 @@ export default function useInitEditedEntityFromURL() {
 				case 'wp_template_part':
 					setTemplatePart( postId );
 					break;
+				case 'wp_navigation':
+					break;
 				default:
 					setPage( {
 						context: { postType, postId },
