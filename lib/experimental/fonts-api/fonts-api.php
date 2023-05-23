@@ -191,27 +191,33 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	function wp_print_fonts( $handles = false ) {
 		global $pagenow;
 
-		$wp_fonts          = wp_fonts();
-		$registered        = $wp_fonts->get_registered_font_families();
-		$in_iframed_editor = true === $handles;
-		$is_site_editor    = $in_iframed_editor && 'site-editor.php' === $pagenow;
+		$wp_fonts   = wp_fonts();
+		$registered = $wp_fonts->get_registered_font_families();
 
 		// Nothing to print, as no fonts are registered.
 		if ( empty( $registered ) ) {
 			return array();
 		}
 
-		// Print all registered fonts for the Site Editor.
-		if ( $is_site_editor ) {
-			$queue           = $wp_fonts->queue;
-			$done            = $wp_fonts->done;
-			$wp_fonts->done  = array();
-			$wp_fonts->queue = $registered;
-			$handles         = false;
+		$in_iframed_editor = true === $handles;
+		$in_site_editor    = $in_iframed_editor && 'site-editor.php' === $pagenow;
+
+		if ( $in_iframed_editor ) {
+			$handles = false;
+
+			// When in an iframed editor, reset "done".
+			$done           = $wp_fonts->done;
+			$wp_fonts->done = array();
+
+			// When in the Site Editor, print all registered fonts.
+			if ( $in_site_editor ) {
+				$queue           = $wp_fonts->queue;
+				$wp_fonts->queue = $registered;
+			}
 		}
 
 		// Automatically enqueue all user-selected fonts.
-		if ( empty( $handles ) || ( $in_iframed_editor && ! $is_site_editor ) ) {
+		if ( empty( $handles ) || ( $in_iframed_editor && ! $in_site_editor ) ) {
 			WP_Fonts_Resolver::enqueue_user_selected_fonts();
 			$handles = false;
 		}
@@ -220,10 +226,12 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		$printed = $wp_fonts->do_items( $handles );
 
-		// Restore the API state.
-		if ( $is_site_editor ) {
-			$wp_fonts->done  = $done;
-			$wp_fonts->queue = $queue;
+		// When in an iframed editor, restore the API state.
+		if ( $in_iframed_editor ) {
+			$wp_fonts->done = $done;
+			if ( $in_site_editor ) {
+				$wp_fonts->queue = $queue;
+			}
 		}
 
 		return $printed;
