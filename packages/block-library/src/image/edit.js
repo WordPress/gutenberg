@@ -110,7 +110,6 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		enableLightbox,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -242,7 +241,6 @@ export function ImageEdit( {
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
-			enableLightbox,
 		} );
 	}
 
