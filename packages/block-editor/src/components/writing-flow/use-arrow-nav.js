@@ -38,7 +38,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
 		if ( tagName === 'INPUT' ) {
-			const vertiaclInputTypes = [
+			const verticalInputTypes = [
 				'date',
 				'datetime-local',
 				'month',
@@ -47,7 +47,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 				'time',
 				'week',
 			];
-			return ! vertiaclInputTypes.includes( elementType );
+			return ! verticalInputTypes.includes( elementType );
 		}
 		return true;
 	}
