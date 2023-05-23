@@ -62,28 +62,38 @@ export function getColors( context, isSubMenu ) {
 
 	const colors = {};
 
-	if ( isSubMenu && !! customOverlayTextColor ) {
-		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
-		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
-		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
-		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
-		colors.customTextColor = style.color.text;
-	}
+	if ( isSubMenu ) {
+		// Text colors
+		if ( !! customOverlayTextColor ) {
+			colors.customTextColor = customOverlayTextColor;
+		} else if ( !! overlayTextColor ) {
+			colors.textColor = overlayTextColor;
+		}
 
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
-		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
-		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
-		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
-		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
-		colors.customTextColor = style.color.background;
+		// Background colors
+		if ( !! customOverlayBackgroundColor ) {
+			colors.customBackgroundColor = customOverlayBackgroundColor;
+		} else if ( !! overlayBackgroundColor ) {
+			colors.backgroundColor = overlayBackgroundColor;
+		}
+	} else {
+		// Text colors
+		if ( !! customTextColor ) {
+			colors.customTextColor = customTextColor;
+		} else if ( !! textColor ) {
+			colors.textColor = textColor;
+		} else if ( !! style?.color?.text ) {
+			colors.customTextColor = style.color.text;
+		}
+
+		// Background colors
+		if ( !! customBackgroundColor ) {
+			colors.customBackgroundColor = customBackgroundColor;
+		} else if ( !! backgroundColor ) {
+			colors.backgroundColor = backgroundColor;
+		} else if ( !! style?.color?.background ) {
+			colors.customTextColor = style.color.background;
+		}
 	}
 
 	return colors;
