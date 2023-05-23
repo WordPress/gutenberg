@@ -890,10 +890,16 @@ export const getRevision =
 		}
 	};
 
+export const getNavigationMenu =
+	( id ) =>
+	async ( { resolveSelect } ) => {
+		resolveSelect.getEntityRecord( 'postType', 'wp_navigation', id );
+	};
+
 export const getNavigationMenuBySlug =
 	( slug ) =>
 	async ( { resolveSelect } ) => {
-		await resolveSelect.getEntityRecords( 'postType', 'wp_navigation', {
+		resolveSelect.getEntityRecords( 'postType', 'wp_navigation', {
 			slug,
 			per_page: 1,
 		} );

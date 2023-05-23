@@ -1378,6 +1378,19 @@ export function getCurrentThemeGlobalStylesRevisions(
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }
 
+export function getNavigationMenu(
+	state: State,
+	id: EntityRecordKey
+): Object | null {
+	const record = getEntityRecord( state, 'postType', 'wp_navigation', id );
+
+	if ( ! record ) {
+		return null;
+	}
+
+	return record;
+}
+
 /**
  * Returns the default template use to render a given query.
  *
