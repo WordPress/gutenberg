@@ -30,9 +30,13 @@ function render_block_core_search( $attributes ) {
 	$show_label          = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button     = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
 	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
+	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
+	$button_behavior     = ( ! empty( $attributes['buttonBehavior'] ) ) ? $attributes['buttonBehavior'] : 'default';
 	$input_markup        = '';
 	$button_markup       = '';
+	$input_aria          = '';
+	$button_aria         = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
 	$color_classes       = get_color_classes_for_block_core_search( $attributes );
@@ -63,16 +67,9 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	$aria_label    = '';
-	$aria_hidden   = '';
-	$aria_expanded = '';
-	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
-		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-			$aria_label    = sprintf( 'aria-label="%s"', __( 'Expand search form' ) );
-			$aria_hidden   = 'aria-hidden="true"';
-			$aria_expanded = sprintf( ' aria-expanded="false" aria-controls="wp-block-search__input-%s"', esc_attr( $input_id ) );
-			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
-		}
+	if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
+		$input_aria = 'aria-hidden="true" tabindex="-1"';
+		wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
 	}
 
 	$input_classes = array( 'wp-block-search__input' );
@@ -89,7 +86,7 @@ function render_block_core_search( $attributes ) {
 		get_search_query(),
 		esc_attr( $attributes['placeholder'] ),
 		$inline_styles['input'],
-		$aria_hidden
+		$input_aria
 	);
 
 	if ( count( $query_params ) > 0 ) {
@@ -120,9 +117,7 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			if ( 'expand-searchfield' !== $attributes['buttonBehavior'] ) {
-				$aria_label = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
-			}
+			$button_aria      = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
 			$button_classes[] = 'has-icon';
 
 			$button_internal_markup =
@@ -130,15 +125,17 @@ function render_block_core_search( $attributes ) {
 					<path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path>
 				</svg>';
 		}
+		if ( 'expand-searchfield' !== $attributes['buttonBehavior'] ) {
+			$button_aria = sprintf( 'aria-label="%s" aria-expanded="false" aria-controls="wp-block-search__input-%s"', __( 'Expand search form' ), esc_attr( $input_id ) );
+		}
 
 		// Include the button element class.
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
-		$aria_attributes  = $aria_label .= $aria_expanded;
 		$button_markup    = sprintf(
 			'<button type="submit" class="%s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
-			$aria_attributes,
+			$button_aria,
 			$button_internal_markup
 		);
 	}

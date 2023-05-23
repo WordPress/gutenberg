@@ -15,7 +15,8 @@ window.addEventListener( 'DOMContentLoaded', () => {
 
 		const toggleSearchField = ( showSearchField ) => {
 			if ( showSearchField ) {
-				searchField.setAttribute( 'aria-hidden', 'false' );
+				searchField.removeAttribute( 'aria-hidden' );
+				searchField.removeAttribute( 'tabindex' );
 				searchButton.removeAttribute( 'aria-expanded' );
 				searchButton.removeAttribute( 'aria-controls' );
 				searchButton.removeAttribute( 'aria-label' );
@@ -24,6 +25,7 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			}
 
 			searchField.setAttribute( 'aria-hidden', 'true' );
+			searchField.setAttribute( 'tabindex', '-1' );
 			searchButton.setAttribute( 'aria-expanded', 'false' );
 			searchButton.setAttribute( 'aria-controls', id );
 			searchButton.setAttribute( 'aria-label', ariaLabel );
