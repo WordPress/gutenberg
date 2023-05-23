@@ -1,16 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/commands';
+import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from './lock-unlock';
-
-const { useCommand } = unlock( privateApis );
 
 export function useAddPostTypeCommands() {
 	useCommand( {

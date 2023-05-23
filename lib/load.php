@@ -99,13 +99,13 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
-require __DIR__ . '/experimental/interactivity-api/script-loader.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/navigation-fallback.php';
-if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-navigation-block' ) ) {
-	require __DIR__ . '/experimental/interactivity-api/navigation-block-interactivity.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
+	require __DIR__ . '/experimental/interactivity-api/script-loader.php';
+	require __DIR__ . '/experimental/interactivity-api/blocks.php';
 }
 
 // Fonts API.

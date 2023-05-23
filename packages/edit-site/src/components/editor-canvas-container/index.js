@@ -19,6 +19,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import ResizableEditor from '../block-editor/resizable-editor';
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -47,7 +48,12 @@ const {
 	Fill: EditorCanvasContainerFill,
 } = createPrivateSlotFill( SLOT_FILL_NAME );
 
-function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
+function EditorCanvasContainer( {
+	children,
+	closeButtonLabel,
+	onClose,
+	enableResizing = false,
+} ) {
 	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
 		( select ) => {
 			const _editorCanvasContainerView = unlock(
@@ -115,24 +121,26 @@ function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 
 	return (
 		<EditorCanvasContainerFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className="edit-site-editor-canvas-container"
-				ref={ shouldShowCloseButton ? focusOnMountRef : null }
-				onKeyDown={ closeOnEscape }
-				aria-label={ title }
-			>
-				{ shouldShowCloseButton && (
-					<Button
-						className="edit-site-editor-canvas-container__close-button"
-						icon={ closeSmall }
-						label={ closeButtonLabel || __( 'Close' ) }
-						onClick={ onCloseContainer }
-						showTooltip={ false }
-					/>
-				) }
-				{ childrenWithProps }
-			</section>
+			<ResizableEditor enableResizing={ enableResizing }>
+				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+				<section
+					className="edit-site-editor-canvas-container"
+					ref={ shouldShowCloseButton ? focusOnMountRef : null }
+					onKeyDown={ closeOnEscape }
+					aria-label={ title }
+				>
+					{ shouldShowCloseButton && (
+						<Button
+							className="edit-site-editor-canvas-container__close-button"
+							icon={ closeSmall }
+							label={ closeButtonLabel || __( 'Close' ) }
+							onClick={ onCloseContainer }
+							showTooltip={ false }
+						/>
+					) }
+					{ childrenWithProps }
+				</section>
+			</ResizableEditor>
 		</EditorCanvasContainerFill>
 	);
 }
