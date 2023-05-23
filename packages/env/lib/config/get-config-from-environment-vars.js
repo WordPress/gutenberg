@@ -87,22 +87,19 @@ function getLifecycleScriptOverrides() {
 	const lifecycleScripts = {};
 
 	// Find all of the lifecycle script overrides and parse them.
-	for ( const env in process.env ) {
-		const match = env.match( /WP_ENV_LIFECYCLE_SCRIPT_([A-Za-z0-9_]+)/ );
-		if ( ! match ) {
+	const lifecycleEnvironmentVars = {
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_START: 'afterStart',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEAN: 'afterClean',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_DESTROY: 'afterDestroy',
+	};
+	for ( const envVar in lifecycleEnvironmentVars ) {
+		const scriptValue = process.env[ envVar ];
+		if ( scriptValue === undefined ) {
 			continue;
 		}
 
-		const scriptValue = process.env[ env ];
-		checkString( 'environment variable', env, scriptValue );
-
-		// Convert the snake_case environment variables into a camelCase lifecycle script key.
-		const scriptKey = match[ 1 ]
-			.toLowerCase()
-			.replace( /(_[a-z])/g, ( group ) =>
-				group.toUpperCase().replace( '_', '' )
-			);
-		lifecycleScripts[ scriptKey ] = scriptValue;
+		checkString( 'environment variable', envVar, scriptValue );
+		lifecycleScripts[ lifecycleEnvironmentVars[ envVar ] ] = scriptValue;
 	}
 
 	return lifecycleScripts;
