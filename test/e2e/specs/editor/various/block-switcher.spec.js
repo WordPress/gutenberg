@@ -17,21 +17,17 @@ test.describe( 'Block Switcher', () => {
 	test( 'Should show the expected block transforms on the list block when the blocks are removed', async ( {
 		page,
 		blockSwitcher,
+		pageUtils,
 	} ) => {
 		// Insert a list block.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '- List content' );
 
-		await page.mouse.move( 50, 50 );
-		await page.mouse.move( 75, 75 );
-		await page.mouse.move( 100, 100 );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+F10' );
 
 		// Verify the block switcher exists.
-		expect(
-			page.locator(
-				'.block-editor-block-toolbar .block-editor-block-switcher'
-			)
-		).toBeTruthy();
+		expect( page.locator( 'role=button[name="List"i]' ) ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
 		expect( await blockSwitcher.getAvailableBlockTransforms() ).toEqual(
@@ -48,7 +44,10 @@ test.describe( 'Block Switcher', () => {
 	test( 'Should show the expected block transforms on the list block when the quote block is removed', async ( {
 		page,
 		blockSwitcher,
+		pageUtils,
 	} ) => {
+		const wp = '';
+
 		// Remove the quote block from the list of registered blocks.
 		await page.evaluate( () => {
 			wp.blocks.unregisterBlockType( 'core/quote' );
@@ -58,16 +57,11 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '- List content' );
 
-		await page.mouse.move( 50, 50 );
-		await page.mouse.move( 75, 75 );
-		await page.mouse.move( 100, 100 );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+F10' );
 
 		// Verify the block switcher exists.
-		expect(
-			page.locator(
-				'.block-editor-block-toolbar .block-editor-block-switcher'
-			)
-		).toBeTruthy();
+		expect( page.locator( 'role=button[name="List"i]' ) ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
 		expect( await blockSwitcher.getAvailableBlockTransforms() ).toEqual(
@@ -82,7 +76,9 @@ test.describe( 'Block Switcher', () => {
 
 	test( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async ( {
 		page,
+		pageUtils,
 	} ) => {
+		const wp = '';
 		async function getAvailableBlockTransforms() {
 			return page.evaluate( ( buttonSelector ) => {
 				return Array.from(
@@ -97,9 +93,8 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '- List content' );
 
-		await page.mouse.move( 50, 50 );
-		await page.mouse.move( 75, 75 );
-		await page.mouse.move( 100, 100 );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+F10' );
 
 		// Remove the paragraph and quote block from the list of registered blocks.
 		await page.evaluate( () => {
@@ -184,9 +179,7 @@ class blockSwitcher {
 	}
 
 	async getAvailableBlockTransforms() {
-		await this.page.click(
-			'.block-editor-block-toolbar .block-editor-block-switcher'
-		);
+		await this.page.click( 'role=button[name="List"i]' );
 		return this.page.evaluate( ( buttonSelector ) => {
 			return Array.from(
 				document.querySelectorAll( buttonSelector )
