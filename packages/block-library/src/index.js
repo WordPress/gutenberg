@@ -67,6 +67,7 @@ import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
+import * as patternPart from './pattern-part';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
@@ -160,6 +161,7 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
+		patternPart,
 		preformatted,
 		pullquote,
 		reusableBlock,

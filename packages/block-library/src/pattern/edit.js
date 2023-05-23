@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import {
@@ -44,9 +44,21 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			window.queueMicrotask( () => {
 				// Clone blocks from the pattern before insertion to ensure they receive
 				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
-				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
-					cloneBlock( block )
-				);
+				const clonedBlocks = selectedPattern.blocks.map( ( block ) => {
+					let newInnerBlocks = [];
+					if ( block.innerBlocks.length > 0 ) {
+						newInnerBlocks = block.innerBlocks.map(
+							( innerBlock ) => {
+								return createBlock( 'core/pattern-part', {}, [
+									cloneBlock( innerBlock ),
+								] );
+							}
+						);
+					}
+					return createBlock( 'core/pattern-part', {}, [
+						cloneBlock( block, {}, newInnerBlocks ),
+					] );
+				} );
 				__unstableMarkNextChangeAsNotPersistent();
 				if ( syncStatus === 'partial' ) {
 					replaceInnerBlocks( clientId, clonedBlocks );
