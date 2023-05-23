@@ -10,8 +10,7 @@
 			"linkDestination": "custom",
 			"behaviors": {
 				"lightbox": true
-			},
-			"lightbox": false
+			}
 		},
 		"innerBlocks": []
 	}

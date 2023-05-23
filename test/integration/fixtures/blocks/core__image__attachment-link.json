@@ -10,8 +10,7 @@
 			"linkDestination": "attachment",
 			"behaviors": {
 				"lightbox": true
-			},
-			"lightbox": false
+			}
 		},
 		"innerBlocks": []
 	}

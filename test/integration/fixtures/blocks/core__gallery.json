@@ -27,8 +27,7 @@
 					"linkDestination": "none",
 					"behaviors": {
 						"lightbox": true
-					},
-					"lightbox": false
+					}
 				},
 				"innerBlocks": []
 			},
@@ -44,8 +43,7 @@
 					"linkDestination": "none",
 					"behaviors": {
 						"lightbox": true
-					},
-					"lightbox": false
+					}
 				},
 				"innerBlocks": []
 			}

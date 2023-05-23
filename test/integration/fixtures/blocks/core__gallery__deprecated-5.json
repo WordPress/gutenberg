@@ -23,8 +23,7 @@
 					"linkDestination": "media",
 					"behaviors": {
 						"lightbox": true
-					},
-					"lightbox": false
+					}
 				},
 				"innerBlocks": []
 			},
@@ -41,8 +40,7 @@
 					"linkDestination": "media",
 					"behaviors": {
 						"lightbox": true
-					},
-					"lightbox": false
+					}
 				},
 				"innerBlocks": []
 			},
@@ -59,8 +57,7 @@
 					"linkDestination": "media",
 					"behaviors": {
 						"lightbox": true
-					},
-					"lightbox": false
+					}
 				},
 				"innerBlocks": []
 			}

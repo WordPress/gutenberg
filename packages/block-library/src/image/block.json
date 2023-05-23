@@ -86,10 +86,6 @@
 			"default": {
 				"lightbox": true
 			}
-		},
-		"lightbox": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {

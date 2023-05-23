@@ -9,8 +9,7 @@
 			"caption": "Give it a try. Press the \"really wide\" button on the image toolbar.",
 			"behaviors": {
 				"lightbox": true
-			},
-			"lightbox": false
+			}
 		},
 		"innerBlocks": []
 	}
