@@ -64,12 +64,10 @@ function render_block_core_image( $attributes, $content ) {
 			<<<HTML
 				<div class="wp-lightbox-container"
 					data-wp-island=""
-					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false, "lastFocusedElement": null } } }'>
+					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }'>
 						$body_content
 						<div data-wp-body="" class="wp-lightbox-overlay"
 							role="dialog"
-							aria-hidden="true"
-							aria-modal="false"
 							aria-labelledby="$image_lightbox_id"
 							data-wp-class.initialized="context.core.image.initialized"
 							data-wp-class.active="context.core.image.lightboxEnabled"
