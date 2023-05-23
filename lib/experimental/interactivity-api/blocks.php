@@ -164,22 +164,18 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  * <li
  *   class="has-child"
  *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }'
+ *   data-wp-effect="effects.core.navigation.initMenu"
+ *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+ *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
  * >
  *   <button
  *     class="wp-block-navigation-submenu__toggle"
  *     data-wp-on.click="actions.core.navigation.openMenu"
  *     data-wp-bind.aria-expanded="context.core.navigation.isMenuOpen"
- *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
- *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
  *   >
  *   </button>
  *   <span>Title</span>
- *   <ul
- *     class="wp-block-navigation__submenu-container"
- *     data-wp-effect="effects.core.navigation.initMenu"
- *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
- *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
- *   >
+ *   <ul class="wp-block-navigation__submenu-container">
  *     SUBMENU ITEMS
  *   </ul>
  * </li>
@@ -199,6 +195,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 		$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }' );
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
+		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 
 		// Add directives to the toggle submenu button.
 		if ( $w->next_tag(
@@ -209,18 +206,8 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 		) ) {
 			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenu' );
 			$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.core.navigation.isMenuOpen' );
-			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 		};
 
-		// Add directives to the `<ul>` containing the subitems.
-		if ( $w->next_tag(
-			array(
-				'tag_name'   => 'UL',
-				'class_name' => 'wp-block-navigation__submenu-container',
-			)
-		) ) {
-			$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
-		};
 		// Iterate through subitems if exist.
 		gutenberg_block_core_navigation_add_directives_to_submenu( $w );
 	}
