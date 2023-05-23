@@ -38,8 +38,11 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
+import usePageContentLockNotifications from '../use-page-content-lock-notifications';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useBlockEditingMode } = unlock(
+	blockEditorPrivateApis
+);
 
 const LAYOUT = {
 	type: 'default',
@@ -49,20 +52,25 @@ const LAYOUT = {
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, templateType, canvasMode } = useSelect(
-		( select ) => {
-			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
+	const { storedSettings, templateType, canvasMode, hasPageContentLock } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getEditedPostType,
+					getCanvasMode,
+					hasPageContentLock: _hasPageContentLock,
+				} = unlock( select( editSiteStore ) );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpened ),
-				templateType: getEditedPostType(),
-				canvasMode: getCanvasMode(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
+				return {
+					storedSettings: getSettings( setIsInserterOpened ),
+					templateType: getEditedPostType(),
+					canvasMode: getCanvasMode(),
+					hasPageContentLock: _hasPageContentLock(),
+				};
+			},
+			[ setIsInserterOpened ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -137,6 +145,7 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
+		usePageContentLockNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -162,6 +171,9 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			{ hasPageContentLock && (
+				<SetRootBlockEditingMode mode="disabled" />
+			) }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
@@ -214,4 +226,9 @@ export default function BlockEditor() {
 			<ReusableBlocksMenuItems />
 		</ExperimentalBlockEditorProvider>
 	);
+}
+
+function SetRootBlockEditingMode( { mode } ) {
+	useBlockEditingMode( mode );
+	return null;
 }

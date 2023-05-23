@@ -131,6 +131,18 @@ _Returns_
 
 -   `Object`: Settings.
 
+### hasPageContentLock
+
+Whether or not the editor is locked so that only page content can be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor is locked.
+
 ### isFeatureActive
 
 > **Deprecated**
@@ -173,6 +185,22 @@ _Returns_
 ### isNavigationOpened
 
 > **Deprecated**
+
+### isPage
+
+Whether or not the editor has a page loaded into it.
+
+_Related_
+
+-   setPage
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -354,6 +382,18 @@ Dispatches an action that toggles a feature flag.
 _Parameters_
 
 -   _featureName_ `string`: Feature name.
+
+### togglePageContentLock
+
+Action that toggles whether or not the editor is locked so that only page content can be edited.
+
+_Parameters_
+
+-   _hasPageContentLock_ `boolean`: True to enable lock, false to disable, or undefined to toggle.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### updateSettings
 

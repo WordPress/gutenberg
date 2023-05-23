@@ -37,12 +37,12 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+import removePageFromBlockContext from '../../utils/remove-page-from-block-context';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -74,6 +74,7 @@ export default function Editor( { isLoading } ) {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		hasPageContentLock,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -81,6 +82,7 @@ export default function Editor( { isLoading } ) {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
+			hasPageContentLock: _hasPageContentLock,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -105,6 +107,7 @@ export default function Editor( { isLoading } ) {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
+			hasPageContentLock: _hasPageContentLock(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -123,21 +126,14 @@ export default function Editor( { isLoading } ) {
 		? __( 'List View' )
 		: __( 'Block Library' );
 	const blockContext = useMemo(
-		() => ( {
-			...context,
-			queryContext: [
-				context?.queryContext || { page: 1 },
-				( newQueryContext ) =>
-					setEditedPostContext( {
-						...context,
-						queryContext: {
-							...context?.queryContext,
-							...newQueryContext,
-						},
-					} ),
-			],
-		} ),
-		[ context, setEditedPostContext ]
+		() =>
+			addQueryContextToBlockContext(
+				hasPageContentLock
+					? context
+					: removePageFromBlockContext( context ),
+				setEditedPostContext
+			),
+		[ hasPageContentLock, context, setEditedPostContext ]
 	);
 
 	let title;
@@ -246,4 +242,21 @@ export default function Editor( { isLoading } ) {
 			</EntityProvider>
 		</>
 	);
+}
+
+function addQueryContextToBlockContext( context, setContext ) {
+	return {
+		...context,
+		queryContext: [
+			context?.queryContext || { page: 1 },
+			( newQueryContext ) =>
+				setContext( {
+					...context,
+					queryContext: {
+						...context?.queryContext,
+						...newQueryContext,
+					},
+				} ),
+		],
+	};
 }

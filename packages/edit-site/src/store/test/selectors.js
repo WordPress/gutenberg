@@ -15,6 +15,8 @@ import {
 	isInserterOpened,
 	isListViewOpened,
 	__unstableGetPreference,
+	isPage,
+	hasPageContentLock,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -143,6 +145,61 @@ describe( 'selectors', () => {
 			expect( isListViewOpened( state ) ).toBe( true );
 			state.listViewPanel = false;
 			expect( isListViewOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isPage', () => {
+		it( 'returns true if the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+			};
+			expect( isPage( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+			};
+			expect( isPage( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasPageContentLock', () => {
+		it( 'returns true if locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentLock: true,
+			};
+			expect( hasPageContentLock( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if not locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentLock: false,
+			};
+			expect( hasPageContentLock( state ) ).toBe( false );
+		} );
+
+		it( 'returns false if locked and the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+				hasPageContentLock: true,
+			};
+			expect( hasPageContentLock( state ) ).toBe( false );
 		} );
 	} );
 } );
