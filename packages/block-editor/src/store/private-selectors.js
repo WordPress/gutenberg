@@ -40,6 +40,10 @@ export function getLastInsertedBlocksClientIds( state ) {
 }
 
 /**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
  * Returns the block editing mode for a given block.
  *
  * The mode can be one of three options:
@@ -64,8 +68,8 @@ export function getLastInsertedBlocksClientIds( state ) {
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID, or `''` for the root container.
  *
- * @return {string} The block editing mode. One of `'disabled'`,
- *                  `'contentOnly'`, or `'default'`.
+ * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
+ *                            `'contentOnly'`, or `'default'`.
  */
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>

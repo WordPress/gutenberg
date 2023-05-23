@@ -12,6 +12,10 @@ import { unlock } from '../../lock-unlock';
 import { BlockListBlockContext } from '../block-list/block';
 
 /**
+ * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
+ */
+
+/**
  * Allows a block to restrict the user interface that is displayed for editing
  * that block and its inner blocks.
  *
@@ -36,11 +40,10 @@ import { BlockListBlockContext } from '../block-list/block';
  *
  * If called outside of a block context, the mode is applied to all blocks.
  *
- * @param {?string} mode The editing mode to apply. If undefined, the current
- *                       editing mode is not changed. One of `'disabled'`,
- *                       `'contentOnly'`, or `'default'`.
+ * @param {?BlockEditingMode} mode The editing mode to apply. If undefined, the
+ *                                 current editing mode is not changed.
  *
- * @return {string} The current editing mode.
+ * @return {BlockEditingMode} The current editing mode.
  */
 export function useBlockEditingMode( mode ) {
 	const { clientId = '' } = useContext( BlockListBlockContext ) ?? {};

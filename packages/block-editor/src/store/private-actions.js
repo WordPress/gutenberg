@@ -68,13 +68,17 @@ export function showBlockInterface() {
 }
 
 /**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
  * Sets the block editing mode for a given block.
  *
  * @see useBlockEditingMode
  *
- * @param {string} clientId The block client ID, or `''` for the root container.
- * @param {string} mode     The block editing mode. One of `'disabled'`,
- *                          `'contentOnly'`, or `'default'`.
+ * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
+ *                                    `'contentOnly'`, or `'default'`.
  *
  * @return {Object} Action object.
  */
