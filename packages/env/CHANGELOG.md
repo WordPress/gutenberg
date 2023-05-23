@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Rework`run` command to resolve bugs with non-quoted commands. As a consequence it is no longer possible to pass your entire command to `wp-env` wrapped in double-quotes. While `npx wp-env run cli wp help` will still work, `npx wp-env run cli "wp help"` will not. If you are currently escaping any quotes you will need to review those commands and ensure they are compatible with this update.
+
 ### Enhancement
 
+-   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
 -   Validate whether or not config options exist to prevent accidentally including ones that don't.
 
 ## 7.0.0 (2023-05-10)
