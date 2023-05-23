@@ -1,18 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalUseNavigator as useNavigator,
 	Spinner,
+	DropdownMenu,
+	MenuItem,
+	MenuGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -74,6 +78,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	return (
 		<SidebarNavigationScreenWrapper
+			actions={ ScreenNavigationMoreMenu( postId ) }
 			title={ decodeEntities( menuTitle ) }
 			description={ __(
 				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
@@ -153,5 +158,45 @@ function NavigationMenuEditor( { navigationMenu } ) {
 				/>
 			</div>
 		</BlockEditorProvider>
+	);
+}
+
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	variant: 'toolbar',
+};
+
+function ScreenNavigationMoreMenu( navigationMenuID ) {
+	const { deleteEntityRecord } = useDispatch( coreStore );
+	return (
+		<DropdownMenu
+			className="sidebar-navigation__more-menu"
+			icon={ moreVertical }
+			popoverProps={ POPOVER_PROPS }
+		>
+			{ ( { onClose } ) => (
+				<div>
+					<MenuGroup>
+						<MenuItem>{ __( 'Rename' ) }</MenuItem>
+						<MenuItem>{ __( 'Duplicate' ) }</MenuItem>
+						<MenuItem
+							isDestructive
+							isTertiary
+							onClick={ () => {
+								deleteEntityRecord(
+									'postType',
+									'wp_navigation',
+									navigationMenuID,
+									{ force: true }
+								);
+								onClose();
+							} }
+						>
+							{ __( 'Delete' ) }
+						</MenuItem>
+					</MenuGroup>
+				</div>
+			) }
+		</DropdownMenu>
 	);
 }
