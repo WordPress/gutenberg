@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,13 +15,13 @@ import useDropZone from '../';
 
 describe( 'useDropZone', () => {
 	const ComponentWithWrapperDropZone = () => {
-		const outerRef = useRef();
+		const [ dropZoneElement, setDropZoneElement ] = useState( null );
 		const dropZoneRef = useDropZone( {
-			dropZoneRef: outerRef,
+			dropZoneElement,
 		} );
 
 		return (
-			<div role="main" ref={ outerRef }>
+			<div role="main" ref={ setDropZoneElement }>
 				<div role="region" ref={ dropZoneRef }>
 					<div>Drop Zone</div>
 				</div>

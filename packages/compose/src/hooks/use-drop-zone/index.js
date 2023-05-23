@@ -33,20 +33,20 @@ function useFreshRef( value ) {
 /**
  * A hook to facilitate drag and drop handling.
  *
- * @param {Object}                                  props               Named parameters.
- * @param {?import('react').RefObject<HTMLElement>} [props.dropZoneRef] Optional ref to be used as the drop zone.
- * @param {boolean}                                 [props.isDisabled]  Whether or not to disable the drop zone.
- * @param {(e: DragEvent) => void}                  [props.onDragStart] Called when dragging has started.
- * @param {(e: DragEvent) => void}                  [props.onDragEnter] Called when the zone is entered.
- * @param {(e: DragEvent) => void}                  [props.onDragOver]  Called when the zone is moved within.
- * @param {(e: DragEvent) => void}                  [props.onDragLeave] Called when the zone is left.
- * @param {(e: MouseEvent) => void}                 [props.onDragEnd]   Called when dragging has ended.
- * @param {(e: DragEvent) => void}                  [props.onDrop]      Called when dropping in the zone.
+ * @param {Object}                  props                   Named parameters.
+ * @param {HTMLElement}             [props.dropZoneElement] Optional element to be used as the drop zone.
+ * @param {boolean}                 [props.isDisabled]      Whether or not to disable the drop zone.
+ * @param {(e: DragEvent) => void}  [props.onDragStart]     Called when dragging has started.
+ * @param {(e: DragEvent) => void}  [props.onDragEnter]     Called when the zone is entered.
+ * @param {(e: DragEvent) => void}  [props.onDragOver]      Called when the zone is moved within.
+ * @param {(e: DragEvent) => void}  [props.onDragLeave]     Called when the zone is left.
+ * @param {(e: MouseEvent) => void} [props.onDragEnd]       Called when dragging has ended.
+ * @param {(e: DragEvent) => void}  [props.onDrop]          Called when dropping in the zone.
  *
  * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
  */
 export default function useDropZone( {
-	dropZoneRef,
+	dropZoneElement,
 	isDisabled,
 	onDrop: _onDrop,
 	onDragStart: _onDragStart,
@@ -71,7 +71,7 @@ export default function useDropZone( {
 			// If a custom dropZoneRef is passed, use that instead of the element.
 			// This allows the dropzone to cover an expanded area, rather than
 			// be restricted to the area of the ref returned by this hook.
-			const element = dropZoneRef?.current ?? elem;
+			const element = dropZoneElement ?? elem;
 
 			let isDragging = false;
 
@@ -235,6 +235,6 @@ export default function useDropZone( {
 				);
 			};
 		},
-		[ isDisabled, dropZoneRef?.current ] // Refresh when the passed in dropZoneRef changes.
+		[ isDisabled, dropZoneElement ] // Refresh when the passed in dropZoneElement changes.
 	);
 }
