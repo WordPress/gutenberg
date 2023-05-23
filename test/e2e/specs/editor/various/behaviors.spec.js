@@ -115,7 +115,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		const options = select.locator( 'option' );
 		await expect( options ).toHaveCount( 2 );
 
-		// We can change the value of the behaviors dropdown to `No behavior`.
+		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
 		await expect( select ).toHaveValue( '' );
 
@@ -154,7 +154,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		const options = select.locator( 'option' );
 		await expect( options ).toHaveCount( 2 );
 
-		// We can change the value of the behaviors dropdown to `No behavior`.
+		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
 		await expect( select ).toHaveValue( '' );
 	} );

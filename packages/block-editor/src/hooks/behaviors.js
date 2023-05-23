@@ -56,13 +56,16 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					<SelectControl
 						__nextHasNoMarginBottom
 						label={ __( 'Behaviors' ) }
-						// At the moment we are only supporting one behavior (lightbox)
-						value={ behaviors?.lightbox ? 'LIGHTBOX' : '' }
+						// At the moment we are only supporting one behavior (Lightbox)
+						value={ behaviors?.lightbox ? 'lightbox' : '' }
 						options={ Object.entries( behaviors )
 							.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out falsey values
 							.map( ( [ behaviorName ] ) => ( {
 								value: behaviorName,
-								label: behaviorName.toUpperCase(),
+								label:
+									// Capitalize the first letter of the behavior name.
+									behaviorName[ 0 ].toUpperCase() +
+									behaviorName.slice( 1 ).toLowerCase(),
 							} ) )
 							.concat( {
 								value: '',
