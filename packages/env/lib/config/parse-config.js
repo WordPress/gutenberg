@@ -14,7 +14,6 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
-	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -337,26 +336,28 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
+	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
-		parsedConfig.lifecycleScripts = {};
-
-		for ( const key in rawConfig.lifecycleScripts ) {
-			if ( rawConfig.lifecycleScripts[ key ] !== null ) {
-				checkString(
-					configFile,
-					key,
-					rawConfig.lifecycleScripts[ key ]
-				);
-			}
-			parsedConfig.lifecycleScripts[ key ] =
-				rawConfig.lifecycleScripts[ key ];
-		}
+		checkObjectWithValues(
+			configFile,
+			'lifecycleScripts',
+			rawConfig.lifecycleScripts,
+			[ 'null', 'string' ],
+			true
+		);
+		parsedConfig.lifecycleScripts = rawConfig.lifecycleScripts;
 	}
 
 	// Parse the environment-specific configs so they're accessible to the root.
 	parsedConfig.env = {};
 	if ( rawConfig.env ) {
-		checkObjectWithValues( configFile, 'env', rawConfig.env, [ 'object' ] );
+		checkObjectWithValues(
+			configFile,
+			'env',
+			rawConfig.env,
+			[ 'object' ],
+			false
+		);
 		for ( const env in rawConfig.env ) {
 			parsedConfig.env[ env ] = await parseEnvironmentConfig(
 				configFile,
@@ -477,7 +478,8 @@ async function parseEnvironmentConfig(
 			configFile,
 			`${ environmentPrefix }config`,
 			config.config,
-			[ 'string', 'number', 'boolean', 'empty' ]
+			[ 'string', 'number', 'boolean' ],
+			true
 		);
 		parsedConfig.config = config.config;
 
@@ -502,7 +504,8 @@ async function parseEnvironmentConfig(
 			configFile,
 			`${ environmentPrefix }mappings`,
 			config.mappings,
-			[ 'string' ]
+			[ 'string' ],
+			false
 		);
 		parsedConfig.mappings = Object.entries( config.mappings ).reduce(
 			( result, [ wpDir, localDir ] ) => {
