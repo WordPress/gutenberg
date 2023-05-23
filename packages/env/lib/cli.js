@@ -45,7 +45,7 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof env.ValidationError ||
-					error instanceof env.AfterSetupError
+					error instanceof env.LifecycleScriptError
 				) {
 					// Error is a configuration error. That means the user did something wrong.
 					spinner.fail( error.message );
@@ -233,7 +233,13 @@ module.exports = function cli() {
 		wpRed(
 			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
-		() => {},
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
 		withSpinner( env.destroy )
 	);
 	yargs.command(

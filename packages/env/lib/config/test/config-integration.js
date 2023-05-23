@@ -48,7 +48,7 @@ describe( 'Config Integration', () => {
 		delete process.env.WP_ENV_HOME;
 		delete process.env.WP_ENV_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
-		delete process.env.WP_ENV_AFTER_SETUP;
+		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
 	it( 'should use default configuration', async () => {
@@ -69,7 +69,11 @@ describe( 'Config Integration', () => {
 				return JSON.stringify( {
 					core: 'WordPress/WordPress#trunk',
 					port: 123,
-					afterSetup: 'test',
+					lifecycleScripts: {
+						afterStart: 'test',
+						afterClean: null,
+						afterDestroy: null,
+					},
 				} );
 			}
 
@@ -90,12 +94,22 @@ describe( 'Config Integration', () => {
 					core: 'WordPress/WordPress#trunk',
 					port: 123,
 					testsPort: 456,
+					lifecycleScripts: {
+						afterStart: 'test',
+						afterClean: null,
+						afterDestroy: null,
+					},
 				} );
 			}
 
 			if ( fileName === '/test/gutenberg/.wp-env.override.json' ) {
 				return JSON.stringify( {
 					port: 999,
+					lifecycleScripts: {
+						afterStart: null,
+						afterClean: null,
+						afterDestroy: 'test',
+					},
 				} );
 			}
 
@@ -112,7 +126,7 @@ describe( 'Config Integration', () => {
 	it( 'should use environment variables over local and override configuration files', async () => {
 		process.env.WP_ENV_PORT = 12345;
 		process.env.WP_ENV_TESTS_PORT = 61234;
-		process.env.WP_ENV_AFTER_SETUP = 'test';
+		process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START = 'test';
 
 		readFile.mockImplementation( async ( fileName ) => {
 			if ( fileName === '/test/gutenberg/.wp-env.json' ) {
@@ -120,7 +134,11 @@ describe( 'Config Integration', () => {
 					core: 'WordPress/WordPress#trunk',
 					port: 123,
 					testsPort: 456,
-					afterSetup: 'local',
+					lifecycleScripts: {
+						afterStart: 'local',
+						afterClean: null,
+						afterDestroy: null,
+					},
 				} );
 			}
 
@@ -137,6 +155,10 @@ describe( 'Config Integration', () => {
 
 		expect( config.env.development.port ).toEqual( 12345 );
 		expect( config.env.tests.port ).toEqual( 61234 );
+		expect( config.lifecycleScripts ).toHaveProperty(
+			'afterStart',
+			'test'
+		);
 		expect( config ).toMatchSnapshot();
 	} );
 } );
