@@ -39,13 +39,20 @@ import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useBlockEditingMode } = unlock(
+	blockEditorPrivateApis
+);
 
 const LAYOUT = {
 	type: 'default',
 	// At the root level of the site editor, no alignments should be allowed.
 	alignments: [],
 };
+
+function SetRootBlockEditingMode( { mode } ) {
+	useBlockEditingMode( mode );
+	return null;
+}
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
@@ -162,6 +169,7 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			<SetRootBlockEditingMode mode="disabled" />
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
