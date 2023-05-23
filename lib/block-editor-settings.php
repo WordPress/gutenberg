@@ -6,7 +6,7 @@
  */
 
 /**
- * Replaces core 'styles', '__experimentalFeatures' and 'behaviors' block editor settings from
+ * Replaces core 'styles' and '__experimentalFeatures' block editor settings from
  * wordpress-develop/block-editor.php with the Gutenberg versions. Much of the
  * code is copied from get_block_editor_settings() in that file.
  *
