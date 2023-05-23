@@ -82,9 +82,12 @@
 			"attribute": "target"
 		},
 		"behaviors": {
-			"type": "object"
+			"type": "object",
+			"default": {
+				"lightbox": true
+			}
 		},
-		"enableLightbox": {
+		"lightbox": {
 			"type": "boolean",
 			"default": false
 		}

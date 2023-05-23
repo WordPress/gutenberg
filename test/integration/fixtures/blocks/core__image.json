@@ -6,7 +6,10 @@
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
-			"enableLightbox": false
+			"behaviors": {
+				"lightbox": true
+			},
+			"lightbox": false
 		},
 		"innerBlocks": []
 	}

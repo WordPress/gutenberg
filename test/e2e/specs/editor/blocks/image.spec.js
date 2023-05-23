@@ -789,26 +789,22 @@ test.describe( 'Image - interactivity', () => {
 		await page.waitForLoadState();
 	} );
 
-	test( 'should toggle "enable lightbox" in saved attributes', async ( {
+	test( 'should toggle "lightbox" in saved attributes', async ( {
 		editor,
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page
-			.getByRole( 'checkbox', { name: 'Lightbox' } )
-			.setChecked( true );
+		await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
 		const testForTrue = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","enableLightbox":true} -->
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
 		expect( await editor.getEditedPostContent() ).toMatch( testForTrue );
 
-		await page
-			.getByRole( 'checkbox', { name: 'Lightbox' } )
-			.setChecked( false );
+		await page.getByLabel( 'Behaviors' ).selectOption( '' );
 		const testForFalse = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":false}}} -->
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
@@ -820,9 +816,7 @@ test.describe( 'Image - interactivity', () => {
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page
-			.getByRole( 'checkbox', { name: 'Lightbox' } )
-			.setChecked( true );
+		await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
 
 		postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
@@ -854,9 +848,7 @@ test.describe( 'Image - interactivity', () => {
 
 		test.beforeEach( async ( { page, editor } ) => {
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			await page
-				.getByRole( 'checkbox', { name: 'Lightbox' } )
-				.setChecked( true );
+			await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
 
 			postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );

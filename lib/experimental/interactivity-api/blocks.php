@@ -238,7 +238,7 @@ add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add
  */
 function gutenberg_block_update_interactive_view_script( $metadata ) {
 	if (
-		in_array( $metadata['name'], array( 'core/file', 'core/navigation' ), true ) &&
+		in_array( $metadata['name'], array( 'core/file', 'core/navigation', 'core/image' ), true ) &&
 		str_contains( $metadata['file'], 'build/block-library/blocks' )
 	) {
 		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );

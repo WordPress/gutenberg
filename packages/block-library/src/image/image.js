@@ -10,8 +10,6 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
-	ToggleControl,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -93,7 +91,6 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-		enableLightbox,
 	} = attributes;
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
@@ -455,24 +452,6 @@ export default function Image( {
 							</ExternalLink>
 						</>
 					}
-				/>
-				<Heading
-					style={ {
-						textTransform: 'uppercase',
-						fontWeight: '500',
-						fontSize: '11px',
-					} }
-				>
-					Behaviors
-				</Heading>
-				<ToggleControl
-					label="Lightbox"
-					checked={ enableLightbox }
-					onChange={ () => {
-						setAttributes( {
-							enableLightbox: ! enableLightbox,
-						} );
-					} }
 				/>
 			</InspectorControls>
 		</>

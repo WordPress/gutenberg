@@ -25,7 +25,10 @@
 					"id": 705,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -40,7 +43,10 @@
 					"id": 704,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -55,7 +61,10 @@
 					"id": 703,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			}
@@ -87,7 +96,10 @@
 					"id": 705,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -102,7 +114,10 @@
 					"id": 704,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -117,7 +132,10 @@
 					"id": 703,
 					"sizeSlug": "large",
 					"linkDestination": "media",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			}

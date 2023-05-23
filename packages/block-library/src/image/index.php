@@ -31,7 +31,7 @@ function render_block_core_image( $attributes, $content ) {
 	}
 
 	$link_destination = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
-	$enable_lightbox  = isset( $attributes['enableLightbox'] ) ? $attributes['enableLightbox'] : false;
+	$enable_lightbox  = isset( $attributes['behaviors']['lightbox'] ) ? $attributes['behaviors']['lightbox'] : false;
 
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) && 'none' === $link_destination && $enable_lightbox ) {
 

@@ -25,7 +25,10 @@
 					"id": 1421,
 					"sizeSlug": "large",
 					"linkDestination": "none",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			},
@@ -39,7 +42,10 @@
 					"id": 1440,
 					"sizeSlug": "large",
 					"linkDestination": "none",
-					"enableLightbox": false
+					"behaviors": {
+						"lightbox": true
+					},
+					"lightbox": false
 				},
 				"innerBlocks": []
 			}
