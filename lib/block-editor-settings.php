@@ -146,8 +146,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 
-	// Add the behaviors from the theme.json to the block editor settings.
-	// Behaviors are specific, named pieces of interactivity that can be applied to blocks.
+	// Add theme.json behaviors.
 	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
 	if ( array_key_exists( 'behaviors', $theme_data ) ) {
 		$settings['behaviors'] = $theme_data['behaviors'];
