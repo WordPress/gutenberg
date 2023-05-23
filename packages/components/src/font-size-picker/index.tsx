@@ -14,7 +14,6 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
 import {
@@ -24,12 +23,13 @@ import {
 } from '../unit-control';
 import { VisuallyHidden } from '../visually-hidden';
 import { getCommonSizeUnit } from './utils';
-import { HStack } from '../h-stack';
 import type { FontSizePickerProps } from './types';
 import {
 	Container,
+	Header,
 	HeaderHint,
 	HeaderLabel,
+	HeaderToggle,
 	Controls,
 	ResetButton,
 } from './styles';
@@ -127,7 +127,7 @@ const UnforwardedFontSizePicker = (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<Spacer>
-				<HStack className="components-font-size-picker__header">
+				<Header className="components-font-size-picker__header">
 					<HeaderLabel
 						aria-label={ `${ __( 'Size' ) } ${ headerHint || '' }` }
 					>
@@ -139,7 +139,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					</HeaderLabel>
 					{ ! disableCustomFontSizes && (
-						<Button
+						<HeaderToggle
 							label={
 								showCustomValueControl
 									? __( 'Use size preset' )
@@ -155,7 +155,7 @@ const UnforwardedFontSizePicker = (
 							isSmall
 						/>
 					) }
-				</HStack>
+				</Header>
 			</Spacer>
 			<Controls
 				className="components-font-size-picker__controls"
