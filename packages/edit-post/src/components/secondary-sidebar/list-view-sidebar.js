@@ -25,7 +25,9 @@ import ListViewOutline from './list-view-outline';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
+	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	// The next 2 hooks handle focus for when the sidebar closes and returning focus to the element that had focus before sidebar opened.
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
@@ -43,6 +45,7 @@ export default function ListViewSidebar() {
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
 
+	// Must merge the refs together so focus can be handled properly in the next function.
 	const listViewContainerRef = useMergeRefs( [
 		contentFocusReturnRef,
 		focusOnMountRef,
@@ -88,6 +91,11 @@ export default function ListViewSidebar() {
 		}
 	} );
 
+	/**
+	 *
+	 * @param {string} tabName The name of the tab to render.
+	 *
+	 */
 	function renderTabContent( tabName ) {
 		if ( tabName === 'list-view' ) {
 			return (
