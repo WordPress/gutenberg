@@ -49,7 +49,8 @@ export default () => {
 			}, [ context, inheritedValue ] );
 
 			return <Provider value={ value }>{ children }</Provider>;
-		}
+		},
+		{ priority: 5 }
 	);
 
 	// data-wp-effect.[name]
