@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useEntityRecord } from '@wordpress/core-data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import {
+	__experimentalUseNavigator as useNavigator,
+	Spinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -43,8 +46,12 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper
-				description={ __( 'Loading Navigation Menu.' ) }
-			/>
+				description={ __(
+					'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+				) }
+			>
+				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+			</SidebarNavigationScreenWrapper>
 		);
 	}
 

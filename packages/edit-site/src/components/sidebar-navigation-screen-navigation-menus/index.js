@@ -5,7 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 
 import { decodeEntities } from '@wordpress/html-entities';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	Spinner,
+} from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
 
 /**
@@ -31,9 +34,9 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	if ( isLoading ) {
 		return (
-			<SidebarNavigationScreenWrapper
-				description={ __( 'Loading Navigation Menus.' ) }
-			/>
+			<SidebarNavigationScreenWrapper>
+				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+			</SidebarNavigationScreenWrapper>
 		);
 	}
 
