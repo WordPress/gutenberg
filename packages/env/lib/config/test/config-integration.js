@@ -103,7 +103,7 @@ describe( 'Config Integration', () => {
 					port: 999,
 					lifecycleScripts: {
 						afterStart: null,
-						afterEnd: 'test',
+						afterDestroy: 'test',
 					},
 				} );
 			}

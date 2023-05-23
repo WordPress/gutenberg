@@ -26,7 +26,7 @@ describe( 'mergeConfigs', () => {
 					WP_TEST_2: 'test-2',
 				},
 				lifecycleScripts: {
-					afterEnd: 'test-2',
+					afterDestroy: 'test-2',
 				},
 			}
 		);
@@ -43,7 +43,7 @@ describe( 'mergeConfigs', () => {
 			},
 			lifecycleScripts: {
 				afterStart: 'test',
-				afterEnd: 'test-2',
+				afterDestroy: 'test-2',
 			},
 		} );
 	} );

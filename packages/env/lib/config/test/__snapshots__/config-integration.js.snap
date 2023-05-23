@@ -62,7 +62,7 @@ exports[`Config Integration should load local and override configuration files 1
     },
   },
   "lifecycleScripts": {
-    "afterEnd": "test",
+    "afterDestroy": "test",
     "afterStart": null,
   },
   "name": "gutenberg",
