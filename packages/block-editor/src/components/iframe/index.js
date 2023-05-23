@@ -82,7 +82,16 @@ function useParsedAssets( html ) {
 	return useMemo( () => {
 		const doc = document.implementation.createHTMLDocument( '' );
 		doc.body.innerHTML = html;
-		return Array.from( doc.body.children );
+		return Array.from( doc.body.children ).map(
+			( { tagName, href, id, rel, media, textContent } ) => ( {
+				tagName,
+				href,
+				id,
+				rel,
+				media,
+				textContent,
+			} )
+		);
 	}, [ html ] );
 }
 
