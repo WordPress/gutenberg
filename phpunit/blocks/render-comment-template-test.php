@@ -78,11 +78,19 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 	}
 
 	public function test_rendering_comment_template_sets_comment_id_context() {
-		$render_block_callback    = new MockAction();
-		add_filter( 'render_block', array( $render_block_callback, 'filter' ), 10, 3 );
+		$render_block_callback = static function( $block_content, $block ) {
+			if ( 'core/comment-content' !== $block['blockName'] ) {
+				return $block_content;
+			}
+			$inserted_block_markup = '<!-- wp:comment-author-name /-->';
+			$inserted_blocks       = parse_blocks( $inserted_block_markup );
+			$inserted_content      = render_block( $inserted_blocks[0] );
+			return $inserted_content . $block_content;
+		};
 
+		add_filter( 'render_block', $render_block_callback, 10, 3 );
 		$parsed_blocks = parse_blocks(
-			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- /wp:comment-template -->'
+			'<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
 		$block = new WP_Block(
 			$parsed_blocks[0],
@@ -90,17 +98,12 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 				'postId' => self::$custom_post->ID,
 			)
 		);
-		$block->render();
+		$markup = $block->render();
+		remove_filter( 'render_block', $render_block_callback );
 
-		$this->assertSame( 3, $render_block_callback->get_call_count() );
-
-		$args = $render_block_callback->get_args();
-
-		$this->assertSame( 'core/comment-author-name', $args[0][2]->name );
-		$this->assertArrayHasKey( 'commentId', $args[0][2]->context );
-		$this->assertSame( strval( self::$comment_ids[0] ), $args[0][2]->context['commentId'] );
-
-		$this->assertSame( 'core/comment-template', $args[1][2]->name );
-		$this->assertSame( 'core/comment-template', $args[2][2]->name );
+		$this->assertSame(
+			str_replace( array( "\n", "\t" ), '', '<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
+			str_replace( array( "\n", "\t" ), '', $markup )
+		);
 	}
 }
