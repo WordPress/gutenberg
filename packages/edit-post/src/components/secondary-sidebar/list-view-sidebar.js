@@ -106,17 +106,15 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<div
+			<Button
 				className="edit-post-editor__document-overview-panel__close-button"
 				ref={ headerFocusReturnRef }
-			>
-				<Button
-					icon={ closeSmall }
-					label={ __( 'Close' ) }
-					onClick={ () => setIsListViewOpened( false ) }
-				/>
-			</div>
+				icon={ closeSmall }
+				label={ __( 'Close' ) }
+				onClick={ () => setIsListViewOpened( false ) }
+			/>
 			<TabPanel
+				className="edit-post-editor__document-overview-panel__tab-panel"
 				ref={ tabPanelRef }
 				selectOnMove={ false }
 				tabs={ [
