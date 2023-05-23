@@ -202,9 +202,14 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 		$in_iframed_editor = true === $handles;
 		$in_site_editor    = $in_iframed_editor && 'site-editor.php' === $pagenow;
 
-		if ( $in_iframed_editor ) {
+		// Automatically enqueue all user-selected fonts.
+		if ( empty( $handles ) || $in_iframed_editor ) {
+			WP_Fonts_Resolver::enqueue_user_selected_fonts();
 			$handles = false;
+		}
 
+		// Set up for the iframed editor.
+		if ( $in_iframed_editor ) {
 			// When in an iframed editor, reset "done".
 			$done           = $wp_fonts->done;
 			$wp_fonts->done = array();
@@ -214,12 +219,6 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 				$queue           = $wp_fonts->queue;
 				$wp_fonts->queue = $registered;
 			}
-		}
-
-		// Automatically enqueue all user-selected fonts.
-		if ( empty( $handles ) || ( $in_iframed_editor && ! $in_site_editor ) ) {
-			WP_Fonts_Resolver::enqueue_user_selected_fonts();
-			$handles = false;
 		}
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
