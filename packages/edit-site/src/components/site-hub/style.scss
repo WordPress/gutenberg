@@ -19,7 +19,7 @@
 .edit-site-site-hub__text-content {
 	// Necessary for the ellipsis to work.
 	overflow: hidden;
-	.components-external-link {
+	.edit-site-site-hub__site-view-link {
 		flex-grow: 0;
 		@include break-mobile() {
 			opacity: 0;
@@ -29,14 +29,12 @@
 			outline: none;
 			box-shadow: none;
 		}
-		.components-external-link__icon {
+		svg {
 			fill: $white;
-			height: initial;
-			width: initial;
 		}
 	}
 	&:hover {
-		.components-external-link {
+		.edit-site-site-hub__site-view-link {
 			display: inline-block;
 			opacity: 1;
 		}

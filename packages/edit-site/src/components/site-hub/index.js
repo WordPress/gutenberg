@@ -12,8 +12,6 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__experimentalHStack as HStack,
-	ExternalLink,
-	Tooltip,
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -21,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
-import { search } from '@wordpress/icons';
+import { search, external } from '@wordpress/icons';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 
 /**
@@ -156,9 +154,13 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							{ decodeEntities( siteTitle ) }
 						</motion.div>
 					</AnimatePresence>
-					<Tooltip text={ __( 'View site' ) }>
-						<ExternalLink href={ homeUrl } />
-					</Tooltip>
+					<Button
+						href={ homeUrl }
+						target="_blank"
+						label={ __( 'View site' ) }
+						icon={ external }
+						className="edit-site-site-hub__site-view-link"
+					/>
 				</HStack>
 				{ window?.__experimentalEnableCommandCenter &&
 					canvasMode === 'view' && (
