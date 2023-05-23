@@ -889,3 +889,11 @@ export const getRevision =
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};
+
+export const getNavigationMenuBySlug =
+	( slug ) =>
+	async ( { resolveSelect } ) => {
+		await resolveSelect.getEntityRecords( 'postType', 'wp_navigation', {
+			slug,
+		} );
+	};

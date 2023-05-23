@@ -1492,3 +1492,25 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Returns a Navigation Menu object by slug.
+ *
+ * @param state
+ * @param slug  the slug of the Navigation Menu.
+ * @return The Navigation Menu object.
+ */
+export function getNavigationMenuBySlug(
+	state: State,
+	slug: string
+): Object | null {
+	const records = getEntityRecords( state, 'postType', 'wp_navigation', {
+		slug,
+	} );
+
+	if ( ! records?.length ) {
+		return null;
+	}
+
+	return records[ 0 ];
+}
