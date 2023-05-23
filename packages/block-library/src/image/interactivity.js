@@ -3,10 +3,6 @@
  */
 import { store } from '../utils/interactivity';
 
-const raf = window.requestAnimationFrame;
-// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
-
 const focusableSelectors = [
 	'a[href]',
 	'area[href]',
@@ -133,9 +129,6 @@ store( {
 						focusableElements[ focusableElements.length - 1 ];
 
 					if ( context.core.image.lightboxEnabled ) {
-						// We need to wait until the DOM is able
-						// to receive focus updates for accessibility
-						await tick();
 						ref.querySelector( '.close-button' ).focus();
 					}
 				},

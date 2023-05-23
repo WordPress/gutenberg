@@ -227,6 +227,7 @@
 		}
 
 		&.active {
+			visibility: visible;
 			animation: both turn-on-visibility 250ms;
 
 			img {
@@ -239,15 +240,9 @@
 @keyframes turn-on-visibility {
 	0% {
 		opacity: 0;
-		visibility: hidden;
-	}
-	1% {
-		opacity: 0;
-		visibility: visible;
 	}
 	100% {
 		opacity: 1;
-		visibility: visible;
 	}
 }
 
