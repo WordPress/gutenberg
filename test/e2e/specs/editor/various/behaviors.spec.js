@@ -27,7 +27,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'By default, thel Lightbox behavior should be false as defined in the core theme.json', async ( {
+	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -47,13 +47,13 @@ test.describe( 'Testing behaviors functionality', () => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 		const select = page.getByLabel( 'Behavior' );
 
-		// By default, no behaviors should be available.
+		// By default, no behaviors should be selected.
 		await expect( select ).toHaveCount( 1 );
 		await expect( select ).toHaveValue( '' );
 
-		// By default, you cannot select any behaviors.
+		// By default, you should be able to select the Lightbox behavior.
 		const options = select.locator( 'option' );
-		await expect( options ).toHaveCount( 1 );
+		await expect( options ).toHaveCount( 2 );
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
@@ -62,8 +62,8 @@ test.describe( 'Testing behaviors functionality', () => {
 		requestUtils,
 		page,
 	} ) => {
-		// { "lightbox": true } is the default behavior, so we activate the
-		// `behaviors` theme where it is disabled by default. Change if we change
+		// { "lightbox": true } is the default behavior setting, so we activate the
+		// `behaviors-ui-disabled` theme where it is disabled by default. Change if we change
 		// the default value in the core theme.json file.
 		await requestUtils.activateTheme( 'behaviors-ui-disabled' );
 		const media = await createMedia( { admin, requestUtils } );

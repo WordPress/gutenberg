@@ -405,7 +405,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
-		'behaviorsUIEnabled'            => null,
+		'behaviors'                     => null,
 	);
 
 	/**

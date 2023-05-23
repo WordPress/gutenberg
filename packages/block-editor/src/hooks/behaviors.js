@@ -30,12 +30,14 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 			return <BlockEdit { ...props } />;
 		}
 
-		// Check the value of `settings.blocks.core/image.behaviorsUIEnabled` in the
-		// theme.json. If false, do not add the behaviors inspector control.
-		const settings = select( blockEditorStore ).getSettings();
+		const settings =
+			select( blockEditorStore ).getSettings()?.__experimentalFeatures
+				?.blocks?.[ props.name ]?.behaviors;
+
 		if (
-			! settings?.__experimentalFeatures?.blocks?.[ props.name ]
-				?.behaviorsUIEnabled
+			! settings ||
+			// If every behavior is disabled, do not show the behaviors inspector control.
+			Object.entries( settings ).every( ( [ , value ] ) => ! value )
 		) {
 			return <BlockEdit { ...props } />;
 		}
@@ -58,8 +60,8 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 						label={ __( 'Behaviors' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
 						value={ behaviors?.lightbox ? 'lightbox' : '' }
-						options={ Object.entries( behaviors )
-							.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out falsey values
+						options={ Object.entries( settings )
+							.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out behaviors that are disabled.
 							.map( ( [ behaviorName ] ) => ( {
 								value: behaviorName,
 								label:

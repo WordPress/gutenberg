@@ -3,7 +3,9 @@
 	"settings": {
 		"blocks": {
 			"core/image": {
-				"behaviorsUIEnabled": false
+				"behaviors": {
+					"lightbox": false
+				}
 			}
 		}
 	}
