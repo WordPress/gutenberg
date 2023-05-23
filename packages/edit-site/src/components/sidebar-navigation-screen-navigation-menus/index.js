@@ -19,8 +19,11 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 import { useLink } from '../routes/link';
 
-const NAVIGATION_MENUS_QUERY = {
-	per_page: -1,
+// This requested is preloaded in `gutenberg_preload_navigation_posts`.
+// As unbounded queries are limited to 100 by `fetchAllMiddleware`
+// on apiFetch this query is limited to 100.
+const PRELOADED_NAVIGATION_MENUS_QUERY = {
+	per_page: 100,
 	status: 'publish',
 	order: 'desc',
 	orderby: 'date',
@@ -28,7 +31,11 @@ const NAVIGATION_MENUS_QUERY = {
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
-		useEntityRecords( 'postType', `wp_navigation`, NAVIGATION_MENUS_QUERY );
+		useEntityRecords(
+			'postType',
+			`wp_navigation`,
+			PRELOADED_NAVIGATION_MENUS_QUERY
+		);
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 

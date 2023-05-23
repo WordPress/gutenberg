@@ -43,15 +43,15 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 		'GET',
 	);
 
-	// Preload request for Browse Mode sidebar "Navigation" section.
+	// Preload request for all menus in Browse Mode sidebar "Navigation" section.
 	$preload_paths[] = array(
 		add_query_arg(
 			array(
 				'context'  => 'edit',
-				'per_page' => 1,
-				'status'   => 'publish',
+				'per_page' => 100,
 				'order'    => 'desc',
 				'orderby'  => 'date',
+				'status'   => 'publish',
 			),
 			$navigation_rest_route
 		),
