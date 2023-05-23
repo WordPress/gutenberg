@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
+import { createURL, logout } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { saveResultsFile } from './utils';
+import { wpCLI, saveResultsFile } from './utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
@@ -16,12 +16,16 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentyone' );
+		wpCLI(
+			// See https://github.com/WordPress/gutenberg/pull/47037/files#r1087561588
+			'theme install twentytwentyone --version=1.7 --force --activate'
+		);
 		await logout();
 	} );
 
 	afterAll( async () => {
 		saveResultsFile( __filename, results );
+		wpCLI( 'theme update twentytwentyone' );
 	} );
 
 	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {

@@ -2,7 +2,20 @@
  * External dependencies
  */
 import path from 'path';
+import { execSync } from 'child_process';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+
+export function wpCLI( command ) {
+	const wpEnvPath = process.env.WP_ENV_PATH || './node_modules/.bin/wp-env';
+
+	if ( ! existsSync( wpEnvPath ) ) {
+		throw new Error( "Couldn't find wp-env instance." );
+	}
+
+	execSync( `${ wpEnvPath } run cli 'wp ${ command }'`, {
+		stdio: 'inherit',
+	} );
+}
 
 export function readFile( filePath ) {
 	return existsSync( filePath )

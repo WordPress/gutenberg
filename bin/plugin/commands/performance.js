@@ -337,8 +337,6 @@ async function runPerformanceTests( branches, options ) {
 							performanceTestDirectory,
 							'test/emptytheme'
 						),
-						'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
-						'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 					],
 					env: {
 						tests: {
@@ -420,6 +418,9 @@ async function runPerformanceTests( branches, options ) {
 		performanceTestDirectory,
 		'node_modules/.bin/wp-env'
 	);
+
+	// Expose the path so we can e.g. use the WP CLI in the tests.
+	process.env.WP_ENV_PATH = wpEnvPath;
 
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
