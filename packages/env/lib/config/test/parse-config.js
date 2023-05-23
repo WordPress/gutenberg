@@ -40,6 +40,7 @@ const DEFAULT_CONFIG = {
 	pluginSources: [],
 	themeSources: [],
 	config: {
+		FS_METHOD: 'direct',
 		WP_DEBUG: true,
 		SCRIPT_DEBUG: true,
 		WP_ENVIRONMENT_TYPE: 'local',
