@@ -148,7 +148,7 @@ export function hasResolvingSelectors( state ) {
 		 *
 		 * @see https://github.com/aduth/equivalent-key-map
 		 */
-		[ ...selectorState._map.values() ].some(
+		Array.from( selectorState._map ).some(
 			( resolution ) => resolution[ 1 ]?.status === 'resolving'
 		)
 	);
