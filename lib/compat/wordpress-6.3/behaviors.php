@@ -2,6 +2,8 @@
 /**
  * Behaviors.
  *
+ * Updates the block editor settings with the theme's behaviors.
+ *
  * @package gutenberg
  */
 
@@ -12,7 +14,6 @@ add_filter(
 		if ( array_key_exists( 'behaviors', $theme_data ) ) {
 			$settings['behaviors'] = $theme_data['behaviors'];
 		}
-		// TODO: Make sure to also get the value from the core theme.json file.
 		return $settings;
 	},
 	PHP_INT_MAX
