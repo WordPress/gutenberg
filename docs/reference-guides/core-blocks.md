@@ -98,7 +98,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 A single column within a columns block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/column))
 
 -	**Name:** core/column
--	**Category:** text
+-	**Category:** design
 -	**Parent:** core/columns
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
