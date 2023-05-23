@@ -1,16 +1,9 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page } ) );
-	},
 	userGlobalStylesRevisions: async ( { page, requestUtils }, use ) => {
 		await use( new UserGlobalStylesRevisions( { page, requestUtils } ) );
 	},
@@ -29,10 +22,9 @@ test.describe( 'Global styles revisions', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
-		await admin.visitSiteEditor( {
-			canvas: 'edit',
-		} );
+	test.beforeEach( async ( { admin, editor } ) => {
+		await admin.visitSiteEditor();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
