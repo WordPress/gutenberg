@@ -3,7 +3,10 @@
  */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -19,6 +22,18 @@ const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 function getWrappingPopoverElement( element: HTMLElement ) {
 	return element.closest( '.components-popover' );
 }
+
+const UnmockedColorPalette = () => {
+	const [ color, setColor ] = useState< string | undefined >( undefined );
+
+	return (
+		<ColorPalette
+			value={ color }
+			colors={ EXAMPLE_COLORS }
+			onChange={ ( newColor ) => setColor( newColor ) }
+		/>
+	);
+};
 
 describe( 'ColorPalette', () => {
 	it( 'should render a dynamic toolbar of colors', () => {
@@ -142,6 +157,12 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
+		// Check that custom color popover is not visible by default.
+		expect(
+			screen.queryByLabelText( 'Hex color' )
+		).not.toBeInTheDocument();
+
+		// Click the dropdown button while the dropdown is not expanded.
 		await user.click(
 			screen.getByRole( 'button', {
 				name: /^Custom color picker/,
@@ -149,16 +170,12 @@ describe( 'ColorPalette', () => {
 			} )
 		);
 
+		// Confirm the dropdown is now expanded, and the button is still visible.
 		const dropdownButton = screen.getByRole( 'button', {
 			name: /^Custom color picker/,
 			expanded: true,
 		} );
-
 		expect( dropdownButton ).toBeVisible();
-
-		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
-
-		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
 
 		// Check that the popover with custom color input has appeared.
 		const dropdownColorInput = screen.getByLabelText( 'Hex color' );
@@ -194,5 +211,42 @@ describe( 'ColorPalette', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'should display the selected color name and value', async () => {
+		const user = userEvent.setup();
+
+		const { container } = render( <UnmockedColorPalette /> );
+
+		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+		expect(
+			// Relying on implementation details here, but it's the only way I could come up with.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			container.querySelector(
+				'.components-color-palette__custom-color-value'
+			)
+		).toHaveTextContent( '' );
+
+		// Click the first unpressed button
+		await user.click(
+			screen.getAllByRole( 'button', {
+				name: /^Color:/,
+				pressed: false,
+			} )[ 0 ]
+		);
+
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
+
+		// Clear the color, confirm that name and value are correctly updated
+		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+		expect(
+			// Relying on implementation details here, but it's the only way I could come up with.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			container.querySelector(
+				'.components-color-palette__custom-color-value'
+			)
+		).toHaveTextContent( '' );
 	} );
 } );
