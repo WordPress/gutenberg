@@ -104,10 +104,8 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/navigation-fallback.php';
-if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
-	require __DIR__ . '/experimental/interactivity-api/script-loader.php';
-	require __DIR__ . '/experimental/interactivity-api/blocks.php';
-}
+require __DIR__ . '/experimental/interactivity-api/script-loader.php';
+require __DIR__ . '/experimental/interactivity-api/blocks.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
