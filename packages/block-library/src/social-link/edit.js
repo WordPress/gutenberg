@@ -6,13 +6,18 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useRefEffect } from '@wordpress/compose';
+import { DELETE } from '@wordpress/keycodes';
+import { useDispatch } from '@wordpress/data';
+
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -27,11 +32,35 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import { getIconBySite, getNameBySite } from './social-list';
 
+function useOnDelete( props ) {
+	const { removeBlock } = useDispatch( blockEditorStore );
+	const propsRef = useRef( props );
+	propsRef.current = props;
+	return useRefEffect( ( element ) => {
+		function onKeyDown( event ) {
+			const { url, clientId } = propsRef.current;
+			if (
+				!! url ||
+				event.defaultPrevented ||
+				event.keyCode !== DELETE
+			) {
+				return;
+			}
+			removeBlock( clientId );
+		}
+		element.addEventListener( 'keydown', onKeyDown );
+		return () => {
+			element.removeEventListener( 'keydown', onKeyDown );
+		};
+	}, [] );
+}
+
 const SocialLinkURLPopover = ( {
 	url,
 	setAttributes,
 	setPopover,
 	popoverAnchor,
+	clientId,
 } ) => (
 	<URLPopover anchor={ popoverAnchor } onClose={ () => setPopover( false ) }>
 		<form
@@ -40,6 +69,7 @@ const SocialLinkURLPopover = ( {
 				event.preventDefault();
 				setPopover( false );
 			} }
+			ref={ useOnDelete( { url, clientId } ) }
 		>
 			<div className="block-editor-url-input">
 				<URLInput
@@ -66,6 +96,7 @@ const SocialLinkEdit = ( {
 	context,
 	isSelected,
 	setAttributes,
+	clientId,
 } ) => {
 	const { url, service, label, rel } = attributes;
 	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
@@ -143,6 +174,7 @@ const SocialLinkEdit = ( {
 							setAttributes={ setAttributes }
 							setPopover={ setPopover }
 							popoverAnchor={ popoverAnchor }
+							clientId={ clientId }
 						/>
 					) }
 				</Button>
