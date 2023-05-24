@@ -38,11 +38,12 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
-import usePageContentLockNotifications from '../use-page-content-lock-notifications';
+import {
+	PageContentLock,
+	usePageContentLockNotifications,
+} from '../page-content-lock';
 
-const { ExperimentalBlockEditorProvider, useBlockEditingMode } = unlock(
-	blockEditorPrivateApis
-);
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const LAYOUT = {
 	type: 'default',
@@ -171,9 +172,7 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			{ hasPageContentLock && (
-				<SetRootBlockEditingMode mode="disabled" />
-			) }
+			{ hasPageContentLock && <PageContentLock /> }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
@@ -226,9 +225,4 @@ export default function BlockEditor() {
 			<ReusableBlocksMenuItems />
 		</ExperimentalBlockEditorProvider>
 	);
-}
-
-function SetRootBlockEditingMode( { mode } ) {
-	useBlockEditingMode( mode );
-	return null;
 }

@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, __experimentalGetBlockLabel } from '@wordpress/blocks';
 import { store as blockEditorStore, BlockIcon } from '@wordpress/block-editor';
 
 // TODO: This overlaps a lot with BlockInspectorLockedBlocks in
@@ -18,6 +18,7 @@ export default function ContentBlocksList() {
 		const {
 			getClientIdsWithDescendants,
 			getBlockName,
+			getBlock,
 			isBlockSelected,
 			hasSelectedInnerBlock,
 		} = select( blockEditorStore );
@@ -34,8 +35,7 @@ export default function ContentBlocksList() {
 			}
 			return [
 				{
-					clientId,
-					blockName,
+					block: getBlock( clientId ),
 					isSelected:
 						isBlockSelected( clientId ) ||
 						hasSelectedInnerBlock( clientId, /* deep: */ true ),
@@ -52,17 +52,23 @@ export default function ContentBlocksList() {
 
 	return (
 		<VStack spacing={ 1 }>
-			{ contentBlocks.map( ( { clientId, blockName, isSelected } ) => {
-				const blockType = getBlockType( blockName );
+			{ contentBlocks.map( ( { block, isSelected } ) => {
+				const blockType = getBlockType( block.name );
 				return (
 					<Button
-						key={ clientId }
+						key={ block.clientId }
 						isPressed={ isSelected }
-						onClick={ () => selectBlock( clientId ) }
+						onClick={ () => selectBlock( block.clientId ) }
 					>
 						<HStack justify="flex-start">
 							<BlockIcon icon={ blockType.icon } />
-							<FlexItem>{ blockType.title }</FlexItem>
+							<FlexItem>
+								{ __experimentalGetBlockLabel(
+									blockType,
+									block.attributes,
+									'list-view'
+								) }
+							</FlexItem>
 						</HStack>
 					</Button>
 				);

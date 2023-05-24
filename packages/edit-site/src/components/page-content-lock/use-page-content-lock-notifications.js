@@ -20,7 +20,7 @@ import { store as editSiteStore } from '../../store';
  *                                                  (using useMergeRefs()) to
  *                                                  the editor iframe canvas.
  */
-export default function usePageContentLockNotifications() {
+export function usePageContentLockNotifications() {
 	const ref = useEditTemplateNotification();
 	useBackToPageNotification();
 	return ref;
