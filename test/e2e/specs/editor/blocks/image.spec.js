@@ -796,7 +796,7 @@ test.describe( 'Image - interactivity', () => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 		await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
 		const testForTrue = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":true}} -->
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
@@ -804,7 +804,7 @@ test.describe( 'Image - interactivity', () => {
 
 		await page.getByLabel( 'Behaviors' ).selectOption( '' );
 		const testForFalse = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":false}}} -->
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":false}} -->
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
