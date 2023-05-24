@@ -16,6 +16,5 @@ const initialContextValue: NavigatorContextType = {
 	addScreen: () => {},
 	removeScreen: () => {},
 	params: {},
-	backToPreviousScreen: false,
 };
 export const NavigatorContext = createContext( initialContextValue );

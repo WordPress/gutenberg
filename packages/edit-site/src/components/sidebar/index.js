@@ -67,13 +67,12 @@ function SidebarScreens() {
 function Sidebar() {
 	const { params: urlParams } = useLocation();
 	const initialPath = useRef( getPathFromURL( urlParams ) );
-	const { backToPreviousScreen } = urlParams;
+
 	return (
 		<>
 			<NavigatorProvider
 				className="edit-site-sidebar__content"
 				initialPath={ initialPath.current }
-				backToPreviousScreen={ backToPreviousScreen }
 			>
 				<SidebarScreens />
 			</NavigatorProvider>

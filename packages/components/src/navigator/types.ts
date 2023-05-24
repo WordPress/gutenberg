@@ -29,7 +29,6 @@ export type Navigator = {
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
 	goToParent: () => void;
-	backToPreviousScreen?: boolean;
 };
 
 export type NavigatorContext = Navigator & {
@@ -47,13 +46,6 @@ export type NavigatorProviderProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
-	/**
-	 * Whether the navigator should restore focus to the previous screen when
-	 * navigating back.
-	 *
-	 * @default false
-	 */
-	backToPreviousScreen?: boolean;
 };
 
 export type NavigatorScreenProps = {

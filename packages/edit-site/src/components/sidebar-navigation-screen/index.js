@@ -5,7 +5,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
@@ -32,7 +31,6 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
-	backToPreviousScreen = false,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -42,9 +40,7 @@ export default function SidebarNavigationScreen( {
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
 	const theme = getTheme( currentlyPreviewingTheme() );
-	const NavigatorReturnButton = backToPreviousScreen
-		? NavigatorBackButton
-		: NavigatorToParentButton;
+
 	return (
 		<VStack spacing={ 0 }>
 			<HStack
@@ -53,7 +49,7 @@ export default function SidebarNavigationScreen( {
 				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
 				{ ! isRoot ? (
-					<NavigatorReturnButton
+					<NavigatorToParentButton
 						as={ SidebarButton }
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						label={ __( 'Back' ) }

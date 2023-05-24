@@ -87,7 +87,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 }
 
 export default function SidebarNavigationScreenTemplate() {
-	const { params, backToPreviousScreen } = useNavigator();
+	const { params } = useNavigator();
 	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { title, description } = useTemplateTitleAndDescription(
@@ -106,7 +106,6 @@ export default function SidebarNavigationScreenTemplate() {
 				/>
 			}
 			description={ description }
-			backToPreviousScreen={ backToPreviousScreen }
 		/>
 	);
 }

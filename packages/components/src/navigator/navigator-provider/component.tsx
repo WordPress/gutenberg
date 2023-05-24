@@ -59,13 +59,8 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const {
-		initialPath,
-		children,
-		className,
-		backToPreviousScreen,
-		...otherProps
-	} = useContextSystem( props, 'NavigatorProvider' );
+	const { initialPath, children, className, ...otherProps } =
+		useContextSystem( props, 'NavigatorProvider' );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]
@@ -235,7 +230,6 @@ function UnconnectedNavigatorProvider(
 			goToParent,
 			addScreen,
 			removeScreen,
-			backToPreviousScreen,
 		} ),
 		[
 			locationHistory,
@@ -245,7 +239,6 @@ function UnconnectedNavigatorProvider(
 			goToParent,
 			addScreen,
 			removeScreen,
-			backToPreviousScreen,
 		]
 	);
 
