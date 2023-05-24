@@ -27,6 +27,9 @@ store( {
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
+					document.documentElement.classList.add(
+						'has-lightbox-open'
+					);
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
