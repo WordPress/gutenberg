@@ -19,11 +19,9 @@ import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
-const DEFAULT_TITLE = __( 'Untitled page' );
-
 export default function AddNewPageModal( { onSave, onClose } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-	const [ title, setTitle ] = useState( DEFAULT_TITLE );
+	const [ title, setTitle ] = useState( '' );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -43,7 +41,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				{
 					status: 'draft',
 					title,
-					slug: kebabCase( title || DEFAULT_TITLE ),
+					slug: kebabCase( title || __( 'Untitled' ) ),
 				},
 				{ throwOnError: true }
 			);
@@ -82,6 +80,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 						help="You can always change this later"
 						label="Page title"
 						onChange={ setTitle }
+						placeholder={ __( 'Untitled' ) }
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
