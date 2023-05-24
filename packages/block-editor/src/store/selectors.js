@@ -26,6 +26,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
+import { getBlockEditingMode } from './private-selectors';
 
 /**
  * A block selection object.
@@ -2788,6 +2789,13 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
+	// can't be selected, and prevents non-disabled nested blocks from being
+	// selected.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+		return false;
+	}
+
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
 		return true;
