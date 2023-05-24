@@ -88,7 +88,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 							} );
 						} }
 						hideCancelButton={ true }
-						help={ __( 'Add behaviors' ) }
+						help={ __( 'Add behaviors.' ) }
 						size="__unstable-large"
 					/>
 				</InspectorControls>
