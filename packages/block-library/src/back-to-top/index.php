@@ -51,7 +51,8 @@ if ( wp_is_block_theme() ) {
 			}
 			return $html;
 		},
-		10,2
+		10,
+		2
 	);
 } else {
 	add_action( 'wp_body_open', 'block_core_back_to_top_target' );
