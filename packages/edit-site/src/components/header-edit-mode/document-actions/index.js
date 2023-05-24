@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -43,8 +44,6 @@ export default function DocumentActions() {
 			? __( 'template part' )
 			: __( 'template' );
 
-	const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
-
 	return (
 		<Button
 			className="edit-site-document-actions"
@@ -69,7 +68,7 @@ export default function DocumentActions() {
 				</Text>
 			</HStack>
 			<span className="edit-site-document-actions__shortcut">
-				{ isMac ? '⌘' : 'Ctrl' } K
+				{ displayShortcut.primary( 'k' ) }
 			</span>
 		</Button>
 	);

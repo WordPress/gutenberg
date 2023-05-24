@@ -218,6 +218,7 @@ class BottomSheetRangeCell extends Component {
 						activeOpacity={ 1 }
 						accessible={ false }
 						valueStyle={ styles.valueStyle }
+						disabled={ disabled }
 					>
 						<View style={ containerStyle }>
 							{ preview }
@@ -225,7 +226,7 @@ class BottomSheetRangeCell extends Component {
 								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
-								disabled={ disabled }
+								disabled={ disabled && ! isIOS }
 								step={ step }
 								minimumValue={ minimumValue }
 								maximumValue={ maximumValue }

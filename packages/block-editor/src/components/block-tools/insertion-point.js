@@ -198,16 +198,30 @@ function InbetweenInsertionPointPopover( {
 }
 
 export default function InsertionPoint( props ) {
-	const { insertionPoint, isVisible } = useSelect( ( select ) => {
-		const { getBlockInsertionPoint, isBlockInsertionPointVisible } =
-			select( blockEditorStore );
-		return {
-			insertionPoint: getBlockInsertionPoint(),
-			isVisible: isBlockInsertionPointVisible(),
-		};
-	}, [] );
+	const { insertionPoint, isVisible, isBlockListEmpty } = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const blockInsertionPoint = getBlockInsertionPoint();
+			return {
+				insertionPoint: blockInsertionPoint,
+				isVisible: isBlockInsertionPointVisible(),
+				isBlockListEmpty:
+					getBlockCount( blockInsertionPoint?.rootClientId ) === 0,
+			};
+		},
+		[]
+	);
 
-	if ( ! isVisible ) {
+	if (
+		! isVisible ||
+		// Don't render the insertion point if the block list is empty.
+		// The insertion point will be represented by the appender instead.
+		isBlockListEmpty
+	) {
 		return null;
 	}
 
