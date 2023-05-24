@@ -36,7 +36,7 @@ function register_block_core_back_to_top() {
 add_action( 'init', 'register_block_core_back_to_top' );
 
 /**
- * Add the target id to top of each page.
+ * Add the target id to the top of each page.
  */
 function block_core_back_to_top_target() {
 	echo '<div id="wp-back-to-top"></div>';
