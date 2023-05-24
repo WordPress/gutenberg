@@ -21,10 +21,10 @@ function LibraryFontVariant ({ face, font }) {
 
     const handleToggleActivation = () => {
         if ( font?.fontFace ) {
-            toggleActivateFont( font.name, face.fontStyle, face.fontWeight );
+            toggleActivateFont( font, face );
             return;
         }
-        toggleActivateFont( font.name );
+        toggleActivateFont( font );
     }
     
     return (

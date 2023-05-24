@@ -30,7 +30,7 @@ function FontLibraryProvider( { children } ) {
 
 	// Installed fonts
 	const installedFonts = useMemo( () => (
-		[ ...( themeFonts || [] ), ...( libraryFonts || [] ) ]
+		[ ...( themeFonts || [] ), ...( libraryFonts || [] ) ].sort( ( a, b ) => (a.name || a.slug).localeCompare( b.name || b.slug ) )
 	), [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
@@ -95,6 +95,7 @@ function FontLibraryProvider( { children } ) {
 		if (!style && !weight) {
 			return !!activatedFontsOutline[ name ];
 		}
+		console.log(activatedFontsOutline);
 		return activatedFontsOutline[ name ]?.includes( style + weight );
 	}
 	
@@ -154,49 +155,55 @@ function FontLibraryProvider( { children } ) {
 	}
 
 
-	const toggleActivateFont = ( name, style, weight ) => {
+	const toggleActivateFont = ( font, face ) => {
 
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
 		const initialCustomFonts = customFonts !== null ? customFonts : themeFonts;
 
-		const installedFont = installedFonts.find( ( font ) => font.name === name );
-		const activatedFont = initialCustomFonts.find( ( font ) => font.name === name );
+		const installedFont = installedFonts.find( ( f ) => f.slug === font.slug );
+		const activatedFont = initialCustomFonts.find( ( f ) => f.slug === font.slug );
 		let newCustomFonts;
 	
 		// Entire font family
-		if ( !style || !weight ) {
+		if ( !face ) {
 			if ( !activatedFont ) { 
 				// If the font is not active, activate the entire font family
 				newCustomFonts = [ ...initialCustomFonts, installedFont ];
 			} else {
 				// If the font is already active, deactivate the entire font family
-				newCustomFonts = initialCustomFonts.filter( ( font ) => font.name !== name );
+				newCustomFonts = initialCustomFonts.filter( ( f ) => f.slug !== font.slug );
 			}
 		} else { //single font variant
 			let newFontFaces;
 			
-			const activatedFontFace = (activatedFont.fontFace || []).find(face => face.fontWeight === weight && face.fontStyle === style);
-	
 			// If the font family is active
 			if ( activatedFont ) {
+				const activatedFontFace = (activatedFont.fontFace || []).find(f => f.fontWeight === face.fontWeight && f.fontStyle === face.fontStyle);
 				// If the font variant is active
 				if ( activatedFontFace ) {
 					// Deactivate the font variant
-					newFontFaces = activatedFont.fontFace.filter( ( face ) => face.fontWeight !== weight || face.fontStyle !== style );
+					newFontFaces = activatedFont.fontFace.filter( ( f ) => !(f.fontWeight === face.fontWeight && f.fontStyle === face.fontStyle) );
+					// If there are no more font faces, deactivate the font family
+					if ( newFontFaces?.length === 0 ) {
+						newCustomFonts = initialCustomFonts.filter( ( f ) => f.slug !== font.slug );
+					} else {
+						// set the newFontFaces in the newCustomFonts
+						newCustomFonts = initialCustomFonts.map( f => f.slug === font.slug ? { ...f, fontFace: newFontFaces } : f);
+					}
 				} else {
 					// Activate the font variant
-					const fontFaceToAdd = installedFont.fontFace.find( ( face ) => face.fontWeight === weight && face.fontStyle === style );
-					newFontFaces = [ ...activatedFont.fontFace, fontFaceToAdd ];
+					newFontFaces = [ ...activatedFont.fontFace, face ];
+					// set the newFontFaces in the newCustomFonts
+					newCustomFonts = initialCustomFonts.map( f => f.slug === font.slug ? { ...f, fontFace: newFontFaces } : f);
 				}
+
 			} else {
 				// If the font family is not active, activate the font family with the font variant
-				const fontFaceToAdd = installedFont.fontFace.find( ( face ) => face.fontWeight === weight && face.fontStyle === style );
-				newFontFaces = [ fontFaceToAdd ];
+				newFontFaces = [ face ];
+				newCustomFonts = [ ...initialCustomFonts, { ...font, fontFace: newFontFaces } ];
 			}
-	
-			// set the newFontFaces in the newCustomFonts
-			newCustomFonts = initialCustomFonts.map( font => font.name === name ? { ...font, fontFace: newFontFaces } : font);
+			
 		}
 
 		setFontFamilies( {
