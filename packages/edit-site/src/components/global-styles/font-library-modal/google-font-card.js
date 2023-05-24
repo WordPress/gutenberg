@@ -15,7 +15,7 @@ import { useContext } from '@wordpress/element';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 
-function GoogleFontCard ( { font, onClick, toggleAddFont, isAdded } ) {
+function GoogleFontCard ( { font, onClick, toggleAddFont, isFontAdded } ) {
 
     const {
     } = useContext( FontLibraryContext );
@@ -25,6 +25,8 @@ function GoogleFontCard ( { font, onClick, toggleAddFont, isAdded } ) {
         // toggleInstallFont( fontName );
         toggleAddFont( font );
     };
+
+    const isAdded = isFontAdded( font );
 
     return (
         <FontCard

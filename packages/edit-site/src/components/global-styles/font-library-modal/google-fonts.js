@@ -67,12 +67,11 @@ function GoogleFonts() {
 	}, [ googleFontsCategories ] );
 
 	const newFontsOutline = useMemo( () => getAvailableFontsOutline( newFonts ), [ newFonts ] );
-
 	const isFontAdded = ( font, fontFace ) => {
 		if ( !fontFace ) {
-			return !!newFontsOutline[font.name];
+			return !!newFontsOutline[font.slug];
 		}
-		return !!(newFontsOutline[font.name] || []).includes(fontFace.fontStyle + fontFace.fontWeight)
+		return !!(newFontsOutline[font.slug] || []).includes(fontFace.fontStyle + fontFace.fontWeight)
 	}
 
 	const handleSelectFont = ( name ) => {
@@ -227,7 +226,7 @@ function GoogleFonts() {
 									font={ font }
 									onClick={ handleSelectFont }
 									toggleAddFont={ toggleAddFont }
-									isAdded={ !!newFontsOutline[font.name] }
+									isFontAdded={ isFontAdded }
 								/>
 							) ) }
 						</FontsGrid>
