@@ -29,6 +29,7 @@ export default function BottomSheetColorCell( props ) {
 			}
 			editable={ false }
 			value={ '' }
+			showLockIcon={ selected }
 		>
 			{ selected && (
 				<Icon icon={ check } style={ selectedIconStyle }></Icon>

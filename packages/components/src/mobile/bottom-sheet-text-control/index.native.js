@@ -65,7 +65,7 @@ const BottomSheetTextControl = ( {
 					placeholder={ cellPlaceholder || placeholder || '' }
 					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }
