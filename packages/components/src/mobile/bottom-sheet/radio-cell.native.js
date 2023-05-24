@@ -10,7 +10,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-export default function BottomSheetColorCell( props ) {
+export default function BottomSheetRadioCell( props ) {
 	const { selected, ...cellProps } = props;
 
 	const selectedIconStyle = usePreferredColorSchemeStyle(
