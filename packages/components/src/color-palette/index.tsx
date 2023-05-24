@@ -290,7 +290,6 @@ function UnforwardedColorPalette(
 												isHex,
 										}
 									) }
-									style={ { minHeight: '18px' } }
 								>
 									{ displayValue }
 								</Truncate>
