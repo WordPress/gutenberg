@@ -165,14 +165,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 tabindex="-1"
               >
                 <div
-                  class="components-flex components-h-stack components-v-stack emotion-10 emotion-5"
+                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
                   data-wp-c16t="true"
                   data-wp-component="VStack"
                 >
                   <button
                     aria-expanded="false"
                     aria-haspopup="true"
-                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#-f-0-0"."
                     class="components-color-palette__custom-color-button"
                     style="background: rgb(255, 0, 0);"
                   />
