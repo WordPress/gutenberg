@@ -741,18 +741,6 @@ test.describe( 'Image - interactivity', () => {
 	} );
 
 	test.beforeEach( async ( { admin, page, editor, imageBlockUtils } ) => {
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( true );
-
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
-
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -771,21 +759,8 @@ test.describe( 'Image - interactivity', () => {
 		await editor.openDocumentSettingsSidebar();
 	} );
 
-	test.afterEach( async ( { requestUtils, admin, page } ) => {
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( false );
-
-		await page.locator( `input[name="submit"]` ).click();
-
-		await page.waitForLoadState();
 	} );
 
 	test( 'should toggle "lightbox" in saved attributes', async ( {
