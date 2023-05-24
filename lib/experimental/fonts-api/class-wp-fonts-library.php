@@ -81,8 +81,7 @@ class WP_Fonts_Library {
     }
 
     function fonts_library_permissions_check () {
-        return true;
-        // return current_user_can( 'edit_posts' );
+        return current_user_can( 'edit_posts' );
     }
 
     function get_fonts_library () {
