@@ -74,6 +74,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
+	// Store the query used by the post-template.
+	// This allows inner blocks of the post-template to access it.
+	$GLOBALS['post_template_query'] = $query;
+
 	$content = '';
 	while ( $query->have_posts() ) {
 		$query->the_post();
@@ -101,6 +105,9 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
 	}
+
+	// Reset the global after the post-template loop.
+	unset( $GLOBALS['post_template_query'] );
 
 	/*
 	 * Use this function to restore the context of the template tags

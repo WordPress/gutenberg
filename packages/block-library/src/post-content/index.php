@@ -22,6 +22,9 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	$post_id = $block->context['postId'];
 
+	// Get the current query the block is rendered with.
+	$query = isset( $GLOBALS['post_template_query'] ) ? $GLOBALS['post_template_query'] : $GLOBALS['wp_query'];
+
 	if ( isset( $seen_ids[ $post_id ] ) ) {
 		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 		// is set in `wp_debug_mode()`.
@@ -37,8 +40,8 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	// Check is needed for backward compatibility with third-party plugins
 	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
-	if ( ! in_the_loop() && have_posts() ) {
-		the_post();
+	if ( ! $query->in_the_loop && $query->have_posts() ) {
+		$query->the_post();
 	}
 
 	// When inside the main loop, we want to use queried object
