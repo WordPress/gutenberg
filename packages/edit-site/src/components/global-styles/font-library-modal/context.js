@@ -30,7 +30,8 @@ function FontLibraryProvider( { children } ) {
 
 	// Installed fonts
 	const installedFonts = useMemo( () => (
-		[ ...( themeFonts || [] ), ...( libraryFonts || [] ) ].sort( ( a, b ) => (a.name || a.slug).localeCompare( b.name || b.slug ) )
+		[ ...( themeFonts.map(f=>({...f, source:"theme"})) || [] ), ...( libraryFonts || [] ) ]
+			.sort( ( a, b ) => (a.name || a.slug).localeCompare( b.name || b.slug ) )
 	), [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
