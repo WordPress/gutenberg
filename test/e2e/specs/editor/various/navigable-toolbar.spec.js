@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	navigable_Toolbar: async ( { page }, use ) => {
-		await use( new navigable_Toolbar( { page } ) );
+	navigableToolbar: async ( { page }, use ) => {
+		await use( new navigableToolbar( { page } ) );
 	},
 } );
 
@@ -18,7 +18,7 @@ test.describe( 'Block Toolbar', () => {
 		test( 'should not scroll page', async ( {
 			page,
 			pageUtils,
-			navigable_Toolbar,
+			navigableToolbar,
 		} ) => {
 			const wp = '';
 			while (
@@ -40,7 +40,7 @@ test.describe( 'Block Toolbar', () => {
 						.scrollTop
 			);
 			await pageUtils.pressKeys( 'alt+F10' );
-			expect( await navigable_Toolbar.isInBlockToolbar() ).toBe( true );
+			expect( await navigableToolbar.isInBlockToolbar() ).toBe( true );
 
 			const scrollTopAfter = await page.evaluate(
 				() =>
@@ -54,7 +54,7 @@ test.describe( 'Block Toolbar', () => {
 		test( 'navigates into the toolbar by keyboard (Alt+F10)', async ( {
 			page,
 			pageUtils,
-			navigable_Toolbar,
+			navigableToolbar,
 		} ) => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
@@ -67,7 +67,7 @@ test.describe( 'Block Toolbar', () => {
 			// Upward.
 			await pageUtils.pressKeys( 'alt+F10' );
 
-			expect( await navigable_Toolbar.isInBlockToolbar() ).toBe( true );
+			expect( await navigableToolbar.isInBlockToolbar() ).toBe( true );
 		} );
 	} );
 
@@ -101,14 +101,14 @@ test.describe( 'Block Toolbar', () => {
 			// Upward.
 			await pageUtils.pressKeys( 'alt+F10' );
 
-			expect(
-				await page.locator( 'role=toolbar[name="Document tools"i]' )
+			await expect(
+				page.locator( 'role=toolbar[name="Document tools"i]' )
 			).toBeVisible();
 		} );
 	} );
 } );
 
-class navigable_Toolbar {
+class navigableToolbar {
 	constructor( { page } ) {
 		this.page = page;
 	}
