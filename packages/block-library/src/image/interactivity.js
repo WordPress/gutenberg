@@ -80,6 +80,15 @@ store( {
 			},
 		},
 	},
+	selectors: {
+		core: {
+			image: {
+				roleAttribute: ( { context } ) => {
+					return context.core.image.lightboxEnabled ? 'dialog' : '';
+				},
+			},
+		},
+	},
 	effects: {
 		core: {
 			image: {

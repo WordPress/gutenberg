@@ -81,7 +81,7 @@ function render_block_core_image( $attributes, $content ) {
 					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }'>
 						$body_content
 						<div data-wp-body="" class="wp-lightbox-overlay"
-							role="dialog"
+							data-wp-bind.role="selectors.core.image.roleAttribute"
 							aria-labelledby="$image_lightbox_id"
 							data-wp-class.initialized="context.core.image.initialized"
 							data-wp-class.active="context.core.image.lightboxEnabled"
