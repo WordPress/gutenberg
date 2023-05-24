@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { DELETE } from '@wordpress/keycodes';
+import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { useDispatch } from '@wordpress/data';
 
 import {
@@ -42,7 +42,7 @@ function useOnDelete( props ) {
 			if (
 				!! url ||
 				event.defaultPrevented ||
-				event.keyCode !== DELETE
+				! [ BACKSPACE, DELETE ].includes( event.keyCode )
 			) {
 				return;
 			}
