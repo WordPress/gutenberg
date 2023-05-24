@@ -8,10 +8,7 @@
 			"caption": "",
 			"href": "https://wordpress.org/",
 			"linkClass": "custom-link",
-			"linkDestination": "custom",
-			"behaviors": {
-				"lightbox": true
-			}
+			"linkDestination": "custom"
 		},
 		"innerBlocks": []
 	}

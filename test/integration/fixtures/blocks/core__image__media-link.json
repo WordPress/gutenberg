@@ -7,10 +7,7 @@
 			"alt": "",
 			"caption": "",
 			"href": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
-			"linkDestination": "media",
-			"behaviors": {
-				"lightbox": true
-			}
+			"linkDestination": "media"
 		},
 		"innerBlocks": []
 	}

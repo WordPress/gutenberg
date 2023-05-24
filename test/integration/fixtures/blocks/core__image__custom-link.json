@@ -7,10 +7,7 @@
 			"alt": "",
 			"caption": "",
 			"href": "https://wordpress.org/",
-			"linkDestination": "custom",
-			"behaviors": {
-				"lightbox": true
-			}
+			"linkDestination": "custom"
 		},
 		"innerBlocks": []
 	}
