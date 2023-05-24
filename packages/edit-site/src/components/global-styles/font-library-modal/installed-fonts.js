@@ -65,6 +65,7 @@ function InstalledFonts () {
                 <LibraryFontDetails
                     font={ fontSelected }
                     handleUnselectFont={ handleUnselectFont }
+                    canBeRemoved={ fontSelected?.source !== "theme" }
                 />
             )}
             

@@ -22,9 +22,9 @@ import LibraryFontVariant from './library-font-variant';
 import PreviewControls from './preview-controls';
 
 
-function LibraryFontDetails ({ font, handleUnselectFont }) {
+function LibraryFontDetails ({ font, handleUnselectFont, canBeRemoved }) {
 
-    const { uninstallFont } = useContext( FontLibraryContext );
+    const { uninstallFont, isFontActivated } = useContext( FontLibraryContext );
     const [ isConfirmOpen, setIsConfirmOpen ] = useState( false );
     const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
 
@@ -51,6 +51,8 @@ function LibraryFontDetails ({ font, handleUnselectFont }) {
         setIsConfirmOpen( false );
     };
 
+    const isActive = isFontActivated( font.slug );
+
     return (
         <>
             <ConfirmDialog
@@ -62,37 +64,32 @@ function LibraryFontDetails ({ font, handleUnselectFont }) {
             >
                 { __( `Would you like to remove ${font.name || font.fontFamily} and all its variants and assets?`) }
             </ConfirmDialog>
-            <div className="font-library-modal__font_details">
-                <PreviewControls />
+
+            <PreviewControls />
+            <Spacer margin={ 8 } />
+
+            <VStack spacing={ 4 }>
                 <Spacer margin={ 8 } />
-                <main>
-                    <VStack spacing={ 4 }>
-                        <Spacer margin={ 8 } />
-                        { fontFaces.map( ( face, i ) => (
-                            <LibraryFontVariant
-                                font={ font }
-                                face={ face }
-                                key={`face${i}`}
-                            />
-                        ) ) }
-                    </VStack>
-                </main>
+                { fontFaces.map( ( face, i ) => (
+                    <LibraryFontVariant
+                        font={ font }
+                        face={ face }
+                        key={`face${i}`}
+                    />
+                ) ) }
+            </VStack>
 
-                <aside>
-                    <VStack spacing={ 1 }>
-                        <Text>{ font.fontFamily }</Text>
-                    </VStack>
+            <Spacer margin={ 8 } />
 
-
-                    <Button
-                        variant='tetriary'
-                        onClick={ handleUninstallClick }
-                    >
-                        { __("Delete permanently") }
-                    </Button>
-                </aside>
-
-            </div>
+            {(!isActive && !!canBeRemoved) && (
+                <Button
+                    variant='link'
+                    onClick={ handleUninstallClick }
+                >
+                    { __("Delete permanently") }
+                </Button>
+            )}
+            
         </>
     );
 }
