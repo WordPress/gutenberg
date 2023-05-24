@@ -45,9 +45,7 @@ function render_block_core_image( $attributes, $content ) {
 		}
 	}
 
-	$experiments = get_option( 'gutenberg-experiments' );
-
-	if ( ! empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) && 'none' === $link_destination && $lightbox ) {
+	if ( 'none' === $link_destination && $lightbox ) {
 
 		$aria_label = 'Open image lightbox';
 		if ( $processor->get_attribute( 'alt' ) ) {
