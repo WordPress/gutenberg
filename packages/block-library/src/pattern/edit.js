@@ -9,8 +9,9 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
+import { Placeholder, Spinner } from '@wordpress/components';
 
-const PatternEdit = ( { attributes, clientId } ) => {
+function PatternFullEdit( { attributes, clientId } ) {
 	const { slug, syncStatus } = attributes;
 	const { selectedPattern, innerBlocks } = useSelect(
 		( select ) => {
@@ -69,15 +70,68 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		className: slug?.replace( '/', '-' ),
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,
-	} );
+	return <div { ...blockProps } />;
+}
 
-	if ( syncStatus !== 'partial' ) {
-		return <div { ...blockProps } />;
+function PatternPartialEdit( { attributes: { slug }, clientId } ) {
+	const { designPattern } = useSelect(
+		( select ) => {
+			return {
+				designPattern:
+					select( blockEditorStore ).__experimentalGetParsedPattern(
+						slug
+					),
+				/*innerBlocks:
+					select( blockEditorStore ).getBlock( clientId )
+						?.innerBlocks,*/
+			};
+		},
+		[ slug ]
+	);
+
+	const blockProps = useBlockProps( {
+		className: slug?.replace( '/', '-' ),
+	} );
+	if ( ! designPattern?.blocks?.length ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			</div>
+		);
 	}
 
-	return <div { ...innerBlocksProps } />;
-};
+	return (
+		<PatternInnerBlocks
+			clientId={ clientId }
+			blockProps={ blockProps }
+			template={ designPattern.blocks }
+		/>
+	);
+}
 
-export default PatternEdit;
+function PatternInnerBlocks( { clientId, blockProps, template } ) {
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: 'contentOnly',
+	} );
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		const blocks = template.map( ( block ) => cloneBlock( block ) );
+		replaceInnerBlocks( clientId, blocks );
+	}, [ clientId, replaceInnerBlocks, template ] );
+
+	return <div { ...innerBlocksProps } />;
+}
+
+export default function PatternEdit( props ) {
+	const { syncStatus } = props.attributes;
+
+	return syncStatus === 'partial' ? (
+		<PatternPartialEdit { ...props } />
+	) : (
+		<PatternFullEdit { ...props } />
+	);
+}
