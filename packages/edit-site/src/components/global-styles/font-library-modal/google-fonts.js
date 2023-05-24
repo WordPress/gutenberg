@@ -234,11 +234,15 @@ function GoogleFonts() {
 					) }
 
 					{ fontSelected && (
-						<GoolgeFontDetails
-							font={ fontSelected }
-							toggleAddFont={ toggleAddFont }
-							isFontAdded={ isFontAdded }
-						/>
+						<>
+							<PreviewControls />
+							<Spacer margin={ 8 } />
+							<GoolgeFontDetails
+								font={ fontSelected }
+								toggleAddFont={ toggleAddFont }
+								isFontAdded={ isFontAdded }
+							/>
+						</>
 					) }
 				</>
 			) }

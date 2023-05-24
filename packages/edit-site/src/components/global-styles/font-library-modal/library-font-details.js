@@ -19,6 +19,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import { FontLibraryContext } from './context';
 import LibraryFontVariant from './library-font-variant';
+import PreviewControls from './preview-controls';
 
 
 function LibraryFontDetails ({ font, handleUnselectFont }) {
@@ -62,6 +63,8 @@ function LibraryFontDetails ({ font, handleUnselectFont }) {
                 { __( `Would you like to remove ${font.name || font.fontFamily} and all its variants and assets?`) }
             </ConfirmDialog>
             <div className="font-library-modal__font_details">
+                <PreviewControls />
+                <Spacer margin={ 8 } />
                 <main>
                     <VStack spacing={ 4 }>
                         <Spacer margin={ 8 } />

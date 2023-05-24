@@ -34,6 +34,6 @@ export const GOOGLE_FONT_FALLBACKS = {
 };
 
 export const DEFAULT_DEMO_CONFIG = {
-    text: DEMO_TEXT,
+    text: '',
     fontSize: 24,
 };

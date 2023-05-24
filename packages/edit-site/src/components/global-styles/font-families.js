@@ -67,7 +67,7 @@ function FontFamilies() {
 
             <VStack spacing={ 3 }>
                 <HStack justify='space-between' >
-                    <Subtitle level={ 3 }>{ __( 'Fonts Available' ) }</Subtitle>
+                    <Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
                     <Dropdown
                         renderContent={ ({ onToggle }) => (
                             <FontFamiliesMenu

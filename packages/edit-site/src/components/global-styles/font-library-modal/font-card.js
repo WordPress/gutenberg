@@ -18,12 +18,13 @@ import FontFaceDemo from "./font-demo";
 
 
 
-function FontCard ( { font, onClick, actionHandler } ) {
+function FontCard ( { font, onClick, actionHandler, elevation } ) {
 
     const fakeFontFace = {
         fontStyle: 'normal',
         fontWeight: '400',
         fontFamily: font.fontFamily,
+        fake: true,
     };
 
     const displayFontFace = (font.fontFace && font.fontFace.length)
@@ -34,12 +35,13 @@ function FontCard ( { font, onClick, actionHandler } ) {
 
     const style = {
         cursor: !!onClick ? 'pointer' : 'default',
-        opacity: !!font.shouldBeRemoved ? 0.5 : 1,
     };
     
     return (
         <div onClick={ onClick } style={ style } className="font-library-modal__font-card">
-            <Card>
+            <Card
+                elevation={ elevation }
+            >
                 <CardBody>
                     <VStack spacing={4}>
                         <HStack justify="space-between">

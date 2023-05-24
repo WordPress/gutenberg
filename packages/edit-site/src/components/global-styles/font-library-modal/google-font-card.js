@@ -6,7 +6,7 @@ import {
 	Button,
     CheckboxControl,
 } from '@wordpress/components';
-import { download, check } from '@wordpress/icons';
+import { download, check, plus, reset } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -28,18 +28,25 @@ function GoogleFontCard ( { font, onClick, toggleAddFont, isAdded } ) {
 
     return (
         <FontCard
+            elevation={  isAdded ? 1 : 0  }
             font={ font }
             onClick={ () =>
                 onClick( font.name )
             }
             actionHandler={
-                <CheckboxControl
-                    onChange={ () => {} }
-                    checked={ isAdded }
-                    onClick={ ( event ) =>
-                        handleClick( event, font )
-                    }
-                />
+                <Button
+                    icon={isAdded ? reset : plus}
+                    onClick={ (event)=>{ handleClick( event, font ) } }
+                >
+                    { isAdded ? __( 'Remove') : __( 'Select' ) }
+                </Button>
+                // <CheckboxControl
+                //     onChange={ () => {} }
+                //     checked={ isAdded }
+                //     onClick={ ( event ) =>
+                //         handleClick( event, font )
+                //     }
+                // />
             }
         />
     )

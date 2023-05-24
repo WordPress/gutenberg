@@ -14,7 +14,7 @@ import { FontLibraryContext } from './context';
 
 function LibraryFontCard ({ font, onClick }) {
     const { toggleActivateFont, isFontActivated } = useContext( FontLibraryContext );
-    const isActive = isFontActivated( font.name );
+    const isActive = isFontActivated( font.slug );
 
     const handleToggleFontActivation = () => {
         toggleActivateFont( font );
