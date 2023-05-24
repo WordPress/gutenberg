@@ -13,7 +13,6 @@
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
 @import "./components/sidebar-edit-mode/template-card/style.scss";
 @import "./components/editor/style.scss";
-@import "./components/template-details/style.scss";
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
 @import "./components/welcome-guide/style.scss";
@@ -35,6 +34,7 @@
 @import "./components/site-icon/style.scss";
 @import "./components/style-book/style.scss";
 @import "./components/editor-canvas-container/style.scss";
+@import "./components/resizable-frame/style.scss";
 @import "./hooks/push-changes-to-global-styles/style.scss";
 
 html #wpadminbar {

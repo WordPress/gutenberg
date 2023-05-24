@@ -1,0 +1,69 @@
+.edit-site-resizable-frame__inner {
+	position: relative;
+
+	&.is-resizing {
+		@at-root {
+			body:has(&) {
+				cursor: col-resize;
+				user-select: none;
+				-webkit-user-select: none;
+			}
+		}
+
+		&::before {
+			// This covers the whole content which ensures mouse up triggers
+			// even if the content is "inert".
+			position: absolute;
+			z-index: 1;
+			inset: 0;
+			content: "";
+		}
+	}
+}
+
+.edit-site-resizable-frame__inner-content {
+	position: absolute;
+	z-index: 0;
+	inset: 0;
+}
+
+.edit-site-resizable-frame__handle {
+	position: absolute;
+	width: 5px;
+	height: 50px;
+	background-color: rgba(255, 255, 255, 0.3);
+	z-index: 100;
+	border-radius: 5px;
+	cursor: col-resize;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	top: 50%;
+	&::before {
+		position: absolute;
+		left: 100%;
+		height: 100%;
+		width: $grid-unit-30;
+		content: "";
+	}
+
+	&::after {
+		position: absolute;
+		right: 100%;
+		height: 100%;
+		width: $grid-unit-30;
+		content: "";
+	}
+
+	&:hover {
+		background-color: var(--wp-admin-theme-color);
+	}
+
+	.edit-site-resizable-frame__handle-label {
+		border-radius: 2px;
+		background: var(--wp-admin-theme-color);
+		padding: 4px 8px;
+		color: #fff;
+		margin-right: $grid-unit-10;
+	}
+}

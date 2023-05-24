@@ -26,7 +26,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"memize": "^1.1.0"
+		"memize": "^2.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -56,7 +56,8 @@ describe( 'Child Blocks', () => {
 			'[data-type="test/child-blocks-restricted-parent"] .block-editor-default-block-appender'
 		);
 		await openGlobalBlockInserter();
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+		const allowedBlocks = await getAllBlockInserterItemTitles();
+		expect( allowedBlocks.sort() ).toEqual( [
 			'Child Blocks Child',
 			'Image',
 			'Paragraph',
