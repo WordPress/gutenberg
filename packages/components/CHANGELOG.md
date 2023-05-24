@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.0.0 (2023-05-24)
+
 ### Breaking Changes
 
 -   `DateTime`: Remove previously deprecated props, `__nextRemoveHelpButton` and `__nextRemoveResetButton` ([#50724](https://github.com/WordPress/gutenberg/pull/50724)).
