@@ -730,7 +730,6 @@ test.describe( 'Image', () => {
 } );
 
 test.describe( 'Image - interactivity', () => {
-	let postId = null;
 	let filename = null;
 
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -794,21 +793,22 @@ test.describe( 'Image - interactivity', () => {
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
-		const testForTrue = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":true}} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
-<!-- \\/wp:image -->`
-		);
-		expect( await editor.getEditedPostContent() ).toMatch( testForTrue );
+		await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
+
+		let blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes ).toMatchObject( {
+			behaviors: { lightbox: true },
+			linkDestination: 'none',
+		} );
+		expect( blocks[ 0 ].attributes.url ).toContain( filename );
 
 		await page.getByLabel( 'Behaviors' ).selectOption( '' );
-		const testForFalse = new RegExp(
-			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none","behaviors":{"lightbox":false}} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
-<!-- \\/wp:image -->`
-		);
-		expect( await editor.getEditedPostContent() ).toMatch( testForFalse );
+		blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes ).toMatchObject( {
+			behaviors: { lightbox: false },
+			linkDestination: 'none',
+		} );
+		expect( blocks[ 0 ].attributes.url ).toContain( filename );
 	} );
 
 	test( 'should open and close the image in a lightbox using the mouse', async ( {
@@ -816,9 +816,9 @@ test.describe( 'Image - interactivity', () => {
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
+		await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
 
-		postId = await editor.publishPost();
+		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
@@ -848,15 +848,15 @@ test.describe( 'Image - interactivity', () => {
 
 		test.beforeEach( async ( { page, editor } ) => {
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			await page.getByLabel( 'Behaviors' ).selectOption( 'Lightbox' );
+			await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
 
-			postId = await editor.publishPost();
+			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 
 			openLightboxButton = page.getByRole( 'button', {
 				name: 'Open image lightbox',
 			} );
-			lightbox = page.locator( '.wp-lightbox-overlay' );
+			lightbox = page.getByRole( 'dialog' );
 			closeButton = lightbox.getByRole( 'button', {
 				name: 'Close lightbox',
 			} );
