@@ -6,12 +6,10 @@ import {
 	store as blockEditorStore,
 	BlockList,
 	BlockTools,
-	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { Popover, VisuallyHidden } from '@wordpress/components';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { VisuallyHidden } from '@wordpress/components';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -21,33 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../private-apis';
 import LeafMoreMenu from './leaf-more-menu';
 
-function CustomLinkAdditionalBlockUI( { block, onClose } ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { label, url, opensInNewTab } = block.attributes;
-	const link = {
-		url,
-		opensInNewTab,
-		title: label && stripHTML( label ),
-	};
-	return (
-		<Popover placement="bottom" shift onClose={ onClose }>
-			<LinkControl
-				hasTextControl
-				hasRichPreviews
-				value={ link }
-				onChange={ ( updatedValue ) => {
-					updateBlockAttributes( block.clientId, {
-						label: updatedValue.title,
-						url: updatedValue.url,
-						opensInNewTab: updatedValue.opensInNewTab,
-					} );
-					onClose();
-				} }
-				onCancel={ onClose }
-			/>
-		</Popover>
-	);
-}
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
@@ -102,29 +73,6 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	const [ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ] =
-		useState( false );
-
-	const renderAdditionalBlockUICallback = useCallback(
-		( block ) => {
-			if (
-				customLinkEditPopoverOpenId &&
-				block.clientId === customLinkEditPopoverOpenId
-			) {
-				return (
-					<CustomLinkAdditionalBlockUI
-						block={ block }
-						onClose={ () => {
-							setIsCustomLinkEditPopoverOpenId( false );
-						} }
-					/>
-				);
-			}
-			return null;
-		},
-		[ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ]
-	);
-
 	// Delay loading stop by 50ms to avoid flickering.
 	useEffect( () => {
 		let timeoutId;
@@ -156,22 +104,11 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					block.clientId,
 					createBlock( 'core/navigation-link', block.attributes )
 				);
-			} else if (
-				block.name === 'core/navigation-link' &&
-				block.attributes.kind === 'custom' &&
-				block.attributes.url
-			) {
-				setIsCustomLinkEditPopoverOpenId( block.clientId );
 			} else {
 				onSelect( block );
 			}
 		},
-		[
-			onSelect,
-			__unstableMarkNextChangeAsNotPersistent,
-			replaceBlock,
-			setIsCustomLinkEditPopoverOpenId,
-		]
+		[ onSelect, __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -188,7 +125,6 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
-					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
 			) }
 			<VisuallyHidden aria-hidden="true">

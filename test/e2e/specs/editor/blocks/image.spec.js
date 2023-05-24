@@ -552,9 +552,16 @@ test.describe( 'Image', () => {
 		} );
 
 		async function openMediaTab() {
-			await page
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
-				.click();
+			const blockInserter = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const isClosed =
+				( await blockInserter.getAttribute( 'aria-pressed' ) ) ===
+				'false';
+
+			if ( isClosed ) {
+				await blockInserter.click();
+			}
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 

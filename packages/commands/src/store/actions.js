@@ -5,11 +5,12 @@
  *
  * @typedef {Object} WPCommandConfig
  *
- * @property {string}      name     Command name.
- * @property {string}      label    Command label.
- * @property {string=}     group    Command group.
- * @property {JSX.Element} icon     Command icon.
- * @property {Function}    callback Command callback.
+ * @property {string}      name        Command name.
+ * @property {string}      label       Command label.
+ * @property {string=}     searchLabel Command search label.
+ * @property {string=}     context     Command context.
+ * @property {JSX.Element} icon        Command icon.
+ * @property {Function}    callback    Command callback.
  */
 
 /**
@@ -21,9 +22,9 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string}              name  Command loader name.
- * @property {string=}             group Command loader group.
- * @property {WPCommandLoaderHook} hook  Command loader hook.
+ * @property {string}              name    Command loader name.
+ * @property {string=}             context Command loader context.
+ * @property {WPCommandLoaderHook} hook    Command loader hook.
  */
 
 /**
@@ -33,30 +34,24 @@
  *
  * @return {Object} action.
  */
-export function registerCommand( { name, label, icon, callback, group = '' } ) {
+export function registerCommand( config ) {
 	return {
 		type: 'REGISTER_COMMAND',
-		name,
-		label,
-		icon,
-		callback,
-		group,
+		...config,
 	};
 }
 
 /**
  * Returns an action object used to unregister a command.
  *
- * @param {string} name  Command name.
- * @param {string} group Command group.
+ * @param {string} name Command name.
  *
  * @return {Object} action.
  */
-export function unregisterCommand( name, group ) {
+export function unregisterCommand( name ) {
 	return {
 		type: 'UNREGISTER_COMMAND',
 		name,
-		group,
 	};
 }
 
@@ -67,28 +62,24 @@ export function unregisterCommand( name, group ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( { name, group = '', hook } ) {
+export function registerCommandLoader( config ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
-		name,
-		group,
-		hook,
+		...config,
 	};
 }
 
 /**
  * Unregister command loader hook.
  *
- * @param {string} name  Command loader name.
- * @param {string} group Command loader group.
+ * @param {string} name Command loader name.
  *
  * @return {Object} action.
  */
-export function unregisterCommandLoader( name, group ) {
+export function unregisterCommandLoader( name ) {
 	return {
 		type: 'UNREGISTER_COMMAND_LOADER',
 		name,
-		group,
 	};
 }
 
@@ -111,5 +102,19 @@ export function open() {
 export function close() {
 	return {
 		type: 'CLOSE',
+	};
+}
+
+/**
+ * Sets the active context.
+ *
+ * @param {string} context Context.
+ *
+ * @return {Object} action.
+ */
+export function setContext( context ) {
+	return {
+		type: 'SET_CONTEXT',
+		context,
 	};
 }

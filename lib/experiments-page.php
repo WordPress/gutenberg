@@ -66,18 +66,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-command-center',
-		__( 'Command center ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the command center; Open it using cmd + k in the site or post editors.', 'gutenberg' ),
-			'id'    => 'gutenberg-command-center',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-group-grid-variation',
 		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -114,14 +102,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-interactivity-api-navigation-block',
-		__( 'Navigation block', 'gutenberg' ),
+		'gutenberg-interactivity-api-core-blocks',
+		__( 'Core blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the Navigation block using the Interactivity API', 'gutenberg' ),
-			'id'    => 'gutenberg-interactivity-api-navigation-block',
+			'label' => __( 'Test the core blocks using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-core-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-pattern-enhancements',
+		__( 'Pattern enhancements', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Pattern block enhancements', 'gutenberg' ),
+			'id'    => 'gutenberg-pattern-enhancements',
 		)
 	);
 
