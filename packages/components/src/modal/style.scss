@@ -85,6 +85,7 @@
 	left: 0;
 
 	.components-modal__header-heading {
+		color: $gray-900;
 		font-size: 1.2rem;
 		font-weight: 600;
 	}
@@ -128,6 +129,7 @@
 
 // Modal contents.
 .components-modal__content {
+	color: $gray-900;
 	flex: 1;
 	margin-top: $header-height + $grid-unit-15;
 	padding: 0 $grid-unit-40 $grid-unit-40;
