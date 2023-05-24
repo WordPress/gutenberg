@@ -43,12 +43,16 @@ function block_core_back_to_top_target() {
 	echo '<div id="wp-back-to-top"></div>';
 }
 if ( wp_is_block_theme() ) {
-	add_filter( 'render_block', function( $html, $block ) {
-		if ( 'core/back-to-top' === $block['blockName'] ) {
-			add_action( 'wp_body_open', 'block_core_back_to_top_target' );
-		}
-		return $html;
-	}, 10,2 );
+	add_filter(
+		'render_block',
+		function( $html, $block ) {
+			if ( 'core/back-to-top' === $block['blockName'] ) {
+				add_action( 'wp_body_open', 'block_core_back_to_top_target' );
+			}
+			return $html;
+		},
+		10,2
+	);
 } else {
 	add_action( 'wp_body_open', 'block_core_back_to_top_target' );
 }
