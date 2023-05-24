@@ -223,7 +223,11 @@ export default function Editor( { isLoading } ) {
 							footer={
 								shouldShowBlockBreakcrumbs && (
 									<BlockBreadcrumb
-										rootLabelText={ __( 'Template' ) }
+										rootLabelText={
+											hasPageContentLock
+												? __( 'Page' )
+												: __( 'Template' )
+										}
 									/>
 								)
 							}
