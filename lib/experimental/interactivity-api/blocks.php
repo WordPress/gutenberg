@@ -230,7 +230,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 1 );
 
 /**
- * Replaces view script for the File and Navigation blocks with version using Interactivity API.
+ * Replaces view script for the File, Navigation, and Image blocks with version using Interactivity API.
  *
  * @param array $metadata Block metadata as read in via block.json.
  *
