@@ -31,7 +31,19 @@ function render_block_core_image( $attributes, $content ) {
 	}
 
 	$link_destination = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
-	$lightbox         = isset( $attributes['behaviors']['lightbox'] ) ? $attributes['behaviors']['lightbox'] : false;
+
+	// Get the lightbox setting from the block attributes.
+	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
+		$lightbox = $attributes['behaviors']['lightbox'];
+		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
+	} else {
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+		if ( isset( $theme_data['behaviors']['blocks']['core/image']['lightbox'] ) ) {
+			$lightbox = $theme_data['behaviors']['blocks']['core/image']['lightbox'];
+		} else {
+			$lightbox = false;
+		}
+	}
 
 	$experiments = get_option( 'gutenberg-experiments' );
 
