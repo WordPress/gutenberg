@@ -35,6 +35,24 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
 	useEffect( () => {
+		function clonePatternBlock( block ) {
+			let newInnerBlocks = [];
+			if ( block.innerBlocks.length > 0 ) {
+				newInnerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+					let nestedInnerBlocks = [];
+					if ( innerBlock.innerBlocks.length > 0 ) {
+						nestedInnerBlocks =
+							innerBlock.innerBlocks.map( clonePatternBlock );
+					}
+					return createBlock( 'core/pattern-part', {}, [
+						cloneBlock( innerBlock, {}, nestedInnerBlocks ),
+					] );
+				} );
+			}
+			return createBlock( 'core/pattern-part', {}, [
+				cloneBlock( block, {}, newInnerBlocks ),
+			] );
+		}
 		if ( selectedPattern?.blocks && ! innerBlocks?.length ) {
 			// We batch updates to block list settings to avoid triggering cascading renders
 			// for each container block included in a tree and optimize initial render.
@@ -44,21 +62,8 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			window.queueMicrotask( () => {
 				// Clone blocks from the pattern before insertion to ensure they receive
 				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
-				const clonedBlocks = selectedPattern.blocks.map( ( block ) => {
-					let newInnerBlocks = [];
-					if ( block.innerBlocks.length > 0 ) {
-						newInnerBlocks = block.innerBlocks.map(
-							( innerBlock ) => {
-								return createBlock( 'core/pattern-part', {}, [
-									cloneBlock( innerBlock ),
-								] );
-							}
-						);
-					}
-					return createBlock( 'core/pattern-part', {}, [
-						cloneBlock( block, {}, newInnerBlocks ),
-					] );
-				} );
+				const clonedBlocks =
+					selectedPattern.blocks.map( clonePatternBlock );
 				__unstableMarkNextChangeAsNotPersistent();
 				if ( syncStatus === 'partial' ) {
 					replaceInnerBlocks( clientId, clonedBlocks );
@@ -82,7 +87,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,
+		templateLock: syncStatus === 'partial' ? false : false,
 	} );
 
 	if ( syncStatus !== 'partial' ) {
