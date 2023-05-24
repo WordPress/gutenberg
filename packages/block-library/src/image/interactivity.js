@@ -27,29 +27,6 @@ store( {
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
-
-					context.core.image.adminElement =
-						document.querySelector( '#wpadminbar' );
-					context.core.image.siteBlocksElement =
-						document.querySelector( '.wp-site-blocks' );
-
-					document.documentElement.classList.add(
-						'has-lightbox-open'
-					);
-
-					if ( context.core.image.adminElement ) {
-						context.core.image.adminElement.setAttribute(
-							'inert',
-							true
-						);
-					}
-
-					if ( context.core.image.siteBlocksElement ) {
-						context.core.image.siteBlocksElement.setAttribute(
-							'inert',
-							true
-						);
-					}
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
@@ -66,18 +43,6 @@ store( {
 						document.documentElement.classList.remove(
 							'has-lightbox-open'
 						);
-
-						if ( context.core.image.adminElement ) {
-							context.core.image.adminElement.removeAttribute(
-								'inert'
-							);
-						}
-
-						if ( context.core.image.siteBlocksElement ) {
-							context.core.image.siteBlocksElement.removeAttribute(
-								'inert'
-							);
-						}
 
 						context.core.image.lightboxEnabled = false;
 						context.core.image.lastFocusedElement.focus();
