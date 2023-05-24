@@ -92,7 +92,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				ease: 'easeOut',
 			} }
 		>
-			<HStack justify="space-between" alignment="center">
+			<HStack
+				justify="space-between"
+				alignment="center"
+				className="edit-site-site-hub__container"
+			>
 				<HStack
 					justify="flex-start"
 					className="edit-site-site-hub__text-content"
