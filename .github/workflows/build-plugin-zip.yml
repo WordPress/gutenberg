@@ -298,8 +298,8 @@ jobs:
                   release_name: ${{ steps.get_release_version.outputs.version }}
                   commitish: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   draft: true
+                  prerelease: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
                   # The following is debug code, should be reverted before merging. See commit that added this for more info.
-                  # prerelease: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
                   # body_path: release-notes.txt
 
             - name: Upload Release Asset
