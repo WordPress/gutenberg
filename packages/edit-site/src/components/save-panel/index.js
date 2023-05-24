@@ -9,11 +9,12 @@ import classnames from 'classnames';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
+	EntitiesSavedStatesExtensible,
+	useEntitiesSavedStatesIsDirty,
 } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { NavigableRegion } from '@wordpress/interface';
-import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { getQueryArg } from '@wordpress/url';
 
@@ -52,18 +53,17 @@ export default function SavePanel() {
 		};
 	}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-	const activateTheme = useActivateTheme();
 	const onClose = () => setIsSaveViewOpened( false );
 
 	const _EntitiesSavedStates = () => {
 		const { getTheme } = useSelect( coreStore );
 		const theme = getTheme( currentlyPreviewingTheme() );
-
-		const [ isDirty, setIsDirty ] = useState( false );
-		const saveEnabled = isPreviewingTheme() || isDirty;
+		const activateTheme = useActivateTheme();
+		const isDirtyProps = useEntitiesSavedStatesIsDirty();
+		const saveEnabled = isPreviewingTheme() || isDirtyProps.isDirty;
 
 		let activateSaveLabel;
-		if ( isPreviewingTheme() && isDirty ) {
+		if ( isPreviewingTheme() && isDirtyProps.isDirty ) {
 			activateSaveLabel = __( 'Activate & Save' );
 		} else if ( isPreviewingTheme() ) {
 			activateSaveLabel = __( 'Activate' );
@@ -86,15 +86,16 @@ export default function SavePanel() {
 		};
 
 		return window?.__experimentalEnableThemePreviews ? (
-				<EntitiesSavedStates {...{
+			<EntitiesSavedStatesExtensible
+				{ ...{
+					...isDirtyProps,
 					additionalPrompt,
 					close: onClose,
-					isDirty,
 					onSave,
 					saveEnabled,
 					saveLabel: activateSaveLabel,
-					setIsDirty,
-				}} />
+				} }
+			/>
 		) : (
 			<EntitiesSavedStates close={ onClose } />
 		);

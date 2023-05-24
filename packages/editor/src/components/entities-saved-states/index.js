@@ -3,13 +3,8 @@
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useState,
-	useCallback,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
@@ -19,15 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
-
-const TRANSLATED_SITE_PROPERTIES = {
-	title: __( 'Title' ),
-	description: __( 'Tagline' ),
-	site_logo: __( 'Logo' ),
-	site_icon: __( 'Icon' ),
-	show_on_front: __( 'Show on front' ),
-	page_on_front: __( 'Page on front' ),
-};
+import { useIsDirty } from './hooks/use-is-dirty';
 
 const PUBLISH_ON_SAVE_ENTITIES = [
 	{
@@ -40,48 +27,31 @@ function identity( values ) {
 	return values;
 }
 
-export default function EntitiesSavedStates( { 
+export default function EntitiesSavedStates( { close } ) {
+	const isDirtyProps = useIsDirty();
+	return (
+		<EntitiesSavedStatesExtensible
+			{ ...{
+				...isDirtyProps,
+				close,
+			} }
+		/>
+	);
+}
+
+export function EntitiesSavedStatesExtensible( {
 	additionalPrompt = undefined,
 	close,
-	isDirty: isDirtyProp = undefined,
 	onSave = identity,
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
-	setIsDirty: setIsDirtyProp = () => {},
+
+	dirtyEntityRecords,
+	isDirty,
+	setUnselectedEntities,
+	unselectedEntities,
 } ) {
 	const saveButtonRef = useRef();
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords =
-			select( coreStore ).__experimentalGetDirtyEntityRecords();
-
-		// Remove site object and decouple into its edited pieces.
-		const dirtyRecordsWithoutSite = dirtyRecords.filter(
-			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
-		);
-
-		const siteEdits = select( coreStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		const siteEditsAsEntities = [];
-		for ( const property in siteEdits ) {
-			siteEditsAsEntities.push( {
-				kind: 'root',
-				name: 'site',
-				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
-				property,
-			} );
-		}
-		const dirtyRecordsWithSiteItems = [
-			...dirtyRecordsWithoutSite,
-			...siteEditsAsEntities,
-		];
-
-		return {
-			dirtyEntityRecords: dirtyRecordsWithSiteItems,
-		};
-	}, [] );
 	const {
 		editEntityRecord,
 		saveEditedEntityRecord,
@@ -118,39 +88,6 @@ export default function EntitiesSavedStates( {
 		...Object.values( contentSavables ),
 	].filter( Array.isArray );
 
-	// Unchecked entities to be ignored by save function.
-	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
-
-	const setUnselectedEntities = (
-		{ kind, name, key, property },
-		checked
-	) => {
-		if ( checked ) {
-			_setUnselectedEntities(
-				unselectedEntities.filter(
-					( elt ) =>
-						elt.kind !== kind ||
-						elt.name !== name ||
-						elt.key !== key ||
-						elt.property !== property
-				)
-			);
-		} else {
-			_setUnselectedEntities( [
-				...unselectedEntities,
-				{ kind, name, key, property },
-			] );
-		}
-	};
-
-	const isDirty =
-		isDirtyProp ??
-		dirtyEntityRecords.length - unselectedEntities.length > 0;
-	useEffect( () => {
-		setIsDirtyProp(
-			dirtyEntityRecords.length - unselectedEntities.length > 0
-		);
-	}, [ dirtyEntityRecords, unselectedEntities, setIsDirtyProp ] );
 	const saveEnabled = saveEnabledProp ?? isDirty;
 
 	const saveCheckedEntities = () => {
