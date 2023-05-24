@@ -60,14 +60,14 @@ function EditableContent( { context = {} } ) {
 		[ postType, postId ]
 	);
 
-	const hasInnerBlocks = !! entityRecord?.content?.raw;
+	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
 
 	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
 
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
-			value: hasInnerBlocks ? blocks : undefined,
+			value: blocks,
 			onInput,
 			onChange,
 			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
