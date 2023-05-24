@@ -39,7 +39,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
 // Get paths of the `render` props included in `block.json` files
-const renderPaths = getRenderPropPaths();
+let renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -275,6 +275,7 @@ const config = {
 					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					filter: ( filepath ) => {
+						renderPaths = getRenderPropPaths();
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
 							renderPaths.includes( filepath )
