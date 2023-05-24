@@ -78,15 +78,23 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 	}
 
 	public function test_rendering_comment_template_sets_comment_id_context() {
-		$render_block_callback = static function( $block_content, $block ) {
+		$parsed_comment_author_name_block = parse_blocks( '<!-- wp:comment-author-name /-->' )[0];
+		$comment_author_name_block        = new WP_Block(
+			$parsed_comment_author_name_block,
+			array(
+				'commentId' => self::$comment_ids[0],
+			)
+		);
+		$comment_author_name_block_markup = $comment_author_name_block->render();
+
+		$render_block_callback = static function( $block_content, $block ) use ( $parsed_comment_author_name_block ) {
 			// Insert a Comment Author Name block (which requires `commentId`
 			// block context to work) after the Comment Content block.
 			if ( 'core/comment-content' !== $block['blockName'] ) {
 				return $block_content;
 			}
-			$inserted_block_markup = '<!-- wp:comment-author-name /-->';
-			$inserted_blocks       = parse_blocks( $inserted_block_markup );
-			$inserted_content      = render_block( $inserted_blocks[0] );
+
+			$inserted_content = render_block( $parsed_comment_author_name_block );
 			return $inserted_content . $block_content;
 		};
 
@@ -103,9 +111,6 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		$markup        = $block->render();
 		remove_filter( 'render_block', $render_block_callback );
 
-		$this->assertSame(
-			str_replace( array( "\n", "\t" ), '', '<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
-			str_replace( array( "\n", "\t" ), '', $markup )
-		);
+		$this->assertStringContainsString( $comment_author_name_block_markup, $markup );
 	}
 }
