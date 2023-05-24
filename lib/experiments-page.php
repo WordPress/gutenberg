@@ -102,6 +102,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-interactivity-api-core-blocks',
+		__( 'Core blocks', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the core blocks using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-core-blocks',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-pattern-enhancements',
 		__( 'Pattern enhancements', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
