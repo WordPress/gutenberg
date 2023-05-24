@@ -22,12 +22,19 @@
 
 } 
 
-.font-library-modal__font-card__name {
-    font-weight: bold;
-}
+.font-library-modal__font-card {
+    
+    & > div {
+        height: 100%;
+    }
 
-.font-library-modal__font-card__count {
-    color: #6e6e6e;
+    .font-library-modal__font-card__name {
+        font-weight: bold;
+    }
+
+    .font-library-modal__font-card__count {
+        color: #6e6e6e;
+    }
 }
 
 .font-library-modal__font-variant {
@@ -45,17 +52,5 @@
         background: #fff;
         margin: 0 -32px;
         padding: 0 16px;
-    }
-}
-
-.font-library-modal__font_details {
-    display: grid;
-    grid-template-columns: 4fr 1fr;
-    column-gap: 2rem;
-
-    aside {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
     }
 }
