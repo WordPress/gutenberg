@@ -793,7 +793,9 @@ test.describe( 'Image - interactivity', () => {
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
 
 		let blocks = await editor.getBlocks();
 		expect( blocks[ 0 ].attributes ).toMatchObject( {
@@ -816,7 +818,9 @@ test.describe( 'Image - interactivity', () => {
 		page,
 	} ) => {
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
@@ -848,7 +852,9 @@ test.describe( 'Image - interactivity', () => {
 
 		test.beforeEach( async ( { page, editor } ) => {
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			await page.getByLabel( 'Behaviors' ).selectOption( 'lightbox' );
+			await page
+				.getByRole( 'combobox', { name: 'Behaviors' } )
+				.selectOption( 'lightbox' );
 
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
