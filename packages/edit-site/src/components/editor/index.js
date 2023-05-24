@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -50,7 +55,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor() {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -153,12 +158,9 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
-
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -171,13 +173,14 @@ export default function Editor() {
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
-							className={ showIconLabels && 'show-icon-labels' }
-							notices={
-								( isEditMode ||
-									window?.__experimentalEnableThemePreviews ) && (
-									<EditorSnackbars />
-								)
-							}
+							className={ classnames(
+								'edit-site-editor__interface-skeleton',
+								{
+									'show-icon-labels': showIconLabels,
+									'is-loading': isLoading,
+								}
+							) }
+							notices={ <EditorSnackbars /> }
 							content={
 								<>
 									<GlobalStylesRenderer />

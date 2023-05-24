@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add new `HeadingLevel` icons. ([#50856](https://github.com/WordPress/gutenberg/pull/50856))
+
+## 9.24.0 (2023-05-10)
+
 ## 9.23.0 (2023-04-26)
 
 ## 9.22.0 (2023-04-12)

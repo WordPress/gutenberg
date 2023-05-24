@@ -1,20 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/commands';
+import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { unlock } from './lock-unlock';
-
-const { useCommand } = unlock( privateApis );
-
 export function useAddPostTypeCommands() {
 	useCommand( {
-		name: 'add new post',
+		name: 'core/add-new-post',
 		label: __( 'Add new post' ),
 		icon: plus,
 		callback: () => {
@@ -22,7 +15,7 @@ export function useAddPostTypeCommands() {
 		},
 	} );
 	useCommand( {
-		name: 'add new page',
+		name: 'core/add-new-page',
 		label: __( 'Add new page' ),
 		icon: plus,
 		callback: () => {

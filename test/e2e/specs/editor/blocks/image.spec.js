@@ -552,9 +552,16 @@ test.describe( 'Image', () => {
 		} );
 
 		async function openMediaTab() {
-			await page
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
-				.click();
+			const blockInserter = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const isClosed =
+				( await blockInserter.getAttribute( 'aria-pressed' ) ) ===
+				'false';
+
+			if ( isClosed ) {
+				await blockInserter.click();
+			}
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
@@ -682,6 +689,42 @@ test.describe( 'Image', () => {
 		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
 			'src',
 			url
+		);
+	} );
+
+	test( 'should appear in the frontend published post content', async ( {
+		editor,
+		imageBlockUtils,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
 		);
 	} );
 } );
