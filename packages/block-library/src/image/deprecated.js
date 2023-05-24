@@ -212,7 +212,7 @@ const deprecated = [
 				title,
 			} = attributes;
 
-			const newRel = isEmpty( rel ) ? undefined : rel;
+			const newRel = ! rel ? undefined : rel;
 			const borderProps = getBorderClassesAndStyles( attributes );
 
 			const classes = classnames( {
@@ -220,7 +220,9 @@ const deprecated = [
 				[ `size-${ sizeSlug }` ]: sizeSlug,
 				'is-resized': width || height,
 				'has-custom-border':
-					!! borderProps.className || ! isEmpty( borderProps.style ),
+					!! borderProps.className ||
+					( borderProps.style &&
+						Object.keys( borderProps.style ).length > 0 ),
 			} );
 
 			const imageClasses = classnames( borderProps.className, {
