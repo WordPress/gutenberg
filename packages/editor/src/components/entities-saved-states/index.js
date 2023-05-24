@@ -8,8 +8,6 @@ import {
 	useState,
 	useCallback,
 	useRef,
-	createContext,
-	useContext,
 	useEffect,
 } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -42,16 +40,15 @@ function identity( values ) {
 	return values;
 }
 
-export const EntitiesSavedStatesContext = createContext( {
-	additionalPrompt: undefined,
-	isDirty: undefined,
-	onSave: identity,
-	saveEnabled: undefined,
-	saveLabel: __( 'Save' ),
-	setIsDirty: undefined,
-} );
-
-export default function EntitiesSavedStates( { close } ) {
+export default function EntitiesSavedStates( { 
+	additionalPrompt = undefined,
+	close,
+	isDirty: isDirtyProp = undefined,
+	onSave = identity,
+	saveEnabled: saveEnabledProp = undefined,
+	saveLabel = __( 'Save' ),
+	setIsDirty: setIsDirtyProp = () => {},
+} ) {
 	const saveButtonRef = useRef();
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		const dirtyRecords =
@@ -146,23 +143,15 @@ export default function EntitiesSavedStates( { close } ) {
 		}
 	};
 
-	const {
-		additionalPrompt,
-		isDirty: isDirtyContext,
-		onSave,
-		saveEnabled: saveEnabledContext,
-		saveLabel,
-		setIsDirty: setIsDirtyContext,
-	} = useContext( EntitiesSavedStatesContext );
 	const isDirty =
-		isDirtyContext ??
+		isDirtyProp ??
 		dirtyEntityRecords.length - unselectedEntities.length > 0;
 	useEffect( () => {
-		setIsDirtyContext(
+		setIsDirtyProp(
 			dirtyEntityRecords.length - unselectedEntities.length > 0
 		);
-	}, [ dirtyEntityRecords, unselectedEntities, setIsDirtyContext ] );
-	const saveEnabled = saveEnabledContext ?? isDirty;
+	}, [ dirtyEntityRecords, unselectedEntities, setIsDirtyProp ] );
+	const saveEnabled = saveEnabledProp ?? isDirty;
 
 	const saveCheckedEntities = () => {
 		const saveNoticeId = 'site-editor-save-success';

@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
-	EntitiesSavedStatesContext,
 } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -69,7 +68,7 @@ export default function SavePanel() {
 		} else if ( isPreviewingTheme() ) {
 			activateSaveLabel = __( 'Activate' );
 		} else {
-			activateSaveLabel = __( 'Save' );
+			activateSaveLabel = undefined;
 		}
 
 		const additionalPrompt = (
@@ -87,18 +86,15 @@ export default function SavePanel() {
 		};
 
 		return window?.__experimentalEnableThemePreviews ? (
-			<EntitiesSavedStatesContext.Provider
-				value={ {
+				<EntitiesSavedStates {...{
 					additionalPrompt,
+					close: onClose,
 					isDirty,
 					onSave,
 					saveEnabled,
 					saveLabel: activateSaveLabel,
 					setIsDirty,
-				} }
-			>
-				<EntitiesSavedStates close={ onClose } />
-			</EntitiesSavedStatesContext.Provider>
+				}} />
 		) : (
 			<EntitiesSavedStates close={ onClose } />
 		);
