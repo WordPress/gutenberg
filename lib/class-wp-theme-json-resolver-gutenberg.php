@@ -275,7 +275,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
+			// I'm disabling this because it merges custom and theme fonts and we need to keep them separate.
+			// TODO: explore more about this change and long term fix for this.
+			// static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
 			// END OF EXPERIMENTAL CODE.
 
 		}
