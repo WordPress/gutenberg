@@ -47,16 +47,51 @@ This message is misleading and no action is required by the release coordinator.
 
 As soon as the workflow has finished, you'll find the release draft under [Gutenberg Releases](https://github.com/WordPress/gutenberg/releases). The draft is pre-populated with changelog entries based on previous release candidates for this version and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, delete any RC version headers (that are only there for your information) and move the more recent changes to the correct section (see below).
 
-The changelog draft will be partially pre-organized (based on GitHub labels) into sections and, within those, into “features.” Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
+## Streamline curating the release changelog. 
+
+The best time to work on the Changelog is at the moment when it’s first created during the Release candidate workflow. That’s when the changelog automation is called and the first version of the Changelog is available in the Release. 
+
+The stable release process takes the RC candidate changelog and adds it to the stable release. There is one caveat: The stable release only ‘remembers’ the first version, that is the version that is available when the Release candidate release is published. Subsequent changes of the changelog can be made but won’t make it into the stable release; only the first version. 
+
+That means if you curate the whole changelog before you publish the Release candidate, you won’t have to work on it for the stable release, except for the few items of subsequent RC 2 or 3 releases that will also be added to the stable release. 
+
+The changelog process is mostly automated, it however depends heavily on proper labeling of the PRs. Before you run the RC candidate, you can save yourself additional time by checking that all PRs have proper labeling.
+
+Review labels on PRs for the Milestone
+An example of such a review was published with 15.8 release, including the label changes made. 
+
+The changelog automation can be called separately from the release workflow with the following command on your local copy: 
+
+```npm run other:changelog -- --milestone="Gutenberg 15.8"```
+With the milestone being the final release version as string. 
+
+The output of this command is the changelog for this milestone at this moment time. Copy/paste it into a  Markdown document so you can view it and follow the links to the PRs.  
+
+The three sections to review are 
+- Enhancements - look for PRs that don’t have any sub category attached
+- Bug fixes - also look for PRs that don’t have any sub-category attached, 
+- Various  - that is created with PRs that don’t have any labels at all. 
+
+Changing the labels on PRs is much faster then reorganizing an existing changelog in the release section afterwards. That work is still to be done for other reasons, but if you double check the labels on a few dozen PRs, you don’t have to navigate the Markdown space up and down to reorganize it. 
+
+One the release changelog is available on draft, ake some time to read the generated notes and then edit them to ensure legibility and accuracy.
 
 Don't rush this part. It's important to ensure the release notes are as organized as possible, and it doesn't need to be completed in one go. You can save the draft and come back to it later.
 
-When editing the notes, you should be sure to:
+If you are worried that people couldn’t get access to the release candidate until you publish the release: you can share the release artifact with the core-editor chanel as it was already created, and you buy yourself some time to finishe the changelog curation task.
 
-1. Delete the `Various` section and move anything under it to a more appropriate section.
-2. Move all features under `Uncategorized` bullet points to a more suitable feature.
+Guidelines for proof-reading changelog items
+- Move all entries under the Various section to a more appropriate section.
+- Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
+- Create new groupings as applicable, and move pull requests between.
+- When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry. Good examples for this are PRs around removing Lodash for performance purposes, replacement of Puppeteer E2D tests with Playwright or efforts to convert public components to TypeScript. 
+- If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
+- If one or more pull requests revert one or more pull requests in the same release netting a zero-sum of code changes, remove them.
+- Remove all mobile app pull request entries (the only exception to this rule is if the mobile PR also updates functionality for the web).
+- If subheaders only have one item listed, remove the subheader and move the PR to the next matching subheader that has more than one item listed. 
 
-You can find some more tips on writing the release notes and post in the section below.
+As mentioned, the stable release process pulls from the first published changelogs from each release candidate. Edit the changelog before you publish the release. 
+
 
 #### Creating Release Candidate Patches
 
@@ -67,10 +102,32 @@ There are a couple of ways a release coordinator might be made aware of these bu
 - Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [Do a search for any of these PRs](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed) before publishing the final release.
 - You may receive a direct message or a ping in the #core-editor channel in slack notifying you of PRs that need to be included in the release candidate. Even when this is the case, the `Backport to Gutenberg RC` should be added to the PR.
 
-The cherry-picking process is handled as follows:
+
+The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md), but make sure to use the `Backport to Gutenberg RC` label when running the command.
+
+_Switch to the release branch_
+
+```git checkout release/X.Y```
+
+_Cherry-pick all the merged PRs with a relevant backport label_
+
+```npm run other:cherry-pick "Backport to Gutenberg RC"```
+
+The script 
+- cherry-picks all PRs with the label 'Backport to Gutenberg RC'
+- Adds them to the release milestone,
+- git push all changes to the release branch
+- Adds a comment to the PR and 
+- once done, it also removes the label 'Backport to Gutenber RC' from the PR. 
+
+Here is a screenshot of the process: 
+![](/docs/assets/Cherry-Pick-Backport-to-GB-RC.png)
+
+
+If you need to handle cherry-picking one at a time and one step at a time you can follow this sequence manually. 
 
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
-2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md), but make sure to use the `Backport to Gutenberg RC` label when running the command.
+2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. 
 3. When done, push the changes to GitHub: `git push`.
 
 <div class="callout callout-tip">
@@ -107,23 +164,7 @@ Documenting the release is a group effort between the release manager, Gutenberg
 
 #### 1. Curating the changelog
 
-The release notes draft is auto-generated by a script that looks for pull requests for the current milestone, and:
-
-1. Groups them into sections (by pull request label).
-2. Sub-groups them into "features" within each section (again by pull request label)
-
-This is intended to be a starting point for release notes, and manually reviewing and curating the changelog entries is still required. The release candidate changelog is reused in the stable release and greatly helps select the highlights; because depending on the release it can be a very time-consuming process, **it is recommended to start this process as soon as the milestone is closed** and the release candidate is published.
-
-Guidelines for proof-reading include:
-
--   Move _all_ entries under the `Various` section to a more appropriate section.
--   Move _all_ features listed under the `Uncategorized` bullet points to a more suitable feature grouping.
--   Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
--   Create new groupings as applicable, and move pull requests between.
--   When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry.
--   If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
--   If one or more pull requests revert one or more pull requests in the same release netting a zero-sum of code changes, remove them.
--   Remove all mobile app pull request entries (the only exception to this rule is if the mobile PR also updates functionality for the web).
+T
 
 #### 2. Selecting the release highlights
 
