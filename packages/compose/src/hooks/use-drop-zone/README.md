@@ -1,4 +1,4 @@
-# useDropZone
+# useDropZone (experimental)
 
 A hook to facilitate drag and drop handling within a designated drop zone area. An optional `dropZoneElement` can be provided, however by default the drop zone is bound by the area where the returned `ref` is assigned.
 
