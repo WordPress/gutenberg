@@ -77,7 +77,7 @@ function render_block_core_image( $attributes, $content ) {
 		return
 			<<<HTML
 				<div class="wp-lightbox-container"
-					data-wp-island=""
+					data-wp-island
 					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }'>
 						$body_content
 						<div data-wp-body="" class="wp-lightbox-overlay"
