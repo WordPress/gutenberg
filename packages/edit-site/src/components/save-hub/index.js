@@ -74,7 +74,7 @@ export default function SaveHub() {
 			);
 		}
 		// if we are on pages
-		else if ( !! params.postType ) {
+		else if ( !! params.postId ) {
 			dirtyLocal = dirtyRecords.find(
 				( record ) =>
 					record.name === params.postType &&
