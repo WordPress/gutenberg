@@ -123,7 +123,6 @@
 		border-radius: 0;
 	}
 
-
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
@@ -214,10 +213,8 @@
 		line-height: 0;
 		width: $button-size;
 		vertical-align: middle;
-		@include reduce-motion("transition");
 
 		> * {
-			will-change: opacity;
 			opacity: 0;
 		}
 
@@ -227,7 +224,6 @@
 		&.is-visible {
 			> * {
 				opacity: 1;
-				@include edit-post__fade-in-animation;
 			}
 		}
 
