@@ -53,7 +53,7 @@ function InstalledFonts () {
                         {installedFonts.map( font => (
                             <LibraryFontCard
                                 font={ font }
-                                key={ font.name }
+                                key={ font.slug }
                                 onClick={ () => { handleSelectFont( font ) } }
                             />
                         ) )}

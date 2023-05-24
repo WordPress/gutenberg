@@ -29,10 +29,17 @@ function FontLibraryProvider( { children } ) {
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
 
 	// Installed fonts
-	const installedFonts = useMemo( () => (
-		[ ...( themeFonts.map(f=>({...f, source:"theme"})) || [] ), ...( libraryFonts || [] ) ]
+	const installedFonts = useMemo( () => {
+		const fromTheme = themeFonts.map( f =>({
+			...f,
+			source:"theme", 
+			...( !f.name ? { name: f.fontFamily } : {} ),
+		})) || [];
+		const fromLibrary = libraryFonts || [];
+
+		return [ ...fromTheme, ...fromLibrary ]
 			.sort( ( a, b ) => (a.name || a.slug).localeCompare( b.name || b.slug ) )
-	), [ themeFonts, libraryFonts ] );
+	}, [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
 	const [ googleFonts, setGoogleFonts ] = useState( null );

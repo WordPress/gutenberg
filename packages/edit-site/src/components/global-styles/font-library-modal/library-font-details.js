@@ -62,7 +62,7 @@ function LibraryFontDetails ({ font, handleUnselectFont, canBeRemoved }) {
                 onCancel={ handleCancelUninstall }
                 onConfirm={ handleConfirmUninstall }
             >
-                { __( `Would you like to remove ${font.name || font.fontFamily} and all its variants and assets?`) }
+                { __( `Would you like to remove ${font.name} and all its variants and assets?`) }
             </ConfirmDialog>
 
             <PreviewControls />

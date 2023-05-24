@@ -84,7 +84,7 @@ function FontFamilies() {
                     {fonts.map( family => (
                         <Item key={family.slug}>
                             <HStack justify="flex-start">
-                                <FlexItem style={{ fontFamily: family.fontFamily }}>{ family.name }</FlexItem>
+                                <FlexItem style={{ fontFamily: family.fontFamily }}>{ family.name || family.fontFamily }</FlexItem>
                             </HStack>
                         </Item>
                     ))}
