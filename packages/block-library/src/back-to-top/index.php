@@ -16,7 +16,7 @@ function render_block_core_back_to_top( $attributes ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return sprintf(
-		'<p %1$s><a href="#top">%2$s</a></p>',
+		'<p %1$s><a href="#wp-back-to-top">%2$s</a></p>',
 		$wrapper_attributes,
 		wp_kses_post( $link_text )
 	);
@@ -34,3 +34,11 @@ function register_block_core_back_to_top() {
 	);
 }
 add_action( 'init', 'register_block_core_back_to_top' );
+
+/**
+ * Add the target id to top of each page.
+ */
+function block_core_back_to_top_target() {
+	echo '<div id="wp-back-to-top"></div>';
+}
+add_action( 'wp_body_open', 'block_core_back_to_top_target' );

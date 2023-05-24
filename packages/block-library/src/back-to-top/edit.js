@@ -10,7 +10,7 @@ export default function BackToTopEdit( { attributes, setAttributes } ) {
 		<p { ...useBlockProps() }>
 			<RichText
 				tagName="a"
-				href="#top"
+				href="#wp-back-to-top"
 				aria-label={ __( 'Back to top link text' ) }
 				value={ text ? text : __( 'Back to top' ) }
 				withoutInteractiveFormatting={ true }
