@@ -22,7 +22,6 @@ describe( 'Front End Performance', () => {
 
 	afterAll( async () => {
 		saveResultsFile( __filename, results );
-		await activateTheme( 'gutenberg-test-themes/twentytwentyone' );
 	} );
 
 	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {

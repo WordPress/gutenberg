@@ -7,6 +7,7 @@ import path from 'path';
  * WordPress dependencies
  */
 import {
+	activateTheme,
 	createNewPost,
 	saveDraft,
 	insertBlock,
@@ -82,6 +83,10 @@ describe( 'Post Editor Performance', () => {
 	const traceFilePath = getTraceFilePath();
 
 	let traceResults;
+
+	beforeAll( async () => {
+		await activateTheme( 'emptytheme' );
+	} );
 
 	afterAll( async () => {
 		saveResultsFile( __filename, results );
