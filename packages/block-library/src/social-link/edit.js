@@ -6,7 +6,6 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { useDispatch } from '@wordpress/data';
 
@@ -17,7 +16,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -32,64 +31,58 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import { getIconBySite, getNameBySite } from './social-list';
 
-function useOnDelete( props ) {
-	const { removeBlock } = useDispatch( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
-			const { url, clientId } = propsRef.current;
-			if (
-				!! url ||
-				event.defaultPrevented ||
-				! [ BACKSPACE, DELETE ].includes( event.keyCode )
-			) {
-				return;
-			}
-			removeBlock( clientId );
-		}
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
-	}, [] );
-}
-
 const SocialLinkURLPopover = ( {
 	url,
 	setAttributes,
 	setPopover,
 	popoverAnchor,
 	clientId,
-} ) => (
-	<URLPopover anchor={ popoverAnchor } onClose={ () => setPopover( false ) }>
-		<form
-			className="block-editor-url-popover__link-editor"
-			onSubmit={ ( event ) => {
-				event.preventDefault();
-				setPopover( false );
-			} }
-			ref={ useOnDelete( { url, clientId } ) }
+} ) => {
+	const { removeBlock } = useDispatch( blockEditorStore );
+	return (
+		<URLPopover
+			anchor={ popoverAnchor }
+			onClose={ () => setPopover( false ) }
 		>
-			<div className="block-editor-url-input">
-				<URLInput
-					__nextHasNoMarginBottom
-					value={ url }
-					onChange={ ( nextURL ) =>
-						setAttributes( { url: nextURL } )
-					}
-					placeholder={ __( 'Enter address' ) }
-					disableSuggestions={ true }
+			<form
+				className="block-editor-url-popover__link-editor"
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					setPopover( false );
+				} }
+			>
+				<div className="block-editor-url-input">
+					<URLInput
+						__nextHasNoMarginBottom
+						value={ url }
+						onChange={ ( nextURL ) =>
+							setAttributes( { url: nextURL } )
+						}
+						placeholder={ __( 'Enter address' ) }
+						disableSuggestions={ true }
+						onKeyDown={ ( event ) => {
+							if (
+								!! url ||
+								event.defaultPrevented ||
+								! [ BACKSPACE, DELETE ].includes(
+									event.keyCode
+								)
+							) {
+								return;
+							}
+							removeBlock( clientId );
+						} }
+					/>
+				</div>
+				<Button
+					icon={ keyboardReturn }
+					label={ __( 'Apply' ) }
+					type="submit"
 				/>
-			</div>
-			<Button
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
-			/>
-		</form>
-	</URLPopover>
-);
+			</form>
+		</URLPopover>
+	);
+};
 
 const SocialLinkEdit = ( {
 	attributes,
