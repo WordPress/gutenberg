@@ -16,7 +16,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as coreStore } from '@wordpress/core-data';
-import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -24,20 +23,10 @@ import { getQueryArg } from '@wordpress/url';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 import { useActivateTheme } from '../../utils/use-activate-theme';
-
-function isPreviewingTheme() {
-	return (
-		window?.__experimentalEnableThemePreviews &&
-		getQueryArg( window.location.href, 'theme_preview' ) !== undefined
-	);
-}
-
-function currentlyPreviewingTheme() {
-	if ( isPreviewingTheme() ) {
-		return getQueryArg( window.location.href, 'theme_preview' );
-	}
-	return null;
-}
+import {
+	currentlyPreviewingTheme,
+	isPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SavePanel() {
 	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {
