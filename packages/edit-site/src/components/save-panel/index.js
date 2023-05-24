@@ -28,6 +28,52 @@ import {
 	isPreviewingTheme,
 } from '../../utils/is-previewing-theme';
 
+const _EntitiesSavedStates = ( { onClose } ) => {
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
+	const activateTheme = useActivateTheme();
+	const isDirtyProps = useEntitiesSavedStatesIsDirty();
+	const saveEnabled = isPreviewingTheme() || isDirtyProps.isDirty;
+
+	let activateSaveLabel;
+	if ( isPreviewingTheme() && isDirtyProps.isDirty ) {
+		activateSaveLabel = __( 'Activate & Save' );
+	} else if ( isPreviewingTheme() ) {
+		activateSaveLabel = __( 'Activate' );
+	} else {
+		activateSaveLabel = undefined;
+	}
+
+	const additionalPrompt = (
+		<p>
+			{ sprintf(
+				'Saving your changes will change your active theme to  %1$s.',
+				theme?.name?.rendered
+			) }
+		</p>
+	);
+
+	const onSave = async ( values ) => {
+		await activateTheme();
+		return values;
+	};
+
+	return window?.__experimentalEnableThemePreviews ? (
+		<EntitiesSavedStatesExtensible
+			{ ...{
+				...isDirtyProps,
+				additionalPrompt,
+				close: onClose,
+				onSave,
+				saveEnabled,
+				saveLabel: activateSaveLabel,
+			} }
+		/>
+	) : (
+		<EntitiesSavedStates close={ onClose } />
+	);
+};
+
 export default function SavePanel() {
 	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {
 		const { isSaveViewOpened, getCanvasMode } = unlock(
@@ -44,52 +90,6 @@ export default function SavePanel() {
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const onClose = () => setIsSaveViewOpened( false );
 
-	const _EntitiesSavedStates = () => {
-		const { getTheme } = useSelect( coreStore );
-		const theme = getTheme( currentlyPreviewingTheme() );
-		const activateTheme = useActivateTheme();
-		const isDirtyProps = useEntitiesSavedStatesIsDirty();
-		const saveEnabled = isPreviewingTheme() || isDirtyProps.isDirty;
-
-		let activateSaveLabel;
-		if ( isPreviewingTheme() && isDirtyProps.isDirty ) {
-			activateSaveLabel = __( 'Activate & Save' );
-		} else if ( isPreviewingTheme() ) {
-			activateSaveLabel = __( 'Activate' );
-		} else {
-			activateSaveLabel = undefined;
-		}
-
-		const additionalPrompt = (
-			<p>
-				{ sprintf(
-					'Saving your changes will change your active theme to  %1$s.',
-					theme?.name?.rendered
-				) }
-			</p>
-		);
-
-		const onSave = async ( values ) => {
-			await activateTheme();
-			return values;
-		};
-
-		return window?.__experimentalEnableThemePreviews ? (
-			<EntitiesSavedStatesExtensible
-				{ ...{
-					...isDirtyProps,
-					additionalPrompt,
-					close: onClose,
-					onSave,
-					saveEnabled,
-					saveLabel: activateSaveLabel,
-				} }
-			/>
-		) : (
-			<EntitiesSavedStates close={ onClose } />
-		);
-	};
-
 	if ( canvasMode === 'view' ) {
 		return isSaveViewOpen ? (
 			<Modal
@@ -100,7 +100,7 @@ export default function SavePanel() {
 					'Save site, content, and template changes'
 				) }
 			>
-				<_EntitiesSavedStates />
+				<_EntitiesSavedStates onClose={ onClose } />
 			</Modal>
 		) : null;
 	}
