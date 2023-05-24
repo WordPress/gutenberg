@@ -73,8 +73,8 @@ interface EntityConfig {
 	kind: string;
 }
 
-interface UndoState extends Array< Object > {
-	flattenedUndo: unknown;
+interface UndoState {
+	list: Array< Object >;
 	offset: number;
 }
 
@@ -889,7 +889,9 @@ function getCurrentUndoOffset( state: State ): number {
  * @return The edit.
  */
 export function getUndoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
+	return state.undo.list[
+		state.undo.list.length - 2 + getCurrentUndoOffset( state )
+	];
 }
 
 /**
@@ -901,7 +903,9 @@ export function getUndoEdit( state: State ): Optional< any > {
  * @return The edit.
  */
 export function getRedoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
+	return state.undo.list[
+		state.undo.list.length + getCurrentUndoOffset( state )
+	];
 }
 
 /**
@@ -1142,11 +1146,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
 export const getReferenceByDistinctEdits = createSelector(
 	// This unused state argument is listed here for the documentation generating tool (docgen).
 	( state: State ) => [],
-	( state: State ) => [
-		state.undo.length,
-		state.undo.offset,
-		state.undo.flattenedUndo,
-	]
+	( state: State ) => [ state.undo.list.length, state.undo.offset ]
 );
 
 /**

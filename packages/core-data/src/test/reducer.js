@@ -173,16 +173,13 @@ describe( 'undo', () => {
 			// We need to "apply" the undo level here and build
 			// the action to move the offset.
 			lastEdits =
-				undoState[
-					undoState.length +
+				undoState.list[
+					undoState.list.length +
 						undoState.offset -
 						( args[ 0 ] === 'isUndo' ? 2 : 0 )
-				].edits;
+				][ 0 ].edits;
 			action = {
-				type: 'EDIT_ENTITY_RECORD',
-				meta: {
-					[ args[ 0 ] ]: true,
-				},
+				type: args[ 0 ] === 'isUndo' ? 'UNDO' : 'REDO',
 			};
 		} else if ( args[ 0 ] === 'isCreate' ) {
 			action = { type: 'CREATE_UNDO_LEVEL' };
@@ -194,8 +191,7 @@ describe( 'undo', () => {
 	beforeEach( () => {
 		lastEdits = {};
 		undoState = undefined;
-		expectedUndoState = [];
-		expectedUndoState.offset = 0;
+		expectedUndoState = { list: [], offset: 0 };
 	} );
 
 	it( 'initializes', () => {
@@ -208,19 +204,19 @@ describe( 'undo', () => {
 		// Check that the first edit creates an undo level for the current state and
 		// one for the new one.
 		undoState = createNextUndoState( { value: 1 } );
-		expectedUndoState.push(
-			createEditActionPart( {} ),
-			createEditActionPart( { value: 1 } )
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1 } ) ]
 		);
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that the second and third edits just create an undo level for
 		// themselves.
 		undoState = createNextUndoState( { value: 2 } );
-		expectedUndoState.push( createEditActionPart( { value: 2 } ) );
+		expectedUndoState.list.push( [ createEditActionPart( { value: 2 } ) ] );
 		expect( undoState ).toEqual( expectedUndoState );
 		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.push( createEditActionPart( { value: 3 } ) );
+		expectedUndoState.list.push( [ createEditActionPart( { value: 3 } ) ] );
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 
@@ -229,11 +225,11 @@ describe( 'undo', () => {
 		undoState = createNextUndoState( { value: 1 } );
 		undoState = createNextUndoState( { value: 2 } );
 		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.push(
-			createEditActionPart( {} ),
-			createEditActionPart( { value: 1 } ),
-			createEditActionPart( { value: 2 } ),
-			createEditActionPart( { value: 3 } )
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1 } ) ],
+			[ createEditActionPart( { value: 2 } ) ],
+			[ createEditActionPart( { value: 3 } ) ]
 		);
 		expect( undoState ).toEqual( expectedUndoState );
 
@@ -255,17 +251,18 @@ describe( 'undo', () => {
 		// Check that another edit will go on top when there
 		// is no undo level offset.
 		undoState = createNextUndoState( { value: 4 } );
-		expectedUndoState.push( createEditActionPart( { value: 4 } ) );
+		expectedUndoState.list.push( [ createEditActionPart( { value: 4 } ) ] );
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that undoing and editing will slice of
 		// all the levels after the current one.
 		undoState = createNextUndoState( 'isUndo' );
 		undoState = createNextUndoState( 'isUndo' );
+
 		undoState = createNextUndoState( { value: 5 } );
-		expectedUndoState.pop();
-		expectedUndoState.pop();
-		expectedUndoState.push( createEditActionPart( { value: 5 } ) );
+		expectedUndoState.list.pop();
+		expectedUndoState.list.pop();
+		expectedUndoState.list.push( [ createEditActionPart( { value: 5 } ) ] );
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 
@@ -277,10 +274,10 @@ describe( 'undo', () => {
 			{ transientValue: true }
 		);
 		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.push(
-			createEditActionPart( {} ),
-			createEditActionPart( { value: 1, transientValue: 2 } ),
-			createEditActionPart( { value: 3 } )
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1, transientValue: 2 } ) ],
+			[ createEditActionPart( { value: 3 } ) ]
 		);
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
@@ -292,9 +289,9 @@ describe( 'undo', () => {
 		// transient edits.
 		undoState = createNextUndoState( { value: 1 } );
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.push(
-			createEditActionPart( {} ),
-			createEditActionPart( { value: 1 } )
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1 } ) ]
 		);
 		expect( undoState ).toEqual( expectedUndoState );
 
@@ -305,18 +302,17 @@ describe( 'undo', () => {
 			{ transientValue: true }
 		);
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState[
-			expectedUndoState.length - 1
-		].edits.transientValue = 2;
+		expectedUndoState.list[
+			expectedUndoState.list.length - 1
+		][ 0 ].edits.transientValue = 2;
 		expect( undoState ).toEqual( expectedUndoState );
 
-		// Check that undo levels are created with the latest action,
-		// even if undone.
+		// Check that create after undo does nothing.
 		undoState = createNextUndoState( { value: 3 } );
 		undoState = createNextUndoState( 'isUndo' );
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.pop();
-		expectedUndoState.push( createEditActionPart( { value: 3 } ) );
+		expectedUndoState.list.push( [ createEditActionPart( { value: 3 } ) ] );
+		expectedUndoState.offset = -1;
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 
@@ -328,9 +324,9 @@ describe( 'undo', () => {
 			{ transientValue: true }
 		);
 		undoState = createNextUndoState( 'isUndo' );
-		expectedUndoState.push(
-			createEditActionPart( {} ),
-			createEditActionPart( { value: 1, transientValue: 2 } )
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1, transientValue: 2 } ) ]
 		);
 		expectedUndoState.offset--;
 		expect( undoState ).toEqual( expectedUndoState );
@@ -341,7 +337,7 @@ describe( 'undo', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value } );
 		undoState = createNextUndoState( { value: () => {} } );
-		expectedUndoState.push( createEditActionPart( { value } ) );
+		expectedUndoState.list.push( [ createEditActionPart( { value } ) ] );
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 } );

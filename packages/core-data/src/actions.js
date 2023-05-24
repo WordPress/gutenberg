@@ -411,9 +411,8 @@ export const undo =
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...undoEdit,
-			meta: { isUndo: true },
+			type: 'UNDO',
+			stackedEdits: undoEdit,
 		} );
 	};
 
@@ -429,9 +428,8 @@ export const redo =
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...redoEdit,
-			meta: { isRedo: true },
+			type: 'REDO',
+			stackedEdits: redoEdit,
 		} );
 	};
 
