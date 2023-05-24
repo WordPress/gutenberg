@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	navigable_toolbar: async ( { page }, use ) => {
-		await use( new navigable_toolbar( { page } ) );
+	navigable_Toolbar: async ( { page }, use ) => {
+		await use( new navigable_Toolbar( { page } ) );
 	},
 } );
 
@@ -18,8 +18,9 @@ test.describe( 'Block Toolbar', () => {
 		test( 'should not scroll page', async ( {
 			page,
 			pageUtils,
-			navigable_toolbar,
+			navigable_Toolbar,
 		} ) => {
+			const wp = '';
 			while (
 				await page.evaluate( () => {
 					const scrollable = wp.dom.getScrollContainer(
@@ -39,7 +40,7 @@ test.describe( 'Block Toolbar', () => {
 						.scrollTop
 			);
 			await pageUtils.pressKeys( 'alt+F10' );
-			expect( await navigable_toolbar.isInBlockToolbar() ).toBe( true );
+			expect( await navigable_Toolbar.isInBlockToolbar() ).toBe( true );
 
 			const scrollTopAfter = await page.evaluate(
 				() =>
@@ -53,7 +54,7 @@ test.describe( 'Block Toolbar', () => {
 		test( 'navigates into the toolbar by keyboard (Alt+F10)', async ( {
 			page,
 			pageUtils,
-			navigable_toolbar,
+			navigable_Toolbar,
 		} ) => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
@@ -66,7 +67,7 @@ test.describe( 'Block Toolbar', () => {
 			// Upward.
 			await pageUtils.pressKeys( 'alt+F10' );
 
-			expect( await navigable_toolbar.isInBlockToolbar() ).toBe( true );
+			expect( await navigable_Toolbar.isInBlockToolbar() ).toBe( true );
 		} );
 	} );
 
@@ -75,6 +76,7 @@ test.describe( 'Block Toolbar', () => {
 			page,
 			pageUtils,
 		} ) => {
+			const wp = '';
 			await page.evaluate( () => {
 				const { select, dispatch } = wp.data;
 				const isCurrentlyUnified =
@@ -100,13 +102,13 @@ test.describe( 'Block Toolbar', () => {
 			await pageUtils.pressKeys( 'alt+F10' );
 
 			expect(
-				page.locator( 'role=toolbar[name="Document tools"i]' )
+				await page.locator( 'role=toolbar[name="Document tools"i]' )
 			).toBeVisible();
 		} );
 	} );
 } );
 
-class navigable_toolbar {
+class navigable_Toolbar {
 	constructor( { page } ) {
 		this.page = page;
 	}
