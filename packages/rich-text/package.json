@@ -39,7 +39,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"memize": "^1.1.0",
+		"memize": "^2.1.0",
 		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {

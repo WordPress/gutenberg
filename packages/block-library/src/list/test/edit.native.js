@@ -70,6 +70,7 @@ describe( 'List block', () => {
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
@@ -117,14 +118,15 @@ describe( 'List block', () => {
 
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
-
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
 			/List item Block\. Row 2/
 		);
 		fireEvent.press( firstNestedLevelBlock );
+		await triggerBlockListLayout( firstNestedLevelBlock );
 
 		// Select second level list
 		const [ secondNestedLevelBlock ] = within(
@@ -152,6 +154,7 @@ describe( 'List block', () => {
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select Secont List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
@@ -162,6 +165,12 @@ describe( 'List block', () => {
 		// Update indentation
 		const indentButton = screen.getByLabelText( 'Indent' );
 		fireEvent.press( indentButton );
+
+		// Await recently indented list item layout
+		const [ listItemBlock1 ] = screen.getAllByLabelText(
+			/List item Block\. Row 1/
+		);
+		await triggerBlockListLayout( listItemBlock1 );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -184,17 +193,21 @@ describe( 'List block', () => {
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
 			/List item Block\. Row 1/
 		);
 		fireEvent.press( firstNestedLevelBlock );
+		await triggerBlockListLayout( firstNestedLevelBlock );
 
 		// Select Inner block List
 		const [ innerBlockList ] = within(
 			firstNestedLevelBlock
 		).getAllByLabelText( /List Block\. Row 1/ );
+		fireEvent.press( innerBlockList );
+		await triggerBlockListLayout( innerBlockList );
 
 		// Select nested List Item block
 		const [ listItemBlock ] = within( innerBlockList ).getAllByLabelText(
@@ -336,6 +349,7 @@ describe( 'List block', () => {
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 2/ );
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
@@ -384,6 +398,7 @@ describe( 'List block', () => {
 		// Select List block
 		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 2/ );
 		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
@@ -414,6 +429,70 @@ describe( 'List block', () => {
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
 		<li>Two</li>
+		<!-- /wp:list-item --></ul>
+		<!-- /wp:list -->"
+	` );
+	} );
+
+	it( 'merges first item into its own paragraph block and keeps its nested items', async () => {
+		const initialHtml = `<!-- wp:paragraph -->
+		<p>A quick brown fox.</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>One<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>Two</li>
+		<!-- /wp:list-item -->
+		<!-- wp:list-item -->
+		<li>Three</li>
+		<!-- /wp:list-item --></ul>
+		<!-- /wp:list --></li>
+		<!-- /wp:list-item --></ul>
+		<!-- /wp:list -->`;
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Select List block
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 2/ );
+		fireEvent.press( listBlock );
+		await triggerBlockListLayout( listBlock );
+
+		// Select List Item block
+		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
+			/List item Block\. Row 1/
+		);
+		fireEvent.press( listItemBlock );
+
+		// With cursor positioned at the beginning of the first List Item, press
+		// backward delete
+		const listItemField =
+			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
+		selectRangeInRichText( listItemField, 0 );
+		fireEvent( listItemField, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox.</p>
+		<!-- /wp:paragraph -->
+		
+		<!-- wp:paragraph -->
+		<p>One</p>
+		<!-- /wp:paragraph -->
+		
+		<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>Two</li>
+		<!-- /wp:list-item -->
+		
+		<!-- wp:list-item -->
+		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
 	` );

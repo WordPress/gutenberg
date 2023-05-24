@@ -21,7 +21,7 @@ store( {
 	effects: {
 		core: {
 			navigation: {
-				initModal: async ( { context, ref } ) => {
+				initMenu: ( { context, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
@@ -32,7 +32,7 @@ store( {
 							focusableElements[ focusableElements.length - 1 ];
 					}
 				},
-				focusFirstElement: async ( { context, ref } ) => {
+				focusFirstElement: ( { context, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						ref.querySelector(
 							'.wp-block-navigation-item > *:first-child'
@@ -84,6 +84,13 @@ store( {
 								'has-modal-open'
 							);
 						}
+					}
+				},
+				toggleMenu: ( { context, actions, ref } ) => {
+					if ( context.core.navigation.isMenuOpen ) {
+						actions.core.navigation.closeMenu( { context } );
+					} else {
+						actions.core.navigation.openMenu( { context, ref } );
 					}
 				},
 				handleMenuKeydown: ( { actions, context, event } ) => {

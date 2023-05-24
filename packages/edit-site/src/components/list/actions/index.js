@@ -3,7 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -21,7 +21,6 @@ export default function Actions( { template } ) {
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
@@ -38,9 +37,17 @@ export default function Actions( { template } ) {
 				template.id
 			);
 
-			createSuccessNotice( __( 'Entity reverted.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				sprintf(
+					/* translators: The template/part's name. */
+					__( '"%s" reverted.' ),
+					template.title.rendered
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-template-reverted',
+				}
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

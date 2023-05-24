@@ -33,7 +33,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^1.1.0"
+		"memize": "^2.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

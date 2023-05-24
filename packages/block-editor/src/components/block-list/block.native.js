@@ -162,7 +162,6 @@ function BlockListBlock( {
 		blockType,
 		draggingClientId,
 		draggingEnabled,
-		firstToSelectId,
 		isDescendantOfParentSelected,
 		isDescendentBlockSelected,
 		isParentSelected,
@@ -174,7 +173,6 @@ function BlockListBlock( {
 				getBlockHierarchyRootClientId,
 				getBlockIndex,
 				getBlockParents,
-				getLowestCommonAncestorWithSelectedBlock,
 				getSelectedBlockClientId,
 				getSettings,
 				hasSelectedInnerBlock,
@@ -198,13 +196,6 @@ function BlockListBlock( {
 				selectedParents.includes( rootClientId );
 			const hasInnerBlocks = getBlockCount( clientId ) > 0;
 
-			const commonAncestor =
-				getLowestCommonAncestorWithSelectedBlock( clientId );
-			const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
-			const firstBlockToSelectId = commonAncestor
-				? parents[ commonAncestorIndex ]
-				: parents[ parents.length - 1 ];
-
 			// For blocks with inner blocks, we only enable the dragging in the nested
 			// blocks if any of them are selected. This way we prevent the long-press
 			// gesture from being disabled for elements within the block UI.
@@ -223,7 +214,6 @@ function BlockListBlock( {
 				blockType: currentBlockType,
 				draggingClientId: currentDraggingClientId,
 				draggingEnabled: isDraggingEnabled,
-				firstToSelectId: firstBlockToSelectId,
 				isDescendantOfParentSelected: descendantOfParentSelected,
 				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
@@ -245,11 +235,10 @@ function BlockListBlock( {
 		[ clientId, removeBlock ]
 	);
 	const onFocus = useCallback( () => {
-		const blockId = firstToSelectId ?? clientId;
 		if ( ! isSelected ) {
-			selectBlock( blockId );
+			selectBlock( clientId );
 		}
-	}, [ selectBlock, clientId, firstToSelectId, isSelected ] );
+	}, [ selectBlock, clientId, isSelected ] );
 
 	const onLayout = useCallback(
 		( { nativeEvent } ) => {
@@ -492,26 +481,26 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				) {
 					removeBlock( _clientId );
 				} else {
-					if (
-						canInsertBlockType(
-							getBlockName( firstClientId ),
-							targetRootClientId
-						)
-					) {
-						moveBlocksToPosition(
-							[ firstClientId ],
-							_clientId,
-							targetRootClientId,
-							getBlockIndex( _clientId )
-						);
-					} else {
-						const replacement = switchToBlockType(
-							getBlock( firstClientId ),
-							getDefaultBlockName()
-						);
+					registry.batch( () => {
+						if (
+							canInsertBlockType(
+								getBlockName( firstClientId ),
+								targetRootClientId
+							)
+						) {
+							moveBlocksToPosition(
+								[ firstClientId ],
+								_clientId,
+								targetRootClientId,
+								getBlockIndex( _clientId )
+							);
+						} else {
+							const replacement = switchToBlockType(
+								getBlock( firstClientId ),
+								getDefaultBlockName()
+							);
 
-						if ( replacement && replacement.length ) {
-							registry.batch( () => {
+							if ( replacement && replacement.length ) {
 								insertBlocks(
 									replacement,
 									getBlockIndex( _clientId ),
@@ -519,16 +508,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 									changeSelection
 								);
 								removeBlock( firstClientId, false );
-							} );
+							}
 						}
-					}
 
-					if (
-						! getBlockOrder( _clientId ).length &&
-						isUnmodifiedBlock( getBlock( _clientId ) )
-					) {
-						removeBlock( _clientId, false );
-					}
+						if (
+							! getBlockOrder( _clientId ).length &&
+							isUnmodifiedBlock( getBlock( _clientId ) )
+						) {
+							removeBlock( _clientId, false );
+						}
+					} );
 				}
 			}
 
