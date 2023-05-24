@@ -156,9 +156,10 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
-		blockEditingMode === 'default' &&
+		hasNonContentControls &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
@@ -327,13 +328,13 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ blockEditingMode === 'default' && (
+				{ hasNonContentControls && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ blockEditingMode === 'default' && (
+				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );

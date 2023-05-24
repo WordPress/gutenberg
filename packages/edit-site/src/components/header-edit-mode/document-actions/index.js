@@ -16,6 +16,7 @@ import {
 	sidebar as sidebarIcon,
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -109,7 +110,6 @@ function TemplateDocumentActions( { onBack } ) {
 
 function BaseDocumentActions( { icon, children, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
-	const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
 	return (
 		<Button
 			className="edit-site-document-actions"
@@ -138,7 +138,7 @@ function BaseDocumentActions( { icon, children, onBack } ) {
 				</Text>
 			</HStack>
 			<span className="edit-site-document-actions__shortcut">
-				{ isMac ? '⌘' : 'Ctrl' } K
+				{ displayShortcut.primary( 'k' ) }
 			</span>
 		</Button>
 	);
