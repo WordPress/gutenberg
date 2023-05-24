@@ -261,4 +261,21 @@ describe( 'getListViewDropTarget', () => {
 
 		expect( target ).toBeUndefined();
 	} );
+
+	it( 'should move below, and not nest when dragging lower than the bottom-most block', () => {
+		const singleBlock = [ { ...blocksData[ 0 ], innerBlockCount: 0 } ];
+
+		// This position is to the right of the block, but below the bottom of the block.
+		// This should result in the block being moved below the bottom-most block, and
+		// not being treated as a nesting gesture.
+		const position = { x: 160, y: 250 };
+		const target = getListViewDropTarget( singleBlock, position );
+
+		expect( target ).toEqual( {
+			blockIndex: 1,
+			clientId: 'block-1',
+			dropPosition: 'bottom',
+			rootClientId: '',
+		} );
+	} );
 } );
