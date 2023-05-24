@@ -139,6 +139,8 @@ function MultiplePalettes( {
 	);
 }
 
+// This is a test. This is only a test. If this were an actual PR, there would be real changes.
+// We now return you to your regularly scheduled programming.
 export function CustomColorPickerDropdown( {
 	isRenderedInSidebar,
 	popoverProps: receivedPopoverProps,
