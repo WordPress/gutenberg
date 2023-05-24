@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
@@ -13,7 +18,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import {
 	chevronLeftSmall as chevronLeftSmallIcon,
-	sidebar as sidebarIcon,
+	page as pageIcon,
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -64,7 +69,7 @@ function PageDocumentActions() {
 	}
 
 	return hasPageContentLock ? (
-		<BaseDocumentActions icon={ sidebarIcon }>
+		<BaseDocumentActions isPage icon={ pageIcon }>
 			{ editedRecord.title }
 		</BaseDocumentActions>
 	) : (
@@ -108,13 +113,10 @@ function TemplateDocumentActions( { onBack } ) {
 	);
 }
 
-function BaseDocumentActions( { icon, children, onBack } ) {
+function BaseDocumentActions( { icon, children, onBack, isPage = false } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	return (
-		<Button
-			className="edit-site-document-actions"
-			onClick={ () => openCommandCenter() }
-		>
+		<div className="edit-site-document-actions">
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
@@ -127,19 +129,29 @@ function BaseDocumentActions( { icon, children, onBack } ) {
 					{ __( 'Back' ) }
 				</Button>
 			) }
-			<HStack
-				spacing={ 1 }
-				justify="center"
-				className="edit-site-document-actions__title"
+			<Button
+				className="edit-site-document-actions__command"
+				onClick={ () => openCommandCenter() }
 			>
-				<BlockIcon icon={ icon } />
-				<Text size="body" as="h1">
-					{ children }
-				</Text>
-			</HStack>
-			<span className="edit-site-document-actions__shortcut">
-				{ displayShortcut.primary( 'k' ) }
-			</span>
-		</Button>
+				<HStack
+					spacing={ 1 }
+					justify="center"
+					className={ classnames(
+						'edit-site-document-actions__title',
+						{
+							'is-page': isPage,
+						}
+					) }
+				>
+					<BlockIcon icon={ icon } />
+					<Text size="body" as="h1">
+						{ children }
+					</Text>
+				</HStack>
+				<span className="edit-site-document-actions__shortcut">
+					{ displayShortcut.primary( 'k' ) }
+				</span>
+			</Button>
+		</div>
 	);
 }
