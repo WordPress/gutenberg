@@ -2,13 +2,13 @@
 
 exports[`Config Integration should load local and override configuration files 1`] = `
 {
-  "afterSetup": null,
   "configDirectoryPath": "/test/gutenberg",
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
     "development": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
         "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -36,6 +36,7 @@ exports[`Config Integration should load local and override configuration files 1
     },
     "tests": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
         "WP_DEBUG": false,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -62,6 +63,11 @@ exports[`Config Integration should load local and override configuration files 1
       "themeSources": [],
     },
   },
+  "lifecycleScripts": {
+    "afterClean": null,
+    "afterDestroy": "test",
+    "afterStart": null,
+  },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
@@ -69,13 +75,13 @@ exports[`Config Integration should load local and override configuration files 1
 
 exports[`Config Integration should load local configuration file 1`] = `
 {
-  "afterSetup": "test",
   "configDirectoryPath": "/test/gutenberg",
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
     "development": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
         "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -103,6 +109,7 @@ exports[`Config Integration should load local configuration file 1`] = `
     },
     "tests": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
         "WP_DEBUG": false,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -129,6 +136,11 @@ exports[`Config Integration should load local configuration file 1`] = `
       "themeSources": [],
     },
   },
+  "lifecycleScripts": {
+    "afterClean": null,
+    "afterDestroy": null,
+    "afterStart": "test",
+  },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
@@ -136,13 +148,13 @@ exports[`Config Integration should load local configuration file 1`] = `
 
 exports[`Config Integration should use default configuration 1`] = `
 {
-  "afterSetup": null,
   "configDirectoryPath": "/test/gutenberg",
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
     "development": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
         "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -170,6 +182,7 @@ exports[`Config Integration should use default configuration 1`] = `
     },
     "tests": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
         "WP_DEBUG": false,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -196,6 +209,11 @@ exports[`Config Integration should use default configuration 1`] = `
       "themeSources": [],
     },
   },
+  "lifecycleScripts": {
+    "afterClean": null,
+    "afterDestroy": null,
+    "afterStart": null,
+  },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
 }
@@ -203,13 +221,13 @@ exports[`Config Integration should use default configuration 1`] = `
 
 exports[`Config Integration should use environment variables over local and override configuration files 1`] = `
 {
-  "afterSetup": "test",
   "configDirectoryPath": "/test/gutenberg",
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
     "development": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
         "WP_DEBUG": true,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -238,6 +256,7 @@ exports[`Config Integration should use environment variables over local and over
     },
     "tests": {
       "config": {
+        "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
         "WP_DEBUG": false,
         "WP_ENVIRONMENT_TYPE": "local",
@@ -264,6 +283,11 @@ exports[`Config Integration should use environment variables over local and over
       "testsPort": 61234,
       "themeSources": [],
     },
+  },
+  "lifecycleScripts": {
+    "afterClean": null,
+    "afterDestroy": null,
+    "afterStart": "test",
   },
   "name": "gutenberg",
   "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",

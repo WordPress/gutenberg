@@ -45,7 +45,7 @@ describe( 'parseSourceString', () => {
 	describe( 'local sources', () => {
 		it( 'should parse relative directories', () => {
 			expect( parseSourceString( '.', options ) ).toEqual( {
-				basename: 'gutenberg',
+				basename: path.basename( path.resolve( '.' ) ),
 				path: path.resolve( '.' ),
 				type: 'local',
 			} );
