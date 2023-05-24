@@ -138,7 +138,7 @@ describe( 'private selectors', () => {
 				).toBe( mode );
 			} );
 
-			it( `should return ${ mode } if overriden by a parent`, () => {
+			it( `should return ${ mode } if overridden by a parent`, () => {
 				const state = {
 					...baseState,
 					blockEditingModes: new Map( [
