@@ -80,7 +80,7 @@ function FontLibraryProvider( { children } ) {
 				const availableFontFaces = (font?.fontFace || []).map( (face) => (
 					`${face.fontStyle + face.fontWeight}`
 				)); 
-				acc[ font.name ] = availableFontFaces;
+				acc[ font.slug ] = availableFontFaces;
 				return acc;
 			}
 		, {});
@@ -91,12 +91,11 @@ function FontLibraryProvider( { children } ) {
 		return getAvailableFontsOutline( customFonts === null ? themeFonts : customFonts );
 	}, [ customFonts ] );
 
-	const isFontActivated = ( name, style, weight ) => {
+	const isFontActivated = ( slug, style, weight ) => {
 		if (!style && !weight) {
-			return !!activatedFontsOutline[ name ];
+			return !!activatedFontsOutline[ slug ];
 		}
-		console.log(activatedFontsOutline);
-		return activatedFontsOutline[ name ]?.includes( style + weight );
+		return !!activatedFontsOutline[ slug ]?.includes( style + weight );
 	}
 	
     async function installFonts ( libraryFonts ) {
@@ -211,7 +210,6 @@ function FontLibraryProvider( { children } ) {
 			custom: newCustomFonts,
 		} );
 	}
-
 
 
 	const loadFontFaceAsset = async ( fontFace ) => {
