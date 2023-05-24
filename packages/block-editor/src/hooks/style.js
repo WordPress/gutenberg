@@ -34,6 +34,7 @@ import {
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -347,10 +348,11 @@ export function addEditProps( settings ) {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const shouldDisplayControls = useDisplayBlockControls();
+		const blockEditingMode = useBlockEditingMode();
 
 		return (
 			<>
-				{ shouldDisplayControls && (
+				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
 						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />

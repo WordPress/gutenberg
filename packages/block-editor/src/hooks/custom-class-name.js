@@ -16,6 +16,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Filters registered block settings, extending attributes to include `className`.
@@ -50,6 +51,7 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
+			const blockEditingMode = useBlockEditingMode();
 			const hasCustomClassName = hasBlockSupport(
 				props.name,
 				'customClassName',
@@ -59,25 +61,27 @@ export const withInspectorControl = createHigherOrderComponent(
 				return (
 					<>
 						<BlockEdit { ...props } />
-						<InspectorControls group="advanced">
-							<TextControl
-								__nextHasNoMarginBottom
-								autoComplete="off"
-								label={ __( 'Additional CSS class(es)' ) }
-								value={ props.attributes.className || '' }
-								onChange={ ( nextValue ) => {
-									props.setAttributes( {
-										className:
-											nextValue !== ''
-												? nextValue
-												: undefined,
-									} );
-								} }
-								help={ __(
-									'Separate multiple classes with spaces.'
-								) }
-							/>
-						</InspectorControls>
+						{ blockEditingMode === 'default' && (
+							<InspectorControls group="advanced">
+								<TextControl
+									__nextHasNoMarginBottom
+									autoComplete="off"
+									label={ __( 'Additional CSS class(es)' ) }
+									value={ props.attributes.className || '' }
+									onChange={ ( nextValue ) => {
+										props.setAttributes( {
+											className:
+												nextValue !== ''
+													? nextValue
+													: undefined,
+										} );
+									} }
+									help={ __(
+										'Separate multiple classes with spaces.'
+									) }
+								/>
+							</InspectorControls>
+						) }
 					</>
 				);
 			}
