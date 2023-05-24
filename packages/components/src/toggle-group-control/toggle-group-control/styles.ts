@@ -46,8 +46,10 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 		&:focus-within {
 			border-color: ${ COLORS.ui.borderFocus };
 			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			outline: none;
 			z-index: 1;
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
 		}
 	`;
 };
@@ -80,6 +82,9 @@ export const BackdropView = styled.div`
 	transition: transform ${ CONFIG.transitionDurationFast } ease;
 	${ reduceMotion( 'transition' ) }
 	z-index: 1;
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: -3px;
 `;
 
 export const VisualLabelWrapper = styled.div`

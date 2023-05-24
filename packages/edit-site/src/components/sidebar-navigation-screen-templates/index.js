@@ -37,13 +37,30 @@ const config = {
 	},
 	wp_template_part: {
 		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
+			title: __( 'Library' ),
+			loading: __( 'Loading library' ),
+			notFound: __( 'No patterns found' ),
 			manage: __( 'Manage all template parts' ),
+			reusableBlocks: __( 'Manage reusable blocks' ),
 			description: __(
-				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
+				'Manage what patterns are available when editing your site.'
 			),
+		},
+		sortCallback: ( items ) => {
+			const groupedByArea = items.reduce(
+				( accumulator, item ) => {
+					const key = accumulator[ item.area ] ? item.area : 'rest';
+					accumulator[ key ].push( item );
+					return accumulator;
+				},
+				{ header: [], footer: [], sidebar: [], rest: [] }
+			);
+			return [
+				...groupedByArea.header,
+				...groupedByArea.footer,
+				...groupedByArea.sidebar,
+				...groupedByArea.rest,
+			];
 		},
 	},
 };
@@ -74,10 +91,13 @@ export default function SidebarNavigationScreenTemplates() {
 			per_page: -1,
 		}
 	);
-	const sortedTemplates = templates ? [ ...templates ] : [];
+	let sortedTemplates = templates ? [ ...templates ] : [];
 	sortedTemplates.sort( ( a, b ) =>
 		a.title.rendered.localeCompare( b.title.rendered )
 	);
+	if ( config[ postType ].sortCallback ) {
+		sortedTemplates = config[ postType ].sortCallback( sortedTemplates );
+	}
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
@@ -128,14 +148,28 @@ export default function SidebarNavigationScreenTemplates() {
 								</TemplateItem>
 							) ) }
 							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-									withChevron
-								/>
+								<>
+									<SidebarNavigationItem
+										className="edit-site-sidebar-navigation-screen-templates__see-all"
+										withChevron
+										{ ...browseAllLink }
+									>
+										{ config[ postType ].labels.manage }
+									</SidebarNavigationItem>
+									{ !! config[ postType ].labels
+										.reusableBlocks && (
+										<SidebarNavigationItem
+											as="a"
+											href="edit.php?post_type=wp_block"
+											withChevron
+										>
+											{
+												config[ postType ].labels
+													.reusableBlocks
+											}
+										</SidebarNavigationItem>
+									) }
+								</>
 							) }
 						</ItemGroup>
 					) }
