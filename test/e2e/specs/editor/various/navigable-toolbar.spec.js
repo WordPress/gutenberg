@@ -1,23 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function isInBlockToolbar() {
-	return await page.evaluate( () => {
-		return !! document.activeElement.closest(
-			'.block-editor-block-toolbar'
-		);
-	} );
-}
+test.use( {
+	navigable_toolbar: async ( { page }, use ) => {
+		await use( new navigable_toolbar( { page } ) );
+	},
+} );
 
-describe( 'Block Toolbar', () => {
-	beforeEach( async () => {
-		await createNewPost();
+test.describe( 'Block Toolbar', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	describe( 'Contextual Toolbar', () => {
-		it( 'should not scroll page', async () => {
+	test.describe( 'Contextual Toolbar', () => {
+		test( 'should not scroll page', async ( {
+			page,
+			pageUtils,
+			navigable_toolbar,
+		} ) => {
 			while (
 				await page.evaluate( () => {
 					const scrollable = wp.dom.getScrollContainer(
@@ -36,9 +38,8 @@ describe( 'Block Toolbar', () => {
 					wp.dom.getScrollContainer( document.activeElement )
 						.scrollTop
 			);
-
-			await pressKeyWithModifier( 'alt', 'F10' );
-			expect( await isInBlockToolbar() ).toBe( true );
+			await pageUtils.pressKeys( 'alt+F10' );
+			expect( await navigable_toolbar.isInBlockToolbar() ).toBe( true );
 
 			const scrollTopAfter = await page.evaluate(
 				() =>
@@ -49,7 +50,11 @@ describe( 'Block Toolbar', () => {
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 
-		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
+		test( 'navigates into the toolbar by keyboard (Alt+F10)', async ( {
+			page,
+			pageUtils,
+			navigable_toolbar,
+		} ) => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
 			await page.keyboard.press( 'Enter' );
@@ -59,15 +64,17 @@ describe( 'Block Toolbar', () => {
 			await page.keyboard.type( 'Example' );
 
 			// Upward.
-			await pressKeyWithModifier( 'alt', 'F10' );
+			await pageUtils.pressKeys( 'alt+F10' );
 
-			expect( await isInBlockToolbar() ).toBe( true );
+			expect( await navigable_toolbar.isInBlockToolbar() ).toBe( true );
 		} );
 	} );
 
-	describe( 'Unified Toolbar', () => {
-		beforeEach( async () => {
-			// Enable unified toolbar
+	test.describe( 'Unified Toolbar', () => {
+		test( 'navigates into the toolbar by keyboard (Alt+F10)', async ( {
+			page,
+			pageUtils,
+		} ) => {
 			await page.evaluate( () => {
 				const { select, dispatch } = wp.data;
 				const isCurrentlyUnified =
@@ -80,9 +87,7 @@ describe( 'Block Toolbar', () => {
 					);
 				}
 			} );
-		} );
 
-		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
 			await page.keyboard.press( 'Enter' );
@@ -92,13 +97,25 @@ describe( 'Block Toolbar', () => {
 			await page.keyboard.type( 'Example' );
 
 			// Upward.
-			await pressKeyWithModifier( 'alt', 'F10' );
+			await pageUtils.pressKeys( 'alt+F10' );
 
 			expect(
-				await page.evaluate( () => {
-					return document.activeElement.getAttribute( 'aria-label' );
-				} )
-			).toBe( 'Show document tools' );
+				page.locator( 'role=toolbar[name="Document tools"i]' )
+			).toBeVisible();
 		} );
 	} );
 } );
+
+class navigable_toolbar {
+	constructor( { page } ) {
+		this.page = page;
+	}
+
+	async isInBlockToolbar() {
+		return await this.page.evaluate( () => {
+			return !! document.activeElement.closest(
+				'.block-editor-block-toolbar'
+			);
+		} );
+	}
+}
