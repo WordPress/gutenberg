@@ -115,8 +115,6 @@ export default function SidebarNavigationScreenPages() {
 								</PageItem>
 							) }
 							{ pages?.map( ( item ) => {
-								const pageIsFrontPage = item.id === frontPage;
-								const pageIsPostsPage = item.id === postsPage;
 								let itemIcon;
 								switch ( item.id ) {
 									case frontPage:
@@ -138,10 +136,6 @@ export default function SidebarNavigationScreenPages() {
 										{ decodeEntities(
 											item.title?.rendered
 										) ?? __( '(no title)' ) }
-										{ pageIsFrontPage &&
-											__( ' (Front Page)' ) }
-										{ pageIsPostsPage &&
-											__( ' (Posts Page)' ) }
 									</PageItem>
 								);
 							} ) }
