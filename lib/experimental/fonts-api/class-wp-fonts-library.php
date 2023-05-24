@@ -44,11 +44,23 @@ class WP_Fonts_Library {
 
         register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/install',
+			'/' . $this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'install_fonts' ),
+					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
+				),
+			)
+		);
+
+        register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'uninstall_font_family' ),
 					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
 				),
 			)
@@ -116,51 +128,6 @@ class WP_Fonts_Library {
         return new WP_REST_Response( $data );
     }
 
-    function prepare_item_for_database ( $font_families ) {
-        $new_font_families = array();
-        foreach ( $font_families as $font_family ) {
-            
-            // Remove the entire family and all its font faces if it is marked for removal
-            if ( isset( $font_family['shouldBeRemoved'] ) ) {
-                if( isset( $font_family['fontFace'] ) ){
-                    foreach ( $font_family['fontFace'] as $font_face ) {
-                        delete_font_face_asset( $font_face );
-                    }
-                }
-            // Update the family if it is not marked for removal
-            } else {
-                $new_font_family = $font_family;
-                if( isset( $font_family['fontFace'] ) ){
-                    $new_font_faces = array();
-                    foreach( $font_family['fontFace'] as $font_face ) {
-                       $new_font_face = $this->prepare_font_face_for_database( $font_face );
-                       if ( $new_font_face ) {
-                           $new_font_faces[] = $new_font_face;
-                       }
-                    }
-                    $new_font_family['fontFace'] = $new_font_faces;
-                }
-                $new_font_families[] = $new_font_family; 
-            }
-
-        }
-
-        return $new_font_families;
-    }
-
-    function prepare_font_face_for_database ( $font_face ) {
-        if ( isset( $font_face['shouldBeRemoved'] ) ) {
-            $this->delete_font_face_asset( $font_face );
-            return null;
-        } else {
-            if ( isset( $font_face['shouldBeDownloaded'] ) ){
-                $prepared_font_face = $this->download_font_face_asset( $font_face );
-                return $prepared_font_face;
-            }
-            return $font_face;
-        }
-    }
-
     function delete_asset( $src ) {
         $filename = basename( $src );
         $file_path = path_join( $this->wp_fonts_dir, $filename );
@@ -213,6 +180,33 @@ class WP_Fonts_Library {
             $new_font_face['src'] = $this->download_asset( $font_face['src'], $filename );
         }
         return $new_font_face;
+    }
+
+    function uninstall_font_family ( $request ) {
+        $post = $this->query_fonts_library();
+        $post_content = $post->post_content;
+        $library = json_decode( $post_content, true );
+        $font_families = $library['fontFamilies'];
+
+        $font_to_uninstall = $request->get_json_params();
+        $new_font_families = $this->remove_font_family( $font_families, $font_to_uninstall );
+        return $this->update_fonts_library( $new_font_families );
+    }
+
+    function remove_font_family ( $font_families, $font_to_uninstall ) {
+        $new_font_families = array();
+        foreach ( $font_families as $font_family ) {
+            if ( $font_family['slug'] !== $font_to_uninstall['slug'] ) {
+                $new_font_families[] = $font_family;
+            } else {
+                if ( isset ( $font_family['fontFace'] ) ){
+                    foreach( $font_family['fontFace'] as $font_face ) {
+                        $this->delete_font_face_assets( $font_face );
+                    }
+                }
+            }
+        }
+        return $new_font_families;
     }
 
     function install_fonts ( $request ) {
