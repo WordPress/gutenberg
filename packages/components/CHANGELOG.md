@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   `TEST`: TEST ([#50932](https://github.com/WordPress/gutenberg/pull/50932)).
 -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
 -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
 -   Added experimental v2 of `DropdownMenu` ([#49473](https://github.com/WordPress/gutenberg/pull/49473)).
