@@ -159,17 +159,17 @@ export default function SidebarNavigationScreenPages() {
 										) ?? __( '(no title)' ) }
 									</PageItem>
 								) ) }
+								<SidebarNavigationItem
+									className="edit-site-sidebar-navigation-screen-pages__see-all"
+									href="edit.php?post_type=page"
+									onClick={ () => {
+										document.location =
+											'edit.php?post_type=page';
+									} }
+								>
+									{ __( 'Manage all pages' ) }
+								</SidebarNavigationItem>
 							</VStack>
-							<SidebarNavigationItem
-								className="edit-site-sidebar-navigation-screen-pages__see-all"
-								href="edit.php?post_type=page"
-								onClick={ () => {
-									document.location =
-										'edit.php?post_type=page';
-								} }
-							>
-								{ __( 'Manage all pages' ) }
-							</SidebarNavigationItem>
 						</ItemGroup>
 					) }
 				</>
