@@ -16,6 +16,7 @@ import {
 	useRef,
 	useReducer,
 	forwardRef,
+	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -128,6 +129,9 @@ function ListViewComponent(
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
+
+	const [ insertedBlock, setInsertedBlock ] = useState( null );
+
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
 		setExpandedState,
@@ -212,6 +216,8 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			renderAdditionalBlockUI,
+			insertedBlock,
+			setInsertedBlock,
 		} ),
 		[
 			draggedClientIds,
@@ -221,11 +227,13 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			renderAdditionalBlockUI,
+			insertedBlock,
+			setInsertedBlock,
 		]
 	);
 
-	// If there are no blocks to show, do not render the list view.
-	if ( ! clientIdsTree.length ) {
+	// If there are no blocks to show and we're not showing the appender, do not render the list view.
+	if ( ! clientIdsTree.length && ! showAppender ) {
 		return null;
 	}
 
@@ -264,18 +272,23 @@ function ListViewComponent(
 		</AsyncModeProvider>
 	);
 }
+
+// This is the private API for the ListView component.
+// It allows access to all props, not just the public ones.
 export const PrivateListView = forwardRef( ListViewComponent );
 
+// This is the public API for the ListView component.
+// We wrap the PrivateListView component to hide some props from the public API.
 export default forwardRef( ( props, ref ) => {
 	return (
 		<PrivateListView
 			ref={ ref }
 			{ ...props }
 			showAppender={ false }
-			blockSettingsMenu={ BlockSettingsDropdown }
 			rootClientId={ null }
 			onSelect={ null }
-			renderAdditionalBlockUICallback={ null }
+			renderAdditionalBlockUI={ null }
+			blockSettingsMenu={ undefined }
 		/>
 	);
 } );

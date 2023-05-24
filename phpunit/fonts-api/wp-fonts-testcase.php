@@ -59,6 +59,13 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	 */
 	protected $orig_theme_dir;
 
+	/**
+	 * Administrator ID.
+	 *
+	 * @var int
+	 */
+	protected static $administrator_id = 0;
+
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
@@ -345,5 +352,40 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 		}
 
 		return $handles;
+	}
+
+	protected static function set_up_admin_user() {
+		self::$administrator_id = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_email' => 'administrator@example.com',
+			)
+		);
+	}
+
+	/**
+	 * Sets up the global styles.
+	 *
+	 * @param array $styles User-selected styles structure.
+	 * @param array $theme  Optional. Theme to switch to for the test. Default 'fonts-block-theme'.
+	 */
+	protected function set_up_global_styles( array $styles, $theme = 'fonts-block-theme' ) {
+		switch_theme( $theme );
+
+		if ( empty( $styles ) ) {
+			return;
+		}
+
+		// Make sure there is data from the user origin.
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config   = json_decode( $user_cpt['post_content'], true );
+
+		// Add the test styles.
+		$config['styles'] = $styles;
+
+		// Update the global styles and settings post.
+		$user_cpt['post_content'] = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
 	}
 }

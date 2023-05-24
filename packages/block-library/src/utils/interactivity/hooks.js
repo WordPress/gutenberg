@@ -19,26 +19,28 @@ export const directive = ( name, cb ) => {
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, ctx ) => {
-	// If path starts with !, remove it and save a flag.
-	const hasNegationOperator =
-		path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 	let current = { ...store, context: ctx };
 	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
-	return hasNegationOperator ? ! current : current;
+	return current;
 };
 
 // Generate the evaluate function.
 const getEvaluate =
 	( { ref } = {} ) =>
 	( path, extraArgs = {} ) => {
+		// If path starts with !, remove it and save a flag.
+		const hasNegationOperator =
+			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		const value = resolve( path, extraArgs.context );
-		return typeof value === 'function'
-			? value( {
-					ref: ref.current,
-					...store,
-					...extraArgs,
-			  } )
-			: value;
+		const returnValue =
+			typeof value === 'function'
+				? value( {
+						ref: ref.current,
+						...store,
+						...extraArgs,
+				  } )
+				: value;
+		return hasNegationOperator ? ! returnValue : returnValue;
 	};
 
 // Directive wrapper.

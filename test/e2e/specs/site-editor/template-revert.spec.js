@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRevertUtils: async ( { page }, use ) => {
-		await use( new TemplateRevertUtils( { page } ) );
+	templateRevertUtils: async ( { editor, page }, use ) => {
+		await use( new TemplateRevertUtils( { editor, page } ) );
 	},
 } );
 
@@ -39,11 +39,22 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await editor.saveSiteEditorEntities();
 
-		await page.click( 'role=button[name="Show template details"i]' );
+		const isTemplateTabVisible = await page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			);
+		}
 
 		// The revert button isn't visible anymore.
 		await expect(
-			page.locator( 'role=menuitem[name=/Clear customizations/i]' )
+			page.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+			)
 		).not.toBeVisible();
 	} );
 
@@ -274,12 +285,26 @@ test.describe( 'Template Revert', () => {
 } );
 
 class TemplateRevertUtils {
-	constructor( { page } ) {
+	constructor( { editor, page } ) {
+		this.editor = editor;
 		this.page = page;
 	}
 
 	async revertTemplate() {
-		await this.page.click( 'role=button[name="Show template details"i]' );
+		await this.editor.openDocumentSettingsSidebar();
+		const isTemplateTabVisible = await this.page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await this.page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			);
+		}
+		await this.page.click(
+			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+		);
 		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'

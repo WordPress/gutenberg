@@ -486,6 +486,71 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should keep nested list items when merging with paragraph', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'p' },
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'i' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Move the caret in front of "1" in the first list item.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'p' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'i' },
+					},
+				],
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( startingContent );
+	} );
+
 	test( 'should split into two ordered lists with paragraph', async ( {
 		editor,
 		page,

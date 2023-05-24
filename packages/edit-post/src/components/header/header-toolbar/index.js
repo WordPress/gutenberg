@@ -26,6 +26,8 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../private-apis';
 
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
@@ -66,8 +68,6 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
-
-	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );

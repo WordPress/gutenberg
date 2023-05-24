@@ -1,0 +1,263 @@
+/**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
+import { css, keyframes } from '@emotion/react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+
+/**
+ * Internal dependencies
+ */
+import { COLORS, font, rtl } from '../utils';
+import { space } from '../ui/utils/space';
+import Icon from '../icon';
+
+const ANIMATION_PARAMS = {
+	SLIDE_AMOUNT: '2px',
+	DURATION: '400ms',
+	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+};
+
+const ITEM_PREFIX_WIDTH = space( 7 );
+const ITEM_PADDING_INLINE_START = space( 2 );
+const ITEM_PADDING_INLINE_END = space( 2.5 );
+
+const slideUpAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideRightAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
+
+const slideDownAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideLeftAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
+
+const baseContent = css`
+	min-width: 220px;
+	background-color: ${ COLORS.ui.background };
+	border-radius: 6px;
+	padding: ${ space( 2 ) };
+	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
+		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
+		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
+		0px 0.7px 1px rgba( 0, 0, 0, 0.1 );
+	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+	will-change: transform, opacity;
+
+	&[data-side='top'] {
+		animation-name: ${ slideDownAndFade };
+	}
+
+	&[data-side='right'] {
+		animation-name: ${ slideLeftAndFade };
+	}
+
+	&[data-side='bottom'] {
+		animation-name: ${ slideUpAndFade };
+	}
+
+	&[data-side='left'] {
+		animation-name: ${ slideRightAndFade };
+	}
+
+	@media ( prefers-reduced-motion ) {
+		animation-duration: 0s;
+	}
+`;
+
+const itemPrefix = css`
+	width: ${ ITEM_PREFIX_WIDTH };
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* Prefixes don't get affected by the item's inline start padding */
+	margin-inline-start: calc( -1 * ${ ITEM_PADDING_INLINE_START } );
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
+`;
+
+const itemSuffix = css`
+	width: max-content;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* Push prefix to the inline-end of the item */
+	margin-inline-start: auto;
+	/* Minimum space between the item's content and suffix */
+	padding-inline-start: ${ space( 6 ) };
+	/*
+		Negative margin allows the suffix to be as tall as the whole item
+		(incl. padding) before increasing the items' height. This can be useful,
+		e.g., when using icons that are bigger than 20x20 px
+	*/
+	margin-top: ${ space( -2 ) };
+	margin-bottom: ${ space( -2 ) };
+
+	/*
+		Override color in normal conditions, but inherit the item's color
+	  for altered conditions.
+
+		TODO:
+		  - For now, used opacity like for disabled item, which makes it work
+			  regardless of the theme
+		  - how do we translate this for themes? Should we have a new variable
+		for "secondary" text?
+	*/
+	opacity: 0.6;
+
+	[data-highlighted] > &,
+	[data-state='open'] > &,
+	[data-disabled] > & {
+		opacity: 1;
+	}
+`;
+
+export const ItemPrefixWrapper = styled.span`
+	${ itemPrefix }
+`;
+
+export const ItemSuffixWrapper = styled.span`
+	${ itemSuffix }
+`;
+
+const baseItem = css`
+	all: unset;
+	font-size: ${ font( 'default.fontSize' ) };
+	font-family: inherit;
+	font-weight: normal;
+	line-height: 20px;
+	color: ${ COLORS.gray[ 900 ] };
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+		${ ITEM_PADDING_INLINE_START };
+	position: relative;
+	user-select: none;
+	outline: none;
+
+	&[data-disabled] {
+		/*
+			TODO:
+			  - we need a disabled color in the Theme variables
+			  - design specs use opacity instead of setting a new text color
+		*/
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	&[data-highlighted] {
+		/*
+			TODO: reconcile with global focus styles
+			(incl high contrast mode fallbacks)
+		 */
+
+		background-color: ${ COLORS.ui.theme };
+		color: white;
+	}
+
+	svg {
+		fill: currentColor;
+	}
+
+	&:not( :has( ${ ItemPrefixWrapper } ) ) {
+		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
+	}
+`;
+
+export const Content = styled( DropdownMenu.Content )`
+	${ baseContent }
+`;
+export const SubContent = styled( DropdownMenu.SubContent )`
+	${ baseContent }
+`;
+
+export const Item = styled( DropdownMenu.Item )`
+	${ baseItem }
+`;
+export const CheckboxItem = styled( DropdownMenu.CheckboxItem )`
+	${ baseItem }
+`;
+export const RadioItem = styled( DropdownMenu.RadioItem )`
+	${ baseItem }
+`;
+export const SubTrigger = styled( DropdownMenu.SubTrigger )`
+	&[data-state='open']:not( [data-highlighted] ) {
+		/* TODO: use variable */
+		background-color: rgba( 56, 88, 233, 0.04 );
+		color: ${ COLORS.ui.theme };
+	}
+
+	${ baseItem }
+`;
+
+export const Label = styled( DropdownMenu.Label )`
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	min-height: ${ space( 8 ) };
+
+	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+		${ ITEM_PREFIX_WIDTH };
+	/* TODO: color doesn't match available UI variables */
+	color: ${ COLORS.gray[ 700 ] };
+
+	/* TODO: font size doesn't match available ones via "font" utils */
+	font-size: 11px;
+	line-height: 1.4;
+	font-weight: 500;
+	text-transform: uppercase;
+`;
+
+export const Separator = styled( DropdownMenu.Separator )`
+	height: 1px;
+	/* TODO: doesn't match border color from variables */
+	background-color: ${ COLORS.ui.borderDisabled };
+	/* Negative horizontal margin to make separator go from side to side */
+	margin: ${ space( 2 ) } 0;
+`;
+
+export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+export const SubmenuRtlChevronIcon = styled( Icon )`
+	${ rtl(
+		{
+			transform: `scaleX(1) translateX(${ space( 2 ) })`,
+		},
+		{
+			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
+		}
+	)() }
+`;

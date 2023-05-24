@@ -143,6 +143,9 @@
 
 				.components-textarea-control__input {
 					flex: 1 1 auto;
+					// CSS input is always LTR regardless of language.
+					/*rtl:ignore*/
+					direction: ltr;
 				}
 			}
 		}
