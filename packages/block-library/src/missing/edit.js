@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -38,36 +38,39 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	const actions = [];
 	let messageHTML;
 
-	let blockName = originalName;
+	const convertToHtmlButton = (
+		<Button key="convert" onClick={ convertToHTML } variant="primary">
+			{ __( 'Keep as HTML' ) }
+		</Button>
+	);
 
-	// Defaulting to "Unknown" if the Classic block isn't registered.
-	if (
-		! hasFreeformBlock &&
-		( ! blockName || blockName === 'core/freeform' )
-	) {
-		blockName = _x( 'Unknown', 'The name we use for an unknown block.' );
-	}
-
-	if ( hasContent && hasHTMLBlock ) {
+	if ( hasContent && ! hasFreeformBlock && ! originalName ) {
+		if ( hasHTMLBlock ) {
+			messageHTML = __(
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+			);
+			actions.push( convertToHtmlButton );
+		} else {
+			messageHTML = __(
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+			);
+		}
+	} else if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
 				'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
 			),
-			blockName
+			originalName
 		);
-		actions.push(
-			<Button key="convert" onClick={ convertToHTML } variant="primary">
-				{ __( 'Keep as HTML' ) }
-			</Button>
-		);
+		actions.push( convertToHtmlButton );
 	} else {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
 				'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.'
 			),
-			blockName
+			originalName
 		);
 	}
 
