@@ -52,7 +52,7 @@ function PageDocumentActions() {
 		context.postId
 	);
 
-	const { togglePageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentLock } = useDispatch( editSiteStore );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -71,7 +71,9 @@ function PageDocumentActions() {
 			{ editedRecord.title }
 		</BaseDocumentActions>
 	) : (
-		<TemplateDocumentActions onBack={ () => togglePageContentLock() } />
+		<TemplateDocumentActions
+			onBack={ () => setHasPageContentLock( true ) }
+		/>
 	);
 }
 

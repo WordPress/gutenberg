@@ -13,7 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
-import { togglePageContentLock } from '../actions';
+import { setHasPageContentLock } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -217,18 +217,32 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'togglePageContentLock', () => {
-		it( 'returns the correct toggle action', () => {
-			expect( togglePageContentLock( true ) ).toEqual( {
-				type: 'TOGGLE_PAGE_CONTENT_LOCK',
+	describe( 'setHasPageContentLock', () => {
+		it( 'toggles the page content lock on', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentLock( true )( { dispatch, registry } );
+			expect( clearSelectedBlock ).toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_LOCK',
 				hasPageContentLock: true,
 			} );
-			expect( togglePageContentLock( false ) ).toEqual( {
-				type: 'TOGGLE_PAGE_CONTENT_LOCK',
+		} );
+
+		it( 'toggles the page content lock off', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentLock( false )( { dispatch, registry } );
+			expect( clearSelectedBlock ).not.toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_LOCK',
 				hasPageContentLock: false,
-			} );
-			expect( togglePageContentLock() ).toEqual( {
-				type: 'TOGGLE_PAGE_CONTENT_LOCK',
 			} );
 		} );
 	} );

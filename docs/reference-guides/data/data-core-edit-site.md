@@ -280,6 +280,14 @@ _Returns_
 
 -   `number`: The resolved template ID for the page route.
 
+### setHasPageContentLock
+
+Sets whether or not the editor is locked so that only page content can be edited.
+
+_Parameters_
+
+-   _hasPageContentLock_ `boolean`: True to enable lock, false to disable.
+
 ### setHomeTemplateId
 
 > **Deprecated**
@@ -382,18 +390,6 @@ Dispatches an action that toggles a feature flag.
 _Parameters_
 
 -   _featureName_ `string`: Feature name.
-
-### togglePageContentLock
-
-Action that toggles whether or not the editor is locked so that only page content can be edited.
-
-_Parameters_
-
--   _hasPageContentLock_ `boolean`: True to enable lock, false to disable, or undefined to toggle.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### updateSettings
 

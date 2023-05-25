@@ -164,32 +164,19 @@ describe( 'state', () => {
 			).toBe( true );
 		} );
 
-		it( 'can be explicitly set', () => {
+		it( 'can be set', () => {
 			expect(
 				hasPageContentLock( false, {
-					type: 'TOGGLE_PAGE_CONTENT_LOCK',
+					type: 'SET_HAS_PAGE_CONTENT_LOCK',
 					hasPageContentLock: true,
 				} )
 			).toBe( true );
 			expect(
 				hasPageContentLock( true, {
-					type: 'TOGGLE_PAGE_CONTENT_LOCK',
+					type: 'SET_HAS_PAGE_CONTENT_LOCK',
 					hasPageContentLock: false,
 				} )
 			).toBe( false );
-		} );
-
-		it( 'can be toggled', () => {
-			expect(
-				hasPageContentLock( true, {
-					type: 'TOGGLE_PAGE_CONTENT_LOCK',
-				} )
-			).toBe( false );
-			expect(
-				hasPageContentLock( false, {
-					type: 'TOGGLE_PAGE_CONTENT_LOCK',
-				} )
-			).toBe( true );
 		} );
 	} );
 } );

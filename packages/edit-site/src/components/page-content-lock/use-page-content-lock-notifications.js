@@ -44,7 +44,7 @@ function useEditTemplateNotification() {
 	const alreadySeen = useRef( false );
 
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { togglePageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentLock } = useDispatch( editSiteStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -63,7 +63,7 @@ function useEditTemplateNotification() {
 								{
 									label: __( 'Edit template' ),
 									onClick: () =>
-										togglePageContentLock( false ),
+										setHasPageContentLock( false ),
 								},
 							],
 						}
@@ -78,7 +78,7 @@ function useEditTemplateNotification() {
 			hasPageContentLock,
 			alreadySeen,
 			createInfoNotice,
-			togglePageContentLock,
+			setHasPageContentLock,
 		]
 	);
 }
@@ -97,7 +97,7 @@ function useBackToPageNotification() {
 	const prevHasPageContentLock = useRef( false );
 
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { togglePageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentLock } = useDispatch( editSiteStore );
 
 	useEffect( () => {
 		if (
@@ -111,7 +111,7 @@ function useBackToPageNotification() {
 				actions: [
 					{
 						label: __( 'Back to page' ),
-						onClick: () => togglePageContentLock( true ),
+						onClick: () => setHasPageContentLock( true ),
 					},
 				],
 			} );
@@ -123,6 +123,6 @@ function useBackToPageNotification() {
 		prevHasPageContentLock,
 		hasPageContentLock,
 		createInfoNotice,
-		togglePageContentLock,
+		setHasPageContentLock,
 	] );
 }

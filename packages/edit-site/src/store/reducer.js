@@ -169,8 +169,8 @@ export function hasPageContentLock( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITED_POST':
 			return !! action.context?.postId;
-		case 'TOGGLE_PAGE_CONTENT_LOCK':
-			return action.hasPageContentLock ?? ! state;
+		case 'SET_HAS_PAGE_CONTENT_LOCK':
+			return action.hasPageContentLock;
 	}
 
 	return state;

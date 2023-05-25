@@ -531,17 +531,19 @@ export const switchEditorMode =
 	};
 
 /**
- * Action that toggles whether or not the editor is locked so that only page
- * content can be edited.
+ * Sets whether or not the editor is locked so that only page content can be
+ * edited.
  *
- * @param {boolean} hasPageContentLock True to enable lock, false to disable, or
- *                                     undefined to toggle.
- *
- * @return {Object} Action object.
+ * @param {boolean} hasPageContentLock True to enable lock, false to disable.
  */
-export function togglePageContentLock( hasPageContentLock ) {
-	return {
-		type: 'TOGGLE_PAGE_CONTENT_LOCK',
-		hasPageContentLock,
+export const setHasPageContentLock =
+	( hasPageContentLock ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentLock ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_LOCK',
+			hasPageContentLock,
+		} );
 	};
-}
