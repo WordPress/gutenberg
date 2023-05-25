@@ -5,12 +5,6 @@
  * @package gutenberg
  */
 
-// Power on/off button controlled by a Gutenberg experiment checkbox.
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-no-tinymce', $gutenberg_experiments ) ) {
-	return;
-}
-
 // If user has already requested TinyMCE, we're ending the experiment.
 if ( isset( $_COOKIE['requiresTinymce'] ) ) {
 	return;
