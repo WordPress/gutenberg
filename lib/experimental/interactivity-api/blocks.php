@@ -214,21 +214,3 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 };
 
 add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 1 );
-
-/**
- * Replaces view script for the File, Navigation, and Image blocks with version using Interactivity API.
- *
- * @param array $metadata Block metadata as read in via block.json.
- *
- * @return array Filtered block type metadata.
- */
-function gutenberg_block_update_interactive_view_script( $metadata ) {
-	if (
-		in_array( $metadata['name'], array( 'core/file', 'core/navigation', 'core/image' ), true ) &&
-		str_contains( $metadata['file'], 'build/block-library/blocks' )
-	) {
-		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
-	}
-	return $metadata;
-}
-add_filter( 'block_type_metadata', 'gutenberg_block_update_interactive_view_script', 10, 1 );

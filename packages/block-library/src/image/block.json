@@ -120,6 +120,7 @@
 		},
 		{ "name": "rounded", "label": "Rounded" }
 	],
+	"viewScript": "file:./interactivity.min.js",
 	"editorStyle": "wp-block-image-editor",
 	"style": "wp-block-image"
 }
