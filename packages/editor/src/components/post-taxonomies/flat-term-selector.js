@@ -142,7 +142,7 @@ export function FlatTermSelector( { slug } ) {
 					: EMPTY_ARRAY,
 			};
 		},
-		[ search ]
+		[ search, slug ]
 	);
 
 	// Update terms state only after the selectors are resolved.

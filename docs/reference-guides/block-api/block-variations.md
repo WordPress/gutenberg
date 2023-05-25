@@ -42,7 +42,7 @@ An object describing a variation defined for the block type can contain the foll
 -   `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
 -   `attributes` (optional, type `Object`) – Values that override block attributes.
 -   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
--   `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
+-   `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type. For more details about the `example` object [see here](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional).
 -   `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it defaults to `block` and `inserter`. Available options:
     -   `inserter` - Block Variation is shown on the inserter.
     -   `block` - Used by blocks to filter specific block variations. `Columns` and `Query Loop` blocks have such variations and are passed to the [experimental BlockVariationPicker](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md) component, which is handling the displaying of variations and the ability to select one from them.
