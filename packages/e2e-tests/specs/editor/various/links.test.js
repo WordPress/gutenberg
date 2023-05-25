@@ -793,7 +793,7 @@ describe( 'Links', () => {
 			await settingsToggle.click();
 
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 5 );
+			await pressKeyTimes( 'Tab', 4 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
