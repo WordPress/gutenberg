@@ -7,10 +7,6 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-
 export default function SidebarDetails( { details } ) {
 	return (
 		<VStack

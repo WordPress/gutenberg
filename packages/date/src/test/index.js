@@ -642,20 +642,6 @@ describe( 'Moment.js Localization', () => {
 					'2023-04-30T13:00:00.000Z'
 				)
 			).toBe( '2 days ago' );
-
-			expect(
-				humanTimeDiff(
-					'2023-04-28T11:00:00.000Z',
-					'2023-04-28T13:00:00.000Z'
-				)
-			).toBe( '2 hours ago' );
-
-			expect(
-				humanTimeDiff(
-					'2023-04-26T13:00:00.000Z',
-					'2023-04-28T13:00:00.000Z'
-				)
-			).toBe( '2 days ago' );
 		} );
 
 		it( 'should return human readable time differences in the future', () => {

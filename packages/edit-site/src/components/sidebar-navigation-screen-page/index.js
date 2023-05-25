@@ -10,7 +10,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalUseNavigator as useNavigator,
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 	ExternalLink,
@@ -23,7 +22,7 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
-import { dateI18n, getDate, getSettings, humanTimeDiff } from '@wordpress/date';
+import { humanTimeDiff } from '@wordpress/date';
 import { count as wordCount } from '@wordpress/wordcount';
 import { getMediaDetails } from '@wordpress/editor';
 import { createInterpolateElement } from '@wordpress/element';
@@ -37,68 +36,10 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import SidebarDetails from '../sidebar-navigation-data-list';
+import StatusLabel from './status-label';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
-
-function StatusLabel( { status, date } ) {
-	const relateToNow = humanTimeDiff( date );
-	let statusLabel = '';
-	switch ( status ) {
-		case 'publish':
-			statusLabel = createInterpolateElement(
-				sprintf(
-					/* translators: %s: is the relative time when the post was published. */
-					__( 'Published <time>%s</time>' ),
-					relateToNow
-				),
-				{ time: <time dateTime={ date } /> }
-			);
-			break;
-		case 'future':
-			const formattedDate = dateI18n(
-				getSettings().formats.date,
-				getDate( date )
-			);
-			statusLabel = createInterpolateElement(
-				sprintf(
-					/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
-					__( 'Scheduled for <time>%s</time>' ),
-					formattedDate
-				),
-				{ time: <time dateTime={ date } /> }
-			);
-			break;
-		case 'draft':
-			statusLabel = __( 'Draft' );
-			break;
-		case 'pending':
-			statusLabel = __( 'Pending' );
-			break;
-		default:
-			statusLabel = __( 'Unknown' );
-			break;
-	}
-
-	return (
-		<HStack
-			alignment="left"
-			spacing={ 2 }
-			className="edit-site-sidebar-navigation-screen-page__status"
-		>
-			<div
-				className={ classnames(
-					'edit-site-sidebar-navigation-screen-page__status-indicator',
-					{
-						[ `has-status has-${ status }-status` ]: !! status,
-					}
-				) }
-				aria-hidden="true"
-			/>
-			<Text>{ statusLabel }</Text>
-		</HStack>
-	);
-}
 
 function getPageDetails( page ) {
 	if ( ! page ) {
@@ -108,27 +49,27 @@ function getPageDetails( page ) {
 
 	if ( page?.status ) {
 		details.push( {
-			label: 'Status',
+			label: __( 'Status' ),
 			value: <StatusLabel status={ page.status } date={ page?.date } />,
 		} );
 	}
 
 	if ( page?.slug ) {
 		details.push( {
-			label: 'Slug',
+			label: __( 'Slug' ),
 			value: <Truncate numberOfLines={ 1 }>{ page.slug }</Truncate>,
 		} );
 	}
 
 	if ( page?.templateTitle ) {
 		details.push( {
-			label: 'Template',
+			label: __( 'Template' ),
 			value: page.templateTitle,
 		} );
 	}
 
 	details.push( {
-		label: 'Parent',
+		label: __( 'Parent' ),
 		value: page?.parentTitle,
 	} );
 
