@@ -18,6 +18,7 @@ export default function SidebarNavigationItem( {
 	className,
 	icon,
 	withChevron = false,
+	suffix,
 	children,
 	...props
 } ) {
@@ -45,6 +46,7 @@ export default function SidebarNavigationItem( {
 						size={ 24 }
 					/>
 				) }
+				{ ! withChevron && suffix }
 			</HStack>
 		</Item>
 	);
