@@ -65,13 +65,10 @@ export default function PagePanels() {
 			<PanelBody title={ __( 'Content' ) }>
 				<ContentBlocksList />
 			</PanelBody>
-			<PanelBody
-				className="edit-site-edit-template-panel"
-				title={ __( 'Template' ) }
-			>
+			<PanelBody title={ __( 'Template' ) }>
 				<VStack>
 					<div>{ getTemplateTitle() }</div>
-					<div className="edit-site-edit-template-panel__preview">
+					<div className="edit-site-page-panels__edit-template-preview">
 						<BlockContextProvider value={ blockContext }>
 							<BlockPreview
 								viewportWidth={ 1024 }
@@ -80,7 +77,7 @@ export default function PagePanels() {
 						</BlockContextProvider>
 					</div>
 					<Button
-						className="edit-site-edit-template-panel__button"
+						className="edit-site-page-panels__edit-template-button"
 						variant="secondary"
 						onClick={ () => togglePageContentLock() }
 					>
