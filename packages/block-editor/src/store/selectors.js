@@ -1668,21 +1668,19 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
-
-	// attributes can be null if the block is already deleted.
 	if ( attributes === null ) {
 		return true;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = !! getTemplateLock( state, rootClientId );
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.remove === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.remove ) {
+		return false;
 	}
-
-	// When remove is true, it means we cannot remove it.
-	return ! lock?.remove;
+	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -1714,16 +1712,16 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.move === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.move ) {
+		return false;
 	}
-
-	// When move is true, it means we cannot move it.
-	return ! lock?.move;
+	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
