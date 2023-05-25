@@ -7,12 +7,11 @@ const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
 const { execSync } = require( 'child_process' );
-const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
-const pkg = require( path.resolve( __dirname, '../package.json' ) );
+const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 const {
