@@ -31,7 +31,7 @@ function GoogleFontCard ( { font, onClick, toggleAddFont, isFontAdded } ) {
             elevation={  isAdded ? 1 : 0  }
             font={ font }
             onClick={ () =>
-                onClick( font.name )
+                onClick( font )
             }
             actionHandler={
                 <Button

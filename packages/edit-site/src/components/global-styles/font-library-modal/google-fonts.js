@@ -71,8 +71,7 @@ function GoogleFonts() {
 		return !!(newFontsOutline[font.slug] || []).includes(fontFace.fontStyle + fontFace.fontWeight)
 	}
 
-	const handleSelectFont = ( name ) => {
-		const font = googleFonts.find( font => font.name === name );
+	const handleSelectFont = ( font ) => {
 		setFontSelected( font );
 	};
 
