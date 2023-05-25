@@ -518,8 +518,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
-	$style = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-	$class = implode( ' ', $classes );
+	$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
+	$class        = implode( ' ', $classes );
 
 	// If the menu name has been used previously then append an ID
 	// to the name to ensure uniqueness across a given post.
@@ -538,11 +538,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$container_attributes = get_block_wrapper_attributes(
 		array(
-			'class'      => 'wp-block-navigation__container ' . $class,
-			'style'      => $style,
+			'class' => 'wp-block-navigation__container ' . $class,
+			'style' => $style,
 		)
 	);
-
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
