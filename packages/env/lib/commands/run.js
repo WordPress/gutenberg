@@ -67,8 +67,9 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 	// to interact with the files mounted from the host.
 	const hostUser = getHostUser();
 
-	// We need to pass absolute paths to the container.
-	envCwd = path.resolve(
+	// Since Docker requires absolute paths, we should resolve the input to a POSIX path.
+	// This is needed because Windows resolves relative paths from the C: drive.
+	envCwd = path.posix.resolve(
 		// Not all containers have the same starting working directory.
 		container === 'mysql' || container === 'tests-mysql'
 			? '/'

@@ -152,7 +152,8 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * inner block.
  *
  * Determined based on nesting level indentation of the current block, plus
- * the indentation of the next level of nesting.
+ * the indentation of the next level of nesting. The vertical position of the
+ * cursor must also be within the block.
  *
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
@@ -161,7 +162,10 @@ function getNextNonDraggedBlock( blocksData, index ) {
 function isNestingGesture( point, rect, nestingLevel = 1 ) {
 	const blockIndentPosition =
 		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
-	return point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
+	return (
+		point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION &&
+		point.y < rect.bottom
+	);
 }
 
 // Block navigation is always a vertical list, so only allow dropping
@@ -359,9 +363,12 @@ export function getListViewDropTarget( blocksData, position ) {
 /**
  * A react hook for implementing a drop zone in list view.
  *
+ * @param {Object}       props                   Named parameters.
+ * @param {?HTMLElement} [props.dropZoneElement] Optional element to be used as the drop zone.
+ *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
-export default function useListViewDropZone() {
+export default function useListViewDropZone( { dropZoneElement } ) {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -432,7 +439,12 @@ export default function useListViewDropZone() {
 	);
 
 	const ref = useDropZone( {
+		dropZoneElement,
 		onDrop: onBlockDrop,
+		onDragLeave() {
+			throttled.cancel();
+			setTarget( null );
+		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
