@@ -205,7 +205,8 @@ function gutenberg_register_packages_scripts( $scripts ) {
 			case 'wp-block-library':
 				if (
 					! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-					isset( $_COOKIE['requiresTinymce'] )
+					isset( $_COOKIE['requiresTinymce'] ) ||
+					gutenberg_current_content_contains_classic_block()
 				) {
 					array_push( $dependencies, 'editor' );
 				}
