@@ -11,7 +11,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post terms for the current post wrapped inside "a" tags.
+ * @return string Returns the filtered post terms for the current post wrapped inside "a" or "span" tags.
  */
 function render_block_core_post_terms( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) || ! isset( $attributes['term'] ) ) {
@@ -49,13 +49,19 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
-	return get_the_term_list(
+	$result = get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
 		wp_kses_post( $prefix ),
 		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
 		wp_kses_post( $suffix )
 	);
+
+	if ( ! empty( $attributes['noLink'] ) ) {
+		return preg_replace( '#<a.*?>(.*?)</a>#i', '<span class="wp-block-post-terms__name">\1</span>', $result );
+	}
+
+	return $result;
 }
 
 /**
