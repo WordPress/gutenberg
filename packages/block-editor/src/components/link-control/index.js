@@ -146,7 +146,7 @@ function LinkControl( {
 		setInternalControlValue,
 		setInternalURLInputValue,
 		setInternalTextInputValue,
-		setInternalSettingValue,
+		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
 
 	const valueHasChanges =
@@ -388,7 +388,9 @@ function LinkControl( {
 							handleSubmitWithEnter={ handleSubmitWithEnter }
 							value={ internalControlValue }
 							settings={ settings }
-							onChange={ setInternalSettingValue( settingsKeys ) }
+							onChange={ createSetInternalSettingValueHandler(
+								settingsKeys
+							) }
 						/>
 					) }
 

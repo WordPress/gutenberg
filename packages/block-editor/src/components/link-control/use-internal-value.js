@@ -31,29 +31,30 @@ export default function useInternalValue( value ) {
 		} );
 	};
 
-	const setInternalSettingValue = ( settingsKeys ) => ( nextValue ) => {
-		// Only apply settings values which are defined in the settings prop.
-		const settingsUpdates = Object.keys( nextValue ).reduce(
-			( acc, key ) => {
-				if ( settingsKeys.includes( key ) ) {
-					acc[ key ] = nextValue[ key ];
-				}
-				return acc;
-			},
-			{}
-		);
+	const createSetInternalSettingValueHandler =
+		( settingsKeys ) => ( nextValue ) => {
+			// Only apply settings values which are defined in the settings prop.
+			const settingsUpdates = Object.keys( nextValue ).reduce(
+				( acc, key ) => {
+					if ( settingsKeys.includes( key ) ) {
+						acc[ key ] = nextValue[ key ];
+					}
+					return acc;
+				},
+				{}
+			);
 
-		setInternalValue( {
-			...internalValue,
-			...settingsUpdates,
-		} );
-	};
+			setInternalValue( {
+				...internalValue,
+				...settingsUpdates,
+			} );
+		};
 
 	return [
 		internalValue,
 		setInternalValue,
 		setInternalURLInputValue,
 		setInternalTextInputValue,
-		setInternalSettingValue,
+		createSetInternalSettingValueHandler,
 	];
 }
