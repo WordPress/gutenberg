@@ -1540,6 +1540,10 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 
 	// The parent block doesn't have settings indicating it doesn't support
