@@ -49,13 +49,13 @@ function render_block_core_image( $attributes, $content ) {
 
 	if ( ! empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) && 'none' === $link_destination && $lightbox ) {
 
-		$aria_label = __( 'Open image lightbox' );
+		$aria_label = __( 'Enlarge image' );
 
 		$alt_attribute = trim( $processor->get_attribute( 'alt' ) );
 
 		if ( $alt_attribute ) {
 			/* translators: %s: Image alt text. */
-			$aria_label = sprintf( __( 'Open image lightbox: %s' ), $alt_attribute );
+			$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
 		}
 		$content = $processor->get_updated_html();
 
@@ -78,7 +78,7 @@ function render_block_core_image( $attributes, $content ) {
 		$background_color  = wp_get_global_styles( array( 'color', 'background' ) );
 		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 
-		$close_label = __( 'Close lightbox' );
+		$close_label = __( 'Close' );
 
 		return
 			<<<HTML
