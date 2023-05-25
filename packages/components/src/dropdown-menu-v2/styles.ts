@@ -175,14 +175,13 @@ const baseItem = css`
 		pointer-events: none;
 	}
 
+	/* Hover and Focus styles */
 	&[data-highlighted] {
-		/*
-			TODO: reconcile with global focus styles
-			(incl high contrast mode fallbacks)
-		 */
+		/* TODO: reconcile with global focus styles */
+		background-color: ${ COLORS.gray[ '100' ] };
 
-		background-color: ${ COLORS.ui.theme };
-		color: white;
+		/* Only visible in Windows High Contrast mode */
+		outline: 2px solid transparent;
 	}
 
 	svg {
@@ -211,13 +210,11 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ baseItem }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
-	&[data-state='open']:not( [data-highlighted] ) {
-		/* TODO: use variable */
-		background-color: rgba( 56, 88, 233, 0.04 );
-		color: ${ COLORS.ui.theme };
-	}
-
 	${ baseItem }
+
+	&[data-state='open'] {
+		background-color: ${ COLORS.gray[ '100' ] };
+	}
 `;
 
 export const Label = styled( DropdownMenu.Label )`
