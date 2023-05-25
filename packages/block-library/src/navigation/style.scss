@@ -180,6 +180,7 @@ $navigation-icon-size: 24px;
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
+		// see also: https://github.com/WordPress/gutenberg/pull/50470
 		background-color: #fff;
 		color: #000;
 
