@@ -3,6 +3,18 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const MatchObject = `<!-- wp:paragraph -->
+<p>1st</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2nd</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3rd</p>
+<!-- /wp:paragraph -->`;
+
 test.describe( 'block editor keyboard shortcuts', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -13,43 +25,28 @@ test.describe( 'block editor keyboard shortcuts', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page
-			.locator( '.block-editor-default-block-appender__content' )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2nd' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3rd' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 		await pageUtils.pressKeys( 'secondary', 't' );
 		await pageUtils.pressKeys( 'secondary', 'y' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 
 	test( 'should move the single block down', async ( { editor, page } ) => {
-		await page
-			.locator( '.block-editor-default-block-appender__content' )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2nd' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3rd' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>1st</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>2nd</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>3rd</p>
-<!-- /wp:paragraph -->` );
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 		await page.keyboard.press( 'ArrowUp' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 
 	test( 'should move the multiple block up', async ( {
@@ -57,19 +54,17 @@ test.describe( 'block editor keyboard shortcuts', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page
-			.locator( '.block-editor-default-block-appender__content' )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2nd' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3rd' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 		await page.keyboard.press( 'ArrowUp' );
 		page.locator( '[aria-label="Multiple selected blocks"]' );
 		await pageUtils.pressKeys( 'secondary', 't' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 
 	test( 'should move the multiple block down', async ( {
@@ -77,28 +72,24 @@ test.describe( 'block editor keyboard shortcuts', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page
-			.locator( '.block-editor-default-block-appender__content' )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2nd' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3rd' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 		await page.keyboard.press( 'ArrowUp' );
 		page.locator( '[aria-label="Multiple selected blocks"]' );
 		await pageUtils.pressKeys( 'secondary', 't' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 } );
 
 test.describe( 'test shortcuts handling through portals in the same tree', () => {
 	test.beforeEach( async ( { page, admin, pageUtils } ) => {
 		await admin.createNewPost();
-		await page
-			.locator( '.block-editor-default-block-appender__content' )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2nd' );
@@ -114,18 +105,7 @@ test.describe( 'test shortcuts handling through portals in the same tree', () =>
 	} ) => {
 		await editor.clickBlockToolbarButton( 'Options' );
 		await pageUtils.pressKeys( 'primaryShift', 'd' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>1st</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>2nd</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>3rd</p>
-<!-- /wp:paragraph -->` );
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 
 	test( 'should prevent deleting multiple selected blocks from inputs', async ( {
@@ -134,20 +114,14 @@ test.describe( 'test shortcuts handling through portals in the same tree', () =>
 	} ) => {
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page
-			.locator( 'role=menuitem[name="Create Reusable block"i]' )
+			.getByRole( 'menuitem', { name: 'Create Reusable block' } )
 			.click();
-		await page
-			.locator(
-				'.reusable-blocks-menu-items__convert-modal .components-text-control__input'
-			)
-			.click();
+		await page.getByLabel( 'Name' ).click();
 		await page.keyboard.type( 'hi' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Delete' );
-		await page
-			.locator( '.components-modal__header .components-button' )
-			.click();
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await page.getByRole( 'button', { name: 'Close' } ).click();
+		await expect.poll( editor.getEditedPostContent ).toBe( MatchObject );
 	} );
 } );
