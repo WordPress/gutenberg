@@ -226,13 +226,6 @@ describe( 'ColorPalette', () => {
 		const { container } = render( <ControlledColorPalette /> );
 
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
-		expect(
-			// Relying on implementation details here, but it's the only way I could come up with.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			container.querySelector(
-				'.components-color-palette__custom-color-value'
-			)
-		).toHaveTextContent( '' );
 
 		// Click the first unpressed button
 		await user.click(
@@ -242,10 +235,21 @@ describe( 'ColorPalette', () => {
 			} )[ 0 ]
 		);
 
+		// Confirm the correct color name, color value, and button label are used
 		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
 		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: `Custom color picker. The currently selected color is called "${
+					EXAMPLE_COLORS[ 0 ].name
+				}" and has a value of "${ EXAMPLE_COLORS[ 0 ].color
+					.split( '' )
+					.join( '-' ) }".`,
+				expanded: false,
+			} )
+		).toBeInTheDocument();
 
-		// Clear the color, confirm that name and value are correctly updated
+		// Clear the color, confirm that the relative values are cleared/updated.
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 		expect(
@@ -255,5 +259,16 @@ describe( 'ColorPalette', () => {
 				'.components-color-palette__custom-color-value'
 			)
 		).toHaveTextContent( '' );
+		expect(
+			screen.queryByText( EXAMPLE_COLORS[ 0 ].name )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( EXAMPLE_COLORS[ 0 ].color )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', {
+				name: /^Custom color picker.$/,
+			} )
+		).toBeInTheDocument();
 	} );
 } );
