@@ -15,6 +15,10 @@ To [release WordPress's npm packages](#packages-releases-to-npm-and-wordpress-co
 
 We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
+The first step is [creating an issue in the Gutenberg repo](https://github.com/WordPress/gutenberg/issues/new?assignees=&labels=&projects=&template=New_release.md). 
+The issue template is called: "Gutenberg Release" and contains a checklist for the complete release process from Release Candidate to changelog curation to cherry-picking, stable release to release post. 
+The [issue for Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example. 
+
 -   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
 
 -   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released and the release post is published.  
@@ -57,7 +61,7 @@ That means if you curate the whole changelog before you publish the Release cand
 
 The changelog process is mostly automated, it however depends heavily on proper labeling of the PRs. Before you run the RC candidate, you can save yourself additional time by checking that all PRs have proper labeling.
 
-Review labels on PRs for the Milestone
+### Review labels on PRs for the Milestone
 An example of such a review was published with 15.8 release, including the label changes made. 
 
 The changelog automation can be called separately from the release workflow with the following command on your local copy: 
@@ -80,7 +84,7 @@ Don't rush this part. It's important to ensure the release notes are as organize
 
 If you are worried that people couldn’t get access to the release candidate until you publish the release: you can share the release artifact with the core-editor chanel as it was already created, and you buy yourself some time to finishe the changelog curation task.
 
-Guidelines for proof-reading changelog items
+### Guidelines for proof-reading changelog items
 - Move all entries under the Various section to a more appropriate section.
 - Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
 - Create new groupings as applicable, and move pull requests between.
@@ -151,26 +155,26 @@ Once approved, the new Gutenberg version will be available to WordPress users al
 
 Once released, all that's left to do is writing a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
 
-### Documenting the release with the Release Notes and Post
+### Documenting the release with the Release Post
 
 <div class="callout callout-info">
 Documenting the release is a group effort between the release manager, Gutenberg core team developers, and designers , comprised of a series of sequential steps that, because of the amount of people involved and the coordination required, need to adhere to a timeline between the RC and stable releases. The release manager will get pinged by a core member to kick-off and coordinate this process.
 </div>
 
-1. Curating the changelog - Wednesday after the RC release to Friday
-2. Selecting the release highlights - Friday to Monday
+1. Selecting the release highlights - Friday to Monday
+2. Requesting Release assets via Design team
 3. Drafting the release post - Monday to Wednesday
 4. Publishing the post - Wednesday after stable release
 
-#### 1. Curating the changelog
 
-T
-
-#### 2. Selecting the release highlights
+#### 1. Selecting the release highlights
 
 Once the changelog is cleaned up, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
 
 Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager, design, and Gutenberg Core team members.
+
+#### 2. Requesting release assets from design team 
+Once the highlights are identified, the release lead request visual assets for the main highlights from the design team via a post in the WordPress #design channel. The assets will be providedd via the Google Drive folder for the specific release. 
 
 #### 3. Drafting the release post
 
@@ -180,7 +184,7 @@ When possible, the highlighted changes in the release post should include an ani
 
 These visual assets should maintain consistency with previous release posts; using lean, white themes helps in this regard and visually integrate well with the [make.wordpress.org/core](https://make.wordpress.org/core/) blog aesthetics. Including copyrighted material should be avoided, and browser plugins that can be seen in the browser canvas (spell checkers, form fillers, etc.) disabled when capturing the assets.
 
-#### 5. Publishing the post
+#### 4. Publishing the post
 
 Once the post content is ready, an author already having permissions to post in [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content; this post should be published after the actual release, helping external media to echo and amplify the release news. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
 
