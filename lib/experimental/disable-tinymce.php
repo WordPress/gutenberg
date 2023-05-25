@@ -69,5 +69,4 @@ function gutenberg_current_content_contains_classic_block() {
 	return false;
 }
 
-
-add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
+// add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
