@@ -17,8 +17,8 @@ if ( ! command.length ) {
 // Rather than just executing the current CLI we will attempt to find a local version
 // and execute that one instead. This prevents users from accidentally using the
 // global CLI when a potentially different local version is expected.
-const localPath = path.resolve( './node_modules/@wordpress/env/lib/cli' );
-const cliPath = fs.existsSync( localPath ) ? localPath : '../lib/cli';
+const localPath = path.resolve( './node_modules/@wordpress/env/lib/cli.js' );
+const cliPath = fs.existsSync( localPath ) ? localPath : '../lib/cli.js';
 const cli = require( cliPath )();
 
 // Now we can execute the CLI with the given command.
