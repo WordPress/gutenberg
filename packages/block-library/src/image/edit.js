@@ -17,6 +17,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -27,6 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import Image from './image';
+import { unlock } from '../private-apis';
 
 /**
  * Module constants
@@ -38,6 +40,8 @@ import {
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 } from './constants';
+
+const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = Object.fromEntries(
@@ -124,20 +128,15 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetContentLockingParent } =
-				select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				imageDefaultSize: settings.imageDefaultSize,
-				mediaUpload: settings.mediaUpload,
-				isContentLocked:
-					!! __unstableGetContentLockingParent( clientId ),
-			};
-		},
-		[]
-	);
+	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			imageDefaultSize: settings.imageDefaultSize,
+			mediaUpload: settings.mediaUpload,
+		};
+	}, [] );
+	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -366,10 +365,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
-					isContentLocked={ isContentLocked }
+					blockEditingMode={ blockEditingMode }
 				/>
 			) }
-			{ ! url && ! isContentLocked && (
+			{ ! url && blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }

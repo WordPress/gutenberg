@@ -3,6 +3,10 @@
  */
 import { useContext, useMemo, useEffect } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
+/**
+ * Internal dependencies
+ */
+import { createPortal } from './portals.js';
 
 /**
  * Internal dependencies
@@ -49,8 +53,19 @@ export default () => {
 			}, [ context, inheritedValue ] );
 
 			return <Provider value={ value }>{ children }</Provider>;
-		}
+		},
+		{ priority: 5 }
 	);
+
+	// data-wp-body
+	directive( 'body', ( { props: { children }, context: inherited } ) => {
+		const { Provider } = inherited;
+		const inheritedValue = useContext( inherited );
+		return createPortal(
+			<Provider value={ inheritedValue }>{ children }</Provider>,
+			document.body
+		);
+	} );
 
 	// data-wp-effect.[name]
 	directive( 'effect', ( { directives: { effect }, context, evaluate } ) => {
@@ -140,16 +155,22 @@ export default () => {
 					} );
 					element.props[ attribute ] = result;
 
+					// This seems necessary because Preact doesn't change the attributes
+					// on the hydration, so we have to do it manually. It doesn't need
+					// deps because it only needs to do it the first time.
 					useEffect( () => {
-						// This seems necessary because Preact doesn't change the attributes
-						// on the hydration, so we have to do it manually. It doesn't need
-						// deps because it only needs to do it the first time.
-						if ( result === false ) {
+						// aria- and data- attributes have no boolean representation.
+						// A `false` value is different from the attribute not being
+						// present, so we can't remove it.
+						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+						if ( result === false && attribute[ 4 ] !== '-' ) {
 							element.ref.current.removeAttribute( attribute );
 						} else {
 							element.ref.current.setAttribute(
 								attribute,
-								result === true ? '' : result
+								result === true && attribute[ 4 ] !== '-'
+									? ''
+									: result
 							);
 						}
 					}, [] );

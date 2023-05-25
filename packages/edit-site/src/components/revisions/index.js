@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
@@ -30,6 +25,10 @@ import EditorCanvasContainer from '../editor-canvas-container';
 const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
 	unlock( blockEditorPrivateApis );
 
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
+
 function Revisions( { onClose, userConfig, blocks } ) {
 	const { baseConfig } = useSelect(
 		( select ) => ( {
@@ -42,7 +41,7 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	);
 
 	const mergedConfig = useMemo( () => {
-		if ( ! isEmpty( userConfig ) && ! isEmpty( baseConfig ) ) {
+		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
 			return mergeBaseAndUserConfigs( baseConfig, userConfig );
 		}
 		return {};
@@ -65,7 +64,7 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
 
 	const editorStyles =
-		! isEmpty( globalStyles ) && ! isEmpty( userConfig )
+		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
 			? globalStyles
 			: settings.styles;
 

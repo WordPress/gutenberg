@@ -10,6 +10,7 @@ import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
 import { cleanEmptyObject } from './hooks/utils';
+import { useBlockEditingMode } from './components/block-editing-mode';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -24,4 +25,5 @@ lock( privateApis, {
 	BlockInfo,
 	useShouldContextualToolbarShow,
 	cleanEmptyObject,
+	useBlockEditingMode,
 } );
