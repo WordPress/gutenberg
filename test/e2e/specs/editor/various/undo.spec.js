@@ -455,6 +455,35 @@ test.describe( 'undo', () => {
 			},
 		] );
 	} );
+
+	// @see https://github.com/WordPress/gutenberg/issues/12075
+	test( 'should be able to undo and redo property cross property changes', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.getByRole( 'textbox', { name: 'Add title' } ).type( 'a' ); // First step.
+		await page.keyboard.press( 'Backspace' ); // Second step.
+		await page.getByRole( 'button', { name: 'Add default block' } ).click(); // third step.
+
+		// Title should be empty
+		await expect(
+			page.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( '' );
+
+		// First undo removes the block.
+		// Second undo restores the title.
+		await pageUtils.pressKeys( 'primary+z' );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect(
+			page.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'a' );
+
+		// Redoing the "backspace" should clear the title again.
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await expect(
+			page.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( '' );
+	} );
 } );
 
 class UndoUtils {

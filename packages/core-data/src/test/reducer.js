@@ -220,6 +220,28 @@ describe( 'undo', () => {
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 
+	it( 'stacks and merges multi-property undo levels', () => {
+		undoState = createNextUndoState();
+
+		undoState = createNextUndoState( { value: 1 } );
+		undoState = createNextUndoState( { value2: 2 } );
+		expectedUndoState.list.push(
+			[ createEditActionPart( {} ) ],
+			[ createEditActionPart( { value: 1, value2: undefined } ) ],
+			[ createEditActionPart( { value2: 2 } ) ]
+		);
+		expect( undoState ).toEqual( expectedUndoState );
+
+		// Check that that creating another undo level merges the "edits"
+		undoState = createNextUndoState( { value: 2 } );
+		expectedUndoState.list.pop(); // Edits the last list item and pushes a new one
+		expectedUndoState.list.push(
+			[ createEditActionPart( { value2: 2, value: 1 } ) ],
+			[ createEditActionPart( { value: 2 } ) ]
+		);
+		expect( undoState ).toEqual( expectedUndoState );
+	} );
+
 	it( 'handles undos/redos', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
