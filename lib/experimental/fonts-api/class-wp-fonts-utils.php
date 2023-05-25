@@ -119,4 +119,17 @@ class WP_Fonts_Utils {
 		trigger_error( 'Font family not defined in the variation.' );
 		return null;
 	}
+
+	/**
+	 * Checks if the Site Editor is the current page being displayed.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return bool True when the Site Editor is the current page, else false.
+	 */
+	public static function is_in_site_editor() {
+		global $pagenow;
+
+		return is_admin() && ( 'site-editor.php' === $pagenow );
+	}
 }

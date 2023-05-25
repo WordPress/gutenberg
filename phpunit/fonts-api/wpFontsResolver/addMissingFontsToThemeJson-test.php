@@ -13,7 +13,8 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
  * @covers WP_Fonts_Resolver::add_missing_fonts_to_theme_json
  */
 class Tests_Fonts_WPFontsResolver_AddMissingFontsToThemeJson extends WP_Fonts_TestCase {
-	const FONTS_THEME = 'fonts-block-theme';
+	const FONTS_THEME       = 'fonts-block-theme';
+	private static $pagenow = '';
 
 	/**
 	 * Cache of test themes' `theme.json` contents.
@@ -35,6 +36,13 @@ class Tests_Fonts_WPFontsResolver_AddMissingFontsToThemeJson extends WP_Fonts_Te
 			$file                            = self::$theme_root . "/{$theme}/theme.json";
 			self::$theme_json_data[ $theme ] = json_decode( file_get_contents( $file ), true );
 		}
+
+		self::$pagenow = $GLOBALS['pagenow'];
+	}
+
+	public function tear_down() {
+		$GLOBALS['pagenow'] = self::$pagenow;
+		parent::tear_down();
 	}
 
 	/**
@@ -79,14 +87,19 @@ class Tests_Fonts_WPFontsResolver_AddMissingFontsToThemeJson extends WP_Fonts_Te
 	}
 
 	/**
-	 * @dataProvider data_should_add_non_theme_json_fonts
+	 * @dataProvider data_should_add_non_theme_json_fonts_when_in_site_editor
 	 *
 	 * @param string $theme    Theme to use.
 	 * @param array  $fonts    Fonts to register.
 	 * @param array  $expected Expected fonts to be added.
 	 */
-	public function test_should_add_non_theme_json_fonts( $theme, $fonts, $expected ) {
+	public function test_should_add_non_theme_json_fonts_when_in_site_editor( $theme, $fonts, $expected ) {
 		switch_theme( static::FONTS_THEME );
+
+		// Set up the Site Editor.
+		global $pagenow;
+		$pagenow = 'site-editor.php';
+		set_current_screen( 'site-editor' );
 
 		// Register the fonts.
 		wp_register_fonts( $fonts );
@@ -113,7 +126,7 @@ class Tests_Fonts_WPFontsResolver_AddMissingFontsToThemeJson extends WP_Fonts_Te
 	 *
 	 * @return array
 	 */
-	public function data_should_add_non_theme_json_fonts() {
+	public function data_should_add_non_theme_json_fonts_when_in_site_editor() {
 		$lato = array(
 			'Lato' => array(
 				array(

@@ -135,7 +135,9 @@ class WP_Fonts_Resolver {
 	 * @return WP_Theme_JSON_Gutenberg|WP_Theme_JSON The global styles with missing fonts.
 	 */
 	public static function add_missing_fonts_to_theme_json( $data ) {
-		$font_families_registered = wp_fonts()->get_registered_font_families();
+		$font_families = WP_Fonts_Utils::is_in_site_editor()
+			? wp_fonts()->get_registered_font_families()
+			: wp_fonts()->get_enqueued();
 
 		$raw_data = $data->get_raw_data();
 
@@ -145,8 +147,8 @@ class WP_Fonts_Resolver {
 
 		// Find missing fonts that are not in the theme's theme.json.
 		$to_add = array();
-		if ( ! empty( $font_families_registered ) ) {
-			$to_add = array_diff( $font_families_registered, static::get_font_families( $font_families_from_theme ) );
+		if ( ! empty( $font_families ) ) {
+			$to_add = array_diff( $font_families, static::get_font_families( $font_families_from_theme ) );
 		}
 
 		// Bail out early if there are no missing fonts.
