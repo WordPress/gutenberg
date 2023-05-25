@@ -112,24 +112,15 @@ export default function SidebarNavigationScreenPage() {
 		params: { postId },
 	} = useNavigator();
 	const { record } = useEntityRecord( 'postType', 'page', postId );
-	/*
-	 * Only custom template slugs are available in the post entity record
-	 * Pages using theme templates will not have a template slug.
-	 */
-	const { records: templates, isResolving: areTemplatesLoading } =
-		useEntityRecords( 'postType', 'wp_template', {
-			per_page: -1,
-		} );
-	const templateTitle = areTemplatesLoading
-		? ''
-		: templates?.find( ( template ) => template?.slug === record?.template )
-				?.title?.rendered || '';
 
 	const {
 		parentTitle,
 		featuredMediaDetails: { mediaSourceUrl, mediaDescription },
+		templateSlug,
 	} = useSelect(
 		( select ) => {
+			const { getEditedPostContext } = unlock( select( editSiteStore ) );
+
 			// Featured image.
 			const attachedMedia = record?.featured_media
 				? select( coreStore ).getEntityRecord(
@@ -156,6 +147,7 @@ export default function SidebarNavigationScreenPage() {
 
 			return {
 				parentTitle: _parentTitle,
+				templateSlug: getEditedPostContext()?.templateSlug,
 				featuredMediaDetails: {
 					...getMediaDetails( attachedMedia, postId ),
 					mediaDescription: attachedMedia?.description?.raw,
@@ -164,6 +156,18 @@ export default function SidebarNavigationScreenPage() {
 		},
 		[ record ]
 	);
+
+	// Match template slug to template title.
+	const { records: templates, isResolving: areTemplatesLoading } =
+		useEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+		} );
+	const templateTitle =
+		! areTemplatesLoading && templateSlug
+			? templates?.find( ( template ) => template?.slug === templateSlug )
+					?.title?.rendered || templateSlug
+			: '';
+
 	const displayLink = record?.link
 		? record.link.replace( /^(https?:\/\/)?/, '' )
 		: null;
