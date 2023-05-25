@@ -21,6 +21,7 @@ if ( class_exists( 'WP_Fonts_Resolver' ) ) {
  * @access private
  */
 class WP_Fonts_Resolver {
+
 	/**
 	 * Defines the key structure in global styles to the fontFamily
 	 * user-selected font.
@@ -39,11 +40,13 @@ class WP_Fonts_Resolver {
 
 	/**
 	 * Register fonts defined in theme.json.
+	 *
+	 * @since X.X.X
 	 */
 	public static function register_fonts_from_theme_json() {
 		$settings = static::get_settings();
 
-		// Bail out early if there are no settings for webfonts.
+		// Bail out early if there are no settings for fonts.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 			return;
 		}
@@ -55,13 +58,14 @@ class WP_Fonts_Resolver {
 	}
 
 	/**
-	 * Add missing fonts data to the global styles.
+	 * Add missing fonts to the given global styles data.
+	 *
+	 * @since X.X.X
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $data The global styles.
-	 *
-	 * @return WP_Theme_JSON_Gutenberg      The global styles with missing fonts data.
+	 * @return WP_Theme_JSON_Gutenberg The global styles with missing fonts data.
 	 */
-	public static function add_registered_fonts_to_theme_json( $data ) {
+	public static function add_missing_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
 
 		$raw_data = $data->get_raw_data();
@@ -81,20 +85,14 @@ class WP_Fonts_Resolver {
 			return $data;
 		}
 
-		// Make sure the path to settings.typography.fontFamilies.theme exists
-		// before adding missing fonts.
+		/*
+		 * Make sure the path to settings.typography.fontFamilies.theme exists
+		 * before adding missing fonts.
+		 */
 		if ( empty( $raw_data['settings'] ) ) {
 			$raw_data['settings'] = array();
 		}
-		if ( empty( $raw_data['settings']['typography'] ) ) {
-			$raw_data['settings']['typography'] = array();
-		}
-		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
-			$raw_data['settings']['typography']['fontFamilies'] = array();
-		}
-		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
-			$raw_data['settings']['typography']['fontFamilies']['theme'] = array();
-		}
+		$raw_data['settings'] = static::set_tyopgraphy_settings_array_structure( $raw_data['settings'] );
 
 		foreach ( $to_add as $font_family_handle ) {
 			$raw_data['settings']['typography']['fontFamilies']['theme'][] = wp_fonts()->to_theme_json( $font_family_handle );
@@ -104,7 +102,32 @@ class WP_Fonts_Resolver {
 	}
 
 	/**
+	 * Sets the typography.fontFamilies.theme structure in the given array, if not already set.
+	 * if not already set.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $data The target array to process.
+	 * @return array Data array with typography.fontFamilies.theme structure set.
+	 */
+	private static function set_tyopgraphy_settings_array_structure( array $data ) {
+		if ( empty( $data['typography'] ) ) {
+			$data['typography'] = array();
+		}
+		if ( empty( $data['typography']['fontFamilies'] ) ) {
+			$data['typography']['fontFamilies'] = array();
+		}
+		if ( empty( $data['typography']['fontFamilies']['theme'] ) ) {
+			$data['typography']['fontFamilies']['theme'] = array();
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Returns theme's settings and adds webfonts defined in variations.
+	 *
+	 * @since X.X.X
 	 *
 	 * @return array An array containing theme's settings.
 	 */
@@ -116,27 +139,30 @@ class WP_Fonts_Resolver {
 			return $settings;
 		}
 
-		// If in the editor, add webfonts defined in variations.
+		// If in the editor, add fonts defined in variations.
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
+		$set_theme_structure = true;
 		foreach ( $variations as $variation ) {
 
-			// Sanity check: Skip if fontFamilies are not defined in the variation.
-			if (
-				empty( $variation['settings'] ) ||
-				empty( $variation['settings']['typography'] ) ||
-				empty( $variation['settings']['typography']['fontFamilies'] )
-			) {
+			// Skip if settings.typography.fontFamilies are not defined in the variation.
+			if ( empty( $variation['settings']['typography']['fontFamilies'] ) ) {
 				continue;
 			}
 
-			// Merge the variation settings with the global settings.
-			$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
-			$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
-			$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
-			$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
+			// One time, set any missing parts of the array structure.
+			if ( $set_theme_structure ) {
+				$set_theme_structure = false;
+				$settings            = static::set_tyopgraphy_settings_array_structure( $settings );
+			}
 
-			// Make sure there are no duplicates.
+			// Merge the variation settings with the global settings.
+			$settings['typography']['fontFamilies']['theme'] = array_merge(
+				$settings['typography']['fontFamilies']['theme'],
+				$variation['settings']['typography']['fontFamilies']['theme']
+			);
+
+			// Remove duplicates.
 			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
 		}
 
@@ -146,9 +172,10 @@ class WP_Fonts_Resolver {
 	/**
 	 * Converts a list of font families into font handles and returns them as an array.
 	 *
-	 * @param array $families_data An array of font families data.
+	 * @since X.X.X
 	 *
-	 * @return array               Am array containing font handles.
+	 * @param array $families_data An array of font families data.
+	 * @return array An array containing font handles.
 	 */
 	private static function get_font_families( $families_data ) {
 		$families = array();
@@ -166,13 +193,15 @@ class WP_Fonts_Resolver {
 	/**
 	 * Parse font families from theme.json.
 	 *
-	 * @param array $settings Font settings to parse.
+	 * @since X.X.X
 	 *
+	 * @param array $settings Font settings to parse.
 	 * @return array Returns an array that contains font data and corresponding handles.
 	 */
 	private static function parse_font_families( array $settings ) {
 		$handles = array();
 		$fonts   = array();
+
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $font_family ) {
@@ -182,45 +211,27 @@ class WP_Fonts_Resolver {
 					continue;
 				}
 
-				$font_family['fontFace'] = (array) $font_family['fontFace'];
+				$font_family_slug = isset( $font_family['slug'] ) ? $font_family['slug'] : '';
 
-				foreach ( $font_family['fontFace'] as $font_face ) {
+				foreach ( (array) $font_family['fontFace'] as $font_face ) {
 					// Skip if the font was registered through the Fonts API.
-					if ( isset( $font_face['origin'] ) && 'gutenberg_wp_fonts_api' === $font_face['origin'] ) {
+					if ( isset( $font_face['origin'] ) && WP_Fonts::REGISTERED_ORIGIN === $font_face['origin'] ) {
 						continue;
 					}
 
-					// Check if webfonts have a "src" param, and if they do account for the use of "file:./".
+					// For each font "src", convert the "file:./" placeholder into a theme font file URI.
 					if ( ! empty( $font_face['src'] ) ) {
-						$font_face['src'] = (array) $font_face['src'];
-
-						foreach ( $font_face['src'] as $src_key => $url ) {
-							// Tweak the URL to be relative to the theme root.
-							if ( ! str_starts_with( $url, 'file:./' ) ) {
-								continue;
-							}
-							$font_face['src'][ $src_key ] = get_theme_file_uri( str_replace( 'file:./', '', $url ) );
-						}
+						$font_face['src'] = static::to_theme_file_uri( (array) $font_face['src'] );
 					}
 
-					// Convert keys to kebab-case.
-					foreach ( $font_face as $property => $value ) {
-						$kebab_case               = _wp_to_kebab_case( $property );
-						$font_face[ $kebab_case ] = $value;
-						if ( $kebab_case !== $property ) {
-							unset( $font_face[ $property ] );
-						}
-					}
+					// Convert font-face properties into kebab-case.
+					$font_face = static::to_kebab_case( $font_face );
 
-					$font_family_handle = WP_Fonts_Utils::get_font_family_from_variation( $font_face );
-					if ( empty( $font_family_handle ) && isset( $font_family['slug'] ) ) {
-						$font_family_handle = $font_family['slug'];
-					}
-					if ( ! empty( $font_family_handle ) ) {
-						$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family_handle );
-					}
-					if ( empty( $font_family_handle ) ) {
-						_doing_it_wrong( __FUNCTION__, __( 'Font family not defined in the variation or "slug".', 'gutenberg' ), '6.1.0' );
+					$font_family_handle = static::get_font_family_handle( $font_family_slug, $font_face );
+
+					// Skip if no font-family handle was found.
+					if ( null === $font_family_handle ) {
+						continue;
 					}
 
 					$handles[] = $font_family_handle;
@@ -234,6 +245,83 @@ class WP_Fonts_Resolver {
 		}
 
 		return array( $fonts, $handles );
+	}
+
+	/**
+	 * Gets the font-family handle if defined in the "slug" or font-face variation.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_slug Font-family "slug".
+	 * @param array  $font_face        Font-face (variation) to search if the slug is empty.
+	 * @return string|null Font-family handle on success, else null if not found.
+	 */
+	private static function get_font_family_handle( $font_family_slug, array $font_face ) {
+		// If the slug was defined in the theme's theme.json, return it as the handle.
+		if ( is_string( $font_family_slug ) && '' !== $font_family_slug ) {
+			return $font_family_slug;
+		}
+
+		// Else, get the font-family from the font-face variation.
+		$font_family_handle = WP_Fonts_Utils::get_font_family_from_variation( $font_face );
+
+		if ( empty( $font_family_handle ) ) {
+			$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family_handle );
+		}
+
+		if ( ! is_string( $font_family_handle ) && empty( $font_family_handle ) ) {
+			_doing_it_wrong( __FUNCTION__, __( 'Font family not defined in the variation or "slug".', 'gutenberg' ), '6.1.0' );
+			return null;
+		}
+
+		return $font_family_handle;
+	}
+
+	/**
+	 * Converts each 'file:./' placeholder into a URI to the font file in the theme.
+	 *
+	 * The 'file:./' is specified in the theme's `theme.json` as a placeholder to be
+	 * replaced with the URI to the font file's location in the theme. When a "src"
+	 * beings with this placeholder, it is replaced, converting the src into a URI.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $src An array of font file sources to process.
+	 * @return array An array of font file src URI(s).
+	 */
+	private static function to_theme_file_uri( array $src ) {
+		$placeholder = 'file:./';
+
+		foreach ( $src as $src_key => $src_url ) {
+			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+			if ( ! str_starts_with( $src_url, $placeholder ) ) {
+				continue;
+			}
+
+			$src_file        = str_replace( $placeholder, '', $src_url );
+			$src[ $src_key ] = get_theme_file_uri( $src_file );
+		}
+
+		return $src;
+	}
+
+	/**
+	 * Converts all first dimension keys into kebab-case.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $data The array to process.
+	 */
+	private static function to_kebab_case( array $data ) {
+		foreach ( $data as $key => $value ) {
+			$kebab_case          = _wp_to_kebab_case( $key );
+			$data[ $kebab_case ] = $value;
+			if ( $kebab_case !== $key ) {
+				unset( $data[ $key ] );
+			}
+		}
+
+		return $data;
 	}
 
 	/**

@@ -3,16 +3,16 @@
 require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
- * Test WP_Fonts_Resolver::add_registered_fonts_to_theme_json().
+ * Test WP_Fonts_Resolver::add_missing_fonts_to_theme_json().
  *
  * @package WordPress
  * @subpackage Fonts API
  *
  * @since X.X.X
  * @group fontsapi
- * @covers WP_Fonts_Resolver::add_registered_fonts_to_theme_json
+ * @covers WP_Fonts_Resolver::add_missing_fonts_to_theme_json
  */
-class Tests_Fonts_WpFontsResolver_AddRegisteredFontsToThemeJson extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFontsResolver_AddMissingFontsToThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
 	/**
@@ -46,7 +46,7 @@ class Tests_Fonts_WpFontsResolver_AddRegisteredFontsToThemeJson extends WP_Fonts
 		switch_theme( $theme );
 
 		$data   = new WP_Theme_JSON_Gutenberg( self::$theme_json_data[ $theme ] );
-		$actual = WP_Fonts_Resolver::add_registered_fonts_to_theme_json( $data );
+		$actual = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( $data );
 
 		$this->assertInstanceOf( WP_Theme_JSON_Gutenberg::class, $actual, 'Instance of WP_Theme_JSON_Gutenberg should be returned' );
 	}
@@ -60,7 +60,7 @@ class Tests_Fonts_WpFontsResolver_AddRegisteredFontsToThemeJson extends WP_Fonts
 		switch_theme( $theme );
 
 		$data   = new WP_Theme_JSON_Gutenberg( self::$theme_json_data[ $theme ] );
-		$actual = WP_Fonts_Resolver::add_registered_fonts_to_theme_json( $data );
+		$actual = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( $data );
 
 		$this->assertEmpty( wp_fonts()->get_registered_font_families(), 'No fonts should be registered in Fonts API' );
 		$this->assertSame( $data, $actual, 'Same instance of WP_Theme_JSON_Gutenberg should be returned' );
@@ -92,7 +92,7 @@ class Tests_Fonts_WpFontsResolver_AddRegisteredFontsToThemeJson extends WP_Fonts
 		wp_register_fonts( $fonts );
 
 		$data   = new WP_Theme_JSON_Gutenberg( self::$theme_json_data[ $theme ] );
-		$actual = WP_Fonts_Resolver::add_registered_fonts_to_theme_json( $data );
+		$actual = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( $data );
 
 		$this->assertNotSame( $data, $actual, 'New instance of WP_Theme_JSON_Gutenberg should be returned' );
 		$actual_raw_data = $actual->get_raw_data();
@@ -104,7 +104,7 @@ class Tests_Fonts_WpFontsResolver_AddRegisteredFontsToThemeJson extends WP_Fonts
 		$this->assertContains(
 			$expected,
 			$actual_raw_data['settings']['typography']['fontFamilies']['theme'],
-			'Fonts should be added after running WP_Fonts_Resolver::add_registered_fonts_to_theme_json()'
+			'Fonts should be added after running WP_Fonts_Resolver::add_missing_fonts_to_theme_json()'
 		);
 	}
 
