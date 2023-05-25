@@ -71,7 +71,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					behaviorName.slice( 1 ).toLowerCase(),
 			} ) );
 
-		const options = [ noBehaviorsOption, behaviorsOptions ];
+		const options = [ noBehaviorsOption, ...behaviorsOptions ];
 
 		return (
 			<>
