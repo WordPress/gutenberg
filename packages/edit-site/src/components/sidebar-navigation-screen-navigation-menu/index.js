@@ -39,6 +39,8 @@ const { useHistory } = unlock( routerPrivateApis );
 const noop = () => {};
 
 export default function SidebarNavigationScreenNavigationMenu() {
+	const { deleteEntityRecord } = useDispatch( coreStore );
+	const [ isOpen, setOpen ] = useState( false );
 	const postType = `wp_navigation`;
 	const {
 		params: { postId },
@@ -52,7 +54,13 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
-	const [ isOpen, setOpen ] = useState( false );
+	const modalProps = {
+		postId,
+		isOpen,
+		setOpen,
+		deleteEntityRecord,
+		menuTitle,
+	};
 
 	if ( isLoading ) {
 		return (
@@ -85,7 +93,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	return (
 		<SidebarNavigationScreenWrapper
-			actions={ ScreenNavigationMoreMenu( postId, isOpen, setOpen ) }
+			actions={ ScreenNavigationMoreMenu( modalProps ) }
 			title={ decodeEntities( menuTitle ) }
 			description={ __(
 				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
@@ -173,10 +181,11 @@ const POPOVER_PROPS = {
 	variant: 'toolbar',
 };
 
-function ScreenNavigationMoreMenu( navigationMenuID, isOpen, setOpen ) {
-	const { deleteEntityRecord } = useDispatch( coreStore );
+function ScreenNavigationMoreMenu( props ) {
+	const { postId, isOpen, setOpen, deleteEntityRecord, menuTitle } = props;
 	const closeModal = () => setOpen( false );
 	const openModal = () => setOpen( true );
+
 	return (
 		<>
 			<DropdownMenu
@@ -187,7 +196,12 @@ function ScreenNavigationMoreMenu( navigationMenuID, isOpen, setOpen ) {
 				{ ( { onClose } ) => (
 					<div>
 						<MenuGroup>
-							<MenuItem onClick={ openModal }>
+							<MenuItem
+								onClick={ () => {
+									openModal();
+									onClose();
+								} }
+							>
 								{ __( 'Rename' ) }
 							</MenuItem>
 							<MenuItem>{ __( 'Duplicate' ) }</MenuItem>
@@ -198,7 +212,7 @@ function ScreenNavigationMoreMenu( navigationMenuID, isOpen, setOpen ) {
 									deleteEntityRecord(
 										'postType',
 										'wp_navigation',
-										navigationMenuID,
+										postId,
 										{ force: true }
 									);
 									onClose();
@@ -217,7 +231,7 @@ function ScreenNavigationMoreMenu( navigationMenuID, isOpen, setOpen ) {
 						<VStack spacing="3">
 							<TextControl
 								__nextHasNoMarginBottom
-								value="NAME!"
+								value={ decodeEntities( menuTitle ) }
 								placeholder={ __( 'Navigation title' ) }
 							/>
 							<HStack justify="right">
