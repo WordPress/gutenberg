@@ -19,7 +19,6 @@ import { useMemo } from '@wordpress/element';
  */
 import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
-import removePageFromBlockContext from '../../../utils/remove-page-from-block-context';
 import SidebarCard from '../sidebar-card';
 import ContentBlocksList from './content-blocks-list';
 
@@ -41,7 +40,7 @@ export default function PagePanels() {
 	const { togglePageContentLock } = useDispatch( editSiteStore );
 
 	const blockContext = useMemo(
-		() => removePageFromBlockContext( context ),
+		() => ( { ...context, postType: null, postId: null } ),
 		[ context ]
 	);
 

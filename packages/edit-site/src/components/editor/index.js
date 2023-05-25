@@ -42,7 +42,6 @@ import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
-import removePageFromBlockContext from '../../utils/remove-page-from-block-context';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -125,16 +124,23 @@ export default function Editor( { isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const blockContext = useMemo(
-		() =>
-			addQueryContextToBlockContext(
-				hasPageContentLock
-					? context
-					: removePageFromBlockContext( context ),
-				setEditedPostContext
-			),
-		[ hasPageContentLock, context, setEditedPostContext ]
-	);
+	const blockContext = useMemo( () => {
+		const { postType, postId, ...nonPostFields } = context ?? {};
+		return {
+			...( hasPageContentLock ? context : nonPostFields ),
+			queryContext: [
+				context?.queryContext || { page: 1 },
+				( newQueryContext ) =>
+					setEditedPostContext( {
+						...context,
+						queryContext: {
+							...context?.queryContext,
+							...newQueryContext,
+						},
+					} ),
+			],
+		};
+	}, [ hasPageContentLock, context, setEditedPostContext ] );
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -246,21 +252,4 @@ export default function Editor( { isLoading } ) {
 			</EntityProvider>
 		</>
 	);
-}
-
-function addQueryContextToBlockContext( context, setContext ) {
-	return {
-		...context,
-		queryContext: [
-			context?.queryContext || { page: 1 },
-			( newQueryContext ) =>
-				setContext( {
-					...context,
-					queryContext: {
-						...context?.queryContext,
-						...newQueryContext,
-					},
-				} ),
-		],
-	};
 }
