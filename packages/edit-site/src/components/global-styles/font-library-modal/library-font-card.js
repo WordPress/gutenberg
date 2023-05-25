@@ -34,7 +34,6 @@ function LibraryFontCard( { font, onClick } ) {
 
 	return (
 		<FontCard
-			elevation={ isActive ? 1 : 0 }
 			onClick={ handleClick }
 			font={ font }
 			actionHandler={ actionHandler }

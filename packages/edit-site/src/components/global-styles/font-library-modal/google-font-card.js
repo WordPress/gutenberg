@@ -24,7 +24,6 @@ function GoogleFontCard( { font, onClick, toggleAddFont, isFontAdded } ) {
 
 	return (
 		<FontCard
-			elevation={ isAdded ? 1 : 0 }
 			font={ font }
 			onClick={ () => onClick( font ) }
 			actionHandler={

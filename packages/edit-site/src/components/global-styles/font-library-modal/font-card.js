@@ -16,7 +16,7 @@ import {
  */
 import FontFaceDemo from './font-demo';
 
-function FontCard( { font, onClick, actionHandler, elevation } ) {
+function FontCard( { font, onClick, actionHandler } ) {
 	const fakeFontFace = {
 		fontStyle: 'normal',
 		fontWeight: '400',
@@ -44,7 +44,7 @@ function FontCard( { font, onClick, actionHandler, elevation } ) {
 			style={ style }
 			className="font-library-modal__font-card"
 		>
-			<Card elevation={ elevation }>
+			<Card>
 				<CardBody>
 					<VStack spacing={ 4 }>
 						<HStack justify="space-between">
