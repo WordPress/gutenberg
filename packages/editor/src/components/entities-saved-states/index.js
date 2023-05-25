@@ -30,12 +30,7 @@ function identity( values ) {
 export default function EntitiesSavedStates( { close } ) {
 	const isDirtyProps = useIsDirty();
 	return (
-		<EntitiesSavedStatesExtensible
-			{ ...{
-				...isDirtyProps,
-				close,
-			} }
-		/>
+		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
 	);
 }
 
