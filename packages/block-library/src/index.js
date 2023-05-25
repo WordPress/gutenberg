@@ -230,7 +230,10 @@ const getAllBlocks = () => {
 	];
 
 	// Only add the classic block in WP Context
-	// and when TinyMCE experiment is disabled or cookie to require TinyMCE is set
+	// and when either of the following is true:
+	// - TinyMCE experiment is disabled;
+	// - there is a classic block in the current post's content;
+	// - the cookie to require TinyMCE is set.
 	if (
 		window?.wp?.oldEditor &&
 		( window?.wp?.needsClassicBlock ||
