@@ -178,9 +178,11 @@ const deprecated = [
 		supports: {
 			anchor: true,
 			color: {
-				__experimentalDuotone: 'img, .components-placeholder',
 				text: false,
 				background: false,
+			},
+			filter: {
+				duotone: true,
 			},
 			__experimentalBorder: {
 				color: true,
