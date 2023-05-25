@@ -13,7 +13,13 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useCallback, memo } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -211,8 +217,37 @@ function ListViewBlock( {
 				event.preventDefault();
 			}
 		},
-		[ settingsRef, showBlockActions ]
+		[ allowRightClickOverrides, settingsRef, showBlockActions ]
 	);
+
+	const onMouseDown = useCallback(
+		( event ) => {
+			// Prevent right-click from focusing the block,
+			// because focus will be handled when opening the block settings dropdown.
+			if ( allowRightClickOverrides && event.button === 2 ) {
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides ]
+	);
+
+	const settingsPopoverAnchor = useMemo( () => {
+		const { ownerDocument } = rowRef?.current || {};
+
+		// If no custom position is set, the settings dropdown will be anchored to the
+		// DropdownMenu toggle button.
+		if ( ! settingsAnchorRect || ! ownerDocument ) {
+			return undefined;
+		}
+
+		// Position the settings dropdown at the cursor when right-clicking a block.
+		return {
+			ownerDocument,
+			getBoundingClientRect() {
+				return settingsAnchorRect;
+			},
+		};
+	}, [ settingsAnchorRect ] );
 
 	const clearSettingsAnchorRect = useCallback( () => {
 		// Clear the custom position for the settings dropdown so that it is restored back
@@ -288,6 +323,7 @@ function ListViewBlock( {
 							block={ block }
 							onClick={ selectEditorBlock }
 							onContextMenu={ onContextMenu }
+							onMouseDown={ onMouseDown }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -355,7 +391,7 @@ function ListViewBlock( {
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							popoverProps={ {
-								anchorRect: settingsAnchorRect, // Used to position the settings at the cursor on right-click.
+								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
 							} }
 							toggleProps={ {
 								ref,
