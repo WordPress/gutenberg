@@ -23,14 +23,21 @@ function getWrappingPopoverElement( element: HTMLElement ) {
 	return element.closest( '.components-popover' );
 }
 
-const UnmockedColorPalette = () => {
+const ControlledColorPalette = ( {
+	onChange,
+}: {
+	onChange?: ( newColor?: string ) => void;
+} ) => {
 	const [ color, setColor ] = useState< string | undefined >( undefined );
 
 	return (
 		<ColorPalette
 			value={ color }
 			colors={ EXAMPLE_COLORS }
-			onChange={ ( newColor ) => setColor( newColor ) }
+			onChange={ ( newColor ) => {
+				setColor( newColor );
+				onChange?.( newColor );
+			} }
 		/>
 	);
 };
@@ -216,7 +223,7 @@ describe( 'ColorPalette', () => {
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
 
-		const { container } = render( <UnmockedColorPalette /> );
+		const { container } = render( <ControlledColorPalette /> );
 
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 		expect(
