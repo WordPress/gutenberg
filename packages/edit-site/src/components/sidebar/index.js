@@ -12,6 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenLibrary from '../sidebar-navigation-screen-library';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenTemplatePart from '../sidebar-navigation-screen-template-part';
@@ -55,7 +56,13 @@ function SidebarScreens() {
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			<NavigatorScreen path="/library">
+				<SidebarNavigationScreenLibrary />
+			</NavigatorScreen>
+			<NavigatorScreen path="/library/:categoryType(wp_template_part|pattern)/:categoryName">
+				<SidebarNavigationScreenLibrary />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
