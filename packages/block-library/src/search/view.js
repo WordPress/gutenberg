@@ -8,8 +8,7 @@ window.addEventListener( 'DOMContentLoaded', () => {
 	).forEach( ( block ) => {
 		const searchField = block.querySelector( '.wp-block-search__input' );
 		const searchButton = block.querySelector( '.wp-block-search__button' );
-		const activeElement = block.ownerDocument.activeElement;
-
+		const searchLabel = block.querySelector( '.wp-block-search__label' );
 		const ariaLabel = searchButton.getAttribute( 'aria-label' );
 		const id = searchField.getAttribute( 'id' );
 
@@ -33,11 +32,7 @@ window.addEventListener( 'DOMContentLoaded', () => {
 		};
 
 		const hideSearchField = ( e ) => {
-			if (
-				! e.target.closest( '.wp-block-search__inside-wrapper' ) &&
-				activeElement !== searchButton &&
-				activeElement !== searchField
-			) {
+			if ( ! e.target.closest( '.wp-block-search' ) ) {
 				return toggleSearchField( false );
 			}
 
@@ -55,11 +50,11 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			}
 		};
 
-		searchField.addEventListener( 'blur', hideSearchField );
 		searchField.addEventListener( 'keydown', ( e ) => {
 			hideSearchField( e );
 		} );
 		searchButton.addEventListener( 'click', handleButtonClick );
+		searchLabel.addEventListener( 'click', handleButtonClick );
 		document.body.addEventListener( 'click', hideSearchField );
 	} );
 } );
