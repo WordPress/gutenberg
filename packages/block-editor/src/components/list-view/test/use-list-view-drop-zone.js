@@ -172,7 +172,7 @@ describe( 'getListViewDropTarget', () => {
 		} );
 	} );
 
-	it( 'should nest when dragging a block over the right side and bottom half of a collapsed block with children', () => {
+	it( 'should nest and append to end when dragging a block over the right side and bottom half of a collapsed block with children', () => {
 		const position = { x: 160, y: 90 };
 
 		const collapsedBlockData = [ ...blocksData ];
@@ -185,6 +185,26 @@ describe( 'getListViewDropTarget', () => {
 
 		// Hide the first block's children.
 		collapsedBlockData.splice( 1, 1 );
+
+		const target = getListViewDropTarget( collapsedBlockData, position );
+
+		expect( target ).toEqual( {
+			blockIndex: 1,
+			dropPosition: 'inside',
+			rootClientId: 'block-1',
+		} );
+	} );
+
+	it( 'should nest and prepend when dragging a block over the right side and bottom half of an expanded block with children', () => {
+		const position = { x: 160, y: 90 };
+
+		const collapsedBlockData = [ ...blocksData ];
+
+		// Set the first block to be collapsed.
+		collapsedBlockData[ 0 ] = {
+			...collapsedBlockData[ 0 ],
+			isExpanded: true,
+		};
 
 		const target = getListViewDropTarget( collapsedBlockData, position );
 
@@ -260,5 +280,22 @@ describe( 'getListViewDropTarget', () => {
 		);
 
 		expect( target ).toBeUndefined();
+	} );
+
+	it( 'should move below, and not nest when dragging lower than the bottom-most block', () => {
+		const singleBlock = [ { ...blocksData[ 0 ], innerBlockCount: 0 } ];
+
+		// This position is to the right of the block, but below the bottom of the block.
+		// This should result in the block being moved below the bottom-most block, and
+		// not being treated as a nesting gesture.
+		const position = { x: 160, y: 250 };
+		const target = getListViewDropTarget( singleBlock, position );
+
+		expect( target ).toEqual( {
+			blockIndex: 1,
+			clientId: 'block-1',
+			dropPosition: 'bottom',
+			rootClientId: '',
+		} );
 	} );
 } );

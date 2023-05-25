@@ -98,12 +98,6 @@
 }
 
 .edit-site-custom-generic-template__modal {
-	.components-base-control {
-		@include break-medium() {
-			width: $grid-unit * 40;
-		}
-	}
-
 	.components-modal__header {
 		border-bottom: none;
 	}

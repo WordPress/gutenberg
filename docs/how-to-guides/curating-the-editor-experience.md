@@ -51,7 +51,7 @@ Specifically, developers can alter the `$settings['canLockBlocks']` value by set
 
 The following example disables block locking permissions for all users when editing a page:
 
-```
+```php
 add_filter( 'block_editor_settings_all', function( $settings, $context ) {
 	if ( $context->post && 'page' === $context->post->post_type ) {
 		$settings['canLockBlocks'] = false;
@@ -63,7 +63,7 @@ add_filter( 'block_editor_settings_all', function( $settings, $context ) {
 
 Another common use case may be to only allow users who can edit the visual design of the site (theme editing) to lock or unlock blocks.  The best option would be to test against the `edit_theme_options` capability, as shown in the following code snippet:
 
-```
+```php
 add_filter( 'block_editor_settings_all', function( $settings ) {
 	$settings['canLockBlocks'] = current_user_can( 'edit_theme_options' );
 
@@ -82,7 +82,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 *Duotone with Core options and customization available for each image related block:*
 
-```
+```json
 {
 "version": 2,
 	"settings": {
@@ -96,7 +96,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 ```
 
 *Duotone with theme defined color options, Core options, and customization available for each image related block:*
-```
+```json
 {
 	"version": 2,
 	"settings": {
@@ -125,7 +125,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 *Duotone with defined default options and all customization available for the Post Featured Image block:*
 
-```
+```json
 {
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
@@ -160,7 +160,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 *Duotone with only defined default options and core options available for the Post Featured Image block (no customization):*
 
-```
+```json
 {
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
@@ -203,7 +203,7 @@ Beyond defining default values, using theme.json allows you to also remove optio
 
 Continuing the examples with duotone, this means you could allow full access to all Duotone functionality for Image blocks and only limit the Post Featured Image block like so:
 
-```
+```json
 {
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
@@ -238,7 +238,7 @@ You can read more about how best to [turn on/off options with theme.json here](/
 
 To disable the “Inherit default layout” setting for container blocks like the Group block, remove the following section: 
 
-```
+```json
 "layout": {
 	"contentSize": null,
 	"wideSize": null
@@ -249,7 +249,7 @@ To disable the “Inherit default layout” setting for container blocks like th
 
 When using theme.json in a block or classic theme, these settings will stop the default color and typography controls from being enabled globally, greatly limiting what’s possible:
 
-```
+```json
 {
 	"$schema": "http://schemas.wp.org/trunk/theme.json",
 	"version": 2,
@@ -297,7 +297,7 @@ To provide more flexibility, WordPress 6.1 introduced server-side filters allowi
 
 In the following example, the data from the current theme's theme.json file is updated using the `wp_theme_json_data_theme` filter. Color controls are restored if the current user is an Administrator.
 
-```
+```php
 // Disable color controls for all users except Administrators.
 function example_filter_theme_json_data_theme( $theme_json ){
     $is_administrator = current_user_can( 'edit_theme_options' );
@@ -333,7 +333,7 @@ WordPress 6.2 introduced a new client-side filter allowing you to modify block-l
 
 The filter is called `blockEditor.useSetting.before` and can be used in the JavaScript code as follows:
 
-```
+```js
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -357,7 +357,7 @@ However, the `blockEditor.useSetting.before` filter is unique because it allows 
 
 In the following example, text color controls are disabled for the Heading block whenever the block is placed inside of a Media & Text block.
 
-```
+```js
 import { select } from  '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 
@@ -420,7 +420,7 @@ As mentioned in the prior section on Locking APIs, aspects of patterns themselve
 **Prioritize specific patterns from the Pattern Directory**
 
 With WordPress 6.0 themes can register patterns from [Pattern Directory](https://wordpress.org/patterns/) through theme.json. To accomplish this, themes should use the new patterns top level key in theme.json. Within this field, themes can list patterns to register from the Pattern Directory. The patterns field is an array of pattern slugs from the Pattern Directory. Pattern slugs can be extracted by the url in a single pattern view at the Pattern Directory. Example: This url https://wordpress.org/patterns/pattern/partner-logos the slug is partner-logos.
-```
+```json
 {
     "version": 2,
     "patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
