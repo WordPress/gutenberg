@@ -530,6 +530,13 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		}
 
 		case 'EDIT_ENTITY_RECORD':
+			// When undo is not specified,
+			// It's unclear whether we should ignore the undo entirely
+			// or consider it a transient (cached) edit.
+			if ( ! action?.meta?.undo ) {
+				return state;
+			}
+
 			const isCachedChange = Object.keys( action.edits ).every(
 				( key ) => action.transientEdits[ key ]
 			);
