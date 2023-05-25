@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import { Button, TextHighlight } from '@wordpress/components';
+import { MenuItem, TextHighlight } from '@wordpress/components';
 import {
 	Icon,
 	globe,
@@ -52,50 +46,29 @@ function SearchItemIcon( { isURL, suggestion } ) {
 export const LinkControlSearchItem = ( {
 	itemProps,
 	suggestion,
-	isSelected = false,
+	searchTerm,
 	onClick,
 	isURL = false,
-	searchTerm = '',
 	shouldShowType = false,
 } ) => {
 	return (
-		<Button
+		<MenuItem
 			{ ...itemProps }
+			info={ isURL && __( 'Press ENTER to add this link' ) } // perhaps add info for all items.
+			iconPosition="left"
+			icon={
+				<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
+			}
 			onClick={ onClick }
-			className={ classnames( 'block-editor-link-control__search-item', {
-				'is-selected': isSelected,
-				'is-url': isURL,
-				'is-entity': ! isURL,
-			} ) }
+			shortcut={ shouldShowType && getVisualTypeName( suggestion ) }
+			className="block-editor-link-control__search-item"
 		>
-			<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
-
-			<span className="block-editor-link-control__search-item-header">
-				<span className="block-editor-link-control__search-item-title">
-					<TextHighlight
-						// The component expects a plain text string.
-						text={ stripHTML( suggestion.title ) }
-						highlight={ searchTerm }
-					/>
-				</span>
-				<span
-					aria-hidden={ ! isURL }
-					className="block-editor-link-control__search-item-info"
-				>
-					{ ! isURL &&
-						( filterURLForDisplay(
-							safeDecodeURI( suggestion.url )
-						) ||
-							'' ) }
-					{ isURL && __( 'Press ENTER to add this link' ) }
-				</span>
-			</span>
-			{ shouldShowType && suggestion.type && (
-				<span className="block-editor-link-control__search-item-type">
-					{ getVisualTypeName( suggestion ) }
-				</span>
-			) }
-		</Button>
+			<TextHighlight
+				// The component expects a plain text string.
+				text={ stripHTML( suggestion.title ) }
+				highlight={ searchTerm }
+			/>
+		</MenuItem>
 	);
 };
 
