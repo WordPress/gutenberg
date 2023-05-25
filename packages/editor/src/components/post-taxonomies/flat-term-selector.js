@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import escapeHtml from 'escape-html';
-
-/**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -12,14 +7,13 @@ import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unescapeString, unescapeTerm } from '../../utils/terms';
+import { unescapeString } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
@@ -50,28 +44,6 @@ const termNamesToIds = ( names, terms ) => {
 			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
-
-// Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( termName, restBase, namespace ) {
-	const escapedTermName = escapeHtml( termName );
-
-	return apiFetch( {
-		path: `/${ namespace }/${ restBase }`,
-		method: 'POST',
-		data: { name: escapedTermName },
-	} )
-		.catch( ( error ) => {
-			if ( error.code !== 'term_exists' ) {
-				return Promise.reject( error );
-			}
-
-			return Promise.resolve( {
-				id: error.data.term_id,
-				name: termName,
-			} );
-		} )
-		.then( unescapeTerm );
-}
 
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
@@ -165,10 +137,21 @@ export function FlatTermSelector( { slug } ) {
 	}, [ searchResults ] );
 
 	const { editPost } = useDispatch( editorStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
 	}
+
+	/**
+	 * Create a new term
+	 *
+	 * @param {Object} term Term object.
+	 * @return {Promise} A promise that resolves to save term object.
+	 */
+	const createTerm = ( term ) => {
+		return saveEntityRecord( 'taxonomy', slug, term );
+	};
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
@@ -209,11 +192,8 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		Promise.all(
-			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( termName, taxonomy.rest_base, namespace )
-			)
+			newTermNames.map( ( termName ) => createTerm( { name: termName } ) )
 		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );
 			return onUpdateTerms(
