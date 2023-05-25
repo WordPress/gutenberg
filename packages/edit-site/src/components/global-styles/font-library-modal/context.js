@@ -117,51 +117,6 @@ function FontLibraryProvider( { children } ) {
 		setLibraryFonts( newLibraryFonts );
 	}
 
-	const toggleInstallFont = ( name, fontFace ) => {
-		const libraryFont = libraryFonts.find( ( font ) => font.name === name );
-		const googleFont = googleFonts.find( ( font ) => font.name === name );
-		let newLibraryFonts;
-		let newFontFaces;
-		
-		if ( !fontFace ) { // Entire font family
-			if ( libraryFont ){ // If the font is already installed
-				newLibraryFonts = libraryFonts.filter( ( font ) => font.name !== name );
-			} else { // If the font is not installed
-				newLibraryFonts = [ ...libraryFonts, googleFont ];
-			}
-
-		} else { // Single font variant
-			const libraryFontFace = (libraryFont?.fontFace || []).find( ( face ) => face.fontStyle === fontFace.fontStyle && face.fontWeight === fontFace.fontWeight );
-			
-			if ( !libraryFont ) { // If the font is not installed the fontface should be missing so we add it to the library
-				newLibraryFonts = [ ...libraryFonts, { ...googleFont, fontFace: [ fontFace ] } ];
-			} else {
-				//If the font is already installed the fontface the font face could be installed or not
-				if ( libraryFontFace ) {
-					newFontFaces = libraryFont.fontFace.filter( face => (
-						face.fontStyle !== fontFace.fontStyle && face.fontWeight !== fontFace.fontWeight
-					));
-				} else {
-					newFontFaces = [ ...libraryFont.fontFace, fontFace ];
-				}
-				// Update the font face of a existing font
-				newLibraryFonts = libraryFonts.map( font => {
-					if ( font.name === name ) {
-						return {
-							...font,
-							fontFace: newFontFaces,
-						};
-					}
-					return font;
-				});
-
-			}
-
-		}
-		setLibraryFonts( newLibraryFonts );
-	}
-
-
 	const toggleActivateFont = ( font, face ) => {
 
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
@@ -267,7 +222,6 @@ function FontLibraryProvider( { children } ) {
                 installFonts,
 				uninstallFont,
 				toggleActivateFont,
-				toggleInstallFont,
 				getAvailableFontsOutline,
 			} }
 		>

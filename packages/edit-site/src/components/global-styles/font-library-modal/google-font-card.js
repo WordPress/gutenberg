@@ -22,7 +22,6 @@ function GoogleFontCard ( { font, onClick, toggleAddFont, isFontAdded } ) {
 
     const handleClick = ( event, font ) => {
         event.stopPropagation();
-        // toggleInstallFont( fontName );
         toggleAddFont( font );
     };
 
