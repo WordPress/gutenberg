@@ -172,7 +172,7 @@ describe( 'getListViewDropTarget', () => {
 		} );
 	} );
 
-	it( 'should nest when dragging a block over the right side and bottom half of a collapsed block with children', () => {
+	it( 'should nest and append to end when dragging a block over the right side and bottom half of a collapsed block with children', () => {
 		const position = { x: 160, y: 90 };
 
 		const collapsedBlockData = [ ...blocksData ];
@@ -185,6 +185,26 @@ describe( 'getListViewDropTarget', () => {
 
 		// Hide the first block's children.
 		collapsedBlockData.splice( 1, 1 );
+
+		const target = getListViewDropTarget( collapsedBlockData, position );
+
+		expect( target ).toEqual( {
+			blockIndex: 1,
+			dropPosition: 'inside',
+			rootClientId: 'block-1',
+		} );
+	} );
+
+	it( 'should nest and prepend when dragging a block over the right side and bottom half of an expanded block with children', () => {
+		const position = { x: 160, y: 90 };
+
+		const collapsedBlockData = [ ...blocksData ];
+
+		// Set the first block to be collapsed.
+		collapsedBlockData[ 0 ] = {
+			...collapsedBlockData[ 0 ],
+			isExpanded: true,
+		};
 
 		const target = getListViewDropTarget( collapsedBlockData, position );
 

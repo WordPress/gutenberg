@@ -338,9 +338,15 @@ export function getListViewDropTarget( blocksData, position ) {
 				candidateBlockParents.length
 			) )
 	) {
+		// If the block is expanded, insert the block as the first child.
+		// Otherwise, for collapsed blocks, insert the block as the last child.
+		const newBlockIndex = candidateBlockData.isExpanded
+			? 0
+			: candidateBlockData.innerBlockCount || 0;
+
 		return {
 			rootClientId: candidateBlockData.clientId,
-			blockIndex: 0,
+			blockIndex: newBlockIndex,
 			dropPosition: 'inside',
 		};
 	}
