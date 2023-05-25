@@ -221,12 +221,14 @@ export default function createReduxStore( key, options ) {
 					get: ( target, prop ) => {
 						return (
 							mapSelectors(
-								mapValues(
-									privateSelectors,
-									( selector ) =>
-										( state, ...args ) =>
-											selector( state.root, ...args )
-								),
+								mapValues( privateSelectors, ( selector ) => {
+									if ( selector.isRegistrySelector ) {
+										selector.registry = registry;
+									}
+
+									return ( state, ...args ) =>
+										selector( state.root, ...args );
+								} ),
 								store
 							)[ prop ] || selectors[ prop ]
 						);

@@ -11,11 +11,14 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+-   [*] Add disabled style to `Cell` component [#50665]
+-   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
 
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 -   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
 -   [*] Use host app namespace in reusable block message [#50478]
+-   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
 
 ## 1.94.0
 -   [*] Split pasted content between title and body. [#37169]
