@@ -30,17 +30,13 @@ import {
 
 const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 
-const _EntitiesSavedStates = ( { onClose } ) => {
+const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
-	const saveEnabled = isPreviewingTheme() || isDirtyProps.isDirty;
-
 	let activateSaveLabel;
-	if ( isPreviewingTheme() && isDirtyProps.isDirty ) {
+	if ( isDirtyProps.isDirty ) {
 		activateSaveLabel = __( 'Activate & Save' );
-	} else if ( isPreviewingTheme() ) {
-		activateSaveLabel = __( 'Activate' );
 	} else {
-		activateSaveLabel = undefined;
+		activateSaveLabel = __( 'Activate' );
 	}
 
 	const { getTheme } = useSelect( coreStore );
@@ -60,20 +56,25 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 		return values;
 	};
 
-	return window?.__experimentalEnableThemePreviews ? (
+	return (
 		<EntitiesSavedStatesExtensible
 			{ ...{
 				...isDirtyProps,
 				additionalPrompt,
 				close: onClose,
 				onSave,
-				saveEnabled,
+				saveEnabled: true,
 				saveLabel: activateSaveLabel,
 			} }
 		/>
-	) : (
-		<EntitiesSavedStates close={ onClose } />
 	);
+};
+
+const _EntitiesSavedStates = ( { onClose } ) => {
+	if ( isPreviewingTheme() ) {
+		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
+	}
+	return <EntitiesSavedStates onClose={ onClose } />;
 };
 
 export default function SavePanel() {
