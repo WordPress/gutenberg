@@ -10,22 +10,23 @@
  *
  * @param array  $attributes The block attributes.
  * @param string $content    The block content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the block content.
  */
 function render_block_core_file( $attributes, $content, $block ) {
 	$should_load_view_script = ! empty( $attributes['displayPreview'] );
-	$view_js_file = 'wp-block-file-view';
+	$view_js_file            = 'wp-block-file-view';
 	// If the script already exists, there is no point in removing it from viewScript.
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
 
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles ) ) {
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
 		}
 		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles ) ) {
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
 		}
 	}
@@ -52,7 +53,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 		$content
 	);
 
-	// If it uses the Interactivity API, add the directives
+	// If it uses the Interactivity API, add the directives.
 	if ( $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
