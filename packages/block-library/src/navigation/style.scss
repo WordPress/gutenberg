@@ -176,12 +176,12 @@ $navigation-icon-size: 24px;
 		height: 0;
 		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
 
-		// Set a default background color for submenus so that they're not transparent.
+		// Inherit the background color for submenus so that they're not transparent.
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
-		background-color: #fff;
-		color: #000;
+		background-color: inherit;
+		color: inherit;
 
 		// Submenu items.
 		> .wp-block-navigation-item {
@@ -405,6 +405,8 @@ button.wp-block-navigation-item__content {
 // Default border color.
 .wp-block-navigation:not(.has-background) {
 	.wp-block-navigation__submenu-container {
+		background-color: #fff;
+		color: #000;
 		// Sets a border for submenus for backwards compatibility.
 		// This is under a :not selector so that if a user sets
 		// a background color the borders are removed.

@@ -524,7 +524,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		if ( $is_list_item && ! $is_list_open ) {
 			$is_list_open       = true;
-			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
+			$inner_blocks_html .= '<ul class="wp-block-navigation__container '.implode( ' ', $classes ).'">';
 		}
 
 		if ( ! $is_list_item && $is_list_open ) {
