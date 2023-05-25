@@ -29,10 +29,12 @@ test.describe( 'Classic', () => {
 	test( 'should be inserted', async ( { editor, page, pageUtils } ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await page.waitForSelector( '.mce-tinymce iframe' );
+		await page.click( '.mce-tinymce iframe' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
@@ -45,7 +47,8 @@ test.describe( 'Classic', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await page.waitForSelector( '.mce-tinymce iframe' );
+		await page.click( '.mce-tinymce iframe' );
 		await page.keyboard.type( 'test' );
 
 		await page.getByRole( 'button', { name: /Add Media/i } ).click();
@@ -74,12 +77,13 @@ test.describe( 'Classic', () => {
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.keyboard.press( 'Enter' );
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
 		await editor.clickBlockToolbarButton( 'Convert to blocks' );
-		const galleryBlock = page.locator(
+		const galleryBlock = editor.canvas.locator(
 			'role=document[name="Block: Gallery"i]'
 		);
 		await expect( galleryBlock ).toBeVisible();
@@ -87,7 +91,7 @@ test.describe( 'Classic', () => {
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
-			page.locator( 'role=document[name="Block: Classic"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Classic"i]' )
 		).toBeVisible();
 		await expect
 			.poll( editor.getEditedPostContent )
@@ -112,10 +116,12 @@ test.describe( 'Classic', () => {
 
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await page.waitForSelector( '.mce-tinymce iframe' );
+		await page.click( '.mce-tinymce iframe' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.keyboard.press( 'Enter' );
 
 		await page.click( 'role=button[name="Save draft"i]' );
 
@@ -131,7 +137,7 @@ test.describe( 'Classic', () => {
 			errors.push( exception );
 		} );
 
-		const classicBlock = page.locator(
+		const classicBlock = editor.canvas.locator(
 			'role=document[name="Block: Classic"i]'
 		);
 

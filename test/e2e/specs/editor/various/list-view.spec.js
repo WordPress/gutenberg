@@ -336,7 +336,7 @@ test.describe( 'List View', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
-			editor.canvas
+			page
 				.getByRole( 'region', { name: 'Document Overview' } )
 				.getByRole( 'button', {
 					name: 'Close',
@@ -354,7 +354,7 @@ test.describe( 'List View', () => {
 		// tab receives similar focus events based on the shortcut.
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await page.keyboard.press( 'ArrowRight' );
-		const outlineButton = editor.canvas.getByRole( 'tab', {
+		const outlineButton = page.getByRole( 'tab', {
 			name: 'Outline',
 		} );
 		await expect( outlineButton ).toBeFocused();

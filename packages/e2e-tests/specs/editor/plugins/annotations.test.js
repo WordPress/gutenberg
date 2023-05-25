@@ -8,6 +8,7 @@ import {
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
@@ -51,7 +52,7 @@ describe( 'Annotations', () => {
 			await page.$x( "//button[contains(text(), 'Add annotation')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () =>
+		await canvas().evaluate( () =>
 			document.querySelector( '.wp-block-paragraph' ).focus()
 		);
 	}
@@ -67,7 +68,7 @@ describe( 'Annotations', () => {
 			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () =>
+		await canvas().evaluate( () =>
 			document.querySelector( '[contenteditable]' ).focus()
 		);
 	}
@@ -78,11 +79,11 @@ describe( 'Annotations', () => {
 	 * @return {Promise<string>} The annotated text.
 	 */
 	async function getAnnotatedText() {
-		const annotations = await page.$$( ANNOTATIONS_SELECTOR );
+		const annotations = await canvas().$$( ANNOTATIONS_SELECTOR );
 
 		const annotation = annotations[ 0 ];
 
-		return await page.evaluate( ( el ) => el.innerText, annotation );
+		return await canvas().evaluate( ( el ) => el.innerText, annotation );
 	}
 
 	/**
@@ -91,7 +92,7 @@ describe( 'Annotations', () => {
 	 * @return {Promise<string>} Inner HTML.
 	 */
 	async function getRichTextInnerHTML() {
-		const htmlContent = await page.$$( '.wp-block-paragraph' );
+		const htmlContent = await canvas().$$( '.wp-block-paragraph' );
 		return await page.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
@@ -102,12 +103,12 @@ describe( 'Annotations', () => {
 
 		await clickOnMoreMenuItem( 'Annotations' );
 
-		let annotations = await page.$$( ANNOTATIONS_SELECTOR );
+		let annotations = await canvas().$$( ANNOTATIONS_SELECTOR );
 		expect( annotations ).toHaveLength( 0 );
 
 		await annotateFirstBlock( 9, 13 );
 
-		annotations = await page.$$( ANNOTATIONS_SELECTOR );
+		annotations = await canvas().$$( ANNOTATIONS_SELECTOR );
 		expect( annotations ).toHaveLength( 1 );
 
 		const text = await getAnnotatedText();
@@ -115,7 +116,7 @@ describe( 'Annotations', () => {
 
 		await clickOnBlockSettingsMenuItem( 'Edit as HTML' );
 
-		const htmlContent = await page.$$(
+		const htmlContent = await canvas().$$(
 			'.block-editor-block-list__block-html-textarea'
 		);
 		const html = await page.evaluate( ( el ) => {
@@ -136,7 +137,7 @@ describe( 'Annotations', () => {
 		await page.keyboard.type( 'D' );
 
 		await removeAnnotations();
-		const htmlContent = await page.$$( '.wp-block-paragraph' );
+		const htmlContent = await canvas().$$( '.wp-block-paragraph' );
 		const html = await page.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );

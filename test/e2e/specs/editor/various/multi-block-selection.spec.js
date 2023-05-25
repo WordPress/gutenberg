@@ -304,6 +304,7 @@ test.describe( 'Multi-block selection', () => {
 				.filter( { hasText: 'Draft saved' } )
 		).toBeVisible();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
@@ -867,7 +868,6 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	test( 'should select title if the cursor is on title', async ( {
-		page,
 		editor,
 		pageUtils,
 		multiBlockSelectionUtils,
@@ -890,7 +890,7 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [] );
 		await expect
 			.poll( () =>
-				page.evaluate( () => window.getSelection().toString() )
+				editor.canvas.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'Post title' );
 	} );

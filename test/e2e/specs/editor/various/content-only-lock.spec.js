@@ -24,7 +24,7 @@ test.describe( 'Content-only lock', () => {
         <!-- /wp:group -->` );
 		await pageUtils.pressKeys( 'secondary+M' );
 
-		await page.click( 'role=document[name="Paragraph block"i]' );
+		await editor.canvas.click( 'role=document[name="Paragraph block"i]' );
 		await page.keyboard.type( ' World' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
