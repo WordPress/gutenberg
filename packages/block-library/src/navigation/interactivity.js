@@ -68,7 +68,10 @@ store( {
 					}
 				},
 				closeMenu: ( { context } ) => {
-					if ( context.core.navigation.isMenuOpen ) {
+					if (
+						context.core.navigation.isMenuOpen &&
+						! context.core.navigation.isHovering
+					) {
 						context.core.navigation.isMenuOpen = false;
 						if (
 							context.core.navigation.modal.contains(
@@ -85,6 +88,14 @@ store( {
 							);
 						}
 					}
+				},
+				openMenuOnHover( { actions, context, ref } ) {
+					context.core.navigation.isHovering = true;
+					actions.core.navigation.openMenu( { context, ref } );
+				},
+				closeMenuOnHover( { actions, context } ) {
+					context.core.navigation.isHovering = false;
+					actions.core.navigation.closeMenu( { context } );
 				},
 				toggleMenu: ( { context, actions, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
