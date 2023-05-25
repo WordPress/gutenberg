@@ -130,7 +130,7 @@ function render_block_core_image( $attributes, $content ) {
 								<div class="scrim" style="background-color: $background_color"></div>
 						</div>
 				</div>
-			HTML;
+HTML;
 	}
 
 	return $content;
