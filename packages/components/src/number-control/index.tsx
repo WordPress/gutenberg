@@ -59,7 +59,6 @@ function UnforwardedNumberControl(
 		} );
 		spinControls = 'none';
 	}
-
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 

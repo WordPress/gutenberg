@@ -69,7 +69,7 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
-		size = 'default',
+		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -209,7 +209,6 @@ function UnforwardedRangeControl(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
-
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
@@ -306,7 +305,11 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						size={ size }
+						size={
+							__next40pxDefaultSize
+								? '__unstable-large'
+								: 'default'
+						}
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
