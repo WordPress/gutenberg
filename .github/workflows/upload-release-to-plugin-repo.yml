@@ -230,40 +230,28 @@ jobs:
             VERSION: ${{ github.event.release.name }}
 
         steps:
-            - name: Check out Gutenberg tags from WP.org plugin repo
-              run: svn checkout "$PLUGIN_REPO_URL/tags" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-
             - name: Download and unzip Gutenberg plugin asset into tags folder
               env:
                   PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
               run: |
                   # do the magic here
                   curl -L -o gutenberg.zip $PLUGIN_URL
-                  unzip gutenberg.zip -d tags/$VERSION
+                  unzip gutenberg.zip -d "$VERSION"
                   rm gutenberg.zip
 
             - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
               env:
                   STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
               run: |
-                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./tags/$VERSION/readme.txt
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
-                  # The name might be confusing here as this job is about a SVN tag and not trunk,
-                  # but in this case `trunk` refers to something else not in the context of SVN.
-                  # it's because the changelog is uploaded using this name in the `update-changelog`
-                  # job above. The changelog is generated and committed to the *git* `trunk` and
-                  # `release/vX.Y.Z` branches, and then the generated text file is stored uising
-                  # the download-artifact action with this name.
                   name: changelog trunk
-                  path: tags/${{ github.event.release.name }}
+                  path: ${{ github.event.release.name }}
 
-            - name: Commit the content changes
-              working-directory: ./tags
+            - name: Add the new version directory and commit changes to the SVN repository
               run: |
-                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
-                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn commit -m "Committing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                  svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
+                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
