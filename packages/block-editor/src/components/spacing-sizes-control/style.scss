@@ -1,4 +1,4 @@
-.components-spacing-sizes-control {
+.spacing-sizes-control {
 	.components-base-control__label {
 		margin-bottom: 0;
 	}
@@ -37,27 +37,27 @@
 	}
 }
 
-.components-spacing-sizes-control__wrapper {
+.spacing-sizes-control__wrapper {
 	& + & {
 		margin-top: $grid-unit-10;
 	}
 }
 
-.components-spacing-sizes-control__header {
+.spacing-sizes-control__header {
 	height: $grid-unit-20;
 	margin-bottom: $grid-unit-10;
 }
 
-.components-spacing-sizes-control__dropdown {
+.spacing-sizes-control__dropdown {
 	height: $grid-unit-30;
 }
 
-.components-spacing-sizes-control__custom-select-control,
-.components-spacing-sizes-control__custom-value-input {
+.spacing-sizes-control__custom-select-control,
+.spacing-sizes-control__custom-value-input {
 	flex: 1;
 }
 
-.components-spacing-sizes-control__icon,
-.components-spacing-sizes-control__custom-toggle {
+.spacing-sizes-control__icon,
+.spacing-sizes-control__custom-toggle {
 	flex: 0 0 auto;
 }

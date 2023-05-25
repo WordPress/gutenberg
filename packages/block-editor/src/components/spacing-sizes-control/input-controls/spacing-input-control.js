@@ -173,10 +173,10 @@ export default function SpacingInputControl( {
 	);
 
 	return (
-		<HStack className="components-spacing-sizes-control__wrapper">
+		<HStack className="spacing-sizes-control__wrapper">
 			{ icon && (
 				<Icon
-					className="components-spacing-sizes-control__icon"
+					className="spacing-sizes-control__icon"
 					icon={ icon }
 					size={ 24 }
 				/>
@@ -198,7 +198,7 @@ export default function SpacingInputControl( {
 						disableUnits={ isMixed }
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
-						className="components-spacing-sizes-control__custom-value-input"
+						className="spacing-sizes-control__custom-value-input"
 						size={ '__unstable-large' }
 					/>
 					<RangeControl
@@ -214,7 +214,7 @@ export default function SpacingInputControl( {
 						}
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
-						className="components-spacing-sizes-control__custom-value-range"
+						className="spacing-sizes-control__custom-value-range"
 						__nextHasNoMarginBottom
 					/>
 				</>
@@ -223,7 +223,7 @@ export default function SpacingInputControl( {
 				<RangeControl
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
-					className="components-spacing-sizes-control__range-control"
+					className="spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
@@ -251,7 +251,7 @@ export default function SpacingInputControl( {
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (
 				<CustomSelectControl
-					className="components-spacing-sizes-control__custom-select-control"
+					className="spacing-sizes-control__custom-select-control"
 					value={
 						options.find(
 							( option ) => option.key === currentValue
@@ -289,7 +289,7 @@ export default function SpacingInputControl( {
 					} }
 					isPressed={ showCustomValueControl }
 					isSmall
-					className="components-spacing-sizes-control__custom-toggle"
+					className="spacing-sizes-control__custom-toggle"
 					iconSize={ 24 }
 				/>
 			) }

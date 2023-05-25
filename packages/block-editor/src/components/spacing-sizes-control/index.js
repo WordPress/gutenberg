@@ -91,8 +91,8 @@ export default function SpacingSizesControl( {
 	);
 
 	return (
-		<fieldset className="components-spacing-sizes-control">
-			<HStack className="components-spacing-sizes-control__header">
+		<fieldset className="spacing-sizes-control">
+			<HStack className="spacing-sizes-control__header">
 				<BaseControl.VisualLabel as="legend">
 					{ label }
 				</BaseControl.VisualLabel>
