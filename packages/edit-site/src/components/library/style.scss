@@ -1,0 +1,50 @@
+.edit-site-library {
+	width: 100%;
+
+	.interface-interface-skeleton__content {
+		border-radius: 0;
+	}
+}
+
+.edit-site-library__grid {
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	// Small top padding required to avoid cutting off the visible outline
+	// when hovering items.
+	padding-top: $border-width-focus-fallback;
+
+	.edit-site-library__pattern {
+		break-inside: avoid-column;
+		display: flex;
+		flex-direction: column;
+		margin-bottom: $grid-unit-60;
+
+		// Temp styles for testing - delete asap
+		min-height: 250px;
+
+		&:nth-child(2) {
+			min-height: 400px;
+		}
+
+		&:nth-child(3) {
+			min-height: 600px;
+		}
+
+		.edit-site-library__preview {
+			border-radius: $radius-block-ui * 4;
+			background: #ededed;
+		}
+
+		.edit-site-library__footer,
+		.edit-site-library__button {
+			color: #e0e0e0;
+		}
+		// END: temp styles for testing.
+	}
+
+	.edit-site-library__preview {
+		flex: 1;
+		margin-bottom: $grid-unit-30;
+	}
+}
