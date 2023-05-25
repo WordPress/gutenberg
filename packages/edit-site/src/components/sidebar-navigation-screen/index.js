@@ -102,7 +102,7 @@ export default function SidebarNavigationScreen( {
 				{ content }
 			</nav>
 			{ footer && (
-				<footer className="edit-site-sidebar-navigation-screen__footer">
+				<footer className="edit-site-sidebar-navigation-screen__sticky-section">
 					{ footer }
 				</footer>
 			) }

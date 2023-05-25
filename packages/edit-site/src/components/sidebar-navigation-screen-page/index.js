@@ -11,7 +11,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -36,6 +35,7 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import SidebarDetails from '../sidebar-navigation-data-list';
+import DataListItem from '../sidebar-navigation-data-list/data-list-item';
 import StatusLabel from './status-label';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
@@ -210,26 +210,23 @@ export default function SidebarNavigationScreenPage() {
 									'has-image': !! mediaSourceUrl,
 								}
 							) }
-							style={
-								!! mediaSourceUrl
-									? {
-											backgroundImage: `url(${ mediaSourceUrl })`,
-									  }
-									: {}
-							}
 						>
+							{ !! mediaSourceUrl && (
+								<img
+									alt={
+										mediaDescription
+											? decodeEntities( mediaDescription )
+											: decodeEntities(
+													record?.title?.rendered
+											  ) || __( 'Featured image' )
+									}
+									src={ mediaSourceUrl }
+								/>
+							) }
 							{ record && ! record?.featured_media && (
 								<p>{ __( 'No featured image' ) }</p>
 							) }
 						</div>
-						{ mediaSourceUrl && mediaDescription && (
-							<Truncate
-								className="edit-site-sidebar-navigation-screen-page__featured-image-description"
-								numberOfLines={ 1 }
-							>
-								{ decodeEntities( mediaDescription ) }
-							</Truncate>
-						) }
 					</VStack>
 					{ !! record?.excerpt?.raw && (
 						<Truncate
@@ -249,27 +246,24 @@ export default function SidebarNavigationScreenPage() {
 							...record,
 						} ) }
 					/>
-					{ !! record && (
-						<VStack className="edit-site-sidebar-navigation-screen__sticky-section">
-							<Text>
-								{ createInterpolateElement(
-									sprintf(
-										/* translators: %s: is the relative time when the post was last modified. */
-										__( 'Last modified <time>%s</time>' ),
-										humanTimeDiff( record.modified )
-									),
-									{
-										time: (
-											<time
-												dateTime={ record.modified }
-											/>
-										),
-									}
-								) }
-							</Text>
-						</VStack>
-					) }
 				</>
+			}
+			footer={
+				!! record ? (
+					<DataListItem
+						label={ __( 'Last modified' ) }
+						value={ createInterpolateElement(
+							sprintf(
+								/* translators: %s: is the relative time when the post was last modified. */
+								__( '<time>%s</time>' ),
+								humanTimeDiff( record.modified )
+							),
+							{
+								time: <time dateTime={ record.modified } />,
+							}
+						) }
+					/>
+				) : null
 			}
 		/>
 	);

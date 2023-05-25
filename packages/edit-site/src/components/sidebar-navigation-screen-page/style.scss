@@ -1,10 +1,9 @@
 .edit-site-sidebar-navigation-screen__sticky-section {
 	padding: $grid-unit-40 0;
-	margin: $grid-unit-40 0;
+	margin: $grid-unit-40 $grid-unit-20;
 }
 
 .edit-site-sidebar-navigation-screen-page__featured-image-wrapper {
-	padding: $grid-unit-10;
 	background-color: $gray-800;
 	margin-bottom: $grid-unit-20;
 	min-height: 128px;
@@ -21,6 +20,12 @@
 	align-items: center;
 	justify-content: center;
 	color: $gray-600;
+	img {
+		object-fit: cover;
+		height: 100%;
+		width: 100%;
+		object-position: 50% 50%;
+	}
 }
 
 .edit-site-sidebar-navigation-screen-page__featured-image-description {
