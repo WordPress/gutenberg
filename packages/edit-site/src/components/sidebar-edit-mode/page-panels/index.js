@@ -79,7 +79,7 @@ export default function PagePanels() {
 					<Button
 						className="edit-site-page-panels__edit-template-button"
 						variant="secondary"
-						onClick={ () => togglePageContentLock() }
+						onClick={ () => togglePageContentLock( false ) }
 					>
 						{ __( 'Edit template' ) }
 					</Button>
