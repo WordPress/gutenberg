@@ -22,6 +22,7 @@ import {
 	setNestedValue,
 } from './utils';
 import type * as ET from './entity-types';
+import { getUndoEdits, getRedoEdits } from './private-selectors';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -884,28 +885,38 @@ function getCurrentUndoOffset( state: State ): number {
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getUndoEdit( state: State ): Optional< any > {
+	deprecated( "select( 'core' ).getUndoEdit()", {
+		since: '6.3',
+	} );
 	return state.undo.list[
 		state.undo.list.length - 2 + getCurrentUndoOffset( state )
-	];
+	]?.[ 0 ];
 }
 
 /**
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getRedoEdit( state: State ): Optional< any > {
+	deprecated( "select( 'core' ).getRedoEdit()", {
+		since: '6.3',
+	} );
 	return state.undo.list[
 		state.undo.list.length + getCurrentUndoOffset( state )
-	];
+	]?.[ 0 ];
 }
 
 /**
@@ -917,7 +928,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( getUndoEdit( state ) );
+	return Boolean( getUndoEdits( state ) );
 }
 
 /**
@@ -929,7 +940,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( getRedoEdit( state ) );
+	return Boolean( getRedoEdits( state ) );
 }
 
 /**
