@@ -111,7 +111,6 @@ function FontLibraryProvider( { children } ) {
     }
 
 	async function uninstallFont ( fontFamily ) {
-		console.log ( "uninstallFont", fontFamily );
 		const newLibraryFonts = await fetchUninstallFonts( fontFamily );
 		setLibraryFonts( newLibraryFonts );
 	}

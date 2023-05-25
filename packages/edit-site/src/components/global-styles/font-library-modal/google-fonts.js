@@ -105,10 +105,10 @@ function GoogleFonts() {
 	};
 
 	const toggleAddFont = ( font, fontFace ) => {
-		const existingFont = newFonts.find( f => f.name === font.name );
+		const existingFont = newFonts.find( f => f.slug === font.slug );
 		if( !fontFace ) {
 			if ( existingFont ) {
-				const fontsToAdd = newFonts.filter( f => f.name !== font.name );
+				const fontsToAdd = newFonts.filter( f => f.slug !== font.slug );
 				setNewFonts( fontsToAdd );
 				return;
 			}
@@ -122,7 +122,7 @@ function GoogleFonts() {
 			if ( existingFontFace ) {
 				
 				const fontsToAdd = newFonts.map( f => {
-					if ( f.name === font.name ) {
+					if ( f.slug === font.slug ) {
 						const fontFaceToAdd = f.fontFace.filter( face => (
 							(face.fontStyle !== fontFace.fontStyle || face.fontWeight !== fontFace.fontWeight))
 						);
@@ -138,7 +138,7 @@ function GoogleFonts() {
 				return;
 			}
 			const fontsToAdd = newFonts.map( f => {
-				if ( f.name === font.name ) {
+				if ( f.slug === font.slug ) {
 					return {
 						...f,
 						fontFace: [ ...f.fontFace, fontFace ],
@@ -220,7 +220,7 @@ function GoogleFonts() {
 						<FontsGrid>
 							{ fonts.map( ( font ) => (
 								<GoogleFontCard
-									key={ font.name }
+									key={ font.slug }
 									font={ font }
 									onClick={ handleSelectFont }
 									toggleAddFont={ toggleAddFont }
