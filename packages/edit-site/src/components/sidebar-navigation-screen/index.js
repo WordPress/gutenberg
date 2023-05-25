@@ -31,7 +31,6 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
-	...otherProps
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -43,7 +42,7 @@ export default function SidebarNavigationScreen( {
 	const theme = getTheme( currentlyPreviewingTheme() );
 
 	return (
-		<VStack spacing={ 0 } { ...otherProps }>
+		<VStack spacing={ 0 }>
 			<HStack
 				spacing={ 4 }
 				alignment="flex-start"

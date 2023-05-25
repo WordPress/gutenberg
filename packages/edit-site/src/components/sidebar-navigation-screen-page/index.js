@@ -174,7 +174,6 @@ export default function SidebarNavigationScreenPage() {
 
 	return (
 		<SidebarNavigationScreen
-			className="edit-site-sidebar-navigation-screen-page"
 			title={
 				record
 					? decodeEntities( record?.title?.rendered )
