@@ -792,6 +792,9 @@ describe( 'Links', () => {
 			);
 			await settingsToggle.click();
 
+			// Wait for settings to open.
+			await page.waitForXPath( `//label[text()='Open in new tab']` );
+
 			// Move focus back to RichText for the underlying link.
 			await pressKeyTimes( 'Tab', 4 );
 
