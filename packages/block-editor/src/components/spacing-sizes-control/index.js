@@ -93,7 +93,10 @@ export default function SpacingSizesControl( {
 	return (
 		<fieldset className="spacing-sizes-control">
 			<HStack className="spacing-sizes-control__header">
-				<BaseControl.VisualLabel as="legend">
+				<BaseControl.VisualLabel
+					as="legend"
+					className="spacing-sizes-control__label"
+				>
 					{ label }
 				</BaseControl.VisualLabel>
 				{ ! hasOneSide && ! hasOnlyAxialSides && (

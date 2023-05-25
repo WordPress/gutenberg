@@ -1,9 +1,9 @@
 .spacing-sizes-control {
-	.components-base-control__label {
+	.spacing-sizes-control__label {
 		margin-bottom: 0;
 	}
 
-	.components-base-control.components-range-control {
+	.spacing-sizes-control__range-control {
 		height: 40px;
 		/* Vertically center the RangeControl until it has true 40px height. */
 		display: flex;
