@@ -75,7 +75,7 @@ function gutenberg_current_content_contains_classic_block() {
 
 	$parsed_blocks = parse_blocks( $content );
 	foreach ( $parsed_blocks as $block ) {
-		if ( empty( $block['blockName'] ) && ! empty( trim( $block['innerHTML'] ) ) ) {
+		if ( empty( $block['blockName'] ) && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
 			return true;
 		}
 	}
