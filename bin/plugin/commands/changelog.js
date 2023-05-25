@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { groupBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -62,8 +61,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	'[Feature] Navigation Screen': 'Experiments',
-	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
 	'[Package] E2E Test Utils': 'Tools',
@@ -75,16 +73,17 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'Automated Testing': 'Tools',
+	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Code Quality': 'Code Quality',
+	'[Type] Performance': 'Performance',
+	'[Type] Security': 'Security',
+	'[Feature] Navigation Screen': 'Experiments',
 	'[Type] Experimental': 'Experiments',
 	'[Type] Bug': 'Bug Fixes',
 	'[Type] Regression': 'Bug Fixes',
-	'[Type] Feature': 'Features',
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
-	'[Type] Performance': 'Performance',
-	'[Type] Developer Documentation': 'Documentation',
-	'[Type] Code Quality': 'Code Quality',
-	'[Type] Security': 'Security',
+	'[Type] Feature': 'Features',
 };
 
 /**
@@ -304,12 +303,6 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
-	// Force all tasks identified as Documentation tasks
-	// to appear under the main "Documentation" section.
-	if ( candidates.includes( 'Documentation' ) ) {
-		return 'Documentation';
-	}
-
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
@@ -378,7 +371,7 @@ function getIssueFeature( issue ) {
  */
 function sortType( a, b ) {
 	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
+		return Object.values( LABEL_TYPE_MAPPING ).indexOf( title );
 	} );
 
 	return aIndex - bIndex;
@@ -711,9 +704,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy(
-		skipCreatedByBots( pullRequests ),
-		getIssueType
+	const groupedPullRequests = skipCreatedByBots( pullRequests ).reduce(
+		(
+			/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+			pr
+		) => {
+			const issueType = getIssueType( pr );
+			if ( ! acc[ issueType ] ) {
+				acc[ issueType ] = [];
+			}
+			acc[ issueType ].push( pr );
+			return acc;
+		},
+		{}
 	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
@@ -732,7 +735,20 @@ function getChangelog( pullRequests ) {
 		changelog += '### ' + group + '\n\n';
 
 		// Group PRs within this section into "Features".
-		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+		const featureGroups = groupPullRequests.reduce(
+			(
+				/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+				pr
+			) => {
+				const issueFeature = getIssueFeature( pr );
+				if ( ! acc[ issueFeature ] ) {
+					acc[ issueFeature ] = [];
+				}
+				acc[ issueFeature ].push( pr );
+				return acc;
+			},
+			{}
+		);
 
 		const featuredGroupNames = sortFeatureGroups( featureGroups );
 
@@ -902,6 +918,10 @@ function getContributorProps( pullRequests ) {
 		sortByUsername,
 		getContributorPropsMarkdownList,
 	] )( pullRequests );
+
+	if ( ! contributorsList ) {
+		return '';
+	}
 
 	return (
 		'## First time contributors' +

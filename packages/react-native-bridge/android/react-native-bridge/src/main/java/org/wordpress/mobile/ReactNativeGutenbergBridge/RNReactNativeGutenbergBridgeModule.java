@@ -47,6 +47,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
+    private static final String EVENT_NAME_POST_SAVE_EVENT = "postHasBeenJustSaved";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
@@ -331,8 +332,23 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void fetchRequest(String path, boolean enableCaching, Promise promise) {
-        mGutenbergBridgeJS2Parent.performRequest(path,
+        mGutenbergBridgeJS2Parent.performGetRequest(path,
                 enableCaching,
+                promise::resolve,
+                errorBundle -> {
+                    WritableMap writableMap = Arguments.makeNativeMap(errorBundle);
+                    if (writableMap.hasKey("code")) {
+                        String code = String.valueOf(writableMap.getInt("code"));
+                        promise.reject(code, new Error(), writableMap);
+                    } else {
+                        promise.reject(new Error(), writableMap);
+                    }
+                });
+    }
+
+    @ReactMethod
+    public void postRequest(String path, ReadableMap data, Promise promise) {
+        mGutenbergBridgeJS2Parent.performPostRequest(path, data,
                 promise::resolve,
                 errorBundle -> {
                     WritableMap writableMap = Arguments.makeNativeMap(errorBundle);
@@ -349,6 +365,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void requestUnsupportedBlockFallback(String content, String blockId, String blockName, String blockTitle) {
         mGutenbergBridgeJS2Parent.gutenbergDidRequestUnsupportedBlockFallback((savedContent, savedBlockId) ->
                 replaceBlock(savedContent, savedBlockId), content, blockId, blockName, blockTitle);
+    }
+
+    @ReactMethod
+    public void requestEmbedFullscreenPreview(String content, String title) {
+        mGutenbergBridgeJS2Parent.requestEmbedFullscreenPreview(content,title);
     }
 
     @ReactMethod
@@ -432,6 +453,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void toggleEditorMode() {
         emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);
+    }
+
+    public void sendToJSPostSaveEvent() {
+        emitToJS(EVENT_NAME_POST_SAVE_EVENT, null);
     }
 
     public void notifyModalClosed() {

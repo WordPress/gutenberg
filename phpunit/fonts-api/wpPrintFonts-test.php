@@ -15,31 +15,37 @@ require_once __DIR__ . '/../fixtures/mock-provider.php';
  */
 class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 
-	public function test_should_return_empty_array_when_global_not_instance() {
-		global $wp_fonts;
-		wp_fonts();
-		$wp_fonts = null;
+	public static function set_up_before_class() {
+		self::$requires_switch_theme_fixtures = true;
 
+		parent::set_up_before_class();
+
+		static::set_up_admin_user();
+	}
+
+	public function test_should_return_empty_array_when_no_fonts_registered() {
 		$this->assertSame( array(), wp_print_fonts() );
-		$this->assertNotInstanceOf( WP_Webfonts::class, $wp_fonts );
 	}
 
 	/**
-	 * Unit test to mock WP_Webfonts::do_items().
+	 * Unit test which mocks WP_Fonts methods.
 	 *
 	 * @dataProvider data_mocked_handles
 	 *
-	 * @param string|string[]|false $handles  Handles to test.
-	 * @param array|string[]        $expected Expected array of processed handles.
+	 * @param string|string[] $handles Handles to test.
 	 */
-	public function test_should_return_mocked_handles( $handles, $expected ) {
-		$mock = $this->set_up_mock( 'do_items' );
+	public function test_should_return_mocked_handles( $handles ) {
+		$mock = $this->set_up_mock( array( 'get_registered_font_families', 'do_items' ) );
+		$mock->expects( $this->once() )
+			->method( 'get_registered_font_families' )
+			->will( $this->returnValue( $handles ) );
+
 		$mock->expects( $this->once() )
 			->method( 'do_items' )
 			->with(
 				$this->identicalTo( $handles )
 			)
-			->will( $this->returnValue( $expected ) );
+			->will( $this->returnValue( $handles ) );
 
 		wp_print_fonts( $handles );
 	}
@@ -51,13 +57,14 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	 */
 	public function data_mocked_handles() {
 		return array(
-			'no handles'          => array(
-				'handles'  => false,
-				'expected' => array(),
+			'font family'            => array(
+				array( 'my-custom-font' ),
 			),
-			'font family handles' => array(
-				'handles'  => array( 'my-custom-font' ),
-				'expected' => array( 'my-custom-font' ),
+			'multiple font families' => array(
+				array(
+					'font1',
+					'font2',
+				),
 			),
 		);
 	}
@@ -106,6 +113,98 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	}
 
 	/**
+	 * @dataProvider data_should_print_all_registered_fonts_for_iframed_editor
+	 *
+	 * @param string $fonts    Fonts to register.
+	 * @param array  $expected Expected results.
+	 */
+	public function test_should_print_all_registered_fonts_for_iframed_editor( $fonts, $expected ) {
+		wp_register_fonts( $fonts );
+
+		$this->expectOutputString( $expected['output'] );
+		$actual_done = wp_print_fonts( true );
+		$this->assertSameSets( $expected['done'], $actual_done, 'All registered font-family handles should be returned' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_print_all_registered_fonts_for_iframed_editor() {
+		$local_fonts = $this->get_registered_local_fonts();
+		$font_faces  = $this->get_registered_fonts_css();
+
+		return array(
+			'Merriweather with 1 variation'      => array(
+				'fonts'    => array( 'merriweather' => $local_fonts['merriweather'] ),
+				'expected' => array(
+					'done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal']
+					),
+				),
+			),
+			'Source Serif Pro with 2 variations' => array(
+				'fonts'    => array( 'Source Serif Pro' => $local_fonts['Source Serif Pro'] ),
+				'expected' => array(
+					'done'   => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s%s\n</style>\n",
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+			'all fonts'                          => array(
+				'fonts'    => $local_fonts,
+				'expected' => array(
+					'done'   => array(
+						'merriweather',
+						'merriweather-200-900-normal',
+						'source-serif-pro',
+						'Source Serif Pro-300-normal',
+						'Source Serif Pro-900-italic',
+					),
+					'output' => sprintf(
+						"<style id='wp-fonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal'],
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Integration test for printing user-selected global fonts.
+	 * This test registers providers and fonts and then enqueues before testing the printing functionality.
+	 *
+	 * @dataProvider data_print_user_selected_fonts
+	 *
+	 * @param array  $global_styles   Test set up information for provider, fonts, and enqueued.
+	 * @param array  $expected_done   Expected array of printed handles.
+	 * @param string $expected_output Expected printed output.
+	 */
+	public function test_should_print_user_selected_fonts( $global_styles, $expected_done, $expected_output ) {
+		$wp_fonts = wp_fonts();
+
+		$setup = array(
+			'provider'      => array( 'mock' => $this->get_provider_definitions( 'mock' ) ),
+			'registered'    => $this->get_registered_mock_fonts(),
+			'global_styles' => $global_styles,
+		);
+		$this->setup_integrated_deps( $setup, $wp_fonts, false );
+
+		$this->expectOutputString( $expected_output );
+		$actual_printed_fonts = wp_print_fonts();
+		$this->assertSameSets( $expected_done, $actual_printed_fonts, 'Should print font-faces for given user-selected fonts' );
+	}
+
+
+	/**
 	 * Sets up the dependencies for integration test.
 	 *
 	 * @param array    $setup    Dependencies to set up.
@@ -122,6 +221,10 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 
 		if ( $enqueue ) {
 			$wp_fonts->enqueue( $setup['enqueued'] );
+		}
+
+		if ( ! empty( $setup['global_styles'] ) ) {
+			$this->set_up_global_styles( $setup['global_styles'] );
 		}
 	}
 }

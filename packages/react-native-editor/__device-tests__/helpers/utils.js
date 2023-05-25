@@ -16,6 +16,7 @@ const AppiumLocal = require( './appium-local' );
 // Platform setup.
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const iPadDevice = process.env.IPAD;
 
 // Environment setup, local environment or Sauce Labs.
 const defaultEnvironment = 'local';
@@ -77,7 +78,7 @@ const setupDriver = async () => {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
 		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
 			await console.log(
 				'Could not start Appium server',
@@ -115,10 +116,10 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
-		desiredCaps = { ...iosServer };
+		desiredCaps = iosServer( { iPadDevice } );
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
-			desiredCaps = { ...iosLocal };
+			desiredCaps = iosLocal( { iPadDevice } );
 
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
@@ -514,6 +515,26 @@ const toggleOrientation = async ( driver ) => {
 	}
 };
 
+/**
+ * Toggle the device dark mode.
+ *
+ * @param {Object}  driver   Driver
+ * @param {boolean} darkMode Whether to enable dark mode or not
+ */
+const toggleDarkMode = ( driver, darkMode = true ) => {
+	if ( isAndroid() ) {
+		return driver.execute( 'mobile: shell', [
+			{
+				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
+			},
+		] );
+	}
+
+	return driver.execute( 'mobile: setAppearance', {
+		style: darkMode ? 'dark' : 'light',
+	} );
+};
+
 const isEditorVisible = async ( driver ) => {
 	const postTitleLocator = isAndroid()
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
@@ -706,6 +727,7 @@ module.exports = {
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
 	timer,
+	toggleDarkMode,
 	toggleHtmlMode,
 	toggleOrientation,
 	typeString,

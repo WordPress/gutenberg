@@ -28,7 +28,7 @@ exports[`Quote block transforms to Pullquote block 1`] = `
 <!-- /wp:pullquote -->"
 `;
 
-exports[`Quote block transforms unwraps content 1`] = `
+exports[`Quote block transforms ungroups block 1`] = `
 "<!-- wp:paragraph -->
 <p>"This will make running your own blog a viable alternative again."</p>
 <!-- /wp:paragraph -->

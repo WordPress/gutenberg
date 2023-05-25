@@ -178,4 +178,13 @@ module.exports = {
 	mediaAreaPadding: {
 		width: 12,
 	},
+	defaultAppender: {
+		marginLeft: 16,
+	},
+	'components-picker__button-title': {
+		color: 'white',
+	},
+	placeholderColor: {
+		color: 'gray',
+	},
 };

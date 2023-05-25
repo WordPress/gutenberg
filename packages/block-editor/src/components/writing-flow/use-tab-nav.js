@@ -43,13 +43,24 @@ export default function useTabNav() {
 		} else {
 			setNavigationMode( true );
 
+			const canvasElement =
+				container.current.ownerDocument === event.target.ownerDocument
+					? container.current
+					: container.current.ownerDocument.defaultView.frameElement;
+
 			const isBefore =
 				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
+				event.target.compareDocumentPosition( canvasElement ) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
-			const action = isBefore ? 'findNext' : 'findPrevious';
+			const tabbables = focus.tabbable.find( container.current );
 
-			focus.tabbable[ action ]( event.target ).focus();
+			if ( tabbables.length ) {
+				const next = isBefore
+					? tabbables[ 0 ]
+					: tabbables[ tabbables.length - 1 ];
+
+				next.focus();
+			}
 		}
 	}
 

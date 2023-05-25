@@ -12,7 +12,10 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
@@ -24,6 +27,8 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import CreateNewPostLink from './create-new-post-link';
+import { unlock } from '../../../private-apis';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -32,11 +37,10 @@ import {
 	useTaxonomies,
 } from '../../utils';
 
-export default function QueryInspectorControls( {
-	attributes,
-	setQuery,
-	setDisplayLayout,
-} ) {
+const { BlockInfo } = unlock( blockEditorPrivateApis );
+
+export default function QueryInspectorControls( props ) {
+	const { attributes, setQuery, setDisplayLayout } = props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
@@ -127,6 +131,9 @@ export default function QueryInspectorControls( {
 
 	return (
 		<>
+			<BlockInfo>
+				<CreateNewPostLink { ...props } />
+			</BlockInfo>
 			{ showSettingsPanel && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>

@@ -22,7 +22,12 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
+import {
+	StyledHelp,
+	StyledLabel,
+} from '../base-control/styles/base-control-styles';
+import { Spacer } from '../spacer';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const identity = ( value: string ) => value;
 
@@ -65,9 +70,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
-	} = props;
+		__nextHasNoMarginBottom = false,
+	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
+		props,
+		'wp.components.FormTokenField'
+	);
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -697,7 +706,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					align="center"
 					gap={ 1 }
 					wrap={ true }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }
@@ -716,17 +725,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
+			{ ! __nextHasNoMarginBottom && <Spacer marginBottom={ 2 } /> }
 			{ __experimentalShowHowTo && (
-				<p
+				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
 					className="components-form-token-field__help"
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ tokenizeOnSpace
 						? __(
 								'Separate with commas, spaces, or the Enter key.'
 						  )
 						: __( 'Separate with commas or the Enter key.' ) }
-				</p>
+				</StyledHelp>
 			) }
 		</div>
 	);

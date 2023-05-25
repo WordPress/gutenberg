@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useReducer,
 	renderToString,
+	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -71,7 +72,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'dragover' ];
+	const eventTypes = [ 'dragover', 'mousemove' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
@@ -243,9 +244,15 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const srcDoc = useMemo( () => {
-		return '<!doctype html>' + renderToString( styleAssets );
+	const src = useMemo( () => {
+		const html = '<!doctype html>' + renderToString( styleAssets );
+		const blob = new window.Blob( [ html ], { type: 'text/html' } );
+		return URL.createObjectURL( blob );
 	}, [] );
+
+	useEffect( () => () => {
+		URL.revokeObjectURL( src );
+	} );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
@@ -260,15 +267,18 @@ function Iframe( {
 				style={ {
 					...props.style,
 					height: expand ? contentHeight : props.style?.height,
-					marginTop: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginTop,
-					marginBottom: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginBottom,
-					transform: scale
-						? `scale( ${ scale } )`
-						: props.style?.transform,
+					marginTop:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginTop,
+					marginBottom:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginBottom,
+					transform:
+						scale !== 1
+							? `scale( ${ scale } )`
+							: props.style?.transform,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
@@ -276,7 +286,7 @@ function Iframe( {
 				// Correct doctype is required to enable rendering in standards
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
-				srcDoc={ srcDoc }
+				src={ src }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&

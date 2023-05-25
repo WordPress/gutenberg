@@ -48,6 +48,13 @@ export default function EditSitePreferencesModal( {
 						) }
 						label={ __( 'Always open list view' ) }
 					/>
+					<EnableFeature
+						featureName="showBlockBreadcrumbs"
+						help={ __(
+							'Shows block breadcrumbs at the bottom of the editor.'
+						) }
+						label={ __( 'Display block breadcrumbs' ) }
+					/>
 				</PreferencesModalSection>
 			),
 		},

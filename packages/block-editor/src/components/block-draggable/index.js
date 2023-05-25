@@ -67,14 +67,18 @@ const BlockDraggable = ( {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds );
-				isDragging.current = true;
+				// Defer hiding the dragged source element to the next
+				// frame to enable dragging.
+				window.requestAnimationFrame( () => {
+					startDraggingBlocks( clientIds );
+					isDragging.current = true;
 
-				startScrolling( event );
+					startScrolling( event );
 
-				if ( onDragStart ) {
-					onDragStart();
-				}
+					if ( onDragStart ) {
+						onDragStart();
+					}
+				} );
 			} }
 			onDragOver={ scrollOnDragOver }
 			onDragEnd={ () => {

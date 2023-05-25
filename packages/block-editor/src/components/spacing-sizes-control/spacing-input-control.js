@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -70,6 +71,16 @@ export default function SpacingInputControl( {
 			value !== undefined &&
 			! isValueSpacingPreset( value )
 	);
+
+	const previousValue = usePrevious( value );
+	if (
+		!! value &&
+		previousValue !== value &&
+		! isValueSpacingPreset( value ) &&
+		showCustomValueControl !== true
+	) {
+		setShowCustomValueControl( true );
+	}
 
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
