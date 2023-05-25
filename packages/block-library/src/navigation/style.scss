@@ -408,7 +408,7 @@ button.wp-block-navigation-item__content {
 		// Sets a border for submenus for backwards compatibility.
 		// This is under a :not selector so that if a user sets
 		// a background color the borders are removed.
-		// One day is should be possible to control this via Global Styles.
+		// One day it should be possible to control this via Global Styles.
 		border: 1px solid rgba(0, 0, 0, 0.15);
 	}
 }
