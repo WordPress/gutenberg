@@ -231,6 +231,8 @@ function LinkControl( {
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
+	const settingsKeys = settings.map( ( { id } ) => id );
+
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
@@ -245,8 +247,6 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		const settingsKeys = settings.map( ( { id } ) => id );
-
 		// Suggestions may contains "settings" values (e.g. `opensInNewTab`)
 		// which should not overide any existing settings values set by the
 		// user. This filters out any settings values from the suggestion.
