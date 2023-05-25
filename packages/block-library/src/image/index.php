@@ -58,6 +58,7 @@ function render_block_core_image( $attributes, $content ) {
 		// which now wraps Image Blocks within innerBlocks.
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
+		$content = $processor->get_updated_html();
 	}
 
 	$link_destination = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
@@ -129,10 +130,10 @@ function render_block_core_image( $attributes, $content ) {
 								<div class="scrim" style="background-color: $background_color"></div>
 						</div>
 				</div>
-HTML;
+			HTML;
 	}
 
-	return $processor->get_updated_html();
+	return $content;
 }
 
 /**
