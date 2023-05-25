@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967)).
+
 ## 25.0.0 (2023-05-24)
 
 ### Breaking Changes
