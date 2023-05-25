@@ -233,7 +233,8 @@ const getAllBlocks = () => {
 	// and when TinyMCE experiment is disabled or cookie to require TinyMCE is set
 	if (
 		window?.wp?.oldEditor &&
-		( ! window?.__experimentalDisableTinymce ||
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
 			( '; ' + document.cookie )
 				.split( '; requiresTinymce=' )
 				.pop()
