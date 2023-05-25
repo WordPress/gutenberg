@@ -1,7 +1,7 @@
 export default function removePageFromBlockContext( context ) {
-	return {
-		...context,
-		postType: null,
-		postId: null,
-	};
+	if ( context ) {
+		const { postType, postId, ...rest } = context;
+		return rest;
+	}
+	return context;
 }
