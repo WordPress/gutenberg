@@ -135,7 +135,8 @@ function GoogleFonts() {
 						};
 					}
 					return f;
-				} );
+				} )
+				.filter( f => f.fontFace.length > 0 );
 				setNewFonts( fontsToAdd );
 				return;
 			}
