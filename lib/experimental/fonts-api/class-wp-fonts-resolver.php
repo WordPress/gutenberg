@@ -253,7 +253,7 @@ class WP_Fonts_Resolver {
 
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					// Skip if the font was registered through the Fonts API.
-					if ( isset( $font_face['origin'] ) && 'gutenberg_wp_fonts_api' === $font_face['origin'] ) {
+					if ( isset( $font_face['origin'] ) && WP_Fonts::REGISTERED_ORIGIN === $font_face['origin'] ) {
 						continue;
 					}
 
