@@ -54,12 +54,10 @@ function PageDocumentActions() {
 
 	const { togglePageContentLock } = useDispatch( editSiteStore );
 
-	// Return a simple loading indicator until we have information to show.
 	if ( ! hasResolved ) {
 		return null;
 	}
 
-	// Return feedback that the page does not seem to exist.
 	if ( ! editedRecord ) {
 		return (
 			<div className="edit-site-document-actions">
@@ -80,12 +78,10 @@ function PageDocumentActions() {
 function TemplateDocumentActions( { onBack } ) {
 	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
 
-	// Return a simple loading indicator until we have information to show.
 	if ( ! isLoaded ) {
 		return null;
 	}
 
-	// Return feedback that the template does not seem to exist.
 	if ( ! record ) {
 		return (
 			<div className="edit-site-document-actions">
