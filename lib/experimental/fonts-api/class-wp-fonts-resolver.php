@@ -125,12 +125,12 @@ class WP_Fonts_Resolver {
 	}
 
 	/**
-	 * Add missing fonts data to the global styles.
+	 * Add missing fonts to the global styles.
 	 *
-	 * @param WP_Theme_JSON_Gutenberg $data The global styles.
-	 * @return WP_Theme_JSON_Gutenberg The global styles with missing fonts data.
+	 * @param WP_Theme_JSON_Gutenberg|WP_Theme_JSON $data The global styles.
+	 * @return WP_Theme_JSON_Gutenberg|WP_Theme_JSON The global styles with missing fonts.
 	 */
-	public static function add_registered_fonts_to_theme_json( $data ) {
+	public static function add_missing_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
 
 		$raw_data = $data->get_raw_data();
