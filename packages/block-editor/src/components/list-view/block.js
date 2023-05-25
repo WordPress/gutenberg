@@ -38,6 +38,7 @@ import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import { unlock } from '../../lock-unlock';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -59,31 +60,13 @@ function ListViewBlock( {
 	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 
-	const { isLocked, isContentLocked, canEdit } = useBlockLock( clientId );
-	const forceSelectionContentLock = useSelect(
-		( select ) => {
-			if ( isSelected ) {
-				return false;
-			}
-			if ( ! isContentLocked ) {
-				return false;
-			}
-			return select( blockEditorStore ).hasSelectedInnerBlock(
-				clientId,
-				true
-			);
-		},
-		[ isContentLocked, clientId, isSelected ]
-	);
+	const { isLocked, canEdit } = useBlockLock( clientId );
 
-	const canExpand = isContentLocked ? false : canEdit;
 	const isFirstSelectedBlock =
-		forceSelectionContentLock ||
-		( isSelected && selectedClientIds[ 0 ] === clientId );
+		isSelected && selectedClientIds[ 0 ] === clientId;
 	const isLastSelectedBlock =
-		forceSelectionContentLock ||
-		( isSelected &&
-			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
+		isSelected &&
+		selectedClientIds[ selectedClientIds.length - 1 ] === clientId;
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
@@ -97,15 +80,21 @@ function ListViewBlock( {
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
 	);
-
-	// When a block hides its toolbar it also hides the block settings menu,
-	// since that menu is part of the toolbar in the editor canvas.
-	// List View respects this by also hiding the block settings menu.
-	const showBlockActions = hasBlockSupport(
-		blockName,
-		'__experimentalToolbar',
-		true
+	const blockEditingMode = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getBlockEditingMode(
+				clientId
+			),
+		[ clientId ]
 	);
+
+	const showBlockActions =
+		// When a block hides its toolbar it also hides the block settings menu,
+		// since that menu is part of the toolbar in the editor canvas.
+		// List View respects this by also hiding the block settings menu.
+		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
+		// Don't show the settings menu if block is disabled or content only.
+		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -205,7 +194,7 @@ function ListViewBlock( {
 	}
 
 	const classes = classnames( {
-		'is-selected': isSelected || forceSelectionContentLock,
+		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected': isBranchSelected,
@@ -249,14 +238,14 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canExpand ? isExpanded : undefined }
+			data-expanded={ canEdit ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-selected={ !! isSelected || forceSelectionContentLock }
+				aria-selected={ !! isSelected }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -273,7 +262,7 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canExpand ? isExpanded : undefined }
+							isExpanded={ canEdit ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaLabel={ blockAriaLabel }
 							ariaDescribedBy={ descriptionId }
@@ -322,7 +311,7 @@ function ListViewBlock( {
 			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
-					aria-selected={ !! isSelected || forceSelectionContentLock }
+					aria-selected={ !! isSelected }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu

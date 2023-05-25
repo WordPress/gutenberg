@@ -46,6 +46,22 @@ const config = {
 				'Manage what patterns are available when editing your site.'
 			),
 		},
+		sortCallback: ( items ) => {
+			const groupedByArea = items.reduce(
+				( accumulator, item ) => {
+					const key = accumulator[ item.area ] ? item.area : 'rest';
+					accumulator[ key ].push( item );
+					return accumulator;
+				},
+				{ header: [], footer: [], sidebar: [], rest: [] }
+			);
+			return [
+				...groupedByArea.header,
+				...groupedByArea.footer,
+				...groupedByArea.sidebar,
+				...groupedByArea.rest,
+			];
+		},
 	},
 };
 
@@ -75,10 +91,13 @@ export default function SidebarNavigationScreenTemplates() {
 			per_page: -1,
 		}
 	);
-	const sortedTemplates = templates ? [ ...templates ] : [];
+	let sortedTemplates = templates ? [ ...templates ] : [];
 	sortedTemplates.sort( ( a, b ) =>
 		a.title.rendered.localeCompare( b.title.rendered )
 	);
+	if ( config[ postType ].sortCallback ) {
+		sortedTemplates = config[ postType ].sortCallback( sortedTemplates );
+	}
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
