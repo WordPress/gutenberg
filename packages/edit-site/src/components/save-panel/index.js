@@ -74,7 +74,7 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 	if ( isPreviewingTheme() ) {
 		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
 	}
-	return <EntitiesSavedStates onClose={ onClose } />;
+	return <EntitiesSavedStates close={ onClose } />;
 };
 
 export default function SavePanel() {
@@ -116,7 +116,7 @@ export default function SavePanel() {
 			ariaLabel={ __( 'Save panel' ) }
 		>
 			{ isSaveViewOpen ? (
-				<_EntitiesSavedStates />
+				<_EntitiesSavedStates onClose={ onClose } />
 			) : (
 				<div className="edit-site-editor__toggle-save-panel">
 					<Button
