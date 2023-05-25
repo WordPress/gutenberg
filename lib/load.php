@@ -113,7 +113,6 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
 	require __DIR__ . '/experimental/fonts-api/fonts-api.php';
-	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-library.php';
 	// BC Layer files, which will not be backported to WP Core.
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
 	require __DIR__ . '/experimental/fonts-api/bc-layer/webfonts-deprecations.php';
@@ -123,6 +122,9 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-web-fonts.php';
 }
+
+// Fonts Library
+require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
