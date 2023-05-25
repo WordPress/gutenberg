@@ -172,11 +172,9 @@
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
 
-	// Enable pointer events on editable blocks.
 	pointer-events: auto;
 	user-select: text;
 
-	// But disable when editing is disabled.
 	&.is-editing-disabled {
 		pointer-events: none;
 		user-select: none;
