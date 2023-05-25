@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRevertUtils: async ( { page }, use ) => {
-		await use( new TemplateRevertUtils( { page } ) );
+	templateRevertUtils: async ( { editor, page }, use ) => {
+		await use( new TemplateRevertUtils( { editor, page } ) );
 	},
 } );
 
@@ -39,7 +39,6 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await editor.saveSiteEditorEntities();
 
-		await page.click( 'role=button[name="Settings"i]' );
 		const isTemplateTabVisible = await page
 			.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
@@ -286,12 +285,13 @@ test.describe( 'Template Revert', () => {
 } );
 
 class TemplateRevertUtils {
-	constructor( { page } ) {
+	constructor( { editor, page } ) {
+		this.editor = editor;
 		this.page = page;
 	}
 
 	async revertTemplate() {
-		await this.page.click( 'role=button[name="Settings"i]' );
+		await this.editor.openDocumentSettingsSidebar();
 		const isTemplateTabVisible = await this.page
 			.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
@@ -309,7 +309,6 @@ class TemplateRevertUtils {
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'
 		);
-		await this.page.click( 'role=button[name="Settings"i]' );
 	}
 
 	async getCurrentSiteEditorContent() {

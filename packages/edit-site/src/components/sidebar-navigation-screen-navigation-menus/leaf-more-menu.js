@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
-import {
-	addSubmenu,
-	chevronUp,
-	chevronDown,
-	moreVertical,
-} from '@wordpress/icons';
+
+import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -18,67 +13,6 @@ const POPOVER_PROPS = {
 	position: 'bottom right',
 	variant: 'toolbar',
 };
-
-const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
-
-function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
-	const { insertBlock, replaceBlock, replaceInnerBlocks } =
-		useDispatch( blockEditorStore );
-
-	const clientId = block.clientId;
-	const isDisabled = ! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
-		block.name
-	);
-	return (
-		<MenuItem
-			icon={ addSubmenu }
-			disabled={ isDisabled }
-			onClick={ () => {
-				const updateSelectionOnInsert = false;
-				const newLink = createBlock( 'core/navigation-link' );
-
-				if ( block.name === 'core/navigation-submenu' ) {
-					insertBlock(
-						newLink,
-						block.innerBlocks.length,
-						clientId,
-						updateSelectionOnInsert
-					);
-				} else {
-					// Convert to a submenu if the block currently isn't one.
-					const newSubmenu = createBlock(
-						'core/navigation-submenu',
-						block.attributes,
-						block.innerBlocks
-					);
-
-					// The following must happen as two independent actions.
-					// Why? Because the offcanvas editor relies on the getLastInsertedBlocksClientIds
-					// selector to determine which block is "active". As the UX needs the newLink to be
-					// the "active" block it must be the last block to be inserted.
-					// Therefore the Submenu is first created and **then** the newLink is inserted
-					// thus ensuring it is the last inserted block.
-					replaceBlock( clientId, newSubmenu );
-
-					replaceInnerBlocks(
-						newSubmenu.clientId,
-						[ newLink ],
-						updateSelectionOnInsert
-					);
-				}
-				if ( ! expandedState[ block.clientId ] ) {
-					expand( block.clientId );
-				}
-				onClose();
-			} }
-		>
-			{ __( 'Add submenu link' ) }
-		</MenuItem>
-	);
-}
 
 export default function LeafMoreMenu( props ) {
 	const { block } = props;
@@ -131,13 +65,6 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						<AddSubmenuItem
-							block={ block }
-							onClose={ onClose }
-							expanded
-							expandedState={ props.expandedState }
-							expand={ props.expand }
-						/>
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

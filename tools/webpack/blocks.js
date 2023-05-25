@@ -229,6 +229,7 @@ module.exports = [
 			file: './packages/block-library/src/file/interactivity.js',
 			navigation:
 				'./packages/block-library/src/navigation/interactivity.js',
+			image: './packages/block-library/src/image/interactivity.js',
 		},
 		output: {
 			devtoolNamespace: 'wp',
