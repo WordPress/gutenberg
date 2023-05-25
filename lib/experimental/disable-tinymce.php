@@ -48,12 +48,12 @@ function gutenberg_current_content_contains_classic_block() {
 		return false;
 	}
 
-	// Post editor
-	if ( ! empty( $_GET['post'] ) && ! empty( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
+	// Handle the post editor.
+	if ( ! empty( $_GET['post'] ) && ! empty( $_GET['action'] ) && 'edit' === $_GET['action'] ) {
 		$content = get_post( intval( $_GET['post'] ) )->post_content;
 	}
 
-	// @TODO the rest of the editors
+	// @TODO the rest of the editors.
 
 	if ( empty( $content ) ) {
 		return false;
