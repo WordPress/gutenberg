@@ -251,7 +251,13 @@ jobs:
             - name: Download Changelog Artifact
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
-                  name: changelog for tags
+                  # The name might be confusing here as this job is about a SVN tag and not trunk,
+                  # but in this case `trunk` refers to something else not in the context of SVN.
+                  # it's because the changelog is uploaded using this name in the `update-changelog`
+                  # job above. The changelog is generated and committed to the *git* `trunk` and
+                  # `release/vX.Y.Z` branches, and then the generated text file is stored uising
+                  # the download-artifact action with this name.
+                  name: changelog trunk
                   path: tags/${{ github.event.release.name }}
 
             - name: Commit the content changes
