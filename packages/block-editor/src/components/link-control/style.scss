@@ -13,6 +13,12 @@ $preview-image-height: 140px;
 	}
 }
 
+.link-control-transform,
+.block-editor-link-control__tools,
+.block-editor-link-control__search-results-label {
+	display: none !important; // temp hacky hide — should def be removed.
+}
+
 .block-editor-link-control {
 	position: relative;
 	min-width: $modal-min-width;
@@ -41,6 +47,7 @@ $preview-image-height: 140px;
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
+	margin-bottom: $grid-unit-10;
 	position: relative;
 }
 
@@ -77,10 +84,11 @@ $preview-image-height: 140px;
 		@include input-control;
 		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
-		padding: 11px $grid-unit-20;
+		padding: $grid-unit-10 $grid-unit-20;
 		margin: 0;
 		position: relative;
-		border: 1px solid $gray-300;
+		border: 1px solid $gray-600;
+		height: 40px;
 		border-radius: $radius-block-ui;
 	}
 }
@@ -97,37 +105,37 @@ $preview-image-height: 140px;
 	order: 20;
 }
 
-.block-editor-link-control__search-results-wrapper {
-	position: relative;
-	margin-top: -$grid-unit-20 + 1px;
+// .block-editor-link-control__search-results-wrapper {
+// 	position: relative;
+// 	margin-top: -$grid-unit-20 + 1px;
 
-	&::before,
-	&::after {
-		content: "";
-		position: absolute;
-		left: -1px;
-		right: $grid-unit-20; // avoid overlaying scrollbars
-		display: block;
-		pointer-events: none;
-		z-index: 100;
-	}
+// 	&::before,
+// 	&::after {
+// 		content: "";
+// 		position: absolute;
+// 		left: -1px;
+// 		right: $grid-unit-20; // avoid overlaying scrollbars
+// 		display: block;
+// 		pointer-events: none;
+// 		z-index: 100;
+// 	}
 
-	&::before {
-		height: $grid-unit-20 * 0.5;
-		top: 0;
-		bottom: auto;
-	}
+// 	&::before {
+// 		height: $grid-unit-20 * 0.5;
+// 		top: 0;
+// 		bottom: auto;
+// 	}
 
-	&::after {
-		height: $grid-unit-20;
-		bottom: 0;
-		top: auto;
-	}
-}
+// 	&::after {
+// 		height: $grid-unit-20;
+// 		bottom: 0;
+// 		top: auto;
+// 	}
+// }
 
 .block-editor-link-control__search-results {
-	margin: 0;
-	padding: $grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20 * 0.5;
+	margin-top: -$grid-unit-20;
+	padding: $grid-unit-10;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -136,40 +144,28 @@ $preview-image-height: 140px;
 	}
 }
 
+// .block-editor-link-control__search-results-wrapper {
+// 	border-bottom: 1px solid $gray-400; // its odd currently because there are no persistent controls in the foot.
+// }
+
 .block-editor-link-control__search-item {
-	position: relative;
-	display: flex;
-	align-items: flex-start; // when link text is very long it is important this indicator remains visible and thus should be aligned top.
-	font-size: $default-font-size;
-	cursor: pointer;
-	background: $white;
-	width: 100%;
-	border: none;
-	text-align: left;
-	padding: $grid-unit-15 $grid-unit-20;
-	border-radius: 2px;
-	height: auto;
 
-	&:hover,
-	&:focus {
-		background-color: $gray-100;
-
-		.block-editor-link-control__search-item-type {
-			background: $white;
-		}
+	&.components-button.components-menu-item__button {
+		padding-left: $grid-unit-05;
+		padding-right: $grid-unit-10;
+		height: auto;
+		text-align: left;
 	}
 
-	// The added specificity is needed to override.
-	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+	.components-menu-item__item {
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	&.is-selected {
-		background: $gray-100;
-
-		.block-editor-link-control__search-item-type {
-			background: $white;
-		}
+	.components-menu-item__shortcut {
+		color: $gray-700;
+		text-transform: capitalize;
+		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
 	&.is-current {
@@ -207,20 +203,20 @@ $preview-image-height: 140px;
 		align-items: center;
 	}
 
-	.block-editor-link-control__search-item-icon {
-		position: relative;
-		top: 0.2em;
-		margin-right: $grid-unit-10;
-		max-height: 24px;
-		flex-shrink: 0;
-		width: 24px;
-		display: flex;
-		justify-content: center;
+	// .block-editor-link-control__search-item-icon {
+	// 	position: relative;
+	// 	top: 0.2em;
+	// 	margin-right: $grid-unit-10;
+	// 	max-height: 24px;
+	// 	flex-shrink: 0;
+	// 	width: 24px;
+	// 	display: flex;
+	// 	justify-content: center;
 
-		img {
-			width: 16px; // favicons often have a source of 32px
-		}
-	}
+	// 	img {
+	// 		width: 16px; // favicons often have a source of 32px
+	// 	}
+	// }
 
 	&.is-error .block-editor-link-control__search-item-icon {
 		top: 0;
@@ -228,17 +224,6 @@ $preview-image-height: 140px;
 		max-height: 32px;
 	}
 
-	.block-editor-link-control__search-item-info,
-	.block-editor-link-control__search-item-title {
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-		.components-external-link__icon {
-			position: absolute;
-			right: 0;
-			margin-top: 0;
-		}
-	}
 
 	.block-editor-link-control__search-item-title {
 		display: block;
@@ -261,27 +246,11 @@ $preview-image-height: 140px;
 		}
 	}
 
-	.block-editor-link-control__search-item-info {
-		display: block;
-		color: $gray-700;
-		font-size: 0.9em;
-		line-height: 1.3;
-	}
-
-	.block-editor-link-control__search-item-error-notice {
-		font-style: italic;
-		font-size: 1.1em;
-	}
-
-	.block-editor-link-control__search-item-type {
-		display: block;
-		padding: 3px 6px;
-		margin-left: auto;
-		font-size: 0.9em;
-		background-color: $gray-100;
-		border-radius: 2px;
-		white-space: nowrap; // tags shouldn't go over two lines.
-	}
+	// .block-editor-link-control__search-item-info {
+	// 	display: block;
+	// 	color: $gray-700;
+	// 	line-height: 1.3;
+	// }
 
 	.block-editor-link-control__search-item-description {
 		padding-top: 12px;
@@ -423,9 +392,9 @@ $preview-image-height: 140px;
 }
 
 // Specificity override
-.block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
-	padding: 10px;
-}
+// .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
+// 	padding: 10px;
+// }
 
 .block-editor-link-control__drawer {
 	display: flex; // allow for ordering.
