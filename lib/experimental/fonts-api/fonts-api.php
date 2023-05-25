@@ -242,9 +242,11 @@ add_filter(
 	}
 );
 
-// `WP_Fonts_Theme_Json_Handler::register_fonts_from_theme_json()` calls `WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()`, which instantiates `WP_Theme_JSON_Gutenberg()`;
-// Gutenberg server-side blocks are registered via the init hook with a priority value of `20`. E.g., `add_action( 'init', 'register_block_core_image', 20 )`;
-// This priority value is added dynamically during the build. See: tools/webpack/blocks.js.
-// We want to make sure Gutenberg blocks are re-registered before any Theme_JSON operations take place
-// so that we have access to updated merged data.
-add_action( 'init', 'WP_Fonts_Theme_Json_Handler::register_fonts_from_theme_json', 21 );
+/*
+ * To make sure blocks are registered before any Theme_JSON operations take place, a priority of 21 is used.
+ *
+ * Why 21?
+ * Blocks are registered via the "init" hook with a priority value of `20`, which is dynamically added
+ * during the build. See: tools/webpack/blocks.js.
+ */
+add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
