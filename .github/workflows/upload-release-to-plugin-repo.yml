@@ -265,5 +265,5 @@ jobs:
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn commit -v -m "Committing version $VERSION" \
+                  svn commit -m "Committing version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
