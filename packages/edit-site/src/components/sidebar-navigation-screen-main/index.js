@@ -75,7 +75,7 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/wp_template_part"
+						path="/library"
 						withChevron
 						icon={ symbol }
 					>
