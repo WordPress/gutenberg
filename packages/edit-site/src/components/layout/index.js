@@ -34,9 +34,11 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import Sidebar from '../sidebar';
 import Editor from '../editor';
+import LibraryPage from '../library';
 import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
+import getIsLibraryPage from '../../utils/get-is-library-page';
 import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -65,8 +67,9 @@ export default function Layout() {
 
 	const hubRef = useRef();
 	const { params } = useLocation();
+	const isLibraryPage = getIsLibraryPage( params );
 	const isListPage = getIsListPage( params );
-	const isEditorPage = ! isListPage;
+	const isEditorPage = ! isListPage && ! isLibraryPage;
 	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
 		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
@@ -93,14 +96,14 @@ export default function Layout() {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const showSidebar =
-		( isMobileViewport && ! isListPage ) ||
+		( isMobileViewport && isEditorPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
 		! isMobileViewport ||
 		! isEditorPage;
 	const isFullCanvas =
-		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
+		( isMobileViewport && ! isEditorPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
@@ -254,6 +257,7 @@ export default function Layout() {
 											</ResizableFrame>
 										) }
 										{ isListPage && <ListPage /> }
+										{ isLibraryPage && <LibraryPage /> }
 									</ErrorBoundary>
 								</motion.div>
 							) }
