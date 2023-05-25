@@ -52,6 +52,17 @@ function render_block_core_file( $attributes, $content, $block ) {
 		$content
 	);
 
+	// If it uses the Interactivity API, add the directives
+	if ( $should_load_view_script ) {
+		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor->next_tag();
+		$processor->set_attribute( 'data-wp-island', '' );
+		$processor->next_tag( 'object' );
+		$processor->set_attribute( 'data-wp-bind.hidden', '!selectors.core.file.hasPdfPreview' );
+		$processor->set_attribute( 'hidden', true );
+		return $processor->get_updated_html();
+	}
+
 	return $content;
 }
 
