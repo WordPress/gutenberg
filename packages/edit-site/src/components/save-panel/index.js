@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
-	EntitiesSavedStatesExtensible,
 	useEntitiesSavedStatesIsDirty,
+	privateApis,
 } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -28,10 +28,9 @@ import {
 	isPreviewingTheme,
 } from '../../utils/is-previewing-theme';
 
+const { EntitiesSavedStatesExtensible } = unlock( privateApis );
+
 const _EntitiesSavedStates = ( { onClose } ) => {
-	const { getTheme } = useSelect( coreStore );
-	const theme = getTheme( currentlyPreviewingTheme() );
-	const activateTheme = useActivateTheme();
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
 	const saveEnabled = isPreviewingTheme() || isDirtyProps.isDirty;
 
@@ -44,6 +43,8 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 		activateSaveLabel = undefined;
 	}
 
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
 	const additionalPrompt = (
 		<p>
 			{ sprintf(
@@ -53,6 +54,7 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 		</p>
 	);
 
+	const activateTheme = useActivateTheme();
 	const onSave = async ( values ) => {
 		await activateTheme();
 		return values;
