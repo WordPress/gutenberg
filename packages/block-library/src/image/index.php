@@ -13,7 +13,7 @@
  * @param  string $content    The block content.
  * @return string Returns the block content with the data-id attribute added.
  */
-function render_block_core_image( $attributes, $content ) {
+function render_block_core_image( $attributes, $content, $block ) {
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'img' );
@@ -45,10 +45,23 @@ function render_block_core_image( $attributes, $content ) {
 		}
 	}
 
-	$experiments = get_option( 'gutenberg-experiments' );
+	$should_load_view_script = 'none' === $link_destination && $lightbox;
+	$view_js_file            = 'wp-block-image-view';
+	// If the script already exists, there is no point in removing it from viewScript.
+	if ( ! wp_script_is( $view_js_file ) ) {
+		$script_handles = $block->block_type->view_script_handles;
 
-	if ( ! empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) && 'none' === $link_destination && $lightbox ) {
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+		}
+	}
 
+	if ( $should_load_view_script ) {
 		$aria_label = 'Open image lightbox';
 		if ( $processor->get_attribute( 'alt' ) ) {
 			$aria_label .= ' : ' . $processor->get_attribute( 'alt' );

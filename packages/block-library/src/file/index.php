@@ -13,10 +13,21 @@
  *
  * @return string Returns the block content.
  */
-function render_block_core_file( $attributes, $content ) {
-	$should_load_view_script = ! empty( $attributes['displayPreview'] ) && ! wp_script_is( 'wp-block-file-view' );
-	if ( $should_load_view_script ) {
-		wp_enqueue_script( 'wp-block-file-view' );
+function render_block_core_file( $attributes, $content, $block ) {
+	$should_load_view_script = ! empty( $attributes['displayPreview'] );
+	$view_js_file = 'wp-block-file-view';
+	// If the script already exists, there is no point in removing it from viewScript.
+	if ( ! wp_script_is( $view_js_file ) ) {
+		$script_handles = $block->block_type->view_script_handles;
+
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+		}
 	}
 
 	// Update object's aria-label attribute if present in block HTML.
