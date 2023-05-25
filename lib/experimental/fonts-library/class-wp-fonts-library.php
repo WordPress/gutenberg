@@ -80,15 +80,30 @@ class WP_Fonts_Library {
 
     }
 
+    /**
+     * Check if user has permissions to use fonts library
+     *
+     * @return bool
+     */
     function fonts_library_permissions_check () {
         return current_user_can( 'edit_posts' );
     }
 
+    /**
+     * Gets the fonts library post content
+     * 
+     * @return WP_REST_Response
+     */
     function get_fonts_library () {
         $post = $this->query_fonts_library();
         return new WP_REST_Response( $post->post_content );
     }
 
+    /**
+     * Query fonts library post
+     *
+     * @return WP_Post
+     */
     private function query_fonts_library () {
         // Try to get the fonts library post
         $wp_fonts_library_query = new WP_Query( $this->base_post_query );
@@ -105,6 +120,14 @@ class WP_Fonts_Library {
         return $post;
     }
 
+    /**
+     * Updates the fonts library post content.
+     *
+     * Updates the content of the fonts library post with a new list of fonts families.
+     *
+     * @param array $new_fonts_families The new list of fonts families to replace the current content of the fonts library post.
+     * @return WP_REST_Response The updated fonts library post content wrapped in a WP_REST_Response object.
+     */
     function update_fonts_library ( $new_fonts_families ) {
         $post = $this->query_fonts_library();
         $new_fonts_library = array (
@@ -119,20 +142,37 @@ class WP_Fonts_Library {
         return new WP_REST_Response( $new_post->post_content );
     }
 
+    /**
+     * Fetches the Google Fonts JSON file.
+     *
+     * Reads the "google-fonts.json" file from the file system and returns its content.
+     *
+     * @return WP_REST_Response The content of the "google-fonts.json" file wrapped in a WP_REST_Response object.
+     */
     function get_google_fonts () {
         $file = file_get_contents(
             path_join ( dirname(__FILE__),"google-fonts.json" )
         );
-        $data = json_decode($file, true);
-        return new WP_REST_Response( $data );
+        return new WP_REST_Response( json_decode( $file ) );
     }
 
+    /**
+     * Deletes a specified font asset file from the fonts directory.
+     *
+     * @param string $src The path of the font asset file to delete.
+     * @return bool Whether the file was deleted.
+     */
     function delete_asset( $src ) {
         $filename = basename( $src );
         $file_path = path_join( $this->wp_fonts_dir, $filename );
         return wp_delete_file( $file_path );
     }
 
+    /**
+     * Deletes all font face asset files associated with a given font face.
+     *
+     * @param array $font_face The font face array containing the 'src' attribute with the file path(s) to be deleted.
+     */
     function delete_font_face_assets ( $font_face ) {
         if ( is_array( $font_face['src'] ) ) {
             foreach ( $font_face['src'] as $src ) {
@@ -143,6 +183,15 @@ class WP_Fonts_Library {
         }
     }
 
+    /**
+     * Downloads a font asset.
+     *
+     * Downloads a font asset from a specified source URL and saves it to the font directory.
+     *
+     * @param string $src The source URL of the font asset to be downloaded.
+     * @param string $filename The filename to save the downloaded font asset as.
+     * @return string The relative path to the downloaded font asset.
+     */
     function download_asset( $src, $filename ) {
         wp_mkdir_p( $this->wp_fonts_dir );
         $file_path = path_join( $this->wp_fonts_dir, $filename );
@@ -151,6 +200,16 @@ class WP_Fonts_Library {
         return "{$this->relative_fonts_path}{$filename}";
     }
 
+    /**
+     * Generates a filename for a font face asset.
+     *
+     * Creates a filename for a font face asset using font family, style, weight and extension information.
+     *
+     * @param array $font_face The font face array containing 'fontFamily', 'fontStyle', and 'fontWeight' attributes.
+     * @param string $url The URL of the font face asset, used to derive the file extension.
+     * @param int $i Optional counter for appending to the filename, default is 0.
+     * @return string The generated filename for the font face asset.
+     */
     function get_filename_from_font_face ( $font_face, $url, $i=0 ) {
         $extension = pathinfo( $url, PATHINFO_EXTENSION );
         $family = sanitize_title( $font_face['fontFamily'] );
@@ -163,6 +222,15 @@ class WP_Fonts_Library {
         return "{$filename}.{$extension}";
     } 
 
+    /**
+     * Downloads font face assets.
+     *
+     * Downloads the font face asset(s) associated with a font face. It works with both single 
+     * source URLs and arrays of multiple source URLs.
+     *
+     * @param array $font_face The font face array containing the 'src' attribute with the source URL(s) of the assets.
+     * @return array The modified font face array with the new source URL(s) to the downloaded assets.
+     */
     function download_font_face_asset ( $font_face ) {
         $new_font_face = $font_face;
         if ( is_array( $font_face['src'] ) ) {
@@ -181,6 +249,14 @@ class WP_Fonts_Library {
         return $new_font_face;
     }
 
+    /**
+     * Uninstalls a font family.
+     *
+     * Removes a font family from the fonts library and deletes its associated font face assets.
+     *
+     * @param WP_REST_Request $request The request object containing the font family to uninstall in the request parameters.
+     * @return WP_REST_Response The updated fonts library post content.
+     */
     function uninstall_font_family ( $request ) {
         $post = $this->query_fonts_library();
         $post_content = $post->post_content;
@@ -192,6 +268,16 @@ class WP_Fonts_Library {
         return $this->update_fonts_library( $new_font_families );
     }
 
+    /**
+     * Removes a font family.
+     *
+     * Removes a font family from an array of font families. If the font family to remove contains font face 
+     * definitions, the associated assets are deleted.
+     *
+     * @param array $font_families The current array of font families.
+     * @param array $font_to_uninstall The font family to remove from the font families array.
+     * @return array The updated array of font families.
+     */
     function remove_font_family ( $font_families, $font_to_uninstall ) {
         $new_font_families = array();
         foreach ( $font_families as $font_family ) {
@@ -208,6 +294,14 @@ class WP_Fonts_Library {
         return $new_font_families;
     }
 
+    /**
+     * Installs new fonts.
+     *
+     * Takes a request containing new fonts to install, downloads their assets, and adds them to the fonts library.
+     *
+     * @param WP_REST_Request $request The request object containing the new fonts to install in the request parameters.
+     * @return WP_REST_Response The updated fonts library post content.
+     */
     function install_fonts ( $request ) {
         $post = $this->query_fonts_library();
         $post_content = $post->post_content;
@@ -220,6 +314,12 @@ class WP_Fonts_Library {
         return $this->update_fonts_library( $new_library_fonts );
     }
 
+    /**
+     * Install new fonts in the library
+     *
+     * @param array $fonts Fonts to install.
+     * @return array New fonts with all assets downloaded and referenced in the font families definition.
+     */
     function install_new_fonts ( $fonts ) {
         $new_fonts = array();
         foreach ( $fonts as $font ) {
@@ -237,6 +337,13 @@ class WP_Fonts_Library {
         return $new_fonts;
     }
 
+    /**
+     * Merge new fonts with existing fonts
+     *
+     * @param array $current_fonts Fonts already installed.
+     * @param array $add_fonts Fonts to be installed.
+     * @return array Merged current fonts + new fonts.
+     */
     function merge_fonts ( $current_fonts, $add_fonts ) {
         $new_fonts = $current_fonts;
         // Search if there is a font family with the same slug in the current fonts. If there is, add the new fontFace definitions to the current font face and if there is not, add the new font family to the current fonts.
