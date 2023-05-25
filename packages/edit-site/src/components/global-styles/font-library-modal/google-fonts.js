@@ -5,12 +5,9 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext, useEffect } from '@wordpress/element';
 import {
 	Spinner,
-	__experimentalHeading as Heading,
 	__experimentalText as Text,
-	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	CheckboxControl,
 	__experimentalInputControl as InputControl,
 	Button,
 	SelectControl,

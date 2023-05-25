@@ -17,7 +17,6 @@ import {
 import FontFaceDemo from "./font-demo";
 
 
-
 function FontCard ( { font, onClick, actionHandler, elevation } ) {
 
     const fakeFontFace = {

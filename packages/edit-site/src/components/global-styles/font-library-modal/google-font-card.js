@@ -4,9 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-    CheckboxControl,
 } from '@wordpress/components';
-import { download, check, plus, reset } from '@wordpress/icons';
+import { plus, reset } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**

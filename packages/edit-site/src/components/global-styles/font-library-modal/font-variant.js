@@ -9,14 +9,12 @@ import {
 	__experimentalHStack as HStack,
 	CheckboxControl,
 } from '@wordpress/components';
-import { useContext, useEffect, useState } from '@wordpress/element';
-
 
 /**
  * Internal dependencies
  */
-import { FontLibraryContext } from './context';
 import FontFaceDemo from './font-demo';
+
 
 function FontVariant ( { fontFace, variantName, checked, onClick } ) {
     const { fontStyle, fontWeight } = fontFace;

@@ -7,8 +7,6 @@ import {
 } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 
-
-
 /**
  * Internal dependencies
  */
