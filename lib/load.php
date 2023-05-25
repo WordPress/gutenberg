@@ -128,7 +128,6 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 
-
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.
