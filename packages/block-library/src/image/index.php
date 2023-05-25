@@ -63,7 +63,7 @@ function render_block_core_image( $attributes, $content ) {
 		$img = null;
 		preg_match( '/<img[^>]+>/', $content, $img );
 		$button       = '<div class="img-container">
-			 					<button aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on.click="actions.core.image.showLightbox"></button>'
+			 					<button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on.click="actions.core.image.showLightbox"></button>'
 									. $img[0] .
 								'</div>';
 		$body_content = preg_replace( '/<img[^>]+>/', $button, $content );
@@ -93,7 +93,7 @@ function render_block_core_image( $attributes, $content ) {
 							data-wp-on.mousewheel="actions.core.image.hideLightbox"
 							data-wp-on.click="actions.core.image.hideLightbox"
 							>
-								<button aria-label="$close_button_label" class="close-button" data-wp-on.click="actions.core.image.hideLightbox">
+								<button type="button" aria-label="$close_button_label" class="close-button" data-wp-on.click="actions.core.image.hideLightbox">
 									$close_button_icon
 								</button>
 								$content
