@@ -87,11 +87,11 @@ function getPageDetails( page ) {
 	if ( wordsCounted ) {
 		details.push(
 			{
-				label: 'Words',
+				label: __( 'Words' ),
 				value: wordsCounted.toLocaleString() || __( 'Unknown' ),
 			},
 			{
-				label: 'Time to read',
+				label: __( 'Time to read' ),
 				value:
 					readingTime > 1
 						? sprintf(
