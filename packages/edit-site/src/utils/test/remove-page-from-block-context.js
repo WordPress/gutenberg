@@ -12,8 +12,6 @@ describe( 'removePageFromBlockContext', () => {
 				templateSlug: 'my-template',
 			} )
 		).toEqual( {
-			postType: null,
-			postId: null,
 			templateSlug: 'my-template',
 		} );
 	} );
