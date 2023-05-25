@@ -10,7 +10,6 @@ import {
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
-
 /**
  * Internal dependencies
  */

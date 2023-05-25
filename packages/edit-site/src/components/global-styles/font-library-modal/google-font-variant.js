@@ -8,17 +8,16 @@ import { __ } from '@wordpress/i18n';
  */
 import FontVariant from './font-variant';
 
-
-function GoogleFontVariant ({ font, fontFace, toggleAddFont, isFontAdded }) {
-    const isAdded = isFontAdded( font, fontFace );
-    return (
-        <FontVariant
-            fontFace={ fontFace }         
-            checked={ isAdded }
-            onClick={ () => toggleAddFont( font, fontFace ) }
-            onChange={ () => {} }
-        />
-    );
+function GoogleFontVariant( { font, fontFace, toggleAddFont, isFontAdded } ) {
+	const isAdded = isFontAdded( font, fontFace );
+	return (
+		<FontVariant
+			fontFace={ fontFace }
+			checked={ isAdded }
+			onClick={ () => toggleAddFont( font, fontFace ) }
+			onChange={ () => {} }
+		/>
+	);
 }
 
 export default GoogleFontVariant;

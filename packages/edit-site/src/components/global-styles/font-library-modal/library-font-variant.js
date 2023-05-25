@@ -10,30 +10,29 @@ import { useContext } from '@wordpress/element';
 import { FontLibraryContext } from './context';
 import FontVariant from './font-variant';
 
+function LibraryFontVariant( { face, font } ) {
+	const { isFontActivated, toggleActivateFont } =
+		useContext( FontLibraryContext );
 
-function LibraryFontVariant ({ face, font }) {
+	const isIstalled = font?.fontFace
+		? isFontActivated( font.slug, face.fontStyle, face.fontWeight )
+		: isFontActivated( font.slug );
 
-    const { isFontActivated, toggleActivateFont } = useContext( FontLibraryContext );
+	const handleToggleActivation = () => {
+		if ( font?.fontFace ) {
+			toggleActivateFont( font, face );
+			return;
+		}
+		toggleActivateFont( font );
+	};
 
-    const isIstalled = font?.fontFace
-        ? isFontActivated( font.slug, face.fontStyle, face.fontWeight )
-        : isFontActivated( font.slug );
-
-    const handleToggleActivation = () => {
-        if ( font?.fontFace ) {
-            toggleActivateFont( font, face );
-            return;
-        }
-        toggleActivateFont( font );
-    }
-    
-    return (
-        <FontVariant
-            fontFace={ face }
-            checked={ isIstalled }
-            onClick={ handleToggleActivation }
-        />
-    );
+	return (
+		<FontVariant
+			fontFace={ face }
+			checked={ isIstalled }
+			onClick={ handleToggleActivation }
+		/>
+	);
 }
 
 export default LibraryFontVariant;

@@ -1,17 +1,21 @@
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' );
 const crypto = require( 'crypto' );
 
 const API_URL = 'https://www.googleapis.com/webfonts/v1/webfonts?key=';
 const API_KEY = process.env.GOOGLE_FONTS_API_KEY;
-const GOOGLE_FONTS_FILE_PATH = '../../lib/experimental/fonts-api/google-fonts.json';
+const GOOGLE_FONTS_FILE_PATH =
+	'../../lib/experimental/fonts-api/google-fonts.json';
 
-function getCategories ( fonts ) {
-    const categories = new Set();
-    fonts.forEach( ( font ) => {
-        categories.add( font.category );
-    } );
-    // Returs an array of categories
-    return [ ...categories ];
+function getCategories( fonts ) {
+	const categories = new Set();
+	fonts.forEach( ( font ) => {
+		categories.add( font.category );
+	} );
+	// Returs an array of categories
+	return [ ...categories ];
 }
 
 function calculateHash( somestring ) {
@@ -24,11 +28,11 @@ function calculateHash( somestring ) {
 
 // Google Fonts API categories mappping to fallback system fonts
 const GOOGLE_FONT_FALLBACKS = {
-    'display': 'system-ui',
-    'sans-serif': 'sans-serif',
-    'serif': 'serif',
-    'handwriting': 'cursive',
-    'monospace': 'monospace',
+	display: 'system-ui',
+	'sans-serif': 'sans-serif',
+	serif: 'serif',
+	handwriting: 'cursive',
+	monospace: 'monospace',
 };
 
 function getStyleFromGoogleVariant( variant ) {
@@ -41,39 +45,38 @@ function getWeightFromGoogleVariant( variant ) {
 		: variant.replace( 'italic', '' );
 }
 
-function getFallbackForGoogleFont ( googleFontCategory ) {
-    return GOOGLE_FONT_FALLBACKS[ googleFontCategory ] || "system-ui";
+function getFallbackForGoogleFont( googleFontCategory ) {
+	return GOOGLE_FONT_FALLBACKS[ googleFontCategory ] || 'system-ui';
 }
 
-function getFontFamilyFromGoogleFont ( font ) {
-    return {
-        name: font.family,
-        fontFamily: `${font.family}, ${ getFallbackForGoogleFont( font.category ) }`,
-        slug: font.family.replace( /\s+/g, '-' ).toLowerCase(),
+function getFontFamilyFromGoogleFont( font ) {
+	return {
+		name: font.family,
+		fontFamily: `${ font.family }, ${ getFallbackForGoogleFont(
+			font.category
+		) }`,
+		slug: font.family.replace( /\s+/g, '-' ).toLowerCase(),
 		category: font.category,
-        fontFace: font.variants.map( variant => (
-            {
-                src: font.files?.[ variant ],
-                fontWeight: getWeightFromGoogleVariant( variant ),
-                fontStyle: getStyleFromGoogleVariant( variant ),
-				fontFamily: font.family,
-            }
-        ) ),
-    };
+		fontFace: font.variants.map( ( variant ) => ( {
+			src: font.files?.[ variant ],
+			fontWeight: getWeightFromGoogleVariant( variant ),
+			fontStyle: getStyleFromGoogleVariant( variant ),
+			fontFamily: font.family,
+		} ) ),
+	};
 }
 
 async function updateFiles() {
 	let newApiData;
 	let newData;
-    let response;
+	let response;
 
 	try {
 		newApiData = await fetch( `${ API_URL }${ API_KEY }` );
 		response = await newApiData.json();
-        const fontFamilies = response.items.map( getFontFamilyFromGoogleFont );
-        const categories = getCategories( response.items );
-        newData = { fontFamilies, categories };
-
+		const fontFamilies = response.items.map( getFontFamilyFromGoogleFont );
+		const categories = getCategories( response.items );
+		newData = { fontFamilies, categories };
 	} catch ( error ) {
 		// TODO: show in UI and remove console statement
 		// eslint-disable-next-line
@@ -84,20 +87,14 @@ async function updateFiles() {
 	if ( response.items ) {
 		const newDataString = JSON.stringify( newData, null, 2 );
 
-		const oldFileData = fs.readFileSync(
-			GOOGLE_FONTS_FILE_PATH,
-			'utf8'
-		);
+		const oldFileData = fs.readFileSync( GOOGLE_FONTS_FILE_PATH, 'utf8' );
 		const oldData = JSON.parse( oldFileData );
 		const oldDataString = JSON.stringify( oldData, null, 2 );
 
 		if (
 			calculateHash( newDataString ) !== calculateHash( oldDataString )
 		) {
-			fs.writeFileSync(
-				GOOGLE_FONTS_FILE_PATH,
-				newDataString
-			);
+			fs.writeFileSync( GOOGLE_FONTS_FILE_PATH, newDataString );
 			// TODO: show in UI and remove console statement
 			// eslint-disable-next-line
 			console.info( '✅  Google Fonts JSON file updated' );

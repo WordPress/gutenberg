@@ -24,14 +24,13 @@ import GoogleFontCard from './google-font-card';
 import GoolgeFontDetails from './google-font-details';
 import PreviewControls from './preview-controls';
 
-
 const filterFonts = ( fonts, filters ) => {
 	const { category, search } = filters;
 	let filteredFonts = fonts || [];
 
 	if ( category && category !== 'all' ) {
-		filteredFonts = filteredFonts.filter( ( font ) =>
-			font.category === category
+		filteredFonts = filteredFonts.filter(
+			( font ) => font.category === category
 		);
 	}
 
@@ -40,20 +39,20 @@ const filterFonts = ( fonts, filters ) => {
 			font.name.toLowerCase().includes( search.toLowerCase() )
 		);
 	}
-	
-	return filteredFonts.slice(0,96);
-}
+
+	return filteredFonts.slice( 0, 96 );
+};
 
 function GoogleFonts() {
 	const {
-        googleFonts,
-        googleFontsCategories,
+		googleFonts,
+		googleFontsCategories,
 		installFonts,
 		getAvailableFontsOutline,
-    } = useContext( FontLibraryContext );
+	} = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
 	const [ filters, setFilters ] = useState( {} );
-	
+
 	const [ newFonts, setNewFonts ] = useState( [] );
 	const [ isSaving, setIsSaving ] = useState( false );
 
@@ -63,13 +62,18 @@ function GoogleFonts() {
 		}
 	}, [ googleFontsCategories ] );
 
-	const newFontsOutline = useMemo( () => getAvailableFontsOutline( newFonts ), [ newFonts ] );
+	const newFontsOutline = useMemo(
+		() => getAvailableFontsOutline( newFonts ),
+		[ newFonts ]
+	);
 	const isFontAdded = ( font, fontFace ) => {
-		if ( !fontFace ) {
-			return !!newFontsOutline[font.slug];
+		if ( ! fontFace ) {
+			return !! newFontsOutline[ font.slug ];
 		}
-		return !!(newFontsOutline[font.slug] || []).includes(fontFace.fontStyle + fontFace.fontWeight)
-	}
+		return !! ( newFontsOutline[ font.slug ] || [] ).includes(
+			fontFace.fontStyle + fontFace.fontWeight
+		);
+	};
 
 	const handleSelectFont = ( font ) => {
 		setFontSelected( font );
@@ -84,8 +88,9 @@ function GoogleFonts() {
 	};
 	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
 
-	const fonts = useMemo( () => filterFonts( googleFonts, filters ), 
-		[googleFonts, filters]
+	const fonts = useMemo(
+		() => filterFonts( googleFonts, filters ),
+		[ googleFonts, filters ]
 	);
 
 	const tabDescription = fontSelected
@@ -104,10 +109,12 @@ function GoogleFonts() {
 	};
 
 	const toggleAddFont = ( font, fontFace ) => {
-		const existingFont = newFonts.find( f => f.slug === font.slug );
-		if( !fontFace ) {
+		const existingFont = newFonts.find( ( f ) => f.slug === font.slug );
+		if ( ! fontFace ) {
 			if ( existingFont ) {
-				const fontsToAdd = newFonts.filter( f => f.slug !== font.slug );
+				const fontsToAdd = newFonts.filter(
+					( f ) => f.slug !== font.slug
+				);
 				setNewFonts( fontsToAdd );
 				return;
 			}
@@ -117,26 +124,32 @@ function GoogleFonts() {
 		}
 
 		if ( existingFont ) {
-			const existingFontFace = existingFont.fontFace.find( f => f.fontStyle === fontFace.fontStyle && f.fontWeight === fontFace.fontWeight );
+			const existingFontFace = existingFont.fontFace.find(
+				( f ) =>
+					f.fontStyle === fontFace.fontStyle &&
+					f.fontWeight === fontFace.fontWeight
+			);
 			if ( existingFontFace ) {
-				
-				const fontsToAdd = newFonts.map( f => {
-					if ( f.slug === font.slug ) {
-						const fontFaceToAdd = f.fontFace.filter( face => (
-							(face.fontStyle !== fontFace.fontStyle || face.fontWeight !== fontFace.fontWeight))
-						);
-						return {
-							...f,
-							fontFace: fontFaceToAdd,
-						};
-					}
-					return f;
-				} )
-				.filter( f => f.fontFace.length > 0 );
+				const fontsToAdd = newFonts
+					.map( ( f ) => {
+						if ( f.slug === font.slug ) {
+							const fontFaceToAdd = f.fontFace.filter(
+								( face ) =>
+									face.fontStyle !== fontFace.fontStyle ||
+									face.fontWeight !== fontFace.fontWeight
+							);
+							return {
+								...f,
+								fontFace: fontFaceToAdd,
+							};
+						}
+						return f;
+					} )
+					.filter( ( f ) => f.fontFace.length > 0 );
 				setNewFonts( fontsToAdd );
 				return;
 			}
-			const fontsToAdd = newFonts.map( f => {
+			const fontsToAdd = newFonts.map( ( f ) => {
 				if ( f.slug === font.slug ) {
 					return {
 						...f,
@@ -151,18 +164,21 @@ function GoogleFonts() {
 
 		const fontsToAdd = [ ...newFonts, { ...font, fontFace: [ fontFace ] } ];
 		setNewFonts( fontsToAdd );
-		return;
-	}
+	};
 
 	const Footer = () => {
 		return (
 			<HStack justify="flex-end">
-				<Button variant="primary" onClick={ handleSaveChanges } disabled={ !newFonts.length || isSaving }>
-					{ isSaving && <Spinner/> } { __("Install Google Fonts") }
+				<Button
+					variant="primary"
+					onClick={ handleSaveChanges }
+					disabled={ ! newFonts.length || isSaving }
+				>
+					{ isSaving && <Spinner /> } { __( 'Install Google Fonts' ) }
 				</Button>
 			</HStack>
 		);
-	}
+	};
 
 	return (
 		<TabLayout
@@ -172,18 +188,18 @@ function GoogleFonts() {
 			footer={ <Footer /> }
 		>
 			{ fonts === null && (
-				<HStack justify='flex-start'>
+				<HStack justify="flex-start">
 					<Spinner />
-					<Text>{ __( 'Loading fonts...' ) }</Text>
+					<Text>{ __( 'Loading fonts…' ) }</Text>
 				</HStack>
 			) }
 
-			{ ( fonts && fonts.length >= 0 && !fontSelected ) && (
+			{ fonts && fonts.length >= 0 && ! fontSelected && (
 				<>
-					<HStack justify='flex-start' alignment='flex-start'>
+					<HStack justify="flex-start" alignment="flex-start">
 						<InputControl
 							value={ filters.search }
-							placeholder={ __('Font name...') }
+							placeholder={ __( 'Font name…' ) }
 							label={ __( 'Search' ) }
 							onChange={ debouncedUpdateSearchInput }
 						/>
@@ -192,26 +208,28 @@ function GoogleFonts() {
 							value={ filters.category }
 							onChange={ handleCategoryFilter }
 						>
-							{ googleFontsCategories && googleFontsCategories.map( ( category ) => (
-								<option value={category}>
-									{ category }
-								</option>
-							) ) }
+							{ googleFontsCategories &&
+								googleFontsCategories.map( ( category ) => (
+									<option value={ category }>
+										{ category }
+									</option>
+								) ) }
 						</SelectControl>
 
 						<PreviewControls />
-
 					</HStack>
 
 					<Spacer margin={ 8 } />
 				</>
-			)}
+			) }
 
 			{ fonts && fonts.length === 0 && (
-				<HStack justify='flex-start'>
-					<Text>{ __( 'No fonts found try another search term' ) }</Text>
+				<HStack justify="flex-start">
+					<Text>
+						{ __( 'No fonts found try another search term' ) }
+					</Text>
 				</HStack>
-			)}
+			) }
 
 			{ fonts && fonts.length > 0 && (
 				<>
