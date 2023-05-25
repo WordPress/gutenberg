@@ -137,47 +137,20 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
+	const settingsKeys = settings.map( ( { id } ) => id );
+
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
-	const [ internalControlValue, setInternalControlValue ] =
-		useInternalValue( value );
+	const [
+		internalControlValue,
+		setInternalControlValue,
+		setInternalURLInputValue,
+		setInternalTextInputValue,
+		setInternalSettingValue,
+	] = useInternalValue( value );
 
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
-
-	const setInternalURLInputValue = ( nextValue ) => {
-		setInternalControlValue( {
-			...internalControlValue,
-			url: nextValue,
-		} );
-	};
-
-	const setInternalTextInputValue = ( nextValue ) => {
-		setInternalControlValue( {
-			...internalControlValue,
-			title: nextValue,
-		} );
-	};
-
-	const setInternalSettingValue = ( nextValue ) => {
-		const settingsKeys = settings.map( ( { id } ) => id );
-
-		// Only apply settings values which are defined in the settings prop.
-		const settingsUpdates = Object.keys( nextValue ).reduce(
-			( acc, key ) => {
-				if ( settingsKeys.includes( key ) ) {
-					acc[ key ] = nextValue[ key ];
-				}
-				return acc;
-			},
-			{}
-		);
-
-		setInternalControlValue( {
-			...internalControlValue,
-			...settingsUpdates,
-		} );
-	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -230,8 +203,6 @@ function LinkControl( {
 	}, [ isEditingLink, isCreatingPage ] );
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
-
-	const settingsKeys = settings.map( ( { id } ) => id );
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
@@ -417,7 +388,7 @@ function LinkControl( {
 							handleSubmitWithEnter={ handleSubmitWithEnter }
 							value={ internalControlValue }
 							settings={ settings }
-							onChange={ setInternalSettingValue }
+							onChange={ setInternalSettingValue( settingsKeys ) }
 						/>
 					) }
 
