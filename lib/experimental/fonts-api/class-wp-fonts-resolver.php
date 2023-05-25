@@ -109,11 +109,13 @@ class WP_Fonts_Resolver {
 
 	/**
 	 * Register fonts defined in theme.json.
+	 *
+	 * @since X.X.X
 	 */
 	public static function register_fonts_from_theme_json() {
 
 		$settings = static::get_settings();
-		// Bail out early if there are no settings for webfonts.
+		// Bail out early if there are no settings for fonts.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
 			return;
 		}
@@ -126,6 +128,8 @@ class WP_Fonts_Resolver {
 
 	/**
 	 * Add missing fonts to the global styles.
+	 *
+	 * @since X.X.X
 	 *
 	 * @param WP_Theme_JSON_Gutenberg|WP_Theme_JSON $data The global styles.
 	 * @return WP_Theme_JSON_Gutenberg|WP_Theme_JSON The global styles with missing fonts.
@@ -167,7 +171,9 @@ class WP_Fonts_Resolver {
 	}
 
 	/**
-	 * Returns theme's settings and adds webfonts defined in variations.
+	 * Returns theme's settings and adds fonts defined in variations.
+	 *
+	 * @since X.X.X
 	 *
 	 * @return array An array containing theme's settings.
 	 */
@@ -179,7 +185,7 @@ class WP_Fonts_Resolver {
 			return $settings;
 		}
 
-		// If in the editor, add webfonts defined in variations.
+		// If in the editor, add fonts defined in variations.
 		$variations          = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 		$set_theme_structure = true;
 
@@ -212,6 +218,8 @@ class WP_Fonts_Resolver {
 	/**
 	 * Converts a list of font families into font handles and returns them as an array.
 	 *
+	 * @since X.X.X
+	 *
 	 * @param array $families_data An array of font families data.
 	 * @return array An array containing font handles.
 	 */
@@ -231,12 +239,15 @@ class WP_Fonts_Resolver {
 	/**
 	 * Parse font families from theme.json.
 	 *
+	 * @since X.X.X
+	 *
 	 * @param array $settings Font settings to parse.
 	 * @return array Returns an array that contains font data and corresponding handles.
 	 */
 	private static function parse_font_families( array $settings ) {
 		$handles = array();
 		$fonts   = array();
+
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $font_family ) {
