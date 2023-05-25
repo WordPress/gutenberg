@@ -355,6 +355,10 @@ async function runPerformanceTests( branches, options ) {
 										performanceTestDirectory,
 										'test/gutenberg-test-themes'
 									),
+								'wp-content/themes/gutenberg-test-themes/twentytwentyone':
+									'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+								'wp-content/themes/gutenberg-test-themes/twentytwentythree':
+									'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 							},
 						},
 					},
