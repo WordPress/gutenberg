@@ -14,6 +14,7 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import { CONTENT_BLOCK_TYPES } from './constants';
 
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
@@ -40,13 +41,7 @@ const withDisableNonContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const mode = useSelect(
 			( select ) => {
-				if (
-					[
-						'core/post-title',
-						'core/post-featured-image',
-						'core/post-content',
-					].includes( props.name )
-				) {
+				if ( CONTENT_BLOCK_TYPES.includes( props.name ) ) {
 					return 'contentOnly';
 				}
 				if (
