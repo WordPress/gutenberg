@@ -552,7 +552,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= sprintf(
 				'<ul %1$s>',
-				$container_attributes,
+				$container_attributes
 			);
 		}
 
