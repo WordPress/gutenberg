@@ -364,7 +364,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	$should_load_view_script      = false;
+	$should_load_view_script      = true;
 	// $should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	// $view_js_file                 = 'wp-block-navigation-view';
 
