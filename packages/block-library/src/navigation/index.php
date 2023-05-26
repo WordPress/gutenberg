@@ -634,12 +634,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$close_button_directives         = '';
 	if ( $should_load_view_script ) {
 		$nav_element_directives          = '
-			data-custom
+			data-wp-island
+			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
 		';
-		// $nav_element_directives          = '
-		// 	data-wp-island
-		// 	data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
-		// ';
 		// $open_button_directives          = '
 		// 	data-wp-on.click="actions.core.navigation.openMenu"
 		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
