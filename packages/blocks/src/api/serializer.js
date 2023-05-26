@@ -361,7 +361,18 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 		return saveContent;
 	}
 
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	/**
+	 * Filters the comment attributes before serialization.
+	 *
+	 * @param {Object}  attributes Block attributes.
+	 * @param {WPBlock} blockType  Block type definition.
+	 */
+	const saveAttributes = applyFilters(
+		'blocks.getSaveCommentAttributes',
+		getCommentAttributes( blockType, block.attributes ),
+		blockType
+	);
+
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
