@@ -25,6 +25,7 @@
 ### Enhancements
 
 -   `Tooltip`: Update background color so tooltip boundaries are more visible in the site editor ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
+-   `FontSizePicker`: Tweak the header spacing to be more consistent with other design tools ([#50855](https://github.com/WordPress/gutenberg/pull/50855)).
 
 ## 24.0.0 (2023-05-10)
 
