@@ -110,7 +110,6 @@ export default function CoverInspectorControls( {
 		isImageBackground,
 		mediaElement,
 		url,
-		isImgElement,
 		overlayColor,
 	} = currentSettings;
 
@@ -200,32 +199,27 @@ export default function CoverInspectorControls( {
 								}
 							/>
 						) }
-						{ ! useFeaturedImage &&
-							url &&
-							isImageBackground &&
-							isImgElement && (
-								<TextareaControl
-									__nextHasNoMarginBottom
-									label={ __( 'Alternative text' ) }
-									value={ alt }
-									onChange={ ( newAlt ) =>
-										setAttributes( { alt: newAlt } )
-									}
-									help={
-										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-											<br />
+						{ ! useFeaturedImage && url && (
+							<TextareaControl
+								__nextHasNoMarginBottom
+								label={ __( 'Alternative text' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 											{ __(
-												'Leave empty if decorative.'
+												'Describe the purpose of the image.'
 											) }
-										</>
-									}
-								/>
-							) }
+										</ExternalLink>
+										<br />
+										{ __( 'Leave empty if decorative.' ) }
+									</>
+								}
+							/>
+						) }
 						<PanelRow>
 							<Button
 								variant="secondary"
