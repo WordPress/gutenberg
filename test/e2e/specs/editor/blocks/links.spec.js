@@ -44,7 +44,7 @@ test.describe( 'Links', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		// Tab back to the Submit and apply the link.
-		await page.getByRole( 'button', { name: 'Apply' } ).click();
+		await page.getByRole( 'button', { name: 'Save' } ).click();
 
 		// The link should have been inserted.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
