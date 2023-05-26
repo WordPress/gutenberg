@@ -174,7 +174,6 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			return true;
 		}
 
 		// Document set with srcDoc is not immediately ready.
