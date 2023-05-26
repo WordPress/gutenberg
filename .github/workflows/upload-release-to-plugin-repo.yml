@@ -156,8 +156,9 @@ jobs:
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' &&
-            !github.event.release.prerelease && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true'           &&
+            (!github.event.release.prerelease || !contains(github.event.release.name, '-rc')) &&
+            github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
@@ -220,8 +221,9 @@ jobs:
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' &&
-            !github.event.release.prerelease && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false'          &&
+            (!github.event.release.prerelease || !contains(github.event.release.name, '-rc')) &&
+            github.event.release.assets[0]
         env:
             PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
