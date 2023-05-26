@@ -364,22 +364,23 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	$should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
-	$view_js_file                 = 'wp-block-navigation-view';
+	$should_load_view_script      = true;
+	// $should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
+	// $view_js_file                 = 'wp-block-navigation-view';
 
 	// If the script already exists, there is no point in removing it from viewScript.
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	// if ( ! wp_script_is( $view_js_file ) ) {
+	// $script_handles = $block->block_type->view_script_handles;
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-		}
-	}
+	// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+	// if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+	// $block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+	// }
+	// If the script is needed, but it was previously removed, add it again.
+	// if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+	// $block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+	// }
+	// }
 
 	$inner_blocks = $block->inner_blocks;
 
@@ -583,10 +584,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Add directives to the submenu if needed.
-	if ( $should_load_view_script ) {
-		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-		$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w );
-	}
+	// if ( $should_load_view_script ) {
+	// 	$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
+	// 	$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w );
+	// }
 
 	$modal_unique_id = wp_unique_id( 'modal-' );
 
@@ -640,7 +641,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			data-wp-on.click="actions.core.navigation.openMenu"
 			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
 		';
-		// 	data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
 		$responsive_container_directives = '
 			data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
 			data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
@@ -649,14 +649,23 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 			tabindex="-1"
 		';
-		$responsive_dialog_directives    = '
-			data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
-			data-wp-bind.role="selectors.core.navigation.roleAttribute"
-			data-wp-effect="effects.core.navigation.focusFirstElement"
-		';
-		$close_button_directives         = '
-			data-wp-on.click="actions.core.navigation.closeMenu"
-		';
+		// $responsive_container_directives = '
+		// 	data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
+		// 	data-wp-effect="effects.core.navigation.initMenu"
+		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+		// 	data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+		// 	tabindex="-1"
+		// ';
+		// $responsive_dialog_directives    = '
+		// 	data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
+		// 	data-wp-bind.role="selectors.core.navigation.roleAttribute"
+		// 	data-wp-effect="effects.core.navigation.focusFirstElement"
+		// ';
+		// $close_button_directives         = '
+		// 	data-wp-on.click="actions.core.navigation.closeMenu"
+		// ';
 	}
 
 	$responsive_container_markup = sprintf(
