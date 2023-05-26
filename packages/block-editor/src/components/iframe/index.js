@@ -139,14 +139,10 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		function setDocumentIfReady() {
+		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
@@ -178,14 +174,12 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			return true;
 		}
 
-		// Document set with srcDoc is not immediately ready.
-		node.addEventListener( 'load', setDocumentIfReady );
+		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			node.removeEventListener( 'load', setDocumentIfReady );
+			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
 				preventFileDropDefault
