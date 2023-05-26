@@ -40,4 +40,27 @@ describe( 'isURLLike', () => {
 	it( 'returns true for internal anchor ("hash") links.', () => {
 		expect( isURLLike( '#someinternallink' ) ).toBe( true );
 	} );
+
+	// use .each to test multiple cases
+	it.each( [
+		[ true, 'http://example.com' ],
+		[ true, 'https://test.co.uk?query=param' ],
+		[ true, 'ftp://openai.ai?param=value#section' ],
+		[ true, 'example.com' ],
+		[ true, 'http://example.com?query=param#section' ],
+		[ true, 'https://test.co.uk/some/path' ],
+		[ true, 'ftp://openai.ai/some/path' ],
+		[ true, 'example.org/some/path' ],
+		[ true, 'example_test.tld' ],
+		[ true, 'example_test.com' ],
+		[ false, 'example' ],
+		[ false, '.com' ],
+		[ true, '_test.com' ],
+		[ true, 'http://example_test.com' ],
+	] )(
+		'returns %s when testing against string "%s" for a valid TLD',
+		( expected, testString ) => {
+			expect( isURLLike( testString ) ).toBe( expected );
+		}
+	);
 } );
