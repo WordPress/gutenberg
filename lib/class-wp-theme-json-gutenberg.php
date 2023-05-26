@@ -1164,10 +1164,10 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $this->theme_json['styles']['blocks'][ $name ]['variations'] ) ) {
 					foreach ( $this->theme_json['styles']['blocks'][ $name ]['variations'] as $variation_name => $node ) {
 						$custom_variation_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'variations', $variation_name, 'css' ) );
-						if ( $custom_variation_css && 'default' !== $variation_name  ) {
+						if ( $custom_variation_css && 'default' !== $variation_name ) {
 							// Add the variation selectors, excluding the default variation.
 							$variation_selector = static::$blocks_metadata[ $name ]['styleVariations'][ $variation_name ];
-							$stylesheet .= $this->process_blocks_custom_css( $custom_variation_css, $variation_selector );
+							$stylesheet        .= $this->process_blocks_custom_css( $custom_variation_css, $variation_selector );
 						}
 					}
 				}
