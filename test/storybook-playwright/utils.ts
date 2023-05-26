@@ -62,9 +62,10 @@ export const getAllPropsPermutations = (
 
 		// Test all values for the given prop.
 		for ( const value of propObject.valuesToTest ) {
+			const valueAsString = value === undefined ? 'undefined' : value;
 			const newAccProps = {
 				...accProps,
-				[ propObject.propName ]: value,
+				[ propObject.propName ]: valueAsString,
 			};
 
 			if ( restProps.length === 0 ) {
