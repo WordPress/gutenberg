@@ -41,6 +41,8 @@ export default function ListViewSidebar() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	// Tracks our current tab.
+	const [ tab, setTab ] = useState( 'list-view' );
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
@@ -60,25 +62,27 @@ export default function ListViewSidebar() {
 	/*
 	 * Callback function to handle list view or outline focus.
 	 *
+	 * @param {string} currentTab The current tab. Either list view or outline.
+	 *
 	 * @return void
 	 */
-	function handleSidebarFocus() {
-		// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
-		const listViewApplicationFocus = focus.tabbable.find(
-			listViewRef.current
-		)[ 0 ];
-		const listViewFocusArea = sidebarRef.current.contains(
-			listViewApplicationFocus
-		)
-			? listViewApplicationFocus
-			: focus.tabbable.find( tabPanelRef.current )[ 0 ];
-		// Do not focus when focus is already there.
-		if (
-			sidebarRef.current.ownerDocument.activeElement === listViewFocusArea
-		) {
-			return;
+	function handleSidebarFocus( currentTab ) {
+		// List view tab is selected.
+		if ( currentTab === 'list-view' ) {
+			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
+			const listViewApplicationFocus = focus.tabbable.find(
+				listViewRef.current
+			)[ 0 ];
+			const listViewFocusArea = sidebarRef.current.contains(
+				listViewApplicationFocus
+			)
+				? listViewApplicationFocus
+				: tabPanelRef.current;
+			listViewFocusArea.focus();
+			// Outline tab is selected.
+		} else {
+			tabPanelRef.current.focus();
 		}
-		listViewFocusArea.focus();
 	}
 
 	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
@@ -92,14 +96,14 @@ export default function ListViewSidebar() {
 			setIsListViewOpened( false );
 			// If the list view or outline does not have focus, focus should be moved to it.
 		} else {
-			handleSidebarFocus();
+			handleSidebarFocus( tab );
 		}
 	} );
 
 	/**
+	 * Render tab content for a given tab name.
 	 *
 	 * @param {string} tabName The name of the tab to render.
-	 *
 	 */
 	function renderTabContent( tabName ) {
 		if ( tabName === 'list-view' ) {
@@ -129,6 +133,7 @@ export default function ListViewSidebar() {
 			<TabPanel
 				className="edit-post-editor__document-overview-panel__tab-panel"
 				ref={ tabPanelRef }
+				onSelect={ ( tabName ) => setTab( tabName ) }
 				selectOnMove={ false }
 				tabs={ [
 					{
@@ -143,12 +148,12 @@ export default function ListViewSidebar() {
 					},
 				] }
 			>
-				{ ( tab ) => (
+				{ ( currentTab ) => (
 					<div
 						className="edit-post-editor__list-view-container"
 						ref={ listViewContainerRef }
 					>
-						{ renderTabContent( tab.name ) }
+						{ renderTabContent( currentTab.name ) }
 					</div>
 				) }
 			</TabPanel>
