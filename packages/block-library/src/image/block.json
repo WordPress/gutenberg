@@ -80,6 +80,9 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"behaviors": {
+			"type": "object"
 		}
 	},
 	"supports": {

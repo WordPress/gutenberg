@@ -85,6 +85,25 @@ function BlockListAppender( {
 	tagName: TagName = 'div',
 } ) {
 	const appender = useAppender( rootClientId, renderAppender );
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
+			);
+		},
+		[ rootClientId ]
+	);
 
 	if ( ! appender ) {
 		return null;
@@ -101,10 +120,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			className={ classnames( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
 			// should collapse the selection to the end of that selection and

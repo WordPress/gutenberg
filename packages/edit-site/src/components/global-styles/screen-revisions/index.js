@@ -42,19 +42,11 @@ function ScreenRevisions() {
 			blocks: select( blockEditorStore ).getBlocks(),
 		};
 	}, [] );
-
 	const { revisions, isLoading, hasUnsavedChanges } =
 		useGlobalStylesRevisions();
+	const [ selectedRevisionId, setSelectedRevisionId ] = useState();
 	const [ globalStylesRevision, setGlobalStylesRevision ] =
 		useState( userConfig );
-
-	const [ currentRevisionId, setCurrentRevisionId ] = useState(
-		/*
-		 * We need this for the first render,
-		 * otherwise the unsaved changes haven't been merged into the revisions array yet.
-		 */
-		hasUnsavedChanges ? 'unsaved' : revisions?.[ 0 ]?.id
-	);
 	const [
 		isLoadingRevisionWithUnsavedChanges,
 		setIsLoadingRevisionWithUnsavedChanges,
@@ -89,7 +81,7 @@ function ScreenRevisions() {
 			settings: revision?.settings,
 			id: revision?.id,
 		} );
-		setCurrentRevisionId( revision?.id );
+		setSelectedRevisionId( revision?.id );
 	};
 
 	const isLoadButtonEnabled =
@@ -117,7 +109,7 @@ function ScreenRevisions() {
 			<div className="edit-site-global-styles-screen-revisions">
 				<RevisionsButtons
 					onChange={ selectRevision }
-					currentRevisionId={ currentRevisionId }
+					selectedRevisionId={ selectedRevisionId }
 					userRevisions={ revisions }
 				/>
 				{ isLoadButtonEnabled && (

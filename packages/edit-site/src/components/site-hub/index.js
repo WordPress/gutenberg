@@ -150,15 +150,14 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						</motion.div>
 					</AnimatePresence>
 				</HStack>
-				{ window?.__experimentalEnableCommandCenter &&
-					canvasMode === 'view' && (
-						<Button
-							className="edit-site-site-hub_toggle-command-center"
-							icon={ search }
-							onClick={ () => openCommandCenter() }
-							label={ __( 'Open command center' ) }
-						/>
-					) }
+				{ canvasMode === 'view' && (
+					<Button
+						className="edit-site-site-hub_toggle-command-center"
+						icon={ search }
+						onClick={ () => openCommandCenter() }
+						label={ __( 'Open command center' ) }
+					/>
+				) }
 			</HStack>
 		</motion.div>
 	);

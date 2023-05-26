@@ -41,6 +41,10 @@ export default function ListViewSidebar() {
 		}
 	}
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+
 	const [ tab, setTab ] = useState( 'list-view' );
 
 	// This ref refers to the sidebar as a whole.
@@ -147,12 +151,13 @@ export default function ListViewSidebar() {
 					contentFocusReturnRef,
 					focusOnMountRef,
 					listViewRef,
+					setDropZoneElement,
 				] ) }
 				className="edit-post-editor__list-view-container"
 			>
 				{ tab === 'list-view' && (
 					<div className="edit-post-editor__list-view-panel-content">
-						<ListView />
+						<ListView dropZoneElement={ dropZoneElement } />
 					</div>
 				) }
 				{ tab === 'outline' && <ListViewOutline /> }

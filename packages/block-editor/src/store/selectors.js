@@ -18,7 +18,6 @@ import {
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
@@ -2101,7 +2100,6 @@ export const getInserterItems = createSelector(
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
-		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -2118,22 +2116,10 @@ export const getBlockTransformItems = createSelector(
 			] )
 		);
 
-		// Consider unwraping the highest priority.
-		itemsByName[ '*' ] = {
-			frecency: +Infinity,
-			id: '*',
-			isDisabled: false,
-			name: '*',
-			title: __( 'Unwrap' ),
-			icon: itemsByName[ sourceBlock?.name ]?.icon,
-		};
-
 		const possibleTransforms = getPossibleBlockTransformations(
 			normalizedBlocks
 		).reduce( ( accumulator, block ) => {
-			if ( block === '*' ) {
-				accumulator.push( itemsByName[ '*' ] );
-			} else if ( itemsByName[ block?.name ] ) {
+			if ( itemsByName[ block?.name ] ) {
 				accumulator.push( itemsByName[ block.name ] );
 			}
 			return accumulator;
@@ -2502,6 +2488,30 @@ export function getBlockListSettings( state, clientId ) {
  */
 export function getSettings( state ) {
 	return state.settings;
+}
+
+/**
+ * Returns the behaviors registered with the editor.
+ *
+ * Behaviors are named, reusable pieces of functionality that can be
+ * attached to blocks. They are registered with the editor using the
+ * `theme.json` file.
+ *
+ * @example
+ *
+ * ```js
+ * const behaviors = select( blockEditorStore ).getBehaviors();
+ * if ( behaviors?.lightbox ) {
+ * 	 // Do something with the lightbox.
+ * }
+ *```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor behaviors object.
+ */
+export function getBehaviors( state ) {
+	return state.settings.behaviors;
 }
 
 /**

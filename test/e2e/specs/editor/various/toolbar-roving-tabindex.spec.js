@@ -96,6 +96,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
+		await page.keyboard.press( 'ArrowLeft' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Block: Table',
 			'Table'

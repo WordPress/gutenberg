@@ -74,7 +74,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
-	isContentLocked,
+	blockEditingMode,
 } ) {
 	const {
 		url = '',
@@ -117,7 +117,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, clientId ]
+		[ id, isSelected ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -156,9 +156,10 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
-		! isContentLocked &&
+		hasNonContentControls &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
@@ -327,13 +328,13 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );

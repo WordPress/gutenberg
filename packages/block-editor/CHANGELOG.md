@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.2.0 (2023-05-24)
+
 ## 12.1.0 (2023-05-10)
 
 -   `MediaPlaceholder`: Remove the undocumented `onHTMLDrop` prop ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).

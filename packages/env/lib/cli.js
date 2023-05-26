@@ -13,6 +13,10 @@ const { execSync } = require( 'child_process' );
  */
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
+const {
+	RUN_CONTAINERS,
+	validateRunContainer,
+} = require( './validate-run-container' );
 
 // Colors.
 const boldWhite = chalk.bold.white;
@@ -41,7 +45,7 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof env.ValidationError ||
-					error instanceof env.AfterSetupError
+					error instanceof env.LifecycleScriptError
 				) {
 					// Error is a configuration error. That means the user did something wrong.
 					spinner.fail( error.message );
@@ -99,9 +103,12 @@ module.exports = function cli() {
 		default: false,
 	} );
 
-	// Make sure any unknown arguments are passed to the command as arguments.
-	// This allows options to be passed to "run" without being quoted.
-	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
+	yargs.parserConfiguration( {
+		// Treats unknown options as arguments for commands to deal with instead of discarding them.
+		'unknown-options-as-args': true,
+		// Populates '--' in the command options with arguments after the double dash.
+		'populate--': true,
+	} );
 
 	yargs.command(
 		'start',
@@ -184,8 +191,8 @@ module.exports = function cli() {
 		'Displays the latest logs for the e2e test environment without watching.'
 	);
 	yargs.command(
-		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
+		'run <container> [command...]',
+		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
 		( args ) => {
 			args.option( 'env-cwd', {
 				type: 'string',
@@ -196,7 +203,10 @@ module.exports = function cli() {
 			} );
 			args.positional( 'container', {
 				type: 'string',
-				describe: 'The container to run the command on.',
+				describe:
+					'The underlying Docker service to run the command on.',
+				choices: RUN_CONTAINERS,
+				coerce: validateRunContainer,
 			} );
 			args.positional( 'command', {
 				type: 'array',
@@ -223,7 +233,13 @@ module.exports = function cli() {
 		wpRed(
 			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
-		() => {},
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
 		withSpinner( env.destroy )
 	);
 	yargs.command(

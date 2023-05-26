@@ -4,7 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import { forwardRef, useState, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -12,11 +12,12 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { useListViewContext } from './context';
 import Inserter from '../inserter';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const [ insertedBlock, setInsertedBlock ] = useState( null );
+		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
 		const { hideInserter } = useSelect(
