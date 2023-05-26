@@ -28,22 +28,6 @@ module.exports = {
 		filename: './build/interactivity/[name].min.js',
 		path: join( __dirname, '..', '..' ),
 	},
-	optimization: {
-		...baseConfig.optimization,
-		runtimeChunk: {
-			name: 'vendors',
-		},
-		splitChunks: {
-			cacheGroups: {
-				vendors: {
-					name: 'vendors',
-					test: /[\\/]node_modules[\\/]/,
-					minSize: 0,
-					chunks: 'all',
-				},
-			},
-		},
-	},
 	module: {
 		rules: [
 			{
