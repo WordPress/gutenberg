@@ -23,8 +23,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
 import { humanTimeDiff } from '@wordpress/date';
 import { count as wordCount } from '@wordpress/wordcount';
-import { getMediaDetails } from '@wordpress/editor';
 import { createInterpolateElement } from '@wordpress/element';
+import { privateApis as privateEditorApis } from '@wordpress/editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -45,21 +47,16 @@ function getPageDetails( page ) {
 	if ( ! page ) {
 		return [];
 	}
-	const details = [];
-
-	if ( page?.status ) {
-		details.push( {
+	const details = [
+		{
 			label: __( 'Status' ),
 			value: <StatusLabel status={ page.status } date={ page?.date } />,
-		} );
-	}
-
-	if ( page?.slug ) {
-		details.push( {
+		},
+		{
 			label: __( 'Slug' ),
 			value: <Truncate numberOfLines={ 1 }>{ page.slug }</Truncate>,
-		} );
-	}
+		},
+	];
 
 	if ( page?.templateTitle ) {
 		details.push( {
@@ -79,8 +76,8 @@ function getPageDetails( page ) {
 	 * Do not translate into your own language.
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
-	const wordsCounted = page?.content?.raw
-		? wordCount( page.content.raw, wordCountType )
+	const wordsCounted = page?.content?.rendered
+		? wordCount( page.content.rendered, wordCountType )
 		: 0;
 	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
 
@@ -108,6 +105,7 @@ function getPageDetails( page ) {
 
 export default function SidebarNavigationScreenPage() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { getFeaturedMediaDetails } = unlock( privateEditorApis );
 	const {
 		params: { postId },
 	} = useNavigator();
@@ -115,7 +113,7 @@ export default function SidebarNavigationScreenPage() {
 
 	const {
 		parentTitle,
-		featuredMediaDetails: { mediaSourceUrl, mediaDescription },
+		featuredMediaDetails: { mediaSourceUrl, altText },
 		templateSlug,
 	} = useSelect(
 		( select ) => {
@@ -131,30 +129,37 @@ export default function SidebarNavigationScreenPage() {
 				: null;
 
 			// Parent page title.
-			const parent = record?.parent
+			let _parentTitle = record?.parent
 				? select( coreStore ).getEntityRecord(
 						'postType',
 						'page',
-						record.parent
+						record.parent,
+						{ _fields: [ 'title' ] }
 				  )
 				: null;
-			let _parentTitle = __( 'Top level' );
-			if ( parent ) {
-				_parentTitle = parent?.title?.rendered
-					? decodeEntities( parent.title.rendered )
+
+			if ( _parentTitle?.title ) {
+				_parentTitle = _parentTitle.title?.rendered
+					? decodeEntities( _parentTitle.title.rendered )
 					: __( 'Untitled' );
+			} else {
+				_parentTitle = __( 'Top level' );
 			}
 
 			return {
 				parentTitle: _parentTitle,
 				templateSlug: getEditedPostContext()?.templateSlug,
 				featuredMediaDetails: {
-					...getMediaDetails( attachedMedia, postId ),
-					mediaDescription: attachedMedia?.description?.raw,
+					...getFeaturedMediaDetails( attachedMedia, postId ),
+					altText: escapeAttribute(
+						attachedMedia?.alt_text ||
+							attachedMedia?.description?.raw ||
+							''
+					),
 				},
 			};
 		},
-		[ record ]
+		[ record, postId ]
 	);
 
 	// Match template slug to template title.
@@ -168,17 +173,9 @@ export default function SidebarNavigationScreenPage() {
 					?.title?.rendered || templateSlug
 			: '';
 
-	const displayLink = record?.link
-		? record.link.replace( /^(https?:\/\/)?/, '' )
-		: null;
-
-	return (
+	return record ? (
 		<SidebarNavigationScreen
-			title={
-				record
-					? decodeEntities( record?.title?.rendered )
-					: __( 'Untitled' )
-			}
+			title={ decodeEntities( record?.title?.rendered ) }
 			actions={
 				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }
@@ -187,14 +184,12 @@ export default function SidebarNavigationScreenPage() {
 				/>
 			}
 			meta={
-				!! record?.link && (
-					<ExternalLink
-						className="edit-site-sidebar-navigation-screen__page-link"
-						href={ record.link }
-					>
-						{ displayLink }
-					</ExternalLink>
-				)
+				<ExternalLink
+					className="edit-site-sidebar-navigation-screen__page-link"
+					href={ record.link }
+				>
+					{ record.link.replace( /^(https?:\/\/)?/, '' ) }
+				</ExternalLink>
 			}
 			content={
 				<>
@@ -214,26 +209,26 @@ export default function SidebarNavigationScreenPage() {
 							{ !! mediaSourceUrl && (
 								<img
 									alt={
-										mediaDescription
-											? decodeEntities( mediaDescription )
+										altText
+											? decodeEntities( altText )
 											: decodeEntities(
-													record?.title?.rendered
+													record.title?.rendered
 											  ) || __( 'Featured image' )
 									}
 									src={ mediaSourceUrl }
 								/>
 							) }
-							{ record && ! record?.featured_media && (
+							{ ! record?.featured_media && (
 								<p>{ __( 'No featured image' ) }</p>
 							) }
 						</div>
 					</VStack>
-					{ !! record?.excerpt?.raw && (
+					{ !! record?.excerpt?.rendered && (
 						<Truncate
 							className="edit-site-sidebar-navigation-screen-page__excerpt"
 							numberOfLines={ 3 }
 						>
-							{ decodeEntities( record?.excerpt?.raw ) }
+							{ stripHTML( record.excerpt.rendered ) }
 						</Truncate>
 					) }
 					<SidebarNavigationSubtitle>
@@ -249,22 +244,20 @@ export default function SidebarNavigationScreenPage() {
 				</>
 			}
 			footer={
-				!! record ? (
-					<DataListItem
-						label={ __( 'Last modified' ) }
-						value={ createInterpolateElement(
-							sprintf(
-								/* translators: %s: is the relative time when the post was last modified. */
-								__( '<time>%s</time>' ),
-								humanTimeDiff( record.modified )
-							),
-							{
-								time: <time dateTime={ record.modified } />,
-							}
-						) }
-					/>
-				) : null
+				<DataListItem
+					label={ __( 'Last modified' ) }
+					value={ createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the relative time when the post was last modified. */
+							__( '<time>%s</time>' ),
+							humanTimeDiff( record.modified )
+						),
+						{
+							time: <time dateTime={ record.modified } />,
+						}
+					) }
+				/>
 			}
 		/>
-	);
+	) : null;
 }

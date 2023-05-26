@@ -78,9 +78,6 @@ export default function StatusLabel( { status, date } ) {
 		case 'pending':
 			statusLabel = __( 'Pending' );
 			break;
-		default:
-			statusLabel = __( 'Unknown' );
-			break;
 	}
 
 	return (
