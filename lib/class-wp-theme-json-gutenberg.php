@@ -1157,9 +1157,16 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
 				$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
 				if ( $custom_block_css ) {
-					// Add the block selector and the .is-style-default style variation class.
-					$selector    = static::$blocks_metadata[ $name ]['selector'] . ', ' . static::$blocks_metadata[ $name ]['styleVariations']['default'];
-					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+					// Only use the class for the default style variation if the block has style variations.
+					if ( isset( static::$blocks_metadata[ $name ]['styleVariations'] ) ) {
+						// Add the block selector and the .is-style-default style variation class.
+						$selector    = static::$blocks_metadata[ $name ]['selector'] . ', ' . static::$blocks_metadata[ $name ]['styleVariations']['default'];
+						$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+					} else {
+						// Add the block selector.
+						$selector    = static::$blocks_metadata[ $name ]['selector'];
+						$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+					}
 				}
 				if ( isset( $this->theme_json['styles']['blocks'][ $name ]['variations'] ) ) {
 					foreach ( $this->theme_json['styles']['blocks'][ $name ]['variations'] as $variation_name => $node ) {
