@@ -42,9 +42,9 @@ test.describe( 'Links', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Toggle should still have focus and be checked.
-		await page.waitForSelector(
-			':focus:checked.components-form-toggle__input'
-		);
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await expect( checkbox ).toBeChecked();
+		await expect( checkbox ).toBeFocused();
 
 		// Ensure that the contents of the post have not been changed, since at
 		// this point the link is still not inserted.
