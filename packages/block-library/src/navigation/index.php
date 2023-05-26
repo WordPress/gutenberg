@@ -644,12 +644,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$responsive_container_directives = '
 			data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
 			data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
-			data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
 			data-wp-effect="effects.core.navigation.initMenu"
 			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
 			data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 			tabindex="-1"
 		';
+		// $responsive_container_directives = '
+		// 	data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
+		// 	data-wp-effect="effects.core.navigation.initMenu"
+		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+		// 	data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+		// 	tabindex="-1"
+		// ';
 		// $responsive_dialog_directives    = '
 		// 	data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
 		// 	data-wp-bind.role="selectors.core.navigation.roleAttribute"
