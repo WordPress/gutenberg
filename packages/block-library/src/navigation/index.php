@@ -637,10 +637,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			data-wp-island
 			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
 		';
-		// $open_button_directives          = '
-		// 	data-wp-on.click="actions.core.navigation.openMenu"
-		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-		// ';
+		$open_button_directives          = '
+			data-wp-on.click="actions.core.navigation.openMenu"
+			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+		';
 		// $responsive_container_directives = '
 		// 	data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
 		// 	data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
