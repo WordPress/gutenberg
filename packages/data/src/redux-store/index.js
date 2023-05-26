@@ -529,7 +529,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 	} );
 
 	const mapSelector = ( selector, selectorName ) => {
-		const resolver = resolvers[ selectorName ];
+		const resolver = mappedResolvers[ selectorName ];
 		if ( ! resolver ) {
 			selector.hasResolver = false;
 			return selector;
