@@ -1,5 +1,7 @@
 //Bottom Sheet
 
+$cell-disable-opacity: 0.38;
+
 .bottomModal {
 	justify-content: flex-end;
 	margin: 0;
@@ -288,11 +290,11 @@
 }
 
 .placeholderColorDisabled {
-	color: lighten($gray, 20%);
+	color: rgba($gray-dark, $cell-disable-opacity);
 }
 
 .placeholderColorDisabledDark {
-	color: lighten($gray-dark, 10%);
+	color: rgba($white, $cell-disable-opacity);
 }
 
 .applyButton {
@@ -327,5 +329,5 @@
 }
 
 .cellDisabled {
-	opacity: 0.3;
+	opacity: $cell-disable-opacity;
 }

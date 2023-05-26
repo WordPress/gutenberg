@@ -156,7 +156,9 @@ describe( 'postProcessConfig', () => {
 		const processed = postProcessConfig( {
 			port: 8888,
 			testsPort: 8889,
-			afterSetup: 'test',
+			lifecycleScripts: {
+				afterStart: 'test',
+			},
 			env: {
 				development: {},
 				tests: {},
@@ -166,7 +168,9 @@ describe( 'postProcessConfig', () => {
 		expect( processed ).toEqual( {
 			port: 8888,
 			testsPort: 8889,
-			afterSetup: 'test',
+			lifecycleScripts: {
+				afterStart: 'test',
+			},
 			env: {
 				development: {
 					port: 8888,

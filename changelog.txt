@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 15.9.0-rc.1 =
+
+There has been an error with the Github action that creates the backlog. It will be updated as soon as possible. More info
+
+```
+HttpError: API rate limit exceeded. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)
+    at /home/runner/work/gutenberg/gutenberg/node_modules/@octokit/request/dist-node/index.js:85:23
+    at runMicrotasks (<anonymous>)
+    at processTicksAndRejections (internal/process/task_queues.js:95:5)
+    at async getIssuesByMilestone (/home/runner/work/gutenberg/gutenberg/bin/plugin/lib/milestone.js:82:20)
+    at async fetchAllPullRequests (/home/runner/work/gutenberg/gutenberg/bin/plugin/commands/changelog.js:673:17)
+    at async createChangelog (/home/runner/work/gutenberg/gutenberg/bin/plugin/commands/changelog.js:994:24)
+    at async getReleaseChangelog (/home/runner/work/gutenberg/gutenberg/bin/plugin/commands/changelog.js:1020:2)
+    at async Command.<anonymous> (/home/runner/work/gutenberg/gutenberg/bin/plugin/cli.js:11:4)
+```
+
+
 = 15.8.1 =
 
 

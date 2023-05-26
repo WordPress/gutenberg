@@ -1834,6 +1834,32 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of block client IDs to block editing modes.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function blockEditingModes( state = new Map(), action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EDITING_MODE':
+			return new Map( state ).set( action.clientId, action.mode );
+		case 'UNSET_BLOCK_EDITING_MODE': {
+			const newState = new Map( state );
+			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'RESET_BLOCKS': {
+			return state.has( '' )
+				? new Map().set( '', state.get( '' ) )
+				: state;
+		}
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1856,6 +1882,7 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	blockEditingModes,
 } );
 
 function withAutomaticChangeReset( reducer ) {

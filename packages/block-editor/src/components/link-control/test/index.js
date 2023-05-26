@@ -655,7 +655,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.getByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -673,7 +673,7 @@ describe( 'Manual link entry', () => {
 				await user.keyboard( '[Enter]' );
 
 				submitButton = screen.getByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -696,7 +696,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.queryByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -715,7 +715,7 @@ describe( 'Manual link entry', () => {
 				await user.click( submitButton );
 
 				submitButton = screen.queryByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -1784,6 +1784,63 @@ describe( 'Addition Settings UI', () => {
 			} )
 		).toBeChecked();
 	} );
+
+	it( 'should require settings changes to be submitted/applied', async () => {
+		const user = userEvent.setup();
+
+		const mockOnChange = jest.fn();
+
+		const selectedLink = {
+			...fauxEntitySuggestions[ 0 ],
+			// Including a setting here helps to assert on a potential bug
+			// whereby settings on the suggestion override the current (internal)
+			// settings values set by the user in the UI.
+			opensInNewTab: false,
+		};
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		// check that the "Apply" button is disabled by default.
+		const submitButton = screen.queryByRole( 'button', {
+			name: 'Save',
+		} );
+
+		expect( submitButton ).toBeDisabled();
+
+		await toggleSettingsDrawer( user );
+
+		const opensInNewTabToggle = screen.queryByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		// toggle the checkbox
+		await user.click( opensInNewTabToggle );
+
+		// Check settings are **not** directly submitted
+		// which would trigger the onChange handler.
+		expect( mockOnChange ).not.toHaveBeenCalled();
+
+		// Check Apply button is now enabled because changes
+		// have been detected.
+		expect( submitButton ).toBeEnabled();
+
+		// Submit the changed setting value using the Apply button
+		await user.click( submitButton );
+
+		// Assert the value is updated.
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				opensInNewTab: true,
+			} )
+		);
+	} );
 } );
 
 describe( 'Post types', () => {
@@ -2185,7 +2242,7 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toHaveValue( textValue );
 
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Apply',
+			name: 'Save',
 		} );
 
 		await user.click( submitButton );
@@ -2199,7 +2256,7 @@ describe( 'Controlling link title text', () => {
 
 	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
 		const user = userEvent.setup();
-		const textValue = 'My new text value';
+		const newTextValue = 'My new text value';
 		const mockOnChange = jest.fn();
 
 		render(
@@ -2218,14 +2275,14 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toBeVisible();
 
 		await user.clear( textInput );
-		await user.keyboard( textValue );
+		await user.keyboard( newTextValue );
 
 		// Attempt to submit the empty search value in the input.
 		triggerEnter( textInput );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				title: textValue,
+				title: newTextValue,
 				url: selectedLink.url,
 			} )
 		);
@@ -2236,7 +2293,7 @@ describe( 'Controlling link title text', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should reset state on value change', async () => {
+	it( 'should reset state upon controlled value change', async () => {
 		const user = userEvent.setup();
 		const textValue = 'My new text value';
 		const mockOnChange = jest.fn();

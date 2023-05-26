@@ -374,3 +374,48 @@ div[data-type="core/freeform"] {
 		display: block;
 	}
 }
+
+.block-editor-freeform-modal {
+	.components-modal__frame {
+		// On large screens, make the TinyMCE edit area grow to take all the
+		// available height so that the Cancel/Save buttons are always into the
+		// view. On smaller screens, the modal content is scrollable.
+		@include break-large() {
+			// On medium and large screens, the modal component sets a max-height.
+			// We want the modal to be as tall as possible also when the content is short.
+			height: 9999rem;
+
+			.components-modal__header + div {
+				height: 100%;
+			}
+
+			.mce-tinymce {
+				height: calc(100% - #{$button-size} - #{$grid-unit-20});
+			}
+
+			.mce-container-body {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.mce-edit-area {
+				flex-grow: 1;
+				display: flex;
+				flex-direction: column;
+
+				iframe {
+					flex-grow: 1;
+					// Override the height TinyMCE sets via JavaScript so that it
+					// can shrink to a smaller height. The actual height is
+					// determined by Flexbox.
+					height: 10px !important;
+				}
+			}
+		}
+	}
+
+	&__actions {
+		margin-top: $grid-unit-20;
+	}
+}

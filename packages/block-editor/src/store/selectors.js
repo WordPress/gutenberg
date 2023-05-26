@@ -2491,6 +2491,30 @@ export function getSettings( state ) {
 }
 
 /**
+ * Returns the behaviors registered with the editor.
+ *
+ * Behaviors are named, reusable pieces of functionality that can be
+ * attached to blocks. They are registered with the editor using the
+ * `theme.json` file.
+ *
+ * @example
+ *
+ * ```js
+ * const behaviors = select( blockEditorStore ).getBehaviors();
+ * if ( behaviors?.lightbox ) {
+ * 	 // Do something with the lightbox.
+ * }
+ *```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor behaviors object.
+ */
+export function getBehaviors( state ) {
+	return state.settings.behaviors;
+}
+
+/**
  * Returns true if the most recent block change is be considered persistent, or
  * false otherwise. A persistent change is one committed by BlockEditorProvider
  * via its `onChange` callback, in addition to `onInput`.

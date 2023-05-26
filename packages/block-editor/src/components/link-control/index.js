@@ -6,11 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
+import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -18,8 +19,9 @@ import { ENTER } from '@wordpress/keycodes';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
+import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
-import useInternalInputValue from './use-internal-input-value';
+import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -136,13 +138,20 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
+	const settingsKeys = settings.map( ( { id } ) => id );
+
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
-	const [ internalUrlInputValue, setInternalUrlInputValue ] =
-		useInternalInputValue( value?.url || '' );
+	const [
+		internalControlValue,
+		setInternalControlValue,
+		setInternalURLInputValue,
+		setInternalTextInputValue,
+		createSetInternalSettingValueHandler,
+	] = useInternalValue( value );
 
-	const [ internalTextInputValue, setInternalTextInputValue ] =
-		useInternalInputValue( value?.title || '' );
+	const valueHasChanges =
+		value && ! isShallowEqualObjects( internalControlValue, value );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -160,6 +169,8 @@ function LinkControl( {
 		) {
 			setIsEditingLink( forceIsEditingLink );
 		}
+		// Todo: bug if the missing dep is introduced. Will need a fix.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
@@ -208,22 +219,39 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
+		// Suggestions may contains "settings" values (e.g. `opensInNewTab`)
+		// which should not overide any existing settings values set by the
+		// user. This filters out any settings values from the suggestion.
+		const nonSettingsChanges = Object.keys( updatedValue ).reduce(
+			( acc, key ) => {
+				if ( ! settingsKeys.includes( key ) ) {
+					acc[ key ] = updatedValue[ key ];
+				}
+				return acc;
+			},
+			{}
+		);
+
 		onChange( {
-			...updatedValue,
-			title: internalTextInputValue || updatedValue?.title,
+			...internalControlValue,
+			...nonSettingsChanges,
+			// As title is not a setting, it must be manually applied
+			// in such a way as to preserve the users changes over
+			// any "title" value provided by the "suggestion".
+			title: internalControlValue?.title || updatedValue?.title,
 		} );
+
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
-		if (
-			currentUrlInputValue !== value?.url ||
-			internalTextInputValue !== value?.title
-		) {
+		if ( valueHasChanges ) {
+			// Submit the original value with new stored values applied
+			// on top. URL is a special case as it may also be a prop.
 			onChange( {
 				...value,
+				...internalControlValue,
 				url: currentUrlInputValue,
-				title: internalTextInputValue,
 			} );
 		}
 		stopEditing();
@@ -231,6 +259,7 @@ function LinkControl( {
 
 	const handleSubmitWithEnter = ( event ) => {
 		const { keyCode } = event;
+
 		if (
 			keyCode === ENTER &&
 			! currentInputIsEmpty // Disallow submitting empty values.
@@ -241,8 +270,7 @@ function LinkControl( {
 	};
 
 	const resetInternalValues = () => {
-		setInternalUrlInputValue( value?.url );
-		setInternalTextInputValue( value?.title );
+		setInternalControlValue( value );
 	};
 
 	const handleCancel = ( event ) => {
@@ -263,7 +291,8 @@ function LinkControl( {
 		onCancel?.();
 	};
 
-	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+	const currentUrlInputValue =
+		propInputValue || internalControlValue?.url || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
@@ -306,7 +335,7 @@ function LinkControl( {
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalUrlInputValue }
+							onChange={ setInternalURLInputValue }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
@@ -348,18 +377,28 @@ function LinkControl( {
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
-							showTextControl={ showTextControl }
-							showSettings={ showSettings }
-							textInputRef={ textInputRef }
-							internalTextInputValue={ internalTextInputValue }
-							setInternalTextInputValue={
-								setInternalTextInputValue
-							}
-							handleSubmitWithEnter={ handleSubmitWithEnter }
-							value={ value }
-							settings={ settings }
-							onChange={ onChange }
-						/>
+						>
+							{ showTextControl && (
+								<TextControl
+									__nextHasNoMarginBottom
+									ref={ textInputRef }
+									className="block-editor-link-control__setting block-editor-link-control__text-content"
+									label="Text"
+									value={ internalControlValue?.title }
+									onChange={ setInternalTextInputValue }
+									onKeyDown={ handleSubmitWithEnter }
+								/>
+							) }
+							{ showSettings && (
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings }
+									onChange={ createSetInternalSettingValueHandler(
+										settingsKeys
+									) }
+								/>
+							) }
+						</LinkControlSettingsDrawer>
 					) }
 
 					<div className="block-editor-link-control__search-actions">
@@ -367,9 +406,11 @@ function LinkControl( {
 							variant="primary"
 							onClick={ handleSubmit }
 							className="block-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+							disabled={
+								! valueHasChanges || currentInputIsEmpty
+							}
 						>
-							{ __( 'Apply' ) }
+							{ __( 'Save' ) }
 						</Button>
 						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }

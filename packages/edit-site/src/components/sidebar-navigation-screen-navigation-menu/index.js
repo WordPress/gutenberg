@@ -63,6 +63,15 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		);
 	}
 
+	if ( ! navigationMenu?.content?.raw ) {
+		return (
+			<SidebarNavigationScreenWrapper
+				title={ decodeEntities( menuTitle ) }
+				description={ __( 'This Navigation Menu is empty.' ) }
+			/>
+		);
+	}
+
 	return (
 		<SidebarNavigationScreenWrapper
 			title={ decodeEntities( menuTitle ) }

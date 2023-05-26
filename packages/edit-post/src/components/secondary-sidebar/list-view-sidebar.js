@@ -10,7 +10,7 @@ import {
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -38,6 +38,10 @@ export default function ListViewSidebar() {
 		}
 	}
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 	// This ref refers to the tab panel.
@@ -50,6 +54,7 @@ export default function ListViewSidebar() {
 		contentFocusReturnRef,
 		focusOnMountRef,
 		listViewRef,
+		setDropZoneElement,
 	] );
 
 	/*
@@ -100,7 +105,7 @@ export default function ListViewSidebar() {
 		if ( tabName === 'list-view' ) {
 			return (
 				<div className="edit-post-editor__list-view-panel-content">
-					<ListView />
+					<ListView dropZone={ dropZoneElement } />
 				</div>
 			);
 		}

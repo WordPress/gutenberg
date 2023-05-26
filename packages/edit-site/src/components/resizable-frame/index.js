@@ -171,6 +171,18 @@ function ResizableFrame( {
 		},
 	};
 
+	const resizeHandleVariants = {
+		default: {
+			opacity: 1,
+			left: -16,
+		},
+		resizing: {
+			opacity: 1,
+			left: -16,
+			scaleY: 1.3,
+		},
+	};
+
 	return (
 		<ResizableBox
 			as={ motion.div }
@@ -212,20 +224,18 @@ function ResizableFrame( {
 						<motion.div
 							key="handle"
 							className="edit-site-resizable-frame__handle"
+							variants={ resizeHandleVariants }
+							animate={ isResizing ? 'resizing' : 'default' }
 							title="Drag to resize"
 							initial={ {
 								opacity: 0,
 								left: 0,
 							} }
-							animate={ {
-								opacity: 1,
-								left: -15,
-							} }
 							exit={ {
 								opacity: 0,
 								left: 0,
 							} }
-							whileHover={ { scale: 1.1 } }
+							whileHover={ { scaleY: 1.3 } }
 						/>
 					) : null,
 			} }
