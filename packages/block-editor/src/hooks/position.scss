@@ -41,14 +41,3 @@
 	box-sizing: border-box;
 	overflow: hidden;
 }
-
-.block-editor-hooks__position-helptext {
-	color: $gray-700;
-	font-size: $helptext-font-size;
-	margin-bottom: $grid-unit-20;
-}
-
-.block-editor-hooks__position-helptext__block-title {
-	text-decoration: underline;
-	text-decoration-style: dotted;
-}

@@ -15,7 +15,6 @@ import {
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
-	createInterpolateElement,
 	useContext,
 	useEffect,
 	useMemo,
@@ -302,25 +301,12 @@ export function PositionPanel( props ) {
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
 		allowSticky && value === STICKY_OPTION.value && blockInformation
-			? createInterpolateElement(
-					sprintf(
-						/* translators: %s: the name of the parent block. */
-						__(
-							'The block will stick to the scrollable area of the parent <span>%s</span> block.'
-						),
-						blockInformation.title
+			? sprintf(
+					/* translators: %s: the name of the parent block. */
+					__(
+						'The block will stick to the scrollable area of the parent %s block.'
 					),
-					{
-						span: (
-							<span
-								className="block-editor-hooks__position-helptext__block-title"
-								onMouseEnter={ onMouseOverPosition }
-								onMouseLeave={ onMouseLeavePosition }
-								onFocus={ onMouseOverPosition }
-								onBlur={ onMouseLeavePosition }
-							/>
-						),
-					}
+					blockInformation.title
 			  )
 			: null;
 
@@ -378,7 +364,11 @@ export function PositionPanel( props ) {
 							clientId={ firstParentClientId }
 						/>
 					) : null }
-					<BaseControl className="block-editor-hooks__position-selection">
+					<BaseControl
+						className="block-editor-hooks__position-selection"
+						__nextHasNoMarginBottom
+						help={ stickyHelpText }
+					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
 							__next36pxDefaultSize
@@ -401,11 +391,6 @@ export function PositionPanel( props ) {
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
-					{ stickyHelpText && (
-						<p className="block-editor-hooks__position-helptext">
-							{ stickyHelpText }
-						</p>
-					) }
 				</InspectorControls>
 			) : null,
 		native: null,
