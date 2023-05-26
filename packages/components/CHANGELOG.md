@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Autocomplete`: Announce how many results are available to screen readers when suggestions list first renders ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
+-   `Autocomplete`: Announce how many results are available to screen readers when suggestions list first renders ([#51018](https://github.com/WordPress/gutenberg/pull/51018)).
 
 ### Experimental
 
