@@ -42,7 +42,7 @@ const Example = () => {
 					<CircularOptionPicker.ButtonAction
 						onClick={ () => setCurrentColor( undefined ) }
 					>
-						{ 'Clear' }
+						{ 'Reset' }
 					</CircularOptionPicker.ButtonAction>
 				}
 			/>
@@ -136,6 +136,6 @@ Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.
 
 Props for the underlying `Button` component.
 
-Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
+Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`.
 
 - Required: No

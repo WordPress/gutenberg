@@ -109,7 +109,7 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+		await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
@@ -188,7 +188,7 @@ describe( 'ColorPalette', () => {
 		);
 
 		expect(
-			screen.getByRole( 'button', { name: 'Clear' } )
+			screen.getByRole( 'button', { name: 'Reset' } )
 		).toBeInTheDocument();
 	} );
 
@@ -198,7 +198,7 @@ describe( 'ColorPalette', () => {
 		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
 
 		expect(
-			screen.getByRole( 'button', { name: 'Clear' } )
+			screen.getByRole( 'button', { name: 'Reset' } )
 		).toBeInTheDocument();
 	} );
 } );

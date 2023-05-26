@@ -69,6 +69,7 @@ $swatch-gap: 12px;
 * with the `:last-child` styles.
 */
 .block-editor-tools-panel-color-gradient-settings__item {
+	position: relative;
 	padding: 0;
 	max-width: 100%;
 
@@ -99,7 +100,7 @@ $swatch-gap: 12px;
 	display: block;
 	padding: 0;
 
-	> button {
+	> .block-editor-panel-color-gradient-settings__dropdown {
 		height: auto;
 		padding-top: $grid-unit * 1.25;
 		padding-bottom: $grid-unit * 1.25;
@@ -123,5 +124,34 @@ $swatch-gap: 12px;
 
 	.component-color-indicator {
 		flex-shrink: 0;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__reset {
+	position: absolute;
+	display: inline-flex;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto $grid-unit auto;
+	height: 24px;
+	width: 24px;
+	opacity: 0;
+	transition: opacity 0.1s ease-in-out;
+
+	// Override the button style.
+	&.components-button.has-icon {
+		padding: 0;
+		min-width: 0;
+		border-radius: 0;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown:hover + & {
+		opacity: 1;
+	}
+
+	&:focus,
+	&:hover {
+		opacity: 1;
 	}
 }
