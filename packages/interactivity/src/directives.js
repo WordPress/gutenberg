@@ -7,6 +7,7 @@ import { deepSignal, peek } from 'deepsignal';
 /**
  * Internal dependencies
  */
+import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
 
@@ -52,6 +53,16 @@ export default () => {
 		},
 		{ priority: 5 }
 	);
+
+	// data-wp-body
+	directive( 'body', ( { props: { children }, context: inherited } ) => {
+		const { Provider } = inherited;
+		const inheritedValue = useContext( inherited );
+		return createPortal(
+			<Provider value={ inheritedValue }>{ children }</Provider>,
+			document.body
+		);
+	} );
 
 	// data-wp-effect.[name]
 	directive( 'effect', ( { directives: { effect }, context, evaluate } ) => {
