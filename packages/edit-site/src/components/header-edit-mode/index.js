@@ -44,6 +44,7 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import { unlock } from '../../private-apis';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -258,37 +259,39 @@ export default function HeaderEditMode() {
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && hasDefaultEditorCanvasView && (
-						<div
-							className={ classnames(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
-						>
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								viewLabel={ __( 'View' ) }
+					{ ! isFocusMode &&
+						! isPreviewingTheme() &&
+						hasDefaultEditorCanvasView && (
+							<div
+								className={ classnames(
+									'edit-site-header-edit-mode__preview-options',
+									{ 'is-zoomed-out': isZoomedOutView }
+								) }
 							>
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
-							</PreviewOptions>
-						</div>
-					) }
+								<PreviewOptions
+									deviceType={ deviceType }
+									setDeviceType={ setPreviewDeviceType }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									viewLabel={ __( 'View' ) }
+								>
+									<MenuGroup>
+										<MenuItem
+											href={ homeUrl }
+											target="_blank"
+											icon={ external }
+										>
+											{ __( 'View site' ) }
+											<VisuallyHidden as="span">
+												{
+													/* translators: accessibility text */
+													__( '(opens in a new tab)' )
+												}
+											</VisuallyHidden>
+										</MenuItem>
+									</MenuGroup>
+								</PreviewOptions>
+							</div>
+						) }
 					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu showIconLabels={ showIconLabels } />
