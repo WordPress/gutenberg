@@ -1,18 +1,18 @@
 <?php
 
-require_once __DIR__ . '/wp-fonts-testcase.php';
+require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
- * Test gutenberg_register_fonts_from_theme_json().
+ * Test WP_Fonts_Resolver::register_fonts_from_theme_json().
  *
  * @package WordPress
  * @subpackage Fonts API
  *
  * @since X.X.X
  * @group fontsapi
- * @covers ::gutenberg_register_fonts_from_theme_json
+ * @covers WP_Fonts_Resolver::register_fonts_from_theme_json
  */
-class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase {
+class Tests_Fonts_WPFontsResolver_RegisterFontsFromThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME   = 'fonts-block-theme';
 	const FONT_FAMILIES = array(
 		'fonts-block-theme' => array(
@@ -33,7 +33,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_bails_out_when_no_fonts_defined() {
 		switch_theme( 'block-theme' );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 		$wp_fonts = wp_fonts();
 
 		$this->assertEmpty( $wp_fonts->get_registered() );
@@ -43,7 +43,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_register_and_enqueue_style_variation_fonts() {
 		switch_theme( static::FONTS_THEME );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 		$wp_fonts = wp_fonts();
 
 		$this->assertContains( 'open-sans', $wp_fonts->get_registered_font_families(), 'Font families should be registered' );
@@ -57,7 +57,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_register_and_enqueue_all_defined_font_families() {
 		switch_theme( static::FONTS_THEME );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 		$wp_fonts = wp_fonts();
 
 		$expected = static::FONT_FAMILIES[ static::FONTS_THEME ];
@@ -74,7 +74,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_not_reregister_duplicate_fonts_from_style_variations() {
 		switch_theme( static::FONTS_THEME );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 		$wp_fonts = wp_fonts();
 
 		// Font families are not duplicated.
@@ -117,7 +117,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_replace_src_file_placeholder( $handle, $expected ) {
 		switch_theme( static::FONTS_THEME );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 
 		$variation = wp_fonts()->registered[ $handle ];
 		$actual    = array_pop( $variation->src );
@@ -185,7 +185,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	public function test_should_convert_font_face_properties_into_kebab_case() {
 		switch_theme( static::FONTS_THEME );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 
 		// Testing only one variation since this theme's fonts use the same properties.
 		$variation         = wp_fonts()->registered['dm-sans-400-normal'];
@@ -202,12 +202,12 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 	}
 
 	/**
-	 * Tests that gutenberg_register_fonts_from_theme_json() skips fonts that are already registered
+	 * Tests that WP_Fonts_Resolver::register_fonts_from_theme_json() skips fonts that are already registered
 	 * in the Fonts API. How does it do that? Using the 'origin' property when checking each variation.
 	 * This property is added when WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() runs.
 	 *
 	 * To simulate this scenario, a font is registered first, but not enqueued. Then after running,
-	 * it checks if the gutenberg_register_fonts_from_theme_json() enqueued the font. If no, then
+	 * it checks if the WP_Fonts_Resolver::register_fonts_from_theme_json() enqueued the font. If no, then
 	 * it was skipped as expected.
 	 */
 	public function test_should_skip_registered_fonts() {
@@ -234,13 +234,13 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 		);
 
 		// Pre-check to ensure no fonts are enqueued.
-		$this->assertEmpty( wp_fonts()->get_enqueued(), 'No fonts should be enqueued before running gutenberg_register_fonts_from_theme_json()' );
+		$this->assertEmpty( wp_fonts()->get_enqueued(), 'No fonts should be enqueued before running WP_Fonts_Resolver::register_fonts_from_theme_json()' );
 
 		/*
 		 * When this function runs, it invokes WP_Theme_JSON_Resolver_Gutenberg::get_merged_data(),
 		 * which will include the Lato fonts with a 'origin' property set in each variation.
 		 */
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 
 		$actual_enqueued_fonts = wp_fonts()->get_enqueued();
 
@@ -254,7 +254,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 
 		/**
 		 * Callback that removes the 'fontFace' of the expected font family from the theme's theme.json data.
-		 * This callback is invoked at the start of gutenberg_register_fonts_from_theme_json() before processing
+		 * This callback is invoked at the start of WP_Fonts_Resolver::register_fonts_from_theme_json() before processing
 		 * within that function. How? It's in the call stack of WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg| WP_Theme_JSON_Data $theme_json_data Instance of the Data object.
@@ -288,7 +288,7 @@ class Tests_Fonts_GutenbergRegisterFontsFromThemeJson extends WP_Fonts_TestCase 
 		};
 		add_filter( 'wp_theme_json_data_theme', $remove_expected_font_family );
 
-		gutenberg_register_fonts_from_theme_json();
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
 
 		remove_filter( 'wp_theme_json_data_theme', $remove_expected_font_family );
 
