@@ -528,6 +528,49 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		};
 	} );
 
+	function fulfillSelector( resolver, selectorName, args ) {
+		const state = store.getState();
+
+		if (
+			resolversCache.isRunning( selectorName, args ) ||
+			( typeof resolver.isFulfilled === 'function' &&
+				resolver.isFulfilled( state, ...args ) )
+		) {
+			return;
+		}
+
+		const { metadata } = store.__unstableOriginalGetState();
+
+		if (
+			metadataSelectors.hasStartedResolution(
+				metadata,
+				selectorName,
+				args
+			)
+		) {
+			return;
+		}
+
+		resolversCache.markAsRunning( selectorName, args );
+
+		setTimeout( async () => {
+			resolversCache.clear( selectorName, args );
+			store.dispatch(
+				metadataActions.startResolution( selectorName, args )
+			);
+			try {
+				await fulfillResolver( store, resolver, ...args );
+				store.dispatch(
+					metadataActions.finishResolution( selectorName, args )
+				);
+			} catch ( error ) {
+				store.dispatch(
+					metadataActions.failResolution( selectorName, args, error )
+				);
+			}
+		} );
+	}
+
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = mappedResolvers[ selectorName ];
 		if ( ! resolver ) {
@@ -536,57 +579,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		}
 
 		const selectorResolver = ( ...args ) => {
-			function fulfillSelector() {
-				const state = store.getState();
-
-				if (
-					resolversCache.isRunning( selectorName, args ) ||
-					( typeof resolver.isFulfilled === 'function' &&
-						resolver.isFulfilled( state, ...args ) )
-				) {
-					return;
-				}
-
-				const { metadata } = store.__unstableOriginalGetState();
-
-				if (
-					metadataSelectors.hasStartedResolution(
-						metadata,
-						selectorName,
-						args
-					)
-				) {
-					return;
-				}
-
-				resolversCache.markAsRunning( selectorName, args );
-
-				setTimeout( async () => {
-					resolversCache.clear( selectorName, args );
-					store.dispatch(
-						metadataActions.startResolution( selectorName, args )
-					);
-					try {
-						await fulfillResolver( store, resolver, ...args );
-						store.dispatch(
-							metadataActions.finishResolution(
-								selectorName,
-								args
-							)
-						);
-					} catch ( error ) {
-						store.dispatch(
-							metadataActions.failResolution(
-								selectorName,
-								args,
-								error
-							)
-						);
-					}
-				} );
-			}
-
-			fulfillSelector( ...args );
+			fulfillSelector( resolver, selectorName, args );
 			return selector( ...args );
 		};
 		selectorResolver.hasResolver = true;
