@@ -14,7 +14,7 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { Icon, globe, info, linkOff } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
@@ -26,7 +26,6 @@ import useRichUrlData from './use-rich-url-data';
 
 export default function LinkPreview( {
 	value,
-	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
@@ -114,13 +113,6 @@ export default function LinkPreview( {
 					</span>
 				</span>
 
-				<Button
-					icon={ edit }
-					label={ __( 'Edit' ) }
-					className="block-editor-link-control__search-item-action"
-					onClick={ onEditClick }
-					iconSize={ 24 }
-				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
