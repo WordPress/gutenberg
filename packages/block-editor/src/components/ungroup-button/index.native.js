@@ -6,7 +6,7 @@ import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { Ungroup } from '@wordpress/icons';
+import { ungroup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Ungroup' ) }
-				icon={ Ungroup }
+				icon={ ungroup }
 				onClick={ onConvertFromGroup }
 			/>
 		</ToolbarGroup>
