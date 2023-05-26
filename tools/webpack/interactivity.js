@@ -15,7 +15,13 @@ module.exports = {
 	},
 	name: 'interactivity',
 	entry: {
-		runtime: './packages/interactivity/src/index.js',
+		runtime: {
+			import: `./packages/interactivity`,
+			library: {
+				name: [ 'wp', 'interactivity' ],
+				type: 'window',
+			},
+		},
 	},
 	output: {
 		devtoolNamespace: 'wp',
