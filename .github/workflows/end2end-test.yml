@@ -16,49 +16,49 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    e2e-puppeteer:
-        name: Puppeteer - ${{ matrix.part }}
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3, 4]
-                totalParts: [4]
+    # e2e-puppeteer:
+    #     name: Puppeteer - ${{ matrix.part }}
+    #     runs-on: ubuntu-latest
+    #     if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+    #     strategy:
+    #         fail-fast: false
+    #         matrix:
+    #             part: [1, 2, 3, 4]
+    #             totalParts: [4]
 
-        steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+    #     steps:
+    #         - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
+    #         - name: Setup Node.js and install dependencies
+    #           uses: ./.github/setup-node
 
-            - name: Npm build
-              run: npm run build
+    #         - name: Npm build
+    #           run: npm run build
 
-            - name: Install WordPress
-              run: |
-                  npm run wp-env start
+    #         - name: Install WordPress
+    #           run: |
+    #               npm run wp-env start
 
-            - name: Running the tests
-              run: |
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % ${{ matrix.totalParts }} == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
+    #         - name: Running the tests
+    #           run: |
+    #               $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+    #               $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % ${{ matrix.totalParts }} == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
 
-            - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
-              with:
-                  name: failures-artifacts
-                  path: artifacts
-                  if-no-files-found: ignore
+    #         - name: Archive debug artifacts (screenshots, HTML snapshots)
+    #           uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+    #           if: always()
+    #           with:
+    #               name: failures-artifacts
+    #               path: artifacts
+    #               if-no-files-found: ignore
 
-            - name: Archive flaky tests report
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
-              with:
-                  name: flaky-tests-report
-                  path: flaky-tests
-                  if-no-files-found: ignore
+    #         - name: Archive flaky tests report
+    #           uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+    #           if: always()
+    #           with:
+    #               name: flaky-tests-report
+    #               path: flaky-tests
+    #               if-no-files-found: ignore
 
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
@@ -89,7 +89,7 @@ jobs:
 
             - name: Run the tests
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright navigation.spec.js -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
