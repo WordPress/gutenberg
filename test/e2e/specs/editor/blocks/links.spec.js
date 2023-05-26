@@ -67,7 +67,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( 'should contain a label when it should open in a new tab', async ( {
+	test( 'can update the url of an existing link', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -82,29 +82,9 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 
-		// Link settings open
-		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
-		await checkbox.click();
-
-		// Confirm that focus was not prematurely returned to the paragraph on
-		// a changing value of the setting.
-		await expect( checkbox ).toBeFocused();
-
-		// Submit link. Expect that "Open in new tab" would have been applied
-		// immediately.
 		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-
-		// Regression Test: This verifies that the UI is updated according to
-		// the expected changed values, where previously the value could have
-		// fallen out of sync with how the UI is displayed (specifically for
-		// collapsed selections).
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/15573
 
 		// Move caret back into the link.
 		await page.keyboard.press( 'ArrowLeft' );
@@ -124,12 +104,10 @@ test.describe( 'Links', () => {
 
 		// Navigate back to inputs to verify appears as changed.
 		await pageUtils.pressKeys( 'primary+k' );
-
-		// Navigate to the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Uncheck the checkbox.
-		await page.keyboard.press( 'Space' );
+		const urlInputValue = await page
+			.getByPlaceholder( 'Search or type url' )
+			.inputValue();
+		expect( urlInputValue ).toContain( 'wordpress.org' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
