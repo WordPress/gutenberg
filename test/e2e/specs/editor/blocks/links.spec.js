@@ -71,9 +71,11 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
-		linkControl,
 	} ) => {
-		await linkControl.clickBlockAppender();
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
 		await page.keyboard.type( 'This is WordPress' );
 		// Select "WordPress".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
@@ -81,21 +83,19 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'w.org' );
 
 		// Link settings open
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await checkbox.click();
 
 		// Confirm that focus was not prematurely returned to the paragraph on
 		// a changing value of the setting.
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeFocused();
+		await expect( checkbox ).toBeFocused();
 
 		// Submit link. Expect that "Open in new tab" would have been applied
 		// immediately.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
