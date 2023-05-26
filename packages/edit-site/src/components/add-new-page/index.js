@@ -73,12 +73,12 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 	}
 
 	return (
-		<Modal title="Draft a new page" onRequestClose={ onClose }>
+		<Modal title={ __( 'Draft a new page' ) } onRequestClose={ onClose }>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
-						help="You can always change this later"
-						label="Page title"
+						help={ __( 'You can always change this later' ) }
+						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'Untitled' ) }
 						value={ title }
