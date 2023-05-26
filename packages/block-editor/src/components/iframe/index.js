@@ -141,12 +141,8 @@ function Iframe( {
 		}
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
