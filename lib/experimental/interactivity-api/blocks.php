@@ -227,7 +227,7 @@ function gutenberg_block_update_interactive_view_script( $metadata ) {
 		in_array( $metadata['name'], array( 'core/file', 'core/navigation', 'core/image' ), true ) &&
 		str_contains( $metadata['file'], 'build/block-library/blocks' )
 	) {
-		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+		$metadata['viewScript'] = array( 'file:./view-interactivity.min.js' );
 	}
 	return $metadata;
 }
