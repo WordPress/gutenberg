@@ -475,4 +475,23 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
 		).not.toBeVisible();
 	} );
+
+	test( 'should allow speaking number of initial results', async ( {
+		page,
+		editor,
+	} ) => {
+		// Get the assertive live region screen reader announcement.
+		const getLiveRegion = page.locator(
+			'#a11y-speak-assertive'
+		).textContent;
+
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '/' );
+		await expect(
+			page.locator( `role=option[name="Image"i]` )
+		).toBeVisible();
+		expect( getLiveRegion ).toEqual(
+			'9 results found, use up and down arrow keys to navigate.'
+		);
+	} );
 } );
