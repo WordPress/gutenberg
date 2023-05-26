@@ -15,7 +15,7 @@ module.exports = {
 	},
 	name: 'interactivity',
 	entry: {
-		runtime: {
+		index: {
 			import: `./packages/interactivity`,
 			library: {
 				name: [ 'wp', 'interactivity' ],
