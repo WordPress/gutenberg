@@ -78,6 +78,12 @@ export default function StatusLabel( { status, date } ) {
 		case 'pending':
 			statusLabel = __( 'Pending' );
 			break;
+		case 'private':
+			statusLabel = __( 'Private' );
+			break;
+		case 'protected':
+			statusLabel = __( 'Password protected' );
+			break;
 	}
 
 	return (

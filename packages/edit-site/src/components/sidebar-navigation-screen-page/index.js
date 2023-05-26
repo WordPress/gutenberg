@@ -47,10 +47,16 @@ function getPageDetails( page ) {
 	if ( ! page ) {
 		return [];
 	}
+
 	const details = [
 		{
 			label: __( 'Status' ),
-			value: <StatusLabel status={ page.status } date={ page?.date } />,
+			value: (
+				<StatusLabel
+					status={ page?.password ? 'protected' : page.status }
+					date={ page?.date }
+				/>
+			),
 		},
 		{
 			label: __( 'Slug' ),

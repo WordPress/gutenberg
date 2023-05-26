@@ -57,15 +57,11 @@
 		height: 16px;
 		width: 16px;
 		margin-right: $grid-unit-10;
+		fill: $alert-yellow;
 	}
 
 	&.has-publish-status svg,
 	&.has-future-status svg {
 		fill: $alert-green;
-	}
-
-	&.has-pending-status svg,
-	&.has-draft-status svg {
-		fill: $alert-yellow;
 	}
 }
