@@ -559,7 +559,10 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 				metadataActions.startResolution( selectorName, args )
 			);
 			try {
-				await fulfillResolver( store, resolver, ...args );
+				const action = resolver.fulfill( ...args );
+				if ( action ) {
+					await store.dispatch( action );
+				}
 				store.dispatch(
 					metadataActions.finishResolution( selectorName, args )
 				);
@@ -590,18 +593,4 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		resolvers: mappedResolvers,
 		selectors: mapValues( selectors, mapSelector ),
 	};
-}
-
-/**
- * Calls a resolver given arguments
- *
- * @param {Object} store    Store reference, for fulfilling via resolvers
- * @param {Object} resolver Store Resolvers
- * @param {Array}  args     Selector Arguments.
- */
-async function fulfillResolver( store, resolver, ...args ) {
-	const action = resolver.fulfill( ...args );
-	if ( action ) {
-		await store.dispatch( action );
-	}
 }
