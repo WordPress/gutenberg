@@ -131,11 +131,14 @@ const migrateToConstrainedLayout = ( attributes ) => {
 	if ( ! layout ) {
 		return attributes;
 	}
-	if ( layout.inherit || layout.contentSize ) {
+	const { inherit = null, contentSize = null, ...newLayout } = layout;
+
+	if ( inherit || contentSize ) {
 		return {
 			...attributes,
 			layout: {
-				...layout,
+				...newLayout,
+				contentSize,
 				type: 'constrained',
 			},
 		};
