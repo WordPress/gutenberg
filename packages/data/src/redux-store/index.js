@@ -536,7 +536,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		}
 
 		const selectorResolver = ( ...args ) => {
-			async function fulfillSelector() {
+			function fulfillSelector() {
 				const state = store.getState();
 
 				if (
