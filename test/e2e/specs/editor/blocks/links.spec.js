@@ -29,15 +29,13 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Open settings.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await checkbox.click();
 
 		// Toggle should still have focus and be checked.
-		const checkbox = page.getByLabel( 'Open in new tab' );
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
 
@@ -46,12 +44,9 @@ test.describe( 'Links', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		// Tab back to the Submit and apply the link.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// The link should have been inserted.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
-
-	test.describe( 'should contain a label when it should open in a new tab', () => {} );
 } );
