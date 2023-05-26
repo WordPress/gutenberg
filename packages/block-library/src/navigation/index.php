@@ -634,30 +634,33 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$close_button_directives         = '';
 	if ( $should_load_view_script ) {
 		$nav_element_directives          = '
-			data-wp-island
-			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
+			data-custom
 		';
-		$open_button_directives          = '
-			data-wp-on.click="actions.core.navigation.openMenu"
-			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-		';
-		$responsive_container_directives = '
-			data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
-			data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
-			data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
-			data-wp-effect="effects.core.navigation.initMenu"
-			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-			data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
-			tabindex="-1"
-		';
-		$responsive_dialog_directives    = '
-			data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
-			data-wp-bind.role="selectors.core.navigation.roleAttribute"
-			data-wp-effect="effects.core.navigation.focusFirstElement"
-		';
-		$close_button_directives         = '
-			data-wp-on.click="actions.core.navigation.closeMenu"
-		';
+		// $nav_element_directives          = '
+		// 	data-wp-island
+		// 	data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
+		// ';
+		// $open_button_directives          = '
+		// 	data-wp-on.click="actions.core.navigation.openMenu"
+		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+		// ';
+		// $responsive_container_directives = '
+		// 	data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
+		// 	data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
+		// 	data-wp-effect="effects.core.navigation.initMenu"
+		// 	data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+		// 	data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+		// 	tabindex="-1"
+		// ';
+		// $responsive_dialog_directives    = '
+		// 	data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
+		// 	data-wp-bind.role="selectors.core.navigation.roleAttribute"
+		// 	data-wp-effect="effects.core.navigation.focusFirstElement"
+		// ';
+		// $close_button_directives         = '
+		// 	data-wp-on.click="actions.core.navigation.closeMenu"
+		// ';
 	}
 
 	$responsive_container_markup = sprintf(
