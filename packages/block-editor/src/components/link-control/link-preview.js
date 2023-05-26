@@ -7,12 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	ExternalLink,
-	__experimentalText as Text,
-	Tooltip,
-} from '@wordpress/components';
+import { Button, ExternalLink, Tooltip } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { Icon, globe, info, linkOff } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -124,48 +119,6 @@ export default function LinkPreview( {
 				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
-
-			{ !! (
-				( hasRichData &&
-					( richData?.image || richData?.description ) ) ||
-				isFetching
-			) && (
-				<div className="block-editor-link-control__search-item-bottom">
-					{ ( richData?.image || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.image }
-							className={ classnames(
-								'block-editor-link-control__search-item-image',
-								{
-									'is-placeholder': ! richData?.image,
-								}
-							) }
-						>
-							{ richData?.image && (
-								<img src={ richData?.image } alt="" />
-							) }
-						</div>
-					) }
-
-					{ ( richData?.description || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.description }
-							className={ classnames(
-								'block-editor-link-control__search-item-description',
-								{
-									'is-placeholder': ! richData?.description,
-								}
-							) }
-						>
-							{ richData?.description && (
-								<Text truncate numberOfLines="2">
-									{ richData.description }
-								</Text>
-							) }
-						</div>
-					) }
-				</div>
-			) }
 
 			{ additionalControls && additionalControls() }
 		</div>
