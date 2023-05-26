@@ -486,11 +486,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			page.locator( `role=option[name="Image"i]` )
 		).toBeVisible();
 		// Get the assertive live region screen reader announcement.
-		const getLiveRegion = page
-			.locator( '#a11y-speak-assertive' )
-			.textContent();
-		expect( getLiveRegion ).toEqual(
-			'9 results found, use up and down arrow keys to navigate.'
-		);
+		await expect(
+			page.getByText(
+				'9 results found, use up and down arrow keys to navigate.'
+			)
+		).toBeVisible();
 	} );
 } );
