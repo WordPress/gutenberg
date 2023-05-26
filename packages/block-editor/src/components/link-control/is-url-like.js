@@ -27,14 +27,10 @@ export default function isURLLike( val ) {
 	const mayBeTLD = hasPossibleTLD( val );
 
 	const isWWW = val?.startsWith( 'www.' );
-	const isHTTPProtocol = /^(http|https)/.test( val ) && protocolIsValid;
-	const isMailTo = val?.startsWith( 'mailto:' ) && protocolIsValid;
-	const isTel = val?.startsWith( 'tel:' ) && protocolIsValid;
+
 	const isInternal = val?.startsWith( '#' ) && isValidFragment( val );
 
-	return (
-		isHTTPProtocol || isWWW || isMailTo || isTel || isInternal || mayBeTLD
-	);
+	return protocolIsValid || isWWW || isInternal || mayBeTLD;
 }
 
 /**
