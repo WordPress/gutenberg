@@ -12,7 +12,6 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
-	renderToString,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -238,15 +237,19 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const src = useMemo( () => {
-		const html = '<!doctype html>' + renderToString( styleAssets );
-		const blob = new window.Blob( [ html ], { type: 'text/html' } );
-		return URL.createObjectURL( blob );
-	}, [] );
+	const html =
+		'<!doctype html>' +
+		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		( assets?.styles ?? '' );
 
-	useEffect( () => () => {
-		URL.revokeObjectURL( src );
-	} );
+	const [ src, cleanup ] = useMemo( () => {
+		const _src = URL.createObjectURL(
+			new window.Blob( [ html ], { type: 'text/html' } )
+		);
+		return [ _src, () => URL.revokeObjectURL( _src ) ];
+	}, [ html ] );
+
+	useEffect( () => cleanup, [ cleanup ] );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
