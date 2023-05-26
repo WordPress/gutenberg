@@ -176,7 +176,6 @@ export default function createReduxStore( key, options ) {
 			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
-			let resolvers;
 			const actions = mapActions(
 				{
 					...metadataActions,
@@ -236,15 +235,15 @@ export default function createReduxStore( key, options ) {
 				} )
 			);
 
+			let resolvers;
 			if ( options.resolvers ) {
-				const result = mapResolvers(
-					options.resolvers,
+				resolvers = mapResolvers( options.resolvers );
+				selectors = mapSelectorsWithResolvers(
 					selectors,
+					resolvers,
 					store,
 					resolversCache
 				);
-				resolvers = result.resolvers;
-				selectors = result.selectors;
 			}
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
@@ -504,20 +503,13 @@ function mapSuspendSelectors( selectors, store ) {
 }
 
 /**
- * Returns resolvers with matched selectors for a given namespace.
- * Resolvers are side effects invoked once per argument set of a given selector call,
- * used in ensuring that the data needs for the selector are satisfied.
+ * Convert resolvers to a normalized form, an object with `fulfill` method and
+ * optional methods like `isFulfilled`.
  *
- * @param {Object} resolvers      Resolvers to register.
- * @param {Object} selectors      The current selectors to be modified.
- * @param {Object} store          The redux store to which the resolvers should be mapped.
- * @param {Object} resolversCache Resolvers Cache.
+ * @param {Object} resolvers Resolver to convert
  */
-function mapResolvers( resolvers, selectors, store, resolversCache ) {
-	// The `resolver` can be either a function that does the resolution, or, in more advanced
-	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
-	// Here we normalize the `resolver` function to an object with `fulfill` method.
-	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
+function mapResolvers( resolvers ) {
+	return mapValues( resolvers, ( resolver ) => {
 		if ( resolver.fulfill ) {
 			return resolver;
 		}
@@ -527,7 +519,24 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 			fulfill: resolver, // Add the fulfill method.
 		};
 	} );
+}
 
+/**
+ * Returns resolvers with matched selectors for a given namespace.
+ * Resolvers are side effects invoked once per argument set of a given selector call,
+ * used in ensuring that the data needs for the selector are satisfied.
+ *
+ * @param {Object} selectors      The current selectors to be modified.
+ * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} store          The redux store to which the resolvers should be mapped.
+ * @param {Object} resolversCache Resolvers Cache.
+ */
+function mapSelectorsWithResolvers(
+	selectors,
+	resolvers,
+	store,
+	resolversCache
+) {
 	function fulfillSelector( resolver, selectorName, args ) {
 		const state = store.getState();
 
@@ -574,8 +583,8 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		}, 0 );
 	}
 
-	const mapSelector = ( selector, selectorName ) => {
-		const resolver = mappedResolvers[ selectorName ];
+	return mapValues( selectors, ( selector, selectorName ) => {
+		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
 			selector.hasResolver = false;
 			return selector;
@@ -587,10 +596,5 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		};
 		selectorResolver.hasResolver = true;
 		return selectorResolver;
-	};
-
-	return {
-		resolvers: mappedResolvers,
-		selectors: mapValues( selectors, mapSelector ),
-	};
+	} );
 }
