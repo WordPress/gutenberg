@@ -1210,7 +1210,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 				Object.entries(
 					mergedConfig.styles.blocks[ blockType.name ]?.variations
 				).forEach( ( variation ) => {
-					if ( variation[ 1 ].css ) {
+					if ( variation[ 1 ].css && 'default' !== variation[ 0 ] ) {
 						const variationSelector =
 							blockSelectors[ blockType.name ]
 								.styleVariationSelectors[ variation[ 0 ] ];
