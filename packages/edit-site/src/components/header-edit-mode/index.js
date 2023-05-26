@@ -260,6 +260,14 @@ export default function HeaderEditMode() {
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
 					{ ! isFocusMode &&
+						/**
+						 * This isPreviewingTheme() condition can be removed
+						 * once the issues below are fixed
+						 * and previewing the front of the site works well.
+						 *
+						 * https://github.com/WordPress/gutenberg/issues/50713
+						 * https://github.com/WordPress/gutenberg/issues/50712
+						 */
 						! isPreviewingTheme() &&
 						hasDefaultEditorCanvasView && (
 							<div
