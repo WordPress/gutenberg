@@ -14,7 +14,7 @@ type Optional< T > = T | undefined;
  * @return The edit.
  */
 export function getUndoEdits( state: State ): Optional< any > {
-	return state.undo.list[ state.undo.list.length - 2 + state.undo.offset ];
+	return state.undo.list[ state.undo.list.length - 1 + state.undo.offset ];
 }
 
 /**
