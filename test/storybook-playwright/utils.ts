@@ -100,5 +100,7 @@ export const testSnapshotForPropsConfig = async (
 
 	await submitButton.click();
 
-	expect( await page.screenshot() ).toMatchSnapshot();
+	expect(
+		await page.screenshot( { animations: 'disabled' } )
+	).toMatchSnapshot();
 };
