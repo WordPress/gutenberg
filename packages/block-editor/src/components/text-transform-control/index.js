@@ -32,11 +32,13 @@ const TEXT_TRANSFORMS = [
 		icon: formatLowercase,
 	},
 	{
-		name: __( 'Initial Caps' ),
+		name: __( 'Start Case' ),
 		value: 'capitalize',
 		icon: formatCapitalize,
 	},
 ];
+
+//'Start Case' was was formerly named as 'capitalize'.
 
 /**
  * Control to facilitate text transform selections.
