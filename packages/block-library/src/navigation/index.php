@@ -658,14 +658,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		// 	data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
 		// 	tabindex="-1"
 		// ';
-		// $responsive_dialog_directives    = '
-		// 	data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
-		// 	data-wp-bind.role="selectors.core.navigation.roleAttribute"
-		// 	data-wp-effect="effects.core.navigation.focusFirstElement"
-		// ';
-		// $close_button_directives         = '
-		// 	data-wp-on.click="actions.core.navigation.closeMenu"
-		// ';
+		$responsive_dialog_directives    = '
+			data-wp-bind.aria-modal="context.core.navigation.isMenuOpen"
+			data-wp-bind.role="selectors.core.navigation.roleAttribute"
+			data-wp-effect="effects.core.navigation.focusFirstElement"
+		';
+		$close_button_directives         = '
+			data-wp-on.click="actions.core.navigation.closeMenu"
+		';
 	}
 
 	$responsive_container_markup = sprintf(
