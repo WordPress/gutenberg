@@ -90,7 +90,7 @@ test.describe( 'Links', () => {
 
 		// Confirm that focus was not prematurely returned to the paragraph on
 		// a changing value of the setting.
-		await page.waitForSelector( ':focus.components-form-toggle__input' );
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeFocused();
 
 		// Submit link. Expect that "Open in new tab" would have been applied
 		// immediately.
