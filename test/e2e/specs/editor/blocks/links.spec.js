@@ -4,12 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Links', () => {
-	test.use( {
-		linkControl: async ( { page }, use ) => {
-			await use( new LinkControl( { page } ) );
-		},
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -18,10 +12,11 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
-		linkControl,
 	} ) => {
 		// Create a block with some text.
-		await linkControl.clickBlockAppender();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text.
@@ -60,24 +55,3 @@ test.describe( 'Links', () => {
 
 	test.describe( 'should contain a label when it should open in a new tab', () => {} );
 } );
-
-//TODO: refactor into a shared util.
-class LinkControl {
-	constructor( { page } ) {
-		this.page = page;
-	}
-
-	async clickBlockAppender() {
-		// The block appender is only visible when there's no selection.
-		await this.page.evaluate( () =>
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
-		);
-		const appender = await this.page.waitForSelector(
-			'.block-editor-default-block-appender__content'
-		);
-		await appender.click();
-		await this.page.evaluate(
-			() => new Promise( window.requestIdleCallback )
-		);
-	}
-}
