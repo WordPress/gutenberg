@@ -386,8 +386,8 @@ export function PositionPanel( props ) {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
-							onFocus={ onMouseOverPosition }
-							onBlur={ onMouseLeavePosition }
+							onMouseOver={ onMouseOverPosition }
+							onMouseOut={ onMouseLeavePosition }
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
