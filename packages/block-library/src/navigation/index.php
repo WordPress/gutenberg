@@ -584,10 +584,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Add directives to the submenu if needed.
-	if ( $should_load_view_script ) {
-		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-		$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w );
-	}
+	// if ( $should_load_view_script ) {
+	// 	$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
+	// 	$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w );
+	// }
 
 	$modal_unique_id = wp_unique_id( 'modal-' );
 
