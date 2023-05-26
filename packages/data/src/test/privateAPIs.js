@@ -4,6 +4,7 @@
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
 import { unlock } from '../private-apis';
+import { createRegistrySelector } from '../factory';
 
 describe( 'Private data APIs', () => {
 	let registry;
@@ -200,6 +201,42 @@ describe( 'Private data APIs', () => {
 				subRegistry.select( storeName )
 			);
 			expect( subPrivateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support private registry selectors', () => {
+			const groceryStore = createStore();
+			const otherStore = createReduxStore( 'other', {
+				reducer: ( state = {} ) => state,
+			} );
+			registry.register( otherStore );
+			unlock( otherStore ).registerPrivateSelectors( {
+				getPrice: createRegistrySelector(
+					( select ) => () => select( groceryStore ).getPublicPrice()
+				),
+			} );
+			const privateSelectors = unlock( registry.select( otherStore ) );
+			expect( privateSelectors.getPrice() ).toEqual( 1000 );
+		} );
+
+		it( 'should support calling a private registry selector from a public selector', () => {
+			const groceryStore = createStore();
+			const store = createReduxStore( 'a', {
+				reducer: ( state = {} ) => state,
+				selectors: {
+					getPriceWithShippingAndTax: ( state ) =>
+						getPriceWithShipping( state ) * 1.1,
+				},
+			} );
+			registry.register( store );
+			const getPriceWithShipping = createRegistrySelector(
+				( select ) => () => select( groceryStore ).getPublicPrice() + 5
+			);
+			unlock( store ).registerPrivateSelectors( {
+				getPriceWithShipping,
+			} );
+			expect(
+				registry.select( store ).getPriceWithShippingAndTax()
+			).toEqual( 1105.5 );
 		} );
 	} );
 
