@@ -571,7 +571,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 					metadataActions.failResolution( selectorName, args, error )
 				);
 			}
-		} );
+		}, 0 );
 	}
 
 	const mapSelector = ( selector, selectorName ) => {
