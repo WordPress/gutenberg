@@ -364,8 +364,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	$should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
-	$view_js_file                 = 'wp-block-navigation-view';
+	$should_load_view_script      = false;
+	// $should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
+	// $view_js_file                 = 'wp-block-navigation-view';
+
 	// If the script already exists, there is no point in removing it from viewScript.
 	// if ( ! wp_script_is( $view_js_file ) ) {
 	// $script_handles = $block->block_type->view_script_handles;
