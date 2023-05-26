@@ -16,21 +16,25 @@ test.describe( 'Links', () => {
 		},
 	} );
 
-	test( 'show a list view in the inspector controls', async ( {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
-		LinkControl,
 		pageUtils,
+		linkControl,
 	} ) => {
 		// Create a block with some text.
-		await LinkControl.clickBlockAppender();
+		await linkControl.clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text.
-		await pageUtils.pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeyWithModifier( 'primary', 'K' );
+		await pageUtils.pressKeys( 'primary+K' );
 
 		// Wait for the URL field to auto-focus.
 		await waitForURLFieldAutoFocus();
