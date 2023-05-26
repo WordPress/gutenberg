@@ -12,6 +12,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		linkControl,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
