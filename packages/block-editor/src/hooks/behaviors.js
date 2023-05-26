@@ -38,7 +38,6 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 		const settings =
 			select( blockEditorStore ).getSettings()?.__experimentalFeatures
 				?.blocks?.[ props.name ]?.behaviors;
-
 		if (
 			! settings ||
 			// If every behavior is disabled, do not show the behaviors inspector control.
@@ -102,8 +101,10 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBehaviors' );
 
-addFilter(
-	'editor.BlockEdit',
-	'core/behaviors/with-inspector-control',
-	withBehaviors
-);
+if ( window?.__experimentalInteractivityAPI ) {
+	addFilter(
+		'editor.BlockEdit',
+		'core/behaviors/with-inspector-control',
+		withBehaviors
+	);
+}
