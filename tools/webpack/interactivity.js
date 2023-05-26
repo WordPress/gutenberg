@@ -16,7 +16,7 @@ module.exports = {
 	name: 'interactivity',
 	entry: {
 		index: {
-			import: `./packages/interactivity`,
+			import: `./packages/interactivity/src/index.js`,
 			library: {
 				name: [ 'wp', 'interactivity' ],
 				type: 'window',
