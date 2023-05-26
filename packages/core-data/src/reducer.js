@@ -188,15 +188,19 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 		const { stackedEdits } = action;
 
 		let newState = state;
-		stackedEdits.forEach( ( { kind, name, recordId, edits } ) => {
-			newState = reducer( newState, {
-				type: 'EDIT_ENTITY_RECORD',
-				kind,
-				name,
-				recordId,
-				edits,
-			} );
-		} );
+		stackedEdits.forEach(
+			( { kind, name, recordId, property, from, to } ) => {
+				newState = reducer( newState, {
+					type: 'EDIT_ENTITY_RECORD',
+					kind,
+					name,
+					recordId,
+					edits: {
+						[ property ]: action.type === 'UNDO' ? from : to,
+					},
+				} );
+			}
+		);
 		return newState;
 	}
 
@@ -479,7 +483,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		nextState = omitPendingRedos( nextState );
 		let previousUndoState = nextState.list.pop();
 		currentState.cache.forEach( ( edit ) => {
-			previousUndoState = appendEditsToStack( previousUndoState, edit );
+			previousUndoState = appendEditToStack( previousUndoState, edit );
 		} );
 		nextState.list.push( previousUndoState );
 
@@ -489,30 +493,31 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		};
 	};
 
-	const appendEditsToStack = (
+	const appendEditToStack = (
 		stack = [],
-		{ kind, name, recordId, edits }
+		{ kind, name, recordId, property, from, to }
 	) => {
 		const existingEditIndex = stack?.findIndex(
-			( { kind: k, name: n, recordId: r } ) => {
-				return k === kind && n === name && r === recordId;
+			( { kind: k, name: n, recordId: r, property: p } ) => {
+				return (
+					k === kind && n === name && r === recordId && p === property
+				);
 			}
 		);
-
-		const nextStack = stack.filter(
-			( _, index ) => index !== existingEditIndex
-		);
-		nextStack.push( {
-			kind,
-			name,
-			recordId,
-			edits: {
-				...( existingEditIndex !== -1
-					? stack[ existingEditIndex ].edits
-					: {} ),
-				...edits,
-			},
-		} );
+		const nextStack = [ ...stack ];
+		if ( existingEditIndex !== -1 ) {
+			// If the edit is already in the stack leave the initial "from" value.
+			nextStack[ existingEditIndex ].to = to;
+		} else {
+			nextStack.push( {
+				kind,
+				name,
+				recordId,
+				property,
+				from,
+				to,
+			} );
+		}
 		return nextStack;
 	};
 
@@ -529,11 +534,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			};
 		}
 
-		case 'EDIT_ENTITY_RECORD':
-			// When undo is not specified,
-			// It's unclear whether we should ignore the undo entirely
-			// or consider it a transient (cached) edit.
-			if ( ! action?.meta?.undo ) {
+		case 'EDIT_ENTITY_RECORD': {
+			if ( ! action.meta.undo ) {
 				return state;
 			}
 
@@ -541,25 +543,32 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				( key ) => action.transientEdits[ key ]
 			);
 
+			const edits = Object.keys( action.edits ).map( ( key ) => {
+				return {
+					kind: action.kind,
+					name: action.name,
+					recordId: action.recordId,
+					property: key,
+					from: action.meta.undo.edits[ key ],
+					to: action.edits[ key ],
+				};
+			} );
+
 			if ( isCachedChange ) {
+				let newCache = state.cache;
+				edits.forEach(
+					( edit ) =>
+						( newCache = appendEditToStack( newCache, edit ) )
+				);
 				return {
 					...state,
-					cache: appendEditsToStack( state.cache, action ),
+					cache: newCache,
 				};
 			}
 
 			let nextState = omitPendingRedos( state );
 			nextState = appendCachedEditsToLastUndo( nextState );
 			nextState = { ...nextState, list: [ ...nextState.list ] };
-			const previousUndoState = nextState.list.pop();
-			nextState.list.push(
-				appendEditsToStack( previousUndoState, {
-					kind: action.kind,
-					name: action.name,
-					recordId: action.recordId,
-					edits: action.meta.undo.edits,
-				} )
-			);
 			// When an edit is a function it's an optimization to avoid running some expensive operation.
 			// We can't rely on the function references being the same so we opt out of comparing them here.
 			const comparisonUndoEdits = Object.values(
@@ -569,17 +578,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				( edit ) => typeof edit !== 'function'
 			);
 			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
-				nextState.list.push( [
-					{
-						kind: action.kind,
-						name: action.name,
-						recordId: action.recordId,
-						edits: action.edits,
-					},
-				] );
+				nextState.list.push( edits );
 			}
 
 			return nextState;
+		}
 	}
 
 	return state;
