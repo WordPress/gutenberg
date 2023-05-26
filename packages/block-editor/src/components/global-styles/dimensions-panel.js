@@ -207,8 +207,19 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const decodeValue = ( rawValue ) => {
+		if ( typeof rawValue === 'object' ) {
+			return Object.keys( rawValue ).reduce( ( acc, key ) => {
+				acc[ key ] = getValueFromVariable(
+					{ settings },
+					'',
+					rawValue[ key ]
+				);
+				return acc;
+			}, {} );
+		}
+		return getValueFromVariable( { settings }, '', rawValue );
+	};
 
 	const showSpacingPresetsControl = useHasSpacingPresets( settings );
 	const units = useCustomUnits( {
