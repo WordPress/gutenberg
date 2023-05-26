@@ -1002,15 +1002,15 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 
 		// Add directives to the toggle submenu button.
-		if ( $w->next_tag(
-			array(
-				'tag_name'   => 'BUTTON',
-				'class_name' => 'wp-block-navigation-submenu__toggle',
-			)
-		) ) {
-			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenu' );
-			$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.core.navigation.isMenuOpen' );
-		};
+		// if ( $w->next_tag(
+		// 	array(
+		// 		'tag_name'   => 'BUTTON',
+		// 		'class_name' => 'wp-block-navigation-submenu__toggle',
+		// 	)
+		// ) ) {
+		// 	$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenu' );
+		// 	$w->set_attribute( 'data-wp-bind.aria-expanded', 'context.core.navigation.isMenuOpen' );
+		// };
 
 		// Iterate through subitems if exist.
 		gutenberg_block_core_navigation_add_directives_to_submenu( $w );
