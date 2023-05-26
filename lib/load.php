@@ -51,6 +51,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/link-template.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/behaviors.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
@@ -113,7 +114,6 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
-	require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-resolver.php';
@@ -165,4 +165,3 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
-

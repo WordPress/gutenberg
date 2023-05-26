@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useReducer,
 	renderToString,
+	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -243,9 +244,15 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const srcDoc = useMemo( () => {
-		return '<!doctype html>' + renderToString( styleAssets );
+	const src = useMemo( () => {
+		const html = '<!doctype html>' + renderToString( styleAssets );
+		const blob = new window.Blob( [ html ], { type: 'text/html' } );
+		return URL.createObjectURL( blob );
 	}, [] );
+
+	useEffect( () => () => {
+		URL.revokeObjectURL( src );
+	} );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
@@ -279,7 +286,7 @@ function Iframe( {
 				// Correct doctype is required to enable rendering in standards
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
-				srcDoc={ srcDoc }
+				src={ src }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&

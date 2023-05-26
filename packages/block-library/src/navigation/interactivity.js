@@ -86,6 +86,13 @@ store( {
 						}
 					}
 				},
+				toggleMenu: ( { context, actions, ref } ) => {
+					if ( context.core.navigation.isMenuOpen ) {
+						actions.core.navigation.closeMenu( { context } );
+					} else {
+						actions.core.navigation.openMenu( { context, ref } );
+					}
+				},
 				handleMenuKeydown: ( { actions, context, event } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						// If Escape close the menu

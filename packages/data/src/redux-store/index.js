@@ -371,23 +371,8 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
  */
 function mapSelectors( selectors, store ) {
 	const createStateSelector = ( registrySelector ) => {
-		const selector = function runSelector() {
-			// This function is an optimized implementation of:
-			//
-			//   selector( store.getState(), ...arguments )
-			//
-			// Where the above would incur an `Array#concat` in its application,
-			// the logic here instead efficiently constructs an arguments array via
-			// direct assignment.
-			const argsLength = arguments.length;
-			const args = new Array( argsLength + 1 );
-			args[ 0 ] = store.__unstableOriginalGetState();
-			for ( let i = 0; i < argsLength; i++ ) {
-				args[ i + 1 ] = arguments[ i ];
-			}
-
-			return registrySelector( ...args );
-		};
+		const selector = ( ...args ) =>
+			registrySelector( store.__unstableOriginalGetState(), ...args );
 		selector.hasResolver = false;
 		return selector;
 	};
