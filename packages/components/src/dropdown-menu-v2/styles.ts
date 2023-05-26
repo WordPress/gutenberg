@@ -18,6 +18,7 @@ const ANIMATION_PARAMS = {
 	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
 };
 
+const CONTENT_WRAPPER_PADDING = space( 2 );
 const ITEM_PREFIX_WIDTH = space( 7 );
 const ITEM_PADDING_INLINE_START = space( 2 );
 const ITEM_PADDING_INLINE_END = space( 2.5 );
@@ -58,7 +59,7 @@ const baseContent = css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
 	border-radius: 6px;
-	padding: ${ space( 2 ) };
+	padding: ${ CONTENT_WRAPPER_PADDING };
 	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
 		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
 		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
@@ -174,14 +175,13 @@ const baseItem = css`
 		pointer-events: none;
 	}
 
+	/* Hover and Focus styles */
 	&[data-highlighted] {
-		/*
-			TODO: reconcile with global focus styles
-			(incl high contrast mode fallbacks)
-		 */
+		/* TODO: reconcile with global focus styles */
+		background-color: ${ COLORS.gray[ '100' ] };
 
-		background-color: ${ COLORS.ui.theme };
-		color: white;
+		/* Only visible in Windows High Contrast mode */
+		outline: 2px solid transparent;
 	}
 
 	svg {
@@ -210,13 +210,11 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ baseItem }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
-	&[data-state='open']:not( [data-highlighted] ) {
-		/* TODO: use variable */
-		background-color: rgba( 56, 88, 233, 0.04 );
-		color: ${ COLORS.ui.theme };
-	}
-
 	${ baseItem }
+
+	&[data-state='open'] {
+		background-color: ${ COLORS.gray[ '100' ] };
+	}
 `;
 
 export const Label = styled( DropdownMenu.Label )`
@@ -242,7 +240,7 @@ export const Separator = styled( DropdownMenu.Separator )`
 	/* TODO: doesn't match border color from variables */
 	background-color: ${ COLORS.ui.borderDisabled };
 	/* Negative horizontal margin to make separator go from side to side */
-	margin: ${ space( 2 ) } 0;
+	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
 `;
 
 export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
