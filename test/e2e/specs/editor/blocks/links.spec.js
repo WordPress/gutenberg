@@ -4,12 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Links', () => {
-	/*const waitForURLFieldAutoFocus = async ( { page } ) => {
-		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
-	};*/
-
 	test.use( {
 		linkControl: async ( { page }, use ) => {
 			await use( new LinkControl( { page } ) );
@@ -35,9 +29,6 @@ test.describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
-
-		// Wait for the URL field to auto-focus.
-		//await waitForURLFieldAutoFocus();
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
