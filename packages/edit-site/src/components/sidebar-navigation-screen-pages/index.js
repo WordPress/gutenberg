@@ -42,11 +42,9 @@ export default function SidebarNavigationScreenPages() {
 			per_page: -1,
 		} );
 
-	const dynamicPageTemplates =
-		templates &&
-		templates.filter( ( template ) => {
-			return template.slug === '404' || template.slug === 'search';
-		} );
+	const dynamicPageTemplates = templates?.filter( ( { slug } ) =>
+		[ '404', 'search' ].includes( slug )
+	);
 
 	const homeTemplate =
 		templates?.find( ( template ) => template.slug === 'front-page' ) ||
@@ -69,20 +67,20 @@ export default function SidebarNavigationScreenPages() {
 
 	const isHomePageBlog = frontPage === postsPage;
 
-	if ( ! isHomePageBlog ) {
-		const homePageIndex = pages?.findIndex(
+	if ( ! isHomePageBlog && pages?.length ) {
+		const homePageIndex = pages.findIndex(
 			( item ) => item.id === frontPage
 		);
-		const homePage = pages?.splice( homePageIndex, 1 );
+		const homePage = pages.splice( homePageIndex, 1 );
 		pages?.splice( 0, 0, ...homePage );
 
-		const postsPageIndex = pages?.findIndex(
+		const postsPageIndex = pages.findIndex(
 			( item ) => item.id === postsPage
 		);
 
-		const blogPage = pages?.splice( postsPageIndex, 1 );
+		const blogPage = pages.splice( postsPageIndex, 1 );
 
-		pages?.splice( 1, 0, ...blogPage );
+		pages.splice( 1, 0, ...blogPage );
 	}
 
 	return (
