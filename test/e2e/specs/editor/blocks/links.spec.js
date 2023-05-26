@@ -66,4 +66,71 @@ test.describe( 'Links', () => {
 			},
 		] );
 	} );
+
+	test( 'should contain a label when it should open in a new tab', async ( {
+		page,
+		editor,
+		pageUtils,
+		linkControl,
+	} ) => {
+		await linkControl.clickBlockAppender();
+		await page.keyboard.type( 'This is WordPress' );
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+
+		// Link settings open
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Confirm that focus was not prematurely returned to the paragraph on
+		// a changing value of the setting.
+		await page.waitForSelector( ':focus.components-form-toggle__input' );
+
+		// Submit link. Expect that "Open in new tab" would have been applied
+		// immediately.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		// Regression Test: This verifies that the UI is updated according to
+		// the expected changed values, where previously the value could have
+		// fallen out of sync with how the UI is displayed (specifically for
+		// collapsed selections).
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/15573
+
+		// Move caret back into the link.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Edit link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.type( 'wordpress.org' );
+
+		// Update the link.
+		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to the popover.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Navigate back to inputs to verify appears as changed.
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Navigate to the "Open in new tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Uncheck the checkbox.
+		await page.keyboard.press( 'Space' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
