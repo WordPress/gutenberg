@@ -28,12 +28,6 @@ module.exports = {
 		filename: './build/interactivity/[name].min.js',
 		path: join( __dirname, '..', '..' ),
 	},
-	resolve: {
-		alias: {
-			react: 'preact/compat',
-			'react-dom': 'preact/compat',
-		},
-	},
 	module: {
 		rules: [
 			{
