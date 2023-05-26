@@ -481,9 +481,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		// Get the assertive live region screen reader announcement.
-		const getLiveRegion = page.locator(
-			'#a11y-speak-assertive'
-		).textContent;
+		const getLiveRegion = page
+			.locator( '#a11y-speak-assertive' )
+			.textContent();
 
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/' );
