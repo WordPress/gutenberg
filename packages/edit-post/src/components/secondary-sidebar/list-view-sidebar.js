@@ -67,6 +67,8 @@ export default function ListViewSidebar() {
 	 * @return void
 	 */
 	function handleSidebarFocus( currentTab ) {
+		// Tab panel focus.
+		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
 			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
@@ -77,11 +79,11 @@ export default function ListViewSidebar() {
 				listViewApplicationFocus
 			)
 				? listViewApplicationFocus
-				: tabPanelRef.current;
+				: tabPanelFocus;
 			listViewFocusArea.focus();
 			// Outline tab is selected.
 		} else {
-			tabPanelRef.current.focus();
+			tabPanelFocus.focus();
 		}
 	}
 
