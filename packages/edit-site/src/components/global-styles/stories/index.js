@@ -367,7 +367,7 @@ const BASE_SETTINGS = {
 			textColumns: false,
 			textDecoration: true,
 			textTransform: true,
-			textOrientation: false,
+			writingMode: false,
 			fluid: true,
 			fontFamilies: {
 				theme: [

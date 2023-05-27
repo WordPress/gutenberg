@@ -112,13 +112,13 @@ const textTransform = {
 	},
 };
 
-const textOrientation = {
-	name: 'textOrientation',
+const writingMode = {
+	name: 'writingMode',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
 			options,
-			[ 'typography', 'textOrientation' ],
+			[ 'typography', 'writingMode' ],
 			'writingMode'
 		);
 	},
@@ -134,5 +134,5 @@ export default [
 	textColumns,
 	textDecoration,
 	textTransform,
-	textOrientation,
+	writingMode,
 ];

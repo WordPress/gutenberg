@@ -55,7 +55,7 @@ export interface Style {
 		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
-		textOrientation?: CSSProperties[ 'writingMode' ];
+		writingMode?: CSSProperties[ 'writingMode' ];
 	};
 	color?: {
 		text?: CSSProperties[ 'color' ];

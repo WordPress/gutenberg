@@ -215,9 +215,9 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
-	textOrientation: {
-		value: [ 'typography', 'textOrientation' ],
-		support: [ 'typography', '__experimentalTextOrientation' ],
+	writingMode: {
+		value: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
 		useEngine: true,
 	},
 	'--wp--style--root--padding': {

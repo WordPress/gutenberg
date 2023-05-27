@@ -458,8 +458,8 @@
 							"type": "boolean",
 							"default": true
 						},
-						"textOrientation": {
-							"description": "Allow users to set the text orientation.",
+						"writingMode": {
+							"description": "Allow users to set the writing mode.",
 							"type": "boolean",
 							"default": false
 						},
@@ -1513,7 +1513,7 @@
 								}
 							]
 						},
-						"textOrientation": {
+						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
 								{
