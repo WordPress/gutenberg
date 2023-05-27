@@ -109,7 +109,7 @@ export default function ListViewSidebar() {
 		if ( tabName === 'list-view' ) {
 			return (
 				<div className="edit-post-editor__list-view-panel-content">
-					<ListView dropZone={ dropZoneElement } />
+					<ListView dropZoneElement={ dropZoneElement } />
 				</div>
 			);
 		}
