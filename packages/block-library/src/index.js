@@ -147,6 +147,7 @@ const getAllBlocks = () => {
 		columns,
 		commentAuthorAvatar,
 		cover,
+		details,
 		embed,
 		file,
 		group,
@@ -226,9 +227,6 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
-	if ( window?.__experimentalEnableDetailsBlocks ) {
-		blocks.push( details );
-	}
 	return blocks.filter( Boolean );
 };
 

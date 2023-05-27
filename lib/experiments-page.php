@@ -78,18 +78,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-details-blocks',
-		__( 'Details block', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the Details block', 'gutenberg' ),
-			'id'    => 'gutenberg-details-blocks',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-theme-previews',
 		__( 'Block Theme Previews', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
