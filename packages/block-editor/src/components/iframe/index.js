@@ -189,15 +189,15 @@ function Iframe( {
 		};
 	}, [] );
 
+	// Correct doctype is required to enable rendering in standards
+	// mode. Also preload the styles to avoid a flash of unstyled
+	// content.
 	const html =
 		'<!doctype html>' +
 		'<style>html{height:auto!important;}body{margin:0}</style>' +
 		styles +
 		scripts;
 
-	// Correct doctype is required to enable rendering in standards
-	// mode. Also preload the styles to avoid a flash of unstyled
-	// content.
 	const [ src, cleanup ] = useMemo( () => {
 		const _src = URL.createObjectURL(
 			new window.Blob( [ html ], { type: 'text/html' } )
@@ -236,9 +236,6 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
 				src={ src }
 				title={ __( 'Editor canvas' ) }
 			>
