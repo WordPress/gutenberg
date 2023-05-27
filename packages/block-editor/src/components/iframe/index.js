@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,7 +6,6 @@ import {
 	createPortal,
 	forwardRef,
 	useMemo,
-	useReducer,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -78,29 +72,6 @@ function bubbleEvents( doc ) {
 	}
 }
 
-function useParsedAssets( html ) {
-	return useMemo( () => {
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = html;
-		return Array.from( doc.body.children );
-	}, [ html ] );
-}
-
-async function loadScript( head, { id, src } ) {
-	return new Promise( ( resolve, reject ) => {
-		const script = head.ownerDocument.createElement( 'script' );
-		script.id = id;
-		if ( src ) {
-			script.src = src;
-			script.onload = () => resolve();
-			script.onerror = () => reject();
-		} else {
-			resolve();
-		}
-		head.appendChild( script );
-	} );
-}
-
 function Iframe( {
 	contentRef,
 	children,
@@ -112,20 +83,25 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const assets = useSelect(
+	const { styles = '', scripts = '' } = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
+			select( blockEditorStore ).getSettings().__unstableResolvedAssets ??
+			{},
 		[]
 	);
-	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const compatStyles = useCompatibilityStyles();
-	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
+	const disabledRef = useDisabled( { isDisabled: ! readonly } );
+	const bodyRef = useMergeRefs( [
+		contentRef,
+		clearerRef,
+		writingFlowRef,
+		disabledRef,
+	] );
 	const setRef = useRefEffect( ( node ) => {
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
@@ -140,21 +116,35 @@ function Iframe( {
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
+			bodyRef( contentDocument.body );
+
+			contentDocument.body.classList.add( 'wp-block-editor__iframe' );
+			contentDocument.body.classList.add( 'editor-styles-wrapper' );
 
 			// Ideally ALL classes that are added through get_body_class should
 			// be added in the editor too, which we'll somehow have to get from
 			// the server in the future (which will run the PHP filters).
-			setBodyClasses(
-				Array.from( ownerDocument.body.classList ).filter(
-					( name ) =>
-						name.startsWith( 'admin-color-' ) ||
-						name.startsWith( 'post-type-' ) ||
-						name === 'wp-embed-responsive'
-				)
-			);
+			for ( const className of ownerDocument.body.classList ) {
+				if (
+					className.startsWith( 'admin-color-' ) ||
+					className.startsWith( 'post-type-' ) ||
+					className === 'wp-embed-responsive'
+				) {
+					contentDocument.body.classList.add( className );
+				}
+			}
+
+			for ( const compatStyle of compatStyles ) {
+				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
+				}
+
+				contentDocument.head.appendChild(
+					compatStyle.cloneNode( true )
+				);
+			}
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.body );
 
 			for ( const compatStyle of compatStyles ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
@@ -199,36 +189,15 @@ function Iframe( {
 		};
 	}, [] );
 
-	const headRef = useRefEffect( ( element ) => {
-		scripts
-			.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( element, script ) ),
-				Promise.resolve()
-			)
-			.finally( () => {
-				// When script are loaded, re-render blocks to allow them
-				// to initialise.
-				forceRender();
-			} );
-	}, [] );
-	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
-		contentRef,
-		clearerRef,
-		writingFlowRef,
-		disabledRef,
-		headRef,
-	] );
+	const html =
+		'<!doctype html>' +
+		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		styles +
+		scripts;
 
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const html =
-		'<!doctype html>' +
-		'<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>' +
-		( assets?.styles ?? '' );
-
 	const [ src, cleanup ] = useMemo( () => {
 		const _src = URL.createObjectURL(
 			new window.Blob( [ html ], { type: 'text/html' } )
@@ -275,20 +244,13 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						<body
-							ref={ bodyRef }
-							className={ classnames(
-								'block-editor-iframe__body',
-								'editor-styles-wrapper',
-								...bodyClasses
-							) }
-						>
+						<>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
-						</body>,
-						iframeDocument.documentElement
+						</>,
+						iframeDocument.body
 					) }
 			</iframe>
 			{ tabIndex >= 0 && after }
