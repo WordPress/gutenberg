@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { BlockPreview } from '@wordpress/block-editor';
+import {
+	Button,
+	VisuallyHidden,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
 
@@ -10,8 +16,41 @@ import { moreHorizontal } from '@wordpress/icons';
  */
 import usePatterns from './use-patterns';
 
+const GridItem = ( { item } ) => {
+	const instanceId = useInstanceId( GridItem );
+	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+
+	return (
+		<div
+			className="edit-site-library__pattern"
+			aria-label={ item.title }
+			aria-describedby={ item.description ? descriptionId : undefined }
+		>
+			<div className="edit-site-library__preview">
+				<BlockPreview blocks={ item.blocks } />
+				{ !! item.description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ item.description }
+					</VisuallyHidden>
+				) }
+			</div>
+			<HStack
+				className="edit-site-library__footer"
+				justify="space-between"
+			>
+				<span>{ item.title }</span>
+				<Button
+					className="edit-site-library__button"
+					icon={ moreHorizontal }
+					isSmall
+				/>
+			</HStack>
+		</div>
+	);
+};
+
 export default function Grid( { type, name } ) {
-	const patterns = usePatterns( type, name );
+	const [ patterns, isResolving ] = usePatterns( type, name );
 
 	if ( ! patterns ) {
 		return null;
@@ -23,24 +62,11 @@ export default function Grid( { type, name } ) {
 
 	return (
 		<div className="edit-site-library__grid">
-			{ patterns.map( ( pattern ) => (
-				<div key={ pattern.id } className="edit-site-library__pattern">
-					<div className="edit-site-library__preview">
-						{ pattern.id }
-					</div>
-					<HStack
-						className="edit-site-library__footer"
-						justify="space-between"
-					>
-						<span>{ pattern.title.rendered }</span>
-						<Button
-							className="edit-site-library__button"
-							icon={ moreHorizontal }
-							isSmall
-						/>
-					</HStack>
-				</div>
-			) ) }
+			{ isResolving && __( 'Loading' ) }
+			{ ! isResolving &&
+				patterns.map( ( pattern ) => (
+					<GridItem key={ pattern.name } item={ pattern } />
+				) ) }
 		</div>
 	);
 }
