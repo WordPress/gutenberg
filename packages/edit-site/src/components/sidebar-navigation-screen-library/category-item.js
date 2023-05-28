@@ -5,7 +5,11 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
 
 export default function CategoryItem( { count, icon, label, name, type } ) {
-	const linkInfo = useLink( { path: `/library/${ type }/${ name }` } );
+	const linkInfo = useLink( {
+		path: '/library',
+		categoryType: type,
+		categoryName: name,
+	} );
 
 	if ( ! count ) {
 		return;
