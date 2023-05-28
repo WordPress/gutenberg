@@ -40,7 +40,7 @@ function ListViewBlockSelectButton(
 		draggable,
 		isExpanded,
 		ariaLabel,
-		ariaDescribedBy,
+		ariaDescription,
 		updateFocusAndSelection,
 	},
 	ref
@@ -138,7 +138,8 @@ function ListViewBlockSelectButton(
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
 				aria-label={ ariaLabel }
-				aria-describedby={ ariaDescribedBy }
+				// eslint-disable-next-line jsx-a11y/aria-props
+				aria-description={ ariaDescription }
 				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />

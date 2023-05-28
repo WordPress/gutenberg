@@ -10,9 +10,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
-	VisuallyHidden,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useState,
@@ -97,8 +95,6 @@ function ListViewBlock( {
 		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
 		// Don't show the settings menu if block is disabled or content only.
 		blockEditingMode === 'default';
-	const instanceId = useInstanceId( ListViewBlock );
-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -295,12 +291,9 @@ function ListViewBlock( {
 							isExpanded={ canEdit ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaLabel={ blockAriaLabel }
-							ariaDescribedBy={ descriptionId }
+							ariaDescription={ blockPositionDescription }
 							updateFocusAndSelection={ updateFocusAndSelection }
 						/>
-						<VisuallyHidden id={ descriptionId }>
-							{ blockPositionDescription }
-						</VisuallyHidden>
 					</div>
 				) }
 			</TreeGridCell>
