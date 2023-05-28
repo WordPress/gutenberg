@@ -78,18 +78,33 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 				return;
 			}
 			if ( !! options.length ) {
-				debouncedSpeak(
-					sprintf(
-						/* translators: %d: number of results. */
-						_n(
-							'%d result found, use up and down arrow keys to navigate.',
-							'%d results found, use up and down arrow keys to navigate.',
+				if ( filterValue ) {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'%d result found, use up and down arrow keys to navigate.',
+								'%d results found, use up and down arrow keys to navigate.',
+								options.length
+							),
 							options.length
 						),
-						options.length
-					),
-					'assertive'
-				);
+						'assertive'
+					);
+				} else {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'%d result loaded. Type to filter or use up and down arrow keys to select the unfiltered result.',
+								'%d results loaded. Type to filter or use up and down arrow keys to navigate the unfiltered results.',
+								options.length
+							),
+							options.length
+						),
+						'assertive'
+					);
+				}
 			} else {
 				debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}

@@ -488,7 +488,18 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		// Get the assertive live region screen reader announcement.
 		await expect(
 			page.getByText(
-				'9 results found, use up and down arrow keys to navigate.'
+				'9 results loaded. Type to filter or use up and down arrow keys to navigate the unfiltered results.'
+			)
+		).toBeVisible();
+
+		await page.keyboard.type( 'heading' );
+		await expect(
+			page.locator( `role=option[name="Heading"i]` )
+		).toBeVisible();
+		// Get the assertive live region screen reader announcement.
+		await expect(
+			page.getByText(
+				'2 results found, use up and down arrow keys to navigate.'
 			)
 		).toBeVisible();
 	} );
