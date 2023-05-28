@@ -8,11 +8,11 @@ const getTemplatePartAreas = ( items ) => {
 
 	const groupedByArea = allItems.reduce(
 		( accumulator, item ) => {
-			const key = accumulator[ item.area ] ? item.area : 'rest';
+			const key = accumulator[ item.area ] ? item.area : 'uncategorized';
 			accumulator[ key ].push( item );
 			return accumulator;
 		},
-		{ header: [], footer: [], sidebar: [], rest: [] }
+		{ header: [], footer: [], sidebar: [], uncategorized: [] }
 	);
 
 	return groupedByArea;
