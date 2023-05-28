@@ -13,6 +13,8 @@
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
+	padding-left: $grid-unit-15;
+	padding-right: $grid-unit-15;
 
 	.edit-site-library__pattern {
 		break-inside: avoid-column;
@@ -21,19 +23,9 @@
 		margin-bottom: $grid-unit-60;
 
 		// Temp styles for testing - delete asap
-		min-height: 250px;
-
-		&:nth-child(2) {
-			min-height: 400px;
-		}
-
-		&:nth-child(3) {
-			min-height: 600px;
-		}
-
 		.edit-site-library__preview {
 			border-radius: $radius-block-ui * 4;
-			background: #ededed;
+			overflow: hidden;
 		}
 
 		.edit-site-library__footer,
