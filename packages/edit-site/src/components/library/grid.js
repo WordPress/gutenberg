@@ -10,8 +10,8 @@ import { moreHorizontal } from '@wordpress/icons';
  */
 import usePatterns from './use-patterns';
 
-export default function Grid() {
-	const patterns = usePatterns();
+export default function Grid( { type, name } ) {
+	const patterns = usePatterns( type, name );
 
 	if ( ! patterns ) {
 		return null;

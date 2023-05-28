@@ -6,6 +6,7 @@ import { EditorSnackbars } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -14,6 +15,8 @@ import Grid from './grid';
 import useTitle from '../routes/use-title';
 
 export default function Library() {
+	const { categoryType, categoryName } = getQueryArgs( window.location.href );
+
 	// Do we need shortcuts if we aren't displaying a header?
 	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
 		return {
@@ -37,7 +40,7 @@ export default function Library() {
 			className="edit-site-library"
 			labels={ regionLabels }
 			notices={ <EditorSnackbars /> }
-			content={ <Grid /> }
+			content={ <Grid type={ categoryType } name={ categoryName } /> }
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,
