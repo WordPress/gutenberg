@@ -6,6 +6,7 @@ import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
 import { forwardRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -90,12 +91,9 @@ export const Appender = forwardRef(
 						}
 					} }
 				/>
-				<div
-					className="list-view-appender__description"
-					id={ descriptionId }
-				>
+				<VisuallyHidden id={ descriptionId }>
 					{ description }
-				</div>
+				</VisuallyHidden>
 			</div>
 		);
 	}

@@ -10,6 +10,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
@@ -297,12 +298,9 @@ function ListViewBlock( {
 							ariaDescribedBy={ descriptionId }
 							updateFocusAndSelection={ updateFocusAndSelection }
 						/>
-						<div
-							className="block-editor-list-view-block-select-button__description"
-							id={ descriptionId }
-						>
+						<VisuallyHidden id={ descriptionId }>
 							{ blockPositionDescription }
-						</div>
+						</VisuallyHidden>
 					</div>
 				) }
 			</TreeGridCell>
