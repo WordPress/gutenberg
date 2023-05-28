@@ -96,8 +96,8 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 						sprintf(
 							/* translators: %d: number of results. */
 							_n(
-								'%d result loaded. Type to filter or use up and down arrow keys to select the unfiltered result.',
-								'%d results loaded. Type to filter or use up and down arrow keys to navigate the unfiltered results.',
+								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
 								options.length
 							),
 							options.length
