@@ -199,7 +199,7 @@ export default function CoverInspectorControls( {
 								}
 							/>
 						) }
-						{ ! useFeaturedImage && url && (
+						{ ! useFeaturedImage && url && ! isVideoBackground && (
 							<TextareaControl
 								__nextHasNoMarginBottom
 								label={ __( 'Alternative text' ) }
