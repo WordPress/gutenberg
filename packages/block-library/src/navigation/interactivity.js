@@ -21,9 +21,6 @@ store( {
 	effects: {
 		core: {
 			navigation: {
-				initGlobalNav: ( { context, ref } ) => {
-					context.core.navigation.globalNav = ref;
-				},
 				initMenu: ( { context, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						const focusableElements =
@@ -53,23 +50,6 @@ store( {
 						context.core.navigation.isMenuOpen
 						? 'dialog'
 						: '';
-				},
-				ariaHiddenAttribute: ( { context } ) => {
-					const { isMenuOpen, globalNav } = context.core.navigation;
-					if ( globalNav ) {
-						let isGlobalNavWrapped = false;
-						// If the Open menu button is visible, set `isGlobalNavWrapped` to true.
-						if (
-							globalNav
-								.querySelector(
-									'button.wp-block-navigation__responsive-container-open '
-								)
-								?.checkVisibility()
-						) {
-							isGlobalNavWrapped = true;
-						}
-						return isMenuOpen ? false : isGlobalNavWrapped;
-					}
 				},
 			},
 		},
