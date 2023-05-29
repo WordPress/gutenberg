@@ -204,6 +204,7 @@ export default function useArrowNav() {
 			const { defaultView } = ownerDocument;
 
 			if ( ! isNav ) {
+				edgeHasFocus = false;
 				return;
 			}
 
@@ -232,8 +233,9 @@ export default function useArrowNav() {
 			}
 
 			// If no longer on an edge, let's unset our edge focus tracker.
-			if ( ! isNavEdge ) {
+			if ( ! isNavEdge( target, isReverse ) ) {
 				edgeHasFocus = false;
+				return;
 			}
 
 			// Abort if our current target is not a candidate for navigation
