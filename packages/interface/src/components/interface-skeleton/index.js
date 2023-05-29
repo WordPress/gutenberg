@@ -59,7 +59,7 @@ function InterfaceSkeleton(
 
 	const defaultLabels = {
 		/* translators: accessibility text for the top bar landmark region. */
-		header: __( 'Header' ),
+		header: _x( 'Header', 'header landmark area' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
 		/* translators: accessibility text for the secondary sidebar landmark region. */
