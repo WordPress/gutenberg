@@ -2,17 +2,17 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { ALL_SIDES, LABELS } from './utils';
+import { ALL_SIDES, LABELS, ICONS } from '../utils';
 
-export default function BoxInputControls( {
-	values,
-	sides,
+export default function SeparatedInputControls( {
+	minimumCustomValue,
 	onChange,
+	onMouseOut,
+	onMouseOver,
+	sides,
 	spacingSizes,
 	type,
-	minimumCustomValue,
-	onMouseOver,
-	onMouseOut,
+	values,
 } ) {
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
@@ -31,17 +31,18 @@ export default function BoxInputControls( {
 			{ filteredSides.map( ( side ) => {
 				return (
 					<SpacingInputControl
-						value={ values[ side ] }
-						label={ LABELS[ side ] }
 						key={ `spacing-sizes-control-${ side }` }
-						withInputField={ false }
-						side={ side }
+						icon={ ICONS[ side ] }
+						label={ LABELS[ side ] }
+						minimumCustomValue={ minimumCustomValue }
 						onChange={ createHandleOnChange( side ) }
+						onMouseOut={ onMouseOut }
+						onMouseOver={ onMouseOver }
+						side={ side }
 						spacingSizes={ spacingSizes }
 						type={ type }
-						minimumCustomValue={ minimumCustomValue }
-						onMouseOver={ onMouseOver }
-						onMouseOut={ onMouseOut }
+						value={ values[ side ] }
+						withInputField={ false }
 					/>
 				);
 			} ) }
