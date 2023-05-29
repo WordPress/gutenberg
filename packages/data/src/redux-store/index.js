@@ -162,17 +162,10 @@ export default function createReduxStore( key, options ) {
 			const thunkArgs = {
 				registry,
 				get dispatch() {
-					return Object.assign(
-						( action ) => store.dispatch( action ),
-						getActions()
-					);
+					return thunkActions;
 				},
 				get select() {
-					return Object.assign(
-						( selector ) =>
-							selector( store.__unstableOriginalGetState() ),
-						getSelectors()
-					);
+					return thunkSelectors;
 				},
 				get resolveSelect() {
 					return getResolveSelectors();
@@ -201,17 +194,19 @@ export default function createReduxStore( key, options ) {
 			};
 
 			const boundPrivateActions = createBindingCache( bindAction );
-			const allActions = new Proxy(
-				{},
-				{
-					get: ( target, prop ) => {
-						const privateAction = privateActions[ prop ];
-						return privateAction
-							? boundPrivateActions.get( privateAction )
-							: actions[ prop ];
-					},
-				}
-			);
+			const allActions = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateAction = privateActions[ prop ];
+					return privateAction
+						? boundPrivateActions.get( privateAction )
+						: actions[ prop ];
+				},
+			} );
+
+			const thunkActions = new Proxy( allActions, {
+				apply: ( target, thisArg, [ action ] ) =>
+					store.dispatch( action ),
+			} );
 
 			lock( actions, allActions );
 
@@ -253,17 +248,19 @@ export default function createReduxStore( key, options ) {
 			}
 
 			const boundPrivateSelectors = createBindingCache( bindSelector );
-			const allSelectors = new Proxy(
-				{},
-				{
-					get: ( target, prop ) => {
-						const privateSelector = privateSelectors[ prop ];
-						return privateSelector
-							? boundPrivateSelectors.get( privateSelector )
-							: selectors[ prop ];
-					},
-				}
-			);
+			const allSelectors = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateSelector = privateSelectors[ prop ];
+					return privateSelector
+						? boundPrivateSelectors.get( privateSelector )
+						: selectors[ prop ];
+				},
+			} );
+
+			const thunkSelectors = new Proxy( allSelectors, {
+				apply: ( target, thisArg, [ selector ] ) =>
+					selector( store.__unstableOriginalGetState() ),
+			} );
 
 			lock( selectors, allSelectors );
 

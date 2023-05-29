@@ -32,23 +32,19 @@ describe( 'Private data APIs', () => {
 			getState: ( state ) => state,
 		},
 		actions: { setPublicPrice },
-		reducer: ( state, action ) => {
-			if ( action?.type === 'SET_PRIVATE_PRICE' ) {
+		reducer: ( state = { price: 1000, secretDiscount: 800 }, action ) => {
+			if ( action.type === 'SET_PRIVATE_PRICE' ) {
 				return {
 					...state,
-					secretDiscount: action?.price,
+					secretDiscount: action.price,
 				};
-			} else if ( action?.type === 'SET_PUBLIC_PRICE' ) {
+			} else if ( action.type === 'SET_PUBLIC_PRICE' ) {
 				return {
 					...state,
-					price: action?.price,
+					price: action.price,
 				};
 			}
-			return {
-				price: 1000,
-				secretDiscount: 800,
-				...( state || {} ),
-			};
+			return state;
 		},
 	};
 	function createStore() {
@@ -312,6 +308,29 @@ describe( 'Private data APIs', () => {
 			expect(
 				unlock( registry.select( groceryStore ) ).getSecretDiscount()
 			).toEqual( 100 );
+		} );
+
+		it( 'should expose unlocked private selectors and actions to thunks', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+				doubleSecretDiscount() {
+					return ( { dispatch, select } ) => {
+						dispatch.setSecretDiscount(
+							select.getSecretDiscount() * 2
+						);
+					};
+				},
+			} );
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
+			privateActions.setSecretDiscount( 100 );
+			privateActions.doubleSecretDiscount();
+			expect(
+				unlock( registry.select( groceryStore ) ).getSecretDiscount()
+			).toEqual( 200 );
 		} );
 
 		it( 'should support registerStore', () => {
