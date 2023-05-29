@@ -13,6 +13,7 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
+import { download } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -172,9 +173,11 @@ function GoogleFonts() {
 				<Button
 					variant="primary"
 					onClick={ handleSaveChanges }
-					disabled={ ! newFonts.length || isSaving }
+					disabled={ !newFonts.length || isSaving }
+					icon = { isSaving ? <Spinner /> : download }
+					isBusy={ isSaving }
 				>
-					{ isSaving && <Spinner /> } { __( 'Install Google Fonts' ) }
+					{ __( 'Install Fonts' ) }
 				</Button>
 			</HStack>
 		);

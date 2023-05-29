@@ -48,9 +48,26 @@
         top: 0;
         width: calc(100% + 64px);
         border-bottom: 1px solid #e6e6e6;
-        z-index: 99;
         background: #fff;
         margin: 0 -32px;
         padding: 0 16px;
     }
+}
+
+.font-library-modal__upload-area {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: calc(100vh - 360px);
+    width: 100%;
+    border: 1px dashed #e5e5e5;
+    border-radius: 8px;
+}
+
+.font-library-modal__font-name {
+    font-weight: bold;
+}
+
+.font-library-modal__font-filename {
+    color: #6e6e6e;
 }

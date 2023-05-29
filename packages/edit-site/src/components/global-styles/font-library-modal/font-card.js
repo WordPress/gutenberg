@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 
 function FontCard( { font, onClick, actionHandler } ) {
 	const fakeFontFace = {
@@ -63,7 +63,7 @@ function FontCard( { font, onClick, actionHandler } ) {
 							</VStack>
 							{ !! actionHandler && actionHandler }
 						</HStack>
-						<FontFaceDemo fontFace={ displayFontFace } />
+						<FontDemo fontFace={ displayFontFace } />
 					</VStack>
 				</CardBody>
 			</Card>

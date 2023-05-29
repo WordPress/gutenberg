@@ -11,7 +11,7 @@ import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import { FontLibraryContext } from './context';
 import { DEMO_TEXT } from './constants';
 
-function FontFaceDemo( { fontFace, style = {} } ) {
+function FontFaceDemo( { fontFace, text, style = {} } ) {
 	const ref = useRef( null );
 	const [ isIntersecting, setIsIntersecting ] = useState( false );
 	const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
@@ -50,7 +50,7 @@ function FontFaceDemo( { fontFace, style = {} } ) {
 
 	return (
 		<Text style={ demoStyle } ref={ ref }>
-			{ demoConfig.text || DEMO_TEXT }
+			{ demoConfig.text || text || DEMO_TEXT }
 		</Text>
 	);
 }

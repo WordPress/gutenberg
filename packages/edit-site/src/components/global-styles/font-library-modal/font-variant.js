@@ -15,7 +15,7 @@ import {
  */
 import FontFaceDemo from './font-demo';
 
-function FontVariant( { fontFace, variantName, checked, onClick } ) {
+function FontVariant( { fontFace, variantName, checked, onClick, text, actionHandler } ) {
 	const { fontStyle, fontWeight } = fontFace;
 	const displayVariantName = variantName || `${ fontWeight } ${ fontStyle }`;
 
@@ -23,10 +23,16 @@ function FontVariant( { fontFace, variantName, checked, onClick } ) {
 		<div className="font-library-modal__font-variant">
 			<VStack spacing={ 1 }>
 				<HStack justify="flex-start" alignment="top">
-					<CheckboxControl checked={ checked } onChange={ onClick } />
-					<Text>{ displayVariantName }</Text>
+					{!!actionHandler
+						? actionHandler
+						: <CheckboxControl checked={ checked } onChange={ onClick } />
+					}
+					{typeof displayVariantName === "string"
+						? <Text>{ displayVariantName }</Text>
+						: displayVariantName
+					}
 				</HStack>
-				<FontFaceDemo fontFace={ fontFace } />
+				<FontFaceDemo fontFace={ fontFace } text={text} />
 			</VStack>
 		</div>
 	);

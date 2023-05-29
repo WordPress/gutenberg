@@ -308,8 +308,16 @@ class WP_Fonts_Library {
         $library = json_decode( $post_content, true );
         $font_families = $library['fontFamilies'];
 
-        $fonts_to_install = $request->get_json_params();
-        $new_fonts = $this->install_new_fonts( $fonts_to_install );
+
+        $fonts_to_install = $request->get_param('fontFamilies');
+        if ( is_string( $fonts_to_install ) ) {
+            // If we are receiving form data (as we to upload local fonts), the font families are encoded as a string.
+            $fonts_to_install = json_decode( $fonts_to_install, true );
+        }
+
+        $files = $request->get_file_params();
+
+        $new_fonts = $this->install_new_fonts( $fonts_to_install, $files );
         $new_library_fonts = $this->merge_fonts( $font_families, $new_fonts );
         return $this->update_fonts_library( $new_library_fonts );
     }
@@ -320,14 +328,20 @@ class WP_Fonts_Library {
      * @param array $fonts Fonts to install.
      * @return array New fonts with all assets downloaded and referenced in the font families definition.
      */
-    function install_new_fonts ( $fonts ) {
+    function install_new_fonts ( $fonts, $files ) {
         $new_fonts = array();
         foreach ( $fonts as $font ) {
             $new_font = $font;
             if ( isset( $font['fontFace'] ) ) {
                 $new_font_faces = array();
                 foreach ( $font['fontFace'] as $font_face ) {
-                    $new_font_face = $this->download_font_face_asset( $font_face );
+                    $new_font_face;
+                    if ( empty($files) ){
+                        $new_font_face = $this->download_font_face_asset( $font_face );
+                    } else {
+                        $new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'file' ] ] );
+                    }
+                    
                     $new_font_faces[] = $new_font_face;
                 }
                 $new_font['fontFace'] = $new_font_faces;
@@ -335,6 +349,20 @@ class WP_Fonts_Library {
             $new_fonts[] = $new_font;
         }
         return $new_fonts;
+    }
+
+    function move_font_face_asset ( $font_face, $file ) {
+        $new_font_face = $font_face;
+        $filename =  $this->get_filename_from_font_face( $font_face, $file['name'] );
+        $filepath= path_join( $this->wp_fonts_dir, $filename );
+        $success = move_uploaded_file( $file['tmp_name'], $filepath );
+
+        if ( $success ) {
+            unset($new_font_face['file']);
+            $new_font_face['src'] = "{$this->relative_fonts_path}{$filename}";
+            return $new_font_face;
+        }
+        
     }
 
     /**

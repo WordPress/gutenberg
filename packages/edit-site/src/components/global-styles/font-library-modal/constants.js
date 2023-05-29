@@ -19,7 +19,7 @@ export const MODAL_TABS = [
 	},
 	{
 		name: 'local-fonts',
-		title: __( 'Local Fonts' ),
+		title: __( 'Upload' ),
 		className: 'local-fonts',
 	},
 ];
@@ -41,3 +41,10 @@ export const DEFAULT_DEMO_CONFIG = {
 	text: '',
 	fontSize: 24,
 };
+
+export const ALLOWED_FILE_EXTENSIONS = [
+    'otf',
+    'ttf',
+    // 'woff',
+    // 'woff2',
+];
