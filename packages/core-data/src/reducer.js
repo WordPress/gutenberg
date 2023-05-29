@@ -481,11 +481,12 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			list: [ ...currentState.list ],
 		};
 		nextState = omitPendingRedos( nextState );
-		let previousUndoState = nextState.list.pop();
-		currentState.cache.forEach( ( edit ) => {
-			previousUndoState = appendEditToStack( previousUndoState, edit );
-		} );
-		nextState.list.push( previousUndoState );
+		const previousUndoState = nextState.list.pop();
+		const updatedUndoState = currentState.cache.reduce(
+			appendEditToStack,
+			previousUndoState
+		);
+		nextState.list.push( updatedUndoState );
 
 		return {
 			...nextState,
