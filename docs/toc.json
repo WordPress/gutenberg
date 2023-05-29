@@ -302,6 +302,7 @@
 				"docs/explanations/architecture/README.md": [
 					{ "docs/explanations/architecture/key-concepts.md": [] },
 					{ "docs/explanations/architecture/data-flow.md": [] },
+					{ "docs/explanations/architecture/entities.md": [] },
 					{ "docs/explanations/architecture/modularity.md": [] },
 					{ "docs/explanations/architecture/performance.md": [] },
 					{
