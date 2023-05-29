@@ -50,7 +50,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 	}
 
 	if ( ! empty( $attributes['noLink'] ) ) {
-		return wp_kses_post( $prefix ) . '<span class="wp-block-post-terms__name">' . wp_kses_post( join( '</span><span class="wp-block-terms__separator">' . esc_html( $separator ) . '</span><span class="wp-block-post-terms__name">', wp_list_pluck( $post_terms, 'name' ) ) ) . '</span>' . wp_kses_post( $suffix );
+		return wp_kses_post( $prefix ) . '<span class="wp-block-post-terms__name">' . wp_kses_post( join( '</span><span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span><span class="wp-block-post-terms__name">', wp_list_pluck( $post_terms, 'name' ) ) ) . '</span>' . wp_kses_post( $suffix );
 	}
 
 	return get_the_term_list(
