@@ -6,9 +6,14 @@
 
 -   `Button`: Add `__next32pxSmallSize` prop to opt into the new 32px size when the `isSmall` prop is enabled ([#51012](https://github.com/WordPress/gutenberg/pull/51012)).
 
+### Bug Fix
+
+-   `FocalPointUnitControl`: Add aria-labels ([#50993](https://github.com/WordPress/gutenberg/pull/50993)).
+
 ### Experimental
 
 -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967)).
+
 
 ## 25.0.0 (2023-05-24)
 

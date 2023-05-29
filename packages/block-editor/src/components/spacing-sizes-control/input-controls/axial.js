@@ -2,19 +2,19 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { LABELS } from './utils';
+import { LABELS, ICONS, hasAxisSupport } from '../utils';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
 export default function AxialInputControls( {
+	minimumCustomValue,
 	onChange,
-	values,
+	onMouseOut,
+	onMouseOver,
 	sides,
 	spacingSizes,
 	type,
-	minimumCustomValue,
-	onMouseOver,
-	onMouseOut,
+	values,
 } ) {
 	const createHandleOnChange = ( side ) => ( next ) => {
 		if ( ! onChange ) {
@@ -37,7 +37,7 @@ export default function AxialInputControls( {
 
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
-		? groupedSides.filter( ( side ) => sides.includes( side ) )
+		? groupedSides.filter( ( side ) => hasAxisSupport( sides, side ) )
 		: groupedSides;
 
 	return (
@@ -47,17 +47,18 @@ export default function AxialInputControls( {
 					side === 'vertical' ? values.top : values.left;
 				return (
 					<SpacingInputControl
-						value={ axisValue }
-						onChange={ createHandleOnChange( side ) }
-						label={ LABELS[ side ] }
 						key={ `spacing-sizes-control-${ side }` }
-						withInputField={ false }
+						icon={ ICONS[ side ] }
+						label={ LABELS[ side ] }
+						minimumCustomValue={ minimumCustomValue }
+						onChange={ createHandleOnChange( side ) }
+						onMouseOut={ onMouseOut }
+						onMouseOver={ onMouseOver }
 						side={ side }
 						spacingSizes={ spacingSizes }
 						type={ type }
-						minimumCustomValue={ minimumCustomValue }
-						onMouseOver={ onMouseOver }
-						onMouseOut={ onMouseOut }
+						value={ axisValue }
+						withInputField={ false }
 					/>
 				);
 			} ) }
