@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p>This is Gutenberg</p>
-<!-- /wp:paragraph -->
