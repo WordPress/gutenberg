@@ -21,9 +21,6 @@ store( {
 	effects: {
 		core: {
 			navigation: {
-				initGlobalNav: ( { context, ref } ) => {
-					context.core.navigation.globalNav = ref;
-				},
 				initMenu: ( { context, ref } ) => {
 					if ( context.core.navigation.isMenuOpen ) {
 						const focusableElements =
@@ -53,18 +50,6 @@ store( {
 						context.core.navigation.isMenuOpen
 						? 'dialog'
 						: '';
-				},
-				ariaHiddenAttribute: ( { context } ) => {
-					const { isMenuOpen, globalNav } = context.core.navigation;
-					if ( globalNav ) {
-						const responsiveContainer = globalNav.querySelector(
-							'div.wp-block-navigation__responsive-container'
-						);
-						// If the element has display: none, `offsetParent` returns null.
-						const isGlobalNavWrapped =
-							responsiveContainer.offsetParent === null;
-						return isMenuOpen ? false : isGlobalNavWrapped;
-					}
 				},
 			},
 		},
