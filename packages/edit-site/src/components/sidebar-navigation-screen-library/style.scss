@@ -3,3 +3,7 @@
 	border-bottom: 1px solid $gray-800;
 	margin-bottom: $grid-unit-20;
 }
+
+.edit-site-sidebar-navigation-item.is-active-category {
+	background: $gray-800;
+}

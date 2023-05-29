@@ -14,8 +14,13 @@ import { getQueryArgs } from '@wordpress/url';
 import Grid from './grid';
 import useTitle from '../routes/use-title';
 
+const DEFAULT_TYPE = 'wp_template_part';
+const DEFAULT_CATEGORY = 'header';
+
 export default function Library() {
 	const { categoryType, categoryName } = getQueryArgs( window.location.href );
+	const type = categoryType || DEFAULT_TYPE;
+	const category = categoryName || DEFAULT_CATEGORY;
 
 	// Do we need shortcuts if we aren't displaying a header?
 	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
@@ -40,7 +45,7 @@ export default function Library() {
 			className="edit-site-library"
 			labels={ regionLabels }
 			notices={ <EditorSnackbars /> }
-			content={ <Grid type={ categoryType } name={ categoryName } /> }
+			content={ <Grid type={ type } category={ category } /> }
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,
