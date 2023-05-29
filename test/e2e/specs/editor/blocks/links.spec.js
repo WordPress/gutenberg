@@ -50,6 +50,7 @@ test.describe( 'Links', () => {
 
 		// Tab back to the Submit and apply the link.
 		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
