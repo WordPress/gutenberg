@@ -83,6 +83,7 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'w.org' );
 
 		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
