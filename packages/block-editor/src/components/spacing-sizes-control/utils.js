@@ -275,7 +275,7 @@ export function hasAxisSupport( sides, axis ) {
 }
 
 /**
- * Determines which menu options should be included in then SidePicker.
+ * Determines which menu options should be included in the SidePicker.
  *
  * @param {Array} sides Supported sides.
  *
