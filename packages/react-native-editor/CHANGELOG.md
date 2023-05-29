@@ -10,8 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.96.0
 -   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
 -   [*] Add disabled style to `Cell` component [#50665]
+-   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
 
 ## 1.95.0

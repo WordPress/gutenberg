@@ -410,7 +410,7 @@ function LinkControl( {
 								! valueHasChanges || currentInputIsEmpty
 							}
 						>
-							{ __( 'Apply' ) }
+							{ __( 'Save' ) }
 						</Button>
 						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }

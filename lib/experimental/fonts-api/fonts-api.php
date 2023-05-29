@@ -241,3 +241,12 @@ add_filter(
 		return $mime_types;
 	}
 );
+
+/*
+ * To make sure blocks are registered before any Theme_JSON operations take place, a priority of 21 is used.
+ *
+ * Why 21?
+ * Blocks are registered via the "init" hook with a priority value of `20`, which is dynamically added
+ * during the build. See: tools/webpack/blocks.js.
+ */
+add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
