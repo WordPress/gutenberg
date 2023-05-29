@@ -33,6 +33,7 @@ export default function PatternTemplateContentEdit( { clientId } ) {
 
 	const {
 		parentClientId,
+		placeholderClientIds,
 		selectedBlockIndex,
 		selectedBlockName,
 		selectedClientId,
@@ -44,6 +45,7 @@ export default function PatternTemplateContentEdit( { clientId } ) {
 				getBlocksByClientId,
 				getBlockIndex,
 				getBlockName,
+				getBlockOrder,
 				getClientIdsOfDescendants,
 				getBlockRootClientId,
 				getSelectedBlockClientId,
@@ -67,8 +69,13 @@ export default function PatternTemplateContentEdit( { clientId } ) {
 					tokenClientId === selectedBlockClientId
 			);
 
+			const rootClientId = getBlockRootClientId( clientId );
+
 			return {
-				parentClientId: getBlockRootClientId( clientId ),
+				parentClientId: rootClientId,
+				placeholderClientIds: getBlockOrder( rootClientId ).filter(
+					( siblingClientId ) => siblingClientId !== clientId
+				),
 				selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 				selectedClientId: selectedBlockClientId,
 				selectedBlockName: getBlockName( selectedBlockClientId ),
@@ -81,38 +88,67 @@ export default function PatternTemplateContentEdit( { clientId } ) {
 		[ clientId ]
 	);
 
-	const { insertBlock, moveBlockToPosition } =
+	const { insertBlock, removeBlock, moveBlockToPosition } =
 		useDispatch( blockEditorStore );
 
 	const canConvertToToken =
 		! NON_CONVERTABLE_BLOCKS.includes( selectedBlockName );
 
+	const canRevertFromToken =
+		selectedBlockName === 'core/pattern-template-token';
+
 	// Show a 'convert' button on children, but not on this block.
-	const controls = canConvertToToken && (
+	const controls = ( canConvertToToken || canRevertFromToken ) && (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
-			<ToolbarButton
-				onClick={ () => {
-					const token = createBlock( 'core/pattern-template-token' );
-					const updateSelection = false;
-					registry.batch( () => {
-						moveBlockToPosition(
-							selectedClientId,
-							selectedParentClientId,
-							parentClientId,
-							tokenIndex + 1
+			{ canConvertToToken && (
+				<ToolbarButton
+					onClick={ () => {
+						const token = createBlock(
+							'core/pattern-template-token'
 						);
-						// TODO - determine if the move was successful before inserting the token.
-						insertBlock(
-							token,
-							selectedBlockIndex,
-							selectedParentClientId,
-							updateSelection
-						);
-					} );
-				} }
-			>
-				{ __( 'Convert to placeholder' ) }
-			</ToolbarButton>
+						const updateSelection = false;
+						registry.batch( () => {
+							// Move the selected block to the correct placeholder position.
+							moveBlockToPosition(
+								selectedClientId,
+								selectedParentClientId,
+								parentClientId,
+								tokenIndex + 1
+							);
+							// Insert a token in its place.
+							// TODO - determine if the move was successful before inserting the token.
+							insertBlock(
+								token,
+								selectedBlockIndex,
+								selectedParentClientId,
+								updateSelection
+							);
+						} );
+					} }
+				>
+					{ __( 'Convert to placeholder' ) }
+				</ToolbarButton>
+			) }
+			{ canRevertFromToken && (
+				<ToolbarButton
+					onClick={ () => {
+						const selectPrevious = true;
+						registry.batch( () => {
+							// Move the placeholder back to where the token is.
+							moveBlockToPosition(
+								placeholderClientIds[ tokenIndex ],
+								parentClientId,
+								selectedParentClientId,
+								selectedBlockIndex
+							);
+							// Remove the token.
+							removeBlock( selectedClientId, selectPrevious );
+						} );
+					} }
+				>
+					{ __( 'Remove token' ) }
+				</ToolbarButton>
+			) }
 		</BlockControls>
 	);
 
