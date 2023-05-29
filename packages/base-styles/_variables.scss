@@ -45,10 +45,10 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
  */
 
 $icon-size: 24px;
-$icon-size-next-default-32px: 32px; // transitionary variable for next small button size
 $button-size: 36px;
 $button-size-next-default-40px: 40px; // transitionary variable for next default button size
 $button-size-small: 24px;
+$button-size-small-next-default-32px: 32px; // transitionary variable for next small button size
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
 $nav-sidebar-width: 360px;
