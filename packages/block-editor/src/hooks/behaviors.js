@@ -117,8 +117,10 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBehaviors' );
 
-addFilter(
-	'editor.BlockEdit',
-	'core/behaviors/with-inspector-control',
-	withBehaviors
-);
+if ( window?.__experimentalInteractivityAPI ) {
+	addFilter(
+		'editor.BlockEdit',
+		'core/behaviors/with-inspector-control',
+		withBehaviors
+	);
+}
