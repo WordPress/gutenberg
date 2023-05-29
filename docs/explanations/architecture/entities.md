@@ -48,7 +48,7 @@ And to be able to perform both undo and redo operations propertly, each modifica
  - From: The previous value of the property (needed to apply the undo operation).
  - To: The new value of the property (needed to apply the redo operation).
  
-For example, when a user edits the title of a post, followed by a modification to the post slug, and then a modification of the title of a reusable block used with the post for instance. the following information is stored in the undo/redo stack:
+For example, let's say a user edits the title of a post, followed by a modification to the post slug, and then a modification of the title of a reusable block used with the post for instance. The following information is stored in the undo/redo stack:
 
  - `[ { kind: 'postType', name: 'post', id: 1, property: 'title', from: '', to: 'Hello World' } ]`
  - `[ { kind: 'postType', name: 'post', id: 1, property: 'slug', from: 'Previous slug', to: 'This is the slug of the hello world post' } ]`
@@ -58,6 +58,6 @@ The store also keep tracks of a "pointer" to the current "undo/redo" step. By de
 
 ### Transient changes
 
-The undo/redo core behavior also support what we call "transient modifications". These are modifications that are not stored in the undo/redo stack right way. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
+The undo/redo core behavior also supports what we call "transient modifications". These are modifications that are not stored in the undo/redo stack right away. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
 
 So by default, `core-data` store considers all modifications to properties that are marked as "transient" (like the `blocks` property in the post entity) as transient modifications. It keeps these modifications outside the undo/redo stack in what is called a "cache" of modifications and these modifications are only stored in the undo/redo stack when we explicitely call `__unstableCreateUndoLevel` or when the next non transient modification is performed.
