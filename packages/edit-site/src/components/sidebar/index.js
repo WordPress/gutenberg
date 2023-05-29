@@ -14,6 +14,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenTemplatePart from '../sidebar-navigation-screen-template-part';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
@@ -51,13 +52,16 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part)/:postId">
+				<SidebarNavigationScreenTemplatePart />
+			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
+			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
 			</NavigatorScreen>
 		</>

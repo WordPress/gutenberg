@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import {
@@ -36,8 +36,10 @@ function useTemplateTitleAndDescription( postType, postId ) {
 	let descriptionText = getDescription();
 
 	if ( ! descriptionText && addedBy.text ) {
-		descriptionText = __(
-			'This is a custom template that can be applied manually to any Post or Page.'
+		descriptionText = sprintf(
+			// translators: %s: template part title e.g: "Header".
+			__( 'This is your %s template part.' ),
+			getTitle()
 		);
 	}
 
@@ -65,7 +67,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 
 					{ addedBy.isCustomized && (
 						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
-							{ _x( '(Customized)', 'template' ) }
+							{ _x( '(Customized)', 'template part' ) }
 						</span>
 					) }
 				</span>
@@ -76,7 +78,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 	return { title, description };
 }
 
-export default function SidebarNavigationScreenTemplate() {
+export default function SidebarNavigationScreenTemplatePart() {
 	const { params } = useNavigator();
 	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
