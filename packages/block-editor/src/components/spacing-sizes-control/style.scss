@@ -3,7 +3,8 @@
 		margin-bottom: 0;
 	}
 
-	.spacing-sizes-control__range-control {
+	.spacing-sizes-control__range-control,
+	.spacing-sizes-control__custom-value-range {
 		height: 40px;
 		/* Vertically center the RangeControl until it has true 40px height. */
 		display: flex;
