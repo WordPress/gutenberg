@@ -157,4 +157,10 @@ module.exports = {
 				.concat( vendorsCopyConfig ),
 		} ),
 	].filter( Boolean ),
+	resolve: {
+		fallback: {
+			zlib: false,
+			fs: false,
+		},
+	},
 };
