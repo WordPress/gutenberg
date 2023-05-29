@@ -9,7 +9,6 @@
 	"textdomain": "default",
 	"attributes": {},
 	"supports": {
-		"inserter": false,
 		"html": false,
 		"reusable": false
 	}

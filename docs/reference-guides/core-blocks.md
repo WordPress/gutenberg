@@ -489,7 +489,7 @@ Create arrangements of blocks where the design is fixed, but content can be alte
 -	**Name:** core/pattern-template
 -	**Experimental:** true
 -	**Category:** design
--	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Pattern Template Content
