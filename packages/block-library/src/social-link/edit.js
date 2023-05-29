@@ -92,10 +92,19 @@ const SocialLinkEdit = ( {
 	clientId,
 } ) => {
 	const { url, service, label, rel } = attributes;
-	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
+	const {
+		showLabels,
+		iconColor,
+		iconColorValue,
+		iconBackgroundColor,
+		iconBackgroundColorValue,
+	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
+		[ `has-${ iconColor }-color` ]: iconColor,
+		[ `has-${ iconBackgroundColor }-background-color` ]:
+			iconBackgroundColor,
 	} );
 
 	// Use internal state instead of a ref to make sure that the component
