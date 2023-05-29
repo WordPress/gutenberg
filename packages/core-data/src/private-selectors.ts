@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { State } from './selectors';
+import type { State, UndoEdit } from './selectors';
 
 type Optional< T > = T | undefined;
 
@@ -13,7 +13,7 @@ type Optional< T > = T | undefined;
  *
  * @return The edit.
  */
-export function getUndoEdits( state: State ): Optional< any > {
+export function getUndoEdits( state: State ): Optional< UndoEdit[] > {
 	return state.undo.list[ state.undo.list.length - 1 + state.undo.offset ];
 }
 
@@ -25,6 +25,6 @@ export function getUndoEdits( state: State ): Optional< any > {
  *
  * @return The edit.
  */
-export function getRedoEdits( state: State ): Optional< any > {
+export function getRedoEdits( state: State ): Optional< UndoEdit[] > {
 	return state.undo.list[ state.undo.list.length + state.undo.offset ];
 }

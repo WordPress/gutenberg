@@ -74,9 +74,18 @@ interface EntityConfig {
 	kind: string;
 }
 
+export interface UndoEdit {
+	name: string;
+	kind: string;
+	recordId: string;
+	from: any;
+	to: any;
+}
+
 interface UndoState {
-	list: Array< Object >;
+	list: Array< UndoEdit[] >;
 	offset: number;
+	cache: UndoEdit[];
 }
 
 interface UserState {
