@@ -107,9 +107,11 @@ export default function SidebarNavigationScreenPages() {
 									icon={ home }
 									withChevron
 								>
-									{ decodeEntities(
-										homeTemplate.title?.rendered
-									) ?? __( '(no title)' ) }
+									<Truncate numberOfLines={ 1 }>
+										{ decodeEntities(
+											homeTemplate.title?.rendered
+										) ?? __( '(no title)' ) }
+									</Truncate>
 								</PageItem>
 							) }
 							{ pages?.map( ( item ) => {
@@ -131,9 +133,11 @@ export default function SidebarNavigationScreenPages() {
 										icon={ itemIcon }
 										withChevron
 									>
-										{ decodeEntities(
-											item.title?.rendered
-										) ?? __( '(no title)' ) }
+										<Truncate numberOfLines={ 1 }>
+											{ decodeEntities(
+												item.title?.rendered
+											) ?? __( '(no title)' ) }
+										</Truncate>
 									</PageItem>
 								);
 							} ) }
@@ -146,9 +150,11 @@ export default function SidebarNavigationScreenPages() {
 										icon={ layout }
 										withChevron
 									>
-										{ decodeEntities(
-											item.title?.rendered
-										) ?? __( '(no title)' ) }
+										<Truncate numberOfLines={ 1 }>
+											{ decodeEntities(
+												item.title?.rendered
+											) ?? __( '(no title)' ) }
+										</Truncate>
 									</PageItem>
 								) ) }
 								<SidebarNavigationItem
