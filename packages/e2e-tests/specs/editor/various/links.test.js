@@ -130,7 +130,7 @@ describe( 'Links', () => {
 
 		// Toggle should still have focus and be checked.
 		await page.waitForSelector(
-			':focus:checked.components-form-toggle__input'
+			':focus:checked.components-checkbox-control__input'
 		);
 
 		// Ensure that the contents of the post have not been changed, since at
@@ -539,7 +539,9 @@ describe( 'Links', () => {
 
 		// Confirm that focus was not prematurely returned to the paragraph on
 		// a changing value of the setting.
-		await page.waitForSelector( ':focus.components-form-toggle__input' );
+		await page.waitForSelector(
+			':focus.components-checkbox-control__input'
+		);
 
 		// Submit link. Expect that "Open in new tab" would have been applied
 		// immediately.
@@ -792,8 +794,11 @@ describe( 'Links', () => {
 			);
 			await settingsToggle.click();
 
+			// Wait for settings to open.
+			await page.waitForXPath( `//label[text()='Open in new tab']` );
+
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 5 );
+			await pressKeyTimes( 'Tab', 4 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );

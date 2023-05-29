@@ -4,6 +4,7 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -28,7 +29,8 @@ const PageItem = ( { postId, ...props } ) => {
 export default function SidebarNavigationScreenPages() {
 	const { records: pages, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'page'
+		'page',
+		{ status: 'any' }
 	);
 
 	return (
@@ -57,9 +59,11 @@ export default function SidebarNavigationScreenPages() {
 										key={ page.id }
 										withChevron
 									>
-										{ decodeEntities(
-											page.title?.rendered
-										) ?? __( '(no title)' ) }
+										<Truncate numberOfLines={ 1 }>
+											{ decodeEntities(
+												page.title?.rendered
+											) ?? __( 'Untitled' ) }
+										</Truncate>
 									</PageItem>
 								) ) }
 								<SidebarNavigationItem

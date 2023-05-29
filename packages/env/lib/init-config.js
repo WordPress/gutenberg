@@ -202,15 +202,20 @@ RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		case 'cli': {
 			dockerFileContent += `
+# Make sure we're working with the latest packages.
 RUN apk update
+
+# Install some basic PHP dependencies.
 RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+
+# Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		default: {
@@ -238,8 +243,8 @@ RUN rm /tmp/composer-setup.php`;
 	// Install any Composer packages we might need globally.
 	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
 	dockerFileContent += `
-USER $HOST_USERNAME
-ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+USER $HOST_UID:$HOST_GID
+ENV PATH="\${PATH}:~/.composer/vendor/bin"
 RUN composer global require --dev yoast/phpunit-polyfills:"^1.0"
 USER root`;
 

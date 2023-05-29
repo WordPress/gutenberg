@@ -161,12 +161,12 @@
 	padding: 0;
 }
 
-.is-content-locked {
-	.block-editor-block-list__block {
+.block-editor-block-list__layout,
+.block-editor-block-list__block {
+	pointer-events: initial;
+
+	&.is-editing-disabled {
 		pointer-events: none;
-	}
-	.is-content-block {
-		pointer-events: initial;
 	}
 }
 

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -322,5 +327,135 @@ test.describe( 'Draggable block', () => {
 <p>1</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
+	} );
+
+	test( 'can drag and drop to an empty parent block like Group or Columns', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Insert a row.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', flexWrap: 'nowrap' },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{ name: 'core/column' },
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '3' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Deselect the block to hide the block toolbar.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
+		const testImagePath = path.join(
+			__dirname,
+			'../../../assets',
+			testImageName
+		);
+
+		{
+			const { dragOver, drop } = await pageUtils.dragFiles(
+				testImagePath
+			);
+
+			const rowBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Row',
+			} );
+			const rowAppender = rowBlock.getByRole( 'button', {
+				name: 'Add block',
+			} );
+
+			await dragOver( rowAppender );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect(
+				rowAppender,
+				'Dragging over the button block appender should show the blue background'
+			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+
+			const { width: rowWidth } = await rowBlock.boundingBox();
+			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect(
+				rowAppender,
+				'Dragging over the empty group block but outside the appender should still show the blue background'
+			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+
+			await drop();
+			await expect( rowAppender ).toBeHidden();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [ { name: 'core/image' } ],
+				},
+				{ name: 'core/columns' },
+			] );
+		}
+
+		{
+			const { dragOver, drop } = await pageUtils.dragFiles(
+				testImagePath
+			);
+
+			const columnAppender = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Column',
+				} )
+				.getByRole( 'button', {
+					name: 'Add block',
+					includeHidden: true,
+				} );
+
+			await dragOver( columnAppender );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect( columnAppender ).toHaveCSS(
+				'background-color',
+				'rgb(0, 124, 186)'
+			);
+
+			await drop();
+			await expect( columnAppender ).toBeHidden();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{
+							name: 'core/column',
+							innerBlocks: [ { name: 'core/image' } ],
+						},
+						{ name: 'core/column' },
+					],
+				},
+			] );
+		}
 	} );
 } );

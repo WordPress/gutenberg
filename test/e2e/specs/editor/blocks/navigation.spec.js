@@ -522,9 +522,25 @@ test.describe( 'Navigation block', () => {
 			linkControl,
 		} ) => {
 			await admin.createNewPost();
-			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+			const { id: menuId } = await requestUtils.createNavigationMenu(
+				navMenuBlocksFixture
+			);
 
-			await editor.insertBlock( { name: 'core/navigation' } );
+			// Insert x2 blocks as a stress test as several bugs have been found with inserting
+			// blocks into the navigation block when there are multiple blocks referencing the
+			// **same** menu.
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
 
 			await editor.openDocumentSettingsSidebar();
 
@@ -572,11 +588,17 @@ test.describe( 'Navigation block', () => {
 			// Expect to see the Link creation UI be focused.
 			const linkUIInput = linkControl.getSearchInput();
 
+			// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
+			// It should:
+			// - be focused - should not be in "preview" mode but rather ready to accept input.
+			// - be empty - not pre-populated
+			// See: https://github.com/WordPress/gutenberg/issues/50733
 			await expect( linkUIInput ).toBeFocused();
+			await expect( linkUIInput ).toBeEmpty();
 
 			const firstResult = await linkControl.getNthSearchResult( 0 );
 
-			// Grab the text from the first result so we can check it was inserted.
+			// Grab the text from the first result so we can check (later on) that it was inserted.
 			const firstResultText = await linkControl.getSearchResultText(
 				firstResult
 			);
@@ -820,6 +842,92 @@ test.describe( 'Navigation block', () => {
 					} )
 					.getByText( 'Top Level Item 1' )
 			).toBeVisible();
+		} );
+
+		test( `does not display link interface for blocks that have not just been inserted`, async ( {
+			admin,
+			page,
+			editor,
+			requestUtils,
+			linkControl,
+		} ) => {
+			// Provides coverage for a bug whereby the Link UI would be unexpectedly displayed for the last
+			// inserted block even if the block had been deselected and then reselected.
+			// See: https://github.com/WordPress/gutenberg/issues/50601
+
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu(
+				navMenuBlocksFixture
+			);
+
+			// Insert x2 blocks as a stress test as several bugs have been found with inserting
+			// blocks into the navigation block when there are multiple blocks referencing the
+			// **same** menu.
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description: 'Structure for navigation menu: Test Menu',
+			} );
+
+			await listView
+				.getByRole( 'button', {
+					name: 'Add block',
+				} )
+				.click();
+
+			const blockResults = page.getByRole( 'listbox', {
+				name: 'Blocks',
+			} );
+
+			await expect( blockResults ).toBeVisible();
+
+			const blockResultOptions = blockResults.getByRole( 'option' );
+
+			// Select the Page Link option.
+			await blockResultOptions.nth( 0 ).click();
+
+			// Immediately dismiss the Link UI thereby not populating the `url` attribute
+			// of the block.
+			await linkControl.pressCancel();
+
+			// Get the Inspector Tabs.
+			const blockSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Trigger "unmount" of the List View.
+			await blockSettings
+				.getByRole( 'tab', {
+					name: 'Settings',
+				} )
+				.click();
+
+			// "Remount" the List View.
+			// this is where the bug previously occurred.
+			await blockSettings
+				.getByRole( 'tab', {
+					name: 'List View',
+				} )
+				.click();
+
+			// Check that despite being the last inserted block, the Link UI is not displayed
+			// in this scenario because it was not **just** inserted into the List View (i.e.
+			// we have unmounted the list view and then remounted it).
+			await expect( linkControl.getSearchInput() ).not.toBeVisible();
 		} );
 	} );
 } );
@@ -1157,6 +1265,14 @@ class LinkControl {
 		return this.page.getByRole( 'combobox', {
 			name: 'URL',
 		} );
+	}
+
+	async pressCancel() {
+		const cancelButton = this.page.getByRole( 'button', {
+			name: 'Cancel',
+		} );
+
+		return cancelButton.click();
 	}
 
 	async getSearchResults() {

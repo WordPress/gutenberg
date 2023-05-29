@@ -29,6 +29,7 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
@@ -131,25 +132,16 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	return css;
 }
 
-function LayoutPanel( {
-	clientId,
-	setAttributes,
-	attributes,
-	name: blockName,
-} ) {
+function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
-	const { themeSupportsLayout, isContentLocked } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetContentLockingParent } =
-				select( blockEditorStore );
-			return {
-				themeSupportsLayout: getSettings().supportsLayout,
-				isContentLocked: __unstableGetContentLockingParent( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			themeSupportsLayout: getSettings().supportsLayout,
+		};
+	}, [] );
+	const blockEditingMode = useBlockEditingMode();
 
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
@@ -270,7 +262,7 @@ function LayoutPanel( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ ! inherit && ! isContentLocked && layoutType && (
+			{ ! inherit && blockEditingMode === 'default' && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }

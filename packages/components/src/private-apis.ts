@@ -9,6 +9,18 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
+import {
+	DropdownMenu as DropdownMenuV2,
+	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
+	DropdownMenuGroup as DropdownMenuGroupV2,
+	DropdownMenuItem as DropdownMenuItemV2,
+	DropdownMenuLabel as DropdownMenuLabelV2,
+	DropdownMenuRadioGroup as DropdownMenuRadioGroupV2,
+	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
+	DropdownMenuSeparator as DropdownMenuSeparatorV2,
+	DropdownSubMenu as DropdownSubMenuV2,
+	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
+} from './dropdown-menu-v2';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -21,4 +33,14 @@ lock( privateApis, {
 	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
+	DropdownMenuV2,
+	DropdownMenuCheckboxItemV2,
+	DropdownMenuGroupV2,
+	DropdownMenuItemV2,
+	DropdownMenuLabelV2,
+	DropdownMenuRadioGroupV2,
+	DropdownMenuRadioItemV2,
+	DropdownMenuSeparatorV2,
+	DropdownSubMenuV2,
+	DropdownSubMenuTriggerV2,
 } );

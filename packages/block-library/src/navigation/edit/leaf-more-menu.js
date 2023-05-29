@@ -24,7 +24,13 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-submenu',
 ];
 
-function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
+function AddSubmenuItem( {
+	block,
+	onClose,
+	expandedState,
+	expand,
+	setInsertedBlock,
+} ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -69,6 +75,12 @@ function AddSubmenuItem( { block, onClose, expandedState, expand } ) {
 						updateSelectionOnInsert
 					);
 				}
+
+				// This call sets the local List View state for the "last inserted block".
+				// This is required for the Nav Block to determine whether or not to display
+				// the Link UI for this new block.
+				setInsertedBlock( newLink );
+
 				if ( ! expandedState[ block.clientId ] ) {
 					expand( block.clientId );
 				}
@@ -138,6 +150,7 @@ export default function LeafMoreMenu( props ) {
 							expanded
 							expandedState={ props.expandedState }
 							expand={ props.expand }
+							setInsertedBlock={ props.setInsertedBlock }
 						/>
 					</MenuGroup>
 					<MenuGroup>
