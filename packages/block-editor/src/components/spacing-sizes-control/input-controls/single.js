@@ -9,6 +9,7 @@ export default function SingleInputControl( {
 	onChange,
 	onMouseOut,
 	onMouseOver,
+	showSideInLabel,
 	side,
 	spacingSizes,
 	type,
@@ -28,6 +29,7 @@ export default function SingleInputControl( {
 			onChange={ createHandleOnChange( side ) }
 			onMouseOut={ onMouseOut }
 			onMouseOver={ onMouseOver }
+			showSideInLabel={ showSideInLabel }
 			side={ side }
 			spacingSizes={ spacingSizes }
 			type={ type }

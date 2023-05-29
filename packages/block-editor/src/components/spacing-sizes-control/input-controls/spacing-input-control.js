@@ -23,6 +23,7 @@ import { settings } from '@wordpress/icons';
 import useSetting from '../../use-setting';
 import { store as blockEditorStore } from '../../../store';
 import {
+	ALL_SIDES,
 	LABELS,
 	getSliderValueFromPreset,
 	getCustomValueFromPreset,
@@ -46,6 +47,7 @@ export default function SpacingInputControl( {
 	onChange,
 	onMouseOut,
 	onMouseOver,
+	showSideInLabel = true,
 	side,
 	spacingSizes,
 	type,
@@ -165,12 +167,16 @@ export default function SpacingInputControl( {
 		label: undefined,
 	} ) );
 
+	const sideLabel =
+		ALL_SIDES.includes( side ) && showSideInLabel ? LABELS[ side ] : '';
+	const typeLabel = showSideInLabel ? type?.toLowerCase() : type;
+
 	const ariaLabel = sprintf(
 		// translators: 1: The side of the block being modified (top, bottom, left, All sides etc.). 2. Type of spacing being modified (Padding, margin, etc)
 		__( '%1$s %2$s' ),
-		LABELS[ side ],
-		type?.toLowerCase()
-	);
+		sideLabel,
+		typeLabel
+	).trim();
 
 	return (
 		<HStack className="spacing-sizes-control__wrapper">

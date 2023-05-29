@@ -71,7 +71,13 @@ export default function SpacingSizesControl( {
 		if ( view === VIEWS.custom ) {
 			return <SeparatedInputControls { ...inputControlProps } />;
 		}
-		return <SingleInputControl side={ view } { ...inputControlProps } />;
+		return (
+			<SingleInputControl
+				side={ view }
+				{ ...inputControlProps }
+				showSideInLabel={ showSideInLabel }
+			/>
+		);
 	};
 
 	const sideLabel =
@@ -82,7 +88,7 @@ export default function SpacingSizesControl( {
 		__( '%1$s %2$s' ),
 		labelProp,
 		sideLabel
-	);
+	).trim();
 
 	const dropdownLabelText = sprintf(
 		// translators: %s: The current spacing property e.g. "Padding", "Margin".
