@@ -2298,12 +2298,6 @@
 		"parent": "design"
 	},
 	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/design/reference.md",
-		"parent": "design"
-	},
-	{
 		"title": "Documentation Contributions",
 		"slug": "documentation",
 		"markdown_source": "../docs/contributors/documentation/README.md",
