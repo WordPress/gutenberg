@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p>This is <a href="http://w.org">WordPress</a></p>
-<!-- /wp:paragraph -->

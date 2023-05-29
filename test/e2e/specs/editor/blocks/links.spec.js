@@ -82,9 +82,19 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 
-		await page.getByRole( 'button', { name: 'Apply' } ).click();
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is <a href="http://w.org">WordPress</a>',
+				},
+			},
+		] );
 
 		// Move caret back into the link.
 		await page.keyboard.press( 'ArrowLeft' );
@@ -109,6 +119,14 @@ test.describe( 'Links', () => {
 			.inputValue();
 		expect( urlInputValue ).toContain( 'wordpress.org' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'This is <a href="http://wordpress.org">WordPress</a>',
+				},
+			},
+		] );
 	} );
 } );
