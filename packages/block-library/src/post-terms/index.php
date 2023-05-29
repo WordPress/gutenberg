@@ -49,19 +49,17 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
-	$result = get_the_term_list(
+	if ( ! empty( $attributes['noLink'] ) ) {
+		return wp_kses_post( $prefix ) . '<span class="wp-block-post-terms__separator">' . wp_kses_post( join( '</span><span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span><span class="wp-block-post-terms__separator">', wp_list_pluck( $post_terms, 'name' ) ) ) . '</span>' . wp_kses_post( $suffix );
+	}
+
+	return get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
 		wp_kses_post( $prefix ),
 		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
 		wp_kses_post( $suffix )
 	);
-
-	if ( ! empty( $attributes['noLink'] ) ) {
-		return preg_replace( '#<a.*?>(.*?)</a>#i', '<span class="wp-block-post-terms__name">\1</span>', $result );
-	}
-
-	return $result;
 }
 
 /**
