@@ -41,12 +41,28 @@ test.describe( 'Links', () => {
 
 		// Ensure that the contents of the post have not been changed, since at
 		// this point the link is still not inserted.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'This is Gutenberg' },
+			},
+		] );
 
 		// Tab back to the Submit and apply the link.
-		await page.getByRole( 'button', { name: 'Save' } ).click();
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 
 		// The link should have been inserted.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener">Gutenberg</a>',
+				},
+			},
+		] );
 	} );
 } );
