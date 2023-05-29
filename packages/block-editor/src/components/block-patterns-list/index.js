@@ -43,6 +43,7 @@ function BlockPattern( {
 			isEnabled={ isDraggable }
 			blocks={ blocks }
 			isPattern={ !! pattern }
+			label={ __( 'Pattern' ) }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div

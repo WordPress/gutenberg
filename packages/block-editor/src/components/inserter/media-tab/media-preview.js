@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, getBlockType } from '@wordpress/blocks';
 import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -128,6 +128,8 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
 	);
+	const blockType = getBlockType( block.name );
+
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
@@ -203,7 +205,12 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks
+				isEnabled={ true }
+				blocks={ [ block ] }
+				label={ blockType?.title }
+				icon={ blockType?.icon }
+			>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
 						className={ classnames(
