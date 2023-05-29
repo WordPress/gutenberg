@@ -49,8 +49,8 @@ const GridItem = ( { item } ) => {
 	);
 };
 
-export default function Grid( { type, name } ) {
-	const [ patterns, isResolving ] = usePatterns( type, name );
+export default function Grid( { type, category } ) {
+	const [ patterns, isResolving ] = usePatterns( type, category );
 
 	if ( ! patterns ) {
 		return null;
