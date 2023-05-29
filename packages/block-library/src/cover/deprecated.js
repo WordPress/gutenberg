@@ -182,7 +182,7 @@ const v7toV10BlockSupports = {
 	},
 };
 
-// Deprecation for blocks that does not have the aria-label when the image backround is fixed or repeated.
+// Deprecation for blocks that does not have the aria-label when the image background is fixed or repeated.
 const v12 = {
 	attributes: {
 		url: {
