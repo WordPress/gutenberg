@@ -32,7 +32,9 @@ function FontVariant( { fontFace, variantName, checked, onClick, text, actionHan
 						: displayVariantName
 					}
 				</HStack>
-				<FontFaceDemo fontFace={ fontFace } text={text} />
+				<div className="font-library-modal__font-variant_demo-wrapper">
+					<FontFaceDemo fontFace={ fontFace } text={text} />
+				</div>
 			</VStack>
 		</div>
 	);
