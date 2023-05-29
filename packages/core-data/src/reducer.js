@@ -183,6 +183,30 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 	return state;
 }
 
+const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
+		const { stackedEdits } = action;
+
+		let newState = state;
+		stackedEdits.forEach(
+			( { kind, name, recordId, property, from, to } ) => {
+				newState = reducer( newState, {
+					type: 'EDIT_ENTITY_RECORD',
+					kind,
+					name,
+					recordId,
+					edits: {
+						[ property ]: action.type === 'UNDO' ? from : to,
+					},
+				} );
+			}
+		);
+		return newState;
+	}
+
+	return reducer( state, action );
+};
+
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
@@ -196,6 +220,8 @@ export function themeGlobalStyleVariations( state = {}, action ) {
  */
 function entity( entityConfig ) {
 	return compose( [
+		withMultiEntityRecordEdits,
+
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
 		ifMatchingAction(
@@ -411,8 +437,9 @@ export const entities = ( state = {}, action ) => {
 /**
  * @typedef {Object} UndoStateMeta
  *
- * @property {number} offset          Where in the undo stack we are.
- * @property {Object} [flattenedUndo] Flattened form of undo stack.
+ * @property {number} list   The undo stack.
+ * @property {number} offset Where in the undo stack we are.
+ * @property {Object} cache  Cache of unpersisted transient edits.
  */
 
 /** @typedef {Array<Object> & UndoStateMeta} UndoState */
@@ -422,10 +449,7 @@ export const entities = ( state = {}, action ) => {
  *
  * @todo Given how we use this we might want to make a custom class for it.
  */
-const UNDO_INITIAL_STATE = Object.assign( [], { offset: 0 } );
-
-/** @type {Object} */
-let lastEditAction;
+const UNDO_INITIAL_STATE = { list: [], offset: 0 };
 
 /**
  * Reducer keeping track of entity edit undo history.
@@ -436,107 +460,114 @@ let lastEditAction;
  * @return {UndoState} Updated state.
  */
 export function undo( state = UNDO_INITIAL_STATE, action ) {
+	const omitPendingRedos = ( currentState ) => {
+		return {
+			...currentState,
+			list: currentState.list.slice(
+				0,
+				currentState.offset || undefined
+			),
+			offset: 0,
+		};
+	};
+
+	const appendCachedEditsToLastUndo = ( currentState ) => {
+		if ( ! currentState.cache ) {
+			return currentState;
+		}
+
+		let nextState = {
+			...currentState,
+			list: [ ...currentState.list ],
+		};
+		nextState = omitPendingRedos( nextState );
+		const previousUndoState = nextState.list.pop();
+		const updatedUndoState = currentState.cache.reduce(
+			appendEditToStack,
+			previousUndoState
+		);
+		nextState.list.push( updatedUndoState );
+
+		return {
+			...nextState,
+			cache: undefined,
+		};
+	};
+
+	const appendEditToStack = (
+		stack = [],
+		{ kind, name, recordId, property, from, to }
+	) => {
+		const existingEditIndex = stack?.findIndex(
+			( { kind: k, name: n, recordId: r, property: p } ) => {
+				return (
+					k === kind && n === name && r === recordId && p === property
+				);
+			}
+		);
+		const nextStack = [ ...stack ];
+		if ( existingEditIndex !== -1 ) {
+			// If the edit is already in the stack leave the initial "from" value.
+			nextStack[ existingEditIndex ] = {
+				...nextStack[ existingEditIndex ],
+				to,
+			};
+		} else {
+			nextStack.push( {
+				kind,
+				name,
+				recordId,
+				property,
+				from,
+				to,
+			} );
+		}
+		return nextStack;
+	};
+
 	switch ( action.type ) {
-		case 'EDIT_ENTITY_RECORD':
 		case 'CREATE_UNDO_LEVEL':
-			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
-			const isUndoOrRedo =
-				! isCreateUndoLevel &&
-				( action.meta.isUndo || action.meta.isRedo );
-			if ( isCreateUndoLevel ) {
-				action = lastEditAction;
-			} else if ( ! isUndoOrRedo ) {
-				// Don't lose the last edit cache if the new one only has transient edits.
-				// Transient edits don't create new levels so updating the cache would make
-				// us skip an edit later when creating levels explicitly.
-				if (
-					Object.keys( action.edits ).some(
-						( key ) => ! action.transientEdits[ key ]
-					)
-				) {
-					lastEditAction = action;
-				} else {
-					lastEditAction = {
-						...action,
-						edits: {
-							...( lastEditAction && lastEditAction.edits ),
-							...action.edits,
-						},
-					};
-				}
-			}
+			return appendCachedEditsToLastUndo( state );
 
-			/** @type {UndoState} */
-			let nextState;
+		case 'UNDO':
+		case 'REDO': {
+			const nextState = appendCachedEditsToLastUndo( state );
+			return {
+				...nextState,
+				offset: state.offset + ( action.type === 'UNDO' ? -1 : 1 ),
+			};
+		}
 
-			if ( isUndoOrRedo ) {
-				// @ts-ignore we might consider using Object.assign({}, state)
-				nextState = [ ...state ];
-				nextState.offset =
-					state.offset + ( action.meta.isUndo ? -1 : 1 );
-
-				if ( state.flattenedUndo ) {
-					// The first undo in a sequence of undos might happen while we have
-					// flattened undos in state. If this is the case, we want execution
-					// to continue as if we were creating an explicit undo level. This
-					// will result in an extra undo level being appended with the flattened
-					// undo values.
-					// We also have to take into account if the `lastEditAction` had opted out
-					// of being tracked in undo history, like the action that persists the latest
-					// content right before saving. In that case we have to update the `lastEditAction`
-					// to avoid returning early before applying the existing flattened undos.
-					isCreateUndoLevel = true;
-					if ( ! lastEditAction.meta.undo ) {
-						lastEditAction.meta.undo = {
-							edits: {},
-						};
-					}
-					action = lastEditAction;
-				} else {
-					return nextState;
-				}
-			}
-
+		case 'EDIT_ENTITY_RECORD': {
 			if ( ! action.meta.undo ) {
 				return state;
 			}
 
-			// Transient edits don't create an undo level, but are
-			// reachable in the next meaningful edit to which they
-			// are merged. They are defined in the entity's config.
-			if (
-				! isCreateUndoLevel &&
-				! Object.keys( action.edits ).some(
-					( key ) => ! action.transientEdits[ key ]
-				)
-			) {
-				// @ts-ignore we might consider using Object.assign({}, state)
-				nextState = [ ...state ];
-				nextState.flattenedUndo = {
-					...state.flattenedUndo,
-					...action.edits,
+			const isCachedChange = Object.keys( action.edits ).every(
+				( key ) => action.transientEdits[ key ]
+			);
+
+			const edits = Object.keys( action.edits ).map( ( key ) => {
+				return {
+					kind: action.kind,
+					name: action.name,
+					recordId: action.recordId,
+					property: key,
+					from: action.meta.undo.edits[ key ],
+					to: action.edits[ key ],
 				};
-				nextState.offset = state.offset;
-				return nextState;
+			} );
+
+			if ( isCachedChange ) {
+				return {
+					...state,
+					cache: edits.reduce( appendEditToStack, state.cache ),
+				};
 			}
 
-			// Clear potential redos, because this only supports linear history.
-			nextState =
-				// @ts-ignore this needs additional cleanup, probably involving code-level changes
-				nextState || state.slice( 0, state.offset || undefined );
-			nextState.offset = nextState.offset || 0;
-			nextState.pop();
-			if ( ! isCreateUndoLevel ) {
-				nextState.push( {
-					kind: action.meta.undo.kind,
-					name: action.meta.undo.name,
-					recordId: action.meta.undo.recordId,
-					edits: {
-						...state.flattenedUndo,
-						...action.meta.undo.edits,
-					},
-				} );
-			}
+			let nextState = omitPendingRedos( state );
+			nextState = appendCachedEditsToLastUndo( nextState );
+			nextState = { ...nextState, list: [ ...nextState.list ] };
 			// When an edit is a function it's an optimization to avoid running some expensive operation.
 			// We can't rely on the function references being the same so we opt out of comparing them here.
 			const comparisonUndoEdits = Object.values(
@@ -546,16 +577,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				( edit ) => typeof edit !== 'function'
 			);
 			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
-				nextState.push( {
-					kind: action.kind,
-					name: action.name,
-					recordId: action.recordId,
-					edits: isCreateUndoLevel
-						? { ...state.flattenedUndo, ...action.edits }
-						: action.edits,
-				} );
+				nextState.list.push( edits );
 			}
+
 			return nextState;
+		}
 	}
 
 	return state;

@@ -62,7 +62,6 @@ const storeConfig = () => ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
-
 register( store );
 
 export { default as EntityProvider } from './entity-provider';
