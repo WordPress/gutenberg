@@ -103,48 +103,6 @@ describe( 'Links', () => {
 		expect( urlInputValue ).toBe( '' );
 	} );
 
-	it( 'can be created by selecting text and using keyboard shortcuts', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg' );
-
-		// Select some text.
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Press Cmd+K to insert a link.
-		await pressKeyWithModifier( 'primary', 'K' );
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Open settings.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Toggle should still have focus and be checked.
-		await page.waitForSelector(
-			':focus:checked.components-checkbox-control__input'
-		);
-
-		// Ensure that the contents of the post have not been changed, since at
-		// this point the link is still not inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// Tab back to the Submit and apply the link.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-
-		// The link should have been inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'can be created without any text selected', async () => {
 		// Create a block with some text.
 		await clickBlockAppender();
