@@ -15,7 +15,11 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function RenameMenuItem( { template, onClose } ) {
+export default function RenameMenuItem( {
+	template,
+	onClose,
+	as: UsedComponent = MenuItem,
+} ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
@@ -64,14 +68,14 @@ export default function RenameMenuItem( { template, onClose } ) {
 
 	return (
 		<>
-			<MenuItem
+			<UsedComponent
 				onClick={ () => {
 					setIsModalOpen( true );
 					setTitle( template.title.rendered );
 				} }
 			>
 				{ __( 'Rename' ) }
-			</MenuItem>
+			</UsedComponent>
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Rename' ) }

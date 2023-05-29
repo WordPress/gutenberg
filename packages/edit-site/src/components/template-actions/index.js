@@ -4,8 +4,8 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+// import { Icon, moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -15,6 +15,21 @@ import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
+
+import { unlock } from '../../private-apis';
+
+const {
+	DropdownMenuV2,
+	// DropdownMenuCheckboxItemV2,
+	DropdownMenuGroupV2,
+	DropdownMenuItemV2,
+	// DropdownMenuLabelV2,
+	// DropdownMenuRadioGroupV2,
+	// DropdownMenuRadioItemV2,
+	// DropdownMenuSeparatorV2,
+	// DropdownSubMenuV2,
+	// DropdownSubMenuTriggerV2,
+} = unlock( componentsPrivateApis );
 
 export default function TemplateActions( {
 	postType,
@@ -70,48 +85,44 @@ export default function TemplateActions( {
 	}
 
 	return (
-		<DropdownMenu
-			icon={ moreVertical }
+		<DropdownMenuV2
 			label={ __( 'Actions' ) }
 			className={ className }
 			toggleProps={ toggleProps }
+			// trigger={ <Icon icon={ moreVertical } /> }
+			trigger={ <button>hi</button> }
 		>
-			{ ( { onClose } ) => (
-				<MenuGroup>
-					{ isRemovable && (
-						<>
-							<RenameMenuItem
-								template={ template }
-								onClose={ onClose }
-							/>
-							<MenuItem
-								isDestructive
-								isTertiary
-								onClick={ () => {
-									removeTemplate( template );
-									onRemove?.();
-									onClose();
-								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						</>
-					) }
-					{ isRevertable && (
-						<MenuItem
-							info={ __(
-								'Use the template as supplied by the theme.'
-							) }
+			<DropdownMenuGroupV2>
+				{ isRemovable && (
+					<>
+						<RenameMenuItem
+							template={ template }
+							as={ DropdownMenuItemV2 }
+						/>
+						<DropdownMenuItemV2
 							onClick={ () => {
-								revertAndSaveTemplate();
-								onClose();
+								removeTemplate( template );
+								onRemove?.();
 							} }
 						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
-					) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+							{ __( 'Delete' ) }
+						</DropdownMenuItemV2>
+					</>
+				) }
+				{ isRevertable && (
+					<DropdownMenuItemV2
+						info={ __(
+							'Use the template as supplied by the theme.'
+						) }
+						onClick={ () => {
+							revertAndSaveTemplate();
+							// onClose();
+						} }
+					>
+						{ __( 'Clear customizations' ) }
+					</DropdownMenuItemV2>
+				) }
+			</DropdownMenuGroupV2>
+		</DropdownMenuV2>
 	);
 }

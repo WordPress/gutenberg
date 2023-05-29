@@ -74,7 +74,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description };
+	return { title, description, template: record };
 }
 
 export default function SidebarNavigationScreenTemplate() {
