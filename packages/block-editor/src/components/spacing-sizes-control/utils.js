@@ -327,7 +327,7 @@ export function getSupportedMenuItems( sides ) {
  * - Horizontal - both left and right sides are supported.
  * - Vertical - both top and bottom are supported.
  *
- * @param {Array} sides The supported sides which may axes as well.
+ * @param {Array} sides The supported sides which may be axes as well.
  *
  * @return {boolean} Whether or not the supported sides are balanced.
  */
