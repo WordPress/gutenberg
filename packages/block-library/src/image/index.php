@@ -68,12 +68,12 @@ function render_block_core_image( $attributes, $content ) {
 								'</div>';
 		$body_content = preg_replace( '/<img[^>]+>/', $button, $content );
 
-		$background_color  = wp_get_global_styles( array( 'color', 'background' ) );
+		$background_color  = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
 		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 
-		$dialog_label = $alt_attribute ? $alt_attribute : __( 'Image' );
+		$dialog_label = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
 
-		$close_button_label = __( 'Close' );
+		$close_button_label = esc_attr__( 'Close' );
 
 		return
 			<<<HTML
