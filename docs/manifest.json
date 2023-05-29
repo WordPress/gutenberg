@@ -2314,11 +2314,5 @@
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
 		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
-		"parent": "contributors"
 	}
 ]
