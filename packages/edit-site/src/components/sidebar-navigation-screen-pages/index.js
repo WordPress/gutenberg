@@ -67,20 +67,22 @@ export default function SidebarNavigationScreenPages() {
 
 	const isHomePageBlog = frontPage === postsPage;
 
-	if ( ! isHomePageBlog && pages?.length ) {
-		const homePageIndex = pages.findIndex(
+	const reorderedPages = pages && [ ...pages ];
+
+	if ( ! isHomePageBlog && reorderedPages?.length ) {
+		const homePageIndex = reorderedPages.findIndex(
 			( item ) => item.id === frontPage
 		);
-		const homePage = pages.splice( homePageIndex, 1 );
-		pages?.splice( 0, 0, ...homePage );
+		const homePage = reorderedPages.splice( homePageIndex, 1 );
+		reorderedPages?.splice( 0, 0, ...homePage );
 
-		const postsPageIndex = pages.findIndex(
+		const postsPageIndex = reorderedPages.findIndex(
 			( item ) => item.id === postsPage
 		);
 
-		const blogPage = pages.splice( postsPageIndex, 1 );
+		const blogPage = reorderedPages.splice( postsPageIndex, 1 );
 
-		pages.splice( 1, 0, ...blogPage );
+		reorderedPages.splice( 1, 0, ...blogPage );
 	}
 
 	return (
@@ -114,7 +116,7 @@ export default function SidebarNavigationScreenPages() {
 									</Truncate>
 								</PageItem>
 							) }
-							{ pages?.map( ( item ) => {
+							{ reorderedPages?.map( ( item ) => {
 								let itemIcon;
 								switch ( item.id ) {
 									case frontPage:
