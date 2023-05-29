@@ -831,14 +831,12 @@ test.describe( 'Image - interactivity', () => {
 		const image = lightbox.locator( 'img' );
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
-		await page
-			.getByRole( 'button', { name: 'Open image lightbox' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
 		await expect( lightbox ).toBeVisible();
 
-		const closeButton = page.getByRole( 'button', {
-			name: 'Close lightbox',
+		const closeButton = lightbox.getByRole( 'button', {
+			name: 'Close',
 		} );
 		await closeButton.click();
 
@@ -860,11 +858,11 @@ test.describe( 'Image - interactivity', () => {
 			await page.goto( `/?p=${ postId }` );
 
 			openLightboxButton = page.getByRole( 'button', {
-				name: 'Open image lightbox',
+				name: 'Enlarge image',
 			} );
 			lightbox = page.getByRole( 'dialog' );
 			closeButton = lightbox.getByRole( 'button', {
-				name: 'Close lightbox',
+				name: 'Close',
 			} );
 		} );
 
