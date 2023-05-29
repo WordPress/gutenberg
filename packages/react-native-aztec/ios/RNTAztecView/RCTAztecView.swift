@@ -364,6 +364,10 @@ class RCTAztecView: Aztec.TextView {
         let objectPlaceholder = "\u{FFFC}"
         let dictationText = dictationResult.reduce("") { $0 + $1.text }
         isInsertingDictationResult = false
+
+        if let text = self.text {
+            self.text = text.replacingOccurrences(of: objectPlaceholder, with: "")
+        }
                 
         if let textRange = self.selectedTextRange {
                 self.replace(textRange, withText: dictationText)
