@@ -11,6 +11,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useState,
@@ -39,6 +40,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import { unlock } from '../../lock-unlock';
+import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -95,6 +97,8 @@ function ListViewBlock( {
 		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
 		// Don't show the settings menu if block is disabled or content only.
 		blockEditingMode === 'default';
+	const instanceId = useInstanceId( ListViewBlock );
+	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -291,9 +295,12 @@ function ListViewBlock( {
 							isExpanded={ canEdit ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaLabel={ blockAriaLabel }
-							ariaDescription={ blockPositionDescription }
+							ariaDescribedBy={ descriptionId }
 							updateFocusAndSelection={ updateFocusAndSelection }
 						/>
+						<AriaReferencedText id={ descriptionId }>
+							{ blockPositionDescription }
+						</AriaReferencedText>
 					</div>
 				) }
 			</TreeGridCell>
