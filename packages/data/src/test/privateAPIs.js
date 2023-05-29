@@ -183,24 +183,23 @@ describe( 'Private data APIs', () => {
 
 		it( 'should support calling a private registry selector from a public selector', () => {
 			const groceryStore = createStore();
-			const storeA = createReduxStore( 'a', {
-				reducer: ( state = {} ) => state,
-			} );
-			registry.register( storeA );
-			const getPrice = createRegistrySelector(
-				( select ) => () => select( groceryStore ).getPublicPrice()
-			);
-			unlock( storeA ).registerPrivateSelectors( {
-				getPrice,
-			} );
-			const storeB = createReduxStore( 'b', {
+			const store = createReduxStore( 'a', {
 				reducer: ( state = {} ) => state,
 				selectors: {
-					getPrice: ( state ) => getPrice( state ),
+					getPriceWithShippingAndTax: ( state ) =>
+						getPriceWithShipping( state ) * 1.1,
 				},
 			} );
-			registry.register( storeB );
-			expect( registry.select( storeB ).getPrice() ).toEqual( 1000 );
+			registry.register( store );
+			const getPriceWithShipping = createRegistrySelector(
+				( select ) => () => select( groceryStore ).getPublicPrice() + 5
+			);
+			unlock( store ).registerPrivateSelectors( {
+				getPriceWithShipping,
+			} );
+			expect(
+				registry.select( store ).getPriceWithShippingAndTax()
+			).toEqual( 1105.5 );
 		} );
 	} );
 
