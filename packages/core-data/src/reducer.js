@@ -507,7 +507,10 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		const nextStack = [ ...stack ];
 		if ( existingEditIndex !== -1 ) {
 			// If the edit is already in the stack leave the initial "from" value.
-			nextStack[ existingEditIndex ].to = to;
+			nextStack[ existingEditIndex ] = {
+				...nextStack[ existingEditIndex ],
+				to,
+			};
 		} else {
 			nextStack.push( {
 				kind,
@@ -555,14 +558,9 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			} );
 
 			if ( isCachedChange ) {
-				let newCache = state.cache;
-				edits.forEach(
-					( edit ) =>
-						( newCache = appendEditToStack( newCache, edit ) )
-				);
 				return {
 					...state,
-					cache: newCache,
+					cache: edits.reduce( appendEditToStack, state.cache ),
 				};
 			}
 
