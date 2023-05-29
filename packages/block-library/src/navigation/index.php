@@ -636,6 +636,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$nav_element_directives          = '
 			data-wp-island
 			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": false, "overlay": true, "roleAttribute": "" } } }\'
+			data-wp-effect="effects.core.navigation.initGlobalNav"
 		';
 		$open_button_directives          = '
 			data-wp-on.click="actions.core.navigation.openMenu"
@@ -644,7 +645,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$responsive_container_directives = '
 			data-wp-class.has-modal-open="context.core.navigation.isMenuOpen"
 			data-wp-class.is-menu-open="context.core.navigation.isMenuOpen"
-			data-wp-bind.aria-hidden="!context.core.navigation.isMenuOpen"
+			data-wp-bind.aria-hidden="selectors.core.navigation.ariaHiddenAttribute"
 			data-wp-effect="effects.core.navigation.initMenu"
 			data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
 			data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
