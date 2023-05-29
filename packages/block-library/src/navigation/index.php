@@ -690,7 +690,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'<nav %1$s %3$s>%2$s</nav>',
 		$wrapper_attributes,
 		$responsive_container_markup,
-		$nav_element_directives,
+		$nav_element_directives
 	);
 }
 
@@ -976,7 +976,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  *
  * @param string $w Markup of the navigation block.
  *
- * @return void
+ * @return string Submenu markup with the directives injected.
  */
 function gutenberg_block_core_navigation_add_directives_to_submenu( $w ) {
 	while ( $w->next_tag(
