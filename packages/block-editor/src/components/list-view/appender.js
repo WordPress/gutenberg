@@ -84,7 +84,7 @@ export const Appender = forwardRef(
 					shouldDirectInsert={ false }
 					__experimentalIsQuick
 					{ ...props }
-					toggleProps={ { 'aria-description': description } }
+					toggleProps={ { 'aria-describedby': descriptionId } }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
 						if ( maybeInsertedBlock?.clientId ) {
 							setInsertedBlock( maybeInsertedBlock );
