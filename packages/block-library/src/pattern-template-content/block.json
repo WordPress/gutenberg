@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": true,
+	"name": "core/pattern-template-content",
+	"title": "Pattern Template Content",
+	"category": "design",
+	"description": "The content of a pattern template.",
+	"textdomain": "default",
+	"attributes": {},
+	"supports": {
+		"__experimentalExposeControlsToChildren": true,
+		"inserter": false,
+		"html": false,
+		"reusable": false
+	}
+}

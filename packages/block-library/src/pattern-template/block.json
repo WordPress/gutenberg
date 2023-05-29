@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": true,
+	"name": "core/pattern-template",
+	"title": "Pattern Template",
+	"category": "design",
+	"description": "Create arrangements of blocks where the design is fixed, but content can be altered.",
+	"textdomain": "default",
+	"attributes": {},
+	"supports": {
+		"inserter": false,
+		"html": false,
+		"reusable": false
+	}
+}

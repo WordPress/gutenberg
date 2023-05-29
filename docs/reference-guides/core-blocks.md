@@ -482,6 +482,36 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** slug, syncStatus
 
+## Pattern Template
+
+Create arrangements of blocks where the design is fixed, but content can be altered. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern-template))
+
+-	**Name:** core/pattern-template
+-	**Experimental:** true
+-	**Category:** design
+-	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Attributes:** 
+
+## Pattern Template Content
+
+The content of a pattern template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern-template-content))
+
+-	**Name:** core/pattern-template-content
+-	**Experimental:** true
+-	**Category:** design
+-	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Attributes:** 
+
+## Pattern Template Token
+
+A token that can be inserted into a pattern template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern-template-token))
+
+-	**Name:** core/pattern-template-token
+-	**Experimental:** true
+-	**Category:** design
+-	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Post Author
 
 Display post author details such as name, avatar, and bio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))

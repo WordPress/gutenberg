@@ -67,6 +67,9 @@ import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
+import * as patternTemplate from './pattern-template';
+import * as patternTemplateContent from './pattern-template-content';
+import * as patternTemplateToken from './pattern-template-token';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
@@ -227,6 +230,11 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+	if ( window?.__experimentalEnablePatternEnhancements ) {
+		blocks.push( patternTemplate );
+		blocks.push( patternTemplateContent );
+		blocks.push( patternTemplateToken );
+	}
 	return blocks.filter( Boolean );
 };
 

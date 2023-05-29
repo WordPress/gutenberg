@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": true,
+	"name": "core/pattern-template-token",
+	"title": "Pattern Template Token",
+	"category": "design",
+	"description": "A token that can be inserted into a pattern template.",
+	"textdomain": "default",
+	"attributes": {},
+	"supports": {
+		"inserter": false,
+		"html": false,
+		"reusable": false
+	}
+}
