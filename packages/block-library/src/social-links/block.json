@@ -41,7 +41,9 @@
 	"providesContext": {
 		"openInNewTab": "openInNewTab",
 		"showLabels": "showLabels",
+		"iconColor": "iconColor",
 		"iconColorValue": "iconColorValue",
+		"iconBackgroundColor": "iconBackgroundColor",
 		"iconBackgroundColorValue": "iconBackgroundColorValue"
 	},
 	"supports": {

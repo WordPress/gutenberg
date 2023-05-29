@@ -47,7 +47,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$icon               = block_core_social_link_get_icon( $service );
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => 'wp-social-link wp-social-link-' . $service,
+			'class' => 'wp-social-link wp-social-link-' . $service . block_core_social_link_get_color_classes( $block->context ),
 			'style' => block_core_social_link_get_color_styles( $block->context ),
 		)
 	);
@@ -336,4 +336,25 @@ function block_core_social_link_get_color_styles( $context ) {
 	}
 
 	return implode( '', $styles );
+}
+
+/**
+ * Returns CSS classes for icon and icon background colors.
+ *
+ * @param array $context Block context passed to Social Sharing Link.
+ *
+ * @return string CSS classes for link's icon and background colors.
+ */
+function block_core_social_link_get_color_classes( $context ) {
+	$classes = array();
+
+	if ( array_key_exists( 'iconColor', $context ) ) {
+		$classes[] = 'has-' . $context['iconColor'] . '-color';
+	}
+
+	if ( array_key_exists( 'iconBackgroundColor', $context ) ) {
+		$classes[] = 'has-' . $context['iconBackgroundColor'] . '-background-color';
+	}
+
+	return ' ' . implode( ' ', $classes );
 }

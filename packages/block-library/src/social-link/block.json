@@ -24,7 +24,9 @@
 	"usesContext": [
 		"openInNewTab",
 		"showLabels",
+		"iconColor",
 		"iconColorValue",
+		"iconBackgroundColor",
 		"iconBackgroundColorValue"
 	],
 	"supports": {
