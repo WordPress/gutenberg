@@ -34,8 +34,6 @@ import { menu, wordpress } from '@wordpress/icons';
  */
 import Icon from '../../icon';
 
-const SLOT_NAME = 'dropdown-storybook-popover-slot';
-
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
 	component: DropdownMenu,
@@ -132,9 +130,9 @@ const RadioItemsGroup = () => {
 
 const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
 	<SlotFillProvider>
-		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
-		<Popover.Slot name={ SLOT_NAME } />
 		<DropdownMenu { ...props } />
+		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+		<Popover.Slot />
 	</SlotFillProvider>
 );
 export const Default = Template.bind( {} );
@@ -198,10 +196,4 @@ Default.args = {
 			<RadioItemsGroup />
 		</>
 	),
-};
-
-export const WithCustomSlot = Template.bind( {} );
-WithCustomSlot.args = {
-	...Default.args,
-	slotName: SLOT_NAME,
 };

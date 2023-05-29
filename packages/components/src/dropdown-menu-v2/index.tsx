@@ -16,6 +16,7 @@ import { SVG, Circle } from '@wordpress/primitives';
  */
 import { useSlot } from '../slot-fill';
 import Icon from '../icon';
+import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
 import * as DropdownMenuStyled from './styles';
 import type {
 	DropdownMenuProps,
@@ -59,10 +60,10 @@ export const DropdownMenu = ( {
 	// Render props
 	children,
 	trigger,
-	// Other props
-	slotName,
 }: DropdownMenuProps ) => {
-	const slot = useSlot( slotName );
+	// Render the portal in the default slot used by the legacy Popover component.
+	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
+	const portalContainer = slot.ref?.current;
 
 	return (
 		<DropdownMenuPrimitive.Root
@@ -75,7 +76,7 @@ export const DropdownMenu = ( {
 			<DropdownMenuPrimitive.Trigger asChild>
 				{ trigger }
 			</DropdownMenuPrimitive.Trigger>
-			<DropdownMenuPrimitive.Portal container={ slot.ref?.current }>
+			<DropdownMenuPrimitive.Portal container={ portalContainer }>
 				<DropdownMenuStyled.Content
 					side={ side }
 					align={ align }
@@ -84,7 +85,7 @@ export const DropdownMenu = ( {
 					loop={ true }
 				>
 					<DropdownMenuPrivateContext.Provider
-						value={ { portalContainer: slot.ref?.current } }
+						value={ { portalContainer } }
 					>
 						{ children }
 					</DropdownMenuPrivateContext.Provider>
