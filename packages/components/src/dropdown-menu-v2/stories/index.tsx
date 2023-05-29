@@ -20,6 +20,8 @@ import {
 	DropdownSubMenuTrigger,
 } from '..';
 import Button from '../../button';
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 /**
  * WordPress dependencies
@@ -31,6 +33,8 @@ import { menu, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../../icon';
+
+const SLOT_NAME = 'dropdown-storybook-popover-slot';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
@@ -127,7 +131,11 @@ const RadioItemsGroup = () => {
 };
 
 const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
-	<DropdownMenu { ...props } />
+	<SlotFillProvider>
+		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+		<Popover.Slot name={ SLOT_NAME } />
+		<DropdownMenu { ...props } />
+	</SlotFillProvider>
 );
 export const Default = Template.bind( {} );
 Default.args = {
@@ -190,4 +198,10 @@ Default.args = {
 			<RadioItemsGroup />
 		</>
 	),
+};
+
+export const WithCustomSlot = Template.bind( {} );
+WithCustomSlot.args = {
+	...Default.args,
+	slotName: SLOT_NAME,
 };
