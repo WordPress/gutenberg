@@ -57,17 +57,12 @@ store( {
 				ariaHiddenAttribute: ( { context } ) => {
 					const { isMenuOpen, globalNav } = context.core.navigation;
 					if ( globalNav ) {
-						let isGlobalNavWrapped = false;
-						// If the Open menu button is visible, set `isGlobalNavWrapped` to true.
-						if (
-							globalNav
-								.querySelector(
-									'button.wp-block-navigation__responsive-container-open '
-								)
-								?.checkVisibility()
-						) {
-							isGlobalNavWrapped = true;
-						}
+						const responsiveContainer = globalNav.querySelector(
+							'div.wp-block-navigation__responsive-container'
+						);
+						// If the element has display: none, `offsetParent` returns null.
+						const isGlobalNavWrapped =
+							responsiveContainer.offsetParent === null;
 						return isMenuOpen ? false : isGlobalNavWrapped;
 					}
 				},
