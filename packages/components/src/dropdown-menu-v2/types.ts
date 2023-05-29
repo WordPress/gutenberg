@@ -61,6 +61,12 @@ export type DropdownMenuProps = {
 	 * The contents of the dropdown
 	 */
 	children: React.ReactNode;
+	/**
+	 * The name of the slot where the dropdown content should render.
+	 *
+	 * @default TODO
+	 */
+	slotName?: string;
 };
 
 export type DropdownSubMenuTriggerProps = {

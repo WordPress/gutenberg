@@ -14,6 +14,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { useSlot } from '../slot-fill';
 import Icon from '../icon';
 import * as DropdownMenuStyled from './styles';
 import type {
@@ -52,7 +53,11 @@ export const DropdownMenu = ( {
 	// Render props
 	children,
 	trigger,
+	// Other props
+	slotName,
 }: DropdownMenuProps ) => {
+	const slot = useSlot( slotName );
+
 	return (
 		<DropdownMenuPrimitive.Root
 			defaultOpen={ defaultOpen }
@@ -64,7 +69,7 @@ export const DropdownMenu = ( {
 			<DropdownMenuPrimitive.Trigger asChild>
 				{ trigger }
 			</DropdownMenuPrimitive.Trigger>
-			<DropdownMenuPrimitive.Portal>
+			<DropdownMenuPrimitive.Portal container={ slot.ref?.current }>
 				<DropdownMenuStyled.Content
 					side={ side }
 					align={ align }
