@@ -147,6 +147,16 @@ describe( 'Private data APIs', () => {
 			expect( unlockedSelectors.getPublicPrice() ).toEqual( 1000 );
 		} );
 
+		it( 'should return stable references to selectors', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			const select = unlock( registry.select( groceryStore ) );
+			expect( select.getPublicPrice ).toBe( select.getPublicPrice );
+			expect( select.getSecretDiscount ).toBe( select.getSecretDiscount );
+		} );
+
 		it( 'should support registerStore', () => {
 			const groceryStore = registry.registerStore(
 				storeName,
@@ -261,6 +271,16 @@ describe( 'Private data APIs', () => {
 			expect(
 				registry.select( groceryStore ).getState().secretDiscount
 			).toEqual( 400 );
+		} );
+
+		it( 'should return stable references to actions', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const disp = unlock( registry.dispatch( groceryStore ) );
+			expect( disp.setPublicPrice ).toBe( disp.setPublicPrice );
+			expect( disp.setSecretDiscount ).toBe( disp.setSecretDiscount );
 		} );
 
 		it( 'should dispatch public actions on the unlocked store', () => {

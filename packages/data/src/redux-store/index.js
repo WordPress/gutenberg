@@ -101,6 +101,21 @@ function createResolversCache() {
 	};
 }
 
+function createBindingCache( bind ) {
+	const cache = new WeakMap();
+
+	return {
+		get( item ) {
+			let boundItem = cache.get( item );
+			if ( ! boundItem ) {
+				boundItem = bind( item );
+				cache.set( item, boundItem );
+			}
+			return boundItem;
+		},
+	};
+}
+
 /**
  * Creates a data store descriptor for the provided Redux store configuration containing
  * properties describing reducer, actions, selectors, controls and resolvers.
@@ -185,17 +200,20 @@ export default function createReduxStore( key, options ) {
 				...mapValues( options.actions, bindAction ),
 			};
 
-			lock(
-				actions,
-				new Proxy( privateActions, {
+			const boundPrivateActions = createBindingCache( bindAction );
+			const allActions = new Proxy(
+				{},
+				{
 					get: ( target, prop ) => {
 						const privateAction = privateActions[ prop ];
 						return privateAction
-							? bindAction( privateAction )
+							? boundPrivateActions.get( privateAction )
 							: actions[ prop ];
 					},
-				} )
+				}
 			);
+
+			lock( actions, allActions );
 
 			function bindSelector( selector ) {
 				if ( selector.isRegistrySelector ) {
@@ -234,17 +252,20 @@ export default function createReduxStore( key, options ) {
 				);
 			}
 
-			lock(
-				selectors,
-				new Proxy( privateSelectors, {
+			const boundPrivateSelectors = createBindingCache( bindSelector );
+			const allSelectors = new Proxy(
+				{},
+				{
 					get: ( target, prop ) => {
 						const privateSelector = privateSelectors[ prop ];
 						return privateSelector
-							? bindSelector( privateSelector )
+							? boundPrivateSelectors.get( privateSelector )
 							: selectors[ prop ];
 					},
-				} )
+				}
 			);
+
+			lock( selectors, allSelectors );
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
 			const suspendSelectors = mapSuspendSelectors( selectors, store );
