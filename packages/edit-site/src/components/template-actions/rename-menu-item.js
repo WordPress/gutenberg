@@ -16,7 +16,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function RenameMenuItem( { template, onClose } ) {
-	const [ title, setTitle ] = useState( () => template.title.rendered );
+	const [ title, setTitle ] = useState(
+		() => template.title?.rendered || template.title
+	);
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const { editEntityRecord, saveEditedEntityRecord } =
@@ -67,7 +69,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			<MenuItem
 				onClick={ () => {
 					setIsModalOpen( true );
-					setTitle( template.title.rendered );
+					setTitle( template.title?.rendered || template.title );
 				} }
 			>
 				{ __( 'Rename' ) }

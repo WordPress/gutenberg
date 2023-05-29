@@ -19,6 +19,7 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
+import TemplateActions from '../template-actions';
 
 function useTemplateTitleAndDescription( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -83,14 +84,16 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description };
+	return { title, description, template: record };
 }
 
 export default function SidebarNavigationScreenTemplate() {
-	const { params } = useNavigator();
-	const { postType, postId } = params;
+	const navigator = useNavigator();
+	const {
+		params: { postType, postId },
+	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, description } = useTemplateTitleAndDescription(
+	const { title, description, template } = useTemplateTitleAndDescription(
 		postType,
 		postId
 	);
@@ -99,11 +102,20 @@ export default function SidebarNavigationScreenTemplate() {
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<div>
+					<TemplateActions
+						template={ template }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( `/${ postType }/all` );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</div>
 			}
 			description={ description }
 		/>

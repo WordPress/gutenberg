@@ -144,7 +144,7 @@ export const removeTemplate =
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					template.title?.rendered || template.title
 				),
 				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
