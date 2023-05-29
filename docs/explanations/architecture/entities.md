@@ -1,13 +1,13 @@
 # Entities and Undo/Redo.
 
-The WordPress editors, whether it's the post or site editor manipulate what we call entity records. These are objects that represent a post, a page, a user, a term, a template etc. They are the data that is stored in the database and that is manipulated by the editor. Each editor can fetch, edit and save multiple entity records at the same time. 
+The WordPress editors, whether it's the post or site editor, manipulate what we call entity records. These are objects that represent a post, a page, a user, a term, a template, etc. They are the data that is stored in the database and that is manipulated by the editor. Each editor can fetch, edit and save multiple entity records at the same time. 
 
 For instance, when opening a page in the site editor:
  - you can edit properties of the page itself (title, content...)
  - you can edit properties of the template of the page (content of the template, design...)
  - you can edit properties of template parts (header, footer) used with the template.
 
-The editor keeps track of all these modifications and orchestrated the saving of all these modified records. This happens within the `@wordpress/core-data` package.
+The editor keeps track of all these modifications and orchestrates the saving of all these modified records. This happens within the `@wordpress/core-data` package.
 
 
 ## Editing entities
@@ -22,9 +22,9 @@ Once the entity is loaded, you can edit it. For example, the following code sets
  - the "persisted" record: The last state of the record as it was fetched from the backend.
  - A list of "edits": Unsaved local modifications for one or several properties of the record. 
  
-The package also exposes a set of actions to manipuate the fetched entity records.
+The package also exposes a set of actions to manipulate the fetched entity records.
 
-To entity a fetched entity record, you can call `editEntityRecord` and take the entity type, the entity ID and the new entity record as parameters. The following example sets the title of the post with ID 1 to "Hello World".
+To fetch an entity record, you can call `editEntityRecord`, which takes the entity type, the entity ID and the new entity record as parameters. The following example sets the title of the post with ID 1 to "Hello World".
 
 ````js
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, { title: 'Hello World' } );
