@@ -9,6 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -20,6 +21,9 @@ import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 import { store as editSiteStore } from '../../store';
 
+const DEFAULT_CATEGORY = 'header';
+const DEFAULT_TYPE = 'wp_template_part';
+
 const templatePartAreaLabels = {
 	header: __( 'Headers' ),
 	footer: __( 'Footers' ),
@@ -29,6 +33,9 @@ const templatePartAreaLabels = {
 
 export default function SidebarNavigationScreenLibrary() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const { categoryType, categoryName } = getQueryArgs( window.location.href );
+	const currentCategory = categoryName || DEFAULT_CATEGORY;
+	const currentType = categoryType || DEFAULT_TYPE;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
@@ -78,6 +85,11 @@ export default function SidebarNavigationScreenLibrary() {
 												}
 												name={ area }
 												type="wp_template_part"
+												isActive={
+													currentCategory === area &&
+													currentType ===
+														'wp_template_part'
+												}
 											/>
 										)
 									) }
@@ -92,6 +104,11 @@ export default function SidebarNavigationScreenLibrary() {
 											label={ category.label }
 											name={ category.name }
 											type="pattern"
+											isActive={
+												currentCategory ===
+													category.name &&
+												currentType === 'pattern'
+											}
 										/>
 									) ) }
 								</ItemGroup>

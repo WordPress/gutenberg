@@ -4,7 +4,14 @@
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
 
-export default function CategoryItem( { count, icon, label, name, type } ) {
+export default function CategoryItem( {
+	count,
+	icon,
+	isActive,
+	label,
+	name,
+	type,
+} ) {
 	const linkInfo = useLink( {
 		path: '/library',
 		categoryType: type,
@@ -20,6 +27,7 @@ export default function CategoryItem( { count, icon, label, name, type } ) {
 			{ ...linkInfo }
 			icon={ icon }
 			suffix={ <span>{ count }</span> }
+			className={ isActive ? 'is-active-category' : undefined }
 		>
 			{ label }
 		</SidebarNavigationItem>
