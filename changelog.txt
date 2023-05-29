@@ -1,5 +1,37 @@
 == Changelog ==
 
+= 15.9.0-rc.2 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Patterns
+- Library: Revert description change until new grid view lands. ([51039](https://github.com/WordPress/gutenberg/pull/51039))
+
+#### Block library
+- Social Links: Add color classes so icon colors correctly reflect changes in Global Styles. ([51020](https://github.com/WordPress/gutenberg/pull/51020))
+- Image: Improve the image block lightbox translations, labelling, and escaping.  ([50962](https://github.com/WordPress/gutenberg/pull/50962))
+
+#### Block editor
+
+- Don't use global 'select' in the Behaviors controls component. ([51028](https://github.com/WordPress/gutenberg/pull/51028))
+- Lightbox UI appearing with interactivity experiment disabled. ([51025](https://github.com/WordPress/gutenberg/pull/51025))
+- Move "No Behaviors" to be the first option in the list of behaviors. ([50979](https://github.com/WordPress/gutenberg/pull/50979))
+- Revert "Browse Mode: Add snackbar notices.  ([50937](https://github.com/WordPress/gutenberg/pull/50937))
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @afercia @andrewserong @c4rl0sbr4v0 @Mamaduka @michalczaplinski @ndiego @talldan
+
+
 = 15.9.0-rc.1 =
 
 There has been an error with the Github action that creates the backlog. It will be updated as soon as possible. More info
