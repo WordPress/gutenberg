@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import Inserter from '../inserter';
+import AriaReferencedText from './aria-referenced-text';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
@@ -90,12 +91,9 @@ export const Appender = forwardRef(
 						}
 					} }
 				/>
-				<div
-					className="list-view-appender__description"
-					id={ descriptionId }
-				>
+				<AriaReferencedText id={ descriptionId }>
 					{ description }
-				</div>
+				</AriaReferencedText>
 			</div>
 		);
 	}
