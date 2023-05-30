@@ -200,7 +200,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
-		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) ) {
+		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
 			$w->set_attribute( 'data-wp-on.mouseenter', 'actions.core.navigation.openMenuOnHover' );
 			$w->set_attribute( 'data-wp-on.mouseleave', 'actions.core.navigation.closeMenuOnHover' );
 		}
