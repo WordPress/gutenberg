@@ -52,7 +52,7 @@ export default function LinkControlSearchResults( {
 	// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
 	const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 	const labelText = isInitialSuggestions
-		? __( 'Links' )
+		? __( 'Suggestions' )
 		: sprintf(
 				/* translators: %s: search term. */
 				__( 'Search results for "%s"' ),
