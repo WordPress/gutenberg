@@ -8,6 +8,7 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	removeNotices,
 } from '../actions';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
 
@@ -211,6 +212,29 @@ describe( 'actions', () => {
 			expect( removeNotice( id, context ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
 				id,
+				context,
+			} );
+		} );
+	} );
+
+	describe( 'removeNotices', () => {
+		it( 'should return action', () => {
+			const ids = [ 'id', 'id2' ];
+
+			expect( removeNotices( ids ) ).toEqual( {
+				type: 'REMOVE_NOTICES',
+				ids,
+				context: DEFAULT_CONTEXT,
+			} );
+		} );
+
+		it( 'should return action with custom context', () => {
+			const ids = [ 'id', 'id2' ];
+			const context = 'foo';
+
+			expect( removeNotices( ids, context ) ).toEqual( {
+				type: 'REMOVE_NOTICES',
+				ids,
 				context,
 			} );
 		} );
