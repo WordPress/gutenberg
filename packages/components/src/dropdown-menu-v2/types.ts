@@ -248,3 +248,11 @@ export type DropdownMenuGroupProps = {
 };
 
 export type DropdownMenuSeparatorProps = {};
+
+export type DropdownMenuContext = {
+	/**
+	 * This variant can be used to change the appearance of the component in
+	 * specific contexts, ie. when rendered inside the `Toolbar` component.
+	 */
+	variant?: 'toolbar';
+};

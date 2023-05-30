@@ -14,6 +14,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../ui/context';
 import { useSlot } from '../slot-fill';
 import Icon from '../icon';
 import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
@@ -29,6 +30,7 @@ import type {
 	DropdownMenuRadioItemProps,
 	DropdownMenuSeparatorProps,
 	DropdownSubMenuTriggerProps,
+	DropdownMenuContext,
 } from './types';
 
 // Menu content's side padding + 4px
@@ -46,21 +48,29 @@ const DropdownMenuPrivateContext = createContext< {
  * `DropdownMenu` displays a menu to the user (such as a set of actions
  * or functions) triggered by a button.
  */
-export const DropdownMenu = ( {
-	// Root props
-	defaultOpen,
-	open,
-	onOpenChange,
-	modal = true,
-	// Content positioning props
-	side = 'bottom',
-	sideOffset = 0,
-	align = 'center',
-	alignOffset = 0,
-	// Render props
-	children,
-	trigger,
-}: DropdownMenuProps ) => {
+export const DropdownMenu = ( props: DropdownMenuProps ) => {
+	const {
+		// Root props
+		defaultOpen,
+		open,
+		onOpenChange,
+		modal = true,
+		// Content positioning props
+		side = 'bottom',
+		sideOffset = 0,
+		align = 'center',
+		alignOffset = 0,
+		// Render props
+		children,
+		trigger,
+
+		// From internal components context
+		variant,
+	} = useContextSystem<
+		// Adding `className` to the context type to avoid a TS error
+		DropdownMenuProps & DropdownMenuContext & { className?: string }
+	>( props, 'DropdownMenuV2' );
+
 	// Render the portal in the default slot used by the legacy Popover component.
 	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
 	const portalContainer = slot.ref?.current;
@@ -83,6 +93,7 @@ export const DropdownMenu = ( {
 					sideOffset={ sideOffset }
 					alignOffset={ alignOffset }
 					loop={ true }
+					variant={ variant }
 				>
 					<DropdownMenuPrivateContext.Provider
 						value={ { portalContainer } }
