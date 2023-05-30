@@ -729,7 +729,9 @@ test.describe( 'Image', () => {
 	} );
 } );
 
-test.describe( 'Image - interactivity', () => {
+// Skipped because the release won't have the behaviors UI.
+// So we cannot test that the behaviors inferface is present or its values.
+test.describe.skip( 'Image - interactivity', () => {
 	let filename = null;
 
 	test.beforeAll( async ( { requestUtils } ) => {
