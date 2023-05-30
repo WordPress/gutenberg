@@ -18,6 +18,7 @@ import {
 	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
+	loadBlocksFromHtml,
 } from './utils';
 
 const results = {
@@ -56,28 +57,14 @@ test.describe( 'Site Editor Performance', () => {
 	// This can't be done in the beforeAll hook because the page object is not
 	// available there, as it's created on a per-test basis.
 	test( 'Create the test page', async ( { page, admin } ) => {
-		const largePostHTML = readFile(
-			path.join( __dirname, '../../assets/large-post.html' )
-		);
-
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
 		// Turn the large post HTML into blocks and insert.
-		await page.evaluate( ( html ) => {
-			const { parse } = window.wp.blocks;
-			const { dispatch } = window.wp.data;
-			const blocks = parse( html );
-
-			blocks.forEach( ( block ) => {
-				if ( block.name === 'core/image' ) {
-					delete block.attributes.id;
-					delete block.attributes.url;
-				}
-			} );
-
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
-		}, largePostHTML );
+		await loadBlocksFromHtml(
+			page,
+			path.join( __dirname, '../../assets/large-post.html' )
+		);
 
 		// Save the page draft.
 		await page

@@ -149,3 +149,24 @@ export function round( number, decimalPlaces = 2 ) {
 	const factor = Math.pow( 10, decimalPlaces );
 	return Math.round( number * factor ) / factor;
 }
+
+export async function loadBlocksFromHtml( page, filepath ) {
+	if ( ! existsSync( filepath ) ) {
+		throw new Error( `File not found (${ filepath })` );
+	}
+
+	return await page.evaluate( ( html ) => {
+		const { parse } = window.wp.blocks;
+		const { dispatch } = window.wp.data;
+		const blocks = parse( html );
+
+		blocks.forEach( ( block ) => {
+			if ( block.name === 'core/image' ) {
+				delete block.attributes.id;
+				delete block.attributes.url;
+			}
+		} );
+
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	}, readFile( filepath ) );
+}
