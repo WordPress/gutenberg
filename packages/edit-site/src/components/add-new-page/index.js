@@ -77,7 +77,6 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
-						help={ __( 'You can always change this later' ) }
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'Untitled' ) }
