@@ -60,8 +60,6 @@ const supportedLocales = [
 	'zh-tw', // Chinese (Taiwan)
 ];
 
-const TRANSLATION_FETCH_BATCH_COUNT = 10;
-const TRANSLATION_FETCH_BATCH_DELAY = 250;
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 2000;
 
@@ -123,17 +121,8 @@ const fetchTranslations = ( {
 		supportedLocales
 	);
 
-	const fetchPromises = supportedLocales.map(
-		( locale, index ) =>
-			new Promise( ( resolve ) =>
-				// Fetch requests are made in batches to avoid the error 429 - Too Many Requests
-				setTimeout(
-					() =>
-						fetchTranslation( locale, projectSlug ).then( resolve ),
-					TRANSLATION_FETCH_BATCH_DELAY *
-						Math.floor( index / TRANSLATION_FETCH_BATCH_COUNT )
-				)
-			)
+	const fetchPromises = supportedLocales.map( ( locale ) =>
+		fetchTranslation( locale, projectSlug )
 	);
 
 	// Create data folder if it doesn't exist
