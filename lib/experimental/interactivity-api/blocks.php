@@ -72,10 +72,11 @@ add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_
  * </nav>
  *
  * @param string $block_content Markup of the navigation block.
+ * @param array  $block         Block object.
  *
  * @return string Navigation block markup with the proper directives
  */
-function gutenberg_block_core_navigation_add_directives_to_markup( $block_content, $block, $instance ) {
+function gutenberg_block_core_navigation_add_directives_to_markup( $block_content, $block ) {
 	$w = new WP_HTML_Tag_Processor( $block_content );
 	// Add directives to the `<nav>` element.
 	if ( $w->next_tag( 'nav' ) ) {
@@ -97,7 +98,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 		// If the open modal button not found, we handle submenus immediately.
 		$w = new WP_HTML_Tag_Processor( $w->get_updated_html() );
 
-		gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block[ 'attrs' ] );
+		gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block['attrs'] );
 
 		return $w->get_updated_html();
 	}
@@ -152,7 +153,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 	};
 
 	// Submenus.
-	gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block[ 'attrs' ] );
+	gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block['attrs'] );
 
 	return $w->get_updated_html();
 };
@@ -167,8 +168,8 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  *   data-wp-effect="effects.core.navigation.initMenu"
  *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
  *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
- * 	 data-wp-on.mouseenter="actions.core.navigation.openMenuOnHover"
- * 	 data-wp-on.mouseleave="actions.core.navigation.closeMenuOnHover"
+ *   data-wp-on.mouseenter="actions.core.navigation.openMenuOnHover"
+ *   data-wp-on.mouseleave="actions.core.navigation.closeMenuOnHover"
  * >
  *   <button
  *     class="wp-block-navigation-submenu__toggle"
@@ -182,7 +183,8 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  *   </ul>
  * </li>
  *
- * @param string $w Markup of the navigation block.
+ * @param string $w                Markup of the navigation block.
+ * @param array  $block_attributes Block attributes.
  *
  * @return void
  */
@@ -198,7 +200,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
-		if ( ! isset( $block_attributes[ 'openSubmenusOnClick' ] ) ) {
+		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) ) {
 			$w->set_attribute( 'data-wp-on.mouseenter', 'actions.core.navigation.openMenuOnHover' );
 			$w->set_attribute( 'data-wp-on.mouseleave', 'actions.core.navigation.closeMenuOnHover' );
 		}
@@ -219,7 +221,7 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 	}
 };
 
-add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 3 );
+add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add_directives_to_markup', 10, 2 );
 
 /**
  * Replaces view script for the File, Navigation, and Image blocks with version using Interactivity API.
