@@ -41,9 +41,7 @@ export default function SidebarNavigationScreenPage() {
 	} = useNavigator();
 	const { record } = useEntityRecord( 'postType', 'page', postId );
 
-	const {
-		featuredMediaDetails: { sourceUrl, altText },
-	} = useSelect(
+	const { featuredMediaAltText, featuredMediaSourceUrl } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 			// Featured image.
@@ -56,23 +54,21 @@ export default function SidebarNavigationScreenPage() {
 				: null;
 
 			return {
-				featuredMediaDetails: {
-					sourceUrl:
-						attachedMedia?.media_details.sizes?.medium
-							?.source_url || attachedMedia?.source_url,
-					altText: escapeAttribute(
-						attachedMedia?.alt_text ||
-							attachedMedia?.description?.raw ||
-							''
-					),
-				},
+				featuredMediaSourceUrl:
+					attachedMedia?.media_details.sizes?.medium?.source_url ||
+					attachedMedia?.source_url,
+				featuredMediaAltText: escapeAttribute(
+					attachedMedia?.alt_text ||
+						attachedMedia?.description?.raw ||
+						''
+				),
 			};
 		},
 		[ record ]
 	);
 
-	const featureImageAltText = altText
-		? decodeEntities( altText )
+	const featureImageAltText = featuredMediaAltText
+		? decodeEntities( featuredMediaAltText )
 		: decodeEntities( record?.title?.rendered || __( 'Featured image' ) );
 
 	return record ? (
@@ -106,14 +102,14 @@ export default function SidebarNavigationScreenPage() {
 							className={ classnames(
 								'edit-site-sidebar-navigation-screen-page__featured-image',
 								{
-									'has-image': !! sourceUrl,
+									'has-image': !! featuredMediaSourceUrl,
 								}
 							) }
 						>
-							{ !! sourceUrl && (
+							{ !! featuredMediaSourceUrl && (
 								<img
 									alt={ featureImageAltText }
-									src={ sourceUrl }
+									src={ featuredMediaSourceUrl }
 								/>
 							) }
 							{ ! record?.featured_media && (
