@@ -14,63 +14,83 @@ The Gutenberg project uses GitHub for managing code and tracking issues. The mai
 
 There are two major sets of documentation for the Gutenberg project:
 
-1. [User documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
-2. [Block editor handbook](https://developer.wordpress.org/block-editor/) is everything related to the Gutenberg project including: developing, extending, and—what you are reading right now—contributing specific to Gutenberg.
+1. [User documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel to understand the current priorities.
+2. [Block Editor Handbook](https://developer.wordpress.org/block-editor/) is everything related to the Gutenberg project, including developing, extending, and—what you are reading right now—contributing specifically to Gutenberg.
 
-The rest of this document covers contributing to the block editor handbook.
+The rest of this document covers contributing to the Block Editor Handbook.
 
-## Block editor handbook process
+## Block Editor Handbook process
 
-The block editor handbook is a mix of markdown files in the `/docs/` directory of the [Gutenberg project repository](https://github.com/WordPress/gutenberg/) and generated documentation from the packages.
+The Block Editor Handbook is a mix of markdown files in the `/docs/` directory of the [Gutenberg project repository](https://github.com/WordPress/gutenberg/) and generated documentation from the packages.
 
-An automated job publishes the docs every 15 minutes to the [block editor handbook site](https://developer.wordpress.org/block-editor/).
+An automated job publishes the docs every 15 minutes to the [Block Editor Handbook site](https://developer.wordpress.org/block-editor/).
 
 See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
 
 ### Handbook structure
 
-The handbook is organized into four sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
+The handbook is organized into five sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short, they are:
 
--   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
--   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
--   **Reference guides** - API documentation, purely functional descriptions,
--   **Explanations** - longer documentation focused on learning, not a specific task.
+- **Getting Started** - full lessons that take learners step by step to complete an objective, for example, the [create a block tutorial](/docs/getting-started/create-block/README.md).
+- **How-to Guides** - short lessons specific to completing a small specific task, for example, [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
+- **Reference Guides** - API documentation, purely functional descriptions.
+- **Explanations** - longer documentation focused on learning, not a specific task.
+- **Contributor Guides** – documentation on how to contribute to the Gutenberg project.
 
 ### Templates
 
-A [how to guide template](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/contributors/documentation/how-to-guide-template.md) is available to provide a common structure to guides. If starting a new how to guide, copy the markdown from the template to get started.
+A [how to guide template](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/contributors/documentation/how-to-guide-template.md) is available to provide a common structure to guides. If starting a new how-to guide, copy the markdown from the template to get started.
 
-The template is based on examples from The Good Docs Project, see their [template repository for additional examples](https://github.com/thegooddocsproject/templates) to help you create quality documentation.
+The template is based on examples from The Good Docs Project. See their [template repository for additional examples](https://github.com/thegooddocsproject/templates) to help you create quality documentation.
 
 ### Update a document
 
-To update an existing page:
+To update an existing document:
 
-1. Check out the gutenberg repository.
-2. Create a branch to work, for example `docs/update-contrib-guide`.
+1. Check out the Gutenberg repository.
+2. Create a new branch, for example, `docs/update-example-doc`.
 3. Make the necessary changes to the existing document.
 4. Commit your changes.
 5. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
 
-### Create a new document
+### Add a new document
 
-To add a new document requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md):
+Adding a new document requires a working JavaScript development environment to build the documentation. See the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md). Once you're set up:
 
-1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and `.md` extension.
-2. Add content, all documents require one and only H1 tag, using markdown notation.
-3. Add document entry to the [toc.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/toc.json) hierarchy, see existing entries for format.
-4. Run `npm run docs:build` to update `manifest.json`.
-5. Commit `manifest.json` with other files updated.
+1. Check out the Gutenberg repository.
+2. Create a new branch, for example, `docs/add-example-doc`.
+3. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, a dash separator if needed, and `.md` extension.
+4. Add content. All documents require one and only H1 tag, using markdown notation.
+5. Add a document entry to the [toc.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/toc.json) hierarchy. See existing entries for format.
+6. Run `npm run docs:build` to update `manifest.json`.
+7. Commit `manifest.json` along with the other updated and new files.
+8. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
 
-If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
+If you forget to run `npm run docs:build`, your PR will fail the static analysis check since the `manifest.json` file is an uncommitted local change that must be committed.
 
-### Documenting Packages
+### Remove a document
 
-Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
+Removing a document requires a working JavaScript development environment to build the documentation. See the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md). Once you're set up:
+
+1. Check out the Gutenberg repository.
+2. Create a new branch, for example, `docs/remove-example-doc`.
+3. Delete the document `.md` file.
+4. Remove the document's entry from the [toc.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/toc.json) hierarchy.
+5. Run `npm run docs:build` to update `manifest.json`.
+6. Commit `manifest.json` along with the other changes.
+7. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
+
+If you forget to run `npm run docs:build`, your PR will fail the static analysis check since the `manifest.json` file is an uncommitted local change that must be committed.
+
+<div class="callout callout-alert">Unlike updating or adding documentation, removing pages requires an additional step. Once your PR has been approved and merged, a contributor with Editor-level permissions to the Block Editor Handbook website must manually delete the page. A <a href="https://github.com/WordPress/gutenberg/blob/trunk/.github/CODEOWNERS#L2">documentation code owner</a> can assist you with this step. Ping them directly in the PR.</div>
+
+### Documenting packages
+
+Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes, however, it is preferable to split the contents of the README into smaller, easier-to-read portions.
 
 This can be accomplished by creating a `docs` directory in the package and adding `toc.json` file that contains references other markdown files also contained in the `docs` directory. The `toc.json` file should contain an array of pages to be added as sub-pages of the main README file. The formatting follows the [`manifest.json`](https://github.com/WordPress/gutenberg/blob/HEAD/docs/manifest.json) file that is generated automatically.
 
-In order for these pages to be nested under the main package name, be sure to set the `parent` property correctly. See the example below that adds child pages to the [`@wordpress/create-block` section](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
+In order for these pages to be nested under the main package name, be sure to set the `parent` property correctly. See the example below that adds child pages to the [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) section.
 
 ```json
 [
@@ -85,13 +105,13 @@ In order for these pages to be nested under the main package name, be sure to se
 
 ### Using links
 
-It's likely at some point you'll want to link to other internal documentation pages. It's worth emphasizing all documents can be browsed in different contexts:
+You'll likely want to link to other internal documentation pages at some point. It's worth emphasizing all documents can be browsed in different contexts:
 
--   Block editor handbook
+-   Block Editor Handbook
 -   GitHub website
 -   npm website
 
-To create links that work in all contexts, you must use absolute path links without the `https://github.com/WordPress/gutenberg` prefix. You can reference files using the following patterns:
+You must use absolute path links without the `https://github.com/WordPress/gutenberg` prefix to create links that work in all contexts. You can reference files using the following patterns:
 
 -   `/docs/*.md`
 -   `/packages/*/README.md`
@@ -99,7 +119,7 @@ To create links that work in all contexts, you must use absolute path links with
 
 This way they will be properly handled in all three aforementioned contexts.
 
-Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links.
+Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook but should be included in links.
 
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
@@ -111,7 +131,7 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature of the Gutenberg documentation is the `codetabs` toggle. This allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples, for example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 Here is an example `codetabs` section:
 
@@ -128,15 +148,15 @@ Here is an example `codetabs` section:
     \{\% end \%\}
 ````
 
-The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
+The preferred format for code examples is JSX. This should be the default view. The example placed first in the source will be shown as the default.
 
-**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.
+<div class="callout callout-info">It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.</div>
 
 ### Callout notices
 
-The Block Editor handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the block editor handbook documentation is published (npm, GitHub).
+The Block Editor Handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the Block Editor Handbook documentation is published (npm, GitHub).
 
-The recommended way to implement in markdown is to use the raw HTML and`callout callout-LEVEL` classes. For example:
+The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
 
 ```html
 <div class="callout callout-info">This is an **info** callout.</div>
