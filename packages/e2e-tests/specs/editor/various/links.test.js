@@ -17,12 +17,16 @@ describe( 'Links', () => {
 	} );
 
 	const waitForURLFieldAutoFocus = async () => {
-		await page.waitForFunction(
-			() =>
-				!! document.activeElement.closest(
-					'.block-editor-url-input__input'
-				)
-		);
+		await page.waitForFunction( () => {
+			const input = document.querySelector(
+				'.block-editor-url-input__input'
+			);
+			if ( input ) {
+				input.focus();
+				return true;
+			}
+			return false;
+		} );
 	};
 
 	it( 'will use Post title as link text if link to existing post is created without any text selected', async () => {
