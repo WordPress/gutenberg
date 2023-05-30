@@ -7,7 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import reducer from '../reducer';
-import { createNotice, removeNotice, removeNotices, removeAllNotices } from '../actions';
+import {
+	createNotice,
+	removeNotice,
+	removeNotices,
+	removeAllNotices,
+} from '../actions';
 import { getNotices } from '../selectors';
 import { DEFAULT_CONTEXT } from '../constants';
 
