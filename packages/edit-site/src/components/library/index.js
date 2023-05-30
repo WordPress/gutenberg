@@ -45,7 +45,13 @@ export default function Library() {
 			className="edit-site-library"
 			labels={ regionLabels }
 			notices={ <EditorSnackbars /> }
-			content={ <Grid type={ type } category={ category } /> }
+			content={
+				<Grid
+					type={ type }
+					category={ category }
+					label={ __( 'Patterns list' ) }
+				/>
+			}
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,
