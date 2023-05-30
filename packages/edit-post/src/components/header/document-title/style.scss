@@ -3,7 +3,6 @@
 	align-items: center;
 	gap: $grid-unit;
 	height: $button-size;
-	padding: $grid-unit;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
@@ -40,7 +39,8 @@
 .edit-post-document-title__shortcut {
 	flex-shrink: 0;
 	color: $gray-700;
-	width: #{$grid-unit * 4.5};
+	padding: 0 $grid-unit-15;
+
 	&:hover {
 		color: $gray-700;
 	}
@@ -51,9 +51,8 @@
 	flex-shrink: 0;
 
 	.components-button.has-icon.has-text {
-		padding-left: 0;
-		padding-right: 0;
 		color: $gray-700;
+		gap: 0;
 
 		&:hover {
 			color: currentColor;
