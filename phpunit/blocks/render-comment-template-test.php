@@ -86,6 +86,10 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 			)
 		);
 		$comment_author_name_block_markup = $comment_author_name_block->render();
+		$this->assertNotEmpty(
+			$comment_author_name_block_markup,
+			'Comment Author Name block rendered markup is empty.'
+		);
 
 		$render_block_callback = static function( $block_content, $block ) use ( $parsed_comment_author_name_block ) {
 			// Insert a Comment Author Name block (which requires `commentId`
@@ -111,6 +115,10 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		$markup        = $block->render();
 		remove_filter( 'render_block', $render_block_callback );
 
-		$this->assertStringContainsString( $comment_author_name_block_markup, $markup );
+		$this->assertStringContainsString(
+			$comment_author_name_block_markup,
+			$markup,
+			"Rendered markup doesn't contain Comment Author Name block."
+		);
 	}
 }
