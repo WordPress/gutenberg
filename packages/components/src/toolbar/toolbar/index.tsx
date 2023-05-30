@@ -16,7 +16,18 @@ import deprecated from '@wordpress/deprecated';
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
+import {
+	WordPressComponentProps,
+	ContextSystemProvider,
+} from '../../ui/context';
+
+const CONTEXT_SYSTEM_VALUE = {
+	DropdownMenu: {
+		// Note: the legacy `DropdownMenu` component is not yet reactive to this
+		// context variant. See https://github.com/WordPress/gutenberg/pull/51097.
+		variant: 'toolbar',
+	},
+};
 
 function UnforwardedToolbar(
 	{
@@ -40,12 +51,14 @@ function UnforwardedToolbar(
 		className
 	);
 	return (
-		<ToolbarContainer
-			className={ finalClassName }
-			label={ label }
-			ref={ ref }
-			{ ...props }
-		/>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+			<ToolbarContainer
+				className={ finalClassName }
+				label={ label }
+				ref={ ref }
+				{ ...props }
+			/>
+		</ContextSystemProvider>
 	);
 }
 
