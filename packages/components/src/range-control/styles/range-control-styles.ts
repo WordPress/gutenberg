@@ -19,6 +19,7 @@ import type {
 	TooltipProps,
 	TrackProps,
 	WrapperProps,
+	RangeControlProps,
 } from '../types';
 
 const rangeHeightValue = 30;
@@ -27,7 +28,14 @@ const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
-export const Root = styled.div`
+const deprecatedDefaultHeight = ( {
+	__next40pxDefaultSize,
+}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) => {
+	return ! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
+};
+
+type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
+export const Root = styled.div< RootProps >`
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
 	display: flex;
@@ -36,6 +44,9 @@ export const Root = styled.div`
 	position: relative;
 	touch-action: none;
 	width: 100%;
+	min-height: 40px;
+
+	${ deprecatedDefaultHeight }
 `;
 
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>

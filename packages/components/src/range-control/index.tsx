@@ -218,7 +218,10 @@ function UnforwardedRangeControl(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
+			<Root
+				className="components-range-control__root"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+			>
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />
