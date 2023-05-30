@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -273,21 +273,24 @@ export function ImageEdit( {
 			return;
 		}
 
-		const file = getBlobByURL( url );
-
-		if ( file ) {
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ img ] ) => {
-					onSelectImage( img );
-				},
-				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: ( message ) => {
-					isTemp = false;
-					onUploadError( message );
-				},
+		// Do not use getBlobByURL as it will only work for blobs created by us.
+		// Pasting might give us a blob URL that is not in the cache.
+		window
+			.fetch( url )
+			.then( ( r ) => r.blob() )
+			.then( ( file ) => {
+				mediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ img ] ) => {
+						onSelectImage( img );
+					},
+					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						isTemp = false;
+						onUploadError( message );
+					},
+				} );
 			} );
-		}
 	}, [] );
 
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
