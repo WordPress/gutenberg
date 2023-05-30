@@ -23,6 +23,7 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments',
 				'details',
+				'footnotes',
 				'group',
 				'html',
 				'list',
