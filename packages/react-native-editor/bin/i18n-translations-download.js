@@ -62,6 +62,8 @@ const supportedLocales = [
 
 const TRANSLATION_FETCH_BATCH_COUNT = 10;
 const TRANSLATION_FETCH_BATCH_DELAY = 250;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000;
 
 const getLanguageUrl = ( locale, projectSlug ) =>
 	`https://translate.wordpress.org/projects/${ projectSlug }/dev/${ locale }/default/export-translations\?format\=json`;
@@ -69,26 +71,45 @@ const getLanguageUrl = ( locale, projectSlug ) =>
 const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 
 const fetchTranslation = ( locale, projectSlug ) => {
+	let retryCount = MAX_RETRIES;
 	const localeUrl = getLanguageUrl( locale, projectSlug );
-	return fetch( localeUrl )
-		.then( ( response ) => {
-			if ( ! response.ok ) {
+	const request = () =>
+		fetch( localeUrl )
+			.then( ( response ) => {
+				if ( ! response.ok ) {
+					const { status, statusText } = response;
+
+					// Retry when encountering "429 - Too Many Requests" error
+					if ( status === 429 && retryCount > 0 ) {
+						console.log(
+							`Translation file ${ localeUrl } for project slug ${ projectSlug } failed with error 429 - Too Many Requests, retrying (${ retryCount })...`
+						);
+						retryCount--;
+						return new Promise( ( resolve ) =>
+							setTimeout(
+								() => request().then( resolve ),
+								RETRY_DELAY
+							)
+						);
+					}
+
+					console.error(
+						`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`,
+						{ status, statusText }
+					);
+					return { locale, status, statusText };
+				}
+				return response.json();
+			} )
+			.then( ( body ) => {
+				return { response: body, locale };
+			} )
+			.catch( () => {
 				console.error(
-					`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`,
-					{ status: response.status, statusText: response.statusText }
+					`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`
 				);
-				return;
-			}
-			return response.json();
-		} )
-		.then( ( body ) => {
-			return { response: body, locale };
-		} )
-		.catch( () => {
-			console.error(
-				`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`
-			);
-		} );
+			} );
+	return request();
 };
 
 const fetchTranslations = ( {
