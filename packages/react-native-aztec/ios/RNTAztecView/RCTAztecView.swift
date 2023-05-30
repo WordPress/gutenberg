@@ -765,6 +765,10 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
+        // Workaround for RN dictation bug that adds obj symbol.
+        // Ref: https://github.com/facebook/react-native/issues/36521
+        // TODO: Remove workaround when RN issue is fixed
+        textView.text = textView.text.replacingOccurrences(of: "\u{FFFC}", with: "")
         
         propagateContentChanges()
         updatePlaceholderVisibility()
