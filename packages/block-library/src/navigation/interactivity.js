@@ -98,6 +98,12 @@ store( {
 				closeMenuOnHover( args ) {
 					closeMenu( args, 'hover' );
 				},
+				openMenuOnClick( args ) {
+					openMenu( args, 'click' );
+				},
+				closeMenuOnClick( args ) {
+					closeMenu( args, 'click' );
+				},
 				toggleMenuOnClick: ( args ) => {
 					const { context } = args;
 					if ( context.core.navigation.isMenuOpen.click ) {

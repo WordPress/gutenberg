@@ -61,7 +61,7 @@ add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_
  *       >
  *         <button
  *           class="wp-block-navigation__responsive-container-close"
- *           data-wp-on.click="actions.core.navigation.closeMenu"
+ *           data-wp-on.click="actions.core.navigation.closeMenuOnclick"
  *         >
  *           <svg>
  *         <button>
@@ -147,7 +147,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 			'class_name' => 'wp-block-navigation__responsive-container-close',
 		)
 	) ) {
-		$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.closeMenu' );
+		$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.closeMenuOnClick' );
 		$w->remove_attribute( 'data-micromodal-close' );
 	};
 
@@ -170,7 +170,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  * >
  *   <button
  *     class="wp-block-navigation-submenu__toggle"
- *     data-wp-on.click="actions.core.navigation.openMenu"
+ *     data-wp-on.click="actions.core.navigation.openMenuOnClick"
  *     data-wp-bind.aria-expanded="selectors.core.navigation.isMenuOpen"
  *   >
  *   </button>
