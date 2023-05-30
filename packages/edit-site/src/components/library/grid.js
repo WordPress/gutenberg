@@ -8,6 +8,9 @@ import {
 	MenuItem,
 	VisuallyHidden,
 	__experimentalHStack as HStack,
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -18,7 +21,7 @@ import { moreHorizontal } from '@wordpress/icons';
  */
 import usePatterns from './use-patterns';
 
-const GridItem = ( { item } ) => {
+const GridItem = ( { composite, item } ) => {
 	const instanceId = useInstanceId( GridItem );
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
 
@@ -28,14 +31,22 @@ const GridItem = ( { item } ) => {
 			aria-label={ item.title }
 			aria-describedby={ item.description ? descriptionId : undefined }
 		>
-			<div className="edit-site-library__preview">
+			<CompositeItem
+				className="edit-site-library__preview"
+				role="option"
+				as="div"
+				{ ...composite }
+				onClick={ () => {
+					// TODO: Implement pattern editing flow.
+				} }
+			>
 				<BlockPreview blocks={ item.blocks } />
 				{ !! item.description && (
 					<VisuallyHidden id={ descriptionId }>
 						{ item.description }
 					</VisuallyHidden>
 				) }
-			</div>
+			</CompositeItem>
 			<HStack
 				className="edit-site-library__footer"
 				justify="space-between"
@@ -69,8 +80,9 @@ const GridItem = ( { item } ) => {
 	);
 };
 
-export default function Grid( { type, category } ) {
+export default function Grid( { category, label, type } ) {
 	const [ patterns, isResolving ] = usePatterns( type, category );
+	const composite = useCompositeState( { orientation: 'vertical' } );
 
 	if ( ! patterns ) {
 		return null;
@@ -81,12 +93,21 @@ export default function Grid( { type, category } ) {
 	}
 
 	return (
-		<div className="edit-site-library__grid">
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="edit-site-library__grid"
+			aria-label={ label }
+		>
 			{ isResolving && __( 'Loading' ) }
 			{ ! isResolving &&
 				patterns.map( ( pattern ) => (
-					<GridItem key={ pattern.name } item={ pattern } />
+					<GridItem
+						key={ pattern.name }
+						item={ pattern }
+						composite={ composite }
+					/>
 				) ) }
-		</div>
+		</Composite>
 	);
 }
