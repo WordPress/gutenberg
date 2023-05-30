@@ -801,7 +801,14 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesComplete",
+					"behaviors": {
+						"lightbox": {
+							"description": "Allow users to open the image in a lightbox.",
+							"type": "boolean",
+							"default": true
+						}
+					}
 				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -2068,6 +2075,21 @@
 		"description": {
 			"type": "string",
 			"description": "Description of the global styles variation."
+		},
+		"behaviors": {
+			"type": "object",
+			"description": "Behaviors for individual blocks. Define if the Behaviors UI should appear in the block inspector.",
+			"properties": {
+				"blocks": {
+					"core/image": {
+						"lightbox": {
+							"type": "boolean",
+							"description": "Whether the lightbox should be enabled for the image block.",
+							"default": true
+						}
+					}
+				}
+			}
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
