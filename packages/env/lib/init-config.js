@@ -133,8 +133,8 @@ ARG HOST_USERNAME
 ARG HOST_UID
 ARG HOST_GID
 # When the IDs are already in use we can still safely move on.
-RUN groupadd -g $HOST_GID $HOST_USERNAME || true
-RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
+RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
 ${ installDependencies( 'wordpress', env, config ) }`;
