@@ -383,7 +383,7 @@ function LinkControl( {
 									__nextHasNoMarginBottom
 									ref={ textInputRef }
 									className="block-editor-link-control__setting block-editor-link-control__text-content"
-									label="Text"
+									label={ __( 'Text' ) }
 									value={ internalControlValue?.title }
 									onChange={ setInternalTextInputValue }
 									onKeyDown={ handleSubmitWithEnter }
