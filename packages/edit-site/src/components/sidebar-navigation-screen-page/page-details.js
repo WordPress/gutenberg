@@ -111,11 +111,12 @@ export default function PageDetails( { id } ) {
 				postContext?.postType === 'page'
 					? postContext?.templateSlug
 					: null;
-			const _templateTitle = defaultTemplateTypes
-				? defaultTemplateTypes.find(
-						( template ) => template.slug === templateSlug
-				  )?.title
-				: null;
+			const _templateTitle =
+				defaultTemplateTypes && templateSlug
+					? defaultTemplateTypes.find(
+							( template ) => template.slug === templateSlug
+					  )?.title
+					: null;
 
 			// Parent page title.
 			const _parentTitle = record?.parent
