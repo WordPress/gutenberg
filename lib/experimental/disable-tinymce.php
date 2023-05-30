@@ -5,6 +5,8 @@
  * @package gutenberg
  */
 
+// add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
+
 /**
  * Render a variable that we'll use to declare that the editor will need the classic block.
  */
@@ -82,5 +84,3 @@ function gutenberg_current_content_contains_classic_block() {
 
 	return false;
 }
-
-// add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
