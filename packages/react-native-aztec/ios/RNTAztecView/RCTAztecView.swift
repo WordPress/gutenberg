@@ -95,12 +95,6 @@ class RCTAztecView: Aztec.TextView {
         let placeholderWidthInset = 2 * leftTextInset
         return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
     }()
-
-    /// If a dictation start with an empty UITextView,
-    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
-    /// on `textViewDidChange` and `textViewDidChangeSelection`
-    private var isInsertingDictationResult = false
     
     // MARK: - Font
 
@@ -352,26 +346,6 @@ class RCTAztecView: Aztec.TextView {
 
         super.deleteBackward()
         updatePlaceholderVisibility()
-    }
-
-    // MARK: - Dictation
-
-    override func dictationRecordingDidEnd() {
-        isInsertingDictationResult = true
-    }
-
-    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
-        let objectPlaceholder = "\u{FFFC}"
-        let dictationText = dictationResult.reduce("") { $0 + $1.text }
-        isInsertingDictationResult = false
-                
-        if let text = self.text {
-            self.text = text.replacingOccurrences(of: objectPlaceholder, with: "")
-        }
-
-        if let textRange = self.selectedTextRange {
-            self.replace(textRange, withText: dictationText)
-        }
     }
 
     // MARK: - Custom Edit Intercepts
@@ -778,7 +752,7 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
-        guard isFirstResponder, isInsertingDictationResult == false else {
+        guard isFirstResponder else {
             return
         }
 
@@ -791,9 +765,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        guard isInsertingDictationResult == false else {
-            return
-        }
         
         propagateContentChanges()
         updatePlaceholderVisibility()
