@@ -6,7 +6,12 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 /**
  * WordPress dependencies
  */
-import { forwardRef, createContext, useContext } from '@wordpress/element';
+import {
+	forwardRef,
+	createContext,
+	useContext,
+	useMemo,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
@@ -72,6 +77,14 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
 	const portalContainer = slot.ref?.current;
 
+	const privateContextValue = useMemo(
+		() => ( {
+			variant,
+			portalContainer,
+		} ),
+		[ variant, portalContainer ]
+	);
+
 	return (
 		<DropdownMenuPrimitive.Root
 			defaultOpen={ defaultOpen }
@@ -93,7 +106,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 					variant={ variant }
 				>
 					<DropdownMenuPrivateContext.Provider
-						value={ { variant, portalContainer } }
+						value={ privateContextValue }
 					>
 						{ children }
 					</DropdownMenuPrivateContext.Provider>
