@@ -140,3 +140,12 @@ export async function getLoadingDurations( page ) {
 export function sum( arr ) {
 	return arr.reduce( ( a, b ) => a + b, 0 );
 }
+
+export function average( array ) {
+	return array.reduce( ( a, b ) => a + b ) / array.length;
+}
+
+export function round( number, decimalPlaces = 2 ) {
+	const factor = Math.pow( 10, decimalPlaces );
+	return Math.round( number * factor ) / factor;
+}
