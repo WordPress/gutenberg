@@ -324,7 +324,6 @@ const inputNumberWidth = ( { size }: InputNumberProps ) => {
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
-	margin-bottom: 0 !important;
 	margin-top: 0;
 	${ inputNumberWidth };
 
