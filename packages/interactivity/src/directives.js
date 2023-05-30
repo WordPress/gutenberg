@@ -175,6 +175,26 @@ export default () => {
 		}
 	);
 
+	// data-wp-show
+	directive(
+		'show',
+		( {
+			directives: {
+				show: { default: show },
+			},
+			element,
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+
+			if ( ! evaluate( show, { context: contextValue } ) )
+				element.props.children = (
+					<template>{ element.props.children }</template>
+				);
+		}
+	);
+
 	// data-wp-ignore
 	directive(
 		'ignore',
@@ -192,6 +212,24 @@ export default () => {
 					{ ...rest }
 				/>
 			);
+		}
+	);
+
+	// data-wp-text
+	directive(
+		'text',
+		( {
+			directives: {
+				text: { default: text },
+			},
+			element,
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			element.props.children = evaluate( text, {
+				context: contextValue,
+			} );
 		}
 	);
 };
