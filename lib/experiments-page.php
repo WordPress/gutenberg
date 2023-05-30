@@ -91,12 +91,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-interactivity-api-core-blocks',
-		__( 'Core blocks', 'gutenberg' ),
+		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the core blocks using the Interactivity API', 'gutenberg' ),
+			'label' => __( 'Use the Interactivity API in File, Navigation and Image core blocks. It also enables the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
 			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);
