@@ -141,7 +141,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the third column in the columns block.
 		await pressKeyWithModifier( 'ctrlShift', '`' );
 		await pressKeyWithModifier( 'ctrlShift', '`' );
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'Tab', 3 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.waitForSelector(
 			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
