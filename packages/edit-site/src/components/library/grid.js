@@ -3,7 +3,9 @@
  */
 import { BlockPreview } from '@wordpress/block-editor';
 import {
-	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 	VisuallyHidden,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -39,11 +41,29 @@ const GridItem = ( { item } ) => {
 				justify="space-between"
 			>
 				<span>{ item.title }</span>
-				<Button
-					className="edit-site-library__button"
+				<DropdownMenu
 					icon={ moreHorizontal }
-					isSmall
-				/>
+					label={ __( 'Actions' ) }
+					className="edit-site-library__dropdown"
+					popoverProps={ { placement: 'bottom-end' } }
+					toggleProps={ {
+						className: 'edit-site-library__button',
+						isSmall: true,
+					} }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							<MenuItem
+								onClick={ () => {
+									// TODO: Implement pattern / template part deletion.
+									onClose();
+								} }
+							>
+								{ __( 'Delete' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
 			</HStack>
 		</div>
 	);
