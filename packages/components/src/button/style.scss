@@ -263,15 +263,24 @@
 	}
 
 	&.is-small {
-		height: $icon-size;
+		height: $button-size-small-next-default-32px;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			width: $icon-size;
-			min-width: $icon-size;
+			width: $button-size-small-next-default-32px;
+			min-width: $button-size-small-next-default-32px;
+		}
+
+		&:not(.is-next-32px-small-size) {
+			height: $button-size-small;
+
+			&.has-icon:not(.has-text) {
+				width: $button-size-small;
+				min-width: $button-size-small;
+			}
 		}
 	}
 
