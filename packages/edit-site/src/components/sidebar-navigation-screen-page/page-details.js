@@ -98,34 +98,35 @@ export default function PageDetails( { id } ) {
 
 	const { parentTitle, templateTitle } = useSelect(
 		( select ) => {
-			const { getEditedPostContext } = unlock( select( editSiteStore ) );
-			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			const { getEditedPostContext, getSettings } = unlock(
+				select( editSiteStore )
+			);
+			const defaultTemplateTypes = getSettings()?.defaultTemplateTypes;
 			const postContext = getEditedPostContext();
 
 			// Template title.
-			const currentThemeStyleSheet = getCurrentTheme()?.stylesheet;
 			const templateSlug =
 				// Checks that the post type matches the current theme's post type, otherwise
 				// the templateSlug returns 'home'.
 				postContext?.postType === 'page'
 					? postContext?.templateSlug
 					: null;
-			const _templateTitle =
-				currentThemeStyleSheet && templateSlug
-					? getEntityRecord(
-							'postType',
-							'wp_template',
-							`${
-								getCurrentTheme()?.stylesheet
-							}//${ templateSlug }`
-					  )?.title?.rendered
-					: null;
+			const _templateTitle = defaultTemplateTypes
+				? defaultTemplateTypes.find(
+						( template ) => template.slug === templateSlug
+				  )?.title
+				: null;
 
 			// Parent page title.
 			const _parentTitle = record?.parent
-				? getEntityRecord( 'postType', 'page', record.parent, {
-						_fields: [ 'title' ],
-				  } )?.title?.rendered
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'page',
+						record.parent,
+						{
+							_fields: [ 'title' ],
+						}
+				  )?.title?.rendered
 				: null;
 
 			return {
