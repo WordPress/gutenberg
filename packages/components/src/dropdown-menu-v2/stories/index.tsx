@@ -33,6 +33,7 @@ import { menu, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../../icon';
+import { ContextSystemProvider } from '../../ui/context';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
@@ -196,4 +197,20 @@ Default.args = {
 			<RadioItemsGroup />
 		</>
 	),
+};
+
+const toolbarVariantContextValue = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+};
+export const ToolbarVariant: ComponentStory< typeof DropdownMenu > = (
+	props
+) => (
+	<ContextSystemProvider value={ toolbarVariantContextValue }>
+		<DropdownMenu { ...props } />
+	</ContextSystemProvider>
+);
+ToolbarVariant.args = {
+	...Default.args,
 };
