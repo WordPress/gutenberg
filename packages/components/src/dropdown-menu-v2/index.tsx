@@ -31,6 +31,7 @@ import type {
 	DropdownMenuSeparatorProps,
 	DropdownSubMenuTriggerProps,
 	DropdownMenuContext,
+	DropdownMenuPrivateContext as DropdownMenuPrivateContextType,
 } from './types';
 
 // Menu content's side padding + 4px
@@ -38,11 +39,11 @@ const SUB_MENU_OFFSET_SIDE = 12;
 // Opposite amount of the top padding of the menu item
 const SUB_MENU_OFFSET_ALIGN = -8;
 
-const DropdownMenuPrivateContext = createContext< {
-	portalContainer: HTMLElement | null;
-} >( {
-	portalContainer: null,
-} );
+const DropdownMenuPrivateContext =
+	createContext< DropdownMenuPrivateContextType >( {
+		variant: undefined,
+		portalContainer: null,
+	} );
 
 /**
  * `DropdownMenu` displays a menu to the user (such as a set of actions
@@ -96,7 +97,7 @@ export const DropdownMenu = ( props: DropdownMenuProps ) => {
 					variant={ variant }
 				>
 					<DropdownMenuPrivateContext.Provider
-						value={ { portalContainer } }
+						value={ { variant, portalContainer } }
 					>
 						{ children }
 					</DropdownMenuPrivateContext.Provider>
@@ -145,7 +146,9 @@ export const DropdownSubMenu = ( {
 	children,
 	trigger,
 }: DropdownSubMenuProps ) => {
-	const { portalContainer } = useContext( DropdownMenuPrivateContext );
+	const { variant, portalContainer } = useContext(
+		DropdownMenuPrivateContext
+	);
 
 	return (
 		<DropdownMenuPrimitive.Sub
@@ -164,6 +167,7 @@ export const DropdownSubMenu = ( {
 					loop
 					sideOffset={ SUB_MENU_OFFSET_SIDE }
 					alignOffset={ SUB_MENU_OFFSET_ALIGN }
+					variant={ variant }
 				>
 					{ children }
 				</DropdownMenuStyled.SubContent>
@@ -265,6 +269,7 @@ export const DropdownMenuRadioItem = ( {
 	);
 };
 
-export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => (
-	<DropdownMenuStyled.Separator { ...props } />
-);
+export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => {
+	const { variant } = useContext( DropdownMenuPrivateContext );
+	return <DropdownMenuStyled.Separator { ...props } variant={ variant } />;
+};

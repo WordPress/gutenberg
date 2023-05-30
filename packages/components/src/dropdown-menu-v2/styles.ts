@@ -206,8 +206,10 @@ export const Content = styled( DropdownMenu.Content )<
 >`
 	${ ( props ) => baseContent( props.variant ) }
 `;
-export const SubContent = styled( DropdownMenu.SubContent )`
-	${ baseContent }
+export const SubContent = styled( DropdownMenu.SubContent )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	${ ( props ) => baseContent( props.variant ) }
 `;
 
 export const Item = styled( DropdownMenu.Item )`
@@ -245,10 +247,15 @@ export const Label = styled( DropdownMenu.Label )`
 	text-transform: uppercase;
 `;
 
-export const Separator = styled( DropdownMenu.Separator )`
-	height: 1px;
+export const Separator = styled( DropdownMenu.Separator )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	height: ${ CONFIG.borderWidth };
 	/* TODO: doesn't match border color from variables */
-	background-color: ${ COLORS.ui.borderDisabled };
+	background-color: ${ ( props ) =>
+		props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BORDER_COLOR
+			: COLORS.ui.borderDisabled };
 	/* Negative horizontal margin to make separator go from side to side */
 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
 `;

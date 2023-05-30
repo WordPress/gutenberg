@@ -256,3 +256,10 @@ export type DropdownMenuContext = {
 	 */
 	variant?: 'toolbar';
 };
+
+export type DropdownMenuPrivateContext = Pick<
+	DropdownMenuContext,
+	'variant'
+> & {
+	portalContainer: HTMLElement | null;
+};
