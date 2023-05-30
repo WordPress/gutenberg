@@ -14,12 +14,14 @@ import { getQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
+import SidebarButton from '../sidebar-button';
+import { store as editSiteStore } from '../../store';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
-import { store as editSiteStore } from '../../store';
 
 const DEFAULT_CATEGORY = 'header';
 const DEFAULT_TYPE = 'wp_template_part';
@@ -53,7 +55,14 @@ export default function SidebarNavigationScreenLibrary() {
 			description={ __(
 				'Manage what patterns are available when editing your site.'
 			) }
-			// actions={ {} }
+			actions={
+				<AddNewPattern
+					patternType={ categoryType }
+					toggleProps={ {
+						as: SidebarButton,
+					} }
+				/>
+			}
 			content={
 				<>
 					{ isLoading && __( 'Loading library' ) }
