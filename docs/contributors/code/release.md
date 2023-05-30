@@ -1,6 +1,6 @@
 # Gutenberg Release Process
 
-This repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
+This repository is used to perform several types of releases.It is helpful if you'd like to understand the different workflows.
 
 To release a stable version of the Gutenberg plugin you need:
 - To be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams), to launch the GitHub actions related to the release process and to potentially backport PRs to the release branch.
@@ -11,13 +11,18 @@ To [release WordPress's npm packages](#packages-releases-to-npm-and-wordpress-co
 
 ## Plugin Releases
 
-### Schedule
-
-We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
 The first step is [creating an issue in the Gutenberg repo](https://github.com/WordPress/gutenberg/issues/new?assignees=&labels=&projects=&template=New_release.md). 
 The issue template is called: "Gutenberg Release" and contains a checklist for the complete release process from Release Candidate to changelog curation to cherry-picking, stable release to release post. 
 The [issue for Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example. 
+
+The checklist helps you coordinate with the developer and other teams. 
+
+The Schedule will help you fill in the blank on the top of the issue. 
+
+### Schedule
+
+We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
 -   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. 
 
@@ -27,6 +32,27 @@ Release candidates should be versioned incrementally, starting with `-rc.1`, the
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
+When it's time, announce in core-editor channel that you are about to start the RC workflow. 
+
+### Organize and Label PRs on the relevant milestone 
+An example of such a review was published with 15.8 release, including the label changes made. 
+
+The changelog automation can be called separately from the release workflow with the following command on your local copy: 
+
+```npm run other:changelog -- --milestone="Gutenberg 15.8"```
+With the milestone being the final release version as string. 
+
+The output of this command is the changelog for this milestone at this moment time. Copy/paste it into a  Markdown document so you can view it and follow the links to the PRs.  
+
+The three sections to review are 
+- Enhancements - look for PRs that don’t have any sub category attached
+- Bug fixes - also look for PRs that don’t have any sub-category attached, 
+- Various  - that is created with PRs that don’t have any labels at all. 
+
+Changing the labels on PRs is much faster then reorganizing an existing changelog in the release section afterwards. 
+
+Now you are ready to start the release candidate worklow.
+
 ### Release Tool
 
 The plugin release process is mostly automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
@@ -35,11 +61,12 @@ For your convenience, here's an [11-minute video walkthrough](https://youtu.be/T
 
 #### Running workflow
 
-In order to start the release process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
+To start the release process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
 ![Run workflow dropdown for the plugin release](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-plugin-banner.png)
 
-To release a release candidate (RC) version of the plugin, enter `rc`. To release a stable version, enter `stable`. In each case, press the green "Run workflow" button.
+To release a release candidate (RC) version of the plugin, enter `rc`. 
+To release a stable version, enter `stable`. In each case, press the button **Run workflow**
 
 This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version, builds the Gutenberg plugin .zip file, creates a release draft, and attaches the plugin .zip file to it. This part of the process typically takes a little under six minutes. You'll see that workflow appear at the top of the list, right under the blue banner. Once it's finished, it'll change its status icon from a yellow dot to a green checkmark. You can follow along in a more detailed view by clicking on the workflow.
 
@@ -57,34 +84,17 @@ As soon as the workflow has finished, you'll find the release draft under [Guten
 
 The best time to work on the Changelog is at the moment when it’s first created during the Release candidate workflow. That’s when the changelog automation is called and the first version of the Changelog is available in the Release. 
 
-The stable release process takes the RC candidate changelog and adds it to the stable release. There is one caveat: The stable release only ‘remembers’ the first version, that is the version that is available when the Release candidate release is published. Subsequent changes of the changelog can be made but won’t make it into the stable release; only the first version. 
+The stable release process takes the RC candidates changelogs and adds them to the stable release. There is one caveat: The stable release only ‘remembers’ the first version, that is the version that is available when the Release candidate releases is published. Subsequent changes of the changelog of release candidates  won’t make it into the stable release; only the first version. 
 
 That means if you curate the whole changelog before you publish the Release candidate, you won’t have to work on it for the stable release, except for the few items of subsequent RC 2 or 3 releases that will also be added to the stable release. 
 
 The changelog process is mostly automated, it however depends heavily on proper labeling of the PRs. Before you run the RC candidate, you can save yourself additional time by checking that all PRs have proper labeling.
 
-### Review labels on PRs for the Milestone
-An example of such a review was published with 15.8 release, including the label changes made. 
-
-The changelog automation can be called separately from the release workflow with the following command on your local copy: 
-
-```npm run other:changelog -- --milestone="Gutenberg 15.8"```
-With the milestone being the final release version as string. 
-
-The output of this command is the changelog for this milestone at this moment time. Copy/paste it into a  Markdown document so you can view it and follow the links to the PRs.  
-
-The three sections to review are 
-- Enhancements - look for PRs that don’t have any sub category attached
-- Bug fixes - also look for PRs that don’t have any sub-category attached, 
-- Various  - that is created with PRs that don’t have any labels at all. 
-
-Changing the labels on PRs is much faster then reorganizing an existing changelog in the release section afterwards. That work is still to be done for other reasons, but if you double check the labels on a few dozen PRs, you don’t have to navigate the Markdown space up and down to reorganize it. 
-
-One the release changelog is available on draft, ake some time to read the generated notes and then edit them to ensure legibility and accuracy.
+One the release changelog is available on draft, make some time to read the generated notes and then edit them to ensure legibility and accuracy.
 
 Don't rush this part. It's important to ensure the release notes are as organized as possible, and it doesn't need to be completed in one go. You can save the draft and come back to it later.
 
-If you are worried that people couldn’t get access to the release candidate until you publish the release: you can share the release artifact with the core-editor chanel as it was already created, and you buy yourself some time to finishe the changelog curation task.
+If you are worried that people couldn’t get access to the release candidate version until you publish the release: you can share the release artifact with the core-editor channel as it was already created, and you buy yourself some time to finish the changelog curation task.
 
 ### Guidelines for proof-reading changelog items
 - Move all entries under the Various section to a more appropriate section.
