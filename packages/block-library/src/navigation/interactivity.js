@@ -81,11 +81,6 @@ store( {
 					Object.values( context.core.navigation.isMenuOpen ).filter(
 						Boolean
 					).length > 0,
-				menuOpenedOn: ( { context } ) =>
-					Object.entries( context.core.navigation.isMenuOpen )
-						.filter( ( [ , value ] ) => value )
-						.map( ( [ key ] ) => key )
-						.join( ', ' ) || 'none',
 			},
 		},
 	},

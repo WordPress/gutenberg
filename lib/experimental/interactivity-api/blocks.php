@@ -210,7 +210,6 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 		) ) {
 			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenuOnClick' );
 			$w->set_attribute( 'data-wp-bind.aria-expanded', 'selectors.core.navigation.isMenuOpen' );
-			$w->set_attribute( 'data-wp-bind.data-menu-opened-on', 'selectors.core.navigation.menuOpenedOn' );
 		};
 
 		// Iterate through subitems if exist.
