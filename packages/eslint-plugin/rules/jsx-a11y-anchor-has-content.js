@@ -35,6 +35,8 @@ const meta = {
 			'Anchors must have content and the content must be accessible by a screen reader. Check the first parameter to createInterpolateElement.',
 		invalidMarkup:
 			'The first parameter to createInterpolateElement does not contain valid markup for an anchor.',
+		unexpected:
+			'Unexpected error occurred: {{error}}. This is not an error in your code. Please report this to the Gutenberg team.',
 	},
 	schema: [
 		{
@@ -156,7 +158,14 @@ const rule = function ( context ) {
 			} catch ( e ) {
 				// if the error is not what we expect, something else went wrong and we should re-throw
 				if ( ! meta.messages.hasOwnProperty( e.message ) ) {
-					throw e;
+					context.report( {
+						node: interpolatedNode,
+						messageId: 'unexpected',
+						data: {
+							error: e.message,
+						},
+					} );
+					return;
 				}
 				context.report( {
 					node: interpolatedNode,
