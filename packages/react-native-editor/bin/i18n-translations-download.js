@@ -71,7 +71,16 @@ const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 const fetchTranslation = ( locale, projectSlug ) => {
 	const localeUrl = getLanguageUrl( locale, projectSlug );
 	return fetch( localeUrl )
-		.then( ( response ) => response.json() )
+		.then( ( response ) => {
+			if ( ! response.ok ) {
+				console.error(
+					`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`,
+					{ status: response.status, statusText: response.statusText }
+				);
+				return;
+			}
+			return response.json();
+		} )
 		.then( ( body ) => {
 			return { response: body, locale };
 		} )
