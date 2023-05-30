@@ -73,12 +73,12 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__sticky-section {
+.edit-site-sidebar-navigation-screen__sticky-section.edit-site-sidebar-navigation-screen__sticky-section {
 	position: sticky;
 	bottom: 0;
 	background-color: $gray-900;
 	gap: 0;
-	padding: $grid-unit-20 0;
-	margin: $grid-unit-20 0 #{- $grid-unit-20} 0;
+	padding: $grid-unit-40 0;
+	margin: $grid-unit-40 $grid-unit-20;
 	border-top: 1px solid $gray-800;
 }
