@@ -17,9 +17,16 @@ describe( 'Links', () => {
 	} );
 
 	const waitForURLFieldAutoFocus = async () => {
-		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
+		await page.waitForFunction( () => {
+			const input = document.querySelector(
+				'.block-editor-url-input__input'
+			);
+			if ( input ) {
+				input.focus();
+				return true;
+			}
+			return false;
+		} );
 	};
 
 	it( 'will use Post title as link text if link to existing post is created without any text selected', async () => {
@@ -520,11 +527,6 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
-
 			await page.keyboard.press( 'Tab' );
 
 			// Tabbing should land us in the text input.
@@ -582,15 +584,6 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			await waitForURLFieldAutoFocus();
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
-
-			await page.keyboard.press( 'Tab' );
-
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
@@ -617,14 +610,6 @@ describe( 'Links', () => {
 				'//button[contains(@aria-label, "Edit")]'
 			);
 			await editButton.click();
-			await waitForURLFieldAutoFocus();
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
-
-			await page.keyboard.press( 'Tab' );
 
 			// Tabbing should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -679,7 +664,7 @@ describe( 'Links', () => {
 			await page.waitForXPath( `//label[text()='Open in new tab']` );
 
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 4 );
+			await pressKeyTimes( 'Tab', 3 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
@@ -687,7 +672,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
 			// Move back to the text input.
-			await pressKeyTimes( 'Tab', 3 );
+			await pressKeyTimes( 'Tab', 2 );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -886,10 +871,6 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Enter' );
 
 			await waitForURLFieldAutoFocus();
-
-			// Link settings open
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Space' );
 
 			// Move to Link Text field.
 			await page.keyboard.press( 'Tab' );
