@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+-   `RangeControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#49105](https://github.com/WordPress/gutenberg/pull/49105)).
+
 ## 25.0.0 (2023-05-24)
 
 ### Breaking Changes
