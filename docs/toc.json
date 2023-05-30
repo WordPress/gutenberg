@@ -302,6 +302,7 @@
 				"docs/explanations/architecture/README.md": [
 					{ "docs/explanations/architecture/key-concepts.md": [] },
 					{ "docs/explanations/architecture/data-flow.md": [] },
+					{ "docs/explanations/architecture/entities.md": [] },
 					{ "docs/explanations/architecture/modularity.md": [] },
 					{ "docs/explanations/architecture/performance.md": [] },
 					{
@@ -399,8 +400,7 @@
 			{ "docs/contributors/accessibility-testing.md": [] },
 			{ "docs/contributors/repository-management.md": [] },
 			{ "docs/contributors/folder-structure.md": [] },
-			{ "docs/contributors/versions-in-wordpress.md": [] },
-			{ "docs/contributors/roadmap.md": [] }
+			{ "docs/contributors/versions-in-wordpress.md": [] }
 		]
 	}
 ]
