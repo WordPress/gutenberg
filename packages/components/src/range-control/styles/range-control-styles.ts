@@ -310,12 +310,12 @@ const inputNumberWidth = ( { size }: InputNumberProps ) => {
 
 	if ( size === '__unstable-large' ) {
 		return css( {
-			width: `${ sizes[ '__unstable-large' ] } !important`,
+			width: `${ sizes[ '__unstable-large' ] }`,
 		} );
 	}
 
 	return css`
-		width: ${ sizes.default } !important;
+		width: ${ sizes.default };
 	`;
 };
 
