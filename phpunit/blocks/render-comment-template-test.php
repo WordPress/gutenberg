@@ -121,4 +121,55 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 			"Rendered markup doesn't contain Comment Author Name block."
 		);
 	}
+
+	public function test_inner_block_inserted_by_render_block_data_is_retained() {
+		$render_block_callback = new MockAction();
+		add_filter( 'render_block', array( $render_block_callback, 'filter' ), 10, 3 );
+
+		$render_block_data_callback = static function( $parsed_block ) {
+			// Add a Social Links block to a Comment Template block's inner blocks.
+			if ( 'core/comment-template' === $parsed_block['blockName'] ) {
+				$inserted_block_markup = <<<END
+<!-- wp:social-links -->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+<!-- /wp:social-links -->'
+END;
+
+				$inserted_blocks = parse_blocks( $inserted_block_markup );
+
+				$parsed_block['innerBlocks'][] = $inserted_blocks[0];
+			}
+			return $parsed_block;
+		};
+
+		add_filter( 'render_block_data', $render_block_data_callback, 10, 1 );
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comments --><!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template --><!-- /wp:comments -->'
+		);
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$block->render();
+		remove_filter( 'render_block_data', $render_block_data_callback );
+
+		$this->assertSame( 5, $render_block_callback->get_call_count() );
+
+		$args = $render_block_callback->get_args();
+		$this->assertSame( 'core/comment-content', $args[0][2]->name );
+		$this->assertSame( 'core/comment-template', $args[1][2]->name );
+		$this->assertCount( 2, $args[1][2]->inner_blocks, "Inner block inserted by render_block_data filter wasn't retained." );
+		$this->assertInstanceOf(
+			'WP_Block',
+			$args[1][2]->inner_blocks[1],
+			"Inner block inserted by render_block_data isn't a WP_Block class instance."
+		);
+		$this->assertSame(
+			'core/social-links',
+			$args[1][2]->inner_blocks[1]->name,
+			"Inner block inserted by render_block_data isn't named as expected."
+		);
+	}
 }
