@@ -131,6 +131,10 @@ function FontLibraryProvider( { children } ) {
 		return !! activatedFontsOutline[ slug ]?.includes( style + weight );
 	};
 
+	const getFontFacesActivated = ( slug ) => {
+		return activatedFontsOutline[ slug ] || [];
+	};
+
 	async function installFonts( libraryFonts ) {
 		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
 		setLibraryFonts( newLibraryFonts );
@@ -266,6 +270,7 @@ function FontLibraryProvider( { children } ) {
 				libraryFonts,
 				installedFonts,
 				isFontActivated,
+				getFontFacesActivated,
 				googleFonts,
 				googleFontsCategories,
 				loadFontFaceAsset,

@@ -12,10 +12,13 @@ import FontCard from './font-card';
 import { FontLibraryContext } from './context';
 
 function LibraryFontCard( { font, onClick } ) {
-	const { toggleActivateFont, isFontActivated } =
+	const { toggleActivateFont, isFontActivated, getFontFacesActivated } =
 		useContext( FontLibraryContext );
-	const isActive = isFontActivated( font.slug );
 
+	const isActive = isFontActivated( font.slug );
+	const facesActivated = getFontFacesActivated( font.slug );
+	const isPartiallyActivated = !!facesActivated.length && facesActivated.length < font?.fontFace?.length;
+	
 	const handleToggleFontActivation = () => {
 		toggleActivateFont( font );
 	};
@@ -29,6 +32,7 @@ function LibraryFontCard( { font, onClick } ) {
 			checked={ isActive }
 			onClick={ ( e ) => e.stopPropagation() }
 			onChange={ handleToggleFontActivation }
+			indeterminate={ isPartiallyActivated }
 		/>
 	);
 
