@@ -30,6 +30,5 @@
 	"supports": {
 		"html": false
 	},
-	"editorStyle": "wp-block-footnotes-editor",
 	"style": "wp-block-footnotes"
 }
