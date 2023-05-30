@@ -161,5 +161,15 @@ END;
 		$this->assertSame( 'core/comment-content', $args[0][2]->name );
 		$this->assertSame( 'core/comment-template', $args[1][2]->name );
 		$this->assertCount( 2, $args[1][2]->inner_blocks, "Inner block inserted by render_block_data filter wasn't retained." );
+		$this->assertInstanceOf(
+			'WP_Block',
+			$args[1][2]->inner_blocks[1],
+			"Inner block inserted by render_block_data isn't a WP_Block class instance."
+		);
+		$this->assertSame(
+			'core/social-links',
+			$args[1][2]->inner_blocks[1]->name,
+			"Inner block inserted by render_block_data isn't named as expected."
+		);
 	}
 }
