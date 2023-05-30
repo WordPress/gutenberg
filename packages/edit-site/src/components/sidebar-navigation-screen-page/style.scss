@@ -60,3 +60,15 @@
 		fill: $alert-green;
 	}
 }
+
+.edit-site-sidebar-navigation-screen-page__details {
+	.edit-site-sidebar-navigation-screen-page__details-label {
+		color: $gray-600;
+		width: 100px;
+	}
+
+	.edit-site-sidebar-navigation-screen-page__details-value.edit-site-sidebar-navigation-screen-page__details-value {
+		color: $gray-200;
+	}
+}
+
