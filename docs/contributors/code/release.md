@@ -1,6 +1,6 @@
 # Gutenberg Release Process
 
-This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
+This repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
 To release a stable version of the Gutenberg plugin you need:
 - To be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams), to launch the GitHub actions related to the release process and to potentially backport PRs to the release branch.
@@ -19,7 +19,9 @@ The first step is [creating an issue in the Gutenberg repo](https://github.com/W
 The issue template is called: "Gutenberg Release" and contains a checklist for the complete release process from Release Candidate to changelog curation to cherry-picking, stable release to release post. 
 The [issue for Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example. 
 
--   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
+-   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. 
+
+Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
 
 -   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released and the release post is published.  
 
@@ -27,7 +29,7 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 
 ### Release Tool
 
-The plugin release process is entirely automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
+The plugin release process is mostly automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
 
 For your convenience, here's an [11-minute video walkthrough](https://youtu.be/TnSgJd3zpJY) that demonstrates the release process. It's recommended to watch this if you're unfamiliar with it. The process is also documented in the following paragraphs.
 
