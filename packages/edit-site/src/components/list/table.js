@@ -127,7 +127,8 @@ export default function Table( { templateType } ) {
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
 							<TemplateActions
-								template={ template }
+								postType={ template.type }
+								postId={ template.id }
 								className="edit-site-list-table__actions"
 							/>
 						</td>

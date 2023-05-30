@@ -84,7 +84,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description, template: record };
+	return { title, description };
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -93,7 +93,7 @@ export default function SidebarNavigationScreenTemplate() {
 		params: { postType, postId },
 	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, description, template } = useTemplateTitleAndDescription(
+	const { title, description } = useTemplateTitleAndDescription(
 		postType,
 		postId
 	);
@@ -104,7 +104,8 @@ export default function SidebarNavigationScreenTemplate() {
 			actions={
 				<div>
 					<TemplateActions
-						template={ template }
+						postType={ postType }
+						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
 							navigator.goTo( `/${ postType }/all` );
