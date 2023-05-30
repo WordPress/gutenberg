@@ -84,12 +84,9 @@ const MainContent = ( {
 } ) => {
 	const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree.
-	const clientIdsTree = useSelect(
+	const hasChildren = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
-			return __unstableGetClientIdsTree( clientId );
+			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
 	);
@@ -116,13 +113,12 @@ const MainContent = ( {
 
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">
-			{ clientIdsTree.length === 0 && (
+			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
 					{ __( 'This navigation menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView
-				blocks={ clientIdsTree }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
