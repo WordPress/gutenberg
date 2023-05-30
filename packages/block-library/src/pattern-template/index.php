@@ -22,7 +22,7 @@ function register_block_core_pattern_template() {
 /**
  * Replaces token blocks with the matching placeholder block.
  *
- * @param WP_Block_List $content_blocks     The content inner blocks.
+ * @param WP_Block_List $content_block      The content inner blocks.
  * @param array         $placeholder_blocks The block's content.
  *
  * @return WP_Block_List The compiled block list.
@@ -56,9 +56,9 @@ function block_core_pattern_template_replace_content_tokens_with_placeholder_blo
 /**
  * Renders the `core/pattern` block on the server.
  *
- * @param array $attributes Block attributes.
- * @param array $content    The block's content.
- * @param array $block      The WP_Block object.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    The block's content.
+ * @param WP_Block $block      The WP_Block object.
  *
  * @return string Returns the output of the pattern template.
  */
