@@ -261,6 +261,53 @@ _Returns_
 
 -   `Object`: Action object.
 
+### removeAllNotices
+
+Removes all notices from a given context. Defaults to the default context.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+export const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button onClick={ () => removeAllNotices() }>
+				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+			</Button>
+			<Button onClick={ () => removeAllNotices( 'snackbar' ) }>
+				{ __(
+					'Clear all snackbar notices',
+					'woo-gutenberg-products-block'
+				) }
+			</Button>
+		</>
+	);
+};
+```
+
+_Parameters_
+
+-   _noticeType_ `string`: The context to remove all notices from.
+-   _context_ `string`: The context to remove all notices from.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### removeNotice
 
 Returns an action object used in signalling that a notice is to be removed.
