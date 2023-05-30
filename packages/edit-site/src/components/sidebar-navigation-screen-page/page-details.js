@@ -136,16 +136,18 @@ export default function PageDetails( { id } ) {
 		[ record ]
 	);
 	return (
-		<VStack
-			className="edit-site-sidebar-navigation-screen-page__details"
-			spacing={ 5 }
-		>
+		<VStack spacing={ 5 }>
 			{ getPageDetails( {
 				parentTitle,
 				templateTitle,
 				...record,
 			} ).map( ( { label, value } ) => (
-				<HStack key={ label } spacing={ 5 } alignment="left">
+				<HStack
+					key={ label }
+					spacing={ 5 }
+					alignment="left"
+					className="edit-site-sidebar-navigation-screen-page__details"
+				>
 					<Text className="edit-site-sidebar-navigation-screen-page__details-label">
 						{ label }
 					</Text>

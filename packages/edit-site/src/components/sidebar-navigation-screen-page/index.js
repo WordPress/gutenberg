@@ -136,23 +136,29 @@ export default function SidebarNavigationScreenPage() {
 				</>
 			}
 			footer={
-				<HStack spacing={ 5 } alignment="left">
-					<Text className="edit-site-sidebar-navigation-screen-page__details-label">
-						{ __( 'Last modified' ) }
-					</Text>
-					<Text className="edit-site-sidebar-navigation-screen-page__details-value">
-						{ createInterpolateElement(
-							sprintf(
-								/* translators: %s: is the relative time when the post was last modified. */
-								__( '<time>%s</time>' ),
-								humanTimeDiff( record.modified )
-							),
-							{
-								time: <time dateTime={ record.modified } />,
-							}
-						) }
-					</Text>
-				</HStack>
+				!! record?.modified && (
+					<HStack
+						spacing={ 5 }
+						alignment="left"
+						className="edit-site-sidebar-navigation-screen-page__details"
+					>
+						<Text className="edit-site-sidebar-navigation-screen-page__details-label">
+							{ __( 'Last modified' ) }
+						</Text>
+						<Text className="edit-site-sidebar-navigation-screen-page__details-value">
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %s: is the relative time when the post was last modified. */
+									__( '<time>%s</time>' ),
+									humanTimeDiff( record.modified )
+								),
+								{
+									time: <time dateTime={ record.modified } />,
+								}
+							) }
+						</Text>
+					</HStack>
+				)
 			}
 		/>
 	) : null;
