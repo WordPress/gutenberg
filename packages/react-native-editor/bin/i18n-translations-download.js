@@ -116,7 +116,16 @@ const fetchTranslations = ( {
 	let extraTranslations = [];
 
 	return Promise.all( fetchPromises ).then( ( results ) => {
-		const fetchedTranslations = results.filter( Boolean );
+		const fetchedTranslations = results.filter(
+			( result ) => result.response
+		);
+
+		// Abort process if any translation can't be fetched
+		if ( fetchedTranslations.length !== supportedLocales.length ) {
+			process.exit( 1 );
+			return;
+		}
+
 		const translationFilePromises = fetchedTranslations.map(
 			( languageResult ) => {
 				return new Promise( ( resolve, reject ) => {
