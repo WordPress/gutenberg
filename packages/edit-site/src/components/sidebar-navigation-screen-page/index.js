@@ -145,9 +145,9 @@ export default function SidebarNavigationScreenPage() {
 				: null;
 
 			if ( _parentTitle?.title ) {
-				_parentTitle = _parentTitle.title?.rendered
-					? decodeEntities( _parentTitle.title.rendered )
-					: __( 'Untitled' );
+				_parentTitle = decodeEntities(
+					_parentTitle.title?.rendered || __( '(no title)' )
+				);
 			} else {
 				_parentTitle = __( 'Top level' );
 			}
@@ -181,7 +181,9 @@ export default function SidebarNavigationScreenPage() {
 
 	return record ? (
 		<SidebarNavigationScreen
-			title={ decodeEntities( record?.title?.rendered ) }
+			title={ decodeEntities(
+				record?.title?.rendered || __( '(no title)' )
+			) }
 			actions={
 				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }
@@ -218,8 +220,9 @@ export default function SidebarNavigationScreenPage() {
 										altText
 											? decodeEntities( altText )
 											: decodeEntities(
-													record.title?.rendered
-											  ) || __( 'Featured image' )
+													record.title?.rendered ||
+														__( 'Featured image' )
+											  )
 									}
 									src={ mediaSourceUrl }
 								/>

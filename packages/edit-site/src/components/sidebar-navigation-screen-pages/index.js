@@ -111,8 +111,9 @@ export default function SidebarNavigationScreenPages() {
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ decodeEntities(
-											homeTemplate.title?.rendered
-										) ?? __( '(no title)' ) }
+											homeTemplate.title?.rendered ||
+												__( '(no title)' )
+										) }
 									</Truncate>
 								</PageItem>
 							) }
@@ -137,8 +138,9 @@ export default function SidebarNavigationScreenPages() {
 									>
 										<Truncate numberOfLines={ 1 }>
 											{ decodeEntities(
-												item.title?.rendered
-											) ?? __( '(no title)' ) }
+												item?.title?.rendered ||
+													__( '(no title)' )
+											) }
 										</Truncate>
 									</PageItem>
 								);
@@ -154,8 +156,9 @@ export default function SidebarNavigationScreenPages() {
 									>
 										<Truncate numberOfLines={ 1 }>
 											{ decodeEntities(
-												item.title?.rendered
-											) ?? __( '(no title)' ) }
+												item.title?.rendered ||
+													__( '(no title)' )
+											) }
 										</Truncate>
 									</PageItem>
 								) ) }
