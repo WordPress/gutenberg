@@ -21,6 +21,7 @@ const config = defineConfig( {
 	// Don't report slow test "files", as we will be running our tests in serial.
 	reportSlowTests: null,
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
+	testIgnore: '**/performance/**',
 	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
