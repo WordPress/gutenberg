@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancements
+### New Feature
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 
