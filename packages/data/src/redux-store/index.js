@@ -248,6 +248,13 @@ export default function createReduxStore( key, options ) {
 			}
 
 			const boundPrivateSelectors = createBindingCache( bindSelector );
+
+			// Pre-bind the private selectors that have been registered by the time of
+			// instantiation, so that registry selectors are bound to the registry.
+			for ( const privateSelector of Object.values( privateSelectors ) ) {
+				boundPrivateSelectors.get( privateSelector );
+			}
+
 			const allSelectors = new Proxy( () => {}, {
 				get: ( target, prop ) => {
 					const privateSelector = privateSelectors[ prop ];
