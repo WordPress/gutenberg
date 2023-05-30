@@ -112,7 +112,6 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 	) ) {
 		$w->set_attribute( 'data-wp-class.has-modal-open', 'selectors.core.navigation.isMenuOpen' );
 		$w->set_attribute( 'data-wp-class.is-menu-open', 'selectors.core.navigation.isMenuOpen' );
-		$w->set_attribute( 'data-wp-bind.aria-hidden', '!selectors.core.navigation.isMenuOpen' );
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
 		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
