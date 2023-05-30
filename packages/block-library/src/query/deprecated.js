@@ -454,9 +454,8 @@ const v4 = {
 		return <Tag { ...innerBlocksProps } />;
 	},
 	isEligible: ( { layout } ) =>
-		! layout ||
-		layout.inherit ||
-		( layout.contentSize && layout.type !== 'constrained' ),
+		layout?.inherit ||
+		( layout?.contentSize && layout?.type !== 'constrained' ),
 	migrate( attributes, innerBlocks ) {
 		const withConstrainedLayoutAttributes =
 			migrateToConstrainedLayout( attributes );
