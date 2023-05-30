@@ -37,7 +37,7 @@ export default function QueryPaginationEdit( {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
 		/**
-		 * Show the `paginationArrow` and 'showLabel' controls only if a
+		 * Show the `paginationArrow` and `showLabel` controls only if a
 		 * `QueryPaginationNext/Previous` block exists.
 		 */
 		return innerBlocks?.find( ( innerBlock ) => {
