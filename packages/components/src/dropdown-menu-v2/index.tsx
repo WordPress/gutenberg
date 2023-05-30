@@ -14,7 +14,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
+import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
 import { useSlot } from '../slot-fill';
 import Icon from '../icon';
 import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
@@ -45,11 +45,7 @@ const DropdownMenuPrivateContext =
 		portalContainer: null,
 	} );
 
-/**
- * `DropdownMenu` displays a menu to the user (such as a set of actions
- * or functions) triggered by a button.
- */
-export const DropdownMenu = ( props: DropdownMenuProps ) => {
+const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 	const {
 		// Root props
 		defaultOpen,
@@ -70,7 +66,7 @@ export const DropdownMenu = ( props: DropdownMenuProps ) => {
 	} = useContextSystem<
 		// Adding `className` to the context type to avoid a TS error
 		DropdownMenuProps & DropdownMenuContext & { className?: string }
-	>( props, 'DropdownMenuV2' );
+	>( props, 'DropdownMenu' );
 
 	// Render the portal in the default slot used by the legacy Popover component.
 	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
@@ -106,6 +102,15 @@ export const DropdownMenu = ( props: DropdownMenuProps ) => {
 		</DropdownMenuPrimitive.Root>
 	);
 };
+
+/**
+ * `DropdownMenu` displays a menu to the user (such as a set of actions
+ * or functions) triggered by a button.
+ */
+export const DropdownMenu = contextConnectWithoutRef(
+	UnconnectedDropdownMenu,
+	'DropdownMenu'
+);
 
 export const DropdownSubMenuTrigger = ( {
 	prefix,
