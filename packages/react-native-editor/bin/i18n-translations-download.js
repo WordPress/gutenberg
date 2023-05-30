@@ -64,7 +64,7 @@ const MAX_RETRIES = 5;
 const RETRY_DELAY = 2000;
 
 const getLanguageUrl = ( locale, projectSlug ) =>
-	`https://translate.wordpress.org/projects/${ projectSlug }/dev/${ locale }/default/export-translations\?format\=json`;
+	`https://translate.wordpress.org/projects/${ projectSlug }/dev/${ locale }/default/export-translations/\?format\=json`;
 
 const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 
