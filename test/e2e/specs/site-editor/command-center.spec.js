@@ -28,6 +28,9 @@ test.describe( 'Site editor command center', () => {
 		await page.getByRole( 'option', { name: 'Add new page' } ).click();
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 		const frame = page.frame( 'editor-canvas' );
+		await expect( page ).toHaveURL(
+			'/wp-admin/post-new.php?post_type=page'
+		);
 		await expect(
 			frame.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeVisible();
