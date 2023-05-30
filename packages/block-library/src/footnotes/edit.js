@@ -2,28 +2,10 @@
  * WordPress dependencies
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/compose';
 
 export default function FootnotesEdit( { attributes, setAttributes } ) {
-	const ref = useRefEffect( ( node ) => {
-		const { ownerDocument } = node;
-		function onClick( event ) {
-			const { target } = event;
-			if ( target.nodeName !== 'A' ) return;
-			if ( target.isContentEditable ) return;
-
-			const id = target.getAttribute( 'href' ).replace( '#', '' );
-			ownerDocument.getElementById( id )?.focus();
-			event.preventDefault();
-		}
-		ownerDocument.addEventListener( 'click', onClick );
-		return () => {
-			ownerDocument.removeEventListener( 'click', onClick );
-		};
-	}, [] );
-
 	return (
-		<footer { ...useBlockProps( { ref } ) }>
+		<footer { ...useBlockProps() }>
 			<ol>
 				{ attributes.footnotes.map( ( { id, content } ) => (
 					<li key={ id }>

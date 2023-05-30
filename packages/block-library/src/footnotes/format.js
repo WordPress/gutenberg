@@ -7,8 +7,8 @@ import { v4 as createId } from 'uuid';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { group as icon } from '@wordpress/icons';
-import { insert, applyFormat } from '@wordpress/rich-text';
+import { formatListNumbered as icon } from '@wordpress/icons';
+import { insertObject } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	store as blockEditorStore,
@@ -20,23 +20,23 @@ export const format = {
 	tagName: 'a',
 	className: 'fn',
 	contentEditable: false,
-	edit: function Edit( { value, onChange, isActive } ) {
+	edit: function Edit( { value, onChange, isObjectActive } ) {
 		const registry = useRegistry();
 		const { getBlocks } = useSelect( blockEditorStore );
 		const { selectionChange } = useDispatch( blockEditorStore );
 		function onClick() {
 			registry.batch( () => {
 				const id = createId();
-				let newValue = insert( value, '*' );
-				newValue.start = newValue.end - 1;
-				newValue = applyFormat( newValue, {
+				const newValue = insertObject( value, {
 					type: 'core/footnote',
 					attributes: {
 						href: '#' + id,
 						id: `${ id }-link`,
 						'data-fn': id,
 					},
+					innerHTML: '*',
 				} );
+				newValue.start = newValue.end - 1;
 
 				onChange( newValue );
 
@@ -61,7 +61,7 @@ export const format = {
 				icon={ icon }
 				title={ __( 'Footnote' ) }
 				onClick={ onClick }
-				isActive={ isActive }
+				isActive={ isObjectActive }
 			/>
 		);
 	},
