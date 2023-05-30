@@ -12,6 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -144,7 +145,7 @@ export const removeTemplate =
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					decodeEntities( template.title.rendered )
 				),
 				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);

@@ -180,12 +180,7 @@ export default function Editor( { isLoading } ) {
 									'is-loading': isLoading,
 								}
 							) }
-							notices={
-								( isEditMode ||
-									window?.__experimentalEnableThemePreviews ) && (
-									<EditorSnackbars />
-								)
-							}
+							notices={ <EditorSnackbars /> }
 							content={
 								<>
 									<GlobalStylesRenderer />
