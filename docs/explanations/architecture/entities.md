@@ -24,7 +24,7 @@ Once the entity is loaded, you can edit it. For example, the following code sets
  
 The package also exposes a set of actions to manipulate the fetched entity records.
 
-To fetch an entity record, you can call `editEntityRecord`, which takes the entity type, the entity ID and the new entity record as parameters. The following example sets the title of the post with ID 1 to "Hello World".
+To edit an entity record, you can call `editEntityRecord`, which takes the entity type, the entity ID and the new entity record as parameters. The following example sets the title of the post with ID 1 to "Hello World".
 
 ````js
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, { title: 'Hello World' } );
@@ -42,13 +42,13 @@ Since the WordPress editors allow multiple entity records to be edited at the sa
 
 And to be able to perform both undo and redo operations propertly, each modification in the list of edits contains the following information:
 
- - Entity kind and name: Each entity in core-data is identified by a tuple kind, name. This corresponds to the identifier of the modified entity. 
+ - Entity kind and name: Each entity in core-data is identified by the pair _(kind, name)_. This corresponds to the identifier of the modified entity. 
  - Entity Record ID: The ID of the modified record.
  - Property: The name of the modified property.
  - From: The previous value of the property (needed to apply the undo operation).
  - To: The new value of the property (needed to apply the redo operation).
  
-For example, let's say a user edits the title of a post, followed by a modification to the post slug, and then a modification of the title of a reusable block used with the post for instance. The following information is stored in the undo/redo stack:
+For example, let's say a user edits the title of a post, followed by a modification to the post slug, and then a modification of the title of a reusable block used with the post. The following information is stored in the undo/redo stack:
 
  - `[ { kind: 'postType', name: 'post', id: 1, property: 'title', from: '', to: 'Hello World' } ]`
  - `[ { kind: 'postType', name: 'post', id: 1, property: 'slug', from: 'Previous slug', to: 'This is the slug of the hello world post' } ]`
@@ -60,4 +60,4 @@ The store also keep tracks of a "pointer" to the current "undo/redo" step. By de
 
 The undo/redo core behavior also supports what we call "transient modifications". These are modifications that are not stored in the undo/redo stack right away. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
 
-So by default, `core-data` store considers all modifications to properties that are marked as "transient" (like the `blocks` property in the post entity) as transient modifications. It keeps these modifications outside the undo/redo stack in what is called a "cache" of modifications and these modifications are only stored in the undo/redo stack when we explicitely call `__unstableCreateUndoLevel` or when the next non transient modification is performed.
+So by default, `core-data` store considers all modifications to properties that are marked as "transient" (like the `blocks` property in the post entity) as transient modifications. It keeps these modifications outside the undo/redo stack in what is called a "cache" of modifications and these modifications are only stored in the undo/redo stack when we explicitely call `__unstableCreateUndoLevel` or when the next non-transient modification is performed.
