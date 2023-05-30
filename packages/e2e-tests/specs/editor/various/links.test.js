@@ -18,7 +18,10 @@ describe( 'Links', () => {
 
 	const waitForURLFieldAutoFocus = async () => {
 		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
+			() =>
+				!! document.activeElement.closest(
+					'.block-editor-url-input__input'
+				)
 		);
 	};
 
