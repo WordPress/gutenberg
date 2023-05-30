@@ -14,7 +14,7 @@ const TEMPLATE = [
 			[
 				'core/buttons',
 				{},
-				[ [ 'core/button', { label: 'Click here!' } ] ],
+				[ [ 'core/button', { text: 'Click here!' } ] ],
 			],
 		],
 	],
