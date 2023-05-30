@@ -39,7 +39,7 @@ add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_
  * >
  *   <button
  *     class="wp-block-navigation__responsive-container-open"
- *     data-wp-on.click="actions.core.navigation.openMenu"
+ *     data-wp-on.click="actions.core.navigation.openMenuOnClick"
  *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
  *   >
  *   <div
@@ -167,10 +167,12 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  *   data-wp-effect="effects.core.navigation.initMenu"
  *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
  *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+ * 	 data-wp-on.mouseenter="actions.core.navigation.openMenuOnHover"
+ * 	 data-wp-on.mouseleave="actions.core.navigation.closeMenuOnHover"
  * >
  *   <button
  *     class="wp-block-navigation-submenu__toggle"
- *     data-wp-on.click="actions.core.navigation.openMenuOnClick"
+ *     data-wp-on.click="actions.core.navigation.toggleMenuOnClick"
  *     data-wp-bind.aria-expanded="selectors.core.navigation.isMenuOpen"
  *   >
  *   </button>

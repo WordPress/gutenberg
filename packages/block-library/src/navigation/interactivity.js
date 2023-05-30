@@ -21,13 +21,14 @@ const openMenu = ( { context, ref }, menuOpenedOn ) => {
 	context.core.navigation.isMenuOpen[ menuOpenedOn ] = true;
 	context.core.navigation.previousFocus = ref;
 	if ( context.core.navigation.overlay ) {
-		// It adds a `has-modal-open` class to the <html> root
+		// Add a `has-modal-open` class to the <html> root.
 		document.documentElement.classList.add( 'has-modal-open' );
 	}
 };
 
 const closeMenu = ( { context, selectors }, menuClosedOn ) => {
 	context.core.navigation.isMenuOpen[ menuClosedOn ] = false;
+	// Check if the menu is still open or not.
 	if ( ! selectors.core.navigation.isMenuOpen( { context } ) ) {
 		if (
 			context.core.navigation.modal.contains(
@@ -78,6 +79,7 @@ store( {
 						? 'dialog'
 						: '',
 				isMenuOpen: ( { context } ) =>
+					// The menu is opened if either `click` or `hover` is true.
 					Object.values( context.core.navigation.isMenuOpen ).filter(
 						Boolean
 					).length > 0,
@@ -149,7 +151,8 @@ store( {
 					// If focus is outside modal, and in the document, close menu
 					// event.target === The element losing focus
 					// event.relatedTarget === The element receiving focus (if any)
-					// When focusout is outsite the document, `window.document.activeElement` doesn't change
+					// When focusout is outsite the document,
+					// `window.document.activeElement` doesn't change
 					if (
 						context.core.navigation.isMenuOpen.click &&
 						! context.core.navigation.modal.contains(
