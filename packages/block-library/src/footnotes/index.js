@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { group as icon } from '@wordpress/icons';
+import { formatListNumbered as icon } from '@wordpress/icons';
 import { registerFormatType } from '@wordpress/rich-text';
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
