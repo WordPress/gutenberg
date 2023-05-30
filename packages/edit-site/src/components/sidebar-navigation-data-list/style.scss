@@ -6,7 +6,17 @@
 		width: 100px;
 	}
 
-	.edit-site-sidebar-navigation_data-list__value.edit-site-sidebar-navigation_data-list__value {
+	.edit-site-sidebar-navigation_data-list__value {
 		color: $gray-200;
+		flex-grow: 1;
+	}
+	.components-button.is-tertiary {
+		color: $gray-200;
+		width: 100%;
+		margin: 0 0 0 -$grid-unit-10;
+		&:hover {
+			background-color: $gray-800;
+			color: $gray-100;
+		}
 	}
 }

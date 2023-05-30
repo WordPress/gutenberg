@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { pencil } from '@wordpress/icons';
+import { pencil, header, footer } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
+	Button,
 	Icon,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import { humanTimeDiff } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -19,6 +21,10 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
+import SidebarDetails from '../sidebar-navigation-data-list';
+import DataListItem from '../sidebar-navigation-data-list/data-list-item';
+import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
+import { createInterpolateElement } from '@wordpress/element';
 
 function useTemplateTitleAndDescription( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -84,8 +90,9 @@ export default function SidebarNavigationScreenTemplate() {
 		postType,
 		postId
 	);
+	const { record } = useEntityRecord( 'postType', 'wp_template', postId );
 
-	return (
+	return record ? (
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
@@ -95,7 +102,55 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
+			content={
+				<>
+					<SidebarNavigationSubtitle>Areas</SidebarNavigationSubtitle>
+					<SidebarDetails
+						details={ [
+							{
+								label: 'Header',
+								value: (
+									<Button
+										variant="tertiary"
+										as="a"
+										icon={ header }
+									>
+										Primary
+									</Button>
+								),
+							},
+							{
+								label: 'Footer',
+								value: (
+									<Button
+										variant="tertiary"
+										as="a"
+										icon={ footer }
+									>
+										Footer
+									</Button>
+								),
+							},
+						] }
+					/>
+				</>
+			}
+			footer={
+				<DataListItem
+					label={ __( 'Last modified' ) }
+					value={ createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the relative time when the post was last modified. */
+							__( '<time>%s</time>' ),
+							humanTimeDiff( record.modified )
+						),
+						{
+							time: <time dateTime={ record.modified } />,
+						}
+					) }
+				/>
+			}
 			description={ description }
 		/>
-	);
+	) : null;
 }
