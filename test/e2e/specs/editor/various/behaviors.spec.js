@@ -21,9 +21,32 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deleteAllPosts();
 	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
+	test.beforeEach( async ( { admin, page, requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( true );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
+	} );
+
+	test.afterEach( async ( { admin, page, requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
 	} );
 
 	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
