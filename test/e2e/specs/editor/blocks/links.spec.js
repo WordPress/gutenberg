@@ -103,7 +103,7 @@ test.describe( 'Links', () => {
 
 		// Edit link.
 		await pageUtils.pressKeys( 'primary+k' );
-		await pageUtils.pressKeys( 'primary+a' );
+		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Update the link.
