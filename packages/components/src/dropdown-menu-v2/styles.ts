@@ -8,7 +8,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl } from '../utils';
+import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 import Icon from '../icon';
 
@@ -58,7 +58,7 @@ const slideLeftAndFade = keyframes( {
 const baseContent = css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
-	border-radius: 6px;
+	border-radius: ${ CONFIG.radiusBlockUi };
 	padding: ${ CONTENT_WRAPPER_PADDING };
 	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
 		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
@@ -156,7 +156,7 @@ const baseItem = css`
 	font-weight: normal;
 	line-height: 20px;
 	color: ${ COLORS.gray[ 900 ] };
-	border-radius: 3px;
+	border-radius: ${ CONFIG.radiusBlockUi };
 	display: flex;
 	align-items: center;
 	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
