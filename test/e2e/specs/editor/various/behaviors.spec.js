@@ -50,7 +50,9 @@ test.describe( 'Testing behaviors functionality', () => {
 		await page.waitForLoadState();
 	} );
 
-	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
+	// Skipped because the release won't have the behaviors UI.
+	// So we cannot test that the behaviors inferface is present or its values.
+	test.skip( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -79,7 +81,9 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( options ).toHaveCount( 2 );
 	} );
 
-	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
+	// Skipped because the release won't have the behaviors UI.
+	// So we cannot test that the behaviors inferface is present or its values.
+	test.skip( 'Behaviors UI can be disabled in the `theme.json`', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -106,7 +110,9 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( page.getByLabel( 'Behavior' ) ).toHaveCount( 0 );
 	} );
 
-	test( "Block's value for behaviors takes precedence over the theme's value", async ( {
+	// Skipped because the release won't have the behaviors UI.
+	// So we cannot test that the behaviors inferface is present or its values.
+	test.skip( "Block's value for behaviors takes precedence over the theme's value", async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -146,7 +152,9 @@ test.describe( 'Testing behaviors functionality', () => {
 		// lightbox even though the theme.json has it set to false.
 	} );
 
-	test( 'You can set the default value for the behaviors in the theme.json', async ( {
+	// Skipped because the release won't have the behaviors UI.
+	// So we cannot test that the behaviors inferface is present or its values.
+	test.skip( 'You can set the default value for the behaviors in the theme.json', async ( {
 		admin,
 		editor,
 		requestUtils,
