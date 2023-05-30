@@ -73,9 +73,9 @@ store( {
 	selectors: {
 		core: {
 			navigation: {
-				roleAttribute: ( { context } ) =>
+				roleAttribute: ( { context, selectors } ) =>
 					context.core.navigation.overlay &&
-					context.core.navigation.isMenuOpen
+					selectors.core.navigation.isMenuOpen( { context } )
 						? 'dialog'
 						: '',
 				isMenuOpen: ( { context } ) =>
