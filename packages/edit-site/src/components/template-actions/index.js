@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
@@ -11,12 +11,23 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
-import isTemplateRemovable from '../../../utils/is-template-removable';
-import isTemplateRevertable from '../../../utils/is-template-revertable';
+import { store as editSiteStore } from '../../store';
+import isTemplateRemovable from '../../utils/is-template-removable';
+import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
 
-export default function Actions( { template } ) {
+export default function TemplateActions( {
+	postType,
+	postId,
+	className,
+	toggleProps,
+	onRemove,
+} ) {
+	const template = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+		[ postType, postId ]
+	);
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -62,7 +73,8 @@ export default function Actions( { template } ) {
 		<DropdownMenu
 			icon={ moreVertical }
 			label={ __( 'Actions' ) }
-			className="edit-site-list-table__actions"
+			className={ className }
+			toggleProps={ toggleProps }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
@@ -77,6 +89,7 @@ export default function Actions( { template } ) {
 								isTertiary
 								onClick={ () => {
 									removeTemplate( template );
+									onRemove?.();
 									onClose();
 								} }
 							>

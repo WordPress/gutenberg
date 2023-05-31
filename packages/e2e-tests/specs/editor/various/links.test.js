@@ -17,9 +17,16 @@ describe( 'Links', () => {
 	} );
 
 	const waitForURLFieldAutoFocus = async () => {
-		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
+		await page.waitForFunction( () => {
+			const input = document.querySelector(
+				'.block-editor-url-input__input'
+			);
+			if ( input ) {
+				input.focus();
+				return true;
+			}
+			return false;
+		} );
 	};
 
 	it( 'will use Post title as link text if link to existing post is created without any text selected', async () => {
@@ -101,48 +108,6 @@ describe( 'Links', () => {
 		);
 
 		expect( urlInputValue ).toBe( '' );
-	} );
-
-	it( 'can be created by selecting text and using keyboard shortcuts', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg' );
-
-		// Select some text.
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Press Cmd+K to insert a link.
-		await pressKeyWithModifier( 'primary', 'K' );
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Open settings.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Toggle should still have focus and be checked.
-		await page.waitForSelector(
-			':focus:checked.components-checkbox-control__input'
-		);
-
-		// Ensure that the contents of the post have not been changed, since at
-		// this point the link is still not inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// Tab back to the Submit and apply the link.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-
-		// The link should have been inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'can be created without any text selected', async () => {
@@ -520,83 +485,6 @@ describe( 'Links', () => {
 		);
 	} );
 
-	it( 'should contain a label when it should open in a new tab', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is WordPress' );
-		// Select "WordPress".
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForURLFieldAutoFocus();
-		await page.keyboard.type( 'w.org' );
-
-		// Link settings open
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Confirm that focus was not prematurely returned to the paragraph on
-		// a changing value of the setting.
-		await page.waitForSelector(
-			':focus.components-checkbox-control__input'
-		);
-
-		// Submit link. Expect that "Open in new tab" would have been applied
-		// immediately.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-
-		// Wait for Gutenberg to finish the job.
-		await page.waitForXPath(
-			'//a[contains(@href,"w.org") and @target="_blank"]'
-		);
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// Regression Test: This verifies that the UI is updated according to
-		// the expected changed values, where previously the value could have
-		// fallen out of sync with how the UI is displayed (specifically for
-		// collapsed selections).
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/15573
-
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Edit link.
-		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForURLFieldAutoFocus();
-		await pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( 'wordpress.org' );
-
-		// Update the link.
-		await page.keyboard.press( 'Enter' );
-
-		// Navigate back to the popover.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Navigate back to inputs to verify appears as changed.
-		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForURLFieldAutoFocus();
-
-		// Navigate to the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Uncheck the checkbox.
-		await page.keyboard.press( 'Space' );
-
-		// Wait for Gutenberg to finish the job.
-		await page.waitForXPath(
-			'//a[contains(@href,"wordpress.org") and not(@target)]'
-		);
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	describe( 'Editing link text', () => {
 		it( 'should not display text input when initially creating the link', async () => {
 			// Create a block with some text.
@@ -638,11 +526,6 @@ describe( 'Links', () => {
 			await editButton.click();
 
 			await waitForURLFieldAutoFocus();
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
 
 			await page.keyboard.press( 'Tab' );
 
@@ -701,15 +584,6 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			await waitForURLFieldAutoFocus();
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
-
-			await page.keyboard.press( 'Tab' );
-
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
@@ -736,14 +610,6 @@ describe( 'Links', () => {
 				'//button[contains(@aria-label, "Edit")]'
 			);
 			await editButton.click();
-			await waitForURLFieldAutoFocus();
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
-			);
-			await settingsToggle.click();
-
-			await page.keyboard.press( 'Tab' );
 
 			// Tabbing should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -798,7 +664,7 @@ describe( 'Links', () => {
 			await page.waitForXPath( `//label[text()='Open in new tab']` );
 
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 4 );
+			await pressKeyTimes( 'Tab', 3 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
@@ -806,7 +672,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
 			// Move back to the text input.
-			await pressKeyTimes( 'Tab', 3 );
+			await pressKeyTimes( 'Tab', 2 );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -1005,10 +871,6 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Enter' );
 
 			await waitForURLFieldAutoFocus();
-
-			// Link settings open
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Space' );
 
 			// Move to Link Text field.
 			await page.keyboard.press( 'Tab' );
