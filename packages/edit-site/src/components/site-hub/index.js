@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
-import { search } from '@wordpress/icons';
+import { search, external } from '@wordpress/icons';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 
 /**
@@ -34,15 +34,20 @@ const { store: commandsStore } = unlock( commandsPrivateApis );
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
-	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
+	const { canvasMode, dashboardLink, homeUrl } = useSelect( ( select ) => {
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);
+
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
 
 		return {
 			canvasMode: getCanvasMode(),
 			dashboardLink:
 				getSettings().__experimentalDashboardLink || 'index.php',
+			homeUrl: getUnstableBase()?.home,
 		};
 	}, [] );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
@@ -87,7 +92,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				ease: 'easeOut',
 			} }
 		>
-			<HStack justify="space-between" alignment="center">
+			<HStack
+				justify="space-between"
+				alignment="center"
+				className="edit-site-site-hub__container"
+			>
 				<HStack
 					justify="flex-start"
 					className="edit-site-site-hub__text-content"
@@ -149,16 +158,23 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							{ decodeEntities( siteTitle ) }
 						</motion.div>
 					</AnimatePresence>
+					<Button
+						href={ homeUrl }
+						target="_blank"
+						label={ __( 'View site' ) }
+						aria-label={ __( 'View site (opens in a new tab)' ) }
+						icon={ external }
+						className="edit-site-site-hub__site-view-link"
+					/>
 				</HStack>
-				{ window?.__experimentalEnableCommandCenter &&
-					canvasMode === 'view' && (
-						<Button
-							className="edit-site-site-hub_toggle-command-center"
-							icon={ search }
-							onClick={ () => openCommandCenter() }
-							label={ __( 'Open command center' ) }
-						/>
-					) }
+				{ canvasMode === 'view' && (
+					<Button
+						className="edit-site-site-hub_toggle-command-center"
+						icon={ search }
+						onClick={ () => openCommandCenter() }
+						label={ __( 'Open command center' ) }
+					/>
+				) }
 			</HStack>
 		</motion.div>
 	);

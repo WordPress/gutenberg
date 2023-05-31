@@ -18,6 +18,10 @@
 	border-radius: $radius-block-ui;
 	color: $components-color-foreground;
 
+	&.is-next-40px-default-size {
+		height: $button-size-next-default-40px;
+	}
+
 	&[aria-expanded="true"],
 	&:hover {
 		color: $components-color-accent;
@@ -114,21 +118,14 @@
 		outline: 1px solid transparent;
 
 		&:active:not(:disabled) {
-			background: $components-color-gray-300;
-			color: $components-color-accent-darker-10;
 			box-shadow: none;
-		}
-
-		&:hover:not(:disabled) {
-			color: $components-color-accent-darker-10;
 		}
 
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: lighten($gray-700, 5%);
-			background: lighten($gray-300, 5%);
+			color: $gray-600;
+			background: transparent;
 			transform: none;
 			opacity: 1;
 			box-shadow: none;
@@ -161,12 +158,12 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
-		&:active:not(:disabled) {
+		&:active:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
@@ -235,7 +232,7 @@
 		}
 	}
 
-	&:not([aria-disabled="true"]):active {
+	&:not(:disabled, [aria-disabled="true"]):active {
 		color: $components-color-foreground;
 	}
 
@@ -266,15 +263,24 @@
 	}
 
 	&.is-small {
-		height: $icon-size;
+		height: $button-size-small-next-default-32px;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			width: $icon-size;
-			min-width: $icon-size;
+			width: $button-size-small-next-default-32px;
+			min-width: $button-size-small-next-default-32px;
+		}
+
+		&:not(.is-next-32px-small-size) {
+			height: $button-size-small;
+
+			&.has-icon:not(.has-text) {
+				width: $button-size-small;
+				min-width: $button-size-small;
+			}
 		}
 	}
 
@@ -284,6 +290,10 @@
 		// Icon buttons are square.
 		min-width: $button-size;
 		justify-content: center;
+
+		&.is-next-40px-default-size {
+			min-width: $button-size-next-default-40px;
+		}
 
 		.dashicon {
 			display: inline-block;

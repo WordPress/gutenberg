@@ -11,14 +11,6 @@
  */
 class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_Styles_Controller_6_2 {
 	/**
-	 * Revision controller.
-	 *
-	 * @since 6.3.0
-	 * @var WP_REST_Revisions_Controller
-	 */
-	private $revisions_controller;
-
-	/**
 	 * Prepares links for the request.
 	 *
 	 * @since 5.9.0

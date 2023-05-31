@@ -25,6 +25,8 @@ import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area
 import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../private-apis';
 
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+
 function Header() {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
@@ -72,7 +74,6 @@ function Header() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 	const {
 		shouldShowContextualToolbar,
 		canFocusHiddenToolbar,

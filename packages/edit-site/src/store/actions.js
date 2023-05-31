@@ -12,6 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -144,9 +145,9 @@ export const removeTemplate =
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					decodeEntities( template.title.rendered )
 				),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
 		} catch ( error ) {
 			const errorMessage =
@@ -365,6 +366,8 @@ export function setIsSaveViewOpened( isOpen ) {
 export const revertTemplate =
 	( template, { allowUndo = true } = {} ) =>
 	async ( { registry } ) => {
+		const noticeId = 'edit-site-template-reverted';
+		registry.dispatch( noticesStore ).removeNotice( noticeId );
 		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
@@ -466,6 +469,7 @@ export const revertTemplate =
 					.dispatch( noticesStore )
 					.createSuccessNotice( __( 'Template reverted.' ), {
 						type: 'snackbar',
+						id: noticeId,
 						actions: [
 							{
 								label: __( 'Undo' ),
@@ -473,10 +477,6 @@ export const revertTemplate =
 							},
 						],
 					} );
-			} else {
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ) );
 			}
 		} catch ( error ) {
 			const errorMessage =

@@ -6,47 +6,37 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbol, navigation, styles } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
+
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
+import SidebarNavigationScreenNavigationMenuButton from '../sidebar-navigation-screen-navigation-menus/navigator-button';
 
 export default function SidebarNavigationScreenMain() {
-	const { hasNavigationMenus, hasGlobalStyleVariations } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				__experimentalGetCurrentThemeGlobalStylesVariations,
-			} = select( coreStore );
-			// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
-			// to avoid double network calls.
-			const navigationMenus = getEntityRecords(
-				'postType',
-				'wp_navigation',
-				{
-					per_page: 1,
-					status: 'publish',
-					order: 'desc',
-					orderby: 'date',
-				}
-			);
-			return {
-				hasNavigationMenus: !! navigationMenus?.length,
-				hasGlobalStyleVariations:
-					!! __experimentalGetCurrentThemeGlobalStylesVariations()
-						?.length,
-			};
-		},
-		[]
+	const editorCanvasContainerView = useSelect( ( select ) => {
+		return unlock( select( editSiteStore ) ).getEditorCanvasContainerView();
+	}, [] );
+
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
 	);
-	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
-		? hasNavigationMenus
-		: false;
+
+	// Clear the editor canvas container view when accessing the main navigation screen.
+	useEffect( () => {
+		if ( editorCanvasContainerView ) {
+			setEditorCanvasContainerView( undefined );
+		}
+	}, [ editorCanvasContainerView, setEditorCanvasContainerView ] );
+
 	return (
 		<SidebarNavigationScreen
 			isRoot
@@ -56,26 +46,28 @@ export default function SidebarNavigationScreenMain() {
 			) }
 			content={
 				<ItemGroup>
-					{ showNavigationScreen && (
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/navigation"
-							withChevron
-							icon={ navigation }
-						>
-							{ __( 'Navigation' ) }
-						</NavigatorButton>
-					) }
-					{ hasGlobalStyleVariations && (
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/wp_global_styles"
-							withChevron
-							icon={ styles }
-						>
-							{ __( 'Styles' ) }
-						</NavigatorButton>
-					) }
+					<SidebarNavigationScreenNavigationMenuButton
+						withChevron
+						icon={ navigation }
+						as={ SidebarNavigationItem }
+					>
+						{ __( 'Navigation' ) }
+					</SidebarNavigationScreenNavigationMenuButton>
+
+					<SidebarNavigationItemGlobalStyles
+						withChevron
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/page"
+						withChevron
+						icon={ page }
+					>
+						{ __( 'Pages' ) }
+					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/wp_template"
@@ -90,7 +82,7 @@ export default function SidebarNavigationScreenMain() {
 						withChevron
 						icon={ symbol }
 					>
-						{ __( 'Template Parts' ) }
+						{ __( 'Library' ) }
 					</NavigatorButton>
 				</ItemGroup>
 			}

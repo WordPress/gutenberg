@@ -43,9 +43,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         </svg>
       </button>
     </div>
-    <div
-      class="components-modal__children-container"
-    >
+    <div>
       <section
         class="edit-post-keyboard-shortcut-help-modal__section edit-post-keyboard-shortcut-help-modal__main-shortcuts"
       >

@@ -32,6 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	blockEditingModes,
 } from '../reducer';
 
 const noop = () => {};
@@ -3365,6 +3366,53 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+	} );
+
+	describe( 'blockEditingModes', () => {
+		it( 'should return an empty map by default', () => {
+			expect( blockEditingModes( undefined, {} ) ).toEqual( new Map() );
+		} );
+
+		it( 'should set the editing mode for a block', () => {
+			const state = new Map();
+			const newState = blockEditingModes( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+			expect( newState ).toEqual(
+				new Map( [
+					[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+				] )
+			);
+		} );
+
+		it( 'should clear the editing mode for a block', () => {
+			const state = new Map( [
+				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+			] );
+			const newState = blockEditingModes( state, {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+			} );
+			expect( newState ).toEqual( new Map() );
+		} );
+
+		it( 'should clear editing modes when blocks are reset', () => {
+			const state = new Map( [
+				[ '', 'disabled' ],
+				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+			] );
+			const newState = blockEditingModes( state, {
+				type: 'RESET_BLOCKS',
+			} );
+			expect( newState ).toEqual(
+				new Map( [
+					// Root mode should be maintained.
+					[ '', 'disabled' ],
+				] )
+			);
 		} );
 	} );
 } );

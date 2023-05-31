@@ -12,7 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
-	renderToString,
+	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -138,14 +138,10 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		function setDocumentIfReady() {
+		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
@@ -177,14 +173,12 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			return true;
 		}
 
-		// Document set with srcDoc is not immediately ready.
-		node.addEventListener( 'load', setDocumentIfReady );
+		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			node.removeEventListener( 'load', setDocumentIfReady );
+			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
 				preventFileDropDefault
@@ -243,9 +237,19 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const srcDoc = useMemo( () => {
-		return '<!doctype html>' + renderToString( styleAssets );
-	}, [] );
+	const html =
+		'<!doctype html>' +
+		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		( assets?.styles ?? '' );
+
+	const [ src, cleanup ] = useMemo( () => {
+		const _src = URL.createObjectURL(
+			new window.Blob( [ html ], { type: 'text/html' } )
+		);
+		return [ _src, () => URL.revokeObjectURL( _src ) ];
+	}, [ html ] );
+
+	useEffect( () => cleanup, [ cleanup ] );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
@@ -260,15 +264,18 @@ function Iframe( {
 				style={ {
 					...props.style,
 					height: expand ? contentHeight : props.style?.height,
-					marginTop: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginTop,
-					marginBottom: scale
-						? -marginFromScaling + frameSize
-						: props.style?.marginBottom,
-					transform: scale
-						? `scale( ${ scale } )`
-						: props.style?.transform,
+					marginTop:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginTop,
+					marginBottom:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginBottom,
+					transform:
+						scale !== 1
+							? `scale( ${ scale } )`
+							: props.style?.transform,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
@@ -276,7 +283,7 @@ function Iframe( {
 				// Correct doctype is required to enable rendering in standards
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
-				srcDoc={ srcDoc }
+				src={ src }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&

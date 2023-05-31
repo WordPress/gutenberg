@@ -416,7 +416,8 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		};
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withColorPaletteStyles'
 );
 
 const MIGRATION_PATHS = {

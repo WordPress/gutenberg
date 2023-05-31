@@ -35,7 +35,15 @@ test.describe( 'Test Custom Post Types', () => {
 			.click();
 
 		// Open the Document -> Page Attributes panel.
-		await page.getByRole( 'button', { name: 'Page Attributes' } ).click();
+		const pageAttributes = page.getByRole( 'button', {
+			name: 'Page Attributes',
+		} );
+		const isClosed =
+			( await pageAttributes.getAttribute( 'aria-expanded' ) ) ===
+			'false';
+		if ( isClosed ) {
+			await pageAttributes.click();
+		}
 
 		const parentPageLocator = page.getByRole( 'combobox', {
 			name: 'Parent Page',

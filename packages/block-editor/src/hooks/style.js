@@ -447,7 +447,8 @@ const withElementsStyles = createHigherOrderComponent(
 				/>
 			</>
 		);
-	}
+	},
+	'withElementsStyles'
 );
 
 addFilter(

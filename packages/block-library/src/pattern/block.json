@@ -13,6 +13,10 @@
 	"attributes": {
 		"slug": {
 			"type": "string"
+		},
+		"syncStatus": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "full", "partial" ]
 		}
 	}
 }

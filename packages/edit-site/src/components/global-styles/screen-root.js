@@ -31,7 +31,7 @@ function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
-	const { variations, canEditCSS } = useSelect( ( select ) => {
+	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
 			__experimentalGetCurrentGlobalStylesId,
@@ -44,7 +44,9 @@ function ScreenRoot() {
 			: undefined;
 
 		return {
-			variations: __experimentalGetCurrentThemeGlobalStylesVariations(),
+			hasVariations:
+				!! __experimentalGetCurrentThemeGlobalStylesVariations()
+					?.length,
 			canEditCSS:
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
@@ -59,7 +61,7 @@ function ScreenRoot() {
 							<StylesPreview />
 						</CardMedia>
 					</Card>
-					{ !! variations?.length && (
+					{ hasVariations && (
 						<ItemGroup>
 							<NavigationButtonAsItem
 								path="/variations"
