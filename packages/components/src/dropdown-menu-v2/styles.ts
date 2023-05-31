@@ -25,11 +25,9 @@ const ITEM_PADDING_INLINE_START = space( 2 );
 const ITEM_PADDING_INLINE_END = space( 2.5 );
 
 // TODO: should bring this into the config, and make themeable
+const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
-const DEFAULT_BOX_SHADOW = `0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
-0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
-0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
-0px 0.7px 1px rgba( 0, 0, 0, 0.1 )`;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const slideUpAndFade = keyframes( {
@@ -255,7 +253,7 @@ export const Separator = styled( DropdownMenu.Separator )<
 	background-color: ${ ( props ) =>
 		props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BORDER_COLOR
-			: COLORS.ui.borderDisabled };
+			: DEFAULT_BORDER_COLOR };
 	/* Negative horizontal margin to make separator go from side to side */
 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
 `;
