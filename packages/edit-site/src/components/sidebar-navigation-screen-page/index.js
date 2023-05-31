@@ -33,8 +33,10 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import PageDetails from './page-details';
+import PageActions from '../page-actions';
 
 export default function SidebarNavigationScreenPage() {
+	const navigator = useNavigator();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const {
 		params: { postId },
@@ -77,11 +79,20 @@ export default function SidebarNavigationScreenPage() {
 				record?.title?.rendered || __( '(no title)' )
 			) }
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<div>
+					<PageActions
+						postId={ postId }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( '/page' );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</div>
 			}
 			meta={
 				<ExternalLink
