@@ -43,24 +43,26 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$global_settings          = gutenberg_get_global_settings();
-	$theme_has_sticky_support = _wp_array_get( $global_settings, array( 'position', 'sticky' ), false );
-	$theme_has_fixed_support  = _wp_array_get( $global_settings, array( 'position', 'fixed' ), false );
+	$global_settings = gutenberg_get_global_settings();
 
 	// Only allow output for position types that the theme supports.
 	$allowed_position_types = array();
-	if ( true === $theme_has_sticky_support ) {
+	if ( isset( $global_settings['position']['sticky'] ) && true === $global_settings['position']['sticky'] ) {
 		$allowed_position_types[] = 'sticky';
 	}
-	if ( true === $theme_has_fixed_support ) {
+	if ( isset( $global_settings['position']['fixed'] ) && true === $global_settings['position']['fixed'] ) {
 		$allowed_position_types[] = 'fixed';
 	}
 
-	$style_attribute = _wp_array_get( $block, array( 'attrs', 'style' ), null );
+	$style_attribute = isset( $block['attrs']['style'] )
+		? _wp_array_get( $block, array( 'attrs', 'style' ), array() )
+		: array();
 	$class_name      = wp_unique_id( 'wp-container-' );
 	$selector        = ".$class_name";
 	$position_styles = array();
-	$position_type   = _wp_array_get( $style_attribute, array( 'position', 'type' ), '' );
+	$position_type   = isset( $style_attribute['position']['type'] )
+		? _wp_array_get( $style_attribute, array( 'position', 'type' ), '' )
+		: '';
 	$wrapper_classes = array();
 
 	if (
@@ -71,7 +73,10 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		$sides             = array( 'top', 'right', 'bottom', 'left' );
 
 		foreach ( $sides as $side ) {
-			$side_value = _wp_array_get( $style_attribute, array( 'position', $side ) );
+			$side_value = isset( $style_attribute['position'][ $side ] )
+				? _wp_array_get( $style_attribute, array( 'position', $side ) )
+				: null;
+
 			if ( null !== $side_value ) {
 				/*
 				 * For fixed or sticky top positions,
