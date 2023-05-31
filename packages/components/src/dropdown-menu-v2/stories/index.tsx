@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -33,6 +34,7 @@ import { menu, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../../icon';
+import { ContextSystemProvider } from '../../ui/context';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
@@ -73,8 +75,8 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 export default meta;
 
 const ItemHelpText = styled.span`
-	font-size: 10px;
-	color: #777;
+	font-size: 12px;
+	color: ${ COLORS.gray[ '700' ] };
 
 	/* "> * > &" syntax is to target only immediate parent menu item */
 	[data-highlighted] > * > &,
@@ -144,7 +146,7 @@ Default.args = {
 			<DropdownMenuGroup>
 				<DropdownMenuItem>Menu item</DropdownMenuItem>
 				<DropdownMenuItem
-					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
+					prefix={ <Icon icon={ wordpress } size={ 24 } /> }
 				>
 					Menu item with prefix
 				</DropdownMenuItem>
@@ -196,4 +198,20 @@ Default.args = {
 			<RadioItemsGroup />
 		</>
 	),
+};
+
+const toolbarVariantContextValue = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+};
+export const ToolbarVariant: ComponentStory< typeof DropdownMenu > = (
+	props
+) => (
+	<ContextSystemProvider value={ toolbarVariantContextValue }>
+		<DropdownMenu { ...props } />
+	</ContextSystemProvider>
+);
+ToolbarVariant.args = {
+	...Default.args,
 };
