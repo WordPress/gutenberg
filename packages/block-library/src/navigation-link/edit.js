@@ -15,7 +15,6 @@ import {
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
-	KeyboardShortcuts,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -340,7 +339,7 @@ export default function NavigationLinkEdit( {
 	function onKeyDown( event ) {
 		if (
 			isKeyboardEvent.primary( event, 'k' ) ||
-			( ! url && event.keyCode === ENTER )
+			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
 		) {
 			setIsLinkOpen( true );
 		}
@@ -553,13 +552,6 @@ export default function NavigationLinkEdit( {
 							) }
 							{ ( isInvalid || isDraft ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<KeyboardShortcuts
-										shortcuts={ {
-											enter: () =>
-												isSelected &&
-												setIsLinkOpen( true ),
-										} }
-									/>
 									<Tooltip
 										position="top center"
 										text={ tooltipText }
