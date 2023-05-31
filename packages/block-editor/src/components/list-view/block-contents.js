@@ -44,7 +44,7 @@ const ListViewBlockContents = forwardRef(
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
 			},
-			[ clientId ]
+			[]
 		);
 
 		const { renderAdditionalBlockUI, insertedBlock, setInsertedBlock } =
