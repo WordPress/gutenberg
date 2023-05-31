@@ -655,16 +655,17 @@ class WP_Duotone_Gutenberg {
 			// `supports.filter.duotone` has not been set and the experimental
 			// property has been, the experimental property value is copied into
 			// `supports.filter.duotone`.
-			$duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), false );
+			$duotone_support = isset( $block_type->supports['filter']['duotone'] );
 			if ( ! $duotone_support ) {
 				return null;
 			}
 
 			// If the experimental duotone support was set, that value is to be
 			// treated as a selector and requires scoping.
-			$experimental_duotone = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-			if ( $experimental_duotone ) {
-				$root_selector = wp_get_block_css_selector( $block_type );
+			$supports_experimental_duotone = isset( $block_type->supports['color']['__experimentalDuotone'] );
+			if ( $supports_experimental_duotone ) {
+				$experimental_duotone = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+				$root_selector        = wp_get_block_css_selector( $block_type );
 				return is_string( $experimental_duotone )
 					? WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $experimental_duotone )
 					: $root_selector;
@@ -750,7 +751,7 @@ class WP_Duotone_Gutenberg {
 		if ( property_exists( $block_type, 'supports' ) ) {
 			// Previous `color.__experimentalDuotone` support flag is migrated
 			// to `filter.duotone` via `block_type_metadata_settings` filter.
-			$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
+			$has_duotone_support = isset( $block_type->supports['filter']['duotone'] );
 		}
 
 		if ( $has_duotone_support ) {
@@ -995,10 +996,10 @@ class WP_Duotone_Gutenberg {
 	 * @return array Filtered block type settings.
 	 */
 	public static function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
-		$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
+		$duotone_support = isset( $metadata['supports']['color']['__experimentalDuotone'] );
 
-		if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
-			_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), (bool) $duotone_support );
+		if ( ! isset( $settings['supports']['filter']['duotone'] ) && $duotone_support ) {
+			_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), $duotone_support );
 		}
 
 		return $settings;
