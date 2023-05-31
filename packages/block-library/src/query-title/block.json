@@ -6,6 +6,7 @@
 	"category": "theme",
 	"description": "Display the query title.",
 	"textdomain": "default",
+	"usesContext": [ "templateSlug" ],
 	"attributes": {
 		"type": {
 			"type": "string"
