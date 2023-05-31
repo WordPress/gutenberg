@@ -52,9 +52,6 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part)/:postId">
-				<SidebarNavigationScreenTemplatePart />
-			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
@@ -63,6 +60,9 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part)/:postId">
+				<SidebarNavigationScreenTemplatePart />
 			</NavigatorScreen>
 		</>
 	);
