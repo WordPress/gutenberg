@@ -44,7 +44,7 @@ export type DropdownMenuProps = {
 	 * The preferred alignment against the trigger.
 	 * May change when collisions occur.
 	 *
-	 * @default 'center'
+	 * @default 'start'
 	 */
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'align' ];
 	/**
