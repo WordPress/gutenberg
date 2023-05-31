@@ -152,19 +152,12 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 
 	// Can we void infinite loops?
 
-	if (
-		$block_name !== $block['blockName'] ||
-		! in_array( $block_position, array( 'before', 'after' ), true )
-	) {
-		return $block_content;
-	}
-
-	$inserted_block_markup = '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->';
-
-	$inserted_blocks  = parse_blocks( $inserted_block_markup );
-	$inserted_content = render_block( $inserted_blocks[0] );
-
 	if ( $block_name === $block['blockName'] ) {
+		$inserted_block_markup = '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->';
+
+		$inserted_blocks  = parse_blocks( $inserted_block_markup );
+		$inserted_content = render_block( $inserted_blocks[0] );
+
 		if ( 'before' === $block_position ) {
 			$block_content = $inserted_content . $block_content;
 		} elseif ( 'after' === $block_position ) {
