@@ -13,7 +13,7 @@ const arrowMap = {
 export default function QueryPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow },
+	context: { paginationArrow, showLabel },
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
@@ -34,8 +34,8 @@ export default function QueryPaginationPreviousEdit( {
 				__experimentalVersion={ 2 }
 				tagName="span"
 				aria-label={ __( 'Previous page link' ) }
-				placeholder={ __( 'Previous Page' ) }
-				value={ label }
+				placeholder={ showLabel ? __( 'Previous Page' ) : '' }
+				value={ showLabel ? label : '' }
 				onChange={ ( newLabel ) =>
 					setAttributes( { label: newLabel } )
 				}
