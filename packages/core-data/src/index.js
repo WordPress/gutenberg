@@ -64,7 +64,6 @@ const storeConfig = () => ( {
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 register( store );
 
-// export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
 export * from './entity-types';
 export * from './fetch';
