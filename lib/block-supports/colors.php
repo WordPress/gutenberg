@@ -77,7 +77,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && ( ! isset( $color_support['text'] ) || $color_support['text'] ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && ! isset( $color_support['background'] ) || $color_support['background'] );
+	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && ( ! isset( $color_support['background'] ) || $color_support['background'] ) );
 	$has_gradients_support         = isset( $color_support['gradients'] ) && $color_support['gradients'];
 	$color_block_styles            = array();
 
