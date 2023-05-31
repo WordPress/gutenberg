@@ -141,8 +141,13 @@ function ListViewComponent(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, blockClientId ) => {
-			updateBlockSelection( event, blockClientId );
+		/**
+		 * @param {MouseEvent | KeyboardEvent | undefined} event
+		 * @param {string}                                 blockClientId
+		 * @param {null | undefined | -1 | 1}              focusPosition
+		 */
+		( event, blockClientId, focusPosition ) => {
+			updateBlockSelection( event, blockClientId, null, focusPosition );
 			setSelectedTreeId( blockClientId );
 			if ( onSelect ) {
 				onSelect( getBlock( blockClientId ) );
@@ -222,6 +227,7 @@ function ListViewComponent(
 			renderAdditionalBlockUI,
 			insertedBlock,
 			setInsertedBlock,
+			treeGridElementRef: elementRef,
 		} ),
 		[
 			draggedClientIds,

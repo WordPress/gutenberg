@@ -12,7 +12,6 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
-	renderToString,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -139,14 +138,10 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		function setDocumentIfReady() {
+		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
@@ -178,14 +173,12 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			return true;
 		}
 
-		// Document set with srcDoc is not immediately ready.
-		node.addEventListener( 'load', setDocumentIfReady );
+		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			node.removeEventListener( 'load', setDocumentIfReady );
+			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
 				preventFileDropDefault
@@ -244,15 +237,19 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const src = useMemo( () => {
-		const html = '<!doctype html>' + renderToString( styleAssets );
-		const blob = new window.Blob( [ html ], { type: 'text/html' } );
-		return URL.createObjectURL( blob );
-	}, [] );
+	const html =
+		'<!doctype html>' +
+		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		( assets?.styles ?? '' );
 
-	useEffect( () => () => {
-		URL.revokeObjectURL( src );
-	} );
+	const [ src, cleanup ] = useMemo( () => {
+		const _src = URL.createObjectURL(
+			new window.Blob( [ html ], { type: 'text/html' } )
+		);
+		return [ _src, () => URL.revokeObjectURL( _src ) ];
+	}, [ html ] );
+
+	useEffect( () => cleanup, [ cleanup ] );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
