@@ -50,6 +50,8 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 					: __( 'An error occurred while deleting the page.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		} finally {
+			setIsModalOpen( false );
 		}
 	}
 	return (
