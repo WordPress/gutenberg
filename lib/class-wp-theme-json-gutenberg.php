@@ -2365,7 +2365,7 @@ class WP_Theme_JSON_Gutenberg {
 		$pseudo_matches = array_values(
 			array_filter(
 				$element_pseudo_allowed,
-				function( $pseudo_selector ) use ( $selector ) {
+				static function( $pseudo_selector ) use ( $selector ) {
 					return str_contains( $selector, $pseudo_selector );
 				}
 			)

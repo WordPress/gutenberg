@@ -239,7 +239,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		if ( ! $stylesheet_removed ) {
 			add_action(
 				'wp_enqueue_scripts',
-				function() {
+				static function() {
 					wp_dequeue_style( 'wp-block-library-theme' );
 				}
 			);

@@ -248,7 +248,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	protected function setup_registration_mocks( array $inputs, WP_Fonts $wp_fonts ) {
 		$mocks = array();
 
-		$build_mock = function ( $font_family, $is_font_family = false ) use ( &$mocks, $wp_fonts ) {
+		$build_mock = static function ( $font_family, $is_font_family = false ) use ( &$mocks, $wp_fonts ) {
 			$mock        = new stdClass();
 			$mock->deps  = array();
 			$mock->extra = array( 'is_font_family' => $is_font_family );
