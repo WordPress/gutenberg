@@ -24,7 +24,13 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 	);
 	async function removePage() {
 		try {
-			await deleteEntityRecord( 'postType', 'page', postId );
+			await deleteEntityRecord(
+				'postType',
+				'page',
+				postId,
+				{},
+				{ throwOnError: true }
+			);
 			createSuccessNotice(
 				sprintf(
 					/* translators: The page's title. */
@@ -41,7 +47,7 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while deleting the entity.' );
+					: __( 'An error occurred while deleting the page.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
