@@ -197,6 +197,10 @@ Like scripts, you can enqueue your block's styles using the `block.json` file.
 
 Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on the frontend when the block is used.
 
+It is worth noting that, if the editor content is iframed, both of these will
+load in the iframe. `editorStyle` will also load outside the iframe, so it can
+be used for editor content as well as UI. 
+
 For example:
 
 ```json

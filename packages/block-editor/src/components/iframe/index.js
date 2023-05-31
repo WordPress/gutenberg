@@ -164,6 +164,12 @@ function Iframe( {
 				contentDocument.head.appendChild(
 					compatStyle.cloneNode( true )
 				);
+
+				// eslint-disable-next-line no-console
+				console.warn(
+					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+					compatStyle
+				);
 			}
 
 			iFrameDocument.addEventListener(
