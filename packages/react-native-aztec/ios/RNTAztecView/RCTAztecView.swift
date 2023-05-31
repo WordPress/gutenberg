@@ -347,7 +347,7 @@ class RCTAztecView: Aztec.TextView {
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
-    
+
     // MARK: - Dictation
     
     func removeUnicodeAndRestoreCursor(from textView: UITextView) {
