@@ -148,19 +148,13 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 	// $block_position = 'after'; // Child blocks could be a bit trickier.
 
 	$block_name     = 'core/comment-template';
-	$block_position = 'last-child';
+	$block_position = 'after';
 
 	// Can we void infinite loops?
 
 	if (
-		! (
-			$block_name === $block['blockName'] &&
-			( 'before' === $block_position || 'after' === $block_position )
-		) && ! (
-			isset( $block['parentBlock'] ) &&
-			$block_name === $block['parentBlock'] &&
-			( 'first-child' === $block_position || 'last-child' === $block_position )
-		)
+		$block_name !== $block['blockName'] ||
+		! in_array( $block_position, array( 'before', 'after' ), true )
 	) {
 		return $block_content;
 	}
@@ -169,15 +163,6 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 
 	$inserted_blocks  = parse_blocks( $inserted_block_markup );
 	$inserted_content = render_block( $inserted_blocks[0] );
-
-	if ( isset( $block['parentBlock'] ) && $block_name === $block['parentBlock'] ) {
-		if ( 'last-child' === $block_position ) {
-			// FIXME: This is currently apppending the auto-inserted block
-			// after each child of the parent block, rather than only after
-			// the last one.
-			$block_content = $block_content . $inserted_content;
-		}
-	}
 
 	if ( $block_name === $block['blockName'] ) {
 		if ( 'before' === $block_position ) {
