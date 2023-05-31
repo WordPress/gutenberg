@@ -40,7 +40,11 @@ const noop = () => {};
 
 export default function SidebarNavigationScreenNavigationMenu() {
 	const { deleteEntityRecord } = useDispatch( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
+
 	const [ isOpen, setOpen ] = useState( false );
+
 	const postType = `wp_navigation`;
 	const {
 		params: { postId },
@@ -52,14 +56,34 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		postId
 	);
 
+	const handleSave = async () => {
+		saveEditedEntityRecord( 'postType', postType, postId );
+		setOpen( false );
+	};
+	const handleChange = ( title ) =>
+		editEntityRecord( 'postType', postType, postId, { title } );
+	const handleDelete = () =>
+		deleteEntityRecord( 'postType', postType, postId, { force: true } );
+
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
+	const element = useSelect(
+		( select ) =>
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			),
+		[ postType, postId ]
+	);
+
 	const modalProps = {
-		postId,
 		isOpen,
 		setOpen,
-		deleteEntityRecord,
-		menuTitle,
+		handleDelete,
+		handleSave,
+		handleChange,
+		editedMenuTitle: element.title,
 	};
 
 	if ( isLoading ) {
@@ -182,7 +206,14 @@ const POPOVER_PROPS = {
 };
 
 function ScreenNavigationMoreMenu( props ) {
-	const { postId, isOpen, setOpen, deleteEntityRecord, menuTitle } = props;
+	const {
+		isOpen,
+		setOpen,
+		handleDelete,
+		handleSave,
+		handleChange,
+		editedMenuTitle,
+	} = props;
 	const closeModal = () => setOpen( false );
 	const openModal = () => setOpen( true );
 
@@ -209,12 +240,7 @@ function ScreenNavigationMoreMenu( props ) {
 								isDestructive
 								isTertiary
 								onClick={ () => {
-									deleteEntityRecord(
-										'postType',
-										'wp_navigation',
-										postId,
-										{ force: true }
-									);
+									handleDelete();
 									onClose();
 								} }
 							>
@@ -231,8 +257,9 @@ function ScreenNavigationMoreMenu( props ) {
 						<VStack spacing="3">
 							<TextControl
 								__nextHasNoMarginBottom
-								value={ decodeEntities( menuTitle ) }
+								value={ editedMenuTitle }
 								placeholder={ __( 'Navigation title' ) }
+								onChange={ handleChange }
 							/>
 							<HStack justify="right">
 								<Button
@@ -242,7 +269,11 @@ function ScreenNavigationMoreMenu( props ) {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									variant="primary"
+									type="submit"
+									onClick={ handleSave }
+								>
 									{ __( 'Ok' ) }
 								</Button>
 							</HStack>
