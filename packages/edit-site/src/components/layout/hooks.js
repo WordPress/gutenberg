@@ -10,7 +10,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useEditedEntityRecord from '../use-edited-entity-record';
 
-const MAX_LOADING_TIME = 30000; // 30 seconds
+const MAX_LOADING_TIME = 10000; // 10 seconds
 
 export function useIsSiteEditorLoading() {
 	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
