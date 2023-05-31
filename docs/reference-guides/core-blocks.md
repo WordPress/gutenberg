@@ -247,7 +247,6 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 Hide and show additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
 
 -	**Name:** core/details
--	**Experimental:** true
 -	**Category:** text
 -	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** showContent, summary
@@ -677,7 +676,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** paginationArrow
+-	**Attributes:** paginationArrow, showLabel
 
 ## Next Page
 

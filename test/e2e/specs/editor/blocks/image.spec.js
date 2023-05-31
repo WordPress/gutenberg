@@ -339,7 +339,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -396,7 +396,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -441,7 +441,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -498,7 +498,7 @@ test.describe( 'Image', () => {
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Apply"i]' );
+			await page.click( 'role=button[name="Save"i]' );
 
 			const regex = new RegExp(
 				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
@@ -831,14 +831,12 @@ test.describe( 'Image - interactivity', () => {
 		const image = lightbox.locator( 'img' );
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
-		await page
-			.getByRole( 'button', { name: 'Open image lightbox' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
 		await expect( lightbox ).toBeVisible();
 
-		const closeButton = page.getByRole( 'button', {
-			name: 'Close lightbox',
+		const closeButton = lightbox.getByRole( 'button', {
+			name: 'Close',
 		} );
 		await closeButton.click();
 
@@ -860,11 +858,11 @@ test.describe( 'Image - interactivity', () => {
 			await page.goto( `/?p=${ postId }` );
 
 			openLightboxButton = page.getByRole( 'button', {
-				name: 'Open image lightbox',
+				name: 'Enlarge image',
 			} );
 			lightbox = page.getByRole( 'dialog' );
 			closeButton = lightbox.getByRole( 'button', {
-				name: 'Close lightbox',
+				name: 'Close',
 			} );
 		} );
 

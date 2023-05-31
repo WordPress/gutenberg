@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -19,6 +19,7 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
+import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
@@ -346,6 +347,17 @@ function LinkControl( {
 							}
 							useLabel={ showTextControl }
 						/>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -372,26 +384,19 @@ function LinkControl( {
 
 			{ isEditing && (
 				<div className="block-editor-link-control__tools">
-					{ ( showSettings || showTextControl ) && (
+					{ showSettings && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
-							showTextControl={ showTextControl }
-							showSettings={ showSettings }
-							textInputRef={ textInputRef }
-							internalTextInputValue={
-								internalControlValue?.title
-							}
-							setInternalTextInputValue={
-								setInternalTextInputValue
-							}
-							handleSubmitWithEnter={ handleSubmitWithEnter }
-							value={ internalControlValue }
-							settings={ settings }
-							onChange={ createSetInternalSettingValueHandler(
-								settingsKeys
-							) }
-						/>
+						>
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
+						</LinkControlSettingsDrawer>
 					) }
 
 					<div className="block-editor-link-control__search-actions">
@@ -403,7 +408,7 @@ function LinkControl( {
 								! valueHasChanges || currentInputIsEmpty
 							}
 						>
-							{ __( 'Apply' ) }
+							{ __( 'Save' ) }
 						</Button>
 						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }
