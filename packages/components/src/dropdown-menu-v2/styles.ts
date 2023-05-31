@@ -8,9 +8,10 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl } from '../utils';
+import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 import Icon from '../icon';
+import type { DropdownMenuContext } from './types';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',
@@ -22,6 +23,12 @@ const CONTENT_WRAPPER_PADDING = space( 2 );
 const ITEM_PREFIX_WIDTH = space( 7 );
 const ITEM_PADDING_INLINE_START = space( 2 );
 const ITEM_PADDING_INLINE_END = space( 2.5 );
+
+// TODO: should bring this into the config, and make themeable
+const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
+const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const slideUpAndFade = keyframes( {
 	'0%': {
@@ -55,15 +62,14 @@ const slideLeftAndFade = keyframes( {
 	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
-const baseContent = css`
+const baseContent = ( variant: DropdownMenuContext[ 'variant' ] ) => css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
-	border-radius: 6px;
+	border-radius: ${ CONFIG.radiusBlockUi };
 	padding: ${ CONTENT_WRAPPER_PADDING };
-	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
-		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
-		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
-		0px 0.7px 1px rgba( 0, 0, 0, 0.1 );
+	box-shadow: ${ variant === 'toolbar'
+		? TOOLBAR_VARIANT_BOX_SHADOW
+		: DEFAULT_BOX_SHADOW };
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 	will-change: transform, opacity;
@@ -156,7 +162,7 @@ const baseItem = css`
 	font-weight: normal;
 	line-height: 20px;
 	color: ${ COLORS.gray[ 900 ] };
-	border-radius: 3px;
+	border-radius: ${ CONFIG.radiusBlockUi };
 	display: flex;
 	align-items: center;
 	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
@@ -193,11 +199,15 @@ const baseItem = css`
 	}
 `;
 
-export const Content = styled( DropdownMenu.Content )`
-	${ baseContent }
+export const Content = styled( DropdownMenu.Content )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	${ ( props ) => baseContent( props.variant ) }
 `;
-export const SubContent = styled( DropdownMenu.SubContent )`
-	${ baseContent }
+export const SubContent = styled( DropdownMenu.SubContent )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	${ ( props ) => baseContent( props.variant ) }
 `;
 
 export const Item = styled( DropdownMenu.Item )`
@@ -235,10 +245,15 @@ export const Label = styled( DropdownMenu.Label )`
 	text-transform: uppercase;
 `;
 
-export const Separator = styled( DropdownMenu.Separator )`
-	height: 1px;
+export const Separator = styled( DropdownMenu.Separator )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	height: ${ CONFIG.borderWidth };
 	/* TODO: doesn't match border color from variables */
-	background-color: ${ COLORS.ui.borderDisabled };
+	background-color: ${ ( props ) =>
+		props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BORDER_COLOR
+			: DEFAULT_BORDER_COLOR };
 	/* Negative horizontal margin to make separator go from side to side */
 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
 `;
