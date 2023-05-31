@@ -75,7 +75,7 @@ export function getLastInsertedBlocksClientIds( state ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
-			const explicitEditingMode = getExplcitBlockEditingMode(
+			const explicitEditingMode = getExplicitBlockEditingMode(
 				state,
 				clientId
 			);
@@ -102,7 +102,7 @@ export const getBlockEditingMode = createRegistrySelector(
 		}
 );
 
-const getExplcitBlockEditingMode = createSelector(
+const getExplicitBlockEditingMode = createSelector(
 	( state, clientId = '' ) => {
 		while (
 			! state.blockEditingModes.has( clientId ) &&
@@ -136,7 +136,7 @@ export const isBlockSubtreeDisabled = createSelector(
 			);
 		};
 		return (
-			getExplcitBlockEditingMode( state, clientId ) === 'disabled' &&
+			getExplicitBlockEditingMode( state, clientId ) === 'disabled' &&
 			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
 		);
 	},
