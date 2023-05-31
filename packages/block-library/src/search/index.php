@@ -266,7 +266,7 @@ function classnames_for_block_core_search( $attributes ) {
  * @return void
  */
 function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
-	$is_button_inside = 'button-inside' === _wp_array_get( $attributes, array( 'buttonPosition' ), false );
+	$is_button_inside = isset( $attributes['buttonPosition'] ) && 'button-inside' === $attributes['buttonPosition'];
 
 	$path = array( 'style', 'border', $property );
 
