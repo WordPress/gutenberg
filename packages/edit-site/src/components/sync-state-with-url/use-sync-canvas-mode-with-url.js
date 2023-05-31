@@ -57,6 +57,7 @@ export default function useSyncCanvasModeWithURL() {
 	}, [ canvasMode, history ] );
 
 	useEffect( () => {
+		currentCanvasInUrl.current = canvasInUrl;
 		if (
 			canvasInUrl === undefined &&
 			currentCanvasMode.current !== 'view'
@@ -68,6 +69,5 @@ export default function useSyncCanvasModeWithURL() {
 		) {
 			setCanvasMode( 'edit' );
 		}
-		currentCanvasInUrl.current = canvasInUrl;
 	}, [ canvasInUrl, setCanvasMode ] );
 }
