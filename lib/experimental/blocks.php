@@ -109,8 +109,18 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
  */
 function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $parent_block ) {
-	if ( isset( $parent_block ) ) {
-		$parsed_block['parentBlock'] = $parent_block->name;
+	if ( 'core/comment-template' === $parsed_block['blockName'] ) {
+		$inserted_block_markup = <<<END
+<!-- wp:social-links -->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
+<!-- /wp:social-links -->'
+END;
+		$inserted_blocks = parse_blocks( $inserted_block_markup );
+
+		$parsed_block['innerBlocks'][] = $inserted_blocks[0];
+		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+		// when rendering blocks, we also need to append the new block to that array.
+		$parsed_block['innerContent'][] = $inserted_blocks[0];
 	}
 	return $parsed_block;
 }
