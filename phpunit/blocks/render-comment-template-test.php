@@ -142,6 +142,9 @@ END;
 			return $parsed_block;
 		};
 
+		// Remove auto-insertion filter so it won't collide.
+		remove_filter( 'render_block_data', 'gutenberg_auto_insert_child_block' );
+
 		add_filter( 'render_block_data', $render_block_data_callback, 10, 1 );
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:comments --><!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template --><!-- /wp:comments -->'
@@ -154,6 +157,8 @@ END;
 		);
 		$block->render();
 		remove_filter( 'render_block_data', $render_block_data_callback );
+		// Add back auto-insertion filter.
+		add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
 
 		$this->assertSame( 5, $render_block_callback->get_call_count() );
 
