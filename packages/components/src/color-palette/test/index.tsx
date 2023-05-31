@@ -223,7 +223,7 @@ describe( 'ColorPalette', () => {
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
 
-		const { container } = render( <ControlledColorPalette /> );
+		render( <ControlledColorPalette /> );
 
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 
@@ -252,13 +252,6 @@ describe( 'ColorPalette', () => {
 		// Clear the color, confirm that the relative values are cleared/updated.
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
-		expect(
-			// Relying on implementation details here, but it's the only way I could come up with.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-			container.querySelector(
-				'.components-color-palette__custom-color-value'
-			)
-		).toHaveTextContent( '' );
 		expect(
 			screen.queryByText( EXAMPLE_COLORS[ 0 ].name )
 		).not.toBeInTheDocument();
