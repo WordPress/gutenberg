@@ -90,6 +90,8 @@ export default function useSyncPathWithURL() {
 			updateUrlParams( {
 				postType: undefined,
 				postId: undefined,
+				categoryType: undefined,
+				categoryName: undefined,
 				path:
 					navigatorLocation.path === '/'
 						? undefined
