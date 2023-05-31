@@ -21,6 +21,10 @@ import {
 	ContextSystemProvider,
 } from '../../ui/context';
 
+// TODO:
+// - (optional) make the legacy `DropdownMenu` read the context variable
+// - swap the legacy `DropdownMenu` with the new version of the component
+//   once it's stable
 const CONTEXT_SYSTEM_VALUE = {
 	DropdownMenu: {
 		// Note: the legacy `DropdownMenu` component is not yet reactive to this
