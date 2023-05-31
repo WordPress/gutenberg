@@ -102,14 +102,18 @@ function gutenberg_register_metadata_attribute( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
- * Filters the block being rendered in render_block(), before it's processed.
+ * Auto-insert a block as another block's first or last inner block.
  *
  * @param array         $parsed_block The block being rendered.
  * @param array         $source_block An un-modified copy of $parsed_block, as it appeared in the source content.
  * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
  */
 function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $parent_block ) {
-	if ( 'core/comment-template' === $parsed_block['blockName'] ) {
+	// TODO: Implement an API for users to set the following two parameters.
+	$block_name     = 'core/comment-template';
+	$block_position = 'last-child';
+
+	if ( $block_name === $parsed_block['blockName'] ) {
 		$inserted_block_markup = <<<END
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
@@ -117,10 +121,17 @@ function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $paren
 END;
 		$inserted_blocks = parse_blocks( $inserted_block_markup );
 
-		$parsed_block['innerBlocks'][] = $inserted_blocks[0];
-		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-		// when rendering blocks, we also need to append the new block to that array.
-		$parsed_block['innerContent'][] = $inserted_blocks[0];
+		if ( 'first-child' === $block_position ) {
+			array_unshift( $parsed_block['innerBlocks'], $inserted_blocks[0] );
+			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+			// when rendering blocks, we also need to prepend the new block to that array.
+			array_unshift( $parsed_block['innerContent'], $inserted_blocks[0] );
+		} elseif ( 'last-child' === $block_position ) {
+			array_push( $parsed_block['innerBlocks'], $inserted_blocks[0] );
+			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+			// when rendering blocks, we also need to append the new block to that array.
+			array_push( $parsed_block['innerContent'], $inserted_blocks[0] );
+		}
 	}
 	return $parsed_block;
 }
