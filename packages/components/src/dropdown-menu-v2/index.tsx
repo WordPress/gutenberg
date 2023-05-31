@@ -40,7 +40,7 @@ import type {
 } from './types';
 
 // Menu content's side padding + 4px
-const SUB_MENU_OFFSET_SIDE = 12;
+const SUB_MENU_OFFSET_SIDE = 16;
 // Opposite amount of the top padding of the menu item
 const SUB_MENU_OFFSET_ALIGN = -8;
 
