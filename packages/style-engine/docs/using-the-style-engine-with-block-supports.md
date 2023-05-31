@@ -133,8 +133,18 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$color_block_styles = array();
 
 	// Set the color style values according to whether the block has support and does not skip serialization.
-	$spacing_block_styles['text']       = $has_text_support && ! $skips_serialization_of_color_text ? _wp_array_get( $block_color_styles, array( 'text' ), null ) : null;
-	$spacing_block_styles['background'] = $has_background_support && ! $skips_serialization_of_color_background ? _wp_array_get( $block_color_styles, array( 'background' ), null ) : null;
+	$spacing_block_styles['text']       = null;
+	if ( $has_text_support && ! $skips_serialization_of_color_text ) {
+		$spacing_block_styles['text'] = isset( $block_color_styles['text'] )
+			? _wp_array_get( $block_color_styles, array( 'text' ), null )
+			: null;
+	}
+	$spacing_block_styles['background'] = null;
+	if ( $has_background_support && ! $skips_serialization_of_color_background ) {
+		$spacing_block_styles['background'] = isset( $block_color_styles['background'] )
+			? _wp_array_get( $block_color_styles, array( 'background' ), null )
+			: null;
+	}
 
 	// Pass the color styles, excluding those that have no support or skip serialization, to the Style Engine.
 	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
