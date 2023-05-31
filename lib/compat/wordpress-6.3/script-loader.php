@@ -80,6 +80,5 @@ add_filter(
 		// We must override what core is passing now.
 		$settings['__unstableResolvedAssets'] = _gutenberg_get_iframed_editor_assets();
 		return $settings;
-	},
-	100
+	}
 );
