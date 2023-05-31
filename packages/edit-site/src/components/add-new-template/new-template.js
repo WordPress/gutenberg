@@ -13,6 +13,7 @@ import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -140,7 +141,7 @@ export default function NewTemplate( {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					newTemplate.title?.rendered || title
+					decodeEntities( newTemplate.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',
