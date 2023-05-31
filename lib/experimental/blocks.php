@@ -104,7 +104,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
 /**
  * Auto-insert a block as another block's first or last inner block.
  *
- * @param array         $parsed_block The block being rendered.
+ * @param array $parsed_block The block being rendered.
  */
 function gutenberg_auto_insert_child_block( $parsed_block ) {
 	// TODO: Implement an API for users to set the following two parameters.
@@ -112,11 +112,11 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 	$block_position = 'last-child';
 
 	if ( $block_name === $parsed_block['blockName'] ) {
-		// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0]
+		// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0].
 		$inserted_block = array(
 			'blockName'    => 'core/avatar',
 			'attrs'        => array(
-				'size' => 40,
+				'size'  => 40,
 				'style' => array(
 					'border' => array( 'radius' => '10px' ),
 				),
@@ -144,8 +144,8 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
 /**
  * Auto-insert blocks relative to a given block.
  *
- * @param string   $block_content The block content.
- * @param array    $block         The full block, including name and attributes.
+ * @param string $block_content The block content.
+ * @param array  $block         The full block, including name and attributes.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block ) {
 	// TODO: Implement an API for users to set the following two parameters.
