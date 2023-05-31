@@ -150,7 +150,7 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 	$block_name     = 'core/comment-template';
 	$block_position = 'after';
 
-	// Can we void infinite loops?
+	// Can we avoid infinite loops?
 
 	if ( $block_name === $block['blockName'] ) {
 		$inserted_block_markup = '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->';
