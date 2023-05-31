@@ -105,10 +105,8 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * Auto-insert a block as another block's first or last inner block.
  *
  * @param array         $parsed_block The block being rendered.
- * @param array         $source_block An un-modified copy of $parsed_block, as it appeared in the source content.
- * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
  */
-function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $parent_block ) {
+function gutenberg_auto_insert_child_block( $parsed_block ) {
 	// TODO: Implement an API for users to set the following two parameters.
 	$block_name     = 'core/comment-template';
 	$block_position = 'last-child';
@@ -131,7 +129,7 @@ function gutenberg_auto_insert_child_block( $parsed_block, $source_block, $paren
 	}
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 3 );
+add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
 
 /**
  * Auto-insert blocks relative to a given block.
