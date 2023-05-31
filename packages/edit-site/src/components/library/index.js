@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { EditorSnackbars } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -13,6 +14,10 @@ import { getQueryArgs } from '@wordpress/url';
  */
 import Grid from './grid';
 import useTitle from '../routes/use-title';
+import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const DEFAULT_TYPE = 'wp_template_part';
 const DEFAULT_CATEGORY = 'header';
@@ -36,6 +41,11 @@ export default function Library() {
 
 	useTitle( __( 'Library' ) );
 
+	const settings = useSelect(
+		( select ) => select( editSiteStore ).getSettings(),
+		[]
+	);
+
 	// If we only have a single region, due to not including a header on this page,
 	// do we need the aria-label section?
 	const regionLabels = { body: __( 'Library - Content' ) };
@@ -46,11 +56,16 @@ export default function Library() {
 			labels={ regionLabels }
 			notices={ <EditorSnackbars /> }
 			content={
-				<Grid
-					type={ type }
-					category={ category }
-					label={ __( 'Patterns list' ) }
-				/>
+				// Wrap everything in a block editor provider.
+				// This ensures 'styles' that are needed for the previews are synced
+				// from the site editor store to the block editor store.
+				<ExperimentalBlockEditorProvider settings={ settings }>
+					<Grid
+						type={ type }
+						category={ category }
+						label={ __( 'Patterns list' ) }
+					/>
+				</ExperimentalBlockEditorProvider>
 			}
 			shortcuts={ {
 				previous: previousShortcut,
