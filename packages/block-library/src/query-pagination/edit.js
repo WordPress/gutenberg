@@ -15,6 +15,7 @@ import { PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
+import { QueryPaginationLabelControl } from './query-pagination-label-control';
 
 const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
@@ -28,7 +29,7 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow },
+	attributes: { paginationArrow, showLabel },
 	setAttributes,
 	clientId,
 } ) {
@@ -36,7 +37,7 @@ export default function QueryPaginationEdit( {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
 		/**
-		 * Show the `paginationArrow` control only if a
+		 * Show the `paginationArrow` and `showLabel` controls only if a
 		 * `QueryPaginationNext/Previous` block exists.
 		 */
 		return innerBlocks?.find( ( innerBlock ) => {
@@ -51,6 +52,10 @@ export default function QueryPaginationEdit( {
 		template: TEMPLATE,
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
+	// Always show label text if paginationArrow is set to 'none'.
+	if ( paginationArrow === 'none' ) {
+		setAttributes( { showLabel: true } );
+	}
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
@@ -62,6 +67,14 @@ export default function QueryPaginationEdit( {
 								setAttributes( { paginationArrow: value } );
 							} }
 						/>
+						{ paginationArrow !== 'none' && (
+							<QueryPaginationLabelControl
+								value={ showLabel }
+								onChange={ ( value ) => {
+									setAttributes( { showLabel: value } );
+								} }
+							/>
+						) }
 					</PanelBody>
 				</InspectorControls>
 			) }
