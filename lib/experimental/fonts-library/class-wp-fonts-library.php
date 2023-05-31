@@ -84,7 +84,7 @@ class WP_Fonts_Library {
      * Check if user has permissions to update the fonts library
      *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
     function update_fonts_library_permissions_check ( $request ) {
         if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -107,7 +107,7 @@ class WP_Fonts_Library {
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
     function read_fonts_library_permissions_check ( $request ) {
-        if ( ! current_user_can( 'edit_posts' ) ) {
+        if ( !current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'rest_cannot_read_fonts_library',
 				__( 'Sorry, you are not allowed to read the fonts library on this site.' ),
@@ -123,17 +123,20 @@ class WP_Fonts_Library {
     /**
      * Gets the fonts library post content
      * 
-     * @return WP_REST_Response
+     * @return WP_REST_Response|WP_Error
      */
     function get_fonts_library () {
         $post = $this->query_fonts_library();
+        if ( is_wp_error( $post ) ) {
+            return $post;
+        }
         return new WP_REST_Response( $post->post_content );
     }
 
-    /**
+     /**
      * Query fonts library post
      *
-     * @return WP_Post
+     * @return WP_Post|WP_Error
      */
     private function query_fonts_library () {
         // Try to get the fonts library post
@@ -148,6 +151,13 @@ class WP_Fonts_Library {
         $args['post_content'] = '{"fontFamilies":[]}';
         $post_id = wp_insert_post( $args );
         $post = get_post( $post_id );
+        if ( ! $post ) {
+            return new WP_Error(
+				'rest_cant_create_fonts_library',
+				__( 'Error creating fonts library post.' ),
+				array( 'status' => 500 )
+			);
+        }
         return $post;
     }
 
@@ -157,7 +167,7 @@ class WP_Fonts_Library {
      * Updates the content of the fonts library post with a new list of fonts families.
      *
      * @param array $new_fonts_families The new list of fonts families to replace the current content of the fonts library post.
-     * @return WP_REST_Response The updated fonts library post content wrapped in a WP_REST_Response object.
+     * @return WP_REST_Response|WP_Error The updated fonts library post content wrapped in a WP_REST_Response object.
      */
     function update_fonts_library ( $new_fonts_families ) {
         $post = $this->query_fonts_library();
@@ -169,7 +179,13 @@ class WP_Fonts_Library {
             'post_content' => wp_json_encode( $new_fonts_library ),
         );
         $updated_post = wp_update_post( $updated_post_data );
+        if ( is_wp_error( $updated_post ) ){
+            return $updated_post;
+        }
         $new_post = $this->query_fonts_library();
+        if ( is_wp_error( $new_post ) ){
+            return $new_post;
+        }
         return new WP_REST_Response( $new_post->post_content );
     }
 
@@ -178,13 +194,20 @@ class WP_Fonts_Library {
      *
      * Reads the "google-fonts.json" file from the file system and returns its content.
      *
-     * @return WP_REST_Response The content of the "google-fonts.json" file wrapped in a WP_REST_Response object.
+     * @return WP_REST_Response|WP_Error The content of the "google-fonts.json" file wrapped in a WP_REST_Response object.
      */
     function get_google_fonts () {
         $file = file_get_contents(
             path_join ( dirname(__FILE__),"google-fonts.json" )
         );
-        return new WP_REST_Response( json_decode( $file ) );
+        if ( $file ) {
+            return new WP_REST_Response( json_decode( $file ) );
+        }
+        return new WP_Error(
+            'rest_cant_read_google_fonts',
+            __( 'Error reading Google Fonts JSON file.' ),
+            array( 'status' => 500 )
+        );
     }
 
     /**
@@ -196,6 +219,11 @@ class WP_Fonts_Library {
     function delete_asset( $src ) {
         $filename = basename( $src );
         $file_path = path_join( $this->wp_fonts_dir, $filename );
+
+        if ( ! file_exists( $file_path ) ) {
+            return false;
+        }
+
         return wp_delete_file( $file_path );
     }
 
