@@ -66,7 +66,7 @@ const getEntityContext = ( kind, name ) => {
  * @return {Object} The provided children, wrapped with
  *                   the entity's context provider.
  */
-export default function EntityProvider( { kind, type: name, id, children } ) {
+export function EntityProvider( { kind, type: name, id, children } ) {
 	const Provider = getEntityContext( kind, name ).Provider;
 	return <Provider value={ id }>{ children }</Provider>;
 }
