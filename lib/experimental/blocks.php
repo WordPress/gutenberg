@@ -112,9 +112,18 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 	$block_position = 'last-child';
 
 	if ( $block_name === $parsed_block['blockName'] ) {
-		$inserted_block_markup = '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->';
-		$inserted_blocks       = parse_blocks( $inserted_block_markup );
-		$inserted_block        = $inserted_blocks[0];
+		// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0]
+		$inserted_block = array(
+			'blockName'    => 'core/avatar',
+			'attrs'        => array(
+				'size' => 40,
+				'style' => array(
+					'border' => array( 'radius' => '10px' ),
+				),
+			),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+		);
 
 		if ( 'first-child' === $block_position ) {
 			array_unshift( $parsed_block['innerBlocks'], $inserted_block );
