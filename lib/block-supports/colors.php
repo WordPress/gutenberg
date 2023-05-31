@@ -65,7 +65,7 @@ function gutenberg_register_colors_support( $block_type ) {
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
-	$color_support = $block_type->supports['color'] && $block_type->supports['color']
+	$color_support = isset( $block_type->supports['color'] ) && $block_type->supports['color']
 		? _wp_array_get( $block_type->supports, array( 'color' ), false )
 		: false;
 
