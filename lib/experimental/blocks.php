@@ -140,6 +140,7 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 3 );
  * @param array    $block         The full block, including name and attributes.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block ) {
+	// TODO: Implement an API for users to set the following two parameters.
 	$block_name     = 'core/post-content';
 	$block_position = 'after';
 
