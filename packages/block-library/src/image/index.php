@@ -68,7 +68,7 @@ function render_block_core_image( $attributes, $content ) {
 		$w->add_class( 'wp-lightbox-container' );
 		$w->set_attribute( 'data-wp-interactive', '' );
 		$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }' );
-		$content = $w->get_updated_html();
+		$body_content = $w->get_updated_html();
 
 		// Wrap the image in the body content with a button.
 		$img = null;
@@ -77,7 +77,7 @@ function render_block_core_image( $attributes, $content ) {
 			 					<button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox"></button>'
 									. $img[0] .
 								'</div>';
-		$body_content = preg_replace( '/<img[^>]+>/', $button, $content );
+		$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
 		$background_color  = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
 		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
