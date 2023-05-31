@@ -37,7 +37,7 @@ class WP_Fonts_Library {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_fonts_library' ),
-					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'read_fonts_library_permissions_check' ),
 				),
 			)
 		);
@@ -49,7 +49,7 @@ class WP_Fonts_Library {
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'install_fonts' ),
-					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
 				),
 			)
 		);
@@ -61,7 +61,7 @@ class WP_Fonts_Library {
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'uninstall_font_family' ),
-					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
 				),
 			)
 		);
@@ -73,7 +73,7 @@ class WP_Fonts_Library {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_google_fonts' ),
-					'permission_callback' => array( $this, 'fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'read_fonts_library_permissions_check' ),
 				),
 			)
 		);
@@ -81,12 +81,43 @@ class WP_Fonts_Library {
     }
 
     /**
-     * Check if user has permissions to use fonts library
+     * Check if user has permissions to update the fonts library
      *
-     * @return bool
-     */
-    function fonts_library_permissions_check () {
-        return current_user_can( 'edit_posts' );
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+    function update_fonts_library_permissions_check ( $request ) {
+        if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_update_fonts_library',
+				__( 'Sorry, you are not allowed to update the fonts library on this site.' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+
+		return true;
+    }
+
+    /**
+     * Check if user has permissions to read the fonts library
+     *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+    function read_fonts_library_permissions_check ( $request ) {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error(
+				'rest_cannot_read_fonts_library',
+				__( 'Sorry, you are not allowed to read the fonts library on this site.' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+
+		return true;
     }
 
     /**
