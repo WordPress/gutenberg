@@ -72,7 +72,7 @@ export function getLastInsertedBlocksClientIds( state ) {
  *                            `'contentOnly'`, or `'default'`.
  */
 export const getBlockEditingMode = ( state, clientId = '' ) => {
-	const explicitEditingMode = getExplcitBlockEditingMode( state, clientId );
+	const explicitEditingMode = getExplicitBlockEditingMode( state, clientId );
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const templateLock = getTemplateLock( state, rootClientId );
 	const name = getBlockName( state, clientId );
@@ -99,7 +99,7 @@ export const getBlockEditingMode = ( state, clientId = '' ) => {
 	return 'default';
 };
 
-const getExplcitBlockEditingMode = createSelector(
+const getExplicitBlockEditingMode = createSelector(
 	( state, clientId = '' ) => {
 		while (
 			! state.blockEditingModes.has( clientId ) &&
