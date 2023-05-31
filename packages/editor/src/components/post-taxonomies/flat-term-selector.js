@@ -13,7 +13,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unescapeString } from '../../utils/terms';
+import { unescapeString, unescapeTerm } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
@@ -143,15 +143,23 @@ export function FlatTermSelector( { slug } ) {
 		return null;
 	}
 
-	/**
-	 * Create a new term
-	 *
-	 * @param {Object} term Term object.
-	 * @return {Promise} A promise that resolves to save term object.
-	 */
-	const createTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
-	};
+	async function createTerm( term ) {
+		try {
+			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
+				throwOnError: true,
+			} );
+			return unescapeTerm( newTerm );
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return {
+				id: error.data.term_id,
+				name: term.name,
+			};
+		}
+	}
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
