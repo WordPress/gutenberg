@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -74,8 +75,8 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 export default meta;
 
 const ItemHelpText = styled.span`
-	font-size: 10px;
-	color: #777;
+	font-size: 12px;
+	color: ${ COLORS.gray[ '700' ] };
 
 	/* "> * > &" syntax is to target only immediate parent menu item */
 	[data-highlighted] > * > &,
@@ -145,7 +146,7 @@ Default.args = {
 			<DropdownMenuGroup>
 				<DropdownMenuItem>Menu item</DropdownMenuItem>
 				<DropdownMenuItem
-					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
+					prefix={ <Icon icon={ wordpress } size={ 24 } /> }
 				>
 					Menu item with prefix
 				</DropdownMenuItem>
