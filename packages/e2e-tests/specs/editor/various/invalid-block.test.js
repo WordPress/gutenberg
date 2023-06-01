@@ -75,7 +75,7 @@ describe( 'invalid blocks', () => {
 		expect( hasAlert ).toBe( false );
 	} );
 
-	it( 'should strip potentially malicious script tags', async () => {
+	it( 'should not trigger malicious script tags when using a shortcode block', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
@@ -94,9 +94,6 @@ describe( 'invalid blocks', () => {
 
 		// Give the browser time to show the alert.
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-
-		expect( console ).toHaveWarned();
-		expect( console ).toHaveErrored();
 		expect( hasAlert ).toBe( false );
 	} );
 } );
