@@ -566,3 +566,10 @@ class WP_Fonts_Library {
     }
 
 }
+
+function fonts_library_register_routes () {
+	$fonts_library = new WP_Fonts_Library();
+	$fonts_library->register_routes();
+}
+
+add_action( 'rest_api_init', 'fonts_library_register_routes' );

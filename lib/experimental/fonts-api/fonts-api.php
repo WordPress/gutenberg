@@ -242,13 +242,6 @@ add_filter(
 	}
 );
 
-
-function fonts_library_register_routes () {
-	$fonts_library = new WP_Fonts_Library();
-	$fonts_library->register_routes();
-}
-add_action( 'rest_api_init', 'fonts_library_register_routes' );
-
 /*
  * To make sure blocks are registered before any Theme_JSON operations take place, a priority of 21 is used.
  *
