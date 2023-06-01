@@ -111,32 +111,35 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 	$block_name     = 'core/comment-template';
 	$block_position = 'last-child';
 
-	if ( $block_name === $parsed_block['blockName'] ) {
-		// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0].
-		$inserted_block = array(
-			'blockName'    => 'core/avatar',
-			'attrs'        => array(
-				'size'  => 40,
-				'style' => array(
-					'border' => array( 'radius' => '10px' ),
-				),
-			),
-			'innerHTML'    => '',
-			'innerContent' => array(),
-		);
-
-		if ( 'first-child' === $block_position ) {
-			array_unshift( $parsed_block['innerBlocks'], $inserted_block );
-			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-			// when rendering blocks, we also need to prepend the new block to that array.
-			array_unshift( $parsed_block['innerContent'], $inserted_block );
-		} elseif ( 'last-child' === $block_position ) {
-			array_push( $parsed_block['innerBlocks'], $inserted_block );
-			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-			// when rendering blocks, we also need to append the new block to that array.
-			array_push( $parsed_block['innerContent'], $inserted_block );
-		}
+	if ( $block_name !== $parsed_block['blockName'] ) {
+		return $parsed_block;
 	}
+
+	// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0].
+	$inserted_block = array(
+		'blockName'    => 'core/avatar',
+		'attrs'        => array(
+			'size'  => 40,
+			'style' => array(
+				'border' => array( 'radius' => '10px' ),
+			),
+		),
+		'innerHTML'    => '',
+		'innerContent' => array(),
+	);
+
+	if ( 'first-child' === $block_position ) {
+		array_unshift( $parsed_block['innerBlocks'], $inserted_block );
+		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+		// when rendering blocks, we also need to prepend the new block to that array.
+		array_unshift( $parsed_block['innerContent'], $inserted_block );
+	} elseif ( 'last-child' === $block_position ) {
+		array_push( $parsed_block['innerBlocks'], $inserted_block );
+		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+		// when rendering blocks, we also need to append the new block to that array.
+		array_push( $parsed_block['innerContent'], $inserted_block );
+	}
+
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
