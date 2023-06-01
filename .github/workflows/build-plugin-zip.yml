@@ -164,25 +164,18 @@ jobs:
 
         steps:
             - name: Checkout code
-              # The following is debug code, should be reverted before merging. See commit that added this for more info.
-              if: false
               uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
             - name: Use desired version of Node.js
-              # The following is debug code, should be reverted before merging. See commit that added this for more info.
-              if: false
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Build Gutenberg plugin ZIP file
-              # The following is debug code, should be reverted before merging. See commit that added this for more info.
-              run: |
-                  echo 'Stable tag: V.V.V' > readme.txt
-                  zip -j gutenberg.zip readme.txt
+              run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
 
@@ -193,10 +186,6 @@ jobs:
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
-              # Debug: if we want fast runs, then this should be disabled as this won't
-              # work if the real plugin isn't built (becuase npm install is needed to install
-              # some needed packages that the `other:changelog` task uses`).
-              if: false
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               run: |
@@ -212,8 +201,6 @@ jobs:
                   fi
 
             - name: Upload release notes artifact
-              # The following is debug code, should be reverted before merging. See commit that added this for more info.
-              if: false
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: release-notes
@@ -282,8 +269,6 @@ jobs:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              # The following is debug code, should be reverted before merging. See commit that added this for more info.
-              if: false
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: release-notes
@@ -299,8 +284,7 @@ jobs:
                   commitish: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   draft: true
                   prerelease: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
-                  # The following is debug code, should be reverted before merging. See commit that added this for more info.
-                  # body_path: release-notes.txt
+                  body_path: release-notes.txt
 
             - name: Upload Release Asset
               id: upload-release-asset
