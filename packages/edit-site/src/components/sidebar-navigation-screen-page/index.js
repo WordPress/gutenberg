@@ -79,7 +79,7 @@ export default function SidebarNavigationScreenPage() {
 				record?.title?.rendered || __( '(no title)' )
 			) }
 			actions={
-				<div>
+				<>
 					<PageActions
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
@@ -92,7 +92,7 @@ export default function SidebarNavigationScreenPage() {
 						label={ __( 'Edit' ) }
 						icon={ pencil }
 					/>
-				</div>
+				</>
 			}
 			meta={
 				<ExternalLink

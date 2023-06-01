@@ -83,7 +83,11 @@ export default function SidebarNavigationScreen( {
 								title
 						  ) }
 				</Heading>
-				{ actions }
+				{ actions && (
+					<div className="edit-site-sidebar-navigation-screen__actions">
+						{ actions }
+					</div>
+				) }
 			</HStack>
 			{ meta && (
 				<>

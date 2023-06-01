@@ -57,6 +57,10 @@
 	padding: $grid-unit-15 * 0.5 0 0 0;
 }
 
+.edit-site-sidebar-navigation-screen__actions {
+	flex-shrink: 0;
+}
+
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
 	.edit-site-global-styles-variations_item-preview {
 		border: $gray-900 $border-width solid;

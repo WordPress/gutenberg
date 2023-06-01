@@ -92,7 +92,7 @@ export default function SidebarNavigationScreenTemplate() {
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
-				<div>
+				<>
 					<TemplateActions
 						postType={ postType }
 						postId={ postId }
@@ -106,7 +106,7 @@ export default function SidebarNavigationScreenTemplate() {
 						label={ __( 'Edit' ) }
 						icon={ pencil }
 					/>
-				</div>
+				</>
 			}
 			description={ description }
 		/>
