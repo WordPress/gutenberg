@@ -20,17 +20,16 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
  * @property {?string|?number}               size  A default font size.
  * @property {string}                        name  A font size name, displayed in the UI.
  * @property {string}                        slug  A font size slug
- * @property {boolean|FluidPreset|undefined} fluid A font size slug
+ * @property {boolean|FluidPreset|undefined} fluid Specifies the minimum and maximum font size value of a fluid font size.
  */
 
 /**
  * @typedef {Object} TypographySettings
- * @property {?string|?number} size              A default font size.
- * @property {?string}         minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
- * @property {?string}         maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
- * @property {?number}         scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
- * @property {?number}         minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
- * @property {?string}         minFontSize       The smallest a calculated font size may be. Optional.
+ * @property {?string} minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
+ * @property {?string} maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
+ * @property {?number} scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
+ * @property {?number} minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+ * @property {?string} minFontSize       The smallest a calculated font size may be. Optional.
  */
 
 /**
@@ -77,6 +76,7 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 		maximumFontSize: preset?.fluid?.max,
 		fontSize: defaultSize,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
+		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
