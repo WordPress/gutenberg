@@ -106,7 +106,7 @@ jobs:
               uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ matrix.branch }}
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
 
             - name: Update the Changelog to include the release notes
               run: |
@@ -166,7 +166,7 @@ jobs:
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
@@ -229,7 +229,7 @@ jobs:
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
