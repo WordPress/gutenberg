@@ -54,11 +54,18 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
 
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
+
+	if ( blocks?.length > 0 && blocks[ 0 ].name === 'core/pattern' ) {
+		replaceBlocks( clientId, blocks[ 0 ].innerBlocks );
+	}
+
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		'wp_block',
