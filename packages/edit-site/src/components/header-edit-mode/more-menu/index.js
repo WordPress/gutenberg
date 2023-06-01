@@ -3,12 +3,17 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
 import { ActionItem, MoreMenuDropdown } from '@wordpress/interface';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -20,6 +25,7 @@ import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import { store as siteEditorStore } from '../../../store';
 
 export default function MoreMenu( { showIconLabels } ) {
 	const [ isModalActive, toggleModal ] = useReducer(
@@ -31,6 +37,39 @@ export default function MoreMenu( { showIconLabels } ) {
 		( isActive ) => ! isActive,
 		false
 	);
+
+	const registry = useRegistry();
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'distractionFree'
+			),
+		[]
+	);
+
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( siteEditorStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const toggleDistractionFree = () => {
+		registry.batch( () => {
+			setPreference( 'core/edit-site', 'fixedToolbar', false );
+			setIsInserterOpened( false );
+			setIsListViewOpened( false );
+			closeGeneralSidebar();
+			if ( ! isDistractionFree && !! blocks.length ) {
+				selectBlock( blocks[ 0 ].clientId );
+			}
+		} );
+	};
 
 	useShortcut( 'core/edit-site/keyboard-shortcuts', toggleModal );
 
@@ -48,6 +87,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							<PreferenceToggleMenuItem
 								scope="core/edit-site"
 								name="fixedToolbar"
+								disabled={ isDistractionFree }
 								label={ __( 'Top toolbar' ) }
 								info={ __(
 									'Access all block and document tools in a single place'
@@ -69,6 +109,22 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 								messageDeactivated={ __(
 									'Spotlight mode deactivated'
+								) }
+							/>
+							<PreferenceToggleMenuItem
+								scope="core/edit-site"
+								name="distractionFree"
+								onToggle={ toggleDistractionFree }
+								label={ __( 'Distraction free' ) }
+								info={ __( 'Write with calmness' ) }
+								messageActivated={ __(
+									'Distraction free mode activated'
+								) }
+								messageDeactivated={ __(
+									'Distraction free mode deactivated'
+								) }
+								shortcut={ displayShortcut.primaryShift(
+									'\\'
 								) }
 							/>
 							<ModeSwitcher />
