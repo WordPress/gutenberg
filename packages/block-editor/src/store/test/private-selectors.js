@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { select } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import {
@@ -11,10 +6,6 @@ import {
 	getLastInsertedBlocksClientIds,
 	getBlockEditingMode,
 } from '../private-selectors';
-
-jest.mock( '@wordpress/data/src/select', () => ( {
-	select: jest.fn(),
-} ) );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -101,9 +92,11 @@ describe( 'private selectors', () => {
 		};
 
 		const __experimentalHasContentRoleAttribute = jest.fn( () => false );
-		select.mockReturnValue( {
-			__experimentalHasContentRoleAttribute,
-		} );
+		getBlockEditingMode.registry = {
+			select: jest.fn( () => ( {
+				__experimentalHasContentRoleAttribute,
+			} ) ),
+		};
 
 		it( 'should return default by default', () => {
 			expect(

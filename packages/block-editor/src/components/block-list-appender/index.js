@@ -15,7 +15,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 function DefaultAppender( { rootClientId } ) {
 	const canInsertDefaultBlock = useSelect( ( select ) =>
@@ -47,15 +46,13 @@ function useAppender( rootClientId, CustomAppender ) {
 				getTemplateLock,
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
-				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			return {
 				hideInserter:
 					!! getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled' ||
 					__unstableGetEditorMode() === 'zoom-out',
 				isParentSelected:
 					rootClientId === selectedBlockClientId ||
