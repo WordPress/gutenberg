@@ -44,17 +44,22 @@ export const __experimentalConvertBlockToStatic =
  *
  * @param {string[]} clientIds The client IDs of the block to detach.
  * @param {string}   title     Reusable block title.
+ * @param {string}   blockType They type of block being created, reusable or pattern.
  */
 export const __experimentalConvertBlocksToReusable =
-	( clientIds, title ) =>
+	( clientIds, title, blockType ) =>
 	async ( { registry, dispatch } ) => {
+		let content = serialize(
+			registry.select( blockEditorStore ).getBlocksByClientId( clientIds )
+		);
+
+		if ( blockType === 'pattern' ) {
+			content = `<!-- wp:pattern -->${ content }<!-- /wp:pattern -->`;
+		}
+
 		const reusableBlock = {
 			title: title || __( 'Untitled Reusable block' ),
-			content: serialize(
-				registry
-					.select( blockEditorStore )
-					.getBlocksByClientId( clientIds )
-			),
+			content,
 			status: 'publish',
 		};
 

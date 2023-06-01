@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -39,6 +39,7 @@ export default function ReusableBlockConvertButton( {
 	rootClientId,
 } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ blockType, setBlockType ] = useState( 'resuable' );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
@@ -88,17 +89,29 @@ export default function ReusableBlockConvertButton( {
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
-				await convertBlocksToReusable( clientIds, reusableBlockTitle );
-				createSuccessNotice( __( 'Reusable block created.' ), {
-					type: 'snackbar',
-				} );
+				await convertBlocksToReusable(
+					clientIds,
+					reusableBlockTitle,
+					blockType
+				);
+				createSuccessNotice(
+					sprintf(
+						__( '%s created.' ),
+						blockType === 'reusable'
+							? __( 'Reusable block' )
+							: __( 'Pattern' )
+					),
+					{
+						type: 'snackbar',
+					}
+				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
 				} );
 			}
 		},
-		[ clientIds ]
+		[ clientIds, blockType ]
 	);
 
 	if ( ! canConvert ) {
@@ -112,14 +125,29 @@ export default function ReusableBlockConvertButton( {
 					<MenuItem
 						icon={ symbol }
 						onClick={ () => {
+							setBlockType( 'reusable' );
 							setIsModalOpen( true );
 						} }
 					>
 						{ __( 'Create Reusable block' ) }
 					</MenuItem>
+					<MenuItem
+						icon={ symbol }
+						onClick={ () => {
+							setBlockType( 'pattern' );
+							setIsModalOpen( true );
+						} }
+					>
+						{ __( 'Create a Pattern' ) }
+					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create Reusable block' ) }
+							title={ sprintf(
+								__( 'Create %s' ),
+								blockType === 'reusable'
+									? __( 'Reusable block' )
+									: __( 'Pattern' )
+							) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
