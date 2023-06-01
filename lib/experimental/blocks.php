@@ -131,13 +131,15 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 	if ( 'first-child' === $block_position ) {
 		array_unshift( $parsed_block['innerBlocks'], $inserted_block );
 		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-		// when rendering blocks, we also need to prepend the new block to that array.
-		array_unshift( $parsed_block['innerContent'], $inserted_block );
+		// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+		// location) to that array.
+		array_unshift( $parsed_block['innerContent'], null );
 	} elseif ( 'last-child' === $block_position ) {
 		array_push( $parsed_block['innerBlocks'], $inserted_block );
 		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-		// when rendering blocks, we also need to append the new block to that array.
-		array_push( $parsed_block['innerContent'], $inserted_block );
+		// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+		// location) to that array.
+		array_push( $parsed_block['innerContent'], null );
 	}
 
 	return $parsed_block;
