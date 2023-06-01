@@ -42,17 +42,19 @@ export const __experimentalConvertBlockToStatic =
 /**
  * Returns a generator converting one or more static blocks into a reusable block.
  *
- * @param {string[]} clientIds The client IDs of the block to detach.
- * @param {string}   title     Reusable block title.
- * @param {string}   blockType They type of block being created, reusable or pattern.
+ * @param {string[]} clientIds    The client IDs of the block to detach.
+ * @param {string}   title        Reusable block title.
+ * @param {string}   blockType    They type of block being created, reusable or pattern.
+ * @param {string}   categoryName The category of pattern being created.
  */
 export const __experimentalConvertBlocksToReusable =
-	( clientIds, title, blockType ) =>
+	( clientIds, title, blockType, categoryName ) =>
 	async ( { registry, dispatch } ) => {
 		let meta;
 		if ( blockType === 'pattern' ) {
 			meta = {
 				wp_block_sync_status: 'notSynced',
+				wp_block_category_name: categoryName,
 			};
 		}
 
