@@ -994,7 +994,7 @@ export function toSvgFilters( tree, blockSelectors ) {
 const getSelectorsConfig = ( blockType, rootSelector ) => {
 	if (
 		blockType?.selectors &&
-		Object.keys( blockType?.selectors ).length > 0
+		Object.keys( blockType.selectors ).length > 0
 	) {
 		return blockType.selectors;
 	}
