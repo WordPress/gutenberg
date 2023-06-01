@@ -21,9 +21,9 @@ function gutenberg_block_core_file_add_directives_to_content( $block_content, $b
 	}
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$processor->next_tag();
-	$processor->set_attribute( 'data-wp-island', '' );
+	$processor->set_attribute( 'data-wp-interactive', '' );
 	$processor->next_tag( 'object' );
-	$processor->set_attribute( 'data-wp-bind.hidden', '!selectors.core.file.hasPdfPreview' );
+	$processor->set_attribute( 'data-wp-bind--hidden', '!selectors.core.file.hasPdfPreview' );
 	$processor->set_attribute( 'hidden', true );
 	return $processor->get_updated_html();
 }
@@ -34,34 +34,34 @@ add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_
  * The final HTML of the navigation block will look similar to this:
  *
  * <nav
- *   data-wp-island
+ *   data-wp-interactive
  *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": true, "roleAttribute": "" } } }'
  * >
  *   <button
  *     class="wp-block-navigation__responsive-container-open"
- *     data-wp-on.click="actions.core.navigation.openMenuOnClick"
- *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
+ *     data-wp-on--click="actions.core.navigation.openMenuOnClick"
+ *     data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
  *   >
  *   <div
  *     class="wp-block-navigation__responsive-container"
- *     data-wp-class.has-modal-open="selectors.core.navigation.isMenuOpen"
- *     data-wp-class.is-menu-open="selectors.core.navigation.isMenuOpen"
- *     data-wp-bind.aria-hidden="!selectors.core.navigation.isMenuOpen"
+ *     data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
+ *     data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
+ *     data-wp-bind--aria-hidden="!selectors.core.navigation.isMenuOpen"
  *     data-wp-effect="effects.core.navigation.initMenu"
- *     data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
- *     data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
+ *     data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+ *     data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
  *     tabindex="-1"
  *   >
  *     <div class="wp-block-navigation__responsive-close">
  *       <div
  *         class="wp-block-navigation__responsive-dialog"
- *         data-wp-bind.aria-modal="selectors.core.navigation.isMenuOpen"
- *         data-wp-bind.role="selectors.core.navigation.roleAttribute"
+ *         data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
+ *         data-wp-bind--role="selectors.core.navigation.roleAttribute"
  *         data-wp-effect="effects.core.navigation.focusFirstElement"
  *       >
  *         <button
  *           class="wp-block-navigation__responsive-container-close"
- *           data-wp-on.click="actions.core.navigation.closeMenuOnclick"
+ *           data-wp-on--click="actions.core.navigation.closeMenuOnclick"
  *         >
  *           <svg>
  *         <button>
@@ -80,7 +80,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 	$w = new WP_HTML_Tag_Processor( $block_content );
 	// Add directives to the `<nav>` element.
 	if ( $w->next_tag( 'nav' ) ) {
-		$w->set_attribute( 'data-wp-island', '' );
+		$w->set_attribute( 'data-wp-interactive', '' );
 		$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": true, "roleAttribute": "" } } }' );
 	};
 
@@ -91,8 +91,8 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 			'class_name' => 'wp-block-navigation__responsive-container-open',
 		)
 	) ) {
-		$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.openMenuOnClick' );
-		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
+		$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.openMenuOnClick' );
+		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
 		$w->remove_attribute( 'data-micromodal-trigger' );
 	} else {
 		// If the open modal button not found, we handle submenus immediately.
@@ -110,11 +110,11 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 			'class_name' => 'wp-block-navigation__responsive-container',
 		)
 	) ) {
-		$w->set_attribute( 'data-wp-class.has-modal-open', 'selectors.core.navigation.isMenuOpen' );
-		$w->set_attribute( 'data-wp-class.is-menu-open', 'selectors.core.navigation.isMenuOpen' );
+		$w->set_attribute( 'data-wp-class--has-modal-open', 'selectors.core.navigation.isMenuOpen' );
+		$w->set_attribute( 'data-wp-class--is-menu-open', 'selectors.core.navigation.isMenuOpen' );
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
-		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
+		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
+		$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
 		$w->set_attribute( 'tabindex', '-1' );
 	};
 
@@ -135,8 +135,8 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 			'class_name' => 'wp-block-navigation__responsive-dialog',
 		)
 	) ) {
-		$w->set_attribute( 'data-wp-bind.aria-modal', 'selectors.core.navigation.isMenuOpen' );
-		$w->set_attribute( 'data-wp-bind.role', 'selectors.core.navigation.roleAttribute' );
+		$w->set_attribute( 'data-wp-bind--aria-modal', 'selectors.core.navigation.isMenuOpen' );
+		$w->set_attribute( 'data-wp-bind--role', 'selectors.core.navigation.roleAttribute' );
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.focusFirstElement' );
 	};
 
@@ -147,7 +147,7 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
 			'class_name' => 'wp-block-navigation__responsive-container-close',
 		)
 	) ) {
-		$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.closeMenuOnClick' );
+		$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.closeMenuOnClick' );
 		$w->remove_attribute( 'data-micromodal-close' );
 	};
 
@@ -165,15 +165,15 @@ function gutenberg_block_core_navigation_add_directives_to_markup( $block_conten
  *   class="has-child"
  *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false, "overlay": false } } }'
  *   data-wp-effect="effects.core.navigation.initMenu"
- *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
- *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
- *   data-wp-on.mouseenter="actions.core.navigation.openMenuOnHover"
- *   data-wp-on.mouseleave="actions.core.navigation.closeMenuOnHover"
+ *   data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+ *   data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
+ *   data-wp-on--mouseenter="actions.core.navigation.openMenuOnHover"
+ *   data-wp-on--mouseleave="actions.core.navigation.closeMenuOnHover"
  * >
  *   <button
  *     class="wp-block-navigation-submenu__toggle"
- *     data-wp-on.click="actions.core.navigation.toggleMenuOnClick"
- *     data-wp-bind.aria-expanded="selectors.core.navigation.isMenuOpen"
+ *     data-wp-on--click="actions.core.navigation.toggleMenuOnClick"
+ *     data-wp-bind--aria-expanded="selectors.core.navigation.isMenuOpen"
  *   >
  *   </button>
  *   <span>Title</span>
@@ -197,11 +197,11 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 		// Add directives to the parent `<li>`.
 		$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": false } } }' );
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-		$w->set_attribute( 'data-wp-on.focusout', 'actions.core.navigation.handleMenuFocusout' );
-		$w->set_attribute( 'data-wp-on.keydown', 'actions.core.navigation.handleMenuKeydown' );
+		$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
+		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-			$w->set_attribute( 'data-wp-on.mouseenter', 'actions.core.navigation.openMenuOnHover' );
-			$w->set_attribute( 'data-wp-on.mouseleave', 'actions.core.navigation.closeMenuOnHover' );
+			$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
+			$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -211,8 +211,8 @@ function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_a
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-on.click', 'actions.core.navigation.toggleMenuOnClick' );
-			$w->set_attribute( 'data-wp-bind.aria-expanded', 'selectors.core.navigation.isMenuOpen' );
+			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
+			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
 		};
 
 		// Iterate through subitems if exist.

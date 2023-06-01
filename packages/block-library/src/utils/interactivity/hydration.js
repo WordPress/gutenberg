@@ -11,7 +11,7 @@ import { directivePrefix } from './constants';
 
 export const init = async () => {
 	document
-		.querySelectorAll( `[${ directivePrefix }island]` )
+		.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
 		.forEach( ( node ) => {
 			if ( ! hydratedIslands.has( node ) ) {
 				const fragment = createRootFragment( node.parentNode, node );

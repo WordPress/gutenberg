@@ -63,7 +63,7 @@ function render_block_core_image( $attributes, $content ) {
 		$img = null;
 		preg_match( '/<img[^>]+>/', $content, $img );
 		$button       = '<div class="img-container">
-			 					<button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on.click="actions.core.image.showLightbox"></button>'
+			 					<button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox"></button>'
 									. $img[0] .
 								'</div>';
 		$body_content = preg_replace( '/<img[^>]+>/', $button, $content );
@@ -78,22 +78,22 @@ function render_block_core_image( $attributes, $content ) {
 		return
 			<<<HTML
 				<div class="wp-lightbox-container"
-					data-wp-island
+					data-wp-interactive
 					data-wp-context='{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }'>
 						$body_content
 						<div data-wp-body="" class="wp-lightbox-overlay"
-							data-wp-bind.role="selectors.core.image.roleAttribute"
+							data-wp-bind--role="selectors.core.image.roleAttribute"
 							aria-label="$dialog_label"
-							data-wp-class.initialized="context.core.image.initialized"
-							data-wp-class.active="context.core.image.lightboxEnabled"
-							data-wp-bind.aria-hidden="!context.core.image.lightboxEnabled"
-							data-wp-bind.aria-modal="context.core.image.lightboxEnabled"
+							data-wp-class--initialized="context.core.image.initialized"
+							data-wp-class--active="context.core.image.lightboxEnabled"
+							data-wp-bind--aria-hidden="!context.core.image.lightboxEnabled"
+							data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
 							data-wp-effect="effects.core.image.initLightbox"
-							data-wp-on.keydown="actions.core.image.handleKeydown"
-							data-wp-on.mousewheel="actions.core.image.hideLightbox"
-							data-wp-on.click="actions.core.image.hideLightbox"
+							data-wp-on--keydown="actions.core.image.handleKeydown"
+							data-wp-on--mousewheel="actions.core.image.hideLightbox"
+							data-wp-on--click="actions.core.image.hideLightbox"
 							>
-								<button type="button" aria-label="$close_button_label" class="close-button" data-wp-on.click="actions.core.image.hideLightbox">
+								<button type="button" aria-label="$close_button_label" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
 									$close_button_icon
 								</button>
 								$content
