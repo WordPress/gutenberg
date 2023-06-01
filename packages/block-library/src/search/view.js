@@ -18,11 +18,13 @@ window.addEventListener( 'DOMContentLoaded', () => {
 				searchField.removeAttribute( 'tabindex' );
 				searchButton.removeAttribute( 'aria-expanded' );
 				searchButton.removeAttribute( 'aria-controls' );
-				searchButton.removeAttribute( 'aria-label' );
+				searchButton.setAttribute( 'type', 'submit' );
+				searchButton.setAttribute( 'aria-label', 'Submit Search' );
 
 				return block.classList.remove( hiddenClass );
 			}
 
+			searchButton.removeAttribute( 'type' );
 			searchField.setAttribute( 'aria-hidden', 'true' );
 			searchField.setAttribute( 'tabindex', '-1' );
 			searchButton.setAttribute( 'aria-expanded', 'false' );
@@ -50,10 +52,14 @@ window.addEventListener( 'DOMContentLoaded', () => {
 			}
 		};
 
+		searchButton.removeAttribute( 'type' );
 		searchField.addEventListener( 'keydown', ( e ) => {
 			hideSearchField( e );
 		} );
 		searchButton.addEventListener( 'click', handleButtonClick );
+		searchButton.addEventListener( 'keydown', ( e ) => {
+			hideSearchField( e );
+		} );
 		searchLabel.addEventListener( 'click', handleButtonClick );
 		document.body.addEventListener( 'click', hideSearchField );
 	} );
