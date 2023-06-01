@@ -27,18 +27,37 @@ function gutenberg_add_selectors_property_to_block_type_settings( $settings, $me
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to_block_type_settings', 10, 2 );
 
-add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
-function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ){
+/**
+ * Adds custom fields support to the wp_block post type so a partial and unsynced option can be added.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.3.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/51144
+ *
+ * @param array $args Register post type args.
+ * @param string $post_type The post type string.
+ *
+ * @return array Register post type args.
+ */
+function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 
-    if ( $post_type === 'wp_block' ){
+    if ( 'wp_block' === $post_type ) {
         array_push( $args['supports'], 'custom-fields' );
     }
 
     return $args;
 }
+add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
 
-add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
-
+/**
+ * Adds wp_block_sync_status meta field to the wp_block post type so a partial and unsynced option can be added.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.3.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/51144
+ *
+ * @return void
+ */
 function gutenberg_wp_block_register_post_meta() {
     $post_type = 'wp_block';
     register_post_meta( $post_type, 'wp_block_sync_status', [
@@ -51,3 +70,4 @@ function gutenberg_wp_block_register_post_meta() {
         'type'              => 'string',
     ] );
 }
+add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
