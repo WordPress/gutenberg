@@ -55,6 +55,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 		// Context
 		variant,
+		// TODO: unify type with v2, consider adding unstyled?
 	} = useContextSystem< DropdownMenuProps & { variant?: 'toolbar' } >(
 		dropdownMenuProps,
 		'DropdownMenu'
@@ -80,7 +81,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			variant,
+			// Do not add a `variant` prop if it's not defined, to avoid overriding
+			// values from internal context system.
+			...( !! variant ? { variant } : {} ),
 		},
 		popoverProps
 	);
