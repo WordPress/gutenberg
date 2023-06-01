@@ -107,7 +107,6 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 	}, [] );
 
 	const hasRevisions = revisionsCount >= 2;
-
 	const { modified } = revisions?.[ 0 ] || {};
 
 	if ( ! hasRevisions || isLoading || ! modified ) {
@@ -118,6 +117,7 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 		<VStack>
 			<SidebarNavigationItem
 				className="edit-site-sidebar-navigation-screen-global-styles__revisions"
+				label={ __( 'Revisions' ) }
 				onClick={ onClickRevisions }
 			>
 				<HStack
@@ -129,17 +129,12 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 					<span className="edit-site-sidebar-navigation-screen-global-styles__revisions__label">
 						{ __( 'Last modified' ) }
 					</span>
-
 					<span>
 						<time dateTime={ modified }>
 							{ humanTimeDiff( modified ) }
 						</time>
 					</span>
-
-					<Icon
-						icon={ backup }
-						style={ { fill: 'currentcolor', marginRight: '8px' } }
-					/>
+					<Icon icon={ backup } style={ { fill: 'currentcolor' } } />
 				</HStack>
 			</SidebarNavigationItem>
 		</VStack>
