@@ -31,30 +31,24 @@ function LocalFonts() {
 
 	const onFilesUpload = ( files ) => {
 		let uniqueFilenames = new Set();
-		const allowedFiles = [...files].filter((file) => {
-			console.log('file', file);
+		const allowedFiles = [ ...selectedFiles, ...files ].filter((file) => {
 			if(uniqueFilenames.has(file.name)){
-				return false; // if name has already been seen, ignore this item
+				return false; // Discard duplicates
 			}
+			// Eliminates files that are not allowed
 			const fileExtension = file.name.split('.').pop().toLowerCase();
 			if ( ALLOWED_FILE_EXTENSIONS.includes( fileExtension ) ) {
-				uniqueFilenames.add(file.name); // add name to the set
-				return true; // keep the item in the array
+				uniqueFilenames.add(file.name);
+				return true; // Keep file if the extension is allowed
 			}
-			return false; // if not allowed type, ignore this item	
+			return false; // Discard file extension not allowed
 		});
-		setSelectedFiles( [...selectedFiles, ...allowedFiles] );
+		setSelectedFiles( allowedFiles );
 	};
 
 	const onFontFaceLoad = ( face ) => {
 		setFontFacesLoaded( ( prevFontFaces ) => [...prevFontFaces, face] );
 	}
-
-	useEffect( () => {
-		if ( fontFacesLoaded.length ) {
-			console.log( 'fontFacesLoaded', fontFacesLoaded );
-		}
-	}, [ fontFacesLoaded ] );
 
 	const onFontFaceRemove = ( face ) => {
 		setSelectedFiles( selectedFiles.filter( ( file ) => ( file.name !== face.file.name )) );
