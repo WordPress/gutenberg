@@ -75,6 +75,12 @@ function render_block_core_image( $attributes, $content ) {
 								'</div>';
 		$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
+		// Add directive to expand modal image if appropriate.
+		$m = new WP_HTML_Tag_Processor( $content );
+		$m->next_tag( 'img' );
+		$m->set_attribute( 'data-wp-bind--style', 'selectors.core.image.styleWidth' );
+		$modal_content = $m->get_updated_html();
+
 		$background_color  = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
 		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 
@@ -97,7 +103,7 @@ function render_block_core_image( $attributes, $content ) {
 					<button type="button" aria-label="$close_button_label" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
 						$close_button_icon
 					</button>
-					$content
+					$modal_content
 					<div class="scrim" style="background-color: $background_color"></div>
 			</div>
 HTML;

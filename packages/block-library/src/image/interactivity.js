@@ -89,6 +89,14 @@ store( {
 				roleAttribute: ( { context } ) => {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
+				styleWidth: ( { context } ) => {
+					if ( context.core.image.imageRef ) {
+						return context.core.image.imageRef.offsetWidth >=
+							context.core.image.imageRef.offsetHeight
+							? 'width: 100%;'
+							: 'width: auto;';
+					}
+				},
 			},
 		},
 	},
@@ -96,6 +104,7 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
+					context.core.image.imageRef = ref.querySelector( 'img' );
 					if ( context.core.image.lightboxEnabled ) {
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
