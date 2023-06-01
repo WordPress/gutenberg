@@ -103,6 +103,7 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					sprintf(
+						// translators: %s: Type of block (i.e. Reusable or Pattern).
 						__( '%s created.' ),
 						blockType === 'reusable'
 							? __( 'Reusable block' )
@@ -162,6 +163,7 @@ export default function ReusableBlockConvertButton( {
 					{ isModalOpen && (
 						<Modal
 							title={ sprintf(
+								// translators: %s: Type of block (i.e. Reusable or Pattern).
 								__( 'Create %s' ),
 								blockType === 'reusable'
 									? __( 'Reusable block' )
