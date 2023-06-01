@@ -13,7 +13,9 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
+import { ContextSystemProvider } from '../../ui/context';
 import ToolbarContext from '../toolbar-context';
+import { CONTEXT_SYSTEM_VALUE } from '../constants';
 
 function ToolbarItem(
 	{
@@ -46,13 +48,15 @@ function ToolbarItem(
 	}
 
 	return (
-		<BaseToolbarItem
-			{ ...accessibleToolbarState }
-			{ ...allProps }
-			as={ Component }
-		>
-			{ children }
-		</BaseToolbarItem>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+			<BaseToolbarItem
+				{ ...accessibleToolbarState }
+				{ ...allProps }
+				as={ Component }
+			>
+				{ children }
+			</BaseToolbarItem>
+		</ContextSystemProvider>
 	);
 }
 

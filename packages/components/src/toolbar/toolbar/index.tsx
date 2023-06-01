@@ -20,14 +20,7 @@ import {
 	WordPressComponentProps,
 	ContextSystemProvider,
 } from '../../ui/context';
-
-// TODO: swap the legacy `DropdownMenu` with the new version of the component
-// once it's stable
-const CONTEXT_SYSTEM_VALUE = {
-	DropdownMenu: {
-		variant: 'toolbar',
-	},
-};
+import { CONTEXT_SYSTEM_VALUE } from '../constants';
 
 function UnforwardedToolbar(
 	{

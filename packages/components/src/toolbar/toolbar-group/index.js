@@ -13,10 +13,12 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { ContextSystemProvider } from '../../ui/context';
 import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 import ToolbarContext from '../toolbar-context';
+import { CONTEXT_SYSTEM_VALUE } from '../constants';
 
 /**
  * Renders a collapsible group of controls
@@ -81,33 +83,37 @@ function ToolbarGroup( {
 
 	if ( isCollapsed ) {
 		return (
-			<ToolbarGroupCollapsed
-				label={ title }
-				controls={ controlSets }
-				className={ finalClassName }
-				children={ children }
-				{ ...props }
-			/>
+			<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+				<ToolbarGroupCollapsed
+					label={ title }
+					controls={ controlSets }
+					className={ finalClassName }
+					children={ children }
+					{ ...props }
+				/>
+			</ContextSystemProvider>
 		);
 	}
 
 	return (
-		<ToolbarGroupContainer className={ finalClassName } { ...props }>
-			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
-						containerClassName={
-							indexOfSet > 0 && indexOfControl === 0
-								? 'has-left-divider'
-								: null
-						}
-						{ ...control }
-					/>
-				) )
-			) }
-			{ children }
-		</ToolbarGroupContainer>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+			<ToolbarGroupContainer className={ finalClassName } { ...props }>
+				{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+					controlSet.map( ( control, indexOfControl ) => (
+						<ToolbarButton
+							key={ [ indexOfSet, indexOfControl ].join() }
+							containerClassName={
+								indexOfSet > 0 && indexOfControl === 0
+									? 'has-left-divider'
+									: null
+							}
+							{ ...control }
+						/>
+					) )
+				) }
+				{ children }
+			</ToolbarGroupContainer>
+		</ContextSystemProvider>
 	);
 }
 
