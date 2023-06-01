@@ -396,9 +396,21 @@ export function getStylesDeclarations(
 			 * Values that already have a "clamp()" function will not pass the test,
 			 * and therefore the original $value will be returned.
 			 */
+			const typographySettings =
+				!! tree?.settings?.typography?.fluid &&
+				tree?.settings?.layout?.wideSize
+					? {
+							fluid: {
+								maxViewPortWidth: tree.settings.layout.wideSize,
+								...tree.settings.typography.fluid,
+							},
+					  }
+					: {
+							fluid: tree?.settings?.typography?.fluid,
+					  };
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				typographySettings
 			);
 		}
 

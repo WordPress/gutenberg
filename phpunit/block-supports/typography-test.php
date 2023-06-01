@@ -432,6 +432,30 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
+			'returns clamp value where min and max fluid values defined' => array(
+				'font_size'                   => array(
+					'size'  => '80px',
+					'fluid' => array(
+						'min' => '70px',
+						'max' => '125px',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+			),
+
+			'returns clamp value where max is equal to size' => array(
+				'font_size'                   => array(
+					'size'  => '7.8125rem',
+					'fluid' => array(
+						'min' => '4.375rem',
+						'max' => '7.8125rem',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
+			),
+
 			'returns clamp value if min font size is greater than max' => array(
 				'font_size'                   => array(
 					'size'  => '3rem',
