@@ -214,6 +214,18 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+
+			let resolvers;
+			if ( options.resolvers ) {
+				resolvers = mapResolvers( options.resolvers );
+				selectors = mapSelectorsWithResolvers(
+					selectors,
+					resolvers,
+					store,
+					resolversCache
+				);
+			}
+
 			lock(
 				selectors,
 				new Proxy( privateSelectors, {
@@ -234,17 +246,6 @@ export default function createReduxStore( key, options ) {
 					},
 				} )
 			);
-
-			let resolvers;
-			if ( options.resolvers ) {
-				resolvers = mapResolvers( options.resolvers );
-				selectors = mapSelectorsWithResolvers(
-					selectors,
-					resolvers,
-					store,
-					resolversCache
-				);
-			}
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
 			const suspendSelectors = mapSuspendSelectors( selectors, store );
