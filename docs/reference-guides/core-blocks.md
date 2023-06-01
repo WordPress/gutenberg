@@ -568,7 +568,7 @@ Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree
 
 ## Excerpt
 
-Display an excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
+Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme

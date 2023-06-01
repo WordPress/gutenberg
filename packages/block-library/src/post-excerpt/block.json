@@ -4,7 +4,7 @@
 	"name": "core/post-excerpt",
 	"title": "Excerpt",
 	"category": "theme",
-	"description": "Display an excerpt.",
+	"description": "Display the excerpt.",
 	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
