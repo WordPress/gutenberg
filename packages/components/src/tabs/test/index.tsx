@@ -66,7 +66,11 @@ describe.each( [
 			const panelRenderFunction = jest.fn();
 
 			render(
-				<Component tabs={ TABS } children={ panelRenderFunction } />
+				<Component
+					tabs={ TABS }
+					children={ panelRenderFunction }
+					initialTabName={ 'alpha' }
+				/>
 			);
 
 			const tabList = screen.getByRole( 'tablist' );
