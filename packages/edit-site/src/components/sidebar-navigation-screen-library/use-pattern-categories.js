@@ -11,6 +11,22 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
+const useUserPatterns = () => {
+	const userPatterns = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
+		const nonSyncedPatterns = getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} );
+
+		return nonSyncedPatterns?.map( ( item ) => ( {
+			categories: [ item.meta?.wp_block_categories ],
+			name: item.slug,
+		} ) );
+	}, [] );
+
+	return userPatterns;
+};
+
 export default function usePatternCategories() {
 	const { blockPatterns, blockPatternCategories } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -34,11 +50,14 @@ export default function usePatternCategories() {
 		} )
 	);
 
+	const userPatterns = useUserPatterns();
+
 	const patterns = useMemo(
 		() =>
 			[
 				...( blockPatterns || [] ),
 				...( restBlockPatterns || [] ),
+				...( userPatterns || [] ),
 			].filter(
 				( x, index, arr ) =>
 					index === arr.findIndex( ( y ) => x.name === y.name )
