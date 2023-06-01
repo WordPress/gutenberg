@@ -1,24 +1,23 @@
-### Get involved in triage
+The Gutenberg repository needs to be triaged regularly to keep it healthy. Triage is the practice of reviewing existing [issues](https://github.com/WordPress/gutenberg/issues) and [pull requests](https://github.com/WordPress/gutenberg/pulls) to ensure they're relevant, actionable, and have all the information they need. Anyone can help triage, although you will need to be a member of the Triage Team to edit the title of an issue or modify its labels.
 
-To keep the repository healthy, it needs to be triaged regularly. Triage is the practice of reviewing existing issues and pull requests to make sure they’re relevant, actionable, and have all the information they need. Anyone can help triage, although you’ll need to be a member of the triage team for the Gutenberg repository to modify an issue’s labels or edit its title.
+## Joining the triage team
 
-### Join the triage team
+The [Triage Team](https://github.com/orgs/WordPress/teams/gutenberg-triage-team/members) is an open group of contributors that ensure triage is done consistently across the Gutenberg repository. Various types of triage happen:
 
-The triage team is an open group of people with a particular role of making sure triage is done consistently across the Gutenberg repo. There are various types of triage which happen:
+-   Regular self-triage sessions done by members on their own time.
+-   Organised triage sessions are done as a group at a set time. You can [review the meetings page](https://make.wordpress.org/meetings/) to find these triage sessions and the appropriate Slack channels.
+-   Focused triage sessions on a specific project board, label, or feature.
 
--   Regular self triage sessions done by members on their own time.
--   Organised triage sessions done as a group at a set time. You can [review the meetings page](https://make.wordpress.org/meetings/) to find these triage sessions and appropriate slack channels.
--   Focused triage sessions on a specific board, label or feature.
+Team members are expected to:
 
-These are the expectations of being a triage team member:
+-   Do some triage at least once a week, even if it's just self-triage.
+-   Try to join organized triage sessions when you can.
 
--   You are expected to do some triage even if it is self triage at least once a week.
--   As you can, try to join organized triage sessions.
--   If you join the triage team to focus on a specific label or board, the expectation is that your focus will be there. Please make this known to fellow triage team members.
+If you joined the Triage Team to focus on a specific project board, label, or feature, the expectation is that your focus will be there. Please make this known to fellow team members.
 
-If you would like to join this team, simply ask in #core-editor [Slack](https://make.wordpress.org/chat/) at any time.
+<div class="callout callout-tip">If you want to join the Triage Team, ask anytime in the <a href="https://wordpress.slack.com/archives/C02QB2JS7">#core-editor</a> Slack channel.</div>
 
-### Getting started
+## Getting started with triage
 
 To start simply choose from one of these filtered lists below. Note: You can find most of these filters by selecting the “Sort” option from the [overall Issues page](https://github.com/wordpress/gutenberg/issues).
 
@@ -30,7 +29,7 @@ To start simply choose from one of these filtered lists below. Note: You can fin
 -   [The most commented](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-desc) on Gutenberg issues. If you feel comfortable chiming in and the conversation has stagnated, the best way to triage these kinds of issues is to summarize the discussion thus far and do your best to identify action items, blockers, etc. Triaging this list allows finding solutions to important and complex issues to move forward.
 -   You can also create your own custom set of filters on GitHub. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
 
-### General triage process
+## General triage process
 
 When triaging, either one of the lists above or issues in general, work through issues one-by-one. Here are some steps you can perform for each issue:
 
@@ -46,7 +45,7 @@ When triaging, either one of the lists above or issues in general, work through 
     -   Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
     -   Consider adding the Good First Issue label if you believe this is a relatively easy issue for a first-time contributor to try to solve.
 
-**Commonly Used Labels**
+### Commonly used labels
 
 Generally speaking, the following labels are very useful for triaging issues and will likely be the ones you use the most consistently. You can view all possible labels [here](https://github.com/WordPress/gutenberg/labels).
 
@@ -59,7 +58,7 @@ Generally speaking, the following labels are very useful for triaging issues and
 | `Needs More Info`          | When it’s not clear what the issue is or it would help to provide additional details.     |
 | `Needs Testing`            | When a new issue needs to be confirmed or old bugs seem like they are no longer relevant. |
 
-**Determining Priority Labels**
+### Determining priority labels
 
 If you have enough knowledge about the report at hand and feel confident in doing so, you can consider adding priority. Note that it’s on purpose that no priority label infers a normal level.
 
@@ -69,7 +68,7 @@ If you have enough knowledge about the report at hand and feel confident in doin
 | `Priority: High`     | Fits one of the current focuses and is causing a major broken experience (including flow, visual bugs and blocks).                                                                                                                                         |
 | `Priority: Low`      | Enhancements that aren’t part of focuses, niche bugs, problems with old browsers.                                                                                                                                                                          |
 
-### Closing issues
+## Closing issues
 
 Issues are closed for the following reasons:
 
@@ -80,7 +79,7 @@ Issues are closed for the following reasons:
 -   An issue that needs more information that the author of the issue hasn't responded to for 2+ weeks.
 -   An item that is determined as unable to be fixed or is working as intended.
 
-### Release specific triage
+## Release specific triage
 
 Here are some guidelines to follow when doing triage specifically around the time of a release. This is important to differentiate compared to general triage so problematic, release blocking bugs are properly identified and solutions are found.
 
@@ -88,7 +87,7 @@ Here are some guidelines to follow when doing triage specifically around the tim
 -   If a bug was introduced in the most recent version, and a next RC hasn’t yet happened, ideally the developers can push to fix it prior to RC! The amount of push for a fix should scale proportional to the potential of breakage. In this case, add to the RC milestone and, if deemed urgent, ping in the #core-editor channel in WordPress.org slack.
 -   If a bug wasn’t introduced in the most recent version, do not add a milestone. Instead, use labels like “[Priority] High” if it’s a pressing issue, and if needed you can call attention to it in the weekly core meetings.
 
-### Design specific triage
+## Design specific triage
 
 Along with the general triage flows listed previously, there are some specific additions to the flows for more design-centric triage for design minded folks participating in triage.
 
