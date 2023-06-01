@@ -54,12 +54,11 @@ const trimUndefinedValues = ( array ) => {
  * @return {Array} Transformed object.
  */
 const mapValues = ( obj, callback ) =>
-	Object.entries( obj ?? {} ).reduce(
-		( acc, [ key, value ] ) => ( {
-			...acc,
-			[ key ]: callback( value, key ),
-		} ),
-		{}
+	Object.fromEntries(
+		Object.entries( obj ?? {} ).map( ( [ key, value ] ) => [
+			key,
+			callback( value, key ),
+		] )
 	);
 
 // Convert Map objects to plain objects
