@@ -42,12 +42,25 @@ export const __experimentalConvertBlockToStatic =
 /**
  * Returns a generator converting one or more static blocks into a reusable block.
  *
- * @param {string[]} clientIds The client IDs of the block to detach.
- * @param {string}   title     Reusable block title.
+ * @param {string[]} clientIds  The client IDs of the block to detach.
+ * @param {string}   title      Reusable block title.
+ * @param {string}   blockType  They type of block being created, reusable or pattern.
+ * @param {string}   categoryId The category of pattern being created.
  */
 export const __experimentalConvertBlocksToReusable =
-	( clientIds, title ) =>
+	( clientIds, title, blockType, categoryId ) =>
 	async ( { registry, dispatch } ) => {
+		let meta;
+		let categories;
+		if ( blockType === 'pattern' ) {
+			meta = {
+				wp_block: {
+					sync_status: 'notSynced',
+				},
+			};
+			categories = [ categoryId ];
+		}
+
 		const reusableBlock = {
 			title: title || __( 'Untitled Reusable block' ),
 			content: serialize(
@@ -56,11 +69,17 @@ export const __experimentalConvertBlocksToReusable =
 					.getBlocksByClientId( clientIds )
 			),
 			status: 'publish',
+			meta,
+			wp_pattern: categories,
 		};
 
 		const updatedRecord = await registry
 			.dispatch( 'core' )
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
+
+		if ( blockType === 'pattern' ) {
+			return;
+		}
 
 		const newBlock = createBlock( 'core/block', {
 			ref: updatedRecord.id,

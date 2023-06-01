@@ -14,12 +14,13 @@ import {
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	SelectControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,11 +39,22 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const query = { per_page: -1, hide_empty: false, context: 'view' };
+
+	const { records: categories } = useEntityRecords(
+		'taxonomy',
+		'wp_pattern',
+		query
+	);
+
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ blockType, setBlockType ] = useState( 'reusable' );
 	const [ title, setTitle ] = useState( '' );
-	const canConvert = useSelect(
+	const [ categoryId, setCategoryId ] = useState( '' );
+	const { canConvert } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
+
 			const { getBlocksByClientId, canInsertBlockType } =
 				select( blockEditorStore );
 
@@ -75,7 +87,9 @@ export default function ReusableBlockConvertButton( {
 				// Hide when current doesn't have permission to do that.
 				!! canUser( 'create', 'blocks' );
 
-			return _canConvert;
+			return {
+				canConvert: _canConvert,
+			};
 		},
 		[ clientIds ]
 	);
@@ -88,22 +102,52 @@ export default function ReusableBlockConvertButton( {
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
-				await convertBlocksToReusable( clientIds, reusableBlockTitle );
-				createSuccessNotice( __( 'Reusable block created.' ), {
-					type: 'snackbar',
-				} );
+				await convertBlocksToReusable(
+					clientIds,
+					reusableBlockTitle,
+					blockType,
+					categoryId
+				);
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: Type of block (i.e. Reusable or Pattern).
+						__( '%s created.' ),
+						blockType === 'reusable'
+							? __( 'Reusable block' )
+							: __( 'Pattern' )
+					),
+					{
+						type: 'snackbar',
+					}
+				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
 				} );
 			}
 		},
-		[ clientIds ]
+		[
+			convertBlocksToReusable,
+			clientIds,
+			blockType,
+			categoryId,
+			createSuccessNotice,
+			createErrorNotice,
+		]
 	);
 
 	if ( ! canConvert ) {
 		return null;
 	}
+	const patternCategories = categories === null ? [] : categories;
+	const categoryOptions = patternCategories
+		.map( ( category ) => ( {
+			label: category.name,
+			value: category.id,
+		} ) )
+		.concat( [
+			{ value: '', label: __( 'Select a category' ), disabled: true },
+		] );
 
 	return (
 		<BlockSettingsMenuControls>
@@ -112,14 +156,30 @@ export default function ReusableBlockConvertButton( {
 					<MenuItem
 						icon={ symbol }
 						onClick={ () => {
+							setBlockType( 'reusable' );
 							setIsModalOpen( true );
 						} }
 					>
 						{ __( 'Create Reusable block' ) }
 					</MenuItem>
+					<MenuItem
+						icon={ symbol }
+						onClick={ () => {
+							setBlockType( 'pattern' );
+							setIsModalOpen( true );
+						} }
+					>
+						{ __( 'Create a Pattern' ) }
+					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create Reusable block' ) }
+							title={ sprintf(
+								// translators: %s: Type of block (i.e. Reusable or Pattern).
+								__( 'Create %s' ),
+								blockType === 'reusable'
+									? __( 'Reusable block' )
+									: __( 'Pattern' )
+							) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -142,6 +202,15 @@ export default function ReusableBlockConvertButton( {
 										value={ title }
 										onChange={ setTitle }
 									/>
+									{ blockType === 'pattern' && (
+										<SelectControl
+											label={ __( 'Category' ) }
+											onChange={ setCategoryId }
+											options={ categoryOptions }
+											size="__unstable-large"
+											value={ categoryId }
+										/>
+									) }
 									<HStack justify="right">
 										<Button
 											variant="tertiary"
