@@ -23,6 +23,9 @@ function BlockAlignmentMatrixControl( props ) {
 
 	return (
 		<Dropdown
+			// Note: currently we can't remove `variant` from `popoverProps` because
+			// the `Dropdown` component is not able to read the same variant data
+			// from context.
 			popoverProps={ { variant: 'toolbar', placement: 'bottom-start' } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const openOnArrowDown = ( event ) => {
