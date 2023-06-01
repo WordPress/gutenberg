@@ -2040,6 +2040,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Entities and Undo/Redo.",
+		"slug": "entities",
+		"markdown_source": "../docs/explanations/architecture/entities.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/explanations/architecture/modularity.md",
@@ -2307,12 +2313,6 @@
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
 		"parent": "contributors"
 	}
 ]

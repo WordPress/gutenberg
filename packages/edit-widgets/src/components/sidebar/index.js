@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEffect, Platform } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	store as interfaceStore,
@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
-import { cog } from '@wordpress/icons';
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -168,7 +168,7 @@ export default function Sidebar() {
 			closeLabel={ __( 'Close Settings' ) }
 			scope="core/edit-widgets"
 			identifier={ currentArea }
-			icon={ cog }
+			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ currentArea === WIDGET_AREAS_IDENTIFIER && (

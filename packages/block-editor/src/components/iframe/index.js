@@ -104,7 +104,6 @@ async function loadScript( head, { id, src } ) {
 function Iframe( {
 	contentRef,
 	children,
-	head,
 	tabIndex = 0,
 	scale = 1,
 	frameSize = 0,
@@ -121,12 +120,7 @@ function Iframe( {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( assets?.styles );
-	const styleIds = styles.map( ( style ) => style.id );
 	const compatStyles = useCompatibilityStyles();
-	const neededCompatStyles = compatStyles.filter(
-		( style ) => ! styleIds.includes( style.id )
-	);
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -160,8 +154,23 @@ function Iframe( {
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
+
+			for ( const compatStyle of compatStyles ) {
+				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
+				}
+
+				contentDocument.head.appendChild(
+					compatStyle.cloneNode( true )
+				);
+
+				// eslint-disable-next-line no-console
+				console.warn(
+					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+					compatStyle
+				);
+			}
 
 			iFrameDocument.addEventListener(
 				'dragover',
@@ -209,30 +218,8 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		headRef,
 	] );
-
-	const styleAssets = (
-		<>
-			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ [ ...styles, ...neededCompatStyles ].map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
-
-					if ( TagName === 'style' ) {
-						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
-						);
-					}
-
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
-		</>
-	);
 
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
@@ -288,25 +275,19 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						<>
-							<head ref={ headRef }>
-								{ styleAssets }
-								{ head }
-							</head>
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-							>
-								{ contentResizeListener }
-								<StyleProvider document={ iframeDocument }>
-									{ children }
-								</StyleProvider>
-							</body>
-						</>,
+						<body
+							ref={ bodyRef }
+							className={ classnames(
+								'block-editor-iframe__body',
+								'editor-styles-wrapper',
+								...bodyClasses
+							) }
+						>
+							{ contentResizeListener }
+							<StyleProvider document={ iframeDocument }>
+								{ children }
+							</StyleProvider>
+						</body>,
 						iframeDocument.documentElement
 					) }
 			</iframe>

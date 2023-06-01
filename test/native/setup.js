@@ -2,7 +2,7 @@
  * External dependencies
  */
 import 'react-native-gesture-handler/jestSetup';
-import { Image, NativeModules as RNNativeModules } from 'react-native';
+import { Image } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
@@ -19,24 +19,37 @@ global.ReanimatedDataMock = {
 	now: () => 0,
 };
 
-RNNativeModules.UIManager = RNNativeModules.UIManager || {};
-RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
-RNNativeModules.RNGestureHandlerModule =
-	RNNativeModules.RNGestureHandlerModule || {
-		State: {
-			BEGAN: 'BEGAN',
-			FAILED: 'FAILED',
-			ACTIVE: 'ACTIVE',
-			END: 'END',
-		},
-		attachGestureHandler: jest.fn(),
-		createGestureHandler: jest.fn(),
-		dropGestureHandler: jest.fn(),
-		updateGestureHandler: jest.fn(),
+jest.mock( 'react-native', () => {
+	const ReactNative = jest.requireActual( 'react-native' );
+	const RNNativeModules = ReactNative.NativeModules;
+
+	// Mock React Native modules
+	RNNativeModules.UIManager = RNNativeModules.UIManager || {};
+	RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
+	RNNativeModules.RNGestureHandlerModule =
+		RNNativeModules.RNGestureHandlerModule || {
+			State: {
+				BEGAN: 'BEGAN',
+				FAILED: 'FAILED',
+				ACTIVE: 'ACTIVE',
+				END: 'END',
+			},
+			attachGestureHandler: jest.fn(),
+			createGestureHandler: jest.fn(),
+			dropGestureHandler: jest.fn(),
+			updateGestureHandler: jest.fn(),
+		};
+	RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
+		forceTouchAvailable: false,
 	};
-RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
-	forceTouchAvailable: false,
-};
+
+	// Mock WebView native module from `react-native-webview`
+	RNNativeModules.RNCWebView = {
+		isFileUploadSupported: jest.fn(),
+	};
+
+	return ReactNative;
+} );
 
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
