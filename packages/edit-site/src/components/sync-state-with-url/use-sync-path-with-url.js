@@ -86,6 +86,13 @@ export default function useSyncPathWithURL() {
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );
+		} else if ( navigatorLocation.path === '/library' ) {
+			updateUrlParams( {
+				postType: undefined,
+				postId: undefined,
+				canvas: undefined,
+				path: navigatorLocation.path,
+			} );
 		} else {
 			updateUrlParams( {
 				postType: undefined,
