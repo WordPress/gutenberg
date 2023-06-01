@@ -91,7 +91,7 @@ store( {
 				},
 				styleWidth: ( { context } ) => {
 					if ( context.core.image.imageRef ) {
-						return context.core.image.imageRef.offsetWidth >=
+						return context.core.image.imageRef.offsetWidth >
 							context.core.image.imageRef.offsetHeight
 							? 'width: 100%;'
 							: 'width: auto;';
