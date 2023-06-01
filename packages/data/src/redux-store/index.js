@@ -585,7 +585,6 @@ function mapSelectorsWithResolvers(
 	return mapValues( selectors, ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
-			selector.hasResolver = false;
 			return selector;
 		}
 
