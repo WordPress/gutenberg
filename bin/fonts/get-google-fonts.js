@@ -7,7 +7,7 @@ const crypto = require( 'crypto' );
 const API_URL = 'https://www.googleapis.com/webfonts/v1/webfonts?key=';
 const API_KEY = process.env.GOOGLE_FONTS_API_KEY;
 const GOOGLE_FONTS_FILE_PATH =
-	'../../lib/experimental/fonts-api/google-fonts.json';
+	'../../lib/experimental/fonts-library/google-fonts.json';
 
 function getCategories( fonts ) {
 	const categories = new Set();
@@ -55,7 +55,7 @@ function getFontFamilyFromGoogleFont( font ) {
 		fontFamily: `${ font.family }, ${ getFallbackForGoogleFont(
 			font.category
 		) }`,
-		slug: font.family.replace( /\s+/g, '-' ).toLowerCase(),
+		slug: 'wp-font-lib-' + font.family.replace( /\s+/g, '-' ).toLowerCase(),
 		category: font.category,
 		fontFace: font.variants.map( ( variant ) => ( {
 			src: font.files?.[ variant ],
