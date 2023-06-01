@@ -3,8 +3,6 @@
 include(ABSPATH . "wp-admin/includes/admin.php");
 class WP_Fonts_Library {
 
-    private $wp_fonts_dir;
-
     public function __construct() {
         $this->wp_fonts_dir = path_join( WP_CONTENT_DIR, 'fonts' );
         $this->relative_fonts_path = site_url('/wp-content/fonts/', 'relative');
@@ -27,6 +25,12 @@ class WP_Fonts_Library {
         );
 	}
 
+	const ALLOWED_FONT_MIME_TYPES = array(
+		'otf'   => 'font/otf',
+		'ttf'   => 'font/ttf',
+		'woff'  => 'font/woff',
+		'woff2' => 'font/woff2',
+	);
 
     function register_routes () {
         
@@ -79,6 +83,17 @@ class WP_Fonts_Library {
 		);
 
     }
+
+	/**
+	 * Returns whether the given file has a font MIME type.
+	 *
+	 * @param string $filepath The file to check.
+	 * @return bool True if the file has a font MIME type, false otherwise.
+	 */
+	function has_font_mime_type( $filepath ) {
+		$filetype = wp_check_filetype( $filepath, self::ALLOWED_FONT_MIME_TYPES );
+		return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES, true );
+	}
 
     /**
      * Check if user has permissions to update the fonts library
@@ -254,15 +269,34 @@ class WP_Fonts_Library {
      *
      * @param string $src The source URL of the font asset to be downloaded.
      * @param string $filename The filename to save the downloaded font asset as.
-     * @return string The relative path to the downloaded font asset.
+     * @return string|bool The relative path to the downloaded font asset. False if the download failed.
      */
     function download_asset( $src, $filename ) {
         $file_path = path_join( $this->wp_fonts_dir, $filename );
-        $file = download_url( $src );
-        $renamed_file = rename( $file, $file_path );
-        if ( is_wp_error( $file ) || ! $renamed_file ) {
+
+        // Checks if the file to be downloaded has a font mime type
+        if ( ! $this->has_font_mime_type( $file_path ) ) {
             return false;
         }
+
+        // Downloads the font asset or returns false
+        $temp_file = download_url( $src );
+        if ( is_wp_error( $temp_file ) ) {
+            @unlink( $temp_file );
+            return false;
+        }
+
+        // Moves the file to the fonts directory or return false
+        $renamed_file = rename( $temp_file, $file_path );
+        if ( ! $renamed_file ) {
+            @unlink( $temp_file );
+            return false;
+        }
+
+        // Cleans the temp file
+        @unlink( $temp_file );
+
+        // Returns the relative path to the downloaded font asset to be used as font face src
         return "{$this->relative_fonts_path}{$filename}";
     }
 
@@ -480,11 +514,16 @@ class WP_Fonts_Library {
         $filename =  $this->get_filename_from_font_face( $font_face, $file['name'] );
         $filepath= path_join( $this->wp_fonts_dir, $filename );
 
-        // Move the uploaded font asset from the temp folder to the wp fonts directory
-        $file_was_moved = move_uploaded_file( $file['tmp_name'], $filepath );
-
         // Remove the uploaded font asset reference from the font face definition because is not longer needed
         unset( $new_font_face['file'] );
+
+        // If the filepath has not a font mime type, we don't move the file and return the font face definition without src to be ignored later
+        if ( ! $this->has_font_mime_type( $filepath ) ) {
+            return $new_font_face;
+        }
+
+        // Move the uploaded font asset from the temp folder to the wp fonts directory
+        $file_was_moved = move_uploaded_file( $file['tmp_name'], $filepath );
         
         if ( $file_was_moved ) {
             // If the file was succesfully moved, we update the font face definition to reference the new file location
