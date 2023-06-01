@@ -27,10 +27,10 @@ function gutenberg_add_selectors_property_to_block_type_settings( $settings, $me
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to_block_type_settings', 10, 2 );
 
-add_filter('register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2);
-function gutenberg_add_custom_fields_to_wp_block($args, $post_type){
+add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
+function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ){
 
-    if ($post_type == 'wp_block'){
+    if ( $post_type === 'wp_block' ){
         array_push( $args['supports'], 'custom-fields' );
     }
 
@@ -42,12 +42,12 @@ add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
 function gutenberg_wp_block_register_post_meta() {
     $post_type = 'wp_block';
     register_post_meta( $post_type, 'wp_block_sync_status', [
-        'auth_callback' => function() {
-            return current_user_can('edit_posts');
+        'auth_callback'     => function() {
+            return current_user_can( 'edit_posts' );
         },
         'sanitize_callback' => 'sanitize_text_field',
         'show_in_rest'      => true,
         'single'            => true,
         'type'              => 'string',
-    ]);
+    ] );
 }
