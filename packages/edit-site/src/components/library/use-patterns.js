@@ -12,13 +12,15 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
+const EMPTY_PATTERN_LIST = [];
 const TEMPLATE_PARTS = 'wp_template_part';
 const PATTERNS = 'pattern';
+const USER_PATTERNS = 'wp_block';
 
 const createTemplatePartId = ( theme, slug ) =>
 	theme && slug ? theme + '//' + slug : null;
 
-const toPattern = ( templatePart ) => ( {
+const templatePartToPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: templatePart.title.rendered,
 	blocks: parse( templatePart.content.raw ),
@@ -30,7 +32,10 @@ const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
 	const { templateParts, isResolving } = useSelect(
 		( select ) => {
 			if ( postType !== TEMPLATE_PARTS ) {
-				return { templateParts: [], isResolving: false };
+				return {
+					templateParts: EMPTY_PATTERN_LIST,
+					isResolving: false,
+				};
 			}
 
 			const { getEntityRecords, isResolving: _isResolving } =
@@ -51,14 +56,14 @@ const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
 
 	const filteredTemplateParts = useMemo( () => {
 		if ( ! templateParts ) {
-			return [];
+			return EMPTY_PATTERN_LIST;
 		}
 
 		const partsAsPatterns = [];
 
 		templateParts?.forEach( ( templatePart ) => {
 			if ( ! area || templatePart.area === area ) {
-				partsAsPatterns.push( toPattern( templatePart ) );
+				partsAsPatterns.push( templatePartToPattern( templatePart ) );
 			}
 		} );
 
@@ -98,11 +103,11 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 	);
 
 	if ( postType !== PATTERNS ) {
-		return [];
+		return EMPTY_PATTERN_LIST;
 	}
 
 	if ( ! category ) {
-		return patterns || [];
+		return patterns || EMPTY_PATTERN_LIST;
 	}
 
 	return patterns.filter( ( pattern ) =>
@@ -110,8 +115,48 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 	);
 };
 
+const reusableBlockToPattern = ( reusableBlock ) => ( {
+	blocks: parse( reusableBlock.content.raw ),
+	// TODO: Update this when we allow non-synced patterns to belong in multiple categories.
+	categories: [ reusableBlock.meta?.wp_block_categories ],
+	name: reusableBlock.slug,
+	title: reusableBlock.title.raw,
+	type: reusableBlock.type,
+	reusableBlock,
+} );
+
+const useUserPatterns = ( category, categoryType = PATTERNS ) => {
+	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
+	const userPatterns = useSelect(
+		( select ) => {
+			if ( postType !== USER_PATTERNS ) {
+				return EMPTY_PATTERN_LIST;
+			}
+
+			const { getEntityRecords } = select( coreStore );
+			const nonSyncedPatterns = getEntityRecords( 'postType', postType, {
+				per_page: -1,
+			} );
+
+			if ( ! nonSyncedPatterns ) {
+				return EMPTY_PATTERN_LIST;
+			}
+
+			return nonSyncedPatterns.map( ( item ) =>
+				reusableBlockToPattern( item )
+			);
+		},
+		[ postType ]
+	);
+
+	return userPatterns.filter( ( pattern ) =>
+		pattern.categories?.includes( category )
+	);
+};
+
 export default function usePatterns( categoryType, categoryName ) {
 	const patterns = useBlockPatternsByCategory( categoryName, categoryType );
+	const userPatterns = useUserPatterns( categoryName, categoryType );
 	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
 		categoryName,
 		categoryType
@@ -119,6 +164,6 @@ export default function usePatterns( categoryType, categoryName ) {
 
 	// TODO: Add sorting etc.
 
-	const results = [ ...templateParts, ...patterns ];
+	const results = [ ...templateParts, ...patterns, ...userPatterns ];
 	return [ results, isResolving ];
 }
