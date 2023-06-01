@@ -14,6 +14,7 @@ import {
 import { useNotifyCopy } from '../copy-handler';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
+import { showBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 export default function BlockActions( {
 	clientIds,
@@ -26,6 +27,7 @@ export default function BlockActions( {
 		getBlocksByClientId,
 		canMoveBlocks,
 		canRemoveBlocks,
+		getBlockName,
 	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
@@ -67,6 +69,7 @@ export default function BlockActions( {
 		setBlockMovingClientId,
 		setNavigationMode,
 		selectBlock,
+		displayRemovalPrompt,
 	} = useDispatch( blockEditorStore );
 
 	const notifyCopy = useNotifyCopy();
@@ -84,7 +87,21 @@ export default function BlockActions( {
 			return duplicateBlocks( clientIds, updateSelection );
 		},
 		onRemove() {
-			return removeBlocks( clientIds, updateSelection );
+			const shouldDisplayRemovalPrompt = clientIds
+				.map( ( blockClientId ) =>
+					showBlockRemovalWarning( getBlockName( blockClientId ) )
+				)
+				.filter( ( blockName ) => blockName );
+			if ( shouldDisplayRemovalPrompt.length ) {
+				displayRemovalPrompt( true, {
+					removalFunction: () => {
+						removeBlocks( clientIds, updateSelection );
+					},
+					blockName: shouldDisplayRemovalPrompt[ 0 ],
+				} );
+			} else {
+				removeBlocks( clientIds, updateSelection );
+			}
 		},
 		onInsertBefore() {
 			const clientId = Array.isArray( clientIds )

@@ -1304,6 +1304,21 @@ export function isSelectionEnabled( state ) {
 }
 
 /**
+ * Selector that returns if the removal prompt needs to be displayed.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Boolean indicating if prompt should be displayed and removal function.
+ */
+export function isRemovalPromptDisplayed( state ) {
+	return {
+		displayPrompt: state.isRemovalPromptDisplayed?.displayPrompt,
+		removalFunction: state.isRemovalPromptDisplayed?.removalFunction,
+		blockName: state.isRemovalPromptDisplayed?.blockName,
+	};
+}
+
+/**
  * Returns the block's editing mode, defaulting to "visual" if not explicitly
  * assigned.
  *

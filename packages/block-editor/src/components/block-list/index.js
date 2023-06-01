@@ -40,6 +40,7 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
+import { BlockRemovalWarningModal } from '../../utils/show-block-removal-warning';
 
 const elementContext = createContext();
 
@@ -49,22 +50,37 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode,
-				isFocusMode: focusMode,
-				editorMode: __unstableGetEditorMode(),
-			};
-		},
-		[]
-	);
+	const {
+		isOutlineMode,
+		isFocusMode,
+		editorMode,
+		displayPrompt,
+		removalFunction,
+		blockToRemove,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			__unstableGetEditorMode,
+			isRemovalPromptDisplayed,
+		} = select( blockEditorStore );
+		const { outlineMode, focusMode } = getSettings();
+		const {
+			displayPrompt: _displayPrompt,
+			removalFunction: _removalFunction,
+			blockName,
+		} = isRemovalPromptDisplayed();
+		return {
+			isOutlineMode: outlineMode,
+			isFocusMode: focusMode,
+			editorMode: __unstableGetEditorMode(),
+			displayPrompt: _displayPrompt,
+			removalFunction: _removalFunction,
+			blockToRemove: blockName,
+		};
+	}, [] );
 	const registry = useRegistry();
-	const { setBlockVisibility } = useDispatch( blockEditorStore );
-
+	const { setBlockVisibility, displayRemovalPrompt } =
+		useDispatch( blockEditorStore );
 	const delayedBlockVisibilityUpdates = useDebounce(
 		useCallback( () => {
 			const updates = {};
@@ -116,11 +132,20 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 	return (
-		<elementContext.Provider value={ element }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				<div { ...innerBlocksProps } />
-			</IntersectionObserver.Provider>
-		</elementContext.Provider>
+		<>
+			<elementContext.Provider value={ element }>
+				<IntersectionObserver.Provider value={ intersectionObserver }>
+					<div { ...innerBlocksProps } />
+				</IntersectionObserver.Provider>
+			</elementContext.Provider>
+			{ displayPrompt && (
+				<BlockRemovalWarningModal
+					blockName={ blockToRemove }
+					closeModal={ () => displayRemovalPrompt( false ) }
+					removalFunction={ removalFunction }
+				/>
+			) }
+		</>
 	);
 }
 
@@ -151,6 +176,7 @@ function Items( {
 				getSelectedBlockClientIds,
 				__unstableGetVisibleBlocks,
 			} = select( blockEditorStore );
+
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),

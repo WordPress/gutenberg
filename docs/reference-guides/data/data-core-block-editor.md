@@ -1089,6 +1089,18 @@ _Returns_
 
 -   `boolean`: Is navigation mode enabled.
 
+### isRemovalPromptDisplayed
+
+Selector that returns if the removal prompt needs to be displayed.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Boolean indicating if prompt should be displayed and removal function.
+
 ### isSelectionEnabled
 
 Selector that returns if multi-selection is enabled or not.
@@ -1148,6 +1160,19 @@ _Returns_
 ### clearSelectedBlock
 
 Action that clears the block selection.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### displayRemovalPrompt
+
+Returns an action object used in signalling that a removal prompt must be displayed.
+
+_Parameters_
+
+-   _displayPrompt_ `boolean`: Whether to prompt for removal.
+-   _options_ `Function`: Function to call if removal is confirmed and blockName.
 
 _Returns_
 

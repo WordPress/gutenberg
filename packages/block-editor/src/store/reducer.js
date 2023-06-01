@@ -1470,6 +1470,27 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning whether to display a prompt when certain blocks are removed.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isRemovalPromptDisplayed( state = false, action ) {
+	switch ( action.type ) {
+		case 'PROMPT_REMOVAL':
+			return {
+				displayPrompt: action.displayPrompt,
+				removalFunction: action.removalFunction,
+				blockName: action.blockName,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
@@ -1881,6 +1902,7 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
+	isRemovalPromptDisplayed,
 } );
 
 function withAutomaticChangeReset( reducer ) {

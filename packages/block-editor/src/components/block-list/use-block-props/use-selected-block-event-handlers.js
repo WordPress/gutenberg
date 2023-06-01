@@ -10,6 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { showBlockRemovalWarning } from '../../../utils/show-block-removal-warning';
 
 /**
  * Adds block behaviour:
@@ -20,13 +21,20 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( clientId ) {
-	const isSelected = useSelect(
-		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
+	const { isSelected, blockName } = useSelect(
+		( select ) => {
+			return {
+				isSelected:
+					select( blockEditorStore ).isBlockSelected( clientId ),
+				blockName: select( blockEditorStore ).getBlockName( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
+	const { insertDefaultBlock, removeBlock, displayRemovalPrompt } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -66,6 +74,13 @@ export function useEventHandlers( clientId ) {
 						getBlockRootClientId( clientId ),
 						getBlockIndex( clientId ) + 1
 					);
+				} else if ( showBlockRemovalWarning( blockName ) ) {
+					displayRemovalPrompt( true, {
+						removalFunction: () => {
+							removeBlock( clientId );
+						},
+						blockName,
+					} );
 				} else {
 					removeBlock( clientId );
 				}
