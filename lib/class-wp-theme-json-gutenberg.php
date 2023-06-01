@@ -1073,12 +1073,12 @@ class WP_Theme_JSON_Gutenberg {
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
-			$root_selector    = static::ROOT_BLOCK_SELECTOR;
-			$columns_selector = '.wp-block-columns';
+			$root_selector          = static::ROOT_BLOCK_SELECTOR;
+			$columns_selector       = '.wp-block-columns';
 			$post_template_selector = '.wp-block-post-template';
 			if ( ! empty( $options['scope'] ) ) {
-				$root_selector    = static::scope_selector( $options['scope'], $root_selector );
-				$columns_selector = static::scope_selector( $options['scope'], $columns_selector );
+				$root_selector          = static::scope_selector( $options['scope'], $root_selector );
+				$columns_selector       = static::scope_selector( $options['scope'], $columns_selector );
 				$post_template_selector = static::scope_selector( $options['scope'], $post_template_selector );
 			}
 			if ( ! empty( $options['root_selector'] ) ) {
