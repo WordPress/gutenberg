@@ -96,6 +96,37 @@ describe( 'Private data APIs', () => {
 			);
 		} );
 
+		it( 'should support combination of private selectors and resolvers', async () => {
+			const testStore = createReduxStore( 'test', {
+				reducer: ( state = {}, action ) => {
+					if ( action.type === 'RECEIVE' ) {
+						return { ...state, [ action.key ]: action.value };
+					}
+					return state;
+				},
+				selectors: {
+					get: ( state, key ) => state[ key ],
+				},
+				resolvers: {
+					get:
+						( key ) =>
+						async ( { dispatch } ) => {
+							const value = await ( 'resolved-' + key );
+							dispatch( { type: 'RECEIVE', key, value } );
+						},
+				},
+			} );
+			unlock( testStore ).registerPrivateSelectors( {
+				peek: ( state, key ) => state[ key ],
+			} );
+			registry.register( testStore );
+
+			await registry.resolveSelect( testStore ).get( 'x' );
+			expect( unlock( registry.select( testStore ) ).peek( 'x' ) ).toBe(
+				'resolved-x'
+			);
+		} );
+
 		it( 'should give private selectors access to the state', () => {
 			const groceryStore = createStore();
 			unlock( groceryStore ).registerPrivateSelectors( {
