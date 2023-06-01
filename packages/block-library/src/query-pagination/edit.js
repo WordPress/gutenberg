@@ -55,7 +55,7 @@ export default function QueryPaginationEdit( {
 	} );
 	// Always show label text if paginationArrow is set to 'none'.
 	useEffect( () => {
-		if ( paginationArrow === 'none' ) {
+		if ( paginationArrow === 'none' && ! showLabel ) {
 			setAttributes( { showLabel: true } );
 		}
 	}, [ paginationArrow, setAttributes ] );
