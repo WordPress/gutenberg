@@ -34,7 +34,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to
  *
  * @see https://github.com/WordPress/gutenberg/pull/51144
  *
- * @param array $args Register post type args.
+ * @param array  $args Register post type args.
  * @param string $post_type The post type string.
  *
  * @return array Register post type args.
@@ -60,23 +60,31 @@ add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block'
  */
 function gutenberg_wp_block_register_post_meta() {
 	$post_type = 'wp_block';
-	register_post_meta( $post_type, 'wp_block_sync_status', [
-		'auth_callback'     => function() {
-			return current_user_can( 'edit_posts' );
-		},
-		'sanitize_callback' => 'sanitize_text_field',
-		'show_in_rest'      => true,
-		'single'            => true,
-		'type'              => 'string',
-	] );
-	register_post_meta( $post_type, 'wp_block_categories', [
-		'auth_callback'     => function() {
-			return current_user_can( 'edit_posts' );
-		},
-		'sanitize_callback' => 'sanitize_text_field',
-		'show_in_rest'      => true,
-		'single'            => true,
-		'type'              => 'string',
-	] );
+	register_post_meta(
+		$post_type,
+		'wp_block_sync_status',
+		array(
+			'auth_callback'     => function() {
+				return current_user_can( 'edit_posts' );
+			},
+			'sanitize_callback' => 'sanitize_text_field',
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+		)
+	);
+	register_post_meta(
+		$post_type,
+		'wp_block_categories',
+		array(
+			'auth_callback'     => function() {
+				return current_user_can( 'edit_posts' );
+			},
+			'sanitize_callback' => 'sanitize_text_field',
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+		)
+	);
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
