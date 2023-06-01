@@ -175,21 +175,24 @@ export default function createReduxStore( key, options ) {
 			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
-			const actions = mapActions(
-				{
-					...metadataActions,
-					...options.actions,
-				},
-				store
-			);
+			function bindAction( action ) {
+				return ( ...args ) =>
+					Promise.resolve( store.dispatch( action( ...args ) ) );
+			}
+
+			const actions = {
+				...mapValues( metadataActions, bindAction ),
+				...mapValues( options.actions, bindAction ),
+			};
+
 			lock(
 				actions,
 				new Proxy( privateActions, {
 					get: ( target, prop ) => {
-						return (
-							mapActions( privateActions, store )[ prop ] ||
-							actions[ prop ]
-						);
+						const privateAction = privateActions[ prop ];
+						return privateAction
+							? bindAction( privateAction )
+							: actions[ prop ];
 					},
 				} )
 			);
@@ -376,24 +379,6 @@ function mapSelectors( selectors, store ) {
 	};
 
 	return mapValues( selectors, createStateSelector );
-}
-
-/**
- * Maps actions to dispatch from a given store.
- *
- * @param {Object} actions Actions to register.
- * @param {Object} store   The redux store to which the actions should be mapped.
- *
- * @return {Object} Actions mapped to the redux store provided.
- */
-function mapActions( actions, store ) {
-	const createBoundAction =
-		( action ) =>
-		( ...args ) => {
-			return Promise.resolve( store.dispatch( action( ...args ) ) );
-		};
-
-	return mapValues( actions, createBoundAction );
 }
 
 /**
