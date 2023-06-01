@@ -127,7 +127,7 @@ function useToolbarFocus(
 		// We have to wait for the next browser paint because block controls aren't
 		// rendered right away when the toolbar gets mounted.
 		let raf = 0;
-		if ( initialIndex && ! initialFocusOnMount ) {
+		if ( ! initialFocusOnMount ) {
 			raf = window.requestAnimationFrame( () => {
 				const items = getAllToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
