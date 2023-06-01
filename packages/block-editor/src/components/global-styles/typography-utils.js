@@ -20,7 +20,7 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
  * @property {?string|?number}               size  A default font size.
  * @property {string}                        name  A font size name, displayed in the UI.
  * @property {string}                        slug  A font size slug
- * @property {boolean|FluidPreset|undefined} fluid Specifics the minimum and maximum font size value of a fluid font size.
+ * @property {boolean|FluidPreset|undefined} fluid Specifies the minimum and maximum font size value of a fluid font size.
  */
 
 /**
