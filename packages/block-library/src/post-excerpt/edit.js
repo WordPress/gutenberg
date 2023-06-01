@@ -119,7 +119,7 @@ export default function PostExcerptEditor( {
 			<div { ...blockProps }>
 				<Warning>
 					{ __(
-						'The content is currently protected and does not have an available excerpt.'
+						'The content is currently protected and does not have the available excerpt.'
 					) }
 				</Warning>
 			</div>
