@@ -114,7 +114,6 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
-	require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-resolver.php';

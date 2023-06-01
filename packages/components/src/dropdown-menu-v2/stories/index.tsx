@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -20,6 +21,8 @@ import {
 	DropdownSubMenuTrigger,
 } from '..';
 import Button from '../../button';
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 /**
  * WordPress dependencies
@@ -31,6 +34,7 @@ import { menu, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../../icon';
+import { ContextSystemProvider } from '../../ui/context';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
@@ -71,8 +75,8 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 export default meta;
 
 const ItemHelpText = styled.span`
-	font-size: 10px;
-	color: #777;
+	font-size: 12px;
+	color: ${ COLORS.gray[ '700' ] };
 
 	/* "> * > &" syntax is to target only immediate parent menu item */
 	[data-highlighted] > * > &,
@@ -127,7 +131,11 @@ const RadioItemsGroup = () => {
 };
 
 const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
-	<DropdownMenu { ...props } />
+	<SlotFillProvider>
+		<DropdownMenu { ...props } />
+		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+		<Popover.Slot />
+	</SlotFillProvider>
 );
 export const Default = Template.bind( {} );
 Default.args = {
@@ -138,7 +146,7 @@ Default.args = {
 			<DropdownMenuGroup>
 				<DropdownMenuItem>Menu item</DropdownMenuItem>
 				<DropdownMenuItem
-					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
+					prefix={ <Icon icon={ wordpress } size={ 24 } /> }
 				>
 					Menu item with prefix
 				</DropdownMenuItem>
@@ -190,4 +198,20 @@ Default.args = {
 			<RadioItemsGroup />
 		</>
 	),
+};
+
+const toolbarVariantContextValue = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+};
+export const ToolbarVariant: ComponentStory< typeof DropdownMenu > = (
+	props
+) => (
+	<ContextSystemProvider value={ toolbarVariantContextValue }>
+		<DropdownMenu { ...props } />
+	</ContextSystemProvider>
+);
+ToolbarVariant.args = {
+	...Default.args,
 };
