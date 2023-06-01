@@ -60,11 +60,7 @@ function render_block_core_image( $attributes, $content ) {
 		$content = $processor->get_updated_html();
 
 		$w = new WP_HTML_Tag_Processor( $content );
-		$w->next_tag(
-			array(
-				'tag_name' => 'figure',
-			)
-		);
+		$w->next_tag( 'figure' );
 		$w->add_class( 'wp-lightbox-container' );
 		$w->set_attribute( 'data-wp-interactive', '' );
 		$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }' );
@@ -106,7 +102,7 @@ function render_block_core_image( $attributes, $content ) {
 			</div>
 HTML;
 
-		return preg_replace( '/<\/figure>/', $lightbox_html . '</figure>', $body_content );
+		return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
 	}
 
 	return $processor->get_updated_html();
