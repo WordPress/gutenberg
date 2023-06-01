@@ -88,6 +88,7 @@ const restrictedImports = [
 			'invoke',
 			'isArray',
 			'isBoolean',
+			'isEmpty',
 			'isEqual',
 			'isFinite',
 			'isFunction',
