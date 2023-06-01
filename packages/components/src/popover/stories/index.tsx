@@ -138,6 +138,7 @@ Toolbar.args = {
 			aliquip ex ea commodo consequat.
 		</div>
 	),
+	// TODO: should we deprecate prop? Should we modify example?
 	variant: 'toolbar',
 };
 
@@ -151,6 +152,7 @@ Unstyled.args = {
 			aliquip ex ea commodo consequat.
 		</div>
 	),
+	// Where is unstyled used?
 	variant: 'unstyled',
 };
 
