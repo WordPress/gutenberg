@@ -44,7 +44,7 @@
 		},
 		"spacing": {
 			"blockGap": {
-				"__experimentalDefault": "1.5rem"
+				"__experimentalDefault": "1.25em"
 			},
 			"__experimentalDefaultControls": {
 				"blockGap": true
