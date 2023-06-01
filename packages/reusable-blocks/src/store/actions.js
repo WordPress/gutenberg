@@ -54,7 +54,7 @@ export const __experimentalConvertBlocksToReusable =
 		if ( blockType === 'pattern' ) {
 			meta = {
 				wp_block_sync_status: 'notSynced',
-				wp_block_category_name: categoryName,
+				wp_block_categories: categoryName,
 			};
 		}
 

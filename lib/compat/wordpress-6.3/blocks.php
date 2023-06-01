@@ -69,7 +69,7 @@ function gutenberg_wp_block_register_post_meta() {
 		'single'            => true,
 		'type'              => 'string',
 	] );
-	register_post_meta( $post_type, 'wp_block_category_name', [
+	register_post_meta( $post_type, 'wp_block_categories', [
 		'auth_callback'     => function() {
 			return current_user_can( 'edit_posts' );
 		},
