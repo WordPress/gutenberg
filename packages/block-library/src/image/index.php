@@ -62,7 +62,7 @@ function render_block_core_image( $attributes, $content ) {
 		$w = new WP_HTML_Tag_Processor( $content );
 		$w->next_tag( 'figure' );
 		$w->add_class( 'wp-lightbox-container' );
-		$w->set_attribute( 'data-wp-interactive', '' );
+		$w->set_attribute( 'data-wp-interactive', true );
 		$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }' );
 		$body_content = $w->get_updated_html();
 
