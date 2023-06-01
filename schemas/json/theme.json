@@ -801,14 +801,26 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/image": {
-					"$ref": "#/definitions/settingsPropertiesComplete",
-					"behaviors": {
-						"lightbox": {
-							"description": "Allow users to open the image in a lightbox.",
-							"type": "boolean",
-							"default": true
+					"type": "object",
+					"allOf": [
+						{ "$ref": "#/definitions/settingsPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": {
+								"behaviors": {
+									"description": "Settings related to behaviors.",
+									"type": "object",
+									"properties": {
+										"lightbox": {
+											"description": "Allow users to control lightbox.",
+											"type": "boolean",
+											"default": false
+										}
+									}
+								}
+							}
 						}
-					}
+					]
 				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -2077,15 +2089,20 @@
 			"description": "Description of the global styles variation."
 		},
 		"behaviors": {
+			"description": "Behaviors for individual blocks.",
 			"type": "object",
-			"description": "Behaviors for individual blocks. Define if the Behaviors UI should appear in the block inspector.",
 			"properties": {
 				"blocks": {
-					"core/image": {
-						"lightbox": {
-							"type": "boolean",
-							"description": "Whether the lightbox should be enabled for the image block.",
-							"default": true
+					"type": "object",
+					"properties": {
+						"core/image": {
+							"type": "object",
+							"properties": {
+								"lightbox": {
+									"type": "boolean",
+									"description": "Whether to enable the lightbox feature."
+								}
+							}
 						}
 					}
 				}
