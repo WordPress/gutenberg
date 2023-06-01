@@ -808,7 +808,7 @@
 							"type": "object",
 							"properties": {
 								"behaviors": {
-									"description": "Settings related to behaviors.",
+									"description": "Array of behaviors applied to the image block.",
 									"type": "object",
 									"properties": {
 										"lightbox": {
@@ -2089,7 +2089,7 @@
 			"description": "Description of the global styles variation."
 		},
 		"behaviors": {
-			"description": "Behaviors for individual blocks.",
+			"description": "An array of blocks that have behaviors included. Behaviors are also defined here.",
 			"type": "object",
 			"properties": {
 				"blocks": {
@@ -2100,7 +2100,7 @@
 							"properties": {
 								"lightbox": {
 									"type": "boolean",
-									"description": "Whether to enable the lightbox feature."
+									"description": "Whether to show the lightbox behavior UI in the block sidebar."
 								}
 							}
 						}
