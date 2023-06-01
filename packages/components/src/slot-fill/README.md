@@ -70,7 +70,7 @@ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given 
 
 `Slot` with `bubblesVirtually` set to true also accept an optional `className` to add to the slot container.
 
-`Slot` accepts optional `children` function prop, which takes `fills` as a param. It allows to perform additional processing and wrap `fills` conditionally.
+`Slot` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
 
 _Example_:
 
