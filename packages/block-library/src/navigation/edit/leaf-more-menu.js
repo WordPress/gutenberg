@@ -16,7 +16,6 @@ import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	variant: 'toolbar',
 };
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [

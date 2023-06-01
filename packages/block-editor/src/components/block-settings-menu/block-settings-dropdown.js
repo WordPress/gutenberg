@@ -36,7 +36,6 @@ import { useShowMoversGestures } from '../block-toolbar/utils';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	variant: 'toolbar',
 };
 
 function CopyMenuItem( { blocks, onCopy, label } ) {

@@ -139,7 +139,6 @@ export default function ButtonsEdit( {
 						}
 						popoverProps={ {
 							position: 'bottom right',
-							variant: 'toolbar',
 						} }
 					/>
 				</BlockControls>

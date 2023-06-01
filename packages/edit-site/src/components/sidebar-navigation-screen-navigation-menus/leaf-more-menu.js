@@ -11,7 +11,6 @@ import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	variant: 'toolbar',
 };
 
 export default function LeafMoreMenu( props ) {

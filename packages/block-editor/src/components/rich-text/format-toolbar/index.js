@@ -17,7 +17,6 @@ import { orderBy } from '../../../utils/sorting';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	variant: 'toolbar',
 };
 
 const FormatToolbar = () => {
