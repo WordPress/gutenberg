@@ -22,6 +22,7 @@ const toPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: templatePart.title.rendered,
 	blocks: parse( templatePart.content.raw ),
+	type: templatePart.type,
 	templatePart,
 } );
 
@@ -90,6 +91,7 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 				)
 				.map( ( pattern ) => ( {
 					...pattern,
+					type: 'pattern',
 					blocks: parse( pattern.content ),
 				} ) ),
 		[ blockPatterns, restBlockPatterns ]
