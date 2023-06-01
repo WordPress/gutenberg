@@ -73,8 +73,13 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
-		valueFunc: ( preset, { typography: typographySettings } ) =>
-			getTypographyFontSizeValue( preset, typographySettings ),
+		valueFunc: ( preset, settings ) =>
+			getTypographyFontSizeValue( preset, {
+				fluid: {
+					maxViewPortWidth: settings?.layout?.wideSize,
+					...settings?.typography?.fluid,
+				},
+			} ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],

@@ -398,7 +398,12 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				{
+					fluid: {
+						maxViewPortWidth: tree?.settings?.layout?.wideSize,
+						...tree?.settings?.typography?.fluid,
+					},
+				}
 			);
 		}
 
