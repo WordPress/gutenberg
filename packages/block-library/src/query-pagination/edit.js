@@ -58,7 +58,7 @@ export default function QueryPaginationEdit( {
 		if ( paginationArrow === 'none' && ! showLabel ) {
 			setAttributes( { showLabel: true } );
 		}
-	}, [ paginationArrow, setAttributes ] );
+	}, [ paginationArrow, setAttributes, showLabel ] );
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
