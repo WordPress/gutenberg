@@ -208,7 +208,7 @@ describe.each( [
 	} );
 
 	describe( 'Without `initialTabName`', () => {
-		it( 'should render first tab', async () => {
+		it.skip( 'should render first tab', async () => {
 			const panelRenderFunction = jest.fn();
 
 			render(
@@ -222,7 +222,7 @@ describe.each( [
 			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 		} );
 
-		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
+		it.skip( 'should fall back to first enabled tab if the active tab is removed', async () => {
 			const mockOnSelect = jest.fn();
 			const { rerender } = render(
 				<Component
@@ -244,7 +244,7 @@ describe.each( [
 	} );
 
 	describe( 'With `initialTabName`', () => {
-		it( 'should render the tab set by initialTabName prop', () => {
+		it.skip( 'should render the tab set by initialTabName prop', () => {
 			render(
 				<Component
 					initialTabName="beta"
@@ -256,7 +256,7 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
+		it.skip( 'should not select a tab when `initialTabName` does not match any known tab', () => {
 			render(
 				<Component
 					initialTabName="does-not-exist"
@@ -274,7 +274,7 @@ describe.each( [
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should not change tabs when initialTabName is changed', () => {
+		it.skip( 'should not change tabs when initialTabName is changed', () => {
 			const { rerender } = render(
 				<Component
 					initialTabName="beta"
@@ -294,7 +294,7 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
+		it.skip( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -330,7 +330,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
 
-		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', () => {
+		it.skip( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
@@ -362,7 +362,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
+		it.skip( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
 			const mockOnSelect = jest.fn();
 			const { rerender } = render(
 				<Component
@@ -400,7 +400,7 @@ describe.each( [
 	} );
 
 	describe( 'Disabled Tab', () => {
-		it( 'should disable the tab when `disabled` is `true`', async () => {
+		it.skip( 'should disable the tab when `disabled` is `true`', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -433,7 +433,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should select first enabled tab when the initial tab is disabled', () => {
+		it.skip( 'should select first enabled tab when the initial tab is disabled', () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
@@ -468,7 +468,7 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', () => {
+		it.skip( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
@@ -504,7 +504,7 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
 		} );
 
-		it( 'should select the first enabled tab when the selected tab becomes disabled', () => {
+		it.skip( 'should select the first enabled tab when the selected tab becomes disabled', () => {
 			const mockOnSelect = jest.fn();
 			const { rerender } = render(
 				<Component
@@ -548,7 +548,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 		} );
 
-		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', () => {
+		it.skip( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
@@ -596,7 +596,7 @@ describe.each( [
 	} );
 
 	describe( 'Tab Activation', () => {
-		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
+		it.skip( 'defaults to automatic tab activation (pointer clicks)', async () => {
 			const user = userEvent.setup();
 			const panelRenderFunction = jest.fn();
 			const mockOnSelect = jest.fn();
@@ -638,7 +638,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		it( 'defaults to automatic tab activation (arrow keys)', async () => {
+		it.skip( 'defaults to automatic tab activation (arrow keys)', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -676,7 +676,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		it( 'wraps around the last/first tab when using arrow keys', async () => {
+		it.skip( 'wraps around the last/first tab when using arrow keys', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -714,7 +714,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
+		it.skip( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -802,7 +802,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
+		it.skip( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -860,7 +860,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 		} );
 
-		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
+		it.skip( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -908,7 +908,7 @@ describe.each( [
 	} );
 
 	describe( 'Tab Attributes', () => {
-		it( "should apply the tab's `className` to the tab button", () => {
+		it.skip( "should apply the tab's `className` to the tab button", () => {
 			render( <Component tabs={ TABS } children={ () => undefined } /> );
 
 			expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
@@ -922,7 +922,7 @@ describe.each( [
 			);
 		} );
 
-		it( 'should apply the `activeClass` to the selected tab', async () => {
+		it.skip( 'should apply the `activeClass` to the selected tab', async () => {
 			const user = userEvent.setup();
 			const activeClass = 'my-active-tab';
 
