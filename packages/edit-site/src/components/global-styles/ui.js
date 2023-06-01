@@ -247,7 +247,7 @@ function GlobalStylesRevisionLink() {
 
 	// If the user is in the global styles editor canvas container view, redirect
 	// them to the revisions screen. This effectively allows deep linking to the
-	// revisions screen from outside of the global styles navigation provider.
+	// revisions screen from outside the global styles navigation provider.
 	useEffect( () => {
 		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
 			goTo( '/revisions' );
