@@ -25,14 +25,7 @@ jobs:
               run: |
                   latest_version_in_core_repo=$(curl -s 'https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request\[slug\]=gutenberg' | jq -r '.version')
                   echo "Latest Core Repo version: $latest_version_in_core_repo"
-                  # @todo Revert by uncommenting this before merging
-                  # echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
-
-                  # Mocks the version that would come from the plugin repo, for testing purposes:
-                  # If the version being released by this workflow is > than the last one published
-                  # in the SVN repo, then it will be published as trunk and replace the last version
-                  # on SVN. If it's <, then it will only be published as a tag.
-                  echo "version=v16.1.0" >> $GITHUB_OUTPUT
+                  echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
 
             - name: Decide if it is a trunk or tag update
               id: compute_should_update_trunk
