@@ -16,6 +16,7 @@ import SidebarNavigationScreenLibrary from '../sidebar-navigation-screen-library
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenTemplatePart from '../sidebar-navigation-screen-template-part';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
@@ -53,11 +54,14 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+			<NavigatorScreen path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
 			<NavigatorScreen path="/library">
 				<SidebarNavigationScreenLibrary />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part)/:postId">
+				<SidebarNavigationScreenPattern />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/all">
 				<SidebarNavigationScreenTemplatesBrowse />

@@ -19,11 +19,21 @@ import { moreHorizontal } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { useLink } from '../routes/link';
 import usePatterns from './use-patterns';
 
-const GridItem = ( { composite, item } ) => {
+const GridItem = ( { category, composite, item } ) => {
 	const instanceId = useInstanceId( GridItem );
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+
+	const { onClick } = useLink( {
+		path: '/library',
+		postType: item.type,
+		postId: item.name,
+		categoryName: category,
+		categoryType: item.type,
+		canvas: 'edit',
+	} );
 
 	return (
 		<div
@@ -36,9 +46,10 @@ const GridItem = ( { composite, item } ) => {
 				role="option"
 				as="div"
 				{ ...composite }
-				onClick={ () => {
-					// TODO: Implement pattern editing flow.
-				} }
+				onClick={
+					// TODO: When patterns can be edited this should simply call onClick
+					item.type === 'wp_template_part' ? onClick : undefined
+				}
 			>
 				<BlockPreview blocks={ item.blocks } />
 				{ !! item.description && (
@@ -105,6 +116,7 @@ export default function Grid( { category, label, type } ) {
 					<GridItem
 						key={ pattern.name }
 						item={ pattern }
+						category={ category }
 						composite={ composite }
 					/>
 				) ) }
