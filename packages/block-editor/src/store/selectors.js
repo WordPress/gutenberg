@@ -1540,7 +1540,7 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
 
@@ -1638,6 +1638,7 @@ export const canInsertBlockType = createSelector(
 		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		state.blockEditingModes,
 	]
 );
 
