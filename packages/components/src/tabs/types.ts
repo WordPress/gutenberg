@@ -2,6 +2,10 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
+/**
+ * Internal dependencies
+ */
+import type { IconType } from '../icon';
 
 export type TabValue = string;
 
@@ -12,9 +16,11 @@ export type TabsListProps = {
 
 export type TabProps = {
 	value: TabValue;
+	title: string;
 	disabled?: boolean;
 	className?: string;
 	children?: ReactNode;
+	icon?: IconType;
 };
 
 export type TabPanelProps = {

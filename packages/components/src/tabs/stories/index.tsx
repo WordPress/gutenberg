@@ -35,8 +35,12 @@ Default.args = {
 	children: (
 		<>
 			<TabsList>
-				<Tab value="tab-1">Tab 1</Tab>
-				<Tab value="tab-2">Tab 2</Tab>
+				<Tab value="tab-1" title="Tab 1">
+					Tab 1
+				</Tab>
+				<Tab value="tab-2" title="Tab 1">
+					Tab 2
+				</Tab>
 			</TabsList>
 			<TabPanel value="tab-1">You see the content of tab 1</TabPanel>
 			<TabPanel value="tab-2">You see the content of tab 2</TabPanel>
@@ -50,11 +54,15 @@ DisabledTab.args = {
 	children: (
 		<>
 			<TabsList>
-				<Tab value="tab-1" disabled>
+				<Tab value="tab-1" title="Tab 1" disabled>
 					Tab 1
 				</Tab>
-				<Tab value="tab-2">Tab 2</Tab>
-				<Tab value="tab-3">Tab 3</Tab>
+				<Tab value="tab-2" title="Tab 1">
+					Tab 2
+				</Tab>
+				<Tab value="tab-3" title="Tab 1">
+					Tab 3
+				</Tab>
 			</TabsList>
 			<TabPanel value="tab-1">You see the content of tab 1</TabPanel>
 			<TabPanel value="tab-2">You see the content of tab 2</TabPanel>
@@ -70,8 +78,12 @@ ToBeNamedStory.args = {
 		<>
 			<div style={ { display: 'flex', alignItems: 'center' } }>
 				<TabsList>
-					<Tab value="post">Post</Tab>
-					<Tab value="block">Block</Tab>
+					<Tab value="post" title="Post">
+						Post
+					</Tab>
+					<Tab value="block" title="Block">
+						Block
+					</Tab>
 				</TabsList>
 				<Button
 					icon={ closeSmall }

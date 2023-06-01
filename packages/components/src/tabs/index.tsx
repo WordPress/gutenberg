@@ -8,7 +8,6 @@ import cx from 'classnames';
  * WordPress dependencies
  */
 import {
-	forwardRef,
 	useState,
 	useEffect,
 	useLayoutEffect,
@@ -18,7 +17,6 @@ import {
 /**
  * Internal dependencies
  */
-import { TabPanel as LegacyTabPanel } from '../tab-panel';
 import Button from '../button';
 import type {
 	TabsProps,
@@ -38,9 +36,11 @@ export const TabsList = ( { className, children }: TabsListProps ) => (
 
 export const Tab = ( {
 	value,
+	title,
 	disabled = false,
 	className,
 	children,
+	icon,
 }: TabProps ) => (
 	<RadixTabs.Trigger
 		value={ value }
@@ -48,8 +48,14 @@ export const Tab = ( {
 		className={ cx( 'components-tabs__tab', className ) }
 		asChild
 	>
-		<Button disabled={ disabled } __experimentalIsFocusable>
-			{ children }
+		<Button
+			icon={ icon }
+			label={ icon && title }
+			showTooltip={ !! icon }
+			disabled={ disabled }
+			__experimentalIsFocusable
+		>
+			{ ! icon && children }
 		</Button>
 	</RadixTabs.Trigger>
 );
@@ -155,6 +161,8 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 					<Tab
 						key={ tab.name }
 						value={ tab.name }
+						title={ tab.title }
+						icon={ tab.icon }
 						className={ cx(
 							'components-tab-panel__tabs-item',
 							tab.className,
