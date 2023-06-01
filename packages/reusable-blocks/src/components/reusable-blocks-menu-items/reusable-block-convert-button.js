@@ -14,6 +14,7 @@ import {
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	SelectControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -41,10 +42,11 @@ export default function ReusableBlockConvertButton( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ blockType, setBlockType ] = useState( 'resuable' );
 	const [ title, setTitle ] = useState( '' );
-	const canConvert = useSelect(
+	const [ categoryName, setCategoryName ] = useState( '' );
+	const { canConvert, patternCategories } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } =
+			const { getBlocksByClientId, canInsertBlockType, getSettings } =
 				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
@@ -76,7 +78,11 @@ export default function ReusableBlockConvertButton( {
 				// Hide when current doesn't have permission to do that.
 				!! canUser( 'create', 'blocks' );
 
-			return _canConvert;
+			return {
+				canConvert: _canConvert,
+				patternCategories:
+					getSettings().__experimentalBlockPatternCategories,
+			};
 		},
 		[ clientIds ]
 	);
@@ -92,7 +98,8 @@ export default function ReusableBlockConvertButton( {
 				await convertBlocksToReusable(
 					clientIds,
 					reusableBlockTitle,
-					blockType
+					blockType,
+					categoryName
 				);
 				createSuccessNotice(
 					sprintf(
@@ -111,12 +118,24 @@ export default function ReusableBlockConvertButton( {
 				} );
 			}
 		},
-		[ clientIds, blockType ]
+		[
+			convertBlocksToReusable,
+			clientIds,
+			blockType,
+			categoryName,
+			createSuccessNotice,
+			createErrorNotice,
+		]
 	);
 
 	if ( ! canConvert ) {
 		return null;
 	}
+
+	const categoryOptions = patternCategories.map( ( category ) => ( {
+		label: category.label,
+		value: category.name,
+	} ) );
 
 	return (
 		<BlockSettingsMenuControls>
@@ -170,6 +189,15 @@ export default function ReusableBlockConvertButton( {
 										value={ title }
 										onChange={ setTitle }
 									/>
+									{ blockType === 'pattern' && (
+										<SelectControl
+											label={ __( 'Category' ) }
+											onChange={ setCategoryName }
+											options={ categoryOptions }
+											size="__unstable-large"
+											value={ categoryName }
+										/>
+									) }
 									<HStack justify="right">
 										<Button
 											variant="tertiary"
