@@ -29,6 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
+import { cloneBlock } from '@wordpress/blocks';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -62,8 +63,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		{ id: ref }
 	);
 
-	if ( blocks?.length > 0 && blocks[ 0 ].name === 'core/pattern' ) {
-		replaceBlocks( clientId, blocks[ 0 ].innerBlocks );
+	if (
+		hasResolved &&
+		record.meta?.wp_block_sync_status === 'notSynced' &&
+		blocks?.length > 0
+	) {
+		replaceBlocks(
+			clientId,
+			blocks.map( ( block ) => cloneBlock( block ) )
+		);
 	}
 
 	const [ title, setTitle ] = useEntityProp(

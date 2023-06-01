@@ -49,18 +49,22 @@ export const __experimentalConvertBlockToStatic =
 export const __experimentalConvertBlocksToReusable =
 	( clientIds, title, blockType ) =>
 	async ( { registry, dispatch } ) => {
-		let content = serialize(
-			registry.select( blockEditorStore ).getBlocksByClientId( clientIds )
-		);
-
+		let meta;
 		if ( blockType === 'pattern' ) {
-			content = `<!-- wp:pattern -->${ content }<!-- /wp:pattern -->`;
+			meta = {
+				wp_block_sync_status: 'notSynced',
+			};
 		}
 
 		const reusableBlock = {
 			title: title || __( 'Untitled Reusable block' ),
-			content,
+			content: serialize(
+				registry
+					.select( blockEditorStore )
+					.getBlocksByClientId( clientIds )
+			),
 			status: 'publish',
+			meta,
 		};
 
 		const updatedRecord = await registry
