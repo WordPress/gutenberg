@@ -91,6 +91,7 @@ const Toolbar = ( { isMobile } ) => (
 ```
 
 Props can also be passed from a `Slot` to a `Fill` by using the prop `fillProps` on the `Slot`:
+
 ```jsx
 const { Fill, Slot } = createSlotFill( 'Toolbar' );
 
