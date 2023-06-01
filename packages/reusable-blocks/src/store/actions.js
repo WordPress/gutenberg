@@ -73,6 +73,10 @@ export const __experimentalConvertBlocksToReusable =
 			.dispatch( 'core' )
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
 
+		if ( blockType === 'pattern' ) {
+			return;
+		}
+
 		const newBlock = createBlock( 'core/block', {
 			ref: updatedRecord.id,
 		} );
