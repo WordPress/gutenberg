@@ -30,7 +30,6 @@
 		top: 0;
 		left: 0;
 		z-index: z-index(".block-editor-block-popover");
-		display: block;
 		width: calc(100% + 2 * 12px); //12px is the padding of customizer sidebar content
 
 		overflow-y: hidden;
@@ -44,8 +43,8 @@
 			border-right-color: $gray-200;
 		}
 
-		.block-editor-block-toolbar__group-collapse-fixed-toolbar {
-			display: none;
+		&.is-collapsed {
+			margin-left: -12px; //12px is the padding of customizer sidebar content
 		}
 	}
 }
