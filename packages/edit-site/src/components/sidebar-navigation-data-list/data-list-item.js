@@ -17,7 +17,10 @@ export default function DataListItem( { label, value } ) {
 			<Text className="edit-site-sidebar-navigation_data-list__label">
 				{ label }
 			</Text>
-			<Text className="edit-site-sidebar-navigation_data-list__value">
+			<Text
+				as="div"
+				className="edit-site-sidebar-navigation_data-list__value"
+			>
 				{ value }
 			</Text>
 		</HStack>

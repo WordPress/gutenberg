@@ -6,7 +6,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil, header, footer } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
-	Button,
 	Icon,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
@@ -23,6 +22,7 @@ import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import SidebarDetails from '../sidebar-navigation-data-list';
 import DataListItem from '../sidebar-navigation-data-list/data-list-item';
+import DataListDrilldown from '../sidebar-navigation-data-list/data-list-drilldown';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import { createInterpolateElement } from '@wordpress/element';
 
@@ -110,25 +110,21 @@ export default function SidebarNavigationScreenTemplate() {
 							{
 								label: 'Header',
 								value: (
-									<Button
+									<DataListDrilldown
 										variant="tertiary"
-										as="a"
 										icon={ header }
-									>
-										Primary
-									</Button>
+										label="Primary"
+									/>
 								),
 							},
 							{
 								label: 'Footer',
 								value: (
-									<Button
+									<DataListDrilldown
 										variant="tertiary"
-										as="a"
 										icon={ footer }
-									>
-										Footer
-									</Button>
+										label="Primary"
+									/>
 								),
 							},
 						] }

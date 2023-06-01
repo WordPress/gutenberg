@@ -11,7 +11,7 @@ export default function SidebarDetails( { details } ) {
 	return (
 		<VStack
 			className="edit-site-sidebar-navigation_data-list"
-			spacing={ 5 }
+			spacing={ 2 }
 		>
 			{ details.map( ( detail ) => (
 				<DataListItem
