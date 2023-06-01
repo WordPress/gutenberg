@@ -111,6 +111,21 @@ class WP_Fonts_Library {
 				)
 			);
 		}
+        
+        // Create fonts directory if it doesn't exist
+        wp_mkdir_p( $this->wp_fonts_dir );
+
+        // The update endpoints requires write access to the temp and the fonts directories
+        $temp_dir = get_temp_dir();
+        if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $this->wp_fonts_dir ) ) {
+            return new WP_Error(
+                'rest_cannot_write_fonts_folder',
+                __( 'Error: WordPress does not have permission to write the fonts folder on your server.' ),
+                array(
+                    'status' => 500,
+                )
+            );
+        }
 
 		return true;
     }
@@ -412,12 +427,6 @@ class WP_Fonts_Library {
      * @return WP_REST_Response|WP_Error The updated fonts library post content.
      */
     function install_fonts ( $request ) {
-        // Create fonts directory if it doesn't exist
-        $fonts_directory = wp_mkdir_p( $this->wp_fonts_dir );
-        if ( ! $fonts_directory ) {
-            return new WP_Error( 'fonts_directory_error', __( 'Could not create fonts directory.' ), array( 'status' => 500 ) );
-        }
-
         // Get existing font families
         $post = $this->query_fonts_library();
         if ( is_wp_error( $post ) ) {
