@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit, seen } from '@wordpress/icons';
+import { backup, edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import {
+	Icon,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalVStack as HStack,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import { humanTimeDiff } from '@wordpress/date';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +26,7 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
+import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 
 const noop = () => {};
 
@@ -69,15 +77,72 @@ function SidebarNavigationScreenGlobalStylesContent() {
 	// rendering the iframe. Without this, the iframe previews will not render
 	// in mobile viewport sizes, where the editor canvas is hidden.
 	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<div className="edit-site-sidebar-navigation-screen-global-styles__content">
+		<>
+			<BlockEditorProvider
+				settings={ storedSettings }
+				onChange={ noop }
+				onInput={ noop }
+			>
 				<StyleVariationsContainer />
-			</div>
-		</BlockEditorProvider>
+			</BlockEditorProvider>
+		</>
+	);
+}
+
+function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
+	const { revisions, isLoading } = useGlobalStylesRevisions();
+	const { revisionsCount } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			revisionsCount:
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
+		};
+	}, [] );
+
+	const hasRevisions = revisionsCount >= 2;
+
+	const { modified } = revisions?.[ 0 ] || {};
+
+	if ( ! hasRevisions || isLoading || ! modified ) {
+		return null;
+	}
+
+	return (
+		<VStack>
+			<SidebarNavigationItem
+				className="edit-site-sidebar-navigation-screen-global-styles__revisions"
+				onClick={ onClickRevisions }
+			>
+				<HStack
+					alignment="center"
+					spacing={ 5 }
+					direction="row"
+					justify="space-between"
+				>
+					<span className="edit-site-sidebar-navigation-screen-global-styles__revisions__label">
+						{ __( 'Last modified' ) }
+					</span>
+
+					<span>
+						<time dateTime={ modified }>
+							{ humanTimeDiff( modified ) }
+						</time>
+					</span>
+
+					<Icon
+						icon={ backup }
+						style={ { fill: 'currentcolor', marginRight: '8px' } }
+					/>
+				</HStack>
+			</SidebarNavigationItem>
+		</VStack>
 	);
 }
 
@@ -95,11 +160,14 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		[]
 	);
 
-	const openGlobalStyles = async () =>
-		Promise.all( [
-			setCanvasMode( 'edit' ),
-			openGeneralSidebar( 'edit-site/global-styles' ),
-		] );
+	const openGlobalStyles = useCallback(
+		async () =>
+			Promise.all( [
+				setCanvasMode( 'edit' ),
+				openGeneralSidebar( 'edit-site/global-styles' ),
+			] ),
+		[ setCanvasMode, openGeneralSidebar ]
+	);
 
 	const openStyleBook = async () => {
 		await openGlobalStyles();
@@ -109,6 +177,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		setEditorCanvasContainerView( 'style-book' );
 	};
 
+	const openRevisions = useCallback( async () => {
+		await openGlobalStyles();
+		// Open the global styles revisions once the canvas mode is set to edit,
+		// and the global styles sidebar is open. The global styles UI is responsible
+		// for redirecting to the revisions screen once the editor canvas container
+		// has been set to 'global-styles-revisions'.
+		setEditorCanvasContainerView( 'global-styles-revisions' );
+	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
+
 	return (
 		<>
 			<SidebarNavigationScreen
@@ -117,6 +194,11 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					'Choose a different style combination for the theme styles.'
 				) }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
+				footer={
+					<SidebarNavigationScreenGlobalStylesFooter
+						onClickRevisions={ openRevisions }
+					/>
+				}
 				actions={
 					<>
 						{ ! isMobileViewport && (
