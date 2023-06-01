@@ -22,16 +22,18 @@ export default function QueryPaginationNextEdit( {
 			onClick={ ( event ) => event.preventDefault() }
 			{ ...useBlockProps() }
 		>
-			<PlainText
-				__experimentalVersion={ 2 }
-				tagName="span"
-				aria-label={ __( 'Next page link' ) }
-				placeholder={ showLabel ? __( 'Next Page' ) : '' }
-				value={ showLabel ? label : '' }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
-			/>
+			{ showLabel && (
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( 'Next page link' ) }
+					placeholder={ __( 'Next Page' ) }
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+				/>
+			) }
 			{ displayArrow && (
 				<span
 					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
