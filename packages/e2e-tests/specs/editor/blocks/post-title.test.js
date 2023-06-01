@@ -14,7 +14,7 @@ describe( 'Post Title block', () => {
 
 	it( 'Can edit the post title', async () => {
 		// Create a block with some text that will trigger a list creation.
-		await insertBlock( 'Post Title' );
+		await insertBlock( 'Title' );
 		const editablePostTitleSelector =
 			'.wp-block-post-title[contenteditable="true"]';
 		await page.waitForSelector( editablePostTitleSelector );
