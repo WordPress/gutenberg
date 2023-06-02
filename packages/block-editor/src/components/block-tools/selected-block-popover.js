@@ -102,6 +102,12 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
+
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
