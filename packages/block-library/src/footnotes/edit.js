@@ -13,35 +13,33 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 	);
 	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
 	return (
-		<footer { ...useBlockProps() }>
-			<ol>
-				{ footnotes.map( ( { id, content } ) => (
-					<li key={ id }>
-						<RichText
-							id={ id }
-							tagName="span"
-							value={ content }
-							identifier={ id }
-							onChange={ ( nextFootnote ) => {
-								updateMeta( {
-									...meta,
-									footnotes: JSON.stringify(
-										footnotes.map( ( footnote ) => {
-											return footnote.id === id
-												? {
-														content: nextFootnote,
-														id,
-												  }
-												: footnote;
-										} )
-									),
-								} );
-							} }
-						/>{ ' ' }
-						<a href={ `#${ id }-link` }>↩︎</a>
-					</li>
-				) ) }
-			</ol>
-		</footer>
+		<ol { ...useBlockProps() }>
+			{ footnotes.map( ( { id, content } ) => (
+				<li key={ id }>
+					<RichText
+						id={ id }
+						tagName="span"
+						value={ content }
+						identifier={ id }
+						onChange={ ( nextFootnote ) => {
+							updateMeta( {
+								...meta,
+								footnotes: JSON.stringify(
+									footnotes.map( ( footnote ) => {
+										return footnote.id === id
+											? {
+													content: nextFootnote,
+													id,
+											  }
+											: footnote;
+									} )
+								),
+							} );
+						} }
+					/>{ ' ' }
+					<a href={ `#${ id }-link` }>↩︎</a>
+				</li>
+			) ) }
+		</ol>
 	);
 }

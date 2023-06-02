@@ -14,6 +14,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 export const format = {
 	title: __( 'Footnote' ),
@@ -22,8 +23,14 @@ export const format = {
 	contentEditable: false,
 	edit: function Edit( { value, onChange, isObjectActive } ) {
 		const registry = useRegistry();
-		const { getBlocks } = useSelect( blockEditorStore );
-		const { selectionChange } = useDispatch( blockEditorStore );
+		const {
+			getSelectedBlockClientId,
+			getBlockRootClientId,
+			getBlockName,
+			getBlocks,
+		} = useSelect( blockEditorStore );
+		const { selectionChange, insertBlock } =
+			useDispatch( blockEditorStore );
 		function onClick() {
 			registry.batch( () => {
 				const id = createId();
@@ -49,9 +56,27 @@ export const format = {
 						],
 						[]
 					);
-				const fnBlock = flattenBlocks( getBlocks() ).find(
+				let fnBlock = flattenBlocks( getBlocks() ).find(
 					( block ) => block.name === 'core/footnotes'
 				);
+
+				// Maybe this should all also be moved to the entity provider.
+				if ( ! fnBlock ) {
+					const clientId = getSelectedBlockClientId();
+					let rootClientId = getBlockRootClientId( clientId );
+
+					while (
+						rootClientId &&
+						getBlockName( rootClientId ) !== 'core/post-content'
+					) {
+						rootClientId = getBlockRootClientId( rootClientId );
+					}
+
+					fnBlock = createBlock( 'core/footnotes' );
+
+					insertBlock( fnBlock, undefined, rootClientId );
+				}
+
 				selectionChange( fnBlock.clientId, id, 0, 0 );
 			} );
 		}
