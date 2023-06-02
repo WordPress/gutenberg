@@ -19,7 +19,7 @@
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"anchor": "deliimter",
+		"anchor": "delimiter",
 		"__experimentalLayout": true,
 		"color": {
 			"gradients": true,
