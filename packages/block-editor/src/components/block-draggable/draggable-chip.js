@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
 import { dragHandle } from '@wordpress/icons';
 
@@ -10,8 +10,8 @@ import { dragHandle } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockDraggableChip( { count, icon, label } ) {
-	const blockLabel = label && label;
+export default function BlockDraggableChip( { count, icon, isPattern } ) {
+	const patternLabel = isPattern && __( 'Pattern' );
 
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
@@ -27,7 +27,7 @@ export default function BlockDraggableChip( { count, icon, label } ) {
 						{ icon ? (
 							<BlockIcon icon={ icon } />
 						) : (
-							blockLabel ||
+							patternLabel ||
 							sprintf(
 								/* translators: %d: Number of blocks. */
 								_n( '%d block', '%d blocks', count ),

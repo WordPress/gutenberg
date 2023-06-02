@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
-import { serialize } from '@wordpress/blocks';
+import { serialize, store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -14,12 +15,16 @@ const InserterDraggableBlocks = ( {
 	icon,
 	children,
 	isPattern,
-	label,
 } ) => {
 	const transferData = {
 		type: 'inserter',
 		blocks,
 	};
+
+	const blockType = useSelect( ( select ) => {
+		const { getBlockType } = select( blocksStore );
+		return blocks.length === 1 && getBlockType( blocks[ 0 ].name );
+	} );
 
 	return (
 		<Draggable
@@ -31,9 +36,8 @@ const InserterDraggableBlocks = ( {
 			__experimentalDragComponent={
 				<BlockDraggableChip
 					count={ blocks.length }
-					icon={ icon }
+					icon={ icon || ( ! isPattern && blockType?.icon ) }
 					isPattern={ isPattern }
-					label={ label }
 				/>
 			}
 		>

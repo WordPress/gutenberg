@@ -37,14 +37,12 @@ function BlockPattern( {
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
-	const label = pattern && __( 'Pattern' );
 
 	return (
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
 			blocks={ blocks }
 			isPattern={ !! pattern }
-			label={ label }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
