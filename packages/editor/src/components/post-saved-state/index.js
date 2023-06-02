@@ -47,8 +47,10 @@ export default function PostSavedState( {
 		isDirty,
 		isNew,
 		isPending,
+		isPublished,
 		isSaveable,
 		isSaving,
+		isScheduled,
 		hasPublishAction,
 	} = useSelect(
 		( select ) => {
@@ -100,6 +102,10 @@ export default function PostSavedState( {
 	// Once the post has been submitted for review this button
 	// is not needed for the contributor role.
 	if ( ! hasPublishAction && isPending ) {
+		return null;
+	}
+
+	if ( isPublished || isScheduled ) {
 		return null;
 	}
 
