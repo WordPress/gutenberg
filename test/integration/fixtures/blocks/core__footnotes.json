@@ -2,14 +2,7 @@
 	{
 		"name": "core/footnotes",
 		"isValid": true,
-		"attributes": {
-			"footnotes": [
-				{
-					"content": "test",
-					"id": "1"
-				}
-			]
-		},
+		"attributes": {},
 		"innerBlocks": []
 	}
 ]
