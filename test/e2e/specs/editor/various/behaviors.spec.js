@@ -216,6 +216,43 @@ test.describe( 'Testing behaviors functionality', () => {
 		await select.selectOption( { label: 'No behaviors' } );
 		await expect( select ).toHaveValue( '' );
 	} );
+
+	test( 'Lightbox behavior is disabled if the Image has a link', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				linkDestination: 'custom',
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.click();
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
+		} );
+
+		// The behaviors dropdown should be present but disabled.
+		await expect( select ).toBeDisabled();
+	} );
 } );
 
 class BehaviorUtils {
