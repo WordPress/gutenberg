@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	pressKeyTimes,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -57,7 +58,7 @@ describe( 'Links', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		const actualText = await page.evaluate(
+		const actualText = await canvas().evaluate(
 			() =>
 				document.querySelector( '.block-editor-rich-text__editable a' )
 					.textContent
@@ -172,7 +173,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click somewhere else - it doesn't really matter where.
-		await page.click( '.editor-post-title' );
+		await canvas().click( '.editor-post-title' );
 	} );
 
 	const createAndReselectLink = async () => {
@@ -311,7 +312,7 @@ describe( 'Links', () => {
 
 	const createPostWithTitle = async ( titleText ) => {
 		await createNewPost();
-		await page.type( '.editor-post-title__input', titleText );
+		await canvas().type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
 		// Disable reason: Wait for the animation to complete, since otherwise the
@@ -630,7 +631,7 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Check the created link reflects the link text.
-			const actualLinkText = await page.evaluate(
+			const actualLinkText = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable a'
@@ -880,7 +881,7 @@ describe( 'Links', () => {
 
 			await page.keyboard.press( 'Enter' );
 
-			const richTextText = await page.evaluate(
+			const richTextText = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable'
@@ -889,7 +890,7 @@ describe( 'Links', () => {
 			// Check that the correct (i.e. last) instance of "a" was replaced with "z".
 			expect( richTextText ).toBe( 'a b c z' );
 
-			const richTextLink = await page.evaluate(
+			const richTextLink = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable a'

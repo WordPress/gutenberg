@@ -42,8 +42,12 @@ function _gutenberg_get_iframed_editor_assets() {
 	$wp_styles->registered  = $current_wp_styles->registered;
 	$wp_scripts->registered = $current_wp_scripts->registered;
 
-	// We do not need reset styles for the iframed editor.
-	$wp_styles->done = array( 'wp-reset-editor-styles' );
+	// We generally do not need reset styles for the iframed editor.
+	// However, if it's a classic theme, margins will be added to every block,
+	// which is reset specifically for list items, so classic themes rely on
+	// these reset styles.
+	$wp_styles->done =
+		wp_theme_has_theme_json() ? array( 'wp-reset-editor-styles' ) : array();
 
 	wp_enqueue_script( 'wp-polyfill' );
 	// Enqueue the `editorStyle` handles for all core block, and dependencies.
