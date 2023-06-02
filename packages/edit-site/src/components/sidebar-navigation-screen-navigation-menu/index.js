@@ -39,10 +39,12 @@ const { useHistory } = unlock( routerPrivateApis );
 const noop = () => {};
 
 export default function SidebarNavigationScreenNavigationMenu() {
-	const { deleteEntityRecord } = useDispatch( coreStore );
-	const { editEntityRecord } = useDispatch( coreStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-
+	const {
+		deleteEntityRecord,
+		editEntityRecord,
+		saveEntityRecord,
+		saveEditedEntityRecord,
+	} = useDispatch( coreStore );
 	const [ isOpen, setOpen ] = useState( false );
 
 	const postType = `wp_navigation`;
@@ -56,6 +58,8 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		postId
 	);
 
+	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
+
 	const handleSave = async () => {
 		saveEditedEntityRecord( 'postType', postType, postId );
 		setOpen( false );
@@ -64,8 +68,16 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		editEntityRecord( 'postType', postType, postId, { title } );
 	const handleDelete = () =>
 		deleteEntityRecord( 'postType', postType, postId, { force: true } );
-
-	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
+	const handleDuplicate = async () => {
+		const savedRecord = await saveEntityRecord( 'postType', postType, {
+			title: menuTitle,
+			content: navigationMenu?.content?.raw,
+			status: 'publish',
+		} );
+		if ( savedRecord ) {
+			//TODO: add toast message and navigate back?
+		}
+	};
 
 	const element = useSelect(
 		( select ) =>
@@ -83,6 +95,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		handleDelete,
 		handleSave,
 		handleChange,
+		handleDuplicate,
 		editedMenuTitle: element.title,
 	};
 
@@ -212,6 +225,7 @@ function ScreenNavigationMoreMenu( props ) {
 		handleDelete,
 		handleSave,
 		handleChange,
+		handleDuplicate,
 		editedMenuTitle,
 	} = props;
 	const closeModal = () => setOpen( false );
@@ -235,7 +249,14 @@ function ScreenNavigationMoreMenu( props ) {
 							>
 								{ __( 'Rename' ) }
 							</MenuItem>
-							<MenuItem>{ __( 'Duplicate' ) }</MenuItem>
+							<MenuItem
+								onClick={ () => {
+									handleDuplicate();
+									onClose();
+								} }
+							>
+								{ __( 'Duplicate' ) }
+							</MenuItem>
 							<MenuItem
 								isDestructive
 								isTertiary
