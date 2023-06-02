@@ -150,8 +150,9 @@ export default function SearchEdit( {
 		}
 	}, [ hasOnlyButton, isSelected, setAttributes ] );
 
+	// Show the search field when width changes.
 	useEffect( () => {
-		if ( hasOnlyButton || ! isSelected ) {
+		if ( ! hasOnlyButton || ! isSelected ) {
 			return;
 		}
 
