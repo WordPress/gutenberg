@@ -128,7 +128,6 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
 	);
-
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.

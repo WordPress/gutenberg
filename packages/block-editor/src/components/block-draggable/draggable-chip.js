@@ -12,7 +12,6 @@ import BlockIcon from '../block-icon';
 
 export default function BlockDraggableChip( { count, icon, isPattern } ) {
 	const patternLabel = isPattern && __( 'Pattern' );
-
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
 			<div
