@@ -39,12 +39,14 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		$wp_query      = $block_query;
 		$total         = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
 		$paginate_args = array(
+		$mid_size      = $block->context['midSize'] ? (int) $block->context['midSize'] : null;
 			'base'      => '%_%',
 			'format'    => "?$page_key=%#%",
 			'current'   => max( 1, $page ),
 			'total'     => $total,
 			'prev_next' => false,
 		);
+			'mid_size'  => $mid_size,
 		if ( 1 !== $page ) {
 			/**
 			 * `paginate_links` doesn't use the provided `format` when the page is `1`.
