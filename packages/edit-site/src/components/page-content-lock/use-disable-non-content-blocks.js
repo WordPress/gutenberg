@@ -3,11 +3,7 @@
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -39,22 +35,8 @@ export function useDisableNonContentBlocks() {
 
 const withDisableNonContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const mode = useSelect(
-			( select ) => {
-				if ( CONTENT_BLOCK_TYPES.includes( props.name ) ) {
-					return 'contentOnly';
-				}
-				if (
-					select( blockEditorStore ).getBlockParentsByBlockName(
-						props.clientId,
-						'core/post-content'
-					).length
-				) {
-					return 'default';
-				}
-			},
-			[ props.name, props.clientId ]
-		);
+		const isContent = CONTENT_BLOCK_TYPES.includes( props.name );
+		const mode = isContent ? 'contentOnly' : undefined;
 		useBlockEditingMode( mode );
 		return <BlockEdit { ...props } />;
 	},
