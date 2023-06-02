@@ -107,6 +107,8 @@ require __DIR__ . '/experimental/navigation-fallback.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/blocks.php';
 }
+require __DIR__ . '/experimental/interactivity-api/class-wp-directive-store.php';
+require __DIR__ . '/experimental/interactivity-api/store.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
