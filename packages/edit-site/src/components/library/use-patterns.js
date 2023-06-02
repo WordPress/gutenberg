@@ -117,8 +117,7 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 
 const reusableBlockToPattern = ( reusableBlock ) => ( {
 	blocks: parse( reusableBlock.content.raw ),
-	// TODO: Update this when we allow non-synced patterns to belong in multiple categories.
-	categories: [ reusableBlock.meta?.wp_block_categories ],
+	categories: reusableBlock.meta?.wp_block_categories,
 	name: reusableBlock.slug,
 	title: reusableBlock.title.raw,
 	type: reusableBlock.type,
