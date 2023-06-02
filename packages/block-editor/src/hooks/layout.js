@@ -329,8 +329,11 @@ export const withInspectorControls = createHigherOrderComponent(
 			layoutBlockSupportKey
 		);
 
+		const blockEditingMode = useBlockEditingMode();
 		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
+			supportLayout && blockEditingMode === 'default' && (
+				<LayoutPanel key="layout" { ...props } />
+			),
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},

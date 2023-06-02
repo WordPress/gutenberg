@@ -29,7 +29,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, useBlockEditingMode } = unlock(
+	blockEditorPrivateApis
+);
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -208,15 +210,19 @@ function PushChangesToGlobalStylesControl( {
 }
 
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) =>
-		(
+	( BlockEdit ) => ( props ) => {
+		const blockEditingMode = useBlockEditingMode();
+		return (
 			<>
 				<BlockEdit { ...props } />
-				<InspectorAdvancedControls>
-					<PushChangesToGlobalStylesControl { ...props } />
-				</InspectorAdvancedControls>
+				{ blockEditingMode === 'default' && (
+					<InspectorAdvancedControls>
+						<PushChangesToGlobalStylesControl { ...props } />
+					</InspectorAdvancedControls>
+				) }
 			</>
-		)
+		);
+	}
 );
 
 addFilter(

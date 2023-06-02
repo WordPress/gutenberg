@@ -356,6 +356,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						</div>
 					) }
 					<InspectorControls.Slot />
+					<InspectorControls.Slot group="list" />
 					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
