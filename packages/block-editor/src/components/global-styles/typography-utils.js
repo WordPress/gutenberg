@@ -45,24 +45,15 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
 export function getTypographyFontSizeValue( preset, typographySettings ) {
 	const { size: defaultSize } = preset;
 
+	if ( ! isFluidTypographyEnabled( typographySettings ) ) {
+		return defaultSize;
+	}
 	/*
-	 * Catches falsy values and 0/'0'.
-	 * Fluid calculations cannot be performed on 0.
+	 * Checks whether a font size has explicitly bypassed fluid calculations.
+	 * Also catches falsy values and 0/'0'.
+	 * Fluid calculations cannot be performed on `0`.
 	 */
-	if ( ! defaultSize || '0' === defaultSize ) {
-		return defaultSize;
-	}
-
-	if (
-		! typographySettings?.fluid ||
-		( typeof typographySettings?.fluid === 'object' &&
-			Object.keys( typographySettings.fluid ).length === 0 )
-	) {
-		return defaultSize;
-	}
-
-	// A font size has explicitly bypassed fluid calculations.
-	if ( false === preset?.fluid ) {
+	if ( ! defaultSize || '0' === defaultSize || false === preset?.fluid ) {
 		return defaultSize;
 	}
 
@@ -84,4 +75,37 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	}
 
 	return defaultSize;
+}
+
+function isFluidTypographyEnabled( typographySettings ) {
+	const fluidSettings = typographySettings?.fluid;
+	return (
+		true === fluidSettings ||
+		( typeof fluidSettings === 'object' &&
+			Object.keys( fluidSettings ).length > 0 )
+	);
+}
+
+/**
+ * Returns fluid typography settings from theme.json setting object.
+ *
+ * @param {Object} settings            Theme.json settings
+ * @param {Object} settings.typography Theme.json typography settings
+ * @param {Object} settings.layout     Theme.json layout settings
+ * @return {{fluid: (*&{maxViewPortWidth})}|{fluid: *}} Fluid typography settings
+ */
+export function getFluidTypographyOptionsFromSettings( settings ) {
+	const typographySettings = settings?.typography;
+	const layoutSettings = settings?.layout;
+	return isFluidTypographyEnabled( typographySettings ) &&
+		layoutSettings?.wideSize
+		? {
+				fluid: {
+					maxViewPortWidth: layoutSettings.wideSize,
+					...typographySettings.fluid,
+				},
+		  }
+		: {
+				fluid: typographySettings?.fluid,
+		  };
 }
