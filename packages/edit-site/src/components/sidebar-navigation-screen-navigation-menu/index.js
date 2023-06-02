@@ -22,6 +22,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { moreVertical } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -46,6 +47,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 	const [ isOpen, setOpen ] = useState( false );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const postType = `wp_navigation`;
 	const {
@@ -63,11 +65,19 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const handleSave = async () => {
 		saveEditedEntityRecord( 'postType', postType, postId );
 		setOpen( false );
+		createSuccessNotice( 'Renamed Navigation menu', {
+			type: 'snackbar',
+		} );
 	};
 	const handleChange = ( title ) =>
 		editEntityRecord( 'postType', postType, postId, { title } );
-	const handleDelete = () =>
+	const handleDelete = () => {
 		deleteEntityRecord( 'postType', postType, postId, { force: true } );
+		createSuccessNotice( 'Deleted Navigation menu', {
+			type: 'snackbar',
+		} );
+		//TODO: navigate to previous menu
+	};
 	const handleDuplicate = async () => {
 		const savedRecord = await saveEntityRecord( 'postType', postType, {
 			title: menuTitle,
@@ -75,7 +85,10 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			status: 'publish',
 		} );
 		if ( savedRecord ) {
-			//TODO: add toast message and navigate back?
+			createSuccessNotice( 'Duplicated Navigation menu', {
+				type: 'snackbar',
+			} );
+			//TODO: navigate to the duplicated menu
 		}
 	};
 
