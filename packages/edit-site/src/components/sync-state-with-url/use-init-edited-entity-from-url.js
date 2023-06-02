@@ -31,7 +31,7 @@ export default function useInitEditedEntityFromURL() {
 		};
 	}, [] );
 
-	const { setTemplate, setTemplatePart, setPage, setNavigationMenu } =
+	const { setReusableBlock, setTemplate, setTemplatePart, setPage, setNavigationMenu } =
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
@@ -45,6 +45,9 @@ export default function useInitEditedEntityFromURL() {
 					break;
 				case 'wp_navigation':
 					setNavigationMenu( postId );
+					break;
+				case 'wp_block':
+					setReusableBlock( postId );
 					break;
 				default:
 					setPage( {

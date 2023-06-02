@@ -18,6 +18,7 @@ export function getPathFromURL( urlParams ) {
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
+			case 'wp_block':
 			case 'wp_template':
 			case 'wp_template_part':
 			case 'page':
