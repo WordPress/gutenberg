@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
@@ -40,6 +41,14 @@ function usePatternTitleAndDescription( postType, postId ) {
 			// translators: %s: pattern title e.g: "Header".
 			__( 'This is your %s pattern.' ),
 			getTitle()
+		);
+	}
+
+	if ( ! descriptionText && postType === 'wp_block' && record?.title ) {
+		descriptionText = sprintf(
+			// translators: %s: user created pattern title e.g. "Footer".
+			__( 'This is your %s pattern.' ),
+			record.title
 		);
 	}
 
@@ -82,6 +91,9 @@ export default function SidebarNavigationScreenPattern() {
 	const { params } = useNavigator();
 	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
+	useInitEditedEntityFromURL();
+
 	const { title, description } = usePatternTitleAndDescription(
 		postType,
 		postId

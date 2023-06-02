@@ -177,6 +177,21 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
+ * Action that sets a reusable block.
+ *
+ * @param {string} reusableBlockId The reusable block ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setReusableBlock( reusableBlockId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType: 'wp_block',
+		id: reusableBlockId,
+	};
+}
+
+/**
  * @deprecated
  */
 export function setHomeTemplateId() {
