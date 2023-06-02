@@ -2,12 +2,20 @@
  * WordPress dependencies
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { useEntityProp } from '@wordpress/core-data';
 
-export default function FootnotesEdit( { attributes, setAttributes } ) {
+export default function FootnotesEdit( { context: { postType, postId } } ) {
+	const [ meta, updateMeta ] = useEntityProp(
+		'postType',
+		postType,
+		'meta',
+		postId
+	);
+	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
 	return (
 		<footer { ...useBlockProps() }>
 			<ol>
-				{ attributes.footnotes.map( ( { id, content } ) => (
+				{ footnotes.map( ( { id, content } ) => (
 					<li key={ id }>
 						<RichText
 							id={ id }
@@ -15,16 +23,17 @@ export default function FootnotesEdit( { attributes, setAttributes } ) {
 							value={ content }
 							identifier={ id }
 							onChange={ ( nextFootnote ) => {
-								setAttributes( {
-									footnotes: attributes.footnotes.map(
-										( footnote ) => {
+								updateMeta( {
+									...meta,
+									footnotes: JSON.stringify(
+										footnotes.map( ( footnote ) => {
 											return footnote.id === id
 												? {
 														content: nextFootnote,
 														id,
 												  }
 												: footnote;
-										}
+										} )
 									),
 								} );
 							} }

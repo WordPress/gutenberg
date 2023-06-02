@@ -488,7 +488,7 @@ function _getSaveElement( { name, attributes, innerBlocks } ) {
 	);
 }
 
-export function getRichTextValues( blocks ) {
+export function getRichTextValues( blocks = [] ) {
 	return findContent(
 		( Array.isArray( blocks ) ? blocks : [ blocks ] ).map( _getSaveElement )
 	);

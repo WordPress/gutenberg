@@ -7,6 +7,7 @@
 	"description": "",
 	"keywords": [ "references" ],
 	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"footnotes": {
 			"type": "array",
@@ -28,7 +29,8 @@
 		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"multiple": false
 	},
 	"style": "wp-block-footnotes"
 }
