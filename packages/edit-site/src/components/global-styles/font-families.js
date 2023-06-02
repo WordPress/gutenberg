@@ -18,6 +18,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import FontLibraryModal from './font-library-modal';
+import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 import { unlock } from '../../private-apis';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -63,16 +64,11 @@ function FontFamilies() {
 					</HStack>
 				</HStack>
 				<ItemGroup isBordered isSeparated>
-					{ fonts.map( ( family ) => (
-						<Item key={ family.slug }>
-							<HStack justify="flex-start">
-								<FlexItem
-									style={ { fontFamily: family.fontFamily } }
-								>
-									{ family.name || family.fontFamily }
-								</FlexItem>
-							</HStack>
-						</Item>
+					{ fonts.map( font => (
+						<FontFamilyItem
+							key={ font.slug }
+							font={font}
+						/>
 					) ) }
 				</ItemGroup>
 			</VStack>
