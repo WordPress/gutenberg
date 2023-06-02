@@ -1,10 +1,7 @@
 .edit-site-document-actions {
-	display: flex;
-	align-items: center;
-	gap: $grid-unit;
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr;
 	height: $button-size;
-	padding: $grid-unit;
-	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
 	// subsequently truncate child text, we set an explicit min-width.
@@ -20,29 +17,46 @@
 	}
 }
 
+.edit-site-document-actions__command {
+	grid-column: 1 / -1;
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr;
+	grid-row: 1;
+}
+
+
 .edit-site-document-actions__title {
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
+	grid-column: 2 / 3;
+	&.is-page {
+		color: $gray-800;
+		h1 {
+			color: $gray-800;
+		}
+	}
 
 	h1 {
-		color: var(--wp-block-synced-color);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: var(--wp-block-synced-color);
 	}
 }
 
 .edit-site-document-actions__shortcut {
-	flex-shrink: 0;
 	color: $gray-700;
-	width: #{$grid-unit * 4.5};
+	text-align: right;
 	&:hover {
 		color: $gray-700;
 	}
 }
 
-.edit-site-document-actions__left {
+.edit-site-document-actions__back {
 	min-width: $button-size;
 	flex-shrink: 0;
+	grid-column: 1 / 2;
+	grid-row: 1;
+	z-index: 1;
 }

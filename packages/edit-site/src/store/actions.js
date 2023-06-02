@@ -530,3 +530,21 @@ export const switchEditorMode =
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
+
+/**
+ * Sets whether or not the editor is locked so that only page content can be
+ * edited.
+ *
+ * @param {boolean} hasPageContentLock True to enable lock, false to disable.
+ */
+export const setHasPageContentLock =
+	( hasPageContentLock ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentLock ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_LOCK',
+			hasPageContentLock,
+		} );
+	};

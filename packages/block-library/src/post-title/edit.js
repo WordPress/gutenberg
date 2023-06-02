@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -23,6 +24,9 @@ import { useEntityProp } from '@wordpress/core-data';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
+import { unlock } from '../private-apis';
+
+const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
@@ -58,6 +62,7 @@ export default function PostTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
 	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
 
@@ -112,20 +117,22 @@ export default function PostTitleEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl

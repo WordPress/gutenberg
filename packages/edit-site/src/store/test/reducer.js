@@ -11,6 +11,7 @@ import {
 	editedPost,
 	blockInserterPanel,
 	listViewPanel,
+	hasPageContentLock,
 } from '../reducer';
 
 import { setIsInserterOpened, setIsListViewOpened } from '../actions';
@@ -133,6 +134,49 @@ describe( 'state', () => {
 			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
 				true
 			);
+		} );
+	} );
+
+	describe( 'hasPageContentLocked()', () => {
+		it( 'defaults to false', () => {
+			expect( hasPageContentLock( undefined, {} ) ).toBe( false );
+		} );
+
+		it( 'becomes false when editing a template', () => {
+			expect(
+				hasPageContentLock( true, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+				} )
+			).toBe( false );
+		} );
+
+		it( 'becomes true when editing a page', () => {
+			expect(
+				hasPageContentLock( false, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+					context: {
+						postType: 'page',
+						postId: 123,
+					},
+				} )
+			).toBe( true );
+		} );
+
+		it( 'can be set', () => {
+			expect(
+				hasPageContentLock( false, {
+					type: 'SET_HAS_PAGE_CONTENT_LOCK',
+					hasPageContentLock: true,
+				} )
+			).toBe( true );
+			expect(
+				hasPageContentLock( true, {
+					type: 'SET_HAS_PAGE_CONTENT_LOCK',
+					hasPageContentLock: false,
+				} )
+			).toBe( false );
 		} );
 	} );
 } );
