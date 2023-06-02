@@ -60,6 +60,7 @@ export default function HeaderEditMode() {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
+		isDistractionFree,
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
@@ -99,6 +100,10 @@ export default function HeaderEditMode() {
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
+			isDistractionFree: select( preferencesStore ).get(
+				'core/edit-site',
+				'distractionFree'
+			),
 		};
 	}, [] );
 
@@ -171,19 +176,23 @@ export default function HeaderEditMode() {
 					}
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-site-header-edit-mode__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ preventDefault }
-							onClick={ toggleInserter }
-							disabled={ ! isVisualMode }
-							icon={ plus }
-							label={ showIconLabels ? shortLabel : longLabel }
-							showTooltip={ ! showIconLabels }
-						/>
+						{ ! isDistractionFree && (
+							<ToolbarItem
+								ref={ inserterButton }
+								as={ Button }
+								className="edit-site-header-edit-mode__inserter-toggle"
+								variant="primary"
+								isPressed={ isInserterOpen }
+								onMouseDown={ preventDefault }
+								onClick={ toggleInserter }
+								disabled={ ! isVisualMode }
+								icon={ plus }
+								label={
+									showIconLabels ? shortLabel : longLabel
+								}
+								showTooltip={ ! showIconLabels }
+							/>
+						) }
 						{ isLargeViewport && (
 							<>
 								<ToolbarItem
@@ -208,54 +217,63 @@ export default function HeaderEditMode() {
 										showIconLabels ? 'tertiary' : undefined
 									}
 								/>
-								<ToolbarItem
-									as={ Button }
-									className="edit-site-header-edit-mode__list-view-toggle"
-									disabled={
-										! isVisualMode || isZoomedOutView
-									}
-									icon={ listView }
-									isPressed={ isListViewOpen }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									shortcut={ listViewShortcut }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								{ isZoomedOutViewExperimentEnabled && (
+								{ ! isDistractionFree && (
 									<ToolbarItem
 										as={ Button }
-										className="edit-site-header-edit-mode__zoom-out-view-toggle"
-										icon={ chevronUpDown }
-										isPressed={ isZoomedOutView }
+										className="edit-site-header-edit-mode__list-view-toggle"
+										disabled={
+											! isVisualMode || isZoomedOutView
+										}
+										icon={ listView }
+										isPressed={ isListViewOpen }
 										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'Zoom-out View' ) }
-										onClick={ () => {
-											setPreviewDeviceType( 'desktop' );
-											__unstableSetEditorMode(
-												isZoomedOutView
-													? 'edit'
-													: 'zoom-out'
-											);
-										} }
+										label={ __( 'List View' ) }
+										onClick={ toggleListView }
+										shortcut={ listViewShortcut }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
 									/>
 								) }
+								{ isZoomedOutViewExperimentEnabled &&
+									! isDistractionFree && (
+										<ToolbarItem
+											as={ Button }
+											className="edit-site-header-edit-mode__zoom-out-view-toggle"
+											icon={ chevronUpDown }
+											isPressed={ isZoomedOutView }
+											/* translators: button label text should, if possible, be under 16 characters. */
+											label={ __( 'Zoom-out View' ) }
+											onClick={ () => {
+												setPreviewDeviceType(
+													'desktop'
+												);
+												__unstableSetEditorMode(
+													isZoomedOutView
+														? 'edit'
+														: 'zoom-out'
+												);
+											} }
+										/>
+									) }
 							</>
 						) }
 					</div>
 				</NavigableToolbar>
 			) }
 
-			<div className="edit-site-header-edit-mode__center">
-				{ ! hasDefaultEditorCanvasView ? (
-					getEditorCanvasContainerTitle( editorCanvasView )
-				) : (
-					<DocumentActions />
-				) }
-			</div>
+			{ ! isDistractionFree && (
+				<div className="edit-site-header-edit-mode__center">
+					{ ! hasDefaultEditorCanvasView ? (
+						getEditorCanvasContainerTitle( editorCanvasView )
+					) : (
+						<DocumentActions />
+					) }
+				</div>
+			) }
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
@@ -290,7 +308,9 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<SaveButton />
-					<PinnedItems.Slot scope="core/edit-site" />
+					{ ! isDistractionFree && (
+						<PinnedItems.Slot scope="core/edit-site" />
+					) }
 					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>
 			</div>
