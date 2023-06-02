@@ -3,11 +3,14 @@
  */
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation, useHistory } from '../routes';
+import { unlock } from '../../private-apis';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export function getPathFromURL( urlParams ) {
 	let path = urlParams?.path ?? '/';
@@ -17,6 +20,7 @@ export function getPathFromURL( urlParams ) {
 		switch ( urlParams.postType ) {
 			case 'wp_template':
 			case 'wp_template_part':
+			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType
 				) }/${ encodeURIComponent( urlParams.postId ) }`;
@@ -70,6 +74,15 @@ export default function useSyncPathWithURL() {
 		if ( navigatorParams?.postType && navigatorParams?.postId ) {
 			updateUrlParams( {
 				postType: navigatorParams?.postType,
+				postId: navigatorParams?.postId,
+				path: undefined,
+			} );
+		} else if (
+			navigatorLocation.path.startsWith( '/page/' ) &&
+			navigatorParams?.postId
+		) {
+			updateUrlParams( {
+				postType: 'page',
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );

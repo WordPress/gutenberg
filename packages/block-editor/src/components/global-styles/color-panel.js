@@ -20,7 +20,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,6 +28,7 @@ import { __ } from '@wordpress/i18n';
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable } from './utils';
+import { setImmutably } from '../../utils/object';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -229,6 +230,11 @@ function ColorPanelDropdown( {
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
+						'aria-label': sprintf(
+							/* translators: %s is the type of color property, e.g., "background" */
+							__( 'Color %s styles' ),
+							label
+						),
 					};
 
 					return (
@@ -328,10 +334,13 @@ export default function ColorPanel( {
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColor = () => !! userTextColor;
 	const setTextColor = ( newColor ) => {
-		onChange( {
-			...value,
-			color: { ...value?.color, text: encodeColorValue( newColor ) },
-		} );
+		onChange(
+			setImmutably(
+				value,
+				[ 'color', 'text' ],
+				encodeColorValue( newColor )
+			)
+		);
 	};
 	const resetTextColor = () => setTextColor( undefined );
 
@@ -343,34 +352,31 @@ export default function ColorPanel( {
 	const userGradient = decodeValue( value?.color?.gradient );
 	const hasBackground = () => !! userBackgroundColor || !! userGradient;
 	const setBackgroundColor = ( newColor ) => {
-		onChange( {
-			...value,
-			color: {
-				...value?.color,
-				background: encodeColorValue( newColor ),
-				gradient: undefined,
-			},
-		} );
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'background' ],
+			encodeColorValue( newColor )
+		);
+		newValue.color.gradient = undefined;
+		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
-		onChange( {
-			...value,
-			color: {
-				...value?.color,
-				background: undefined,
-				gradient: encodeGradientValue( newGradient ),
-			},
-		} );
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'gradient' ],
+			encodeGradientValue( newGradient )
+		);
+		newValue.color.background = undefined;
+		onChange( newValue );
 	};
 	const resetBackground = () => {
-		onChange( {
-			...value,
-			color: {
-				...value?.color,
-				background: undefined,
-				gradient: undefined,
-			},
-		} );
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'background' ],
+			undefined
+		);
+		newValue.color.gradient = undefined;
+		onChange( newValue );
 	};
 
 	// Links
@@ -380,19 +386,13 @@ export default function ColorPanel( {
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
 	const setLinkColor = ( newColor ) => {
-		onChange( {
-			...value,
-			elements: {
-				...value?.elements,
-				link: {
-					...value?.elements?.link,
-					color: {
-						...value?.elements?.link?.color,
-						text: encodeColorValue( newColor ),
-					},
-				},
-			},
-		} );
+		onChange(
+			setImmutably(
+				value,
+				[ 'elements', 'link', 'color', 'text' ],
+				encodeColorValue( newColor )
+			)
+		);
 	};
 	const hoverLinkColor = decodeValue(
 		inheritedValue?.elements?.link?.[ ':hover' ]?.color?.text
@@ -401,46 +401,28 @@ export default function ColorPanel( {
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
 	const setHoverLinkColor = ( newColor ) => {
-		onChange( {
-			...value,
-			elements: {
-				...value?.color?.elements,
-				link: {
-					...value?.elements?.link,
-					':hover': {
-						...value?.elements?.link?.[ ':hover' ],
-						color: {
-							...value?.elements?.link?.[ ':hover' ]?.color,
-							text: encodeColorValue( newColor ),
-						},
-					},
-				},
-			},
-		} );
+		onChange(
+			setImmutably(
+				value,
+				[ 'elements', 'link', ':hover', 'color', 'text' ],
+				encodeColorValue( newColor )
+			)
+		);
 	};
 	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
-	const resetLink = () =>
-		onChange( {
-			...value,
-			elements: {
-				...value?.color?.elements,
-				link: {
-					...value?.color?.elements?.link,
-					color: {
-						...value?.color?.elements?.link?.color,
-						text: undefined,
-					},
-					':hover': {
-						...value?.color?.elements?.link?.[ ':hover' ],
-						color: {
-							...value?.color?.elements?.link?.[ ':hover' ]
-								?.color,
-							text: undefined,
-						},
-					},
-				},
-			},
-		} );
+	const resetLink = () => {
+		let newValue = setImmutably(
+			value,
+			[ 'elements', 'link', ':hover', 'color', 'text' ],
+			undefined
+		);
+		newValue = setImmutably(
+			newValue,
+			[ 'elements', 'link', 'color', 'text' ],
+			undefined
+		);
+		onChange( newValue );
+	};
 
 	// Elements
 	const elements = [
@@ -614,69 +596,42 @@ export default function ColorPanel( {
 				elementGradientUserColor
 			);
 		const resetElement = () => {
-			onChange( {
-				...value,
-				elements: {
-					...value?.elements,
-					[ name ]: {
-						...value?.elements?.[ name ],
-						color: {
-							...value?.elements?.[ name ]?.color,
-							background: undefined,
-							gradient: undefined,
-							text: undefined,
-						},
-					},
-				},
-			} );
+			const newValue = setImmutably(
+				value,
+				[ 'elements', name, 'color', 'background' ],
+				undefined
+			);
+			newValue.elements[ name ].color.gradient = undefined;
+			newValue.elements[ name ].color.text = undefined;
+			onChange( newValue );
 		};
 
-		const setElementTextColor = ( newValue ) => {
-			onChange( {
-				...value,
-				elements: {
-					...value?.elements,
-					[ name ]: {
-						...value?.elements?.[ name ],
-						color: {
-							...value?.elements?.[ name ]?.color,
-							text: encodeColorValue( newValue ),
-						},
-					},
-				},
-			} );
+		const setElementTextColor = ( newTextColor ) => {
+			onChange(
+				setImmutably(
+					value,
+					[ 'elements', name, 'color', 'text' ],
+					encodeColorValue( newTextColor )
+				)
+			);
 		};
-		const setElementBackgroundColor = ( newValue ) => {
-			onChange( {
-				...value,
-				elements: {
-					...value?.elements,
-					[ name ]: {
-						...value?.elements?.[ name ],
-						color: {
-							...value?.elements?.[ name ]?.color,
-							background: encodeColorValue( newValue ),
-							gradient: undefined,
-						},
-					},
-				},
-			} );
+		const setElementBackgroundColor = ( newBackgroundColor ) => {
+			const newValue = setImmutably(
+				value,
+				[ 'elements', name, 'color', 'background' ],
+				encodeColorValue( newBackgroundColor )
+			);
+			newValue.elements[ name ].color.gradient = undefined;
+			onChange( newValue );
 		};
-		const setElementGradient = ( newValue ) => {
-			onChange( {
-				...value,
-				elements: {
-					...value?.elements,
-					[ name ]: {
-						...value?.elements?.[ name ],
-						color: {
-							...value?.elements?.[ name ]?.color,
-							gradient: encodeGradientValue( newValue ),
-							background: undefined,
-						},
-					},
-				},
-			} );
+		const setElementGradient = ( newGradient ) => {
+			const newValue = setImmutably(
+				value,
+				[ 'elements', name, 'color', 'gradient' ],
+				encodeGradientValue( newGradient )
+			);
+			newValue.elements[ name ].color.background = undefined;
+			onChange( newValue );
 		};
 		const supportsTextColor = true;
 		// Background color is not supported for `caption`

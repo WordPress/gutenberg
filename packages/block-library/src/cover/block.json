@@ -4,7 +4,7 @@
 	"name": "core/cover",
 	"title": "Cover",
 	"category": "media",
-	"description": "Add an image or video with a text overlay — great for headers.",
+	"description": "Add an image or video with a text overlay.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {
@@ -92,6 +92,18 @@
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
 		"color": {

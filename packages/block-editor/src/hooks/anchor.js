@@ -12,6 +12,7 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -73,6 +74,7 @@ export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
 			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+			const blockEditingMode = useBlockEditingMode();
 
 			if ( hasAnchor && props.isSelected ) {
 				const isWeb = Platform.OS === 'web';
@@ -90,7 +92,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								{ isWeb && (
 									<ExternalLink
 										href={ __(
-											'https://wordpress.org/support/article/page-jumps/'
+											'https://wordpress.org/documentation/article/page-jumps/'
 										) }
 									>
 										{ __( 'Learn more about anchors' ) }
@@ -114,7 +116,7 @@ export const withInspectorControl = createHigherOrderComponent(
 				return (
 					<>
 						<BlockEdit { ...props } />
-						{ isWeb && (
+						{ isWeb && blockEditingMode === 'default' && (
 							<InspectorControls group="advanced">
 								{ textControl }
 							</InspectorControls>

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
@@ -79,7 +74,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
-	isContentLocked,
+	blockEditingMode,
 } ) {
 	const {
 		url = '',
@@ -122,7 +117,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, clientId ]
+		[ id, isSelected ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -161,9 +156,10 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
-		! isContentLocked &&
+		hasNonContentControls &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
@@ -332,13 +328,13 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
@@ -407,19 +403,18 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 										{ __(
-											'Describe the purpose of the image'
+											'Describe the purpose of the image.'
 										) }
 									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
 								</>
 							}
 						/>
@@ -434,6 +429,9 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							'Select the size of the source image.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -478,7 +476,8 @@ export default function Image( {
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 	const hasCustomBorder =
-		!! borderProps.className || ! isEmpty( borderProps.style );
+		!! borderProps.className ||
+		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but

@@ -1,6 +1,6 @@
 # Edit and Save
 
-When registering a block, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
+When registering a block with JavaScript on the client, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
 
 ## Edit
 

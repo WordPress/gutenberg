@@ -916,8 +916,8 @@ test.describe( 'Multi-block selection', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const navButtons = listView.getByRole( 'gridcell', {
-			name: 'Paragraph link',
+		const navButtons = listView.getByRole( 'link', {
+			name: 'Paragraph',
 		} );
 
 		await navButtons.nth( 1 ).click();
@@ -954,9 +954,7 @@ test.describe( 'Multi-block selection', () => {
 
 		// Move focus to the list view link to prepare for the keyboard navigation.
 		await navButtons.nth( 3 ).click();
-		await expect(
-			navButtons.nth( 3 ).getByRole( 'link', { includeHidden: true } )
-		).toBeFocused();
+		await expect( navButtons.nth( 3 ) ).toBeFocused();
 		// Press Up twice to highlight the second block.
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 

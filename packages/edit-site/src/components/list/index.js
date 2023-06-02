@@ -7,6 +7,7 @@ import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { EditorSnackbars } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -14,8 +15,10 @@ import { EditorSnackbars } from '@wordpress/editor';
 import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
 import Table from './table';
-import { useLocation } from '../routes';
 import useTitle from '../routes/use-title';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function List() {
 	const {

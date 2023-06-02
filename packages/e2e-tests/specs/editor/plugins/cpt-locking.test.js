@@ -41,9 +41,7 @@ describe( 'cpt locking', () => {
 		);
 		await clickBlockToolbarButton( 'Options' );
 		expect(
-			await page.$x(
-				'//button/span[contains(text(), "Remove Paragraph")]'
-			)
+			await page.$x( '//button/span[contains(text(), "Delete")]' )
 		).toHaveLength( 0 );
 	};
 
@@ -180,7 +178,7 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove Paragraph' );
+			await clickMenuItem( 'Delete' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
@@ -200,7 +198,7 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove Paragraph' );
+			await clickMenuItem( 'Delete' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

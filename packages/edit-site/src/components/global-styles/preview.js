@@ -117,7 +117,6 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 			{ isReady && (
 				<Iframe
 					className="edit-site-global-styles-preview__iframe"
-					head={ <EditorStyles styles={ editorStyles } /> }
 					style={ {
 						height: normalizedHeight * ratio,
 					} }
@@ -125,12 +124,13 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 					onMouseLeave={ () => setIsHovered( false ) }
 					tabIndex={ -1 }
 				>
+					<EditorStyles styles={ editorStyles } />
 					<motion.div
 						style={ {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: 'pointer',
+							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={

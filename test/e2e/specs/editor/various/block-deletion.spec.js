@@ -41,9 +41,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -90,9 +88,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure the paragraph was removed.
 		await expect
@@ -321,9 +317,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure an empty block was created and focused.
 		await expect(

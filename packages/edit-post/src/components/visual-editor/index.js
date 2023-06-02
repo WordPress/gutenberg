@@ -31,11 +31,9 @@ import {
 	__experimentaluseLayoutStyles as useLayoutStyles,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
-import { arrowLeft } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -67,12 +65,12 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
 			name="editor-canvas"
 		>
+			<EditorStyles styles={ styles } />
 			{ children }
 		</Iframe>
 	);
@@ -160,17 +158,21 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
-		useSelect( ( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-				themeSupportsLayout: _settings.supportsLayout,
-				isFocusMode: _settings.focusMode,
-			};
-		}, [] );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	const {
+		hasRootPaddingAwareAlignments,
+		isFocusMode,
+		themeHasDisabledLayoutStyles,
+		themeSupportsLayout,
+	} = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+			themeSupportsLayout: _settings.supportsLayout,
+			isFocusMode: _settings.focusMode,
+			hasRootPaddingAwareAlignments:
+				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+		};
+	}, [] );
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
@@ -255,7 +257,7 @@ export default function VisualEditor( { styles } ) {
 		postContentAttributes,
 	] );
 
-	const layout = newestPostContentAttributes?.layout || {};
+	const { layout = {}, align = '' } = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -266,7 +268,8 @@ export default function VisualEditor( { styles } ) {
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
-		themeSupportsLayout && postContentLayoutClasses
+		themeSupportsLayout && postContentLayoutClasses,
+		align && `align${ align }`
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
@@ -321,6 +324,12 @@ export default function VisualEditor( { styles } ) {
 		[ styles ]
 	);
 
+	// Add some styles for alignwide/alignfull Post Content and its children.
+	const alignCSS = `.is-root-container.alignwide { max-width: var(--wp--style--global--wide-size); margin-left: auto; margin-right: auto;}
+		.is-root-container.alignwide:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: var(--wp--style--global--wide-size);}
+		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
+		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
@@ -336,18 +345,6 @@ export default function VisualEditor( { styles } ) {
 				} }
 				ref={ blockSelectionClearerRef }
 			>
-				{ isTemplateMode && (
-					<Button
-						className="edit-post-visual-editor__exit-template-mode"
-						icon={ arrowLeft }
-						onClick={ () => {
-							clearSelectedBlock();
-							setIsEditingTemplate( false );
-						} }
-					>
-						{ __( 'Back' ) }
-					</Button>
-				) }
 				<motion.div
 					animate={ animatedStyles }
 					initial={ desktopCanvasStyles }
@@ -376,6 +373,9 @@ export default function VisualEditor( { styles } ) {
 											globalLayoutSettings?.definitions
 										}
 									/>
+									{ align && (
+										<LayoutStyle css={ alignCSS } />
+									) }
 									{ postContentLayoutStyles && (
 										<LayoutStyle
 											layout={ postContentLayout }
@@ -393,8 +393,9 @@ export default function VisualEditor( { styles } ) {
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
-									},
-									'is-layout-flow'
+										'has-global-padding':
+											hasRootPaddingAwareAlignments,
+									}
 								) }
 								contentEditable={ false }
 							>

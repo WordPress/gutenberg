@@ -9,9 +9,9 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -42,7 +42,7 @@ import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
-import ResizableCover from './resizable-cover';
+import ResizableCoverPopover from './resizable-cover-popover';
 
 extend( [ namesPlugin ] );
 
@@ -146,6 +146,14 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
+	const [ resizeListener, { height, width } ] = useResizeObserver();
+	const resizableBoxDimensions = useMemo( () => {
+		return {
+			height: minHeightUnit === 'px' ? minHeight : 'auto',
+			width: 'auto',
+		};
+	}, [ minHeight, minHeightUnit ] );
+
 	const minHeightWithUnit =
 		minHeight && minHeightUnit
 			? `${ minHeight }${ minHeightUnit }`
@@ -246,24 +254,50 @@ function CoverEdit( {
 		/>
 	);
 
+	const resizableCoverProps = {
+		className: 'block-library-cover__resize-container',
+		clientId,
+		height,
+		minHeight: minHeightWithUnit,
+		onResizeStart: () => {
+			setAttributes( { minHeightUnit: 'px' } );
+			toggleSelection( false );
+		},
+		onResize: ( value ) => {
+			setAttributes( { minHeight: value } );
+		},
+		onResizeStop: ( newMinHeight ) => {
+			toggleSelection( true );
+			setAttributes( { minHeight: newMinHeight } );
+		},
+		showHandle: true,
+		size: resizableBoxDimensions,
+		width,
+	};
+
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ blockControls }
 				{ inspectorControls }
+				{ isSelected && (
+					<ResizableCoverPopover { ...resizableCoverProps } />
+				) }
 				<TagName
 					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
 						blockProps.className
 					) }
+					style={ {
+						...blockProps.style,
+						minHeight: minHeightWithUnit || undefined,
+					} }
 				>
+					{ resizeListener }
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
 						onError={ onUploadError }
-						style={ {
-							minHeight: minHeightWithUnit || undefined,
-						} }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
@@ -275,21 +309,6 @@ function CoverEdit( {
 							/>
 						</div>
 					</CoverPlaceholder>
-					<ResizableCover
-						className="block-library-cover__resize-container"
-						onResizeStart={ () => {
-							setAttributes( { minHeightUnit: 'px' } );
-							toggleSelection( false );
-						} }
-						onResize={ ( value ) => {
-							setAttributes( { minHeight: value } );
-						} }
-						onResizeStop={ ( newMinHeight ) => {
-							toggleSelection( true );
-							setAttributes( { minHeight: newMinHeight } );
-						} }
-						showHandle={ isSelected }
-					/>
 				</TagName>
 			</>
 		);
@@ -318,22 +337,7 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
-				<ResizableCover
-					className="block-library-cover__resize-container"
-					onResizeStart={ () => {
-						setAttributes( { minHeightUnit: 'px' } );
-						toggleSelection( false );
-					} }
-					onResize={ ( value ) => {
-						setAttributes( { minHeight: value } );
-					} }
-					onResizeStop={ ( newMinHeight ) => {
-						toggleSelection( true );
-						setAttributes( { minHeight: newMinHeight } );
-					} }
-					showHandle={ isSelected }
-				/>
-
+				{ resizeListener }
 				{ ( ! useFeaturedImage || url ) && (
 					<span
 						aria-hidden="true"
@@ -404,6 +408,9 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
+			{ isSelected && (
+				<ResizableCoverPopover { ...resizableCoverProps } />
+			) }
 		</>
 	);
 }

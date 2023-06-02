@@ -4,26 +4,30 @@
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, postType } = {} } = useLocation();
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
-		const { getSite } = select( coreDataStore );
+		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
+		const base = getUnstableBase();
 
 		return {
-			isRequestingSite: ! siteData,
+			isRequestingSite: ! base,
 			homepageId:
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
-			url: siteData?.url,
+			url: base?.home,
 		};
 	}, [] );
 

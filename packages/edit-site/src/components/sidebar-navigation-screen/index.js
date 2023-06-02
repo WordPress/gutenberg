@@ -5,9 +5,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -16,12 +18,18 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 import SidebarButton from '../sidebar-button';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
+	meta,
 	content,
+	footer,
 	description,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
@@ -30,33 +38,64 @@ export default function SidebarNavigationScreen( {
 			dashboardLink: getSettings().__experimentalDashboardLink,
 		};
 	}, [] );
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
 
 	return (
-		<VStack spacing={ 2 }>
+		<VStack spacing={ 0 }>
 			<HStack
 				spacing={ 4 }
-				justify="flex-start"
+				alignment="flex-start"
 				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
 				{ ! isRoot ? (
 					<NavigatorToParentButton
 						as={ SidebarButton }
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Back' ) }
+						label={ __( 'Back' ) }
 					/>
 				) : (
 					<SidebarButton
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Navigate to the Dashboard' ) }
-						href={ dashboardLink || 'index.php' }
-						label={ __( 'Dashboard' ) }
+						label={
+							! isPreviewingTheme()
+								? __( 'Go back to the Dashboard' )
+								: __( 'Go back to the theme showcase' )
+						}
+						href={
+							! isPreviewingTheme()
+								? dashboardLink || 'index.php'
+								: 'themes.php'
+						}
 					/>
 				) }
-				<h2 className="edit-site-sidebar-navigation-screen__title">
-					{ title }
-				</h2>
-				{ actions }
+				<Heading
+					className="edit-site-sidebar-navigation-screen__title"
+					color={ 'white' }
+					level={ 2 }
+					size={ 20 }
+				>
+					{ ! isPreviewingTheme()
+						? title
+						: sprintf(
+								'Previewing %1$s: %2$s',
+								theme?.name?.rendered,
+								title
+						  ) }
+				</Heading>
+				{ actions && (
+					<div className="edit-site-sidebar-navigation-screen__actions">
+						{ actions }
+					</div>
+				) }
 			</HStack>
+			{ meta && (
+				<>
+					<div className="edit-site-sidebar-navigation-screen__meta">
+						{ meta }
+					</div>
+				</>
+			) }
 
 			<nav className="edit-site-sidebar-navigation-screen__content">
 				{ description && (
@@ -66,6 +105,11 @@ export default function SidebarNavigationScreen( {
 				) }
 				{ content }
 			</nav>
+			{ footer && (
+				<footer className="edit-site-sidebar-navigation-screen__sticky-section">
+					{ footer }
+				</footer>
+			) }
 		</VStack>
 	);
 }

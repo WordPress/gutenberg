@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
+-   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
+
+## 4.2.0 (2023-05-24)
+
+## 4.1.0 (2023-05-10)
+
+## 4.0.0 (2023-04-26)
+
+### Breaking Change
+
+-   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
+
+## 3.31.0 (2023-04-12)
+
+## 3.30.0 (2023-03-29)
+
 ## 3.29.0 (2023-03-15)
 
 ## 3.28.0 (2023-03-01)

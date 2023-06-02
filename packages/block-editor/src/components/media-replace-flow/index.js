@@ -59,6 +59,9 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	popoverProps = {
+		variant: 'toolbar',
+	},
 } ) => {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
@@ -136,13 +139,9 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
-	const POPOVER_PROPS = {
-		variant: 'toolbar',
-	};
-
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={ popoverProps }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarButton

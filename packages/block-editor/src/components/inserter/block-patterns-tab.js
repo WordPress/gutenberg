@@ -28,6 +28,8 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
+const noop = () => {};
+
 // Preferred order of pattern categories. Any other categories should
 // be at the bottom without any re-ordering.
 const patternCategoriesOrder = [
@@ -134,7 +136,7 @@ export function BlockPatternsCategoryDialog( {
 export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
-	onHover,
+	onHover = noop,
 	category,
 	showTitlesAsTooltip,
 } ) {

@@ -4,7 +4,11 @@ export {
 	useGlobalStyle,
 	useSettingsForBlockElement,
 } from './hooks';
-export { useGlobalStylesOutput } from './use-global-styles-output';
+export { getBlockCSSSelector } from './get-block-css-selector';
+export {
+	useGlobalStylesOutput,
+	useGlobalStylesOutputWithConfig,
+} from './use-global-styles-output';
 export { GlobalStylesContext } from './context';
 export {
 	default as TypographyPanel,
@@ -16,3 +20,7 @@ export {
 } from './dimensions-panel';
 export { default as BorderPanel, useHasBorderPanel } from './border-panel';
 export { default as ColorPanel, useHasColorPanel } from './color-panel';
+export { default as EffectsPanel, useHasEffectsPanel } from './effects-panel';
+export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';
+export { default as AdvancedPanel } from './advanced-panel';
+export { areGlobalStyleConfigsEqual } from './utils';

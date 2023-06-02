@@ -22,6 +22,7 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
+			bugfixes: true,
 			include: [
 				'proposal-nullish-coalescing-operator',
 				'proposal-logical-assignment-operators',

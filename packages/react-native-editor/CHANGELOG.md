@@ -10,6 +10,37 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+
+## 1.96.1
+-   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
+
+## 1.96.0
+-   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+-   [*] Add disabled style to `Cell` component [#50665]
+-   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
+-   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
+
+## 1.95.0
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [*] Use host app namespace in reusable block message [#50478]
+-   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
+
+## 1.94.0
+-   [*] Split pasted content between title and body. [#37169]
+
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
+## 1.93.0
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
+## 1.92.0
+* No User facing changes *
 
 ## 1.91.0
 -   [*] Allow new block transformations for most blocks. [#48792]

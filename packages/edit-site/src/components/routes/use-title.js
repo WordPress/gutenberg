@@ -7,11 +7,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from './index';
+import { unlock } from '../../private-apis';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function useTitle( title ) {
 	const location = useLocation();

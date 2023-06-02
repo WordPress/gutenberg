@@ -10,31 +10,10 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
 import { areBlocksDirty } from './are-blocks-dirty';
+import { DEFAULT_BLOCK, ALLOWED_BLOCKS } from '../constants';
 
 const EMPTY_OBJECT = {};
-const DRAFT_MENU_PARAMS = [
-	'postType',
-	'wp_navigation',
-	{ status: 'draft', per_page: -1 },
-];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
 
 export default function UnsavedInnerBlocks( {
 	blocks,
@@ -90,83 +69,64 @@ export default function UnsavedInnerBlocks( {
 		}
 	);
 
-	const { isSaving, hasResolvedDraftNavigationMenus } = useSelect(
+	const { isSaving, hasResolvedAllNavigationMenus } = useSelect(
 		( select ) => {
 			if ( isDisabled ) {
 				return EMPTY_OBJECT;
 			}
 
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				isSavingEntityRecord,
-			} = select( coreStore );
+			const { hasFinishedResolution, isSavingEntityRecord } =
+				select( coreStore );
 
 			return {
 				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-				draftNavigationMenus: getEntityRecords(
-					// This is needed so that hasResolvedDraftNavigationMenus gives the correct status.
-					...DRAFT_MENU_PARAMS
-				),
-				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+				hasResolvedAllNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
-					DRAFT_MENU_PARAMS
+					[
+						'postType',
+						'wp_navigation',
+						{ per_page: -1, status: [ 'publish', 'draft' ] },
+					]
 				),
 			};
 		},
 		[ isDisabled ]
 	);
 
-	const { hasResolvedNavigationMenus } = useNavigationMenu();
-
 	// Automatically save the uncontrolled blocks.
-	useEffect(
-		() => {
-			// The block will be disabled when used in a BlockPreview.
-			// In this case avoid automatic creation of a wp_navigation post.
-			// Otherwise the user will be spammed with lots of menus!
-			//
-			// Also ensure other navigation menus have loaded so an
-			// accurate name can be created.
-			//
-			// Don't try saving when another save is already
-			// in progress.
-			//
-			// And finally only create the menu when the block is selected,
-			// which is an indication they want to start editing.
-			if (
-				isDisabled ||
-				isSaving ||
-				! hasResolvedDraftNavigationMenus ||
-				! hasResolvedNavigationMenus ||
-				! hasSelection ||
-				! innerBlocksAreDirty
-			) {
-				return;
-			}
+	useEffect( () => {
+		// The block will be disabled when used in a BlockPreview.
+		// In this case avoid automatic creation of a wp_navigation post.
+		// Otherwise the user will be spammed with lots of menus!
+		//
+		// Also ensure other navigation menus have loaded so an
+		// accurate name can be created.
+		//
+		// Don't try saving when another save is already
+		// in progress.
+		//
+		// And finally only create the menu when the block is selected,
+		// which is an indication they want to start editing.
+		if (
+			isDisabled ||
+			isSaving ||
+			! hasResolvedAllNavigationMenus ||
+			! hasSelection ||
+			! innerBlocksAreDirty
+		) {
+			return;
+		}
 
-			createNavigationMenu( null, blocks );
-		},
-		/* The dependency "blocks" is intentionally omitted here.
-		 * This is because making blocks a dependency would cause
-		 * createNavigationMenu to run on every block change whereas
-		 * we only want it to run when the blocks are first detected
-		 * as dirty.
-		 * A better solution might be to add a hard saving lock using
-		 * a ref to avoid having to disbale theses eslint rules.
-		 */
-		/* eslint-disable react-hooks/exhaustive-deps */
-		[
-			createNavigationMenu,
-			isDisabled,
-			isSaving,
-			hasResolvedDraftNavigationMenus,
-			hasResolvedNavigationMenus,
-			innerBlocksAreDirty,
-			hasSelection,
-		]
-		/* eslint-enable react-hooks/exhaustive-deps */
-	);
+		createNavigationMenu( null, blocks );
+	}, [
+		blocks,
+		createNavigationMenu,
+		isDisabled,
+		isSaving,
+		hasResolvedAllNavigationMenus,
+		innerBlocksAreDirty,
+		hasSelection,
+	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';
 

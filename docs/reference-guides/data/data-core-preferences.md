@@ -8,8 +8,7 @@ Namespace: `core/preferences`.
 
 ### get
 
-Returns a boolean indicating whether a prefer is active for a particular
-scope.
+Returns a boolean indicating whether a prefer is active for a particular scope.
 
 _Parameters_
 
@@ -29,8 +28,7 @@ _Returns_
 
 ### set
 
-Returns an action object used in signalling that a preference should be set
-to a value
+Returns an action object used in signalling that a preference should be set to a value
 
 _Parameters_
 
@@ -44,8 +42,7 @@ _Returns_
 
 ### setDefaults
 
-Returns an action object used in signalling that preference defaults should
-be set.
+Returns an action object used in signalling that preference defaults should be set.
 
 _Parameters_
 
@@ -65,9 +62,7 @@ When a persistence layer is set, the preferences store will:
 -   call `get` immediately and update the store state to the value returned.
 -   call `set` with all preferences whenever a preference changes value.
 
-`setPersistenceLayer` should ideally be dispatched at the start of an
-application's lifecycle, before any other actions have been dispatched to
-the preferences store.
+`setPersistenceLayer` should ideally be dispatched at the start of an application's lifecycle, before any other actions have been dispatched to the preferences store.
 
 _Parameters_
 
@@ -79,8 +74,7 @@ _Returns_
 
 ### toggle
 
-Returns an action object used in signalling that a preference should be
-toggled.
+Returns an action object used in signalling that a preference should be toggled.
 
 _Parameters_
 

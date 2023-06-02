@@ -93,7 +93,8 @@ function useToolbarFocus(
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
-	onIndexChange
+	onIndexChange,
+	shouldUseKeyboardFocusShortcut
 ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
@@ -103,8 +104,14 @@ function useToolbarFocus(
 		focusFirstTabbableIn( ref.current );
 	}, [] );
 
+	const focusToolbarViaShortcut = () => {
+		if ( shouldUseKeyboardFocusShortcut ) {
+			focusToolbar();
+		}
+	};
+
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
-	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
+	useShortcut( 'core/block-editor/focus-toolbar', focusToolbarViaShortcut );
 
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
@@ -147,6 +154,7 @@ function useToolbarFocus(
 function NavigableToolbar( {
 	children,
 	focusOnMount,
+	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
 	...props
@@ -159,7 +167,8 @@ function NavigableToolbar( {
 		focusOnMount,
 		isAccessibleToolbar,
 		initialIndex,
-		onIndexChange
+		onIndexChange,
+		shouldUseKeyboardFocusShortcut
 	);
 
 	if ( isAccessibleToolbar ) {

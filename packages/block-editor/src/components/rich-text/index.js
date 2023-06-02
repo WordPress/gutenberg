@@ -66,7 +66,6 @@ function removeNativeProps( props ) {
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -403,7 +402,7 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
-					useFirefoxCompat(),
+					useFirefoxCompat( { value, onChange } ),
 					anchorRef,
 				] ) }
 				contentEditable={ true }

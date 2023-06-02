@@ -339,7 +339,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -396,7 +396,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -441,7 +441,7 @@ test.describe( 'Image', () => {
 
 		// Wait for the cropping tools to disappear.
 		await expect(
-			page.locator( 'role=button[name="Apply"i]' )
+			page.locator( 'role=button[name="Save"i]' )
 		).toBeHidden();
 
 		// Assert that the image is edited.
@@ -498,7 +498,7 @@ test.describe( 'Image', () => {
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Apply"i]' );
+			await page.click( 'role=button[name="Save"i]' );
 
 			const regex = new RegExp(
 				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
@@ -537,6 +537,383 @@ test.describe( 'Image', () => {
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->` );
+	} );
+
+	test( 'can be replaced by dragging-and-dropping images from the inserter', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		async function openMediaTab() {
+			const blockInserter = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const isClosed =
+				( await blockInserter.getAttribute( 'aria-pressed' ) ) ===
+				'false';
+
+			if ( isClosed ) {
+				await blockInserter.click();
+			}
+
+			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
+
+			await blockLibrary
+				.getByRole( 'tabpanel', { name: 'Media' } )
+				.getByRole( 'button', { name: 'Openverse' } )
+				.click();
+		}
+
+		await openMediaTab();
+
+		// Drag the first image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.first()
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should update the image from the media inserter' ).toPass();
+		const [
+			{
+				attributes: { url: firstUrl },
+			},
+		] = await editor.getBlocks();
+
+		await openMediaTab();
+
+		// Drag the second image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.nth( 1 )
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect( url ).not.toBe( firstUrl );
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should replace the original image with the second image' ).toPass();
+	} );
+
+	test( 'should allow dragging and dropping HTML to media placeholder', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const html = `
+			<figure>
+				<img src="https://live.staticflickr.com/3894/14962688165_04759a8b03_b.jpg" alt="Cat">
+				<figcaption>"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.</figcaption>
+			</figure>
+		`;
+
+		await page.evaluate( ( _html ) => {
+			const dummy = document.createElement( 'div' );
+			dummy.style.width = '10px';
+			dummy.style.height = '10px';
+			dummy.style.zIndex = 99999;
+			dummy.style.position = 'fixed';
+			dummy.style.top = 0;
+			dummy.style.left = 0;
+			dummy.draggable = 'true';
+			dummy.addEventListener( 'dragstart', ( event ) => {
+				event.dataTransfer.setData( 'text/html', _html );
+				setTimeout( () => {
+					dummy.remove();
+				}, 0 );
+			} );
+			document.body.appendChild( dummy );
+		}, html );
+
+		await page.mouse.move( 0, 0 );
+		await page.mouse.down();
+		await imageBlock.hover();
+		await page.mouse.up();
+
+		const host = new URL( page.url() ).host;
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					link: expect.stringContaining( host ),
+					url: expect.stringContaining( host ),
+					id: expect.any( Number ),
+					alt: 'Cat',
+					caption: `"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.`,
+				},
+			},
+		] );
+		const url = ( await editor.getBlocks() )[ 0 ].attributes.url;
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			url
+		);
+	} );
+
+	test( 'should appear in the frontend published post content', async ( {
+		editor,
+		imageBlockUtils,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
+	} );
+} );
+
+test.describe( 'Image - interactivity', () => {
+	let filename = null;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.beforeEach( async ( { admin, page, editor, imageBlockUtils } ) => {
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( true );
+
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
+
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = page.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		const image = imageBlock.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		await editor.openDocumentSettingsSidebar();
+	} );
+
+	test.afterEach( async ( { requestUtils, admin, page } ) => {
+		await requestUtils.deleteAllMedia();
+
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+
+		await page.locator( `input[name="submit"]` ).click();
+
+		await page.waitForLoadState();
+	} );
+
+	test( 'should toggle "lightbox" in saved attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
+
+		let blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes ).toMatchObject( {
+			behaviors: { lightbox: true },
+			linkDestination: 'none',
+		} );
+		expect( blocks[ 0 ].attributes.url ).toContain( filename );
+
+		await page.getByLabel( 'Behaviors' ).selectOption( '' );
+		blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes ).toMatchObject( {
+			behaviors: { lightbox: false },
+			linkDestination: 'none',
+		} );
+		expect( blocks[ 0 ].attributes.url ).toContain( filename );
+	} );
+
+	test( 'should open and close the image in a lightbox using the mouse', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const lightbox = page.locator( '.wp-lightbox-overlay' );
+		await expect( lightbox ).toBeHidden();
+
+		const image = lightbox.locator( 'img' );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
+
+		await expect( lightbox ).toBeVisible();
+
+		const closeButton = lightbox.getByRole( 'button', {
+			name: 'Close',
+		} );
+		await closeButton.click();
+
+		await expect( lightbox ).toBeHidden();
+	} );
+
+	test.describe( 'keyboard navigation', () => {
+		let openLightboxButton;
+		let lightbox;
+		let closeButton;
+
+		test.beforeEach( async ( { page, editor } ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Behaviors' } )
+				.selectOption( 'lightbox' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			openLightboxButton = page.getByRole( 'button', {
+				name: 'Enlarge image',
+			} );
+			lightbox = page.getByRole( 'dialog' );
+			closeButton = lightbox.getByRole( 'button', {
+				name: 'Close',
+			} );
+		} );
+
+		test( 'should open and focus appropriately using enter key', async ( {
+			page,
+		} ) => {
+			// Open and close lightbox using the close button
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using enter key on close button', async ( {
+			page,
+		} ) => {
+			// Open and close lightbox using the close button
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
+		} );
+
+		test( 'should close and focus appropriately using escape key', async ( {
+			page,
+		} ) => {
+			await openLightboxButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( lightbox ).toBeVisible();
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( lightbox ).toBeHidden();
+			await expect( openLightboxButton ).toBeFocused();
+		} );
+
+		// TO DO: Add these tests, which will involve adding a caption
+		// to uploaded test images
+		// test( 'should trap focus appropriately when using tab', async ( {
+		// 	page,
+		// } ) => {
+
+		// } );
+
+		// test( 'should trap focus appropriately using shift+tab', async ( {
+		// 	page,
+		// } ) => {
+
+		// } );
 	} );
 } );
 

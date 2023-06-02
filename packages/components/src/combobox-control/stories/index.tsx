@@ -65,7 +65,6 @@ const Template: ComponentStory< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__next36pxDefaultSize: false,
 	allowReset: false,
 	label: 'Select a country',
 	options: countryOptions,

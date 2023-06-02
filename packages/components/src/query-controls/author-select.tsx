@@ -27,6 +27,7 @@ export default function AuthorSelect( {
 					? String( selectedAuthorId )
 					: undefined
 			}
+			__nextHasNoMarginBottom
 		/>
 	);
 }

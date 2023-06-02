@@ -60,13 +60,35 @@ function ColumnsEditContainer( {
 } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 
-	const { count, canInsertColumnBlock } = useSelect(
+	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
+			const {
+				canInsertBlockType,
+				canRemoveBlock,
+				getBlocks,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+
+			// Get the indexes of columns for which removal is prevented.
+			// The highest index will be used to determine the minimum column count.
+			const preventRemovalBlockIndexes = innerBlocks.reduce(
+				( acc, block, index ) => {
+					if ( ! canRemoveBlock( block.clientId ) ) {
+						acc.push( index );
+					}
+					return acc;
+				},
+				[]
+			);
+
 			return {
-				count: select( blockEditorStore ).getBlockCount( clientId ),
-				canInsertColumnBlock: select(
-					blockEditorStore
-				).canInsertBlockType( 'core/column', clientId ),
+				count: getBlockCount( clientId ),
+				canInsertColumnBlock: canInsertBlockType(
+					'core/column',
+					clientId
+				),
+				minCount: Math.max( ...preventRemovalBlockIndexes ) + 1,
 			};
 		},
 		[ clientId ]
@@ -104,9 +126,12 @@ function ColumnsEditContainer( {
 								label={ __( 'Columns' ) }
 								value={ count }
 								onChange={ ( value ) =>
-									updateColumns( count, value )
+									updateColumns(
+										count,
+										Math.max( minCount, value )
+									)
 								}
-								min={ 1 }
+								min={ Math.max( 1, minCount ) }
 								max={ Math.max( 6, count ) }
 							/>
 							{ count > 6 && (
@@ -214,13 +239,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 						return createBlock( 'core/column' );
 					} ),
 				];
-			} else {
+			} else if ( newColumns < previousColumns ) {
 				// The removed column will be the last of the inner blocks.
 				innerBlocks = innerBlocks.slice(
 					0,
 					-( previousColumns - newColumns )
 				);
-
 				if ( hasExplicitWidths ) {
 					// Redistribute as if block is already removed.
 					const widths = getRedistributedColumnWidths(

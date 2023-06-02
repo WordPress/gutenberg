@@ -91,7 +91,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }.")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -109,19 +109,9 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		let elementType;
-		switch ( blockName ) {
-			case blockNames.cover:
-				elementType = 'XCUIElementTypeButton';
-				break;
-			default:
-				elementType = 'XCUIElementTypeOther';
-				break;
-		}
-
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-			: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[2]`;
 
 		await waitForVisible( this.driver, blockLocator );
 
@@ -200,14 +190,19 @@ class EditorPage {
 		const titleElement = isAndroid()
 			? 'Post title. Welcome to Gutenberg!, Updates the title.'
 			: 'post-title';
+
+		if ( options.autoscroll ) {
+			await swipeDown( this.driver );
+		}
+
 		const elements = await this.driver.elementsByAccessibilityId(
 			titleElement
 		);
 
-		if ( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) {
-			if ( options.autoscroll ) {
-				await swipeDown( this.driver );
-			}
+		if (
+			elements.length === 0 ||
+			! ( await elements[ 0 ].isDisplayed() )
+		) {
 			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
@@ -347,8 +342,10 @@ class EditorPage {
 	}
 
 	async openBlockSettings() {
-		const settingsButtonElement = 'Open Settings';
-		const settingsButton = await this.waitForElementToBeDisplayedById(
+		const settingsButtonElement = isAndroid()
+			? '//android.widget.Button[@content-desc="Open Settings"]/android.view.ViewGroup'
+			: '//XCUIElementTypeButton[@name="Open Settings"]';
+		const settingsButton = await this.waitForElementToBeDisplayedByXPath(
 			settingsButtonElement
 		);
 
@@ -357,9 +354,9 @@ class EditorPage {
 
 	async removeBlock() {
 		const blockActionsButtonElement = isAndroid()
-			? 'Open Block Actions Menu, Double tap to open Bottom Sheet with available options'
-			: 'Open Block Actions Menu';
-		const blockActionsMenu = await this.waitForElementToBeDisplayedById(
+			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
+			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
+		const blockActionsMenu = await this.waitForElementToBeDisplayedByXPath(
 			blockActionsButtonElement
 		);
 		await blockActionsMenu.click();
@@ -502,6 +499,22 @@ class EditorPage {
 		await toolBarButton.click();
 	}
 
+	async moveBlockSelectionUp( options = { toRoot: false } ) {
+		let navigateUpElements = [];
+		do {
+			await this.driver.sleep( 2000 );
+			navigateUpElements = await this.driver.elementsByAccessibilityId(
+				'Navigate Up'
+			);
+			if ( navigateUpElements.length > 0 ) {
+				await navigateUpElements[ 0 ].click();
+			}
+			if ( ! options.toRoot ) {
+				break;
+			}
+		} while ( navigateUpElements.length > 0 );
+	}
+
 	// =========================
 	// Inline toolbar functions
 	// =========================
@@ -550,10 +563,6 @@ class EditorPage {
 			: '//XCUIElementTypeButton';
 		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
@@ -567,6 +576,10 @@ class EditorPage {
 			}
 		}
 
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
+			blockActionsMenuButtonLocator
+		);
 		await blockActionsMenuButton.click();
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
@@ -604,15 +617,6 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async getParagraphBlockWrapperAtPosition( position = 1 ) {
-		// iOS needs a click to get the text element
-		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
-			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
-
-		return await waitForVisible( this.driver, blockLocator );
-	}
-
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -643,7 +647,7 @@ class EditorPage {
 
 	async getNumberOfParagraphBlocks() {
 		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 
 		const locator = await this.driver.elementsByXPath(
@@ -697,7 +701,7 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
 		const listBlockTextLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
 			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );
@@ -902,7 +906,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Shortcode Block. Row ${ position }"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Shortcode Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -914,7 +918,7 @@ class EditorPage {
 
 	async getButtonBlockTextInputAtPosition( position = 1 ) {
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Button Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
@@ -923,7 +927,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.view.ViewGroup[@content-desc="block-list"]/android.view.ViewGroup[${ position }]/android.widget.Button`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();

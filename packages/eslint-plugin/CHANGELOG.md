@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 14.7.0 (2023-05-24)
+
+## 14.6.0 (2023-05-10)
+
+### Enhancement
+
+-   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
+
+## 14.5.0 (2023-04-26)
+
+## 14.4.0 (2023-04-12)
+
+## 14.3.0 (2023-03-29)
+
 ## 14.2.0 (2023-03-15)
 
 ## 14.1.0 (2023-03-01)

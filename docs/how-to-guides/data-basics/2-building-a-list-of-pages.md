@@ -247,7 +247,7 @@ Voila! We can now filter the results:
 Let’s take a pause for a moment to consider the downsides of an alternative approach we could have taken - working with the API directly. Imagine we sent the API requests directly:
 
 ```js
-import { apiFetch } from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 function MyFirstApp() {
 	// ...
 	const [pages, setPages] = useState( [] );

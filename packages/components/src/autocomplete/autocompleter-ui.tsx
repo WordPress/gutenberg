@@ -12,8 +12,6 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-// Error expected because `@wordpress/rich-text` is not yet fully typed.
-// @ts-expect-error
 import { useAnchor } from '@wordpress/rich-text';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 

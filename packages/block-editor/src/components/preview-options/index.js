@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
+import { check, desktop, mobile, tablet } from '@wordpress/icons';
 
 export default function PreviewOptions( {
 	children,
@@ -38,13 +38,20 @@ export default function PreviewOptions( {
 	const menuProps = {
 		'aria-label': __( 'View options' ),
 	};
+
+	const deviceIcons = {
+		mobile,
+		tablet,
+		desktop,
+	};
+
 	return (
 		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ null }
+			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 		>
 			{ () => (
 				<>
