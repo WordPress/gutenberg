@@ -118,6 +118,7 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 const reusableBlockToPattern = ( reusableBlock ) => ( {
 	blocks: parse( reusableBlock.content.raw ),
 	categories: reusableBlock.meta?.wp_block?.categories,
+	id: reusableBlock.id,
 	name: reusableBlock.slug,
 	title: reusableBlock.title.raw,
 	type: reusableBlock.type,
