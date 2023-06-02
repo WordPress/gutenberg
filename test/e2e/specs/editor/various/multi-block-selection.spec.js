@@ -318,7 +318,13 @@ test.describe( 'Multi-block selection', () => {
 				.filter( { hasText: 'Draft saved' } )
 		).toBeVisible();
 		await page.reload();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
@@ -1156,6 +1162,13 @@ test.describe( 'Multi-block selection', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },
