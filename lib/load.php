@@ -18,9 +18,9 @@ register_post_meta(
 	'post',
 	'footnotes',
 	array(
-		'show_in_rest'       => true,
-		'single'             => true,
-		'type'               => 'string',
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
 	)
 );
 

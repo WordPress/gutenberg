@@ -9,7 +9,6 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -745,13 +744,6 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-// The random number is used so it can't be used without the unlocker.
-// eslint-disable-next-line no-restricted-syntax
-export const horKey = 'blockEditor.higherOrderReducer' + Math.random();
-
-const withHorFilters = ( reducer ) => ( state, action ) =>
-	applyFilters( horKey, reducer( state, action ), reducer );
-
 /**
  * Reducer returning the blocks state.
  *
@@ -769,8 +761,7 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks,
-	withHorFilters
+	withResetControlledBlocks
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact

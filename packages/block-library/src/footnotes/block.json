@@ -8,26 +8,6 @@
 	"keywords": [ "references" ],
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
-	"attributes": {
-		"footnotes": {
-			"type": "array",
-			"default": [],
-			"source": "query",
-			"selector": "li",
-			"query": {
-				"content": {
-					"type": "string",
-					"source": "html",
-					"selector": "span"
-				},
-				"id": {
-					"type": "string",
-					"source": "attribute",
-					"attribute": "id"
-				}
-			}
-		}
-	},
 	"supports": {
 		"html": false,
 		"multiple": false

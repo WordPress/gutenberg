@@ -276,7 +276,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** ~~html~~, ~~multiple~~
--	**Attributes:** footnotes
+-	**Attributes:** 
 
 ## Classic
 

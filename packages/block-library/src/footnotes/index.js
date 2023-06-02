@@ -10,7 +10,6 @@ import { registerFormatType } from '@wordpress/rich-text';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
-import save from './save';
 import { format } from './format';
 
 const { name } = metadata;
@@ -20,7 +19,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
-	save,
 };
 
 // Would be good to remove the format and HoR if the block is unregistered.
