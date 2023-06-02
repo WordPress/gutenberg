@@ -42,6 +42,14 @@
 		"query": {
 			"type": "object",
 			"default": {}
+		},
+		"buttonBehavior": {
+			"type": "string",
+			"default": "expand-searchfield"
+		},
+		"isSearchFieldHidden": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
