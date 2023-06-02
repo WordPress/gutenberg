@@ -186,10 +186,10 @@
 	visibility: hidden;
 
 	.close-button {
-		font-size: 40px;
 		position: absolute;
-		top: 20px;
-		right: 20px;
+		top: 12.5px;
+		right: 12.5px;
+		padding: 0;
 		cursor: pointer;
 		z-index: 5000000;
 	}
@@ -204,6 +204,7 @@
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
+		padding: 30px;
 
 		figcaption {
 			margin: 10px 0 0 0;
@@ -228,7 +229,7 @@
 		position: absolute;
 		z-index: 2000000;
 		background-color: rgb(255, 255, 255);
-		opacity: 0.9;
+		opacity: 0.85;
 	}
 
 	&.initialized {
