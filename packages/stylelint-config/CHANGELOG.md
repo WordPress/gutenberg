@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Increased minimum peer dependency of `stylelint` to `14.16.1`.
+
 ## 21.17.0 (2023-05-24)
 
 ## 21.16.0 (2023-05-10)
