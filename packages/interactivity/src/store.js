@@ -20,7 +20,6 @@ const deepMerge = ( target, source ) => {
 };
 
 const getSerializedState = () => {
-	// TODO: change the store tag ID for a better one.
 	const storeTag = document.querySelector(
 		`script[type="application/json"]#wp-interactivity-store-data`
 	);

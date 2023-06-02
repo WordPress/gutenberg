@@ -67,8 +67,6 @@ class WP_Interactivity_Store {
 		if ( empty( self::$store ) ) {
 			return;
 		}
-
-		// TODO: decide the final id name.
 		$store = self::serialize();
 		echo "<script id=\"wp-interactivity-store-data\" type=\"application/json\">$store</script>";
 	}
