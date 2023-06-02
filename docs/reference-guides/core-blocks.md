@@ -619,7 +619,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 -	**Name:** core/post-time-to-read
 -	**Experimental:** true
 -	**Category:** theme
--	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Title

@@ -22,6 +22,7 @@
 			}
 		},
 		"html": false,
+		"anchor": "delimiter",
 		"spacing": {
 			"margin": true,
 			"padding": true
