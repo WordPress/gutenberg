@@ -21,9 +21,9 @@ import { download } from '@wordpress/icons';
 import TabLayout from './tab-layout';
 import FontsGrid from './fonts-grid';
 import { FontLibraryContext } from './context';
-import GoogleFontCard from './google-font-card';
 import GoolgeFontDetails from './google-font-details';
 import PreviewControls from './preview-controls';
+import FontCard from './font-card';
 
 const filterFonts = ( fonts, filters ) => {
 	const { category, search } = filters;
@@ -239,12 +239,10 @@ function GoogleFonts() {
 					{ ! fontSelected && (
 						<FontsGrid>
 							{ fonts.map( ( font ) => (
-								<GoogleFontCard
+								<FontCard
 									key={ font.slug }
 									font={ font }
-									onClick={ handleSelectFont }
-									toggleAddFont={ toggleAddFont }
-									isFontAdded={ isFontAdded }
+									onClick={ () => handleSelectFont( font ) }
 								/>
 							) ) }
 						</FontsGrid>
