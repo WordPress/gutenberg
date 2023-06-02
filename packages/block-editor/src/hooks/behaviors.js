@@ -4,6 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -38,24 +39,17 @@ function BehaviorsControl( {
 		[ blockName ]
 	);
 
-	if (
-		! settings ||
-		// If every behavior is disabled, do not show the behaviors inspector control.
-		Object.entries( settings ).every( ( [ , value ] ) => ! value )
-	) {
-		return null;
-	}
-
-	// Block behaviors take precedence over theme behaviors.
-	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
-
 	const noBehaviorsOption = {
 		value: '',
 		label: __( 'No behaviors' ),
 	};
 
 	const behaviorsOptions = Object.entries( settings )
-		.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out behaviors that are disabled.
+		.filter(
+			( [ behaviorName, behaviorValue ] ) =>
+				hasBlockSupport( blockName, 'behaviors.' + behaviorName ) &&
+				behaviorValue
+		) // Filter out behaviors that are disabled.
 		.map( ( [ behaviorName ] ) => ( {
 			value: behaviorName,
 			label:
@@ -64,7 +58,13 @@ function BehaviorsControl( {
 				behaviorName.slice( 1 ).toLowerCase(),
 		} ) );
 
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	if ( behaviorsOptions.length === 0 ) return null;
+
 	const options = [ noBehaviorsOption, ...behaviorsOptions ];
+
+	// Block behaviors take precedence over theme behaviors.
+	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
@@ -101,8 +101,8 @@ function BehaviorsControl( {
 export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		// Only add behaviors to the core/image block.
-		if ( props.name !== 'core/image' ) {
+		// Only add behaviors to blocks with support.
+		if ( ! hasBlockSupport( props.name, 'behaviors' ) ) {
 			return blockEdit;
 		}
 		const blockHasLink =
