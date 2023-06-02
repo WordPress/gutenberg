@@ -15,7 +15,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { store as commandsStore } from '@wordpress/commands';
 import {
 	chevronLeftSmall as chevronLeftSmallIcon,
 	page as pageIcon,
@@ -27,10 +27,7 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import useEditedEntityRecord from '../../use-edited-entity-record';
-import { unlock } from '../../../private-apis';
 import { store as editSiteStore } from '../../../store';
-
-const { store: commandsStore } = unlock( commandsPrivateApis );
 
 export default function DocumentActions() {
 	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
