@@ -72,47 +72,35 @@ export function getLastInsertedBlocksClientIds( state ) {
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
-export const getBlockEditingMode = createRegistrySelector(
-	( select ) =>
+export const getBlockEditingMode = createRegistrySelector( ( select ) =>
+	createSelector(
 		( state, clientId = '' ) => {
-			const explicitEditingMode = getExplicitBlockEditingMode(
-				state,
-				clientId
-			);
+			if ( state.blockEditingModes.has( clientId ) ) {
+				return state.blockEditingModes.get( clientId );
+			}
+			if ( ! clientId ) {
+				return 'default';
+			}
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
-			const name = getBlockName( state, clientId );
-			const isContent =
-				select( blocksStore ).__experimentalHasContentRoleAttribute(
-					name
-				);
-			if (
-				explicitEditingMode === 'disabled' ||
-				( templateLock === 'contentOnly' && ! isContent )
-			) {
-				return 'disabled';
+			if ( templateLock === 'contentOnly' ) {
+				const name = getBlockName( state, clientId );
+				const isContent =
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					);
+				return isContent ? 'contentOnly' : 'disabled';
 			}
-			if (
-				explicitEditingMode === 'contentOnly' ||
-				( templateLock === 'contentOnly' && isContent )
-			) {
-				return 'contentOnly';
-			}
-			return 'default';
-		}
-);
-
-const getExplicitBlockEditingMode = createSelector(
-	( state, clientId = '' ) => {
-		while (
-			! state.blockEditingModes.has( clientId ) &&
-			state.blocks.parents.has( clientId )
-		) {
-			clientId = state.blocks.parents.get( clientId );
-		}
-		return state.blockEditingModes.get( clientId ) ?? 'default';
-	},
-	( state ) => [ state.blockEditingModes, state.blocks.parents ]
+			const parentMode = getBlockEditingMode( state, rootClientId );
+			return parentMode === 'contentOnly' ? 'default' : parentMode;
+		},
+		( state ) => [
+			state.blockEditingModes,
+			state.blocks.parents,
+			state.settings.templateLock,
+			state.blockListSettings,
+		]
+	)
 );
 
 /**
@@ -136,7 +124,7 @@ export const isBlockSubtreeDisabled = createSelector(
 			);
 		};
 		return (
-			getExplicitBlockEditingMode( state, clientId ) === 'disabled' &&
+			getBlockEditingMode( state, clientId ) === 'disabled' &&
 			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
 		);
 	},
