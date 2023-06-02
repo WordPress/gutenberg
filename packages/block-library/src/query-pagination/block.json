@@ -15,12 +15,17 @@
 		"showLabel": {
 			"type": "boolean",
 			"default": true
+		},
+		"midSize": {
+			"type": "number",
+			"default": 2
 		}
 	},
 	"usesContext": [ "queryId", "query" ],
 	"providesContext": {
 		"paginationArrow": "paginationArrow",
-		"showLabel": "showLabel"
+		"showLabel": "showLabel",
+		"midSize": "midSize"
 	},
 	"supports": {
 		"align": true,
