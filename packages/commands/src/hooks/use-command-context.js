@@ -8,6 +8,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * Sets the active context of the command center
@@ -17,7 +18,7 @@ import { store as commandsStore } from '../store';
 export default function useCommandContext( context ) {
 	const { getContext } = useSelect( commandsStore );
 	const initialContext = useRef( getContext() );
-	const { setContext } = useDispatch( commandsStore );
+	const { setContext } = unlock( useDispatch( commandsStore ) );
 
 	useEffect( () => {
 		setContext( context );

@@ -9,6 +9,8 @@ import { createReduxStore, register } from '@wordpress/data';
 import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
+import * as privateActions from './private-actions';
+import { unlock } from '../lock-unlock';
 
 const STORE_NAME = 'core/commands';
 
@@ -26,3 +28,4 @@ export const store = createReduxStore( STORE_NAME, {
 } );
 
 register( store );
+unlock( store ).registerPrivateActions( privateActions );

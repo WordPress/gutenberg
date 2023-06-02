@@ -24,6 +24,18 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### store
+
+Store definition for the commands namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object`
+
 ### useCommand
 
 Attach a command to the Global command menu.

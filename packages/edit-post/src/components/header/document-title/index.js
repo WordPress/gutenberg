@@ -11,16 +11,13 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { layout, chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../private-apis';
 import { store as editPostStore } from '../../../store';
-
-const { store: commandsStore } = unlock( commandsPrivateApis );
 
 function DocumentTitle() {
 	const { template, isEditing } = useSelect( ( select ) => {
