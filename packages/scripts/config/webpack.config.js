@@ -38,8 +38,27 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-// Get paths of the `render` props included in `block.json` files
-let renderPaths = getRenderPropPaths();
+/**
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
+ * changes in `block.json` files are picked up in watch mode.
+ */
+class RenderPathsPlugin {
+	/**
+	 * Paths with the `render` props included in `block.json` files.
+	 *
+	 * @type {string[]}
+	 */
+	static renderPaths;
+
+	apply( compiler ) {
+		const pluginName = this.constructor.name;
+
+		compiler.hooks.thisCompilation.tap( pluginName, () => {
+			this.constructor.renderPaths = getRenderPropPaths();
+		} );
+	}
+}
 
 const cssLoaders = [
 	{
@@ -234,6 +253,7 @@ const config = {
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
+		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -275,10 +295,9 @@ const config = {
 					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					filter: ( filepath ) => {
-						renderPaths = getRenderPropPaths();
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							renderPaths.includes( filepath )
+							RenderPathsPlugin.renderPaths.includes( filepath )
 						);
 					},
 				},
