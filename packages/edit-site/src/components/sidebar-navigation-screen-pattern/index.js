@@ -37,8 +37,8 @@ function usePatternTitleAndDescription( postType, postId ) {
 
 	if ( ! descriptionText && addedBy.text ) {
 		descriptionText = sprintf(
-			// translators: %s: template part title e.g: "Header".
-			__( 'This is your %s template part.' ),
+			// translators: %s: pattern title e.g: "Header".
+			__( 'This is your %s pattern.' ),
 			getTitle()
 		);
 	}
@@ -67,7 +67,7 @@ function usePatternTitleAndDescription( postType, postId ) {
 
 					{ addedBy.isCustomized && (
 						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
-							{ _x( '(Customized)', 'template part' ) }
+							{ _x( '(Customized)', 'pattern' ) }
 						</span>
 					) }
 				</span>
