@@ -39,7 +39,7 @@ export function useShouldContextualToolbarShow() {
 
 			const isEditMode = __unstableGetEditorMode() === 'edit';
 			const hasFixedToolbar = getSettings().hasFixedToolbar;
-			const isDistractionFree = getSettings().distractionFree;
+			const isDistractionFree = getSettings().isDistractionFree;
 			const selectedBlockId =
 				getFirstMultiSelectedBlockClientId() ||
 				getSelectedBlockClientId();

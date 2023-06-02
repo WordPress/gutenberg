@@ -107,7 +107,7 @@ export const getSettings = createSelector(
 			...state.settings,
 			outlineMode: true,
 			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
-			distractionFree: !! __unstableGetPreference(
+			isDistractionFree: !! __unstableGetPreference(
 				state,
 				'distractionFree'
 			),
