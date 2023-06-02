@@ -204,18 +204,16 @@
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
-		padding: 20px;
 
 		figcaption {
 			margin: 10px 0 0 0;
+			display: none;
 		}
 
 		img {
 			max-width: 100%;
 			max-height: 100%;
 			width: auto;
-			min-height: 0;
-			min-width: 0;
 		}
 	}
 
