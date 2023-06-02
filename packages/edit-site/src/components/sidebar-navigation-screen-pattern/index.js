@@ -48,9 +48,9 @@ function usePatternTitleAndDescription( postType, postId ) {
 			{ descriptionText }
 
 			{ addedBy.text && ! isAddedByActiveTheme && (
-				<span className="edit-site-sidebar-navigation-screen-template__added-by-description">
-					<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author">
-						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author-icon">
+				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description">
+					<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
+						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author-icon">
 							{ addedBy.imageUrl ? (
 								<img
 									src={ addedBy.imageUrl }
@@ -66,7 +66,7 @@ function usePatternTitleAndDescription( postType, postId ) {
 					</span>
 
 					{ addedBy.isCustomized && (
-						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
+						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
 							{ _x( '(Customized)', 'pattern' ) }
 						</span>
 					) }
