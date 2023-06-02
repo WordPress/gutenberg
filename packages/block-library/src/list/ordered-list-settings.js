@@ -3,9 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { TextControl, PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	TextControl,
+	PanelBody,
+	ToggleControl,
+	SelectControl,
+} from '@wordpress/components';
 
-const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
+const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
@@ -23,6 +28,21 @@ const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 				} }
 				value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
 				step="1"
+			/>
+			<SelectControl
+				__nextHasNoMarginBottom
+				label={ __( 'Numbering type' ) }
+				options={ [
+					{ value: '1', label: __( 'Numbers' ) },
+					{ value: 'A', label: __( 'Uppercase letters' ) },
+					{ value: 'a', label: __( 'Lowercase letter' ) },
+					{ value: 'I', label: __( 'Uppercase roman numerals' ) },
+					{ value: 'i', label: __( 'Lowercase roman numerals' ) },
+				] }
+				value={ type }
+				onChange={ ( newValue ) => {
+					setAttributes( { type: newValue } );
+				} }
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
