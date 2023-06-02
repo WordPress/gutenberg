@@ -258,3 +258,27 @@
 	}
 }
 
+.is-edit-mode.is-distraction-free {
+
+	.edit-site-layout__header-container {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 9998;
+		width: 100%;
+	}
+
+	.edit-site-site-hub,
+	.edit-site-layout__header {
+		position: absolute;
+		top: 0;
+		z-index: 9999;
+	}
+	.edit-site-site-hub {
+		z-index: 10000;
+	}
+	.edit-site-layout__header {
+		width: 100%;
+	}
+}

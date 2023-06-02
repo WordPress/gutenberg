@@ -72,6 +72,7 @@ export default function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
 	const isEditorPage = ! isListPage;
+<<<<<<< HEAD
 	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
 		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
@@ -89,6 +90,10 @@ export default function Layout() {
 				hasFixedToolbar: select( preferencesStore ).get(
 					'core/edit-site',
 					'fixedToolbar'
+				),
+				isDistractionFree: select( preferencesStore ).get(
+					'core/edit-site',
+					'distractionFree'
 				),
 			};
 		}, [] );
@@ -129,6 +134,15 @@ export default function Layout() {
 		return null;
 	}
 
+	const headerVariants = {
+		hidden:
+			isDistractionFree && isEditing ? { opacity: 0 } : { opacity: 1 },
+		hover: {
+			opacity: 1,
+			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+		},
+	};
+
 	return (
 		<>
 			<CommandMenu />
@@ -142,41 +156,94 @@ export default function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
+						'is-distraction-free': isDistractionFree && isEditing,
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>
-				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
+				{ isDistractionFree && isEditing && (
+					<motion.div
+						className="edit-site-layout__header-container"
+						initial={
+							isDistractionFree && isEditing ? 'hidden' : 'hover'
+						}
+						whileHover="hover"
+						variants={ headerVariants }
+						transition={ { type: 'tween', delay: 0.8 } }
+					>
+						<SiteHub
+							ref={ hubRef }
+							className="edit-site-layout__hub"
+						/>
 
-				<AnimatePresence initial={ false }>
-					{ isEditorPage && isEditing && (
-						<NavigableRegion
-							className="edit-site-layout__header"
-							ariaLabel={ __( 'Editor top bar' ) }
-							as={ motion.div }
-							animate={ {
-								y: 0,
-							} }
-							initial={ {
-								y: '-100%',
-							} }
-							exit={ {
-								y: '-100%',
-							} }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion
-									? 0
-									: ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-						>
-							{ isEditing && <Header /> }
-						</NavigableRegion>
-					) }
-				</AnimatePresence>
+						<AnimatePresence initial={ false }>
+							{ isEditorPage && isEditing && (
+								<NavigableRegion
+									className="edit-site-layout__header"
+									ariaLabel={ __( 'Editor top bar' ) }
+									as={ motion.div }
+									animate={ {
+										y: 0,
+									} }
+									initial={ {
+										y: '-100%',
+									} }
+									exit={ {
+										y: '-100%',
+									} }
+									transition={ {
+										type: 'tween',
+										duration: disableMotion
+											? 0
+											: ANIMATION_DURATION,
+										ease: 'easeOut',
+									} }
+								>
+									{ isEditing && <Header /> }
+								</NavigableRegion>
+							) }
+						</AnimatePresence>
+					</motion.div>
+				) }
+
+				{ ( ! isDistractionFree || ! isEditing ) && (
+					<>
+						<SiteHub
+							ref={ hubRef }
+							className="edit-site-layout__hub"
+						/>
+
+						<AnimatePresence initial={ false }>
+							{ isEditorPage && isEditing && (
+								<NavigableRegion
+									className="edit-site-layout__header"
+									ariaLabel={ __( 'Editor top bar' ) }
+									as={ motion.div }
+									animate={ {
+										y: 0,
+									} }
+									initial={ {
+										y: '-100%',
+									} }
+									exit={ {
+										y: '-100%',
+									} }
+									transition={ {
+										type: 'tween',
+										duration: disableMotion
+											? 0
+											: ANIMATION_DURATION,
+										ease: 'easeOut',
+									} }
+								>
+									{ isEditing && <Header /> }
+								</NavigableRegion>
+							) }
+						</AnimatePresence>
+					</>
+				) }
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
