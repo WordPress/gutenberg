@@ -16,7 +16,7 @@ import {
  */
 import FontDemo from './font-demo';
 
-function FontCard( { font, onClick, actionHandler } ) {
+function FontCard( { font, onClick, actionHandler, variantsText } ) {
 	const fakeFontFace = {
 		fontStyle: 'normal',
 		fontWeight: '400',
@@ -53,8 +53,8 @@ function FontCard( { font, onClick, actionHandler } ) {
 									{ font.name }
 								</Text>
 								<Text className="font-library-modal__font-card__count">
-									{ variantsCount }{ ' ' }
-									{ _n(
+									{ variantsText
+										||  variantsCount + ' ' + _n(
 										'variant',
 										'variants',
 										variantsCount

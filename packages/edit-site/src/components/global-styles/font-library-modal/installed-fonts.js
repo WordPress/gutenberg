@@ -17,10 +17,10 @@ import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import SaveButton from '../../save-button';
 import PreviewControls from './preview-controls';
-import FontCard from './font-card';
+import LibraryFontCard from './library-font-card';
 
 function InstalledFonts() {
-	const { installedFonts } = useContext( FontLibraryContext );
+	const { themeFonts, libraryFonts } = useContext( FontLibraryContext );
 	const [ fontSelected, setFontSelected ] = useState( null );
 
 	const handleUnselectFont = () => {
@@ -48,9 +48,28 @@ function InstalledFonts() {
 				<>
 					<PreviewControls />
 					<Spacer margin={ 8 } />
-					<FontsGrid>
-						{ installedFonts.map( ( font ) => (
-							<FontCard
+
+					<FontsGrid
+						title={ __( 'Theme Fonts' ) }
+					>
+						{ themeFonts.map( ( font ) => (
+							<LibraryFontCard
+								font={ font }
+								key={ font.slug }
+								onClick={ () => {
+									handleSelectFont( font );
+								} }
+							/>
+						) ) }
+					</FontsGrid>
+
+					<Spacer margin={ 10 } />
+
+					<FontsGrid
+						title={ __( 'User Fonts' ) }
+					>
+						{ libraryFonts.map( ( font ) => (
+							<LibraryFontCard
 								font={ font }
 								key={ font.slug }
 								onClick={ () => {

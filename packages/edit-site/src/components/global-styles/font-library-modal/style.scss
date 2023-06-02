@@ -22,10 +22,18 @@
 
 }
 
-.font-library-modal__font-card-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(100px, auto));
-    gap: 4px * 4;
+.font-library-modal__fonts-grid {
+    .font-library-modal__fonts-grid__subtitle {
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 11px;
+    }
+
+    .font-library-modal__fonts-grid__main  {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+        gap: 4px * 4;
+    }
 }
 
 .font-library-modal__font-card {

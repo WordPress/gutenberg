@@ -109,9 +109,12 @@ function FontLibraryProvider( { children } ) {
 
 	const getAvailableFontsOutline = ( fontFamilies ) => {
 		const outline = fontFamilies.reduce( ( acc, font ) => {
-			const availableFontFaces = ( font?.fontFace || [] ).map(
-				( face ) => `${ face.fontStyle + face.fontWeight }`
-			);
+			
+			const availableFontFaces = Array.isArray( font?.fontFace )
+				? font?.fontFace.map(
+					( face ) => `${ face.fontStyle + face.fontWeight }`	)
+				: [ "normal400" ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400 
+
 			acc[ font.slug ] = availableFontFaces;
 			return acc;
 		}, {} );
