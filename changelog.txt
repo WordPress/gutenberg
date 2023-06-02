@@ -1,5 +1,27 @@
 == Changelog ==
 
+= 15.9.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Fonts API
+- [Fonts API] Make local font asset file URL absolute. ([51178](https://github.com/WordPress/gutenberg/pull/51178))
+
+#### Block Library
+- Social Icons: Add color classes so icon colors correctly reflect changes in Global Styles. ([51020](https://github.com/WordPress/gutenberg/pull/51020))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@hellofromtonya @ndiego 
+
+
 = 15.9.0 =
 
 ## Changelog
