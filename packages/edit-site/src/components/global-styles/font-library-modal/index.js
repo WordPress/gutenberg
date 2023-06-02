@@ -19,7 +19,7 @@ function FontLibraryModal( {
 } ) {
 	return (
 		<Modal
-			title={ __( 'Fonts Library' ) }
+			title={ __( 'Fonts' ) }
 			onRequestClose={ onRequestClose }
 			isFullScreen={ true }
 			className="font-library-modal"
