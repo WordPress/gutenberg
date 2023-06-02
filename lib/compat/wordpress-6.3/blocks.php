@@ -62,48 +62,30 @@ function gutenberg_wp_block_register_post_meta() {
 	$post_type = 'wp_block';
 	register_post_meta(
 		$post_type,
-		'wp_block_sync_status',
+		'wp_block',
 		array(
 			'auth_callback'     => function() {
 				return current_user_can( 'edit_posts' );
 			},
-			'sanitize_callback' => 'sanitize_text_field',
-			'show_in_rest'      => true,
+			'sanitize_callback' => 'gutenberg_wp_block_sanitize_post_meta',
 			'single'            => true,
-			'type'              => 'string',
-		)
-	);
-	register_post_meta(
-		$post_type,
-		'wp_block_slug',
-		array(
-			'auth_callback'     => function() {
-				return current_user_can( 'edit_posts' );
-			},
-			'sanitize_callback' => 'sanitize_text_field',
-			'show_in_rest'      => true,
-			'single'            => true,
-			'type'              => 'string',
-		)
-	);
-	register_post_meta(
-		$post_type,
-		'wp_block_categories',
-		array(
-			'auth_callback'     => function() {
-				return current_user_can( 'edit_posts' );
-			},
-			'sanitize_callback' => 'gutenberg_wp_block_sanitize_post_meta_categories',
+			'type'              => 'object',
 			'show_in_rest'      => array(
 				'schema' => array(
-					'type'  => 'array',
-					'items' => array(
-						'type' => 'string',
+					'type'       => 'object',
+					'properties' => array(
+						'sync_status' => array(
+							'type' => 'string',
+						),
+						'categories'  => array(
+							'type' => 'array',
+						),
+						'slug'        => array(
+							'type' => 'string',
+						),
 					),
 				),
 			),
-			'single'            => true,
-			'type'              => 'array',
 		)
 	);
 }
@@ -118,7 +100,10 @@ function gutenberg_wp_block_register_post_meta() {
  *
  * @return array Sanitized array of values.
  */
-function gutenberg_wp_block_sanitize_post_meta_categories( $meta_value ) {
-	return array_map( 'sanitize_text_field', $meta_value );
+function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
+	$meta_value['sync_status'] = sanitize_text_field( $meta_value['sync_status'] );
+	$meta_value['slug']        = sanitize_text_field( $meta_value['slug'] );
+	$meta_value['categories']  = array_map( 'sanitize_text_field', $meta_value['categories'] );
+	return $meta_value;
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
