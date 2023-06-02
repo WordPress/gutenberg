@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Directive_Store class
+ * WP_Interactivity_Store class
  *
  * Manages the initial state of the Interactivity API store in the server and
  * its serialization so it can be restored in the browser upon hydration.
@@ -17,7 +17,7 @@
  *
  * @access private
  */
-class WP_Directive_Store {
+class WP_Interactivity_Store {
 	/**
 	 * Store.
 	 *
@@ -70,6 +70,6 @@ class WP_Directive_Store {
 
 		// TODO: decide the final id name.
 		$store = self::serialize();
-		echo "<script id=\"wp-interactivity-store\" type=\"application/json\">$store</script>";
+		echo "<script id=\"wp-interactivity-store-data\" type=\"application/json\">$store</script>";
 	}
 }
