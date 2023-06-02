@@ -1,6 +1,6 @@
 <?php
 /**
- * The functions that expose the store of the WP_Interactivity_Store class.
+ * Functions to expose the store of the WP_Interactivity_Store class.
  *
  * @package Gutenberg
  * @subpackage Interactivity API

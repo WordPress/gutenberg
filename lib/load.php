@@ -110,6 +110,11 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' 
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
 require __DIR__ . '/experimental/interactivity-api/scripts.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
+require __DIR__ . '/experimental/interactivity-api/directive-processing.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-bind.php';
+// require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
