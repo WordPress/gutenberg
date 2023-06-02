@@ -78,7 +78,8 @@ function render_block_core_image( $attributes, $content ) {
 		// Add directive to expand modal image if appropriate.
 		$m = new WP_HTML_Tag_Processor( $content );
 		$m->next_tag( 'img' );
-		$m->set_attribute( 'data-wp-bind--style', 'selectors.core.image.styleWidth' );
+		$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . wp_get_attachment_url($attributes['id']) . '"} } }' );
+		$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
 		$modal_content = $m->get_updated_html();
 
 		$background_color  = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
