@@ -1,5 +1,5 @@
 pluginManagement {
-    gradle.ext.kotlinVersion = '1.5.32'
+    gradle.ext.kotlinVersion = '1.6.10'
 
     plugins {
         id "com.android.library" version "7.2.1"

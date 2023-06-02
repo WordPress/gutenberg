@@ -9,6 +9,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -24,9 +25,14 @@ const { PrivateListView } = unlock( blockEditorPrivateApis );
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			setIsListViewOpened( false );
@@ -55,9 +61,10 @@ export default function ListViewSidebar() {
 				ref={ useMergeRefs( [
 					contentFocusReturnRef,
 					focusOnMountRef,
+					setDropZoneElement,
 				] ) }
 			>
-				<PrivateListView />
+				<PrivateListView dropZoneElement={ dropZoneElement } />
 			</div>
 		</div>
 	);

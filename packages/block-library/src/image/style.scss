@@ -151,3 +151,116 @@
 .wp-block-image figure {
 	margin: 0;
 }
+
+.wp-lightbox-container {
+
+	.img-container {
+		position: relative;
+	}
+
+	button {
+		border: none;
+		background: none;
+		cursor: zoom-in;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 100;
+
+		&:focus-visible {
+			outline: 5px auto #212121;
+			outline: 5px auto -webkit-focus-ring-color;
+			outline-offset: 5px;
+		}
+	}
+}
+
+.wp-lightbox-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	visibility: hidden;
+
+	.close-button {
+		font-size: 40px;
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		cursor: pointer;
+		z-index: 5000000;
+	}
+
+	.wp-block-image {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		z-index: 3000000;
+		position: absolute;
+		flex-direction: column;
+	}
+
+	button {
+		border: none;
+		background: none;
+	}
+
+	.scrim {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 2000000;
+		background-color: rgb(255, 255, 255);
+		opacity: 0.9;
+	}
+
+	&.initialized {
+		animation: both turn-off-visibility 300ms;
+
+		img {
+			animation: both turn-off-visibility 250ms;
+		}
+
+		&.active {
+			visibility: visible;
+			animation: both turn-on-visibility 250ms;
+
+			img {
+				animation: both turn-on-visibility 300ms;
+			}
+		}
+	}
+}
+
+@keyframes turn-on-visibility {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes turn-off-visibility {
+	0% {
+		opacity: 1;
+		visibility: visible;
+	}
+	99% {
+		opacity: 0;
+		visibility: visible;
+	}
+	100% {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+html.has-lightbox-open {
+	overflow: hidden;
+}

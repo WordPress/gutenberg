@@ -48,5 +48,7 @@ describe( 'iframed inline styles', () => {
 		expect( await getComputedStyle( canvas(), 'border-width' ) ).toBe(
 			'2px'
 		);
+
+		expect( console ).toHaveWarned();
 	} );
 } );

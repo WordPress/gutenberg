@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -38,7 +33,10 @@ export default function BlockControlsFill( {
 					// Children passed to BlockControlsFill will not have access to any
 					// React Context whose Provider is part of the BlockControlsSlot tree.
 					// So we re-create the Provider in this subtree.
-					const value = ! isEmpty( fillProps ) ? fillProps : null;
+					const value =
+						fillProps && Object.keys( fillProps ).length > 0
+							? fillProps
+							: null;
 					return (
 						<ToolbarContext.Provider value={ value }>
 							{ group === 'default' && (
