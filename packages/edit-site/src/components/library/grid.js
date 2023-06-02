@@ -29,7 +29,7 @@ const GridItem = ( { category, composite, item } ) => {
 	const { onClick } = useLink( {
 		path: '/library',
 		postType: item.type,
-		postId: item.name,
+		postId: item.type === 'wp_block' ? item.id : item.name,
 		categoryName: category,
 		categoryType: item.type,
 		canvas: 'edit',
@@ -46,10 +46,7 @@ const GridItem = ( { category, composite, item } ) => {
 				role="option"
 				as="div"
 				{ ...composite }
-				onClick={
-					// TODO: When patterns can be edited this should simply call onClick
-					item.type === 'wp_template_part' ? onClick : undefined
-				}
+				onClick={ item.type !== 'pattern' ? onClick : undefined }
 			>
 				<BlockPreview blocks={ item.blocks } />
 				{ !! item.description && (
