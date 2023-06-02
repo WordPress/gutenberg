@@ -16,6 +16,7 @@ import {
 	getBlockRootClientId,
 	getTemplateLock,
 	getBlockName,
+	getBlockOrder,
 } from './selectors';
 
 /**
@@ -74,7 +75,7 @@ export function getLastInsertedBlocksClientIds( state ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
-			const explicitEditingMode = getExplcitBlockEditingMode(
+			const explicitEditingMode = getExplicitBlockEditingMode(
 				state,
 				clientId
 			);
@@ -101,7 +102,7 @@ export const getBlockEditingMode = createRegistrySelector(
 		}
 );
 
-const getExplcitBlockEditingMode = createSelector(
+const getExplicitBlockEditingMode = createSelector(
 	( state, clientId = '' ) => {
 		while (
 			! state.blockEditingModes.has( clientId ) &&
@@ -110,6 +111,34 @@ const getExplcitBlockEditingMode = createSelector(
 			clientId = state.blocks.parents.get( clientId );
 		}
 		return state.blockEditingModes.get( clientId ) ?? 'default';
+	},
+	( state ) => [ state.blockEditingModes, state.blocks.parents ]
+);
+
+/**
+ * Returns true if the block with the given client ID and all of its descendants
+ * have an editing mode of 'disabled', or false otherwise.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether the block and its descendants are disabled.
+ */
+export const isBlockSubtreeDisabled = createSelector(
+	( state, clientId ) => {
+		const isChildSubtreeDisabled = ( childClientId ) => {
+			const mode = state.blockEditingModes.get( childClientId );
+			return (
+				( mode === undefined || mode === 'disabled' ) &&
+				getBlockOrder( state, childClientId ).every(
+					isChildSubtreeDisabled
+				)
+			);
+		};
+		return (
+			getExplicitBlockEditingMode( state, clientId ) === 'disabled' &&
+			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
+		);
 	},
 	( state ) => [ state.blockEditingModes, state.blocks.parents ]
 );
