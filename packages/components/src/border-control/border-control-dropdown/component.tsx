@@ -29,7 +29,7 @@ import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
 import type { ColorProps, DropdownProps } from '../types';
 
-const getAriaLabelValue = ( colorValue: string ) => {
+const getAriaLabelColorValue = ( colorValue: string ) => {
 	const isHex = colorValue.startsWith( '#' );
 
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
@@ -76,7 +76,7 @@ const getToggleAriaLabel = (
 ) => {
 	if ( isStyleEnabled ) {
 		if ( colorObject ) {
-			const ariaLabelValue = getAriaLabelValue( colorObject.color );
+			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
 			return style
 				? sprintf(
 						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %3$s: The current border style selection e.g. "solid".
@@ -94,7 +94,7 @@ const getToggleAriaLabel = (
 		}
 
 		if ( colorValue ) {
-			const ariaLabelValue = getAriaLabelValue( colorValue );
+			const ariaLabelValue = getAriaLabelColorValue( colorValue );
 			return style
 				? sprintf(
 						// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %2$s: The current border style selection e.g. "solid".
@@ -117,7 +117,7 @@ const getToggleAriaLabel = (
 			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
 			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
 			colorObject.name,
-			getAriaLabelValue( colorObject.color )
+			getAriaLabelColorValue( colorObject.color )
 		);
 	}
 
@@ -125,7 +125,7 @@ const getToggleAriaLabel = (
 		return sprintf(
 			// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
 			'Border color picker. The currently selected color has a value of "%1$s".',
-			getAriaLabelValue( colorValue )
+			getAriaLabelColorValue( colorValue )
 		);
 	}
 
