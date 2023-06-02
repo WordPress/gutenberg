@@ -31,7 +31,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^12.0.0",
+		"stylelint-config-recommended": "9",
 		"stylelint-config-recommended-scss": "8"
 	},
 	"peerDependencies": {
