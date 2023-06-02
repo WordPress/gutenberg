@@ -21,6 +21,13 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 						tagName="span"
 						value={ content }
 						identifier={ id }
+						// To do: figure out why the browser is not scrolling
+						// into view when it receives focus.
+						onFocus={ ( event ) => {
+							if ( ! event.target.textContent.trim() ) {
+								event.target.scrollIntoView();
+							}
+						} }
 						onChange={ ( nextFootnote ) => {
 							updateMeta( {
 								...meta,

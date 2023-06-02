@@ -216,7 +216,6 @@ export function useRichText( {
 
 		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			ref.current.focus();
-			ref.current.scrollIntoView();
 		}
 
 		applyFromProps();
