@@ -18,7 +18,12 @@ import { store as blockEditorStore } from '../store';
  */
 import merge from 'deepmerge';
 
-function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
+function BehaviorsControl( {
+	blockName,
+	blockBehaviors,
+	onChange,
+	disabled = false,
+} ) {
 	const { settings, themeBehaviors } = useSelect(
 		( select ) => {
 			const { getBehaviors, getSettings } = select( blockEditorStore );
@@ -61,6 +66,10 @@ function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
 
 	const options = [ noBehaviorsOption, ...behaviorsOptions ];
 
+	const helpText = disabled
+		? __( 'The lightbox behavior is disabled for linked images.' )
+		: __( 'Add behaviors.' );
+
 	return (
 		<InspectorControls group="advanced">
 			<SelectControl
@@ -71,8 +80,9 @@ function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
 				options={ options }
 				onChange={ onChange }
 				hideCancelButton={ true }
-				help={ __( 'Add behaviors.' ) }
+				help={ helpText }
 				size="__unstable-large"
+				disabled={ disabled }
 			/>
 		</InspectorControls>
 	);
@@ -95,7 +105,9 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 		if ( props.name !== 'core/image' ) {
 			return blockEdit;
 		}
-
+		const blockHasLink =
+			typeof props.attributes?.linkDestination !== 'undefined' &&
+			props.attributes?.linkDestination !== 'none';
 		return (
 			<>
 				{ blockEdit }
@@ -111,6 +123,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 							},
 						} );
 					} }
+					disabled={ blockHasLink }
 				/>
 			</>
 		);
