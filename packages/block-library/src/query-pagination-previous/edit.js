@@ -30,16 +30,18 @@ export default function QueryPaginationPreviousEdit( {
 					{ displayArrow }
 				</span>
 			) }
-			<PlainText
-				__experimentalVersion={ 2 }
-				tagName="span"
-				aria-label={ __( 'Previous page link' ) }
-				placeholder={ showLabel ? __( 'Previous Page' ) : '' }
-				value={ showLabel ? label : '' }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
-			/>
+			{ showLabel && (
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( 'Previous page link' ) }
+					placeholder={ __( 'Previous Page' ) }
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+				/>
+			) }
 		</a>
 	);
 }

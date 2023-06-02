@@ -118,7 +118,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				) }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				actions={
-					<div>
+					<>
 						{ ! isMobileViewport && (
 							<SidebarButton
 								icon={ seen }
@@ -138,7 +138,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 							label={ __( 'Edit styles' ) }
 							onClick={ async () => await openGlobalStyles() }
 						/>
-					</div>
+					</>
 				}
 			/>
 			{ isStyleBookOpened && ! isMobileViewport && (

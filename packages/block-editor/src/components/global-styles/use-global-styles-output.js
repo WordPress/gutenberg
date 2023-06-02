@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, set } from 'lodash';
+import { get, kebabCase, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -396,9 +396,21 @@ export function getStylesDeclarations(
 			 * Values that already have a "clamp()" function will not pass the test,
 			 * and therefore the original $value will be returned.
 			 */
+			const typographySettings =
+				!! tree?.settings?.typography?.fluid &&
+				tree?.settings?.layout?.wideSize
+					? {
+							fluid: {
+								maxViewPortWidth: tree.settings.layout.wideSize,
+								...tree.settings.typography.fluid,
+							},
+					  }
+					: {
+							fluid: tree?.settings?.typography?.fluid,
+					  };
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				typographySettings
 			);
 		}
 
@@ -685,7 +697,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || custom ) {
+	if ( Object.keys( presets ).length > 0 || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -698,7 +710,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || blockCustom ) {
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -964,7 +976,7 @@ export const toStyles = (
 		}
 
 		const classes = getPresetsClasses( selector, presets );
-		if ( ! isEmpty( classes ) ) {
+		if ( classes.length > 0 ) {
 			ruleset += classes;
 		}
 	} );
@@ -980,7 +992,10 @@ export function toSvgFilters( tree, blockSelectors ) {
 }
 
 const getSelectorsConfig = ( blockType, rootSelector ) => {
-	if ( ! isEmpty( blockType?.selectors ) ) {
+	if (
+		blockType?.selectors &&
+		Object.keys( blockType.selectors ).length > 0
+	) {
 		return blockType.selectors;
 	}
 

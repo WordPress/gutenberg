@@ -64,9 +64,7 @@ export default function PostTitleEdit( {
 	} );
 	const blockEditingMode = useBlockEditingMode();
 
-	let titleElement = (
-		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
-	);
+	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (
