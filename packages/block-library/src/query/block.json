@@ -32,12 +32,6 @@
 			"type": "string",
 			"default": "div"
 		},
-		"displayLayout": {
-			"type": "object",
-			"default": {
-				"type": "list"
-			}
-		},
 		"namespace": {
 			"type": "string"
 		}
