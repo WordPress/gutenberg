@@ -548,6 +548,13 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
@@ -761,7 +768,7 @@ test.describe( 'Image - interactivity', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();

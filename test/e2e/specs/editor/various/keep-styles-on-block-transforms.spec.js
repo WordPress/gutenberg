@@ -37,6 +37,13 @@ test.describe( 'Keep styles on block transforms', () => {
 		pageUtils,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		// Create a paragraph block with some content.
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );

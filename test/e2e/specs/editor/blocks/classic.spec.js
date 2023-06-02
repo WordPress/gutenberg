@@ -18,8 +18,15 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -29,12 +36,10 @@ test.describe( 'Classic', () => {
 	test( 'should be inserted', async ( { editor, page, pageUtils } ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.waitForSelector( '.mce-tinymce iframe' );
-		await page.click( '.mce-tinymce iframe' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
@@ -47,8 +52,7 @@ test.describe( 'Classic', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.waitForSelector( '.mce-tinymce iframe' );
-		await page.click( '.mce-tinymce iframe' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 
 		await page.getByRole( 'button', { name: /Add Media/i } ).click();
@@ -77,13 +81,12 @@ test.describe( 'Classic', () => {
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
 		await editor.clickBlockToolbarButton( 'Convert to blocks' );
-		const galleryBlock = editor.canvas.locator(
+		const galleryBlock = page.locator(
 			'role=document[name="Block: Gallery"i]'
 		);
 		await expect( galleryBlock ).toBeVisible();
@@ -91,7 +94,7 @@ test.describe( 'Classic', () => {
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
-			editor.canvas.locator( 'role=document[name="Block: Classic"i]' )
+			page.locator( 'role=document[name="Block: Classic"i]' )
 		).toBeVisible();
 		await expect
 			.poll( editor.getEditedPostContent )
@@ -116,12 +119,10 @@ test.describe( 'Classic', () => {
 
 		await editor.insertBlock( { name: 'core/freeform' } );
 		// Ensure there is focus.
-		await page.waitForSelector( '.mce-tinymce iframe' );
-		await page.click( '.mce-tinymce iframe' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
 
 		await page.click( 'role=button[name="Save draft"i]' );
 
@@ -137,7 +138,7 @@ test.describe( 'Classic', () => {
 			errors.push( exception );
 		} );
 
-		const classicBlock = editor.canvas.locator(
+		const classicBlock = page.locator(
 			'role=document[name="Block: Classic"i]'
 		);
 

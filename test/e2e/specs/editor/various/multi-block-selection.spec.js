@@ -247,6 +247,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -292,6 +299,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },

@@ -61,7 +61,14 @@ test.describe( 'Paragraph', () => {
 			editor,
 			pageUtils,
 			draggingUtils,
+			page,
 		} ) => {
+			await page.evaluate( () => {
+				window.wp.blocks.registerBlockType( 'test/v2', {
+					apiVersion: '2',
+					title: 'test',
+				} );
+			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
 			const testImageName = '10x10_e2e_test_image_z9T8jK.png';

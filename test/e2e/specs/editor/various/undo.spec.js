@@ -174,7 +174,7 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+z' );
-		const activeElementLocator = page.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator( ':focus' );
 		await expect( activeElementLocator ).toHaveText( 'test' );
 	} );
 
@@ -353,7 +353,7 @@ test.describe( 'undo', () => {
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const activeElementLocator = page.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator( ':focus' );
 		await expect( activeElementLocator ).toHaveText( 'original' );
 	} );
 
@@ -462,14 +462,19 @@ test.describe( 'undo', () => {
 	test( 'should be able to undo and redo property cross property changes', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
-		await page.getByRole( 'textbox', { name: 'Add title' } ).type( 'a' ); // First step.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.type( 'a' ); // First step.
 		await page.keyboard.press( 'Backspace' ); // Second step.
-		await page.getByRole( 'button', { name: 'Add default block' } ).click(); // third step.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click(); // third step.
 
 		// Title should be empty
 		await expect(
-			page.getByRole( 'textbox', { name: 'Add title' } )
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
 
 		// First undo removes the block.
@@ -477,13 +482,13 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
-			page.getByRole( 'textbox', { name: 'Add title' } )
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( 'a' );
 
 		// Redoing the "backspace" should clear the title again.
 		await pageUtils.pressKeys( 'primaryShift+z' );
 		await expect(
-			page.getByRole( 'textbox', { name: 'Add title' } )
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
 	} );
 } );

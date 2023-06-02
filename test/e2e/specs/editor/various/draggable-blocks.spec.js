@@ -342,6 +342,13 @@ test.describe( 'Draggable block', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',

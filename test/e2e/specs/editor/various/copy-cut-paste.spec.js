@@ -31,6 +31,13 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );

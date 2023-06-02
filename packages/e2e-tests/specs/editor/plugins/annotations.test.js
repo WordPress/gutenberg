@@ -29,6 +29,13 @@ describe( 'Annotations', () => {
 
 	beforeEach( async () => {
 		await createNewPost();
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	} );
 
 	/**

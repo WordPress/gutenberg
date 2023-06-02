@@ -236,6 +236,7 @@ describe( 'Reusable blocks', () => {
 		await editButton.click();
 
 		await page.waitForNavigation();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Click the block to give it focus.
 		const blockSelector = 'p[data-title="Paragraph"]';
@@ -296,6 +297,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Duplicated reusable block' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Wait for the paragraph to be loaded.
 		await canvas().waitForSelector(
@@ -359,6 +361,7 @@ describe( 'Reusable blocks', () => {
 		insertBlock( 'Quote' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// The quote block should have a visible preview in the sidebar for this test to be valid.
 		const quoteBlock = await canvas().waitForSelector(
