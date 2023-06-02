@@ -771,9 +771,9 @@ Documenting a function component should be treated the same as any other functio
  *
  * @return {?string} Block title.
  */
-````
+```
 
-For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://reactjs.org/docs/typechecking-with-proptypes.html).
+For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://react.dev/reference/react/Component#static-proptypes).
 
 ## PHP
 
