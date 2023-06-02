@@ -77,15 +77,13 @@ function SidebarNavigationScreenGlobalStylesContent() {
 	// rendering the iframe. Without this, the iframe previews will not render
 	// in mobile viewport sizes, where the editor canvas is hidden.
 	return (
-		<>
-			<BlockEditorProvider
-				settings={ storedSettings }
-				onChange={ noop }
-				onInput={ noop }
-			>
-				<StyleVariationsContainer />
-			</BlockEditorProvider>
-		</>
+		<BlockEditorProvider
+			settings={ storedSettings }
+			onChange={ noop }
+			onInput={ noop }
+		>
+			<StyleVariationsContainer />
+		</BlockEditorProvider>
 	);
 }
 
@@ -107,7 +105,7 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 	}, [] );
 
 	const hasRevisions = revisionsCount >= 2;
-	const { modified } = revisions?.[ 0 ] || {};
+	const modified = revisions?.[ 0 ]?.modified;
 
 	if ( ! hasRevisions || isLoading || ! modified ) {
 		return null;
@@ -164,13 +162,13 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		[ setCanvasMode, openGeneralSidebar ]
 	);
 
-	const openStyleBook = async () => {
+	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
 		// Open the Style Book once the canvas mode is set to edit,
 		// and the global styles sidebar is open. This ensures that
 		// the Style Book is not prematurely closed.
 		setEditorCanvasContainerView( 'style-book' );
-	};
+	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();
