@@ -70,10 +70,6 @@ export function useCompatibilityStyles() {
 				}
 
 				if ( matchFromRules( cssRules ) ) {
-					// Display warning once we have a way to add style dependencies to the editor.
-					// See: https://github.com/WordPress/gutenberg/pull/37466.
-					accumulator.push( ownerNode.cloneNode( true ) );
-
 					const isInline = ownerNode.tagName === 'STYLE';
 
 					// Add inline styles belonging to the stylesheet.
@@ -83,7 +79,15 @@ export function useCompatibilityStyles() {
 					);
 					const otherElement = document.getElementById( inlineCssId );
 
-					if ( otherElement ) {
+					// If the matched stylesheet is inline, add the main
+					// stylesheet before the inline style element.
+					if ( otherElement && isInline ) {
+						accumulator.push( otherElement.cloneNode( true ) );
+					}
+
+					accumulator.push( ownerNode.cloneNode( true ) );
+
+					if ( otherElement && ! isInline ) {
 						accumulator.push( otherElement.cloneNode( true ) );
 					}
 				}
