@@ -20,7 +20,7 @@
 				"type": "list"
 			},
 			"layout": {
-				"inherit": true
+				"type": "constrained"
 			}
 		},
 		"innerBlocks": [

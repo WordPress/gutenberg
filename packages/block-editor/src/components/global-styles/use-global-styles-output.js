@@ -460,7 +460,11 @@ export function getLayoutStyles( {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== name &&
+					'grid' !== name
+				) {
 					return;
 				}
 
