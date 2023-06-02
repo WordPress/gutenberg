@@ -46,38 +46,46 @@ function InstalledFonts() {
 		>
 			{ ! fontSelected && (
 				<>
-					<PreviewControls />
-					<Spacer margin={ 8 } />
+					{/* <PreviewControls /> */}
+					
+					{ themeFonts.length > 0 && (
+						<>
+							<Spacer margin={ 4 } />
+							<FontsGrid
+								title={ __( 'Theme Fonts' ) }
+							>
+								{ themeFonts.map( ( font ) => (
+									<LibraryFontCard
+										font={ font }
+										key={ font.slug }
+										onClick={ () => {
+											handleSelectFont( font );
+										} }
+									/>
+								) ) }
+							</FontsGrid>
+						</>
+					)}
 
-					<FontsGrid
-						title={ __( 'Theme Fonts' ) }
-					>
-						{ themeFonts.map( ( font ) => (
-							<LibraryFontCard
-								font={ font }
-								key={ font.slug }
-								onClick={ () => {
-									handleSelectFont( font );
-								} }
-							/>
-						) ) }
-					</FontsGrid>
+					{ libraryFonts.length > 0 && (
+						<>
+							<Spacer margin={ 10 } />
+							<FontsGrid
+								title={ __( 'User Fonts' ) }
+							>
+								{ libraryFonts.map( ( font ) => (
+									<LibraryFontCard
+										font={ font }
+										key={ font.slug }
+										onClick={ () => {
+											handleSelectFont( font );
+										} }
+									/>
+								) ) }
+							</FontsGrid>
+						</>
+					)}
 
-					<Spacer margin={ 10 } />
-
-					<FontsGrid
-						title={ __( 'User Fonts' ) }
-					>
-						{ libraryFonts.map( ( font ) => (
-							<LibraryFontCard
-								font={ font }
-								key={ font.slug }
-								onClick={ () => {
-									handleSelectFont( font );
-								} }
-							/>
-						) ) }
-					</FontsGrid>
 				</>
 			) }
 

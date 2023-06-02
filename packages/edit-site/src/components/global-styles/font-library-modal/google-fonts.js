@@ -219,7 +219,7 @@ function GoogleFonts() {
 								) ) }
 						</SelectControl>
 
-						<PreviewControls />
+						{/* <PreviewControls /> */}
 					</HStack>
 
 					<Spacer margin={ 8 } />
@@ -250,7 +250,7 @@ function GoogleFonts() {
 
 					{ fontSelected && (
 						<>
-							<PreviewControls />
+							{/* <PreviewControls /> */}
 							<Spacer margin={ 8 } />
 							<GoolgeFontDetails
 								font={ fontSelected }

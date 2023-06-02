@@ -81,7 +81,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 				) }
 			</ConfirmDialog>
 
-			<PreviewControls />
+			{/* <PreviewControls /> */}
 			<Spacer margin={ 8 } />
 
 			<VStack spacing={ 4 }>
