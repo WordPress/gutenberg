@@ -2172,12 +2172,6 @@
 		"parent": "e2e"
 	},
 	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
-	},
-	{
 		"title": "Scripts",
 		"slug": "scripts",
 		"markdown_source": "../docs/contributors/code/scripts.md",
