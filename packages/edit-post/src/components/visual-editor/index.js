@@ -112,7 +112,7 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
-		blockTypes,
+		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -153,12 +153,11 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
-			blockTypes: getBlockTypes(),
+			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
+				return type.apiVersion >= 3;
+			} ),
 		};
 	}, [] );
-	const hasV3BlocksOnly = blockTypes.every( ( type ) => {
-		return type.apiVersion >= 3;
-	} );
 	const { isCleanNewPost } = useSelect( editorStore );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
