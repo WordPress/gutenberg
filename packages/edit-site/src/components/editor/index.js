@@ -114,7 +114,7 @@ export default function Editor( { isLoading } ) {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -157,7 +157,7 @@ export default function Editor( { isLoading } ) {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
 	return (
@@ -227,7 +227,7 @@ export default function Editor( { isLoading } ) {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={
 											hasPageContentFocus
