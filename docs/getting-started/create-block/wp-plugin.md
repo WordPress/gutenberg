@@ -104,7 +104,7 @@ The `register_block_type` function registers the block we are going to create an
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "create-block/gutenpride",
 	"version": "0.1.0",
 	"title": "Gutenpride",

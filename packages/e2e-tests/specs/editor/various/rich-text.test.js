@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	clickBlockToolbarButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -74,7 +75,7 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate(
+		const count = await canvas().evaluate(
 			() =>
 				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
 					.length
@@ -173,7 +174,7 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '3' );
 
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			let called;
 			const { body } = document;
 			const config = {
@@ -233,7 +234,7 @@ describe( 'RichText', () => {
 
 		await page.keyboard.type( '4' );
 
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			// The selection change event should be called once. If there's only
 			// one item in `window.unsubscribes`, it means that only one
 			// function is present to disconnect the `mutationObserver`.
@@ -274,7 +275,7 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
+		await canvas().waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '12' );
@@ -305,7 +306,7 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '1' );
 		// Simulate moving focus to a different app, then moving focus back,
 		// without selection being changed.
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			const activeElement = document.activeElement;
 			activeElement.blur();
 			activeElement.focus();
@@ -515,7 +516,7 @@ describe( 'RichText', () => {
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await page.evaluate( async () => {
+		await canvas().evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
 			// The `selectionchange` and `compositionend` events should run in separate event

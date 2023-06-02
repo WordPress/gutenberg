@@ -28,7 +28,7 @@ test.describe( 'Inner blocks templates', () => {
 			name: 'test/test-inner-blocks-async-template',
 		} );
 
-		const blockWithTemplateContent = page.locator(
+		const blockWithTemplateContent = editor.canvas.locator(
 			'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
 		);
 

@@ -52,7 +52,7 @@ test.describe( 'changing image size', () => {
 
 		// Verify that the custom size was applied to the image.
 		await expect(
-			page.locator( `role=img[name="${ filename }"]` )
+			editor.canvas.locator( `role=img[name="${ filename }"]` )
 		).toHaveCSS( 'width', '499px' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Width"i]' )

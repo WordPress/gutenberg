@@ -220,7 +220,7 @@ const getPluginTemplate = async ( templateName ) => {
 const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
-		apiVersion: 2,
+		apiVersion: 3,
 		namespace: 'create-block',
 		category: 'widgets',
 		author: 'The WordPress Contributors',

@@ -170,7 +170,7 @@ If you pass `attributes` to `ServerSideRender`, the block must also be registere
 register_block_type(
 	'core/archives',
 	array(
-		'api_version' => 2,
+		'api_version' => 3,
 		'attributes'      => array(
 			'showPostCounts'    => array(
 				'type'      => 'boolean',

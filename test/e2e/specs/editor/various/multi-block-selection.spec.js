@@ -247,6 +247,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -292,6 +299,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
@@ -304,6 +318,13 @@ test.describe( 'Multi-block selection', () => {
 				.filter( { hasText: 'Draft saved' } )
 		).toBeVisible();
 		await page.reload();
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
@@ -867,7 +888,6 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	test( 'should select title if the cursor is on title', async ( {
-		page,
 		editor,
 		pageUtils,
 		multiBlockSelectionUtils,
@@ -890,7 +910,7 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [] );
 		await expect
 			.poll( () =>
-				page.evaluate( () => window.getSelection().toString() )
+				editor.canvas.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'Post title' );
 	} );
@@ -1142,6 +1162,13 @@ test.describe( 'Multi-block selection', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },

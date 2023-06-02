@@ -396,7 +396,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		register_block_type(
 			'my/block-with-styles',
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'borderColor' => array(
 						'type' => 'string',

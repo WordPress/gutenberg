@@ -19,8 +19,9 @@ test.describe( 'Using Hooks API', () => {
 
 	test( 'Should contain a reset block button on the sidebar', async ( {
 		page,
+		editor,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 		await page.click(
 			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
@@ -34,10 +35,10 @@ test.describe( 'Using Hooks API', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'role=document[name="Paragraph block"i]'
 		);
 		await expect( paragraphBlock ).toHaveText( 'First paragraph' );

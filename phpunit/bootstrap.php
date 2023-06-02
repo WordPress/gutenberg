@@ -105,7 +105,7 @@ function gutenberg_register_test_block_for_feature_selectors() {
 	WP_Block_Type_Registry::get_instance()->register(
 		'test/test',
 		array(
-			'api_version' => 2,
+			'api_version' => 3,
 			'attributes'  => array(
 				'textColor' => array(
 					'type' => 'string',

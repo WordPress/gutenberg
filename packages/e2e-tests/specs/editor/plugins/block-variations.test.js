@@ -11,6 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	togglePreferencesOption,
 	toggleMoreMenu,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
@@ -45,7 +46,7 @@ describe( 'Block variations', () => {
 		await insertBlock( 'Large Quote' );
 
 		expect(
-			await page.$(
+			await canvas().$(
 				'.wp-block[data-type="core/quote"] blockquote.is-style-large'
 			)
 		).toBeDefined();
@@ -58,7 +59,7 @@ describe( 'Block variations', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect(
-			await page.$(
+			await canvas().$(
 				'.wp-block[data-type="core/quote"] blockquote.is-style-large'
 			)
 		).toBeDefined();
@@ -75,7 +76,7 @@ describe( 'Block variations', () => {
 	test( 'Insert the Success Message block variation', async () => {
 		await insertBlock( 'Success Message' );
 
-		const successMessageBlock = await page.$(
+		const successMessageBlock = await canvas().$(
 			'.wp-block[data-type="core/paragraph"]'
 		);
 		expect( successMessageBlock ).toBeDefined();
@@ -86,12 +87,12 @@ describe( 'Block variations', () => {
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
 		await insertBlock( 'Columns' );
 
-		const fourColumnsVariation = await page.waitForSelector(
+		const fourColumnsVariation = await canvas().waitForSelector(
 			'.wp-block[data-type="core/columns"] .block-editor-block-variation-picker__variation[aria-label="Four columns"]'
 		);
 		await fourColumnsVariation.click();
 		expect(
-			await page.$$(
+			await canvas().$$(
 				'.wp-block[data-type="core/columns"] .wp-block[data-type="core/column"]'
 			)
 		).toHaveLength( 4 );

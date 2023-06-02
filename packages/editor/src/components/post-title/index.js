@@ -74,7 +74,8 @@ function PostTitle( _, forwardedRef ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
+		const ownerDocument =
+			ref.current.ownerDocument.defaultView.top.document;
 		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should

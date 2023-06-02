@@ -32,10 +32,10 @@ test.describe( 'Image', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'can be inserted', async ( { editor, page, imageBlockUtils } ) => {
+	test( 'can be inserted', async ( { editor, imageBlockUtils } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();
@@ -63,7 +63,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -134,7 +134,7 @@ test.describe( 'Image', () => {
 		{
 			// Focus outside the block to avoid the image caption being selected
 			// It can happen on CI specially.
-			await page.click( 'role=textbox[name="Add title"i]' );
+			await editor.canvas.click( 'role=textbox[name="Add title"i]' );
 			await image.click();
 			await page.keyboard.press( 'Backspace' );
 
@@ -149,7 +149,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -165,7 +165,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.type( '2' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '12' );
 	} );
 
@@ -176,7 +178,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -193,7 +195,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 
@@ -205,7 +209,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -245,7 +249,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowRight' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '<strong>a</strong>' );
 	} );
 
@@ -256,7 +262,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -300,7 +306,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -366,7 +372,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -423,7 +429,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -459,7 +465,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -513,13 +519,12 @@ test.describe( 'Image', () => {
 
 	test( 'should undo without broken temporary state', async ( {
 		editor,
-		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -529,7 +534,7 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-		await page.focus( '.wp-block-image' );
+		await editor.canvas.focus( '.wp-block-image' );
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a
@@ -543,8 +548,15 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
@@ -637,7 +649,7 @@ test.describe( 'Image', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 
@@ -698,7 +710,7 @@ test.describe( 'Image', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();
@@ -756,7 +768,7 @@ test.describe( 'Image - interactivity', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();

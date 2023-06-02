@@ -362,7 +362,7 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-incompatible-keys';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					api_version: 2,
+					api_version: 3,
 					provides_context: {
 						fontSize: 'fontSize',
 					},
@@ -375,7 +375,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -403,7 +403,7 @@ describe( 'blocks', () => {
 			} );
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					apiVersion: 2,
+					apiVersion: 3,
 					category: 'ignored',
 				},
 			} );
@@ -413,7 +413,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
