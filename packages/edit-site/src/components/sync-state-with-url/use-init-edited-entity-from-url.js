@@ -31,7 +31,7 @@ export default function useInitEditedEntityFromURL() {
 		};
 	}, [] );
 
-	const { setTemplate, setTemplatePart, setPage } =
+	const { setReusableBlock, setTemplate, setTemplatePart, setPage } =
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
@@ -42,6 +42,9 @@ export default function useInitEditedEntityFromURL() {
 					break;
 				case 'wp_template_part':
 					setTemplatePart( postId );
+					break;
+				case 'wp_block':
+					setReusableBlock( postId );
 					break;
 				default:
 					setPage( {

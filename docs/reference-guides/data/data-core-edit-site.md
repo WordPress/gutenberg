@@ -354,6 +354,18 @@ _Returns_
 
 -   `number`: The resolved template ID for the page route.
 
+### setReusableBlock
+
+Action that sets a reusable block.
+
+_Parameters_
+
+-   _reusableBlockId_ `string`: The reusable block ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setTemplate
 
 Action that sets a template, optionally fetching it from REST API.
