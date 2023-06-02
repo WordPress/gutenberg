@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { select } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,10 @@ import {
 	getBlockEditingMode,
 	isBlockSubtreeDisabled,
 } from '../private-selectors';
+
+jest.mock( '@wordpress/data/src/select', () => ( {
+	select: jest.fn(),
+} ) );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -117,11 +126,9 @@ describe( 'private selectors', () => {
 			const __experimentalHasContentRoleAttribute = jest.fn(
 				() => false
 			);
-			getBlockEditingMode.registry = {
-				select: jest.fn( () => ( {
-					__experimentalHasContentRoleAttribute,
-				} ) ),
-			};
+			select.mockReturnValue( {
+				__experimentalHasContentRoleAttribute,
+			} );
 
 			it( 'should return default by default', () => {
 				expect(

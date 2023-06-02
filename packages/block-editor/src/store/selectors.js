@@ -26,6 +26,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
+import { getBlockEditingMode } from './private-selectors';
 
 /**
  * A block selection object.
@@ -1539,6 +1540,10 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
+		return false;
+	}
+
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 
 	// The parent block doesn't have settings indicating it doesn't support
@@ -1633,6 +1638,7 @@ export const canInsertBlockType = createSelector(
 		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		state.blockEditingModes,
 	]
 );
 
@@ -1663,21 +1669,19 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
-
-	// attributes can be null if the block is already deleted.
 	if ( attributes === null ) {
 		return true;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = !! getTemplateLock( state, rootClientId );
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.remove === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.remove ) {
+		return false;
 	}
-
-	// When remove is true, it means we cannot remove it.
-	return ! lock?.remove;
+	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -1709,16 +1713,16 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.move === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.move ) {
+		return false;
 	}
-
-	// When move is true, it means we cannot move it.
-	return ! lock?.move;
+	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -2812,6 +2816,13 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
+	// can't be selected, and prevents non-disabled nested blocks from being
+	// selected.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+		return false;
+	}
+
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
 		return true;
