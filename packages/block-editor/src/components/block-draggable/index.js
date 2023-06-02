@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -24,6 +24,7 @@ const BlockDraggable = ( {
 		( select ) => {
 			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
 				select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const blockName = getBlockName( clientIds[ 0 ] );
 
