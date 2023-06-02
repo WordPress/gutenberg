@@ -19,7 +19,7 @@ const useUserPatterns = () => {
 		} );
 
 		return nonSyncedPatterns?.map( ( item ) => ( {
-			categories: item.meta?.wp_block_categories,
+			categories: item.meta?.wp_block?.categories,
 			name: item.slug,
 		} ) );
 	}, [] );
