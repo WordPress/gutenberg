@@ -139,69 +139,113 @@ describe( 'private selectors', () => {
 				).toBe( 'default' );
 			} );
 
-			[ 'disabled', 'contentOnly' ].forEach( ( mode ) => {
-				it( `should return ${ mode } if explicitly set`, () => {
-					const state = {
-						...baseState,
-						blockEditingModes: new Map( [
-							[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', mode ],
-						] ),
-					};
-					expect(
-						getBlockEditingMode(
-							state,
-							'b3247f75-fd94-4fef-97f9-5bfd162cc416'
-						)
-					).toBe( mode );
-				} );
+			it( 'should return disabled if explicitly set', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'disabled' );
+			} );
 
-				it( `should return ${ mode } if explicitly set on a parent`, () => {
-					const state = {
-						...baseState,
-						blockEditingModes: new Map( [
-							[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', mode ],
-						] ),
-					};
-					expect(
-						getBlockEditingMode(
-							state,
-							'b3247f75-fd94-4fef-97f9-5bfd162cc416'
-						)
-					).toBe( mode );
-				} );
+			it( 'should return contentOnly if explicitly set', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+					] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'contentOnly' );
+			} );
 
-				it( `should return ${ mode } if overridden by a parent`, () => {
-					const state = {
-						...baseState,
-						blockEditingModes: new Map( [
-							[ '', mode ],
-							[
-								'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-								'default',
-							],
-							[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', mode ],
-						] ),
-					};
-					expect(
-						getBlockEditingMode(
-							state,
-							'b3247f75-fd94-4fef-97f9-5bfd162cc416'
-						)
-					).toBe( mode );
-				} );
+			it( 'should return disabled if explicitly set on a parent', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'disabled' );
+			} );
 
-				it( `should return ${ mode } if explicitly set on root`, () => {
-					const state = {
-						...baseState,
-						blockEditingModes: new Map( [ [ '', mode ] ] ),
-					};
-					expect(
-						getBlockEditingMode(
-							state,
-							'b3247f75-fd94-4fef-97f9-5bfd162cc416'
-						)
-					).toBe( mode );
-				} );
+			it( 'should return default if parent is set to contentOnly', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							'contentOnly',
+						],
+					] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'default' );
+			} );
+
+			it( 'should return disabled if overridden by a parent', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
+						[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'disabled' );
+			} );
+
+			it( 'should return disabled if explicitly set on root', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'disabled' );
+			} );
+
+			it( 'should return default if root is contentOnly', () => {
+				const state = {
+					...baseState,
+					blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
+				};
+				expect(
+					getBlockEditingMode(
+						state,
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+					)
+				).toBe( 'default' );
 			} );
 
 			it( 'should return disabled if parent is locked and the block has no content role', () => {
