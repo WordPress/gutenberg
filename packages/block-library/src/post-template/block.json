@@ -20,9 +20,7 @@
 		"html": false,
 		"align": [ "wide", "full" ],
 		"anchor": true,
-		"__experimentalLayout": {
-			"allowEditing": false
-		},
+		"__experimentalLayout": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -42,6 +40,14 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": {
+				"__experimentalDefault": "1.25em"
+			},
+			"__experimentalDefaultControls": {
+				"blockGap": true
 			}
 		}
 	},

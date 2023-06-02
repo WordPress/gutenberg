@@ -19,7 +19,6 @@
 			},
 			"tagName": "div",
 			"layout": {
-				"contentSize": null,
 				"type": "constrained"
 			}
 		},

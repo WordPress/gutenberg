@@ -107,7 +107,6 @@ export default function QueryContent( {
 					clientId={ clientId }
 					attributes={ attributes }
 					setQuery={ updateQuery }
-					setDisplayLayout={ updateDisplayLayout }
 					openPatternSelectionModal={ openPatternSelectionModal }
 				/>
 			</BlockControls>

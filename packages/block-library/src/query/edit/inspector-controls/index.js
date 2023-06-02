@@ -101,7 +101,7 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showColumnsControl = displayLayout?.type === 'flex';
+	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -169,7 +169,9 @@ export default function QueryInspectorControls( props ) {
 									label={ __( 'Columns' ) }
 									value={ displayLayout.columns }
 									onChange={ ( value ) =>
-										setDisplayLayout( { columns: value } )
+										setDisplayLayout( {
+											columns: value,
+										} )
 									}
 									min={ 2 }
 									max={ Math.max( 6, displayLayout.columns ) }

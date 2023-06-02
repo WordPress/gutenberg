@@ -1073,11 +1073,13 @@ class WP_Theme_JSON_Gutenberg {
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
-			$root_selector    = static::ROOT_BLOCK_SELECTOR;
-			$columns_selector = '.wp-block-columns';
+			$root_selector          = static::ROOT_BLOCK_SELECTOR;
+			$columns_selector       = '.wp-block-columns';
+			$post_template_selector = '.wp-block-post-template';
 			if ( ! empty( $options['scope'] ) ) {
-				$root_selector    = static::scope_selector( $options['scope'], $root_selector );
-				$columns_selector = static::scope_selector( $options['scope'], $columns_selector );
+				$root_selector          = static::scope_selector( $options['scope'], $root_selector );
+				$columns_selector       = static::scope_selector( $options['scope'], $columns_selector );
+				$post_template_selector = static::scope_selector( $options['scope'], $post_template_selector );
 			}
 			if ( ! empty( $options['root_selector'] ) ) {
 				$root_selector = $options['root_selector'];
@@ -1093,6 +1095,11 @@ class WP_Theme_JSON_Gutenberg {
 					'path'     => array( 'styles', 'blocks', 'core/columns' ),
 					'selector' => $columns_selector,
 					'name'     => 'core/columns',
+				),
+				array(
+					'path'     => array( 'styles', 'blocks', 'core/post-template' ),
+					'selector' => $post_template_selector,
+					'name'     => 'core/post-template',
 				),
 			);
 
@@ -1298,7 +1305,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( null !== $block_gap_value && false !== $block_gap_value && '' !== $block_gap_value ) {
 				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
 					// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-					if ( ! $has_block_gap_support && 'flex' !== $layout_definition_key ) {
+					if ( ! $has_block_gap_support && 'flex' !== $layout_definition_key && 'grid' !== $layout_definition_key ) {
 						continue;
 					}
 
