@@ -1,11 +1,45 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { test, expect } from './fixtures';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
+/**
+ * External dependencies
+ */
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 test.describe( 'data-wp-bind', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directive-bind.html' );
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-interactive-blocks'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-interactive-blocks'
+		);
+	} );
+
+	let postId = '';
+
+	test.beforeEach( async ( { admin, editor, page } ) => {
+		// We only need to publish a new post the first time. Subsequent tests
+		// will access to the same post.
+		if ( ! postId ) {
+			await admin.createNewPost();
+			await editor.setContent(
+				await readFile(
+					join( __dirname, './html/directive-bind.html' ),
+					'utf8'
+				)
+			);
+			postId = `${ await editor.publishPost() }`;
+		}
+		await page.goto( `/?p=${ postId }` );
 	} );
 
 	test( 'add missing href at hydration', async ( { page } ) => {
