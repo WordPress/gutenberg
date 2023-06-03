@@ -424,7 +424,7 @@ function createFromElement( {
 			attributes: getAttributes( { element: node } ),
 		} );
 
-		if ( format.formatType?.contentEditable === false ) {
+		if ( format?.formatType?.contentEditable === false ) {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
@@ -440,7 +440,7 @@ function createFromElement( {
 			continue;
 		}
 
-		delete format.formatType;
+		if ( format ) delete format.formatType;
 
 		if (
 			multilineWrapperTags &&

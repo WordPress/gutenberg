@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/footnotes",
 	"title": "Footnotes",
 	"category": "text",
@@ -10,7 +10,9 @@
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
-		"multiple": false
+		"multiple": false,
+		"inserter": false,
+		"reusable": false
 	},
 	"style": "wp-block-footnotes"
 }
