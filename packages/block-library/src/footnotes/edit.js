@@ -11,7 +11,7 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		'meta',
 		postId
 	);
-	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
+	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
 	return (
 		<ol { ...useBlockProps() }>
 			{ footnotes.map( ( { id, content } ) => (

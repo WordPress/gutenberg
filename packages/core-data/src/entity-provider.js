@@ -192,7 +192,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => {
-			const footnotes = meta.footnotes
+			const footnotes = meta?.footnotes
 				? JSON.parse( meta.footnotes )
 				: [];
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
