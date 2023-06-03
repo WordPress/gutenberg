@@ -87,6 +87,7 @@
 						"name": "core/query-pagination",
 						"isValid": true,
 						"attributes": {
+							"midSize": 2,
 							"paginationArrow": "none",
 							"showLabel": true
 						},
