@@ -2,10 +2,6 @@
  * WordPress dependencies
  */
 import { useBlockProps } from '@wordpress/block-editor';
-/**
- * External dependencies
- */
-import React from '@wordpress/element';
 
 const createPaginationItem = ( content, Tag = 'a', extraClass = '' ) => (
 	<Tag key={ content } className={ `page-numbers ${ extraClass }` }>
