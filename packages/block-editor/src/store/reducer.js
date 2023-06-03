@@ -9,7 +9,6 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-
 /**
  * Internal dependencies
  */

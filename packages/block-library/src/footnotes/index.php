@@ -51,9 +51,18 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/comment-template` block on the server.
+ * Registers the `core/footnotes` block on the server.
  */
 function register_block_core_footnotes() {
+	register_post_meta(
+		'post',
+		'footnotes',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
 	register_block_type_from_metadata(
 		__DIR__ . '/footnotes',
 		array(
