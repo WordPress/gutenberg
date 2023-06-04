@@ -23,13 +23,6 @@ export const unstyledButton = css`
 	&:hover {
 		color: ${ COLORS.ui.theme };
 	}
-
-	&:focus {
-		background-color: transparent;
-		color: ${ COLORS.ui.theme };
-		border-color: ${ COLORS.ui.theme };
-		outline: 3px solid transparent;
-	}
 `;
 
 export const itemWrapper = css`
