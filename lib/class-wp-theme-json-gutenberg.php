@@ -3669,14 +3669,18 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Get styles defined in theme.json with values for the css variables.
+	 * Resolves the values of CSS variables in the given styles.
 	 *
 	 * @since 6.3.0
-	 * @return array
+	 * @param WP_Theme_JSON_Gutenberg $theme_json The theme json resolver.
+	 *
+	 * @return array The styles with the variables replaced with their values.
 	 */
-	public function get_styles_with_values() {
-		$preset_vars = static::compute_preset_vars( self::get_settings(), static::VALID_ORIGINS );
-		$theme_vars  = static::compute_theme_vars( self::get_settings() );
+	public static function resolve_variables( $theme_json ) {
+		$settings    = $theme_json->get_settings();
+		$styles      = $theme_json->get_raw_data()['styles'];
+		$preset_vars = static::compute_preset_vars( $settings, static::VALID_ORIGINS );
+		$theme_vars  = static::compute_theme_vars( $settings );
 		$vars        = array_reduce(
 			array_merge( $preset_vars, $theme_vars ),
 			function( $carry, $item ) {
@@ -3687,7 +3691,6 @@ class WP_Theme_JSON_Gutenberg {
 			array()
 		);
 
-		$styles = self::get_raw_data()['styles'];
 		return self::convert_variables_to_value( $styles, $vars );
 	}
 

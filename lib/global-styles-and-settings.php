@@ -271,11 +271,11 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 	&& is_array( $context['transforms'] )
 	&& in_array( 'resolve-variables', $context['transforms'], true );
 
+	$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 	if ( $resolve_variables ) {
-		$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_styles_with_values();
-	} else {
-		$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles'];
+		$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
 	}
+	$styles = $merged_data->get_raw_data()['styles'];
 	return _wp_array_get( $styles, $path, $styles );
 }
 
