@@ -2026,6 +2026,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$primary_color   = '#9DFF20';
 		$secondary_color = '#9DFF21';
 		$contrast_color  = '#000';
+		$raw_color_value = '#efefef';
 		$large_font      = '18px';
 		$small_font      = '12px';
 		$theme_json      = new WP_Theme_JSON_Gutenberg(
@@ -2069,6 +2070,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'styles'   => array(
+					'color'    => array(
+						'background' => 'var(--wp--preset--color--primary)',
+						'text'       => $raw_color_value,
+					),
 					'elements' => array(
 						'button' => array(
 							'color'      => array(
@@ -2082,7 +2087,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'blocks'   => array(
 						'core/post-terms' => array(
 							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
-							'color'      => array( 'background' => 'var(--wp--preset--color--secondary)' ),
+							'color'      => array( 'background' => $raw_color_value ),
 						),
 						'core/navigation' => array(
 							'elements' => array(
@@ -2114,11 +2119,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$styles = $theme_json->get_styles_with_values();
 
+		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
+		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
+
 		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
 		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
 
 		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
 		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
+		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
 
 		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
 		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
