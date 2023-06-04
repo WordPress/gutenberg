@@ -15,13 +15,13 @@ export const unstyledButton = css`
 	background: none;
 	text-align: start;
 
+	svg,
+	path {
+		fill: currentColor;
+	}
+
 	&:hover {
 		color: ${ COLORS.ui.theme };
-
-		svg,
-		path {
-			fill: ${ COLORS.ui.theme };
-		}
 	}
 
 	&:focus {
