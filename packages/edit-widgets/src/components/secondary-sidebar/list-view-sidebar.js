@@ -9,6 +9,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -21,9 +22,14 @@ import { store as editWidgetsStore } from '../../store';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -53,9 +59,10 @@ export default function ListViewSidebar() {
 				ref={ useMergeRefs( [
 					contentFocusReturnRef,
 					focusOnMountRef,
+					setDropZoneElement,
 				] ) }
 			>
-				<ListView />
+				<ListView dropZoneElement={ dropZoneElement } />
 			</div>
 		</div>
 	);

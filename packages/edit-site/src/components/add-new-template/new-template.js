@@ -13,6 +13,7 @@ import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -96,10 +97,6 @@ export default function NewTemplate( {
 	const [ modalContent, setModalContent ] = useState(
 		modalContentMap.templatesList
 	);
-	const [
-		showCustomGenericTemplateModal,
-		setShowCustomGenericTemplateModal,
-	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
 
@@ -144,7 +141,7 @@ export default function NewTemplate( {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					newTemplate.title?.rendered || title
+					decodeEntities( newTemplate.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',
@@ -183,7 +180,7 @@ export default function NewTemplate( {
 			__( 'Add template: %s' ),
 			entityForSuggestions.labels.singular_name
 		);
-	} else if ( showCustomGenericTemplateModal ) {
+	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
 	}
 	return (
@@ -246,7 +243,9 @@ export default function NewTemplate( {
 									'A custom template can be manually applied to any post or page.'
 								) }
 								onClick={ () =>
-									setShowCustomGenericTemplateModal( true )
+									setModalContent(
+										modalContentMap.customGenericTemplate
+									)
 								}
 							/>
 						</Grid>

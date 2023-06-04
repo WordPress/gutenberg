@@ -19,6 +19,15 @@
 	.edit-site-sidebar-navigation-item__drilldown-indicator {
 		fill: $gray-700;
 	}
+
+	&:is(a) {
+		text-decoration: none;
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+	}
 }
 
 .edit-site-sidebar-navigation-screen__content .block-editor-list-view-block-select-button {

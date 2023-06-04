@@ -25,7 +25,7 @@ function render_block_core_file( $attributes, $content ) {
 	$pattern = '@<object.+(?<attribute>aria-label="(?<filename>[^"]+)?")@i';
 	$content = preg_replace_callback(
 		$pattern,
-		function ( $matches ) {
+		static function ( $matches ) {
 			$filename     = ! empty( $matches['filename'] ) ? $matches['filename'] : '';
 			$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
 			$label        = $has_filename ?

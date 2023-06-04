@@ -313,3 +313,106 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 		context,
 	};
 }
+
+/**
+ * Removes all notices from a given context. Defaults to the default context.
+ *
+ * @param {string} noticeType The context to remove all notices from.
+ * @param {string} context    The context to remove all notices from.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * export const ExampleComponent = () => {
+ * 	const notices = useSelect( ( select ) =>
+ * 		select( noticesStore ).getNotices()
+ * 	);
+ * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	return (
+ * 		<>
+ * 			<ul>
+ * 				{ notices.map( ( notice ) => (
+ * 					<li key={ notice.id }>{ notice.content }</li>
+ * 				) ) }
+ * 			</ul>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices()
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices( 'snackbar' )
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all snackbar notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
+ * 		</>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} 	   Action object.
+ */
+export function removeAllNotices(
+	noticeType = 'default',
+	context = DEFAULT_CONTEXT
+) {
+	return {
+		type: 'REMOVE_ALL_NOTICES',
+		noticeType,
+		context,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that several notices are to be removed.
+ *
+ * @param {string[]} ids                List of unique notice identifiers.
+ * @param {string}   [context='global'] Optional context (grouping) in which the notices are
+ *                                      intended to appear. Defaults to default context.
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ * 	const notices = useSelect( ( select ) =>
+ * 		select( noticesStore ).getNotices()
+ * 	);
+ * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	return (
+ * 		<>
+ * 			<ul>
+ * 				{ notices.map( ( notice ) => (
+ * 					<li key={ notice.id }>{ notice.content }</li>
+ * 				) ) }
+ * 			</ul>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeNotices( notices.map( ( { id } ) => id ) )
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all notices' ) }
+ * 			</Button>
+ * 		</>
+ * 	);
+ * };
+ * ```
+ * @return {Object} Action object.
+ */
+export function removeNotices( ids, context = DEFAULT_CONTEXT ) {
+	return {
+		type: 'REMOVE_NOTICES',
+		ids,
+		context,
+	};
+}
