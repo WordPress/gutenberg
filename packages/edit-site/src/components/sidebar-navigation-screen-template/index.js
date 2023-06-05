@@ -20,12 +20,14 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
+import HomeTemplateDetails from './home-template-details';
 
-function useTemplateTitleAndDescription( postType, postId ) {
+function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
 	);
+
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme(),
 		[]
@@ -40,6 +42,11 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		descriptionText = __(
 			'This is a custom template that can be applied manually to any Post or Page.'
 		);
+	}
+
+	let content = null;
+	if ( record?.slug === 'home' ) {
+		content = <HomeTemplateDetails />;
 	}
 
 	const description = (
@@ -74,7 +81,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description };
+	return { title, description, content };
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -83,7 +90,7 @@ export default function SidebarNavigationScreenTemplate() {
 		params: { postType, postId },
 	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, description } = useTemplateTitleAndDescription(
+	const { title, content, description } = useTemplateDetails(
 		postType,
 		postId
 	);
@@ -109,6 +116,7 @@ export default function SidebarNavigationScreenTemplate() {
 				</>
 			}
 			description={ description }
+			content={ content }
 		/>
 	);
 }

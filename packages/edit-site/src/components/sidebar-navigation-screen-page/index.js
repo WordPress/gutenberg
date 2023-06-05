@@ -26,7 +26,6 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
 
@@ -121,9 +120,6 @@ export default function SidebarNavigationScreenPage() {
 							{ stripHTML( record.excerpt.rendered ) }
 						</Truncate>
 					) }
-					<SidebarNavigationSubtitle>
-						{ __( 'Details' ) }
-					</SidebarNavigationSubtitle>
 					<PageDetails id={ postId } />
 				</>
 			}

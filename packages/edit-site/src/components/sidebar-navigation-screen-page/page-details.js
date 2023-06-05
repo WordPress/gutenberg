@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
+import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { count as wordCount } from '@wordpress/wordcount';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -19,6 +14,12 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import StatusLabel from './status-label';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	SidebarNavigationScreenDetailsPanel,
+	SidebarNavigationScreenDetailsPanelRow,
+	SidebarNavigationScreenDetailsPanelLabel,
+	SidebarNavigationScreenDetailsPanelValue,
+} from '../sidebar-navigation-screen-details-panel';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
@@ -138,26 +139,21 @@ export default function PageDetails( { id } ) {
 		[ record?.parent ]
 	);
 	return (
-		<VStack spacing={ 5 }>
+		<SidebarNavigationScreenDetailsPanel title={ __( 'Details' ) }>
 			{ getPageDetails( {
 				parentTitle,
 				templateTitle,
 				...record,
 			} ).map( ( { label, value } ) => (
-				<HStack
-					key={ label }
-					spacing={ 5 }
-					alignment="left"
-					className="edit-site-sidebar-navigation-screen-page__details"
-				>
-					<Text className="edit-site-sidebar-navigation-screen-page__details-label">
+				<SidebarNavigationScreenDetailsPanelRow key={ label }>
+					<SidebarNavigationScreenDetailsPanelLabel>
 						{ label }
-					</Text>
-					<Text className="edit-site-sidebar-navigation-screen-page__details-value">
+					</SidebarNavigationScreenDetailsPanelLabel>
+					<SidebarNavigationScreenDetailsPanelValue>
 						{ value }
-					</Text>
-				</HStack>
+					</SidebarNavigationScreenDetailsPanelValue>
+				</SidebarNavigationScreenDetailsPanelRow>
 			) ) }
-		</VStack>
+		</SidebarNavigationScreenDetailsPanel>
 	);
 }
