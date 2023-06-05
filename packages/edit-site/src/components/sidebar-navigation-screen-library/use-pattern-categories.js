@@ -62,7 +62,7 @@ export default function usePatternCategories() {
 				( x, index, arr ) =>
 					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
-		[ blockPatterns, restBlockPatterns ]
+		[ blockPatterns, restBlockPatterns, userPatterns ]
 	);
 
 	const categories = useMemo( () => {
