@@ -21,6 +21,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
 
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 -   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
