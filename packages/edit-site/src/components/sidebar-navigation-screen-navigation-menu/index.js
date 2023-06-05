@@ -51,6 +51,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const postType = `wp_navigation`;
 	const {
+		goTo,
 		params: { postId },
 	} = useNavigator();
 
@@ -76,11 +77,11 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		createSuccessNotice( 'Deleted Navigation menu', {
 			type: 'snackbar',
 		} );
-		//TODO: navigate to previous menu
+		goTo( '/navigation' );
 	};
 	const handleDuplicate = async () => {
 		const savedRecord = await saveEntityRecord( 'postType', postType, {
-			title: menuTitle,
+			title: menuTitle + __( ' (Copy)' ),
 			content: navigationMenu?.content?.raw,
 			status: 'publish',
 		} );
@@ -88,7 +89,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			createSuccessNotice( 'Duplicated Navigation menu', {
 				type: 'snackbar',
 			} );
-			//TODO: navigate to the duplicated menu
+			goTo( `/navigation/${ postType }/${ savedRecord.id }` );
 		}
 	};
 
