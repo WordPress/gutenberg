@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import {
 	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
@@ -14,7 +14,12 @@ import warning from '@wordpress/warning';
 import groups from './groups';
 
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const toolbarState = useContext( ToolbarContext );
+	const fillProps = useMemo(
+		() => [ [ ToolbarContext.Provider, toolbarState ] ],
+		[ toolbarState ]
+	);
+
 	const Slot = groups[ group ]?.Slot;
 	if ( ! Slot ) {
 		warning( `Unknown BlockControls group "${ group }" provided.` );
@@ -22,11 +27,11 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	}
 
 	if ( group === 'default' ) {
-		return <Slot { ...props } fillProps={ accessibleToolbarState } />;
+		return <Slot { ...props } fillProps={ fillProps } />;
 	}
 
 	return (
-		<Slot { ...props } fillProps={ accessibleToolbarState }>
+		<Slot { ...props } fillProps={ fillProps }>
 			{ ( fills ) => {
 				if ( ! fills.length ) {
 					return null;

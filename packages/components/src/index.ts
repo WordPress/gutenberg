@@ -213,6 +213,7 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export { ComponentsContext as __experimentalComponentsContext } from './ui/context/context-system-provider';
 
 // Private APIs.
 export { privateApis } from './private-apis';

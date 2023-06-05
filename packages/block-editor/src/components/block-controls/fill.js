@@ -3,7 +3,6 @@
  */
 import {
 	__experimentalStyleProvider as StyleProvider,
-	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
 } from '@wordpress/components';
 
@@ -26,24 +25,24 @@ export default function BlockControlsFill( {
 		return null;
 	}
 
+	const innerMarkup = (
+		<>
+			{ group === 'default' && <ToolbarGroup controls={ controls } /> }
+			{ children }
+		</>
+	);
+
 	return (
 		<StyleProvider document={ document }>
 			<Fill>
-				{ ( fillProps ) => {
-					// Children passed to BlockControlsFill will not have access to any
-					// React Context whose Provider is part of the BlockControlsSlot tree.
-					// So we re-create the Provider in this subtree.
-					const value =
-						fillProps && Object.keys( fillProps ).length > 0
-							? fillProps
-							: null;
-					return (
-						<ToolbarContext.Provider value={ value }>
-							{ group === 'default' && (
-								<ToolbarGroup controls={ controls } />
-							) }
-							{ children }
-						</ToolbarContext.Provider>
+				{ ( fillProps = [] ) => {
+					// `fillProps` is an array of context provider entries, provided by slot,
+					// that should wrap the fill markup.
+					return fillProps.reduce(
+						( inner, [ Provider, value ] ) => (
+							<Provider value={ value }>{ inner }</Provider>
+						),
+						innerMarkup
 					);
 				} }
 			</Fill>
