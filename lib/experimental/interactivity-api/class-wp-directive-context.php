@@ -2,7 +2,8 @@
 /**
  * Context data implementation.
  *
- * @package block-interactivity-experiments
+ * @package Gutenberg
+ * @subpackage Interactivity API
  */
 
 /**
