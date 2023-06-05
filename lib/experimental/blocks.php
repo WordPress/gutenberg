@@ -159,21 +159,23 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 
 	// Can we avoid infinite loops?
 
-	if ( $block_name === $block['blockName'] ) {
-		$inserted_block_markup = <<<END
+	if ( $block_name !== $block['blockName'] ) {
+		return $block_content;
+	}
+
+	$inserted_block_markup = <<<END
 <!-- wp:social-links -->
 <ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
 <!-- /wp:social-links -->'
 END;
 
-		$inserted_blocks  = parse_blocks( $inserted_block_markup );
-		$inserted_content = render_block( $inserted_blocks[0] );
+	$inserted_blocks  = parse_blocks( $inserted_block_markup );
+	$inserted_content = render_block( $inserted_blocks[0] );
 
-		if ( 'before' === $block_position ) {
-			$block_content = $inserted_content . $block_content;
-		} elseif ( 'after' === $block_position ) {
-			$block_content = $block_content . $inserted_content;
-		}
+	if ( 'before' === $block_position ) {
+		$block_content = $inserted_content . $block_content;
+	} elseif ( 'after' === $block_position ) {
+		$block_content = $block_content . $inserted_content;
 	}
 
 	return $block_content;
