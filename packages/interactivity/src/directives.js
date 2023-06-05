@@ -64,7 +64,7 @@ export default () => {
 		);
 	} );
 
-	// data-wp-effect.[name]
+	// data-wp-effect--[name]
 	directive( 'effect', ( { directives: { effect }, context, evaluate } ) => {
 		const contextValue = useContext( context );
 		Object.values( effect ).forEach( ( path ) => {
@@ -74,7 +74,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-init.[name]
+	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, context, evaluate } ) => {
 		const contextValue = useContext( context );
 		Object.values( init ).forEach( ( path ) => {
@@ -84,7 +84,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-on.[event]
+	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate, context } ) => {
 		const contextValue = useContext( context );
 		Object.entries( on ).forEach( ( [ name, path ] ) => {
@@ -94,7 +94,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-class.[classname]
+	// data-wp-class--[classname]
 	directive(
 		'class',
 		( {
@@ -139,7 +139,7 @@ export default () => {
 		}
 	);
 
-	// data-wp-bind.[attribute]
+	// data-wp-bind--[attribute]
 	directive(
 		'bind',
 		( { directives: { bind }, element, context, evaluate } ) => {
@@ -172,6 +172,24 @@ export default () => {
 						}
 					}, [] );
 				} );
+		}
+	);
+
+	// data-wp-text
+	directive(
+		'text',
+		( {
+			directives: {
+				text: { default: text },
+			},
+			element,
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			element.props.children = evaluate( text, {
+				context: contextValue,
+			} );
 		}
 	);
 
