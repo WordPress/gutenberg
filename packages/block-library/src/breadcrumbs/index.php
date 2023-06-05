@@ -103,7 +103,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$attributes,
 			$index,
 			$show_separator,
-			( $show_current_page && $index === count( $breadcrumbs ) -1 )
+			( $show_current_page && count( $breadcrumbs ) - 1 === $index )
 		);
 	}
 
@@ -142,11 +142,12 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * Used when iterating over a list of breadcrumb urls and titles.
  *
- * @param string $url            The url for the link in the breadcrumb.
- * @param string $title          The label/title for the breadcrumb item.
- * @param array  $attributes     Block attributes.
- * @param int    $index          The position in a list of ids.
- * @param bool   $show_separator Whether to show the separator character where available.
+ * @param string $url             The url for the link in the breadcrumb.
+ * @param string $title           The label/title for the breadcrumb item.
+ * @param array  $attributes      Block attributes.
+ * @param int    $index           The position in a list of ids.
+ * @param bool   $show_separator  Whether to show the separator character where available.
+ * @param bool   $is_current_page Whether to mark the breadcrumb item as the current page.
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */

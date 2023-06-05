@@ -122,9 +122,8 @@ export default function BreadcrumbsEdit( {
 
 	const { categories, parents, post, siteTitle } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select(
-				coreStore
-			);
+			const { getEntityRecord, getEditedEntityRecord } =
+				select( coreStore );
 
 			const siteData = getEntityRecord( 'root', '__unstableBase' );
 			const currentPost = getEditedEntityRecord(
@@ -241,6 +240,9 @@ export default function BreadcrumbsEdit( {
 		categories,
 		isSelected,
 		parents,
+		post?.title,
+		separator,
+		setAttributes,
 		showCurrentPageTitle,
 		showLeadingSeparator,
 		showSiteTitle,
@@ -250,7 +252,8 @@ export default function BreadcrumbsEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
-			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+			[ `is-content-justification-${ contentJustification }` ]:
+				contentJustification,
 		} ),
 	} );
 
