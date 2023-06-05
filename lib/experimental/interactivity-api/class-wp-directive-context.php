@@ -57,10 +57,13 @@ class WP_Directive_Context {
 	 * Set the current context.
 	 *
 	 * @param array $context The context to be set.
+	 *
 	 * @return void
 	 */
 	public function set_context( $context ) {
-		array_push( $this->stack, array_replace_recursive( $this->get_context(), $context ) );
+		if ( $context ) {
+			array_push( $this->stack, array_replace_recursive( $this->get_context(), $context ) );
+		}
 	}
 
 	/**

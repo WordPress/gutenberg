@@ -56,4 +56,22 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 			$context->get_context()
 		);
 	}
+
+	public function test_directive_doesnt_throw_on_malformed_context_objects() {
+		$context = new WP_Directive_Context(
+			array( 'my-key' => 'some-value' )
+		);
+
+		$markup = '<div data-wp-context=\'{ "wrong_json_object: }\'>';
+		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags->next_tag();
+
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+	}
+
 }
