@@ -13,14 +13,36 @@ import {
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import { useLink } from '../routes/link';
-import usePatterns from './use-patterns';
+import { usePatterns, PATTERNS, USER_PATTERNS } from './use-patterns';
+
+const DeleteMenuItem = ( { item, onClose } ) => {
+	const { __experimentalDeleteReusableBlock } =
+		useDispatch( reusableBlocksStore );
+
+	if ( item.type !== USER_PATTERNS ) {
+		return;
+	}
+
+	return (
+		<MenuItem
+			onClick={ () => {
+				__experimentalDeleteReusableBlock( item.id );
+				onClose();
+			} }
+		>
+			{ __( 'Delete' ) }
+		</MenuItem>
+	);
+};
 
 const GridItem = ( { category, composite, item } ) => {
 	const instanceId = useInstanceId( GridItem );
@@ -29,7 +51,7 @@ const GridItem = ( { category, composite, item } ) => {
 	const { onClick } = useLink( {
 		path: '/library',
 		postType: item.type,
-		postId: item.type === 'wp_block' ? item.id : item.name,
+		postId: item.type === USER_PATTERNS ? item.id : item.name,
 		categoryName: category,
 		categoryType: item.type,
 		canvas: 'edit',
@@ -46,7 +68,7 @@ const GridItem = ( { category, composite, item } ) => {
 				role="option"
 				as="div"
 				{ ...composite }
-				onClick={ item.type !== 'pattern' ? onClick : undefined }
+				onClick={ item.type !== PATTERNS ? onClick : undefined }
 			>
 				<BlockPreview blocks={ item.blocks } />
 				{ !! item.description && (
@@ -60,29 +82,27 @@ const GridItem = ( { category, composite, item } ) => {
 				justify="space-between"
 			>
 				<span>{ item.title }</span>
-				<DropdownMenu
-					icon={ moreHorizontal }
-					label={ __( 'Actions' ) }
-					className="edit-site-library__dropdown"
-					popoverProps={ { placement: 'bottom-end' } }
-					toggleProps={ {
-						className: 'edit-site-library__button',
-						isSmall: true,
-					} }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							<MenuItem
-								onClick={ () => {
-									// TODO: Implement pattern / template part deletion.
-									onClose();
-								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
+				{ item.type === USER_PATTERNS && (
+					<DropdownMenu
+						icon={ moreHorizontal }
+						label={ __( 'Actions' ) }
+						className="edit-site-library__dropdown"
+						popoverProps={ { placement: 'bottom-end' } }
+						toggleProps={ {
+							className: 'edit-site-library__button',
+							isSmall: true,
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								<DeleteMenuItem
+									item={ item }
+									onClose={ onClose }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				) }
 			</HStack>
 		</div>
 	);
@@ -97,7 +117,20 @@ export default function Grid( { category, label, type } ) {
 	}
 
 	if ( ! patterns.length ) {
-		return <div>{ __( 'No patterns found.' ) }</div>;
+		// TODO: Implement redirecting to root library page or proper empty state.
+		return (
+			<div
+				style={ {
+					color: '#e0e0e0',
+					height: '100%',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
+			>
+				{ __( 'No patterns found.' ) }
+			</div>
+		);
 	}
 
 	return (
