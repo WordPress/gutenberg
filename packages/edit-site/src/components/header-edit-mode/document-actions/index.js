@@ -85,10 +85,7 @@ function PageDocumentActions() {
 	) : (
 		<TemplateDocumentActions
 			className="is-animated"
-			onBack={ () => {
-				setHasEditedTemplate( true );
-				setHasPageContentLock( true );
-			} }
+			onBack={ () => setHasPageContentLock( true ) }
 		/>
 	);
 }
