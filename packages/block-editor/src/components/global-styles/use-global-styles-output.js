@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, set } from 'lodash';
+import { get, kebabCase, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -396,9 +396,21 @@ export function getStylesDeclarations(
 			 * Values that already have a "clamp()" function will not pass the test,
 			 * and therefore the original $value will be returned.
 			 */
+			const typographySettings =
+				!! tree?.settings?.typography?.fluid &&
+				tree?.settings?.layout?.wideSize
+					? {
+							fluid: {
+								maxViewPortWidth: tree.settings.layout.wideSize,
+								...tree.settings.typography.fluid,
+							},
+					  }
+					: {
+							fluid: tree?.settings?.typography?.fluid,
+					  };
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				typographySettings
 			);
 		}
 
@@ -448,7 +460,11 @@ export function getLayoutStyles( {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== name &&
+					'grid' !== name
+				) {
 					return;
 				}
 
@@ -685,7 +701,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || custom ) {
+	if ( Object.keys( presets ).length > 0 || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -698,7 +714,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || blockCustom ) {
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -964,7 +980,7 @@ export const toStyles = (
 		}
 
 		const classes = getPresetsClasses( selector, presets );
-		if ( ! isEmpty( classes ) ) {
+		if ( classes.length > 0 ) {
 			ruleset += classes;
 		}
 	} );
@@ -980,7 +996,10 @@ export function toSvgFilters( tree, blockSelectors ) {
 }
 
 const getSelectorsConfig = ( blockType, rootSelector ) => {
-	if ( ! isEmpty( blockType?.selectors ) ) {
+	if (
+		blockType?.selectors &&
+		Object.keys( blockType.selectors ).length > 0
+	) {
 		return blockType.selectors;
 	}
 
@@ -1106,9 +1125,17 @@ const processCSSNesting = ( css, blockSelector ) => {
 	return processedCSS;
 };
 
-export function useGlobalStylesOutput() {
-	let { merged: mergedConfig } = useContext( GlobalStylesContext );
-
+/**
+ * Returns the global styles output using a global styles configuration.
+ * If wishing to generate global styles and settings based on the
+ * global styles config loaded in the editor context, use `useGlobalStylesOutput()`.
+ * The use case for a custom config is to generate bespoke styles
+ * and settings for previews, or other out-of-editor experiences.
+ *
+ * @param {Object} mergedConfig Global styles configuration.
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -1189,4 +1216,14 @@ export function useGlobalStylesOutput() {
 		mergedConfig,
 		disableLayoutStyles,
 	] );
+}
+
+/**
+ * Returns the global styles output based on the current state of global styles config loaded in the editor context.
+ *
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutput() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return useGlobalStylesOutputWithConfig( mergedConfig );
 }

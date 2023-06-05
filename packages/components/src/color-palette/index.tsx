@@ -5,6 +5,7 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -19,7 +20,6 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
-import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
@@ -37,7 +37,6 @@ import {
 	extractColorNameFromCurrentValue,
 	isMultiplePaletteArray,
 	normalizeColorValue,
-	showTransparentBackground,
 } from './utils';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -219,21 +218,18 @@ function UnforwardedColorPalette(
 			/>
 		</DropdownContentWrapper>
 	);
+	const isHex = value?.startsWith( '#' );
 
-	const colordColor = colord( normalizedColorValue ?? '' );
-
-	const valueWithoutLeadingHash = value?.startsWith( '#' )
-		? value.substring( 1 )
-		: value ?? '';
-
-	const customColorAccessibleLabel = !! valueWithoutLeadingHash
+	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
+	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
-				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
 				__(
 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
 				),
 				buttonLabelName,
-				valueWithoutLeadingHash
+				isHex ? displayValue.split( '' ).join( '-' ) : displayValue
 		  )
 		: __( 'Custom color picker.' );
 
@@ -257,43 +253,48 @@ function UnforwardedColorPalette(
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Flex
-							as={ 'button' }
-							ref={ customColorPaletteCallbackRef }
-							justify="space-between"
-							align="flex-start"
-							className="components-color-palette__custom-color"
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							aria-label={ customColorAccessibleLabel }
-							style={
-								showTransparentBackground( value )
-									? { color: '#000' }
-									: {
-											background: value,
-											color:
-												colordColor.contrast() >
-												colordColor.contrast( '#000' )
-													? '#fff'
-													: '#000',
-									  }
-							}
+						<VStack
+							className="components-color-palette__custom-color-wrapper"
+							spacing={ 0 }
 						>
-							<FlexItem
-								isBlock
-								as={ Truncate }
-								className="components-color-palette__custom-color-name"
+							<button
+								ref={ customColorPaletteCallbackRef }
+								className="components-color-palette__custom-color-button"
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								aria-label={ customColorAccessibleLabel }
+								style={ {
+									background: value,
+								} }
+							/>
+							<VStack
+								className="components-color-palette__custom-color-text-wrapper"
+								spacing={ 0.5 }
 							>
-								{ buttonLabelName }
-							</FlexItem>
-							<FlexItem
-								as="span"
-								className="components-color-palette__custom-color-value"
-							>
-								{ valueWithoutLeadingHash }
-							</FlexItem>
-						</Flex>
+								<Truncate className="components-color-palette__custom-color-name">
+									{ value
+										? buttonLabelName
+										: 'No color selected' }
+								</Truncate>
+								{ /*
+								This `Truncate` is always rendered, even if
+								there is no `displayValue`, to ensure the layout
+								does not shift
+								*/ }
+								<Truncate
+									className={ classnames(
+										'components-color-palette__custom-color-value',
+										{
+											'components-color-palette__custom-color-value--is-hex':
+												isHex,
+										}
+									) }
+								>
+									{ displayValue }
+								</Truncate>
+							</VStack>
+						</VStack>
 					) }
 				/>
 			) }

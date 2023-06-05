@@ -19,6 +19,22 @@ export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
 
 type BaseButtonProps = {
 	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
+	 * Start opting into the larger `isSmall` button size that will become the
+	 * default small size in a future version.
+	 *
+	 * Only takes effect when the `isSmall` prop is `true`.
+	 *
+	 * @default false
+	 */
+	__next32pxSmallSize?: boolean;
+	/**
 	 * The button's children.
 	 */
 	children?: ReactNode;

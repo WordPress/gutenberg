@@ -539,7 +539,7 @@ Provides the CSS class names and inline styles for a block's typography support 
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
+-   _settings_ `Object|boolean`: Merged theme.json settings
 
 _Returns_
 

@@ -20,7 +20,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'before pause' );
 		await editor.page.waitForTimeout( 1000 );
 		await page.keyboard.type( ' after pause' );
@@ -88,7 +88,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'before keyboard ' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -159,8 +159,8 @@ test.describe( 'undo', () => {
 		} );
 	} );
 
-	test( 'should undo bold', async ( { page, pageUtils } ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
 		await page.click( 'role=button[name="Save draft"i]' );
 		await expect(
@@ -169,11 +169,12 @@ test.describe( 'undo', () => {
 			)
 		).toBeVisible();
 		await page.reload();
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await editor.canvas.click( '[data-type="core/paragraph"]' );
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+z' );
-		const activeElementLocator = page.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator( ':focus' );
 		await expect( activeElementLocator ).toHaveText( 'test' );
 	} );
 
@@ -183,7 +184,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		const firstBlock = await editor.getEditedPostContent();
 
@@ -326,7 +327,7 @@ test.describe( 'undo', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/14950
 
 		// Issue is demonstrated from an edited post: create, save, and reload.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'original' );
 		await page.click( 'role=button[name="Save draft"i]' );
 		await expect(
@@ -335,10 +336,11 @@ test.describe( 'undo', () => {
 			)
 		).toBeVisible();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
-		await page.click( '[data-type="core/paragraph"] >> nth=0' );
+		await editor.canvas.click( '[data-type="core/paragraph"] >> nth=0' );
 		await page.keyboard.type( 'modified' );
 
 		// The issue is demonstrated after the one second delay to trigger the
@@ -351,7 +353,7 @@ test.describe( 'undo', () => {
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const activeElementLocator = page.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator( ':focus' );
 		await expect( activeElementLocator ).toHaveText( 'original' );
 	} );
 
@@ -360,7 +362,7 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1' );
 		await page.click( 'role=button[name="Save draft"i]' );
 		await expect(
@@ -378,7 +380,7 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
 		await pageUtils.pressKeys( 'primary+z' );
@@ -391,7 +393,7 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( '1' );
 		await page.click( 'role=button[name="Save draft"i]' );
@@ -406,7 +408,7 @@ test.describe( 'undo', () => {
 		await expect(
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeDisabled();
-		await page.click( '[data-type="core/paragraph"]' );
+		await editor.canvas.click( '[data-type="core/paragraph"]' );
 
 		await page.keyboard.type( '2' );
 
@@ -436,7 +438,7 @@ test.describe( 'undo', () => {
 		// block attribute as in the previous action and results in transient edits
 		// and skipping `undo` history steps.
 		const text = 'tonis';
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( text );
 		await editor.publishPost();
 		await pageUtils.pressKeys( 'primary+z' );
@@ -454,6 +456,40 @@ test.describe( 'undo', () => {
 				},
 			},
 		] );
+	} );
+
+	// @see https://github.com/WordPress/gutenberg/issues/12075
+	test( 'should be able to undo and redo property cross property changes', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.type( 'a' ); // First step.
+		await page.keyboard.press( 'Backspace' ); // Second step.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click(); // third step.
+
+		// Title should be empty
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( '' );
+
+		// First undo removes the block.
+		// Second undo restores the title.
+		await pageUtils.pressKeys( 'primary+z' );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'a' );
+
+		// Redoing the "backspace" should clear the title again.
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( '' );
 	} );
 } );
 

@@ -54,6 +54,7 @@ export default function FocalPointPickerControls( {
 		>
 			<FocalPointUnitControl
 				label={ __( 'Left' ) }
+				aria-label={ __( 'Focal point left position' ) }
 				value={ [ valueX, '%' ].join( '' ) }
 				onChange={
 					( ( next ) =>
@@ -66,6 +67,7 @@ export default function FocalPointPickerControls( {
 			/>
 			<FocalPointUnitControl
 				label={ __( 'Top' ) }
+				aria-label={ __( 'Focal point top position' ) }
 				value={ [ valueY, '%' ].join( '' ) }
 				onChange={
 					( ( next ) =>

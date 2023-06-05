@@ -27,7 +27,9 @@ export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
+	meta,
 	content,
+	footer,
 	description,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
@@ -40,7 +42,7 @@ export default function SidebarNavigationScreen( {
 	const theme = getTheme( currentlyPreviewingTheme() );
 
 	return (
-		<VStack spacing={ 2 }>
+		<VStack spacing={ 0 }>
 			<HStack
 				spacing={ 4 }
 				alignment="flex-start"
@@ -50,7 +52,7 @@ export default function SidebarNavigationScreen( {
 					<NavigatorToParentButton
 						as={ SidebarButton }
 						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Back' ) }
+						label={ __( 'Back' ) }
 					/>
 				) : (
 					<SidebarButton
@@ -81,8 +83,19 @@ export default function SidebarNavigationScreen( {
 								title
 						  ) }
 				</Heading>
-				{ actions }
+				{ actions && (
+					<div className="edit-site-sidebar-navigation-screen__actions">
+						{ actions }
+					</div>
+				) }
 			</HStack>
+			{ meta && (
+				<>
+					<div className="edit-site-sidebar-navigation-screen__meta">
+						{ meta }
+					</div>
+				</>
+			) }
 
 			<nav className="edit-site-sidebar-navigation-screen__content">
 				{ description && (
@@ -92,6 +105,11 @@ export default function SidebarNavigationScreen( {
 				) }
 				{ content }
 			</nav>
+			{ footer && (
+				<footer className="edit-site-sidebar-navigation-screen__sticky-section">
+					{ footer }
+				</footer>
+			) }
 		</VStack>
 	);
 }

@@ -2,25 +2,59 @@
 
 ## Unreleased
 
+### New feature
+
+-   Execute the local package's `wp-env` instead of the globally installed version if one is available.
+
+### Bug fix
+
+-   Run `useradd` with `-l` option to prevent excessive Docker image sizes.
+
+## 8.0.0 (2023-05-24)
+
 ### Breaking Change
 
--   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners
-between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+-   Remove `afterSetup` option from `.wp-env.json` and the `WP_ENV_AFTER_SETUP` environment variable in favor of more granular lifecycle scripts.
 
 ### New feature
 
--   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `wp-env start` and `wp-env clean`.
+-   Add `afterStart`, `afterClean`, and `afterDestroy` lifecycle scripts to a new `lifecycleScripts` key in `.wp-env.json`.
+-   Add a series of `WP_ENV_LIFECYCLE_SCRIPT_` environment variables for the various lifecycle scripts.
+-   Rework `run` command to resolve bugs with non-quoted commands. As a consequence it is no longer possible to pass your entire command to `wp-env` wrapped in double-quotes. While `npx wp-env run cli wp help` will still work, `npx wp-env run cli "wp help"` will not. If you are currently escaping any quotes you will need to review those commands and ensure they are compatible with this update.
+
+### Enhancement
+
+-   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
+-   Validate whether or not config options exist to prevent accidentally including ones that don't.
+
+### Bug fix
+
+-   Support Windows without requiring the use of WSL.
+
+## 7.0.0 (2023-05-10)
+
+### Breaking Change
+
+-   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
+-   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
+
+### New feature
+
+-   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `npx wp-env start` and `npx wp-env clean`.
 -   Add a `WP_ENV_AFTER_SETUP` environment variable to override the `afterSetup` option.
--   Execute the `afterSetup` command on `wp-env start` after the environment is set up. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
--   Execute the `afterSetup` command on `wp-env clean`.
+-   Execute the `afterSetup` command on `npx wp-env start` after the environment is set up. This can happen when your config changes, WordPress updates, or you pass the `--update` flag.
+-   Execute the `afterSetup` command on `npx wp-env clean`.
+-   Globally install `composer` and the correct version of `phpunit` in all of the Docker containers.
 
 ### Bug fix
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
+-   Fix Xdebug while using PHP 7.2x.
 
 ### Enhancement
 
 -   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
+-   Increase the maximum upload size to 1GB.
 
 ## 6.0.0 (2023-04-26)
 

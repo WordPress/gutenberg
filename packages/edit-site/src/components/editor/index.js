@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -32,11 +37,11 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -49,7 +54,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor() {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -68,6 +73,7 @@ export default function Editor() {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		hasPageContentLock,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -75,6 +81,7 @@ export default function Editor() {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
+			hasPageContentLock: _hasPageContentLock,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -99,6 +106,7 @@ export default function Editor() {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
+			hasPageContentLock: _hasPageContentLock(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -116,9 +124,10 @@ export default function Editor() {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const blockContext = useMemo(
-		() => ( {
-			...context,
+	const blockContext = useMemo( () => {
+		const { postType, postId, ...nonPostFields } = context ?? {};
+		return {
+			...( hasPageContentLock ? context : nonPostFields ),
 			queryContext: [
 				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -130,9 +139,8 @@ export default function Editor() {
 						},
 					} ),
 			],
-		} ),
-		[ context, setEditedPostContext ]
-	);
+		};
+	}, [ hasPageContentLock, context, setEditedPostContext ] );
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -152,12 +160,9 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
-	if ( ! hasLoadedPost ) {
-		return <CanvasSpinner />;
-	}
-
 	return (
 		<>
+			{ isLoading ? <CanvasSpinner /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -170,13 +175,14 @@ export default function Editor() {
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
 							enableRegionNavigation={ false }
-							className={ showIconLabels && 'show-icon-labels' }
-							notices={
-								( isEditMode ||
-									window?.__experimentalEnableThemePreviews ) && (
-									<EditorSnackbars />
-								)
-							}
+							className={ classnames(
+								'edit-site-editor__interface-skeleton',
+								{
+									'show-icon-labels': showIconLabels,
+									'is-loading': isLoading,
+								}
+							) }
+							notices={ <EditorSnackbars /> }
 							content={
 								<>
 									<GlobalStylesRenderer />
@@ -214,13 +220,20 @@ export default function Editor() {
 							sidebar={
 								isEditMode &&
 								isRightSidebarOpen && (
-									<ComplementaryArea.Slot scope="core/edit-site" />
+									<>
+										<ComplementaryArea.Slot scope="core/edit-site" />
+										<SidebarFixedBottomSlot />
+									</>
 								)
 							}
 							footer={
 								shouldShowBlockBreakcrumbs && (
 									<BlockBreadcrumb
-										rootLabelText={ __( 'Template' ) }
+										rootLabelText={
+											hasPageContentLock
+												? __( 'Page' )
+												: __( 'Template' )
+										}
 									/>
 								)
 							}

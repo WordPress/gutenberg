@@ -25,6 +25,8 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 	topLeft: false,
 };
 
+const { ResizableBoxPopover } = unlock( blockEditorPrivateApis );
+
 export default function ResizableCoverPopover( {
 	className,
 	height,
@@ -37,7 +39,6 @@ export default function ResizableCoverPopover( {
 	width,
 	...props
 } ) {
-	const { ResizableBoxPopover } = unlock( blockEditorPrivateApis );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const dimensions = useMemo(
 		() => ( { height, minHeight, width } ),

@@ -485,6 +485,11 @@ describe( 'getContributorProps', () => {
 		// npm run other:changelog -- --milestone="Gutenberg 11.3"
 		expect( getContributorProps( pullRequests ) ).toMatchSnapshot();
 	} );
+	test( 'do not include first time contributors section if there are not any', () => {
+		expect(
+			getContributorProps( pullRequests.slice( 0, 4 ) )
+		).toMatchInlineSnapshot( `""` );
+	} );
 } );
 
 describe( 'getContributorList', () => {

@@ -20,6 +20,7 @@ export function getPathFromURL( urlParams ) {
 		switch ( urlParams.postType ) {
 			case 'wp_template':
 			case 'wp_template_part':
+			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType
 				) }/${ encodeURIComponent( urlParams.postId ) }`;
@@ -73,6 +74,15 @@ export default function useSyncPathWithURL() {
 		if ( navigatorParams?.postType && navigatorParams?.postId ) {
 			updateUrlParams( {
 				postType: navigatorParams?.postType,
+				postId: navigatorParams?.postId,
+				path: undefined,
+			} );
+		} else if (
+			navigatorLocation.path.startsWith( '/page/' ) &&
+			navigatorParams?.postId
+		) {
+			updateUrlParams( {
+				postType: 'page',
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );

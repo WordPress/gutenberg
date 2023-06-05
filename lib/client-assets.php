@@ -77,16 +77,8 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$scripts->add( $handle, $src, $deps, $ver, ( $in_footer ? 1 : null ) );
 	}
 
-	/*
-	 * `WP_Dependencies::set_translations` will fall over on itself if setting
-	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
-	 * as a dependency of itself, exhausting memory. The same applies for the
-	 * polyfill and hooks scripts, which are dependencies _of_ `wp-i18n`.
-	 *
-	 * See: https://core.trac.wordpress.org/ticket/46089
-	 */
-	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
-		$scripts->set_translations( $handle, 'default' );
+	if ( in_array( 'wp-i18n', $deps, true ) ) {
+		$scripts->set_translations( $handle );
 	}
 
 	/*

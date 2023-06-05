@@ -18,7 +18,6 @@ import {
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
@@ -27,6 +26,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
+import { getBlockEditingMode } from './private-selectors';
 
 /**
  * A block selection object.
@@ -1540,6 +1540,10 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
+		return false;
+	}
+
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 
 	// The parent block doesn't have settings indicating it doesn't support
@@ -1634,6 +1638,7 @@ export const canInsertBlockType = createSelector(
 		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		state.blockEditingModes,
 	]
 );
 
@@ -1664,21 +1669,19 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
-
-	// attributes can be null if the block is already deleted.
 	if ( attributes === null ) {
 		return true;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = !! getTemplateLock( state, rootClientId );
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.remove === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.remove ) {
+		return false;
 	}
-
-	// When remove is true, it means we cannot remove it.
-	return ! lock?.remove;
+	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -1710,16 +1713,16 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return;
 	}
-
-	const { lock } = attributes;
-	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.move === undefined ) {
-		return ! parentIsLocked;
+	if ( attributes.lock?.move ) {
+		return false;
 	}
-
-	// When move is true, it means we cannot move it.
-	return ! lock?.move;
+	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+		return false;
+	}
+	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -2101,7 +2104,6 @@ export const getInserterItems = createSelector(
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
-		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -2118,22 +2120,10 @@ export const getBlockTransformItems = createSelector(
 			] )
 		);
 
-		// Consider unwraping the highest priority.
-		itemsByName[ '*' ] = {
-			frecency: +Infinity,
-			id: '*',
-			isDisabled: false,
-			name: '*',
-			title: __( 'Unwrap' ),
-			icon: itemsByName[ sourceBlock?.name ]?.icon,
-		};
-
 		const possibleTransforms = getPossibleBlockTransformations(
 			normalizedBlocks
 		).reduce( ( accumulator, block ) => {
-			if ( block === '*' ) {
-				accumulator.push( itemsByName[ '*' ] );
-			} else if ( itemsByName[ block?.name ] ) {
+			if ( itemsByName[ block?.name ] ) {
 				accumulator.push( itemsByName[ block.name ] );
 			}
 			return accumulator;
@@ -2505,6 +2495,30 @@ export function getSettings( state ) {
 }
 
 /**
+ * Returns the behaviors registered with the editor.
+ *
+ * Behaviors are named, reusable pieces of functionality that can be
+ * attached to blocks. They are registered with the editor using the
+ * `theme.json` file.
+ *
+ * @example
+ *
+ * ```js
+ * const behaviors = select( blockEditorStore ).getBehaviors();
+ * if ( behaviors?.lightbox ) {
+ * 	 // Do something with the lightbox.
+ * }
+ *```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor behaviors object.
+ */
+export function getBehaviors( state ) {
+	return state.settings.behaviors;
+}
+
+/**
  * Returns true if the most recent block change is be considered persistent, or
  * false otherwise. A persistent change is one committed by BlockEditorProvider
  * via its `onChange` callback, in addition to `onInput`.
@@ -2802,6 +2816,13 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
+	// can't be selected, and prevents non-disabled nested blocks from being
+	// selected.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+		return false;
+	}
+
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
 		return true;

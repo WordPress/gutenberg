@@ -146,6 +146,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockName,
                                                      String blockTitle);
 
+    void requestEmbedFullscreenPreview(String content, String title);
+
     void gutenbergDidSendButtonPressedAction(String buttonType);
 
     void onShowUserSuggestions(Consumer<String> onResult);

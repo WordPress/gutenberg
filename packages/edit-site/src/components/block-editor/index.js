@@ -38,6 +38,10 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
+import {
+	PageContentLock,
+	usePageContentLockNotifications,
+} from '../page-content-lock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -49,20 +53,25 @@ const LAYOUT = {
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, templateType, canvasMode } = useSelect(
-		( select ) => {
-			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
+	const { storedSettings, templateType, canvasMode, hasPageContentLock } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getEditedPostType,
+					getCanvasMode,
+					hasPageContentLock: _hasPageContentLock,
+				} = unlock( select( editSiteStore ) );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpened ),
-				templateType: getEditedPostType(),
-				canvasMode: getCanvasMode(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
+				return {
+					storedSettings: getSettings( setIsInserterOpened ),
+					templateType: getEditedPostType(),
+					canvasMode: getCanvasMode(),
+					hasPageContentLock: _hasPageContentLock(),
+				};
+			},
+			[ setIsInserterOpened ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -137,12 +146,14 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
+		usePageContentLockNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
+
 	const hasBlocks = blocks.length !== 0;
 	const enableResizing =
 		isTemplatePart &&
@@ -161,6 +172,7 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			{ hasPageContentLock && <PageContentLock /> }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
@@ -169,9 +181,7 @@ export default function BlockEditor() {
 				{ ( [ editorCanvasView ] ) =>
 					editorCanvasView ? (
 						<div className="edit-site-visual-editor is-focus-mode">
-							<ResizableEditor enableResizing>
-								{ editorCanvasView }
-							</ResizableEditor>
+							{ editorCanvasView }
 						</div>
 					) : (
 						<BlockTools
