@@ -108,7 +108,9 @@ class WP_Directive_Processor_Test extends WP_UnitTestCase {
 		$this->assertSame( '<div>outside</div><section id="thesection">This is the new section content.</section>', $tags->get_updated_html() );
 	}
 
-	// TODO: Review this, how that the code is in Gutenberg.
+	/**
+	 * TODO: Review this, how that the code is in Gutenberg.
+	 */
 	public function test_set_inner_html_invalidates_bookmarks_that_point_to_replaced_content() {
 		$this->markTestSkipped( "This requires on bookmark invalidation, which is only in GB's WP 6.3 compat layer." );
 

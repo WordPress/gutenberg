@@ -7,6 +7,7 @@
  */
 
 class Helper_Class {
+	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	function process_foo_test( $tags, $context ) {
 	}
 }
