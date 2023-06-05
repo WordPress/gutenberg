@@ -12,7 +12,7 @@ class Helper_Class {
 }
 
 /**
- * Tests for the wp_process_directives function.
+ * Tests for the gutenberg_interactivity_process_directives function.
  *
  * @group  interactivity-api
  * @covers gutenberg_interactivity_process_directives
@@ -59,5 +59,58 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$markup = '<div foo-test--value="abc"></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+	}
+}
+
+/**
+ * Tests for the gutenberg_interactivity_evaluate_reference function.
+ *
+ * @group  interactivity-api
+ * @covers gutenberg_interactivity_evaluate_reference
+ */
+class Tests_Utils_Evaluate extends WP_UnitTestCase {
+	public function test_evaluate_function_should_access_state() {
+		// Init a simple store.
+		wp_store(
+			array(
+				'state' => array(
+					'core' => array(
+						'number' => 1,
+						'bool'   => true,
+						'nested' => array(
+							'string' => 'hi',
+						),
+					),
+				),
+			)
+		);
+		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
+		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.core.nested.string' ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( '!state.core.bool' ) );
+	}
+
+	public function test_evaluate_function_should_access_passed_context() {
+		$context = array(
+			'local' => array(
+				'number' => 2,
+				'bool'   => false,
+				'nested' => array(
+					'string' => 'bye',
+				),
+			),
+		);
+		$this->assertSame( 2, gutenberg_interactivity_evaluate_reference( 'context.local.number', $context ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'context.local.bool', $context ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( '!context.local.bool', $context ) );
+		$this->assertSame( 'bye', gutenberg_interactivity_evaluate_reference( 'context.local.nested.string', $context ) );
+		// Previously defined state is also accessible.
+		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
+		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.core.nested.string' ) );
+	}
+
+	public function test_evaluate_function_should_return_null_for_unresolved_paths() {
+		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist' ) );
 	}
 }
