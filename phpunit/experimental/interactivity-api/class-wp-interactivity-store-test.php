@@ -9,7 +9,7 @@
 /**
  * Tests for the `WP_Interactivity_Store` class.
  *
- * @group  directives
+ * @group  interactivity-api
  * @covers WP_Interactivity_Store
  */
 class WP_Interactivity_Store_Test extends WP_UnitTestCase {
