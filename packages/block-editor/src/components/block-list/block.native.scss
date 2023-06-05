@@ -2,32 +2,6 @@
 	flex: 1 1 auto;
 }
 
-.solidBorderColor {
-	border-color: $blue-wordpress;
-}
-
-.solidBorderColorDark {
-	border-color: $blue-30;
-}
-
-.dashedBorderColor {
-	border-color: $gray;
-}
-
-.dashedBorderColorDark {
-	border-color: $gray-70;
-}
-
-.borderFullWidth {
-	left: 0;
-	right: 0;
-}
-
-.containerBorderFullWidth {
-	left: -$solid-border-space * 0.5;
-	right: -$solid-border-space * 0.5;
-}
-
 .dimmed {
 	opacity: $dimmed-opacity;
 }
