@@ -101,7 +101,6 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
-					context.core.image.imageRef = ref.querySelector( 'img' );
 					if ( context.core.image.lightboxEnabled ) {
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
