@@ -56,7 +56,7 @@
 		"jed": "^1.1.1",
 		"jsdom-jscore-rn": "0.1.8",
 		"node-fetch": "^2.6.0",
-		"react-native": "0.69.4",
+		"react-native": "0.71.8",
 		"react-native-fast-image": "8.5.11",
 		"react-native-gesture-handler": "https://raw.githubusercontent.com/wordpress-mobile/react-native-gesture-handler/2.3.2-wp-3/react-native-gesture-handler-2.3.2-wp-3.tgz",
 		"react-native-get-random-values": "1.4.0",
