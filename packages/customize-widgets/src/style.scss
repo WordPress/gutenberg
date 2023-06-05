@@ -29,7 +29,7 @@
 		position: sticky;
 		top: 0;
 		left: 0;
-		z-index: z-index(".block-editor-block-popover");
+		z-index: z-index(".block-editor-block-list__insertion-point");
 		width: calc(100% + 2 * 12px); //12px is the padding of customizer sidebar content
 
 		overflow-y: hidden;
