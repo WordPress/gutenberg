@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-devtools-core/.DS_Store b/node_modules/react-devtools-core/.DS_Store
+new file mode 100644
+index 0000000..c88a062
+Binary files /dev/null and b/node_modules/react-devtools-core/.DS_Store differ
+diff --git a/node_modules/react-devtools-core/dist/backend.js b/node_modules/react-devtools-core/dist/backend.js
+index 36f6f77..79d2330 100644
+--- a/node_modules/react-devtools-core/dist/backend.js
++++ b/node_modules/react-devtools-core/dist/backend.js
+@@ -13435,7 +13435,7 @@ function hideOverlay(agent) {
+   }
+ }
+ function showOverlay(elements, componentName, agent, hideAfterTimeout) {
+-  if (window.document == null) {
++  if (window.document == null || window.document.__isJsdom) {
+     if (elements != null && elements[0] != null) {
+       agent.emit('showNativeHighlight', elements[0]);
+     }
