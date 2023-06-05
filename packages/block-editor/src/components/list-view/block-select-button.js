@@ -15,7 +15,7 @@ import {
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -28,7 +28,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
-import { showBlockRemovalWarning } from '../../utils/show-block-removal-warning';
+import { useBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 function ListViewBlockSelectButton(
 	{
@@ -59,11 +59,9 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
-		getBlockName,
+
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { removeBlocks, displayRemovalPrompt } =
-		useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 
@@ -74,6 +72,8 @@ function ListViewBlockSelectButton(
 				blockInformation.positionLabel
 		  )
 		: '';
+
+	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -119,22 +119,7 @@ function ListViewBlockSelectButton(
 				// fallback to focus the parent block.
 				firstBlockRootClientId;
 
-			const shouldDisplayRemovalPrompt = blocksToDelete
-				.map( ( blockClientId ) =>
-					showBlockRemovalWarning( getBlockName( blockClientId ) )
-				)
-				.filter( ( blockName ) => blockName );
-
-			if ( shouldDisplayRemovalPrompt.length ) {
-				displayRemovalPrompt( true, {
-					removalFunction: () => {
-						removeBlocks( blocksToDelete, false );
-					},
-					blockName: shouldDisplayRemovalPrompt[ 0 ],
-				} );
-			} else {
-				removeBlocks( blocksToDelete, false );
-			}
+			removeBlocksWithOptionalWarning( blocksToDelete, false );
 
 			// Update the selection if the original selection has been removed.
 			const shouldUpdateSelection =

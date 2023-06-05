@@ -10,7 +10,7 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { showBlockRemovalWarning } from '../../utils/show-block-removal-warning';
+import { useBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 /**
  * Handles input for selections across blocks.
@@ -21,16 +21,15 @@ export default function useInput() {
 		getSelectedBlockClientIds,
 		__unstableIsSelectionMergeable,
 		hasMultiSelection,
-		getBlockName,
 	} = useSelect( blockEditorStore );
 	const {
 		replaceBlocks,
 		__unstableSplitSelection,
-		removeBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
-		displayRemovalPrompt,
 	} = useDispatch( blockEditorStore );
+
+	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
@@ -69,24 +68,9 @@ export default function useInput() {
 				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
-					const shouldDisplayRemovalPrompt =
+					removeBlocksWithOptionalWarning(
 						getSelectedBlockClientIds()
-							.map( ( blockClientId ) =>
-								showBlockRemovalWarning(
-									getBlockName( blockClientId )
-								)
-							)
-							.filter( ( blockName ) => blockName );
-					if ( shouldDisplayRemovalPrompt.length ) {
-						displayRemovalPrompt( true, {
-							removalFunction: () => {
-								removeBlocks( getSelectedBlockClientIds() );
-							},
-							blockName: shouldDisplayRemovalPrompt[ 0 ],
-						} );
-					} else {
-						removeBlocks( getSelectedBlockClientIds() );
-					}
+					);
 				} else if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
