@@ -1,6 +1,9 @@
 <?php
 /**
  * Directive processing test.
+ *
+ * @package Gutenberg
+ * @subpackage Interactivity API
  */
 
 class Helper_Class {
