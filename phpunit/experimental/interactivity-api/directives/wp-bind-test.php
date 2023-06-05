@@ -7,7 +7,7 @@
  */
 
 /**
- * Tests for the data-wp-bind directive.
+ * Tests for the wp-bind directive.
  *
  * @group  interactivity-api
  * @covers gutenberg_interactivity_process_wp_bind

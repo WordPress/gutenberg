@@ -7,7 +7,7 @@
  */
 
 /**
- * Tests for the data-wp-context attribute directive.
+ * Tests for the wp-context directive.
  *
  * @group  interactivity-api
  * @covers gutenberg_interactivity_process_wp_context
