@@ -13,9 +13,9 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
-const TEMPLATE_PARTS = 'wp_template_part';
-const PATTERNS = 'pattern';
-const USER_PATTERNS = 'wp_block';
+export const TEMPLATE_PARTS = 'wp_template_part';
+export const PATTERNS = 'pattern';
+export const USER_PATTERNS = 'wp_block';
 
 const createTemplatePartId = ( theme, slug ) =>
 	theme && slug ? theme + '//' + slug : null;
@@ -154,7 +154,7 @@ const useUserPatterns = ( category, categoryType = PATTERNS ) => {
 	);
 };
 
-export default function usePatterns( categoryType, categoryName ) {
+export const usePatterns = ( categoryType, categoryName ) => {
 	const patterns = useBlockPatternsByCategory( categoryName, categoryType );
 	const userPatterns = useUserPatterns( categoryName, categoryType );
 	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
@@ -166,4 +166,6 @@ export default function usePatterns( categoryType, categoryName ) {
 
 	const results = [ ...templateParts, ...patterns, ...userPatterns ];
 	return [ results, isResolving ];
-}
+};
+
+export default usePatterns;
