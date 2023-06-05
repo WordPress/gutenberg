@@ -133,10 +133,14 @@ export default function ReusableBlockConvertButton( {
 		return null;
 	}
 
-	const categoryOptions = patternCategories.map( ( category ) => ( {
-		label: category.label,
-		value: category.name,
-	} ) );
+	const categoryOptions = patternCategories
+		.map( ( category ) => ( {
+			label: category.label,
+			value: category.name,
+		} ) )
+		.concat( [
+			{ value: '', label: __( 'Select a category' ), disabled: true },
+		] );
 
 	return (
 		<BlockSettingsMenuControls>
