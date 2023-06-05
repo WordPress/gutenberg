@@ -119,6 +119,7 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 				onClick={ onClickRevisions }
 			>
 				<HStack
+					as="span"
 					alignment="center"
 					spacing={ 5 }
 					direction="row"
