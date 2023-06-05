@@ -10,6 +10,18 @@ class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	function process_foo_test( $tags, $context ) {
 	}
+
+	function increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
+	}
+
+	static function static_increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
+	}
+}
+
+function gutenberg_test_process_directives_helper_increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
 }
 
 /**
@@ -113,5 +125,32 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 
 	public function test_evaluate_function_should_return_null_for_unresolved_paths() {
 		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist' ) );
+	}
+
+	public function test_evaluate_function_should_execute_functions() {
+		$context = new WP_Directive_Context( array( 'count' => 2 ) );
+		$helper  = new Helper_Class;
+
+		wp_store(
+			array(
+				'state'     => array(
+					'count' => 3,
+				),
+				'selectors' => array(
+					'anonymous_function'           => function( $store ) {
+						return $store['state']['count'] + $store['context']['count'];
+					},
+					'function_name'                => 'gutenberg_test_process_directives_helper_increment',
+					'class_method'                 => array( $helper, 'increment' ),
+					'class_static_method'          => 'Helper_Class::static_increment',
+					'class_static_method_as_array' => array( 'Helper_Class', 'static_increment' ),
+				),
+			)
+		);
+
+		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.anonymous_function', $context->get_context() ) );
+		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() ) );
+		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() ) );
+		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method_as_array', $context->get_context() ) );
 	}
 }

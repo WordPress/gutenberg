@@ -126,7 +126,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
  * @return mixed
  */
 function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
-	$current = array_merge(
+	$store = array_merge(
 		WP_Interactivity_Store::get_data(),
 		array( 'context' => $context )
 	);
@@ -136,8 +136,8 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 		$has_negation_operator = true;
 	}
 
-	$array = explode( '.', $path );
-
+	$array   = explode( '.', $path );
+	$current = $store;
 	foreach ( $array as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
@@ -146,5 +146,11 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 		}
 	}
 
+	// Check if $current is a function and if so, call it passing the store.
+	if ( is_callable( $current ) ) {
+		$current = call_user_func( $current, $store );
+	}
+
+	// Return the opposite if it has a negator operator (!).
 	return isset( $has_negation_operator ) ? ! $current : $current;
 }
