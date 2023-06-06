@@ -33,7 +33,6 @@ function render_block_core_search( $attributes ) {
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
 	$button_behavior     = ( ! empty( $attributes['buttonBehavior'] ) ) ? $attributes['buttonBehavior'] : 'default';
-	$input               = '';
 	$button              = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
@@ -46,7 +45,6 @@ function render_block_core_search( $attributes ) {
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
-
 	if ( $label->next_tag() ) {
 		$label->set_attribute( 'for', $input_id );
 		$label->add_class( 'wp-block-search__label' );
@@ -59,6 +57,7 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
+	$input         = new WP_HTML_Tag_Processor( sprintf( '<input type="search" name="s" required %s/>', $inline_styles['input'] ) );
 	$input_classes = array( 'wp-block-search__input' );
 	if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 		$input_classes[] = $border_color_classes;
@@ -66,10 +65,9 @@ function render_block_core_search( $attributes ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
-	$input = new WP_HTML_Tag_Processor( sprintf( '<input type="search" name="s" required %s/>', $inline_styles['input'] ) );
 	if ( $input->next_tag() ) {
+		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
-		$input->set_attribute( 'class', implode( ' ', $input_classes ) );
 		$input->set_attribute( 'value', get_search_query() );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
 		if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
@@ -119,8 +117,8 @@ function render_block_core_search( $attributes ) {
 		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
 
 		if ( $button->next_tag() ) {
-			$button->set_attribute( 'class', implode( ' ', $button_classes ) );
-			if ( 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+			$button->add_class( implode( ' ', $button_classes ) );
+			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
