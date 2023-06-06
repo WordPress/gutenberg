@@ -742,7 +742,7 @@
 			"type": "object",
 			"description": "Positions and blocks to auto-insert this block next to.",
 			"patternProperties": {
-				"[a-zA-Z]": {
+				"^(nextSibling|previousSibling|firstChild|lastChild)$": {
 					"type": "array",
 					"description": "Array of the names of blocks to auto-insert this block next to.",
 					"items": {
