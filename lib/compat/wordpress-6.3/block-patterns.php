@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
- /**
+/**
  * Adds a new taxonomy for organizing patterns.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
