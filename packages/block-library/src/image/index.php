@@ -75,8 +75,17 @@ function render_block_core_image( $attributes, $content ) {
 								'</div>';
 		$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-		$background_color  = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
-		$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+		// Add directive to expand modal image if appropriate.
+		$m = new WP_HTML_Tag_Processor( $content );
+		$m->next_tag( 'img' );
+		$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . wp_get_attachment_url( $attributes['id'] ) . '"} } }' );
+		$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
+		$modal_content = $m->get_updated_html();
+
+		$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
+
+		$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+		$close_button_color = esc_attr( wp_get_global_styles( array( 'color', 'text' ) ) );
 
 		$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
 		$close_button_label = esc_attr__( 'Close' );
@@ -94,10 +103,10 @@ function render_block_core_image( $attributes, $content ) {
 				data-wp-on--mousewheel="actions.core.image.hideLightbox"
 				data-wp-on--click="actions.core.image.hideLightbox"
 				>
-					<button type="button" aria-label="$close_button_label" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
+					<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
 						$close_button_icon
 					</button>
-					$content
+					$modal_content
 					<div class="scrim" style="background-color: $background_color"></div>
 			</div>
 HTML;
