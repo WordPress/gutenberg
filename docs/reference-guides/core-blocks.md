@@ -566,9 +566,9 @@ Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType, format, isLink, textAlign
 
-## Post Excerpt
+## Excerpt
 
-Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
+Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
