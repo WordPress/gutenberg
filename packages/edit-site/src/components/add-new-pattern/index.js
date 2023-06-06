@@ -64,6 +64,8 @@ export default function AddNewPattern( { toggleProps } ) {
 			history.push( {
 				postId: pattern.id,
 				postType: 'wp_block',
+				categoryType: 'wp_block',
+				categoryName,
 				canvas: 'edit',
 			} );
 		} catch ( error ) {
