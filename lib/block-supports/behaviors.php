@@ -31,7 +31,7 @@ function gutenberg_register_behaviors_support( $block_type ) {
 	if ( $has_lightbox_support ) {
 		// Use priority 15 to run this hook after other hooks/plugins.
 		// They could use the `render_block_{$this->name}` filter to modify the markup.
-		add_filter( 'render_block_' . $block_type->name, 'gutenberg_blocks_supports_add_lightbox', 15, 2 );
+		add_filter( 'render_block_' . $block_type->name, 'gutenberg_render_behaviors_support_lightbox', 15, 2 );
 	}
 }
 
@@ -43,7 +43,7 @@ function gutenberg_register_behaviors_support( $block_type ) {
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
-function gutenberg_blocks_supports_add_lightbox( $block_content, $block ) {
+function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$experiments      = get_option( 'gutenberg-experiments' );
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
