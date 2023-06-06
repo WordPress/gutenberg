@@ -65,7 +65,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	if (
 		hasResolved &&
-		record?.meta?.wp_block_sync_status === 'notSynced' &&
+		record?.meta?.wp_block?.sync_status === 'notSynced' &&
 		blocks?.length > 0
 	) {
 		replaceBlocks(
