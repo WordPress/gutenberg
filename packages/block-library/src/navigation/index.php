@@ -214,7 +214,7 @@ function block_core_navigation_render_submenu_icon() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		function( $block ) {
+		static function( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -783,7 +783,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			function( $a, $b ) {
+			static function( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);

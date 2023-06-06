@@ -54,12 +54,11 @@ const trimUndefinedValues = ( array ) => {
  * @return {Array} Transformed object.
  */
 const mapValues = ( obj, callback ) =>
-	Object.entries( obj ?? {} ).reduce(
-		( acc, [ key, value ] ) => ( {
-			...acc,
-			[ key ]: callback( value, key ),
-		} ),
-		{}
+	Object.fromEntries(
+		Object.entries( obj ?? {} ).map( ( [ key, value ] ) => [
+			key,
+			callback( value, key ),
+		] )
 	);
 
 // Convert Map objects to plain objects
@@ -176,21 +175,24 @@ export default function createReduxStore( key, options ) {
 			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
-			const actions = mapActions(
-				{
-					...metadataActions,
-					...options.actions,
-				},
-				store
-			);
+			function bindAction( action ) {
+				return ( ...args ) =>
+					Promise.resolve( store.dispatch( action( ...args ) ) );
+			}
+
+			const actions = {
+				...mapValues( metadataActions, bindAction ),
+				...mapValues( options.actions, bindAction ),
+			};
+
 			lock(
 				actions,
 				new Proxy( privateActions, {
 					get: ( target, prop ) => {
-						return (
-							mapActions( privateActions, store )[ prop ] ||
-							actions[ prop ]
-						);
+						const privateAction = privateActions[ prop ];
+						return privateAction
+							? bindAction( privateAction )
+							: actions[ prop ];
 					},
 				} )
 			);
@@ -214,6 +216,18 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+
+			let resolvers;
+			if ( options.resolvers ) {
+				resolvers = mapResolvers( options.resolvers );
+				selectors = mapSelectorsWithResolvers(
+					selectors,
+					resolvers,
+					store,
+					resolversCache
+				);
+			}
+
 			lock(
 				selectors,
 				new Proxy( privateSelectors, {
@@ -234,17 +248,6 @@ export default function createReduxStore( key, options ) {
 					},
 				} )
 			);
-
-			let resolvers;
-			if ( options.resolvers ) {
-				resolvers = mapResolvers( options.resolvers );
-				selectors = mapSelectorsWithResolvers(
-					selectors,
-					resolvers,
-					store,
-					resolversCache
-				);
-			}
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
 			const suspendSelectors = mapSuspendSelectors( selectors, store );
@@ -377,24 +380,6 @@ function mapSelectors( selectors, store ) {
 	};
 
 	return mapValues( selectors, createStateSelector );
-}
-
-/**
- * Maps actions to dispatch from a given store.
- *
- * @param {Object} actions Actions to register.
- * @param {Object} store   The redux store to which the actions should be mapped.
- *
- * @return {Object} Actions mapped to the redux store provided.
- */
-function mapActions( actions, store ) {
-	const createBoundAction =
-		( action ) =>
-		( ...args ) => {
-			return Promise.resolve( store.dispatch( action( ...args ) ) );
-		};
-
-	return mapValues( actions, createBoundAction );
 }
 
 /**
@@ -586,7 +571,6 @@ function mapSelectorsWithResolvers(
 	return mapValues( selectors, ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
-			selector.hasResolver = false;
 			return selector;
 		}
 

@@ -43,7 +43,7 @@ Create a basic `block.json` file there:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"title": "Example: Basic (ESNext)",
 	"name": "gutenberg-examples/example-01-basic-esnext",
 	"category": "layout",
@@ -56,7 +56,7 @@ Create a basic `block.json` file there:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"title": "Example: Basic",
 	"name": "gutenberg-examples/example-01-basic",
 	"category": "layout",

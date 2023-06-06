@@ -27,7 +27,7 @@ test.describe( 'Buttons', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
@@ -56,7 +56,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'WordPress' );
 
@@ -91,7 +91,7 @@ test.describe( 'Buttons', () => {
 
 		// Focus should move from the link control to the button block's text.
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 
 		// The link control should still be visible when a URL is set.
