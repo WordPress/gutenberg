@@ -439,7 +439,7 @@ describe( 'Searching for a link', () => {
 		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should display only search suggestions when current input value is not URL-like', async () => {
+	it( 'should display only search suggestions (and not URL result type) when current input value is not URL-like', async () => {
 		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
 		const firstSuggestion = fauxEntitySuggestions[ 0 ];
@@ -476,6 +476,36 @@ describe( 'Searching for a link', () => {
 		expect(
 			searchResultElements[ searchResultElements.length - 1 ]
 		).not.toHaveTextContent( 'URL' );
+	} );
+
+	it( 'should display only URL result when current input value is URL-like', async () => {
+		const user = userEvent.setup();
+		const searchTerm = 'www.wordpress.org';
+
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
+
+		const searchResultElement = within(
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getByRole( 'option' );
+
+		expect( searchResultElement ).toBeInTheDocument();
+
+		// Should only be the `URL` suggestion.
+		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		expect( searchResultElement ).toHaveTextContent( searchTerm );
+		expect( searchResultElement ).toHaveTextContent( 'URL' );
+		expect( searchResultElement ).toHaveTextContent(
+			'Press ENTER to add this link'
+		);
 	} );
 
 	it( 'should trim search term', async () => {
