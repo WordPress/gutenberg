@@ -253,6 +253,58 @@ test.describe( 'Testing behaviors functionality', () => {
 		// The behaviors dropdown should be present but disabled.
 		await expect( select ).toBeDisabled();
 	} );
+
+	test( 'Lightbox behavior control has a Reset button that removes the markup', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		const date = new Date();
+		const year = date.getFullYear();
+		const month = ( date.getMonth() + 1 ).toString().padStart( 2, '0' );
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: { lightbox: true },
+			},
+		} );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id },"behaviors":{"lightbox":true}} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.last()
+			.click();
+
+		const resetButton = editorSettings.getByRole( 'button', {
+			name: 'Reset',
+		} );
+
+		expect( resetButton ).toBeDefined();
+
+		await resetButton.last().click();
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id }} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
+	} );
 } );
 
 class BehaviorUtils {
