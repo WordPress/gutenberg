@@ -94,7 +94,12 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// Add directive to expand modal image if appropriate.
 	$m = new WP_HTML_Tag_Processor( $content );
 	$m->next_tag( 'img' );
-	$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . wp_get_attachment_url( $block['attrs']['id'] ) . '"} } }' );
+	if ( isset( $block['attrs']['id'] ) ) {
+		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
+	} else {
+		$img_src = $m->get_attribute( 'src' );
+	}
+	$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . $img_src . '"} } }' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
 	$modal_content = $m->get_updated_html();
 
