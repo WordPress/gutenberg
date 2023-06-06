@@ -538,9 +538,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$is_list_open      = false;
 	$has_submenus      = false;
 	foreach ( $inner_blocks as $inner_block ) {
-		if ( count( $inner_block->inner_blocks ) > 0 ) {
-			$has_submenus = true;
-		}
 		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
 
 		if ( $is_list_item && ! $is_list_open ) {
@@ -557,6 +554,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_block_content = $inner_block->render();
+		if ( strpos( $inner_block_content, 'has-child' ) !== false ) {
+			$has_submenus = true;
+		}
 		if ( ! empty( $inner_block_content ) ) {
 			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
 				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
