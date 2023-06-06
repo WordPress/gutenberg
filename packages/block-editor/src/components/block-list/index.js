@@ -56,7 +56,7 @@ function Root( { className, ...settings } ) {
 		editorMode,
 		displayPrompt,
 		removalFunction,
-		blockToRemove,
+		blocksToRemove,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -67,7 +67,7 @@ function Root( { className, ...settings } ) {
 		const {
 			displayPrompt: _displayPrompt,
 			removalFunction: _removalFunction,
-			blockName,
+			blocksToPromptFor,
 		} = isRemovalPromptDisplayed();
 		return {
 			isOutlineMode: outlineMode,
@@ -75,7 +75,7 @@ function Root( { className, ...settings } ) {
 			editorMode: __unstableGetEditorMode(),
 			displayPrompt: _displayPrompt,
 			removalFunction: _removalFunction,
-			blockToRemove: blockName,
+			blocksToRemove: blocksToPromptFor,
 		};
 	}, [] );
 	const registry = useRegistry();
@@ -140,7 +140,7 @@ function Root( { className, ...settings } ) {
 			</elementContext.Provider>
 			{ displayPrompt && (
 				<BlockRemovalWarningModal
-					blockName={ blockToRemove }
+					blocksToRemove={ blocksToRemove }
 					closeModal={ () => displayRemovalPrompt( false ) }
 					removalFunction={ removalFunction }
 				/>

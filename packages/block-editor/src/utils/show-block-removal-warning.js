@@ -25,37 +25,47 @@ function isBlockCritical( blockName ) {
 	return false;
 }
 
+const blockTypePromptMessages = {
+	'core/query': __(
+		'Query loop displays a list of posts. Removing it is not advised.'
+	),
+
+	'core/post-content': __(
+		'Post Content displays the content of a post or page. Removing it it is not advised.'
+	),
+};
+
 export function useBlockRemovalWarning() {
 	const { getBlockName, getBlockOrder } = useSelect( blockEditorStore );
-	const { getBlockType } = useSelect( blocksStore );
 	const { displayRemovalPrompt, removeBlocks } =
 		useDispatch( blockEditorStore );
 
-	function findFirstCriticalBlock( clientIds ) {
-		return clientIds.map( ( clientId ) => {
-			const blockName = getBlockName( clientId );
-			if ( isBlockCritical( blockName ) ) {
-				const blockType = getBlockType( blockName );
-				return blockType?.title || blockName;
-			}
-			const innerBlocks = getBlockOrder( clientId );
-			if ( innerBlocks.length ) {
-				return findFirstCriticalBlock( innerBlocks );
-			}
-			return false;
-		} );
+	function findCriticalBlocks( clientIds ) {
+		return clientIds
+			.map( ( clientId ) => {
+				const blockName = getBlockName( clientId );
+				if ( isBlockCritical( blockName ) ) {
+					return blockName;
+				}
+				const innerBlocks = getBlockOrder( clientId );
+				if ( innerBlocks.length ) {
+					return findCriticalBlocks( innerBlocks );
+				}
+				return false;
+			} )
+			.flat()
+			.filter( ( blockName ) => blockName );
 	}
 
 	return ( clientIds, selectPrevious = true ) => {
-		const firstCriticalBlock = findFirstCriticalBlock( clientIds ).find(
-			( blockName ) => blockName
-		);
-		if ( firstCriticalBlock ) {
+		const criticalBlocks = findCriticalBlocks( clientIds );
+
+		if ( criticalBlocks.length ) {
 			displayRemovalPrompt( true, {
 				removalFunction: () => {
 					removeBlocks( clientIds, selectPrevious );
 				},
-				blockName: firstCriticalBlock,
+				blocksToPromptFor: criticalBlocks,
 			} );
 		} else {
 			removeBlocks( clientIds, selectPrevious );
@@ -64,18 +74,24 @@ export function useBlockRemovalWarning() {
 }
 
 export function BlockRemovalWarningModal( {
-	blockName,
+	blocksToRemove,
 	closeModal,
 	removalFunction,
 } ) {
-	const message =
-		blockName === 'core/post-content'
-			? __(
-					'This block displays the content of a post or page. Removing it it is not advised.'
-			  )
-			: __(
-					'This block displays a list of posts. Removing it is not advised.'
-			  );
+	const { getBlockType } = useSelect( blocksStore );
+
+	const blockTitles = blocksToRemove
+		.map( ( block ) => {
+			return getBlockType( block ).title;
+		} )
+		.join( ', ' );
+
+	const blockMessages = blocksToRemove.map( ( block ) => {
+		return blockTypePromptMessages[ block ];
+	} );
+
+	const dedupedBlockMessages = [ ...new Set( blockMessages ) ].join( ' ' );
+
 	const onConfirmRemoval = () => {
 		removalFunction();
 		closeModal();
@@ -85,16 +101,16 @@ export function BlockRemovalWarningModal( {
 			title={ sprintf(
 				/* translators: %s: the name of a menu to delete */
 				__( 'Remove %s?' ),
-				blockName
+				blockTitles
 			) }
 			onRequestClose={ () => closeModal() }
 		>
-			<p>{ message }</p>
+			<p>{ dedupedBlockMessages }</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ () => closeModal() }>
+				<Button variant="tertiary" onClick={ closeModal }>
 					{ __( 'Cancel' ) }
 				</Button>
-				<Button variant="primary" onClick={ () => onConfirmRemoval() }>
+				<Button variant="primary" onClick={ onConfirmRemoval }>
 					{ __( 'Confirm' ) }
 				</Button>
 			</HStack>

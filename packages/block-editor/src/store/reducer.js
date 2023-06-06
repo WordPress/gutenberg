@@ -1483,7 +1483,7 @@ export function isRemovalPromptDisplayed( state = false, action ) {
 			return {
 				displayPrompt: action.displayPrompt,
 				removalFunction: action.removalFunction,
-				blockName: action.blockName,
+				blocksToPromptFor: action.blocksToPromptFor,
 			};
 	}
 

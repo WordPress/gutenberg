@@ -1247,12 +1247,12 @@ export function removeBlock( clientId, selectPrevious ) {
  * @return {Object} Action object.
  */
 export function displayRemovalPrompt( displayPrompt, options = {} ) {
-	const { removalFunction, blockName } = options;
+	const { removalFunction, blocksToPromptFor } = options;
 	return {
 		type: 'PROMPT_REMOVAL',
 		displayPrompt,
 		removalFunction,
-		blockName,
+		blocksToPromptFor,
 	};
 }
 

@@ -1314,7 +1314,7 @@ export function isRemovalPromptDisplayed( state ) {
 	return {
 		displayPrompt: state.isRemovalPromptDisplayed?.displayPrompt,
 		removalFunction: state.isRemovalPromptDisplayed?.removalFunction,
-		blockName: state.isRemovalPromptDisplayed?.blockName,
+		blocksToPromptFor: state.isRemovalPromptDisplayed?.blocksToPromptFor,
 	};
 }
 
