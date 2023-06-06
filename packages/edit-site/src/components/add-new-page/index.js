@@ -82,7 +82,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 						/* eslint-enable jsx-a11y/no-autofocus */
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
-						placeholder={ __( 'Untitled' ) }
+						placeholder={ __( 'No title' ) }
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
