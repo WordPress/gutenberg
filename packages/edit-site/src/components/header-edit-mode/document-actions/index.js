@@ -22,6 +22,7 @@ import {
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,6 +52,15 @@ function PageDocumentActions() {
 
 	const { setHasPageContentLock } = useDispatch( editSiteStore );
 
+	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
+	const prevHasPageContentLock = useRef( false );
+	useEffect( () => {
+		if ( prevHasPageContentLock.current && ! hasPageContentLock ) {
+			setHasEditedTemplate( true );
+		}
+		prevHasPageContentLock.current = hasPageContentLock;
+	}, [ hasPageContentLock ] );
+
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -64,17 +74,23 @@ function PageDocumentActions() {
 	}
 
 	return hasPageContentLock ? (
-		<BaseDocumentActions isPage icon={ pageIcon }>
+		<BaseDocumentActions
+			className={ classnames( 'is-page', {
+				'is-animated': hasEditedTemplate,
+			} ) }
+			icon={ pageIcon }
+		>
 			{ editedRecord.title }
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
+			className="is-animated"
 			onBack={ () => setHasPageContentLock( true ) }
 		/>
 	);
 }
 
-function TemplateDocumentActions( { onBack } ) {
+function TemplateDocumentActions( { className, onBack } ) {
 	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
 
 	if ( ! isLoaded ) {
@@ -95,7 +111,11 @@ function TemplateDocumentActions( { onBack } ) {
 			: __( 'template' );
 
 	return (
-		<BaseDocumentActions icon={ icon } onBack={ onBack }>
+		<BaseDocumentActions
+			className={ className }
+			icon={ icon }
+			onBack={ onBack }
+		>
 			<VisuallyHidden as="span">
 				{ sprintf(
 					/* translators: %s: the entity being edited, like "template"*/
@@ -108,10 +128,12 @@ function TemplateDocumentActions( { onBack } ) {
 	);
 }
 
-function BaseDocumentActions( { icon, children, onBack, isPage = false } ) {
+function BaseDocumentActions( { className, icon, children, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	return (
-		<div className="edit-site-document-actions">
+		<div
+			className={ classnames( 'edit-site-document-actions', className ) }
+		>
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
@@ -129,14 +151,9 @@ function BaseDocumentActions( { icon, children, onBack, isPage = false } ) {
 				onClick={ () => openCommandCenter() }
 			>
 				<HStack
+					className="edit-site-document-actions__title"
 					spacing={ 1 }
 					justify="center"
-					className={ classnames(
-						'edit-site-document-actions__title',
-						{
-							'is-page': isPage,
-						}
-					) }
 				>
 					<BlockIcon icon={ icon } />
 					<Text size="body" as="h1">
