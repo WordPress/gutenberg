@@ -50,37 +50,21 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isOutlineMode,
-		isFocusMode,
-		editorMode,
-		displayPrompt,
-		removalFunction,
-		blocksToRemove,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			__unstableGetEditorMode,
-			isRemovalPromptDisplayed,
-		} = select( blockEditorStore );
-		const { outlineMode, focusMode } = getSettings();
-		const {
-			displayPrompt: _displayPrompt,
-			removalFunction: _removalFunction,
-			blocksToPromptFor,
-		} = isRemovalPromptDisplayed();
-		return {
-			isOutlineMode: outlineMode,
-			isFocusMode: focusMode,
-			editorMode: __unstableGetEditorMode(),
-			displayPrompt: _displayPrompt,
-			removalFunction: _removalFunction,
-			blocksToRemove: blocksToPromptFor,
-		};
-	}, [] );
+	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode,
+				isFocusMode: focusMode,
+				editorMode: __unstableGetEditorMode(),
+			};
+		},
+		[]
+	);
 	const registry = useRegistry();
-	const { setBlockVisibility, displayRemovalPrompt } =
-		useDispatch( blockEditorStore );
+	const { setBlockVisibility } = useDispatch( blockEditorStore );
 	const delayedBlockVisibilityUpdates = useDebounce(
 		useCallback( () => {
 			const updates = {};
@@ -138,13 +122,7 @@ function Root( { className, ...settings } ) {
 					<div { ...innerBlocksProps } />
 				</IntersectionObserver.Provider>
 			</elementContext.Provider>
-			{ displayPrompt && (
-				<BlockRemovalWarningModal
-					blocksToRemove={ blocksToRemove }
-					closeModal={ () => displayRemovalPrompt( false ) }
-					removalFunction={ removalFunction }
-				/>
-			) }
+			<BlockRemovalWarningModal />
 		</>
 	);
 }

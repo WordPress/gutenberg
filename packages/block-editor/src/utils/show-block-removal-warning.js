@@ -73,24 +73,32 @@ export function useBlockRemovalWarning() {
 	};
 }
 
-export function BlockRemovalWarningModal( {
-	blocksToRemove,
-	closeModal,
-	removalFunction,
-} ) {
+export function BlockRemovalWarningModal() {
+	const { removalFunction, blocksToPromptFor } = useSelect( ( select ) =>
+		select( blockEditorStore ).isRemovalPromptDisplayed()
+	);
+
+	const { displayRemovalPrompt } = useDispatch( blockEditorStore );
+
 	const { getBlockType } = useSelect( blocksStore );
 
-	const blockTitles = blocksToRemove
+	if ( ! blocksToPromptFor ) {
+		return;
+	}
+
+	const blockTitles = blocksToPromptFor
 		.map( ( block ) => {
 			return getBlockType( block ).title;
 		} )
 		.join( ', ' );
 
-	const blockMessages = blocksToRemove.map( ( block ) => {
+	const blockMessages = blocksToPromptFor.map( ( block ) => {
 		return blockTypePromptMessages[ block ];
 	} );
 
 	const dedupedBlockMessages = [ ...new Set( blockMessages ) ].join( ' ' );
+
+	const closeModal = () => displayRemovalPrompt( false );
 
 	const onConfirmRemoval = () => {
 		removalFunction();
