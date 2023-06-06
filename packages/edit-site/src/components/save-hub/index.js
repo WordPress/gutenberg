@@ -35,25 +35,49 @@ export default function SaveHub() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { dirtyRecords, countUnsavedChanges, isDirty, isSaving } = useSelect(
-		( select ) => {
-			const {
-				__experimentalGetDirtyEntityRecords,
-				isSavingEntityRecord,
-			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+	const { dirtyCurrentEntity, countUnsavedChanges, isDirty, isSaving } =
+		useSelect(
+			( select ) => {
+				const {
+					__experimentalGetDirtyEntityRecords,
+					isSavingEntityRecord,
+				} = select( coreStore );
+				const dirtyEntityRecords =
+					__experimentalGetDirtyEntityRecords();
+				let calcDirtyCurrentEntity = null;
 
-			return {
-				dirtyRecords: dirtyEntityRecords,
-				isDirty: dirtyEntityRecords.length > 0,
-				isSaving: dirtyEntityRecords.some( ( record ) =>
-					isSavingEntityRecord( record.kind, record.name, record.key )
-				),
-				countUnsavedChanges: dirtyEntityRecords.length,
-			};
-		},
-		[]
-	);
+				if ( dirtyEntityRecords.length === 1 ) {
+					// if we are on global styles
+					if ( params.path?.includes( 'wp_global_styles' ) ) {
+						calcDirtyCurrentEntity = dirtyEntityRecords.find(
+							( record ) => record.name === 'globalStyles'
+						);
+					}
+					// if we are on pages
+					else if ( params.postId ) {
+						calcDirtyCurrentEntity = dirtyEntityRecords.find(
+							( record ) =>
+								record.name === params.postType &&
+								String( record.key ) === params.postId
+						);
+					}
+				}
+
+				return {
+					dirtyCurrentEntity: calcDirtyCurrentEntity,
+					isDirty: dirtyEntityRecords.length > 0,
+					isSaving: dirtyEntityRecords.some( ( record ) =>
+						isSavingEntityRecord(
+							record.kind,
+							record.name,
+							record.key
+						)
+					),
+					countUnsavedChanges: dirtyEntityRecords.length,
+				};
+			},
+			[ params.path, params.postType, params.postId ]
+		);
 
 	const {
 		editEntityRecord,
@@ -64,26 +88,7 @@ export default function SaveHub() {
 	const disabled = isSaving || ( ! isDirty && ! isPreviewingTheme() );
 
 	// if we have only one unsaved change and it matches current context, we can show a more specific label
-	let dirtyLocal = null;
-
-	if ( countUnsavedChanges === 1 ) {
-		// if we are on global styles
-		if ( params.path?.includes( 'wp_global_styles' ) ) {
-			dirtyLocal = dirtyRecords.find(
-				( record ) => record.name === 'globalStyles'
-			);
-		}
-		// if we are on pages
-		else if ( !! params.postId ) {
-			dirtyLocal = dirtyRecords.find(
-				( record ) =>
-					record.name === params.postType &&
-					String( record.key ) === params.postId
-			);
-		}
-	}
-
-	let label = dirtyLocal
+	let label = dirtyCurrentEntity
 		? __( 'Save' )
 		: sprintf(
 				// translators: %d: number of unsaved changes (number).
@@ -100,12 +105,12 @@ export default function SaveHub() {
 	}
 
 	const saveCurrentEntity = async () => {
-		if ( ! dirtyLocal ) return;
+		if ( ! dirtyCurrentEntity ) return;
 
-		const { kind, name, key, property } = dirtyLocal;
+		const { kind, name, key, property } = dirtyCurrentEntity;
 
 		try {
-			if ( 'root' === dirtyLocal.kind && 'site' === name ) {
+			if ( 'root' === dirtyCurrentEntity.kind && 'site' === name ) {
 				await saveSpecifiedEntityEdits( 'root', 'site', undefined, [
 					property,
 				] );
@@ -135,7 +140,7 @@ export default function SaveHub() {
 
 	return (
 		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>
-			{ dirtyLocal ? (
+			{ dirtyCurrentEntity ? (
 				<Button
 					variant="primary"
 					onClick={ saveCurrentEntity }
