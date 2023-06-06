@@ -48,7 +48,7 @@ export default function ReusableBlockConvertButton( {
 	);
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ blockType, setBlockType ] = useState( 'resuable' );
+	const [ blockType, setBlockType ] = useState( 'reusable' );
 	const [ title, setTitle ] = useState( '' );
 	const [ categoryId, setCategoryId ] = useState( '' );
 	const { canConvert } = useSelect(
