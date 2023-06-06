@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const urlButtonSelector = '*[aria-label^="Change URL"]';
@@ -28,7 +29,7 @@ describe( 'Sidebar Permalink', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas().type( '.editor-post-title__input', ' (Updated)' );
 		expect( await page.$( urlButtonSelector ) ).toBeNull();
 	} );
 
@@ -37,7 +38,7 @@ describe( 'Sidebar Permalink', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas().type( '.editor-post-title__input', ' (Updated)' );
 		expect( await page.$( urlButtonSelector ) ).toBeNull();
 	} );
 
@@ -46,7 +47,7 @@ describe( 'Sidebar Permalink', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas( 0 ).type( '.editor-post-title__input', ' (Updated)' );
 		expect( await page.$( urlButtonSelector ) ).not.toBeNull();
 	} );
 } );

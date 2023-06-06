@@ -44,9 +44,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-At this point, you can use the local, project-level version of wp-env via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like wp-env installed through node modules. As an example: `npx wp-env start --update`.
+If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute `wp-env` via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like `wp-env` installed through node modules. As an example: `npx wp-env start --update`.
 
-If you don't wish to use `npx`, modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+If you don't wish to use the global installation or `npx`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {

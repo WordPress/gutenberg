@@ -87,6 +87,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	testsPort: 8889,
 	mappings: {},
 	config: {
+		FS_METHOD: 'direct',
 		WP_DEBUG: true,
 		SCRIPT_DEBUG: true,
 		WP_ENVIRONMENT_TYPE: 'local',
@@ -233,7 +234,10 @@ async function getDefaultConfig(
 		env: {
 			development: {},
 			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				config: {
+					WP_DEBUG: false,
+					SCRIPT_DEBUG: false,
+				},
 			},
 		},
 	};

@@ -27,7 +27,7 @@ test.describe( 'Preview', () => {
 			editorPage.locator( 'role=button[name="Preview"i]' )
 		).toBeDisabled();
 
-		await editorPage.type(
+		await editor.canvas.type(
 			'role=textbox[name="Add title"i]',
 			'Hello World'
 		);
@@ -48,7 +48,7 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( 'role=textbox[name="Add title"i]', '!' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', '!' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -70,7 +70,7 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.fill(
+		await editor.canvas.fill(
 			'role=textbox[name="Add title"i]',
 			'Hello World! And more.'
 		);
@@ -107,7 +107,7 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type aaaaa in the title field.
-		await editorPage.type( 'role=textbox[name="Add title"]', 'aaaaa' );
+		await editor.canvas.type( 'role=textbox[name="Add title"]', 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
@@ -127,7 +127,7 @@ test.describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.fill(
+		await editor.canvas.fill(
 			'role=textbox[name="Add title"i]',
 			'aaaaabbbbb'
 		);
@@ -155,7 +155,7 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editorPage.type( 'role=textbox[name="Add title"i]', 'Lorem' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', 'Lorem' );
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
@@ -172,7 +172,7 @@ test.describe( 'Preview', () => {
 		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Change the title and preview again.
-		await editorPage.type( 'role=textbox[name="Add title"i]', ' Ipsum' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', ' Ipsum' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -191,7 +191,7 @@ test.describe( 'Preview', () => {
 		).toBeVisible();
 
 		// Change the title.
-		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', ' Draft' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
@@ -222,7 +222,10 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		const editorPage = page;
 
 		// Add an initial title and content.
-		await editorPage.type( 'role=textbox[name="Add title"i]', 'title 1' );
+		await editor.canvas.type(
+			'role=textbox[name="Add title"i]',
+			'title 1'
+		);
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'content 1' },
@@ -246,8 +249,11 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editorPage.fill( 'role=textbox[name="Add title"i]', 'title 2' );
-		await editorPage.fill(
+		await editor.canvas.fill(
+			'role=textbox[name="Add title"i]',
+			'title 2'
+		);
+		await editor.canvas.fill(
 			'role=document >> text="content 1"',
 			'content 2'
 		);

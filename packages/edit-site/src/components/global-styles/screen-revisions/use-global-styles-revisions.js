@@ -5,10 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-/**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
+
 /**
  * Internal dependencies
  */
@@ -75,7 +72,12 @@ export default function useGlobalStylesRevisions() {
 		}
 
 		// Adds an item for unsaved changes.
-		if ( isDirty && ! isEmpty( userConfig ) && currentUser ) {
+		if (
+			isDirty &&
+			userConfig &&
+			Object.keys( userConfig ).length > 0 &&
+			currentUser
+		) {
 			const unsavedRevision = {
 				id: 'unsaved',
 				styles: userConfig?.styles,
