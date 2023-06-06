@@ -16,6 +16,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
@@ -27,20 +28,32 @@ import { usePatterns, PATTERNS, USER_PATTERNS } from './use-patterns';
 const DeleteMenuItem = ( { item, onClose } ) => {
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	if ( item.type !== USER_PATTERNS ) {
 		return;
 	}
 
+	const deleteReusableBlock = async () => {
+		try {
+			await __experimentalDeleteReusableBlock( item.id );
+			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while deleting the pattern.' );
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		} finally {
+			onClose();
+		}
+	};
+
 	return (
-		<MenuItem
-			onClick={ () => {
-				__experimentalDeleteReusableBlock( item.id );
-				onClose();
-			} }
-		>
-			{ __( 'Delete' ) }
-		</MenuItem>
+		<MenuItem onClick={ deleteReusableBlock }>{ __( 'Delete' ) }</MenuItem>
 	);
 };
 
