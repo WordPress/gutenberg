@@ -737,6 +737,19 @@
 		"render": {
 			"type": "string",
 			"description": "Template file loaded on the server when rendering a block."
+		},
+		"autoInsert": {
+			"type": "object",
+			"description": "Positions and blocks to auto-insert this block next to.",
+			"patternProperties": {
+				"[a-zA-Z]": {
+					"type": "array",
+					"description": "Array of the names of blocks to auto-insert this block next to.",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
 		}
 	},
 	"required": [ "name", "title" ],
