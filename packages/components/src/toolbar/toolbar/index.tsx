@@ -20,7 +20,15 @@ import {
 	WordPressComponentProps,
 	ContextSystemProvider,
 } from '../../ui/context';
-import { CONTEXT_SYSTEM_VALUE } from '../constants';
+
+const CONTEXT_SYSTEM_VALUE = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+	Dropdown: {
+		variant: 'toolbar',
+	},
+};
 
 function UnforwardedToolbar(
 	{
