@@ -554,7 +554,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_block_content = $inner_block->render();
-		if ( strpos( $inner_block_content, 'has-child' ) !== false ) {
+		$p = new WP_HTML_Tag_Processor( $inner_block_content );
+		if ( $p->next_tag(
+			array(
+				'name'       => 'LI',
+				'class_name' => 'has-child',
+			)
+		) ) {
 			$has_submenus = true;
 		}
 		if ( ! empty( $inner_block_content ) ) {
