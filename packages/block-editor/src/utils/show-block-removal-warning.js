@@ -41,20 +41,15 @@ export function useBlockRemovalWarning() {
 		useDispatch( blockEditorStore );
 
 	function findCriticalBlocks( clientIds ) {
-		return clientIds
-			.map( ( clientId ) => {
-				const blockName = getBlockName( clientId );
-				if ( isBlockCritical( blockName ) ) {
-					return blockName;
-				}
-				const innerBlocks = getBlockOrder( clientId );
-				if ( innerBlocks.length ) {
-					return findCriticalBlocks( innerBlocks );
-				}
-				return false;
-			} )
-			.flat()
-			.filter( ( blockName ) => blockName );
+		return clientIds.flatMap( ( clientId ) => {
+			const found = [];
+			const blockName = getBlockName( clientId );
+			if ( isBlockCritical( blockName ) ) {
+				found.push( blockName );
+			}
+			const innerBlocks = getBlockOrder( clientId );
+			return found.concat( findCriticalBlocks( innerBlocks ) );
+		} );
 	}
 
 	return ( clientIds, selectPrevious = true ) => {
