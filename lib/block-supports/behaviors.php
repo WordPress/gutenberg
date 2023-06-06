@@ -29,6 +29,8 @@ function gutenberg_register_behaviors_support( $block_type ) {
 	// In the future, this should be a loop with all the behaviors.
 	$has_lightbox_support = block_has_support( $block_type, array( 'behaviors', 'lightbox' ), false );
 	if ( $has_lightbox_support ) {
+		// Use priority 15 to run this hook after other hooks/plugins.
+		// They could use the `render_block_{$this->name}` filter to modify the markup.
 		add_filter( 'render_block_' . $block_type->name, 'gutenberg_blocks_supports_add_lightbox', 15, 2 );
 	}
 }
