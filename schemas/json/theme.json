@@ -10,17 +10,10 @@
 		"behaviorsBlocksPropertiesComplete": {
 			"type": "object",
 			"properties": {
-				"behaviors": {
-					"description": "List of behaviors applied to each individual block.",
-					"type": "object",
-					"properties": {
-						"lightbox": {
-							"description": "Allow users to control lightbox.",
-							"type": "boolean",
-							"default": false
-						}
-					},
-					"additionalProperties": false
+				"lightbox": {
+					"description": "Allow users to control lightbox.",
+					"type": "boolean",
+					"default": false
 				}
 			},
 			"additionalProperties": false

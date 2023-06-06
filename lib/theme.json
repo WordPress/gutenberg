@@ -1,5 +1,6 @@
 {
 	"version": 2,
+	"$schema": "file:/Users/carlosbravo/repos/gutenberg/schemas/json/theme.json",
 	"behaviors": {
 		"blocks": {
 			"core/image": {
