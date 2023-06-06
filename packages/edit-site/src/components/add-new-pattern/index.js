@@ -24,7 +24,7 @@ export default function AddNewPattern( { toggleProps } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	async function createPattern( { name, categoryName } ) {
+	async function createPattern( { name, categoryId } ) {
 		if ( ! name ) {
 			createErrorNotice( __( 'Name is not defined.' ), {
 				type: 'snackbar',
@@ -32,8 +32,8 @@ export default function AddNewPattern( { toggleProps } ) {
 			return;
 		}
 
-		if ( ! categoryName ) {
-			createErrorNotice( __( 'Category is not defined.' ), {
+		if ( ! categoryId ) {
+			createErrorNotice( __( 'Category has not been selected.' ), {
 				type: 'snackbar',
 			} );
 			return;
@@ -49,12 +49,8 @@ export default function AddNewPattern( { toggleProps } ) {
 					title: name || __( 'Untitled Pattern' ),
 					content: '',
 					status: 'publish',
-					meta: {
-						wp_block: {
-							sync_status: 'notSynced',
-							categories: [ categoryName ],
-						},
-					},
+					meta: { wp_block: { sync_status: 'notSynced' } },
+					wp_pattern: [ categoryId ],
 				},
 				{ throwOnError: true }
 			);
@@ -65,7 +61,7 @@ export default function AddNewPattern( { toggleProps } ) {
 				postId: pattern.id,
 				postType: 'wp_block',
 				categoryType: 'wp_block',
-				categoryName,
+				categoryId,
 				canvas: 'edit',
 			} );
 		} catch ( error ) {

@@ -1,86 +1,61 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
-import { store as editSiteStore } from '../../store';
-
-const useUserPatterns = () => {
-	const userPatterns = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const nonSyncedPatterns = getEntityRecords( 'postType', 'wp_block', {
-			per_page: -1,
-		} );
-
-		return nonSyncedPatterns?.map( ( item ) => ( {
-			categories: item.meta?.wp_block?.categories,
-			name: item.slug,
-		} ) );
-	}, [] );
-
-	return userPatterns;
-};
+import useThemePatterns from './use-theme-patterns';
 
 export default function usePatternCategories() {
-	const { blockPatterns, blockPatternCategories } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		const settings = getSettings();
-
-		return {
-			blockPatterns:
-				settings.__experimentalAdditionalBlockPatterns ??
-				settings.__experimentalBlockPatterns,
-			blockPatternCategories:
-				settings.__experimentalAdditionalBlockPatternCategories ??
-				settings.__experimentalBlockPatternCategories,
-		};
-	} );
-
-	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
-		( select ) => ( {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-		} )
+	const { records: categories } = useEntityRecords(
+		'taxonomy',
+		'wp_pattern',
+		{ per_page: -1, hide_empty: false, context: 'view' }
 	);
 
-	const userPatterns = useUserPatterns();
-
-	const patterns = useMemo(
-		() =>
-			[
-				...( blockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-				...( userPatterns || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ blockPatterns, restBlockPatterns, userPatterns ]
+	// We're collecting the both user & theme patterns along with the taxonomy
+	// categories so that we can recalculate the category counts to reflect
+	// merged patterns, additions, or deletions.
+	const themePatterns = useThemePatterns();
+	const userPatterns = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+				per_page: -1,
+			} ),
+		[]
 	);
 
-	const categories = useMemo( () => {
-		const combinedCategories = [
-			...( blockPatternCategories || [] ),
-			...( restBlockPatternCategories || [] ),
-		];
+	const patternCategories = useMemo( () => {
+		if ( ! categories ) {
+			return [];
+		}
 
 		const categoryMap = {};
+		const categoriesWithCounts = [];
 
-		combinedCategories.forEach( ( category ) => {
-			if ( ! categoryMap[ category.name ] ) {
-				category.count = 0;
-				categoryMap[ category.name ] = category;
+		// Create a map that we can easily update category counts
+		// for both user and theme patterns that match.
+		categories.forEach( ( patternCategory ) => {
+			if ( ! categoryMap[ patternCategory.id ] ) {
+				const category = { ...patternCategory, count: 0 };
+				categoryMap[ category.id ] = category;
+				categoryMap[ category.slug ] = category;
 			}
 		} );
 
-		patterns.forEach( ( pattern ) => {
+		( userPatterns || [] ).forEach( ( pattern ) => {
+			pattern.wp_pattern?.forEach( ( categoryId ) => {
+				if ( categoryMap[ categoryId ] ) {
+					categoryMap[ categoryId ].count += 1;
+				}
+			} );
+		} );
+
+		themePatterns.forEach( ( pattern ) => {
 			pattern.categories?.forEach( ( patternCategory ) => {
 				if ( categoryMap[ patternCategory ] ) {
 					categoryMap[ patternCategory ].count += 1;
@@ -88,11 +63,14 @@ export default function usePatternCategories() {
 			} );
 		} );
 
-		return categoryMap;
-	}, [ blockPatternCategories, restBlockPatternCategories, patterns ] );
+		categories.forEach( ( category ) => {
+			if ( categoryMap[ category.id ].count ) {
+				categoriesWithCounts.push( categoryMap[ category.id ] );
+			}
+		} );
 
-	return {
-		hasPatterns: !! patterns.length,
-		patternCategories: Object.values( categories ),
-	};
+		return categoriesWithCounts;
+	}, [ categories, themePatterns, userPatterns ] );
+
+	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
