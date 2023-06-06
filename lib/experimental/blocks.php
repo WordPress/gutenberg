@@ -150,18 +150,12 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
  * Auto-insert blocks relative to a given block.
  *
  * @param string $block_content The block content.
- * @param array  $block         The full block, including name and attributes.
  */
-function gutenberg_auto_insert_blocks( $block_content, $block ) {
+function gutenberg_auto_insert_blocks( $block_content ) {
 	// TODO: Implement an API for users to set the following two parameters.
-	$block_name     = 'core/post-content';
 	$block_position = 'after';
 
 	// Can we avoid infinite loops?
-
-	if ( $block_name !== $block['blockName'] ) {
-		return $block_content;
-	}
 
 	$inserted_block_markup = <<<END
 <!-- wp:social-links -->
@@ -180,7 +174,7 @@ END;
 
 	return $block_content;
 }
-add_filter( 'render_block', 'gutenberg_auto_insert_blocks', 10, 2 );
+add_filter( 'render_block_core/post-content', 'gutenberg_auto_insert_blocks', 10, 1 );
 
 function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	if ( ! isset( $metadata['autoInsert'] ) ) {
