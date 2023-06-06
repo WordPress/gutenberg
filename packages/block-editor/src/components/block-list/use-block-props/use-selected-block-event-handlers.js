@@ -21,13 +21,8 @@ import { useBlockRemovalWarning } from '../../../utils/show-block-removal-warnin
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( clientId ) {
-	const { isSelected } = useSelect(
-		( select ) => {
-			return {
-				isSelected:
-					select( blockEditorStore ).isBlockSelected( clientId ),
-			};
-		},
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
 	);
 	const { getBlockRootClientId, getBlockIndex } =
