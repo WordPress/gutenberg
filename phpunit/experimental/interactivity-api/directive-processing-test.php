@@ -11,6 +11,9 @@ class Helper_Class {
 	function process_foo_test( $tags, $context ) {
 	}
 
+	function process_bar_test( $tags, $context ) {
+	}
+
 	function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
@@ -27,7 +30,7 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
 /**
  * Tests for the gutenberg_interactivity_process_directives function.
  *
- * @group  interactivity-api
+ * @group  interactivity-api2
  * @covers gutenberg_interactivity_process_directives
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
@@ -52,7 +55,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 					);
 
 		$directives = array(
-			'foo-test' => array( $test_helper, 'process_foo_test' ),
+			'foo-test' => array( array( $test_helper, 'process_foo_test' ), 10 ),
 		);
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
@@ -66,10 +69,48 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 					->method( 'process_foo_test' );
 
 		$directives = array(
-			'foo-test' => array( $test_helper, 'process_foo_test' ),
+			'foo-test' => array( array( $test_helper, 'process_foo_test' ), 10 ),
 		);
 
 		$markup = '<div foo-test--value="abc"></div>';
+		$tags   = new WP_HTML_Tag_Processor( $markup );
+		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+	}
+
+	public function test_directives_get_sorted_by_priority() {
+		$test_helper = $this->createMock( Helper_Class::class );
+		$order       = '';
+
+		// Expect process_bar_test to be called first (at index 0)
+		$test_helper->expects( $this->atLeast( 1 ) )
+				->method( 'process_bar_test' )
+				->with(
+					$this->callback(
+						function( $tags ) use ( $order ) {
+							$order .= 'bar';
+							return $order === 'bar';
+						}
+					)
+				);
+
+		// Expect process_foo_test to be called second (at index 1)
+		$test_helper->expects( $this->atLeast( 1 ) )
+				->method( 'process_foo_test' )
+				->with(
+					$this->callback(
+						function( $tags ) use ( $order ) {
+							$order .= 'foo';
+							return $order === 'barfoo';
+						}
+					)
+				);
+
+		$directives = array(
+			'foo-test' => array( array( $test_helper, 'process_foo_test' ), 10 ),
+			'bar-test' => array( array( $test_helper, 'process_bar_test' ), 5 ),
+		);
+
+		$markup = '<div foo-test--value="abc" bar-test--value="def"></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
 	}
