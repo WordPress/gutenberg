@@ -3,6 +3,8 @@
 ## Unreleased
 
 -   Increased minimum peer dependency of `stylelint` to `14.16.1`.
+-   Updated: `stylelint-config-recommended` to 9.0.0.
+-   Updated: `stylelint-config-recommended-scss` to 8.0.0.
 
 ## 21.17.0 (2023-05-24)
 
