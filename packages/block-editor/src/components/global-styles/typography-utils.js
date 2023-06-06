@@ -37,15 +37,15 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
  * @param {Preset}                     preset
- * @param {Object}                     typographySettings
- * @param {boolean|TypographySettings} typographySettings.fluid Whether fluid typography is enabled, and, optionally, fluid font size options.
+ * @param {Object}                     typographyOptions
+ * @param {boolean|TypographySettings} typographyOptions.fluid Whether fluid typography is enabled, and, optionally, fluid font size options.
  *
  * @return {string|*} A font-size value or the value of preset.size.
  */
-export function getTypographyFontSizeValue( preset, typographySettings ) {
+export function getTypographyFontSizeValue( preset, typographyOptions ) {
 	const { size: defaultSize } = preset;
 
-	if ( ! isFluidTypographyEnabled( typographySettings ) ) {
+	if ( ! isFluidTypographyEnabled( typographyOptions ) ) {
 		return defaultSize;
 	}
 	/*
@@ -58,8 +58,8 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	}
 
 	const fluidTypographySettings =
-		typeof typographySettings?.fluid === 'object'
-			? typographySettings?.fluid
+		typeof typographyOptions?.fluid === 'object'
+			? typographyOptions?.fluid
 			: {};
 
 	const fluidFontSizeValue = getComputedFluidTypographyValue( {
@@ -81,7 +81,8 @@ function isFluidTypographyEnabled( typographySettings ) {
 	const fluidSettings = typographySettings?.fluid;
 	return (
 		true === fluidSettings ||
-		( typeof fluidSettings === 'object' &&
+		( fluidSettings &&
+			typeof fluidSettings === 'object' &&
 			Object.keys( fluidSettings ).length > 0 )
 	);
 }
@@ -92,7 +93,7 @@ function isFluidTypographyEnabled( typographySettings ) {
  * @param {Object} settings            Theme.json settings
  * @param {Object} settings.typography Theme.json typography settings
  * @param {Object} settings.layout     Theme.json layout settings
- * @return {{fluid: (*&{maxViewPortWidth})}|{fluid: *}} Fluid typography settings
+ * @return {TypographySettings} Fluid typography settings
  */
 export function getFluidTypographyOptionsFromSettings( settings ) {
 	const typographySettings = settings?.typography;
