@@ -20,7 +20,7 @@ import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,14 +39,23 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const query = { per_page: -1, hide_empty: false, context: 'view' };
+
+	const { records: categories } = useEntityRecords(
+		'taxonomy',
+		'wp_pattern',
+		query
+	);
+
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ blockType, setBlockType ] = useState( 'resuable' );
 	const [ title, setTitle ] = useState( '' );
-	const [ categoryName, setCategoryName ] = useState( '' );
-	const { canConvert, patternCategories } = useSelect(
+	const [ categoryId, setCategoryId ] = useState( '' );
+	const { canConvert } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType, getSettings } =
+
+			const { getBlocksByClientId, canInsertBlockType } =
 				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
@@ -80,8 +89,6 @@ export default function ReusableBlockConvertButton( {
 
 			return {
 				canConvert: _canConvert,
-				patternCategories:
-					getSettings().__experimentalBlockPatternCategories,
 			};
 		},
 		[ clientIds ]
@@ -99,7 +106,7 @@ export default function ReusableBlockConvertButton( {
 					clientIds,
 					reusableBlockTitle,
 					blockType,
-					categoryName
+					categoryId
 				);
 				createSuccessNotice(
 					sprintf(
@@ -123,7 +130,7 @@ export default function ReusableBlockConvertButton( {
 			convertBlocksToReusable,
 			clientIds,
 			blockType,
-			categoryName,
+			categoryId,
 			createSuccessNotice,
 			createErrorNotice,
 		]
@@ -132,11 +139,11 @@ export default function ReusableBlockConvertButton( {
 	if ( ! canConvert ) {
 		return null;
 	}
-
+	const patternCategories = categories === null ? [] : categories;
 	const categoryOptions = patternCategories
 		.map( ( category ) => ( {
-			label: category.label,
-			value: category.name,
+			label: category.name,
+			value: category.id,
 		} ) )
 		.concat( [
 			{ value: '', label: __( 'Select a category' ), disabled: true },
@@ -198,10 +205,10 @@ export default function ReusableBlockConvertButton( {
 									{ blockType === 'pattern' && (
 										<SelectControl
 											label={ __( 'Category' ) }
-											onChange={ setCategoryName }
+											onChange={ setCategoryId }
 											options={ categoryOptions }
 											size="__unstable-large"
-											value={ categoryName }
+											value={ categoryId }
 										/>
 									) }
 									<HStack justify="right">

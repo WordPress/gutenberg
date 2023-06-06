@@ -77,9 +77,6 @@ function gutenberg_wp_block_register_post_meta() {
 						'sync_status' => array(
 							'type' => 'string',
 						),
-						'categories'  => array(
-							'type' => 'array',
-						),
 						'slug'        => array(
 							'type' => 'string',
 						),
@@ -103,7 +100,32 @@ function gutenberg_wp_block_register_post_meta() {
 function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
 	$meta_value['sync_status'] = sanitize_text_field( $meta_value['sync_status'] );
 	$meta_value['slug']        = sanitize_text_field( $meta_value['slug'] );
-	$meta_value['categories']  = array_map( 'sanitize_text_field', $meta_value['categories'] );
 	return $meta_value;
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
+
+function wporg_register_taxonomy_patterns()
+{
+	$labels = array(
+		'name'              => _x( 'Patterns', 'taxonomy general name' ),
+		'singular_name'     => _x( 'Pattern', 'taxonomy singular name' ),
+		'search_items'      => __( 'Search Patterns' ),
+		'all_items'         => __( 'All Pattern Categories' ),
+		'edit_item'         => __( 'Edit Pattern Category' ),
+		'update_item'       => __( 'Update Pattern Category' ),
+		'add_new_item'      => __( 'Add New Pattern Category' ),
+		'new_item_name'     => __( 'New Pattern Category Name' ),
+		'menu_name'         => __( 'Pattern' ),
+	);
+	$args   = array(
+		'hierarchical'      => false, // make it hierarchical (like categories)
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'show_in_rest'      => true,
+		'rewrite'           => ['slug' => 'wp_pattern'],
+	);
+	register_taxonomy( 'wp_pattern', ['wp_block'], $args );
+}
+add_action( 'init', 'wporg_register_taxonomy_patterns' );
