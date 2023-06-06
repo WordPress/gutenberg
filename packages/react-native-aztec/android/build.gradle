@@ -75,13 +75,7 @@ repositories {
     }
     maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     google()
-    mavenCentral {
-        // We don't want to fetch react-native from Maven Central as there are
-        // older versions over there.
-        content {
-            excludeGroup "com.facebook.react"
-        }
-    }
+    mavenCentral()
 }
 
 dependencies {
@@ -100,7 +94,7 @@ dependencies {
 
     def rnVersion = readReactNativeVersion('../../../package.json', 'devDependencies')
     println "react-native version for react-native-aztec: $rnVersion"
-    implementation "com.facebook.react:react-native:$rnVersion"
+    implementation "com.facebook.react:react-android:$rnVersion"
 }
 
 project.afterEvaluate {

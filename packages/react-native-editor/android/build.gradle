@@ -24,13 +24,7 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenCentral {
-            // We don't want to fetch react-native from Maven Central as there are
-            // older versions over there.
-            content {
-                excludeGroup "com.facebook.react"
-            }
-        }
+        mavenCentral()
         mavenLocal()
         maven {
             url "https://a8c-libs.s3.amazonaws.com/android"
@@ -41,7 +35,6 @@ allprojects {
                 includeGroupByRegex "org.wordpress-mobile.react-native-libraries.*"
             }
         }
-        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
         maven { url 'https://www.jitpack.io' }
         google()
     }

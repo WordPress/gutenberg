@@ -127,8 +127,8 @@ dependencies {
 
     implementation "org.wordpress-mobile.gutenberg-mobile:react-native-bridge"
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}"
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation "com.facebook.react:react-android"
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
@@ -155,10 +155,9 @@ dependencies {
     implementation "$reactNativeLibrariesGroupId:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
-
-    implementation("com.facebook.react:hermes-engine:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}") {
-        exclude group:'com.facebook.fbjni'
-    }
+    
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation "com.facebook.react:hermes-android"
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'

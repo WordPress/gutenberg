@@ -47,13 +47,7 @@ repositories {
     maven { url "https://a8c-libs.s3.amazonaws.com/android" }
     maven { url "https://jitpack.io" }
     google()
-    mavenCentral {
-        // We don't want to fetch react-native from Maven Central as there are
-        // older versions over there.
-        content {
-            excludeGroup "com.facebook.react"
-        }
-    }
+    mavenCentral()
 }
 
 dependencies {
@@ -68,7 +62,7 @@ dependencies {
     println "react-native version for react-native-bridge: $rnVersion"
     def packageJson = '../../../react-native-editor/package.json'
 
-    implementation "com.facebook.react:react-native:$rnVersion"
+    implementation "com.facebook.react:react-android:$rnVersion"
     implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
@@ -93,9 +87,7 @@ dependencies {
     implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
 
-    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
-        exclude group:'com.facebook.fbjni'
-    })
+    runtimeOnly "com.facebook.react:hermes-android:$rnVersion"
 
     if (willPublishReactNativeBridgeBinary) {
         implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
