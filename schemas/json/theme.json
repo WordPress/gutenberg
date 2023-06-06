@@ -7,6 +7,24 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
+		"behaviorsBlocksPropertiesComplete": {
+			"type": "object",
+			"properties": {
+				"behaviors": {
+					"description": "List of behaviors applied to the image block.",
+					"type": "object",
+					"properties": {
+						"lightbox": {
+							"description": "Allow users to control lightbox.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			},
+			"additionalProperties": false
+		},
 		"refComplete": {
 			"type": "object",
 			"properties": {
@@ -649,9 +667,27 @@
 				}
 			}
 		},
+		"settingsPropertiesBehaviors": {
+			"type": "object",
+			"properties": {
+				"behaviors": {
+					"description": "Settings related to behaviors.",
+					"type": "object",
+					"properties": {
+						"lightbox": {
+							"description": "Allow users to enable/disable lightbox.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBehaviors" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
@@ -672,6 +708,7 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"behaviors": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -801,26 +838,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/image": {
-					"type": "object",
-					"allOf": [
-						{ "$ref": "#/definitions/settingsPropertiesComplete" },
-						{
-							"type": "object",
-							"properties": {
-								"behaviors": {
-									"description": "Array of behaviors applied to the image block.",
-									"type": "object",
-									"properties": {
-										"lightbox": {
-											"description": "Allow users to control lightbox.",
-											"type": "boolean",
-											"default": false
-										}
-									}
-								}
-							}
-						}
-					]
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -2089,22 +2107,17 @@
 			"description": "Description of the global styles variation."
 		},
 		"behaviors": {
-			"description": "An array of blocks that have behaviors included. Behaviors are also defined here.",
+			"description": "A list of blocks that have behaviors. These setting controls the display of the behaviors UI in the block editor.",
 			"type": "object",
 			"properties": {
 				"blocks": {
 					"type": "object",
 					"properties": {
 						"core/image": {
-							"type": "object",
-							"properties": {
-								"lightbox": {
-									"type": "boolean",
-									"description": "Whether to show the lightbox behavior UI in the block sidebar."
-								}
-							}
+							"$ref": "#/definitions/behaviorsBlocksPropertiesComplete"
 						}
-					}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
