@@ -254,11 +254,11 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// redirect to the revisions screen.
 			goTo( '/revisions' );
 		} else if (
-			editorCanvasContainerView === 'style-book' &&
+			!! editorCanvasContainerView &&
 			location?.path === '/revisions'
 		) {
-			// Switching to the style book container view should
-			// redirect to the style book screen.
+			// Switching to any container other than revisions should
+			// redirect from the revisions screen to the root global styles screen.
 			goTo( '/' );
 		}
 	}, [ editorCanvasContainerView, location?.path, goTo ] );
