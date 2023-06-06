@@ -47,14 +47,12 @@ function InstalledFonts() {
 			{ ! fontSelected && (
 				<>
 					{/* <PreviewControls /> */}
-					
-					{ themeFonts.length > 0 && (
+
+					{ libraryFonts.length > 0 && (
 						<>
 							<Spacer margin={ 4 } />
-							<FontsGrid
-								title={ __( 'Theme Fonts' ) }
-							>
-								{ themeFonts.map( ( font ) => (
+							<FontsGrid>
+								{ libraryFonts.map( ( font ) => (
 									<LibraryFontCard
 										font={ font }
 										key={ font.slug }
@@ -66,14 +64,14 @@ function InstalledFonts() {
 							</FontsGrid>
 						</>
 					)}
-
-					{ libraryFonts.length > 0 && (
+					
+					{ themeFonts.length > 0 && (
 						<>
 							<Spacer margin={ 10 } />
 							<FontsGrid
-								title={ __( 'User Fonts' ) }
+								title={ __( 'Theme Fonts' ) }
 							>
-								{ libraryFonts.map( ( font ) => (
+								{ themeFonts.map( ( font ) => (
 									<LibraryFontCard
 										font={ font }
 										key={ font.slug }
