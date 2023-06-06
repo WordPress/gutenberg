@@ -13,6 +13,7 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
+        mavenLocal()
         // Starting from React Native 0.70, we no longer need to publish React Native binaries
         // because they are already published to Maven (reference: https://t.ly/Biea).
         // However, the third-party dependencies from forked repositories still point to older
