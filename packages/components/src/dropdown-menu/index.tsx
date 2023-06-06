@@ -81,9 +81,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			// Do not add a `variant` prop if it's not defined, to avoid overriding
-			// values from internal context system.
-			...( !! variant ? { variant } : {} ),
+			variant,
 		},
 		popoverProps
 	);
