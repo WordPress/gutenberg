@@ -307,6 +307,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 
 	return (
 		<div
@@ -402,11 +403,9 @@ function LinkControl( {
 					<div className="block-editor-link-control__search-actions">
 						<Button
 							variant="primary"
-							onClick={ handleSubmit }
+							onClick={ isDisabled ? noop : handleSubmit }
 							className="block-editor-link-control__search-submit"
-							disabled={
-								! valueHasChanges || currentInputIsEmpty
-							}
+							aria-disabled={ isDisabled }
 						>
 							{ __( 'Save' ) }
 						</Button>

@@ -658,7 +658,10 @@ describe( 'Manual link entry', () => {
 					name: 'Save',
 				} );
 
-				expect( submitButton ).toBeDisabled();
+				expect( submitButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
 				expect( submitButton ).toBeVisible();
 
 				if ( searchString.length ) {
@@ -678,7 +681,10 @@ describe( 'Manual link entry', () => {
 
 				// Verify the UI hasn't allowed submission.
 				expect( searchInput ).toBeVisible();
-				expect( submitButton ).toBeDisabled();
+				expect( submitButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
 				expect( submitButton ).toBeVisible();
 			}
 		);
@@ -699,7 +705,10 @@ describe( 'Manual link entry', () => {
 					name: 'Save',
 				} );
 
-				expect( submitButton ).toBeDisabled();
+				expect( submitButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
 				expect( submitButton ).toBeVisible();
 
 				// Simulate searching for a term.
@@ -720,7 +729,10 @@ describe( 'Manual link entry', () => {
 
 				// Verify the UI hasn't allowed submission.
 				expect( searchInput ).toBeVisible();
-				expect( submitButton ).toBeDisabled();
+				expect( submitButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
 				expect( submitButton ).toBeVisible();
 			}
 		);
@@ -1812,7 +1824,7 @@ describe( 'Addition Settings UI', () => {
 			name: 'Save',
 		} );
 
-		expect( submitButton ).toBeDisabled();
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
 		await toggleSettingsDrawer( user );
 
