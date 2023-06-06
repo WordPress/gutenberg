@@ -8,8 +8,6 @@ import {
 	__experimentalVStack as VStack,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -28,6 +26,11 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
+import {
+	SidebarNavigationScreenDetailsPanelRow,
+	SidebarNavigationScreenDetailsPanelLabel,
+	SidebarNavigationScreenDetailsPanelValue,
+} from '../sidebar-navigation-screen-details-panel';
 
 export default function SidebarNavigationScreenPage() {
 	const navigator = useNavigator();
@@ -125,15 +128,11 @@ export default function SidebarNavigationScreenPage() {
 			}
 			footer={
 				!! record?.modified && (
-					<HStack
-						spacing={ 5 }
-						alignment="left"
-						className="edit-site-sidebar-navigation-screen-page__details edit-site-sidebar-navigation-screen-page__footer"
-					>
-						<Text className="edit-site-sidebar-navigation-screen-page__details-label">
+					<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-page__footer">
+						<SidebarNavigationScreenDetailsPanelLabel>
 							{ __( 'Last modified' ) }
-						</Text>
-						<Text className="edit-site-sidebar-navigation-screen-page__details-value">
+						</SidebarNavigationScreenDetailsPanelLabel>
+						<SidebarNavigationScreenDetailsPanelValue>
 							{ createInterpolateElement(
 								sprintf(
 									/* translators: %s: is the relative time when the post was last modified. */
@@ -144,8 +143,8 @@ export default function SidebarNavigationScreenPage() {
 									time: <time dateTime={ record.modified } />,
 								}
 							) }
-						</Text>
-					</HStack>
+						</SidebarNavigationScreenDetailsPanelValue>
+					</SidebarNavigationScreenDetailsPanelRow>
 				)
 			}
 		/>
