@@ -23,9 +23,9 @@ const DEFAULT_TYPE = 'wp_template_part';
 const DEFAULT_CATEGORY = 'header';
 
 export default function Library() {
-	const { categoryType, categoryName } = getQueryArgs( window.location.href );
+	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const type = categoryType || DEFAULT_TYPE;
-	const category = categoryName || DEFAULT_CATEGORY;
+	const category = categoryId || DEFAULT_CATEGORY;
 	const settings = useLibrarySettings();
 
 	// Do we need shortcuts if we aren't displaying a header?
@@ -58,7 +58,7 @@ export default function Library() {
 				<ExperimentalBlockEditorProvider settings={ settings }>
 					<Grid
 						type={ type }
-						category={ category }
+						categoryId={ category }
 						label={ __( 'Patterns list' ) }
 					/>
 				</ExperimentalBlockEditorProvider>

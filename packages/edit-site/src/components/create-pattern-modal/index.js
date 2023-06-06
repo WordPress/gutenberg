@@ -9,25 +9,25 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { useEntityRecords } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import usePatternCategories from '../sidebar-navigation-screen-library/use-pattern-categories';
-
 export default function CreatePatternModal( { closeModal, onCreate } ) {
 	const [ name, setName ] = useState( '' );
-	const [ categoryName, setCategoryName ] = useState( '' );
+	const [ categoryId, setCategoryId ] = useState( '' );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
-	const { patternCategories } = usePatternCategories();
+	const { records: categories } = useEntityRecords(
+		'taxonomy',
+		'wp_pattern',
+		{ per_page: -1, hide_empty: false, context: 'view' }
+	);
 
-	const options = patternCategories
+	const options = ( categories || [] )
 		.map( ( category ) => ( {
-			label: category.label,
-			value: category.name,
+			label: category.name,
+			value: category.id,
 		} ) )
 		.concat( [
 			{ value: '', label: __( 'Select a category' ), disabled: true },
@@ -52,7 +52,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						return;
 					}
 					setIsSubmitting( true );
-					await onCreate( { name, categoryName } );
+					await onCreate( { name, categoryId } );
 				} }
 			>
 				<VStack spacing="4">
@@ -67,10 +67,10 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 					/>
 					<SelectControl
 						label={ __( 'Category' ) }
-						onChange={ setCategoryName }
+						onChange={ setCategoryId }
 						options={ options }
 						size="__unstable-large"
-						value={ categoryName }
+						value={ categoryId }
 					/>
 					<HStack justify="right">
 						<Button
@@ -84,7 +84,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! name || ! categoryName }
+							disabled={ ! name || ! categoryId }
 							isBusy={ isSubmitting }
 						>
 							{ __( 'Create' ) }

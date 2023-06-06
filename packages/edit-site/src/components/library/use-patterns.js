@@ -3,7 +3,7 @@
  */
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -73,7 +73,7 @@ const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
 	return { templateParts: filteredTemplateParts, isResolving };
 };
 
-const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
+const useBlockPatternsByCategory = ( categoryId, postType = PATTERNS ) => {
 	const blockPatterns = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		const settings = getSettings();
@@ -90,6 +90,7 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 	const patterns = useMemo(
 		() =>
 			[ ...( blockPatterns || [] ), ...( restBlockPatterns || [] ) ]
+				.filter( ( pattern ) => pattern.source !== 'core' )
 				.filter(
 					( x, index, arr ) =>
 						index === arr.findIndex( ( y ) => x.name === y.name )
@@ -102,22 +103,27 @@ const useBlockPatternsByCategory = ( category, postType = PATTERNS ) => {
 		[ blockPatterns, restBlockPatterns ]
 	);
 
-	if ( postType !== PATTERNS ) {
+	// Non-user-created patterns (e.g. theme patterns ) will have string
+	// category names in their assigned categories array. We'll need to
+	// to retrieve the current category's name to match them.
+	const { record: category } = useEntityRecord(
+		'taxonomy',
+		'wp_pattern',
+		categoryId
+	);
+
+	if ( postType !== PATTERNS || ! category ) {
 		return EMPTY_PATTERN_LIST;
 	}
 
-	if ( ! category ) {
-		return patterns || EMPTY_PATTERN_LIST;
-	}
-
 	return patterns.filter( ( pattern ) =>
-		pattern.categories?.includes( category )
+		pattern.categories?.includes( category.name )
 	);
 };
 
 const reusableBlockToPattern = ( reusableBlock ) => ( {
 	blocks: parse( reusableBlock.content.raw ),
-	categories: reusableBlock.meta?.wp_block?.categories,
+	categories: reusableBlock.wp_pattern,
 	id: reusableBlock.id,
 	name: reusableBlock.slug,
 	title: reusableBlock.title.raw,
@@ -125,8 +131,9 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 	reusableBlock,
 } );
 
-const useUserPatterns = ( category, categoryType = PATTERNS ) => {
+const useUserPatterns = ( categoryId, categoryType = PATTERNS ) => {
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
+	const currentId = parseInt( categoryId );
 	const userPatterns = useSelect(
 		( select ) => {
 			if ( postType !== USER_PATTERNS ) {
@@ -150,15 +157,15 @@ const useUserPatterns = ( category, categoryType = PATTERNS ) => {
 	);
 
 	return userPatterns.filter( ( pattern ) =>
-		pattern.categories?.includes( category )
+		pattern.categories?.includes( currentId )
 	);
 };
 
-export const usePatterns = ( categoryType, categoryName ) => {
-	const patterns = useBlockPatternsByCategory( categoryName, categoryType );
-	const userPatterns = useUserPatterns( categoryName, categoryType );
+export const usePatterns = ( categoryType, categoryId ) => {
+	const patterns = useBlockPatternsByCategory( categoryId, categoryType );
+	const userPatterns = useUserPatterns( categoryId, categoryType );
 	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
-		categoryName,
+		categoryId,
 		categoryType
 	);
 
