@@ -196,8 +196,7 @@ describe( 'Basic rendering', () => {
 			within( resultsList ).getAllByRole( 'option' );
 
 		expect( searchResultElements ).toHaveLength(
-			// The fauxEntitySuggestions length plus the 'Press ENTER to add this link' button.
-			fauxEntitySuggestions.length + 1
+			fauxEntitySuggestions.length
 		);
 
 		// Step down into the search results, highlighting the first result item.
@@ -504,8 +503,7 @@ describe( 'Searching for a link', () => {
 			.flat()
 			.filter( Boolean );
 
-		// Given we're mocking out the results we should always have 4 mark elements.
-		expect( searchResultTextHighlightElements ).toHaveLength( 4 );
+		expect( searchResultTextHighlightElements ).toHaveLength( 3 );
 
 		// Make sure there are no `mark` elements which contain anything other
 		// than the trimmed search term (ie: no whitespace).
@@ -565,16 +563,15 @@ describe( 'Searching for a link', () => {
 			const lastSearchResultItem =
 				searchResultElements[ searchResultElements.length - 1 ];
 
-			// We should see a search result for each of the expect search suggestions
-			// plus 1 additional one for the fallback URL suggestion.
+			// We should see a search result for each of the expect search suggestions.
 			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length + 1
+				fauxEntitySuggestions.length
 			);
 
-			// The last item should be a URL search suggestion.
-			expect( lastSearchResultItem ).toHaveTextContent( searchTerm );
-			expect( lastSearchResultItem ).toHaveTextContent( 'URL' );
-			expect( lastSearchResultItem ).toHaveTextContent(
+			// The URL search suggestion should not exist.
+			expect( lastSearchResultItem ).not.toHaveTextContent( searchTerm );
+			expect( lastSearchResultItem ).not.toHaveTextContent( 'URL' );
+			expect( lastSearchResultItem ).not.toHaveTextContent(
 				'Press ENTER to add this link'
 			);
 		}
@@ -952,8 +949,7 @@ describe( 'Default search suggestions', () => {
 			} )
 		).getAllByRole( 'option' );
 
-		// It should match any url that's like ?p= and also include a URL option.
-		expect( searchResultElements ).toHaveLength( 5 );
+		expect( searchResultElements ).toHaveLength( 4 );
 
 		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
