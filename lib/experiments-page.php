@@ -96,7 +96,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Use the Interactivity API in File, Navigation and Image core blocks. It also enables the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
 			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);
