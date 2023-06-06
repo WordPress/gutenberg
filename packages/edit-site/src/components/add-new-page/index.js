@@ -41,7 +41,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				{
 					status: 'draft',
 					title,
-					slug: kebabCase( title || __( 'Untitled' ) ),
+					slug: kebabCase( title || __( 'No title' ) ),
 				},
 				{ throwOnError: true }
 			);
