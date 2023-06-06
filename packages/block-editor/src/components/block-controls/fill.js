@@ -39,8 +39,8 @@ export default function BlockControlsFill( {
 					// `fillProps` is an array of context provider entries, provided by slot,
 					// that should wrap the fill markup.
 					return fillProps.reduce(
-						( inner, [ Provider, value ] ) => (
-							<Provider value={ value }>{ inner }</Provider>
+						( inner, [ Provider, props ] ) => (
+							<Provider { ...props }>{ inner }</Provider>
 						),
 						innerMarkup
 					);

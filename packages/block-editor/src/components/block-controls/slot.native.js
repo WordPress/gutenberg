@@ -16,7 +16,7 @@ import groups from './groups';
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	const toolbarState = useContext( ToolbarContext );
 	const fillProps = useMemo(
-		() => [ [ ToolbarContext.Provider, toolbarState ] ],
+		() => [ [ ToolbarContext.Provider, { value: toolbarState } ] ],
 		[ toolbarState ]
 	);
 
