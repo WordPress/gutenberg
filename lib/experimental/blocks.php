@@ -147,34 +147,26 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
 
 /**
- * Auto-insert blocks relative to a given block.
+ * Return a function that auto-inserts blocks relative to a given block.
  *
- * @param string $block_content The block content.
+ * @param string $relative_position The position relative to the given block.
+ * @param array  $inserted_block    The block to insert.
+ * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_blocks( $block_content ) {
-	// TODO: Implement an API for users to set the following two parameters.
-	$block_position = 'after';
-
+function gutenberg_auto_insert_blocks( $relative_position, $inserted_block ) {
 	// Can we avoid infinite loops?
 
-	$inserted_block_markup = <<<END
-<!-- wp:social-links -->
-<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-<!-- /wp:social-links -->'
-END;
+	return function( $block_content ) use ( $relative_position, $inserted_block ) {
+		$inserted_content = render_block( $inserted_block );
 
-	$inserted_blocks  = parse_blocks( $inserted_block_markup );
-	$inserted_content = render_block( $inserted_blocks[0] );
-
-	if ( 'before' === $block_position ) {
-		$block_content = $inserted_content . $block_content;
-	} elseif ( 'after' === $block_position ) {
-		$block_content = $block_content . $inserted_content;
-	}
-
-	return $block_content;
+		if ( 'before' === $relative_position ) {
+			$block_content = $inserted_content . $block_content;
+		} elseif ( 'after' === $relative_position ) {
+			$block_content = $block_content . $inserted_content;
+		}
+		return $block_content;
+	};
 }
-add_filter( 'render_block_core/post-content', 'gutenberg_auto_insert_blocks', 10, 1 );
 
 function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	if ( ! isset( $metadata['autoInsert'] ) ) {
@@ -194,7 +186,12 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 			continue;
 		}
 
-		$settings['auto_insert'][ $block ] = $property_mappings[ $position ];
+		$mapped_position = $property_mappings[ $position ];
+		if ( 'before' === $mapped_position || 'after' === $mapped_position ) {
+			$inserter = gutenberg_auto_insert_blocks( $mapped_position, array( 'blockName' => $metadata['name'] ) );
+			add_filter( "render_block_$block", $inserter, 10, 2 );
+		}
+		$settings['auto_insert'][ $block ] = $mapped_position;
 	}
 
 	return $settings;
