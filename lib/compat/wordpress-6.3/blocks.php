@@ -104,28 +104,38 @@ function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
 
-function wporg_register_taxonomy_patterns()
-{
+/**
+ * Adds a new taxonomy for organizing patterns.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.3.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/51144
+ *
+ * @return void
+ */
+function gutenberg_register_taxonomy_patterns() {
 	$labels = array(
-		'name'              => _x( 'Patterns', 'taxonomy general name' ),
-		'singular_name'     => _x( 'Pattern', 'taxonomy singular name' ),
-		'search_items'      => __( 'Search Patterns' ),
-		'all_items'         => __( 'All Pattern Categories' ),
-		'edit_item'         => __( 'Edit Pattern Category' ),
-		'update_item'       => __( 'Update Pattern Category' ),
-		'add_new_item'      => __( 'Add New Pattern Category' ),
-		'new_item_name'     => __( 'New Pattern Category Name' ),
-		'menu_name'         => __( 'Pattern' ),
+		'name'          => _x( 'Patterns', 'taxonomy general name' ),
+		'singular_name' => _x( 'Pattern', 'taxonomy singular name' ),
+		'search_items'  => __( 'Search Patterns' ),
+		'all_items'     => __( 'All Pattern Categories' ),
+		'edit_item'     => __( 'Edit Pattern Category' ),
+		'update_item'   => __( 'Update Pattern Category' ),
+		'add_new_item'  => __( 'Add New Pattern Category' ),
+		'new_item_name' => __( 'New Pattern Category Name' ),
+		'menu_name'     => __( 'Pattern' ),
 	);
 	$args   = array(
-		'hierarchical'      => false, // make it hierarchical (like categories)
+		'hierarchical'      => false,
 		'labels'            => $labels,
 		'show_ui'           => true,
+		'show_in_menu'      => true,
+		'show_in_nav_menus' => true,
 		'show_admin_column' => true,
 		'query_var'         => true,
 		'show_in_rest'      => true,
-		'rewrite'           => ['slug' => 'wp_pattern'],
+		'rewrite'           => array( 'slug' => 'wp_pattern' ),
 	);
-	register_taxonomy( 'wp_pattern', ['wp_block'], $args );
+	register_taxonomy( 'wp_pattern', array( 'wp_block' ), $args );
 }
-add_action( 'init', 'wporg_register_taxonomy_patterns' );
+add_action( 'init', 'gutenberg_register_taxonomy_patterns' );
