@@ -35,6 +35,8 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBri
 
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
+import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -296,7 +298,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
         }, isDarkMode());
 
-        return new ReactNativeHost(this) {
+        return new DefaultReactNativeHost(this) {
             @Override
             public boolean getUseDeveloperSupport() {
                 return BuildConfig.DEBUG;
@@ -328,6 +330,15 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             protected String getJSMainModuleName() {
                 return "index";
+            }
+
+            @Override
+            protected boolean isNewArchEnabled() {
+                return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+            }
+            @Override
+            protected Boolean isHermesEnabled() {
+                return BuildConfig.IS_HERMES_ENABLED;
             }
         };
     }
