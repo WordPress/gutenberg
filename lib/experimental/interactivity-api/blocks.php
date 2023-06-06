@@ -7,29 +7,6 @@
  */
 
 /**
- * Adds Interactivity API directives to the File block markup using the Tag Processor.
- *
- * @param string   $block_content Markup of the File block.
- * @param array    $block         The full block, including name and attributes.
- * @param WP_Block $instance      The block instance.
- *
- * @return string File block markup with the directives injected when applicable.
- */
-function gutenberg_block_core_file_add_directives_to_content( $block_content, $block, $instance ) {
-	if ( empty( $instance->attributes['displayPreview'] ) ) {
-		return $block_content;
-	}
-	$processor = new WP_HTML_Tag_Processor( $block_content );
-	$processor->next_tag();
-	$processor->set_attribute( 'data-wp-interactive', '' );
-	$processor->next_tag( 'object' );
-	$processor->set_attribute( 'data-wp-bind--hidden', '!selectors.core.file.hasPdfPreview' );
-	$processor->set_attribute( 'hidden', true );
-	return $processor->get_updated_html();
-}
-add_filter( 'render_block_core/file', 'gutenberg_block_core_file_add_directives_to_content', 10, 3 );
-
-/**
  * Add Interactivity API directives to the navigation block markup using the Tag Processor
  * The final HTML of the navigation block will look similar to this:
  *
@@ -231,7 +208,7 @@ add_filter( 'render_block_core/navigation', 'gutenberg_block_core_navigation_add
  */
 function gutenberg_block_update_interactive_view_script( $metadata ) {
 	if (
-		in_array( $metadata['name'], array( 'core/file', 'core/navigation', 'core/image' ), true ) &&
+		in_array( $metadata['name'], array( 'core/navigation', 'core/image' ), true ) &&
 		str_contains( $metadata['file'], 'build/block-library/blocks' )
 	) {
 		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
