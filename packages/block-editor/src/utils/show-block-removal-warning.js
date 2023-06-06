@@ -40,7 +40,7 @@ export function useBlockRemovalWarning() {
 	const { displayRemovalPrompt, removeBlocks } =
 		useDispatch( blockEditorStore );
 
-	function findCriticalBlocks( clientIds ) {
+	function getBlocksToPromptFor( clientIds ) {
 		return clientIds.flatMap( ( clientId ) => {
 			const found = [];
 			const blockName = getBlockName( clientId );
@@ -48,19 +48,19 @@ export function useBlockRemovalWarning() {
 				found.push( blockName );
 			}
 			const innerBlocks = getBlockOrder( clientId );
-			return found.concat( findCriticalBlocks( innerBlocks ) );
+			return found.concat( getBlocksToPromptFor( innerBlocks ) );
 		} );
 	}
 
 	return ( clientIds, selectPrevious = true ) => {
-		const criticalBlocks = findCriticalBlocks( clientIds );
+		const blocksToPromptFor = getBlocksToPromptFor( clientIds );
 
-		if ( criticalBlocks.length ) {
+		if ( blocksToPromptFor.length ) {
 			displayRemovalPrompt( true, {
 				removalFunction: () => {
 					removeBlocks( clientIds, selectPrevious );
 				},
-				blocksToPromptFor: criticalBlocks,
+				blocksToPromptFor,
 			} );
 		} else {
 			removeBlocks( clientIds, selectPrevious );
