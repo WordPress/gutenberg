@@ -112,7 +112,7 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 	}
 
 	return (
-		<VStack>
+		<VStack className="edit-site-sidebar-navigation-screen-global-styles__footer">
 			<SidebarNavigationItem
 				className="edit-site-sidebar-navigation-screen-global-styles__revisions"
 				label={ __( 'Revisions' ) }

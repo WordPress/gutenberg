@@ -1,4 +1,10 @@
+.edit-site-sidebar-navigation-screen-global-styles__footer {
+	padding-left: $grid-unit-15;
+}
+
 .edit-site-sidebar-navigation-screen-global-styles__revisions {
+	border-radius: $radius-block-ui;
+
 	&:not(:hover) {
 		color: $gray-200;
 
