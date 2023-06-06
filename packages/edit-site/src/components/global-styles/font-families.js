@@ -6,9 +6,8 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalItem as Item,
-	FlexItem,
 	Button,
+	Tooltip,
 } from '@wordpress/components';
 import { plus, typography } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -49,18 +48,22 @@ function FontFamilies() {
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					<HStack justify='flex-end'>
-						<Button
-							onClick={ () => toggleFontLibrary( "google-fonts" ) }
-							aria-label={ __( 'Install fonts' ) }
-							icon={ plus }
-							isSmall
-						/>
-						<Button
-							onClick={ () => toggleFontLibrary( "installed-fonts" ) }
-							aria-label={ __( 'Manage fonts' ) }
-							icon={ typography }
-							isSmall
-						/>
+						<Tooltip text={ __( 'Add fonts' ) }>
+							<Button
+								onClick={ () => toggleFontLibrary( "google-fonts" ) }
+								aria-label={ __( 'Add fonts' ) }
+								icon={ plus }
+								isSmall
+							/>
+						</Tooltip>
+						<Tooltip text={ __( 'Manage fonts' ) }>
+							<Button
+								onClick={ () => toggleFontLibrary( "installed-fonts" ) }
+								aria-label={ __( 'Manage fonts' ) }
+								icon={ typography }
+								isSmall
+							/>
+						</Tooltip>
 					</HStack>
 				</HStack>
 				<ItemGroup isBordered isSeparated>
