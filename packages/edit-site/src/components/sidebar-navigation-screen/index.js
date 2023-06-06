@@ -102,14 +102,14 @@ export default function SidebarNavigationScreen( {
 					</>
 				) }
 
-				<nav className="edit-site-sidebar-navigation-screen__content">
+				<div className="edit-site-sidebar-navigation-screen__content">
 					{ description && (
 						<p className="edit-site-sidebar-navigation-screen__description">
 							{ description }
 						</p>
 					) }
 					{ content }
-				</nav>
+				</div>
 			</VStack>
 			{ footer && (
 				<footer className="edit-site-sidebar-navigation-screen__footer">
