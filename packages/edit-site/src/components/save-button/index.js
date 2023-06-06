@@ -14,6 +14,9 @@ import { store as editSiteStore } from '../../store';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 export default function SaveButton( {
+	textForDisabledState = __( 'Saved' ),
+	textForIsDirtyState = __( 'Activate & Save' ),
+	textForDefaultState = __( 'Save' ),
 	className = 'edit-site-save-button__button',
 	variant = 'primary',
 	showTooltip = true,
@@ -39,16 +42,16 @@ export default function SaveButton( {
 
 	const getLabel = () => {
 		if ( disabled ) {
-			return __( 'Saved' );
+			return textForDisabledState;
 		}
 
 		if ( isPreviewingTheme() && isDirty ) {
-			return __( 'Activate & Save' );
+			return textForIsDirtyState;
 		} else if ( isPreviewingTheme() ) {
 			return __( 'Activate' );
 		}
 
-		return __( 'Save' );
+		return textForDefaultState;
 	};
 	const label = getLabel();
 

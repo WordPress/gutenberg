@@ -100,7 +100,11 @@ function InstalledFonts() {
 function Footer() {
 	return (
 		<HStack justify="flex-end">
-			<SaveButton />
+			<SaveButton
+				textForDefaultState={ __( "Update" ) }
+				textForIsDirtyState={ __( "Update" ) }
+				textForDisabledState={ __( "Update" ) }
+			/>
 		</HStack>
 	);
 }
