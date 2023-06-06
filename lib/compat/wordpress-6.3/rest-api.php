@@ -67,3 +67,12 @@ function gutenberg_update_global_styles_rest_controller( $args, $post_type ) {
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_global_styles_rest_controller', 10, 2 );
+
+/**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
