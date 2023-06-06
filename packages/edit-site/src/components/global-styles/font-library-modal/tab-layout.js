@@ -24,10 +24,15 @@ function TabLayout( { title, description, handleBack, children, footer } ) {
 									variant="tertiary"
 									onClick={ handleBack }
 									icon={ chevronLeft }
+									isSmall
 								/>
 							) }
 							{ title && (
-								<Heading level={ 2 }>{ title }</Heading>
+								<Heading
+									level={ 2 }
+									size={ 13 }
+									className="edit-site-global-styles-header"
+								>{ title }</Heading>
 							) }
 						</HStack>
 						{ description && <Text>{ description }</Text> }
