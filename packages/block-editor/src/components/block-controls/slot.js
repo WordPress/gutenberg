@@ -3,7 +3,7 @@
  */
 import { useContext, useMemo } from '@wordpress/element';
 import {
-	__experimentalComponentsContext as ComponentsContext,
+	privateApis,
 	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
 	__experimentalUseSlotFills as useSlotFills,
@@ -14,6 +14,9 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import groups from './groups';
+import { unlock } from '../../lock-unlock';
+
+const { ComponentsContext } = unlock( privateApis );
 
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	const toolbarState = useContext( ToolbarContext );
