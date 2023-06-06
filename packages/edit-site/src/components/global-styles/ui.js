@@ -238,7 +238,7 @@ function GlobalStylesBlockLink() {
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
-	const { goTo } = useNavigator();
+	const { goTo, location } = useNavigator();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
@@ -253,12 +253,15 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// Switching to the revisions container view should
 			// redirect to the revisions screen.
 			goTo( '/revisions' );
-		} else if ( editorCanvasContainerView === 'style-book' ) {
+		} else if (
+			editorCanvasContainerView === 'style-book' &&
+			location?.path === '/revisions'
+		) {
 			// Switching to the style book container view should
 			// redirect to the style book screen.
 			goTo( '/' );
 		}
-	}, [ editorCanvasContainerView, goTo ] );
+	}, [ editorCanvasContainerView, location?.path, goTo ] );
 }
 
 function GlobalStylesUI() {
