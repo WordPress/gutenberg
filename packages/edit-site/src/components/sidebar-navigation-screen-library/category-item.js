@@ -7,15 +7,15 @@ import { useLink } from '../routes/link';
 export default function CategoryItem( {
 	count,
 	icon,
+	id,
 	isActive,
 	label,
-	name,
 	type,
 } ) {
 	const linkInfo = useLink( {
 		path: '/library',
 		categoryType: type,
-		categoryName: name,
+		categoryId: id,
 	} );
 
 	if ( ! count ) {

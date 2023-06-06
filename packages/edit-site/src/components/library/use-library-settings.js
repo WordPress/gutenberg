@@ -35,7 +35,7 @@ export default function useLibrarySettings() {
 				( x, index, arr ) =>
 					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
-		[ ( settingsBlockPatterns, restBlockPatterns ) ]
+		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
 	const settings = useMemo( () => {

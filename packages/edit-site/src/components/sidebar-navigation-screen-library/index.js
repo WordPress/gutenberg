@@ -35,8 +35,8 @@ const templatePartAreaLabels = {
 
 export default function SidebarNavigationScreenLibrary() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const { categoryType, categoryName } = getQueryArgs( window.location.href );
-	const currentCategory = categoryName || DEFAULT_CATEGORY;
+	const { categoryType, categoryId } = getQueryArgs( window.location.href );
+	const currentCategory = categoryId || DEFAULT_CATEGORY;
 	const currentType = categoryType || DEFAULT_TYPE;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
@@ -92,7 +92,7 @@ export default function SidebarNavigationScreenLibrary() {
 														area
 													]
 												}
-												name={ area }
+												id={ area }
 												type="wp_template_part"
 												isActive={
 													currentCategory === area &&
@@ -110,12 +110,12 @@ export default function SidebarNavigationScreenLibrary() {
 										<CategoryItem
 											key={ category.name }
 											count={ category.count }
-											label={ category.label }
-											name={ category.name }
+											label={ category.name }
+											id={ category.id }
 											type="pattern"
 											isActive={
 												currentCategory ===
-													category.name &&
+													category.id &&
 												currentType === 'pattern'
 											}
 										/>

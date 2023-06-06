@@ -57,7 +57,7 @@ const DeleteMenuItem = ( { item, onClose } ) => {
 	);
 };
 
-const GridItem = ( { category, composite, item } ) => {
+const GridItem = ( { categoryId, composite, item } ) => {
 	const instanceId = useInstanceId( GridItem );
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
 
@@ -65,7 +65,7 @@ const GridItem = ( { category, composite, item } ) => {
 		path: '/library',
 		postType: item.type,
 		postId: item.type === USER_PATTERNS ? item.id : item.name,
-		categoryName: category,
+		categoryId,
 		categoryType: item.type,
 		canvas: 'edit',
 	} );
@@ -121,8 +121,8 @@ const GridItem = ( { category, composite, item } ) => {
 	);
 };
 
-export default function Grid( { category, label, type } ) {
-	const [ patterns, isResolving ] = usePatterns( type, category );
+export default function Grid( { categoryId, label, type } ) {
+	const [ patterns, isResolving ] = usePatterns( type, categoryId );
 	const composite = useCompositeState( { orientation: 'vertical' } );
 
 	if ( ! patterns ) {
@@ -130,7 +130,6 @@ export default function Grid( { category, label, type } ) {
 	}
 
 	if ( ! patterns.length ) {
-		// TODO: Implement redirecting to root library page or proper empty state.
 		return (
 			<div
 				style={ {
@@ -159,7 +158,7 @@ export default function Grid( { category, label, type } ) {
 					<GridItem
 						key={ pattern.name }
 						item={ pattern }
-						category={ category }
+						categoryId={ categoryId }
 						composite={ composite }
 					/>
 				) ) }
