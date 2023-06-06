@@ -740,14 +740,12 @@
 		},
 		"autoInsert": {
 			"type": "object",
-			"description": "Positions and blocks to auto-insert this block next to.",
+			"description": "Blocks to auto-insert this block next to.",
 			"patternProperties": {
-				"^(after|before|firstChild|lastChild)$": {
-					"type": "array",
-					"description": "Array of the names of blocks to auto-insert this block next to.",
-					"items": {
-						"type": "string"
-					}
+				"[a-zA-Z]": {
+					"type": "string",
+					"description": "Position relative to the block to auto-insert this block next to.",
+					"pattern": "^(nextSibling|previousSibling|firstChild|lastChild)$"
 				}
 			}
 		}

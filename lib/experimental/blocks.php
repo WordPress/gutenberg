@@ -195,10 +195,12 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	);
 
 	$auto_insert = $metadata['autoInsert'];
-	foreach ( $property_mappings as $key => $mapped_key ) {
-		if ( isset( $auto_insert[ $key ] ) ) {
-			$settings['auto_insert'][ $mapped_key ] = $auto_insert[ $key ];
+	foreach ( $auto_insert as $block => $position ) {
+		if ( ! isset( $property_mappings[ $position ] ) ) {
+			continue;
 		}
+
+		$settings['auto_insert'][ $block ] = $property_mappings[ $position ];
 	}
 
 	return $settings;
