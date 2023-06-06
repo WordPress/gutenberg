@@ -77,6 +77,9 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
+						/* eslint-disable jsx-a11y/no-autofocus */
+						autoFocus
+						/* eslint-enable jsx-a11y/no-autofocus */
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'Untitled' ) }
