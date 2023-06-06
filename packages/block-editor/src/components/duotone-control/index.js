@@ -36,10 +36,6 @@ function DuotoneControl( {
 			popoverProps={ {
 				className: 'block-editor-duotone-control__popover',
 				headerTitle: __( 'Duotone' ),
-				// Note: currently we can't remove `variant` from `popoverProps` because
-				// the `Dropdown` component is not able to read the same variant data
-				// from context.
-				variant: 'toolbar',
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {

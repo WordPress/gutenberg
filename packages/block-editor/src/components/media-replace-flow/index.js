@@ -59,12 +59,7 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
-	popoverProps = {
-		// Note: currently we can't remove `variant` from `popoverProps` because
-		// the `Dropdown` component is not able to read the same variant data
-		// from context.
-		variant: 'toolbar',
-	},
+	popoverProps,
 } ) => {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
