@@ -364,22 +364,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	$should_load_view_script      = ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
-	$view_js_file                 = 'wp-block-navigation-view';
-
-	// If the script already exists, there is no point in removing it from viewScript.
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-		}
-	}
 
 	$inner_blocks = $block->inner_blocks;
 
@@ -552,7 +536,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
+	$has_submenus      = false;
 	foreach ( $inner_blocks as $inner_block ) {
+		if ( count( $inner_block->inner_blocks ) > 0 ) {
+			$has_submenus = true;
+		}
 		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
 
 		if ( $is_list_item && ! $is_list_open ) {
@@ -582,8 +570,24 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
+	// If the script already exists, there is no point in removing it from viewScript.
+	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
+	$view_js_file            = 'wp-block-navigation-view';
+	if ( ! wp_script_is( $view_js_file ) ) {
+		$script_handles = $block->block_type->view_script_handles;
+
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+		}
+	}
+
 	// Add directives to the submenu if needed.
-	if ( $should_load_view_script ) {
+	if ( $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
 		$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
