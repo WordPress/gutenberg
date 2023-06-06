@@ -478,35 +478,46 @@ describe( 'Searching for a link', () => {
 		).not.toHaveTextContent( 'URL' );
 	} );
 
-	it( 'should display only URL result when current input value is URL-like', async () => {
-		const user = userEvent.setup();
-		const searchTerm = 'www.wordpress.org';
+	it.each( [
+		[ 'https://wordpress.org', 'URL' ],
+		[ 'http://wordpress.org', 'URL' ],
+		[ 'www.wordpress.org', 'URL' ],
+		[ 'wordpress.org', 'URL' ],
+		[ 'ftp://wordpress.org', 'URL' ],
+		[ 'mailto:hello@wordpress.org', 'mailto' ],
+		[ 'tel:123456789', 'tel' ],
+		[ '#internal', 'internal' ],
+	] )(
+		'should display only URL result when current input value is URL-like (e.g. %s)',
+		async ( searchTerm, type ) => {
+			const user = userEvent.setup();
 
-		render( <LinkControl /> );
+			render( <LinkControl /> );
 
-		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-		// Simulate searching for a term.
-		await user.type( searchInput, searchTerm );
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-		const searchResultElement = within(
-			await screen.findByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getByRole( 'option' );
+			const searchResultElement = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getByRole( 'option' );
 
-		expect( searchResultElement ).toBeInTheDocument();
+			expect( searchResultElement ).toBeInTheDocument();
 
-		// Should only be the `URL` suggestion.
-		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
+			// Should only be the `URL` suggestion.
+			expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		expect( searchResultElement ).toHaveTextContent( searchTerm );
-		expect( searchResultElement ).toHaveTextContent( 'URL' );
-		expect( searchResultElement ).toHaveTextContent(
-			'Press ENTER to add this link'
-		);
-	} );
+			expect( searchResultElement ).toHaveTextContent( searchTerm );
+			expect( searchResultElement ).toHaveTextContent( type );
+			expect( searchResultElement ).toHaveTextContent(
+				'Press ENTER to add this link'
+			);
+		}
+	);
 
 	it( 'should trim search term', async () => {
 		const user = userEvent.setup();
