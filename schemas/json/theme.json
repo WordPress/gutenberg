@@ -11,7 +11,7 @@
 			"type": "object",
 			"properties": {
 				"behaviors": {
-					"description": "List of behaviors applied to the image block.",
+					"description": "List of behaviors applied to each individual block.",
 					"type": "object",
 					"properties": {
 						"lightbox": {
