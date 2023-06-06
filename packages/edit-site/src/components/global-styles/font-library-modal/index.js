@@ -7,7 +7,6 @@ import { Modal, TabPanel } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import FontLibraryProvider from './context';
 import InstalledFonts from './installed-fonts';
 import GoogleFonts from './google-fonts';
 import LocalFonts from './local-fonts';
@@ -45,8 +44,4 @@ function FontLibraryModal( {
 	);
 }
 
-export default ( { ...props } ) => (
-	<FontLibraryProvider>
-		<FontLibraryModal { ...props } />
-	</FontLibraryProvider>
-);
+export default FontLibraryModal;

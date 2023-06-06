@@ -20,31 +20,30 @@ import PreviewControls from './preview-controls';
 import LibraryFontCard from './library-font-card';
 
 function InstalledFonts() {
-	const { themeFonts, libraryFonts } = useContext( FontLibraryContext );
-	const [ fontSelected, setFontSelected ] = useState( null );
+	const { themeFonts, libraryFonts, libraryFontSelected, setLibraryFontSelected } = useContext( FontLibraryContext );
 
 	const handleUnselectFont = () => {
-		setFontSelected( null );
+		setLibraryFontSelected( null );
 	};
 
 	const handleSelectFont = ( font ) => {
-		setFontSelected( font );
+		setLibraryFontSelected( font );
 	};
 
-	const tabDescription = !! fontSelected
-		? __( `${ fontSelected.name } variants.` )
+	const tabDescription = !! libraryFontSelected
+		? __( `${ libraryFontSelected.name } variants.` )
 		: __(
 				'Fonts installed in your WordPress, activate them to use in your site.'
 		  );
 
 	return (
 		<TabLayout
-			title={ fontSelected?.name || '' }
+			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
-			handleBack={ !! fontSelected && handleUnselectFont }
+			handleBack={ !! libraryFontSelected && handleUnselectFont }
 			footer={ <Footer /> }
 		>
-			{ ! fontSelected && (
+			{ ! libraryFontSelected && (
 				<>
 					{/* <PreviewControls /> */}
 
@@ -87,11 +86,11 @@ function InstalledFonts() {
 				</>
 			) }
 
-			{ fontSelected && (
+			{ libraryFontSelected && (
 				<LibraryFontDetails
-					font={ fontSelected }
+					font={ libraryFontSelected }
 					handleUnselectFont={ handleUnselectFont }
-					canBeRemoved={ fontSelected?.source !== 'theme' }
+					canBeRemoved={ libraryFontSelected?.source !== 'theme' }
 				/>
 			) }
 		</TabLayout>

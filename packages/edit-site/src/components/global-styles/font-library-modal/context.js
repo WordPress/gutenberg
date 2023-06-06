@@ -43,7 +43,13 @@ function FontLibraryProvider( { children } ) {
 	const customFonts = fontFamilies.custom || null;
 
 	// Library Fonts
+	const [ modalTabOepn, setModalTabOepn ] = useState( false );
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
+	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
+
+	const toggleModal = ( tabName ) => {
+		setModalTabOepn( tabName || null );
+	};
 
 	// Installed fonts
 	const installedFonts = useMemo( () => {
@@ -268,6 +274,8 @@ function FontLibraryProvider( { children } ) {
 				demoConfig,
 				updateDemoConfig,
 				setDefaultDemoConfig,
+				libraryFontSelected,
+				setLibraryFontSelected,
 				themeFonts,
 				customFonts,
 				libraryFonts,
@@ -281,6 +289,8 @@ function FontLibraryProvider( { children } ) {
 				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
+				modalTabOepn,
+				toggleModal,
 			} }
 		>
 			{ children }

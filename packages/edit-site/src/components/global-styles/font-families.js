@@ -11,11 +11,12 @@ import {
 } from '@wordpress/components';
 import { plus, typography } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import FontLibraryProvider, { FontLibraryContext } from './font-library-modal/context';
 import FontLibraryModal from './font-library-modal';
 import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
@@ -23,24 +24,19 @@ import { unlock } from '../../private-apis';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
+	const { modalTabOepn, toggleModal } = useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 
 	const fonts = Array.isArray( fontFamilies?.custom )
 		? fontFamilies?.custom
 		: fontFamilies?.theme || [];
 
-	const [ tabOpen, setTabOpen ] = useState( null );
-
-	const toggleFontLibrary = ( tabName ) => {
-		setTabOpen( !! tabOpen ? null : tabName );
-	};
-
 	return (
 		<>
-			{ !! tabOpen && (
+			{ !! modalTabOepn && (
 				<FontLibraryModal
-					onRequestClose={ toggleFontLibrary }
-					initialTabName={ tabOpen }
+					onRequestClose={ () => toggleModal() }
+					initialTabName={ modalTabOepn }
 				/>
 			) }
 
@@ -50,7 +46,7 @@ function FontFamilies() {
 					<HStack justify='flex-end'>
 						<Tooltip text={ __( 'Add fonts' ) }>
 							<Button
-								onClick={ () => toggleFontLibrary( "google-fonts" ) }
+								onClick={ () => toggleModal( "google-fonts" ) }
 								aria-label={ __( 'Add fonts' ) }
 								icon={ plus }
 								isSmall
@@ -58,7 +54,7 @@ function FontFamilies() {
 						</Tooltip>
 						<Tooltip text={ __( 'Manage fonts' ) }>
 							<Button
-								onClick={ () => toggleFontLibrary( "installed-fonts" ) }
+								onClick={ () => toggleModal( "installed-fonts" ) }
 								aria-label={ __( 'Manage fonts' ) }
 								icon={ typography }
 								isSmall
@@ -79,4 +75,8 @@ function FontFamilies() {
 	);
 }
 
-export default FontFamilies;
+export default ( { ...props } ) => (
+	<FontLibraryProvider>
+		<FontFamilies { ...props } />
+	</FontLibraryProvider>
+);
