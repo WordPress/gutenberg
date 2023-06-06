@@ -128,20 +128,6 @@ Default.args = {
 	),
 };
 
-export const Toolbar: ComponentStory< typeof Popover > = Template.bind( {} );
-Toolbar.args = {
-	children: (
-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-			aliquip ex ea commodo consequat.
-		</div>
-	),
-	// TODO: should we deprecate prop? Should we modify example?
-	variant: 'toolbar',
-};
-
 export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
 Unstyled.args = {
 	children: (
@@ -152,7 +138,6 @@ Unstyled.args = {
 			aliquip ex ea commodo consequat.
 		</div>
 	),
-	// Where is unstyled used?
 	variant: 'unstyled',
 };
 
