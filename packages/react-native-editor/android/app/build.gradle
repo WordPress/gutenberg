@@ -47,23 +47,22 @@ react {
 }
 
 /**
- * Set this to true to create two separate APKs instead of one:
- *   - An APK that only works on ARM devices
- *   - An APK that only works on x86 devices
- * The advantage is the size of the APK is reduced by about 4MB.
- * Upload all the APKs to the Play Store and people will download
- * the correct one based on the CPU architecture of their device.
+ * Set this to true to create four separate APKs instead of one,
+ * one for each native architecture. This is useful if you don't
+ * use App Bundles (https://developer.android.com/guide/app-bundle/)
+ * and want to have separate APKs to upload to the Play Store.
  */
 def enableSeparateBuildPerCPUArchitecture = false
 
 /**
- * Run Proguard to shrink the Java bytecode in release builds.
+ * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
 def enableProguardInReleaseBuilds = false
 
 /**
-/**
- * Architectures to build native code for.
+ * Private function to get the list of Native Architectures you want to build.
+ * This reads the value from reactNativeArchitectures in your gradle.properties
+ * file and works together with the --active-arch-only flag of react-native run-android.
  */
 def reactNativeArchitectures() {
     def value = project.getProperties().get("reactNativeArchitectures")
