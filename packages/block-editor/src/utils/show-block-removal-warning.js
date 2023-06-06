@@ -13,17 +13,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
-
-function isBlockCritical( blockName ) {
-	if ( blockName === 'core/query' || blockName === 'core/post-content' ) {
-		return true;
-	}
-	return false;
-}
 
 const blockTypePromptMessages = {
 	'core/query': __(
@@ -44,7 +34,7 @@ export function useBlockRemovalWarning() {
 		return clientIds.flatMap( ( clientId ) => {
 			const found = [];
 			const blockName = getBlockName( clientId );
-			if ( isBlockCritical( blockName ) ) {
+			if ( blockTypePromptMessages[ blockName ] ) {
 				found.push( blockName );
 			}
 			const innerBlocks = getBlockOrder( clientId );
