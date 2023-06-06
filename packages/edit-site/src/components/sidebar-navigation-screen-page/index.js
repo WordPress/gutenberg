@@ -147,10 +147,7 @@ export default function SidebarNavigationScreenPage() {
 					<HStack
 						spacing={ 5 }
 						alignment="left"
-						className={ classnames(
-							'edit-site-sidebar-navigation-screen-page__details',
-							'edit-site-sidebar-navigation-screen-page__footer'
-						) }
+						className="edit-site-sidebar-navigation-screen-page__details edit-site-sidebar-navigation-screen-page__footer"
 					>
 						<Text className="edit-site-sidebar-navigation-screen-page__details-label">
 							{ __( 'Last modified' ) }
