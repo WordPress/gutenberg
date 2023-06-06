@@ -6,7 +6,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -16,12 +16,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 
 const blockTypePromptMessages = {
-	'core/query': __(
-		'Query loop displays a list of posts. Removing it is not advised.'
-	),
+	'core/query': __( 'Query Loop displays a list of posts.' ),
 
 	'core/post-content': __(
-		'Post Content displays the content of a post or page. Removing it it is not advised.'
+		'Post Content displays the content of a post or page.'
 	),
 };
 
@@ -71,17 +69,7 @@ export function BlockRemovalWarningModal() {
 		return;
 	}
 
-	const blockTitles = blocksToPromptFor
-		.map( ( block ) => {
-			return getBlockType( block ).title;
-		} )
-		.join( ', ' );
-
-	const blockMessages = blocksToPromptFor.map( ( block ) => {
-		return blockTypePromptMessages[ block ];
-	} );
-
-	const dedupedBlockMessages = [ ...new Set( blockMessages ) ].join( ' ' );
+	const blockTypes = [ ...new Set( blocksToPromptFor.map( getBlockType ) ) ];
 
 	const closeModal = () => displayRemovalPrompt( false );
 
@@ -89,16 +77,34 @@ export function BlockRemovalWarningModal() {
 		removalFunction();
 		closeModal();
 	};
+
 	return (
 		<Modal
-			title={ sprintf(
-				/* translators: %s: the name of a menu to delete */
-				__( 'Remove %s?' ),
-				blockTitles
+			title={ _n(
+				'Really delete this block?',
+				'Really delete these blocks?',
+				blocksToPromptFor.length
 			) }
-			onRequestClose={ () => closeModal() }
+			onRequestClose={ closeModal }
 		>
-			<p>{ dedupedBlockMessages }</p>
+			{ blockTypes.length === 1 ? (
+				<p>{ blockTypePromptMessages[ blockTypes[ 0 ].name ] }</p>
+			) : (
+				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
+					{ blockTypes.map( ( { name } ) => (
+						<li key={ name }>
+							{ blockTypePromptMessages[ name ] }
+						</li>
+					) ) }
+				</ul>
+			) }
+			<p>
+				{ _n(
+					'Removing this block is not advised.',
+					'Removing these blocks is not advised.',
+					blockTypes.length
+				) }
+			</p>
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ closeModal }>
 					{ __( 'Cancel' ) }
