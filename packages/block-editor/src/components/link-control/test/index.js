@@ -439,44 +439,46 @@ describe( 'Searching for a link', () => {
 		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should display only search suggestions (and not URL result type) when current input value is not URL-like', async () => {
-		const user = userEvent.setup();
-		const searchTerm = 'Hello world';
-		const firstSuggestion = fauxEntitySuggestions[ 0 ];
+	it.each( [ 'With spaces', 'Uppercase', 'lowercase' ] )(
+		'should display only search suggestions (and not URL result type) when current input value (e.g. %s) is not URL-like',
+		async ( searchTerm ) => {
+			const user = userEvent.setup();
+			const firstSuggestion = fauxEntitySuggestions[ 0 ];
 
-		render( <LinkControl /> );
+			render( <LinkControl /> );
 
-		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-		// Simulate searching for a term.
-		await user.type( searchInput, searchTerm );
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-		const searchResultElements = within(
-			await screen.findByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getAllByRole( 'option' );
+			const searchResultElements = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
 
-		expect( searchResultElements ).toHaveLength(
-			fauxEntitySuggestions.length
-		);
+			expect( searchResultElements ).toHaveLength(
+				fauxEntitySuggestions.length
+			);
 
-		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
+			expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		// Check that a search suggestion shows up corresponding to the data.
-		expect( searchResultElements[ 0 ] ).toHaveTextContent(
-			firstSuggestion.title
-		);
-		expect( searchResultElements[ 0 ] ).toHaveTextContent(
-			firstSuggestion.type
-		);
+			// Check that a search suggestion shows up corresponding to the data.
+			expect( searchResultElements[ 0 ] ).toHaveTextContent(
+				firstSuggestion.title
+			);
+			expect( searchResultElements[ 0 ] ).toHaveTextContent(
+				firstSuggestion.type
+			);
 
-		// The fallback URL suggestion should not be shown when input is not URL-like.
-		expect(
-			searchResultElements[ searchResultElements.length - 1 ]
-		).not.toHaveTextContent( 'URL' );
-	} );
+			// The fallback URL suggestion should not be shown when input is not URL-like.
+			expect(
+				searchResultElements[ searchResultElements.length - 1 ]
+			).not.toHaveTextContent( 'URL' );
+		}
+	);
 
 	it.each( [
 		[ 'https://wordpress.org', 'URL' ],
