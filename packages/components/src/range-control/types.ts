@@ -277,12 +277,6 @@ export type TrackProps = {
 	trackColor: CSSProperties[ 'color' ];
 };
 
-export type Size = 'default' | '__unstable-large';
-
-export type InputNumberProps = {
-	size?: Size;
-};
-
 export type UseControlledRangeValueArgs = {
 	/**
 	 * The initial value.

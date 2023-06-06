@@ -12,7 +12,6 @@ import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 import type {
-	InputNumberProps,
 	RangeMarkProps,
 	RailProps,
 	ThumbProps,
@@ -21,6 +20,7 @@ import type {
 	WrapperProps,
 	RangeControlProps,
 } from '../types';
+import type { NumberControlProps } from '../../number-control/types';
 
 const rangeHeightValue = 30;
 const railHeight = 4;
@@ -302,20 +302,17 @@ export const Tooltip = styled.span< TooltipProps >`
 	) }
 `;
 
-const inputNumberWidth = ( { size }: InputNumberProps ) => {
+const inputNumberWidth = ( {
+	size = 'default',
+}: Pick< NumberControlProps, 'size' > ) => {
 	const sizes = {
+		small: space( 16 ),
 		default: space( 16 ),
 		'__unstable-large': space( 20 ),
 	};
 
-	if ( size === '__unstable-large' ) {
-		return css( {
-			width: `${ sizes[ '__unstable-large' ] }`,
-		} );
-	}
-
 	return css`
-		width: ${ sizes.default };
+		width: ${ sizes[ size ?? 'default' ] };
 	`;
 };
 
