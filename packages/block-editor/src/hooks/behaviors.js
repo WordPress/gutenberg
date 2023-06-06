@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -10,8 +14,8 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
+import { InspectorControls } from '../components';
 
 /**
  * External dependencies
@@ -72,18 +76,29 @@ function BehaviorsControl( {
 
 	return (
 		<InspectorControls group="advanced">
-			<SelectControl
-				__nextHasNoMarginBottom
-				label={ __( 'Behaviors' ) }
-				// At the moment we are only supporting one behavior (Lightbox)
-				value={ behaviors?.lightbox ? 'lightbox' : '' }
-				options={ options }
-				onChange={ onChange }
-				hideCancelButton={ true }
-				help={ helpText }
-				size="__unstable-large"
-				disabled={ disabled }
-			/>
+			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
+			<div>
+				<SelectControl
+					label={ __( 'Behaviors' ) }
+					// At the moment we are only supporting one behavior (Lightbox)
+					value={ behaviors?.lightbox ? 'lightbox' : '' }
+					options={ options }
+					onChange={ onChange }
+					hideCancelButton={ true }
+					help={ helpText }
+					size="__unstable-large"
+					disabled={ disabled }
+				/>
+			</div>
+			<HStack justify="flex-end">
+				<Button
+					isSmall
+					disabled={ disabled }
+					onClick={ () => onChange( undefined ) }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</HStack>
 		</InspectorControls>
 	);
 }
@@ -115,13 +130,19 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
 					onChange={ ( nextValue ) => {
-						// If the user selects something, it means that they want to
-						// change the default value (true) so we save it in the attributes.
-						props.setAttributes( {
-							behaviors: {
-								lightbox: nextValue === 'lightbox',
-							},
-						} );
+						if ( nextValue === undefined ) {
+							props.setAttributes( {
+								behaviors: undefined,
+							} );
+						} else {
+							// If the user selects something, it means that they want to
+							// change the default value (true) so we save it in the attributes.
+							props.setAttributes( {
+								behaviors: {
+									lightbox: nextValue === 'lightbox',
+								},
+							} );
+						}
 					} }
 					disabled={ blockHasLink }
 				/>
