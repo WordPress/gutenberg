@@ -15,7 +15,11 @@ import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
-import type { DropdownMenuProps, DropdownOption } from './types';
+import type {
+	DropdownMenuProps,
+	DropdownOption,
+	DropdownMenuInternalContext,
+} from './types';
 
 function mergeProps<
 	T extends { className?: string; [ key: string ]: unknown }
@@ -55,8 +59,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 		// Context
 		variant,
-		// TODO: unify type with v2, consider adding unstyled?
-	} = useContextSystem< DropdownMenuProps & { variant?: 'toolbar' } >(
+	} = useContextSystem< DropdownMenuProps & DropdownMenuInternalContext >(
 		dropdownMenuProps,
 		'DropdownMenu'
 	);

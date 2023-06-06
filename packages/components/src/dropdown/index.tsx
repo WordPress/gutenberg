@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { contextConnect, useContextSystem } from '../ui/context';
 import Popover from '../popover';
-import type { DropdownProps } from './types';
+import type { DropdownProps, DropdownInternalContext } from './types';
 
 function useObservableState(
 	initialState: boolean,
@@ -56,8 +56,7 @@ const UnconnectedDropdown = (
 
 		// From context system
 		variant,
-		// TODO: unify type with v2, consider adding unstyled?
-	} = useContextSystem< DropdownProps & { variant?: 'toolbar' } >(
+	} = useContextSystem< DropdownProps & DropdownInternalContext >(
 		props,
 		'Dropdown'
 	);
