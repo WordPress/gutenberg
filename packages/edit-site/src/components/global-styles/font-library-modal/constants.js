@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 export const MODAL_TABS = [
 	{
 		name: 'installed-fonts',
-		title: __( 'Installed Fonts' ),
+		title: __( 'Library' ),
 		className: 'installed-fonts',
 	},
 	{
