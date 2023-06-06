@@ -14,7 +14,7 @@
 function gutenberg_get_theme_preview_path( $current_stylesheet = null ) {
 	// Don't allow non-admins to preview themes.
 	if ( ! current_user_can( 'switch_themes' ) ) {
-		return;
+		return $current_stylesheet;
 	}
 
 	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;

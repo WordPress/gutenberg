@@ -21,9 +21,32 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deleteAllPosts();
 	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
+	test.beforeEach( async ( { admin, page, requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( true );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
+	} );
+
+	test.afterEach( async ( { admin, page, requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
 	} );
 
 	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
@@ -192,6 +215,95 @@ test.describe( 'Testing behaviors functionality', () => {
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
 		await expect( select ).toHaveValue( '' );
+	} );
+
+	test( 'Lightbox behavior is disabled if the Image has a link', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				linkDestination: 'custom',
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.click();
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
+		} );
+
+		// The behaviors dropdown should be present but disabled.
+		await expect( select ).toBeDisabled();
+	} );
+
+	test( 'Lightbox behavior control has a Reset button that removes the markup', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		const date = new Date();
+		const year = date.getFullYear();
+		const month = ( date.getMonth() + 1 ).toString().padStart( 2, '0' );
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: { lightbox: true },
+			},
+		} );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id },"behaviors":{"lightbox":true}} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.last()
+			.click();
+
+		const resetButton = editorSettings.getByRole( 'button', {
+			name: 'Reset',
+		} );
+
+		expect( resetButton ).toBeDefined();
+
+		await resetButton.last().click();
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id }} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
 	} );
 } );
 

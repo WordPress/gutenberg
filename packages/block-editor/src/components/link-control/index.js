@@ -307,6 +307,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 
 	return (
 		<div
@@ -347,6 +348,17 @@ function LinkControl( {
 							}
 							useLabel={ showTextControl }
 						/>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -373,44 +385,29 @@ function LinkControl( {
 
 			{ isEditing && (
 				<div className="block-editor-link-control__tools">
-					{ ( showSettings || showTextControl ) && (
+					{ showSettings && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
 						>
-							{ showTextControl && (
-								<TextControl
-									__nextHasNoMarginBottom
-									ref={ textInputRef }
-									className="block-editor-link-control__setting block-editor-link-control__text-content"
-									label="Text"
-									value={ internalControlValue?.title }
-									onChange={ setInternalTextInputValue }
-									onKeyDown={ handleSubmitWithEnter }
-								/>
-							) }
-							{ showSettings && (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings }
-									onChange={ createSetInternalSettingValueHandler(
-										settingsKeys
-									) }
-								/>
-							) }
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
 						</LinkControlSettingsDrawer>
 					) }
 
 					<div className="block-editor-link-control__search-actions">
 						<Button
 							variant="primary"
-							onClick={ handleSubmit }
+							onClick={ isDisabled ? noop : handleSubmit }
 							className="block-editor-link-control__search-submit"
-							disabled={
-								! valueHasChanges || currentInputIsEmpty
-							}
+							aria-disabled={ isDisabled }
 						>
-							{ __( 'Apply' ) }
+							{ __( 'Save' ) }
 						</Button>
 						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }

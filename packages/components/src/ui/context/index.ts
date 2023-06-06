@@ -4,6 +4,7 @@ export {
 } from './context-system-provider';
 export {
 	contextConnect,
+	contextConnectWithoutRef,
 	hasConnectNamespace,
 	getConnectNamespace,
 } from './context-connect';
