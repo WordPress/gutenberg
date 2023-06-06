@@ -91,7 +91,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 	return (
 		<Dropdown
-			className={ classnames( 'components-dropdown-menu', className ) }
+			className={ className }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {

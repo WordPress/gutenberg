@@ -129,7 +129,7 @@ const UnconnectedDropdown = (
 
 	return (
 		<div
-			className={ classnames( 'components-dropdown', className ) }
+			className={ className }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,
