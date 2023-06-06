@@ -9,7 +9,6 @@ buildscript {
         compileSdkVersion = 33
         targetSdkVersion = 33
         supportLibVersion = '28.0.0'
-        gradleDownloadTask = '5.0.1'
         
         if (System.properties['os.arch'] == "aarch64") {
             // For M1 Users we need to use the NDK 24 which added support for aarch64
@@ -26,7 +25,6 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("de.undercouch:gradle-download-task:$gradleDownloadTask")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
