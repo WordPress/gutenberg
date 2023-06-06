@@ -237,7 +237,7 @@ function GlobalStylesBlockLink() {
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
-function GlobalStylesRevisionLink() {
+function GlobalStylesEditorCanvasContainerLink() {
 	const { goTo } = useNavigator();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
@@ -245,12 +245,18 @@ function GlobalStylesRevisionLink() {
 		[]
 	);
 
-	// If the user is in the global styles editor canvas container view, redirect
-	// them to the revisions screen. This effectively allows deep linking to the
-	// revisions screen from outside the global styles navigation provider.
+	// If the user switches the editor canvas container view, redirect
+	// to the appropriate screen. This effectively allows deep linking to the
+	// desired screens from outside the global styles navigation provider.
 	useEffect( () => {
 		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
+			// Switching to the revisions container view should
+			// redirect to the revisions screen.
 			goTo( '/revisions' );
+		} else if ( editorCanvasContainerView === 'style-book' ) {
+			// Switching to the style book container view should
+			// redirect to the style book screen.
+			goTo( '/' );
 		}
 	}, [ editorCanvasContainerView, goTo ] );
 }
@@ -344,7 +350,7 @@ function GlobalStylesUI() {
 
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
-			<GlobalStylesRevisionLink />
+			<GlobalStylesEditorCanvasContainerLink />
 		</NavigatorProvider>
 	);
 }
