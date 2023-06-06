@@ -554,7 +554,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_block_content = $inner_block->render();
-		$p = new WP_HTML_Tag_Processor( $inner_block_content );
+		$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
 		if ( $p->next_tag(
 			array(
 				'name'       => 'LI',
