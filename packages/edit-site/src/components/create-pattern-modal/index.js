@@ -24,10 +24,14 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 
 	const { patternCategories } = usePatternCategories();
 
-	const options = patternCategories.map( ( category ) => ( {
-		label: category.label,
-		value: category.name,
-	} ) );
+	const options = patternCategories
+		.map( ( category ) => ( {
+			label: category.label,
+			value: category.name,
+		} ) )
+		.concat( [
+			{ value: '', label: __( 'Select a category' ), disabled: true },
+		] );
 
 	return (
 		<Modal
@@ -48,7 +52,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						return;
 					}
 					setIsSubmitting( true );
-					await onCreate( { name } );
+					await onCreate( { name, categoryName } );
 				} }
 			>
 				<VStack spacing="4">
@@ -80,7 +84,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! name }
+							disabled={ ! name || ! categoryName }
 							isBusy={ isSubmitting }
 						>
 							{ __( 'Create' ) }
