@@ -144,14 +144,16 @@ function gutenberg_register_wp_patterns_taxonomy_categories() {
 	);
 
 	foreach ( $categories as $category ) {
-		wp_insert_term(
-			$category['label'],
-			'wp_pattern',
-			array(
-				'slug'        => $category['slug'],
-				'description' => $category['description'],
-			)
-		);
+		if ( empty( term_exists( $category['slug'], 'wp_pattern' ) ) ) {
+			wp_insert_term(
+				$category['label'],
+				'wp_pattern',
+				array(
+					'slug'        => $category['slug'],
+					'description' => $category['description'],
+				)
+			);
+		}
 	}
 }
 add_action( 'init', 'gutenberg_register_wp_patterns_taxonomy_categories', 20 );
