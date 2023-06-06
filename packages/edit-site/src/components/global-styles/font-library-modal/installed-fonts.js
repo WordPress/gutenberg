@@ -31,10 +31,8 @@ function InstalledFonts() {
 	};
 
 	const tabDescription = !! libraryFontSelected
-		? __( `${ libraryFontSelected.name } variants.` )
-		: __(
-				'Fonts installed in your WordPress, activate them to use in your site.'
-		  );
+		? __( "Choose font variants. Keep in mind that too many variants could make your site slower." )
+		: null;
 
 	return (
 		<TabLayout

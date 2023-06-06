@@ -94,8 +94,8 @@ function GoogleFonts() {
 	);
 
 	const tabDescription = fontSelected
-		? __( `Select ${ fontSelected.name } variants you want to install` )
-		: __( 'Select a font to install' );
+		? __( 'Choose font variants. Keep in mind that too many variants could make your site slower.' )
+		: __( 'Add from Google Fonts. Fonts are copied to, and served, from your own server.' );
 
 	const handleCategoryFilter = ( category ) => {
 		setFilters( { ...filters, category } );
