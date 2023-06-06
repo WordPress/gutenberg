@@ -110,7 +110,7 @@ The distance in pixels from the trigger.
 The preferred alignment against the trigger. May change when collisions occur.
 
 - Required: no
-- Default: `"center"`
+- Default: `"start"`
 
 ##### `alignOffset`: `number`
 

@@ -655,7 +655,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.getByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -673,7 +673,7 @@ describe( 'Manual link entry', () => {
 				await user.keyboard( '[Enter]' );
 
 				submitButton = screen.getByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -696,7 +696,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.queryByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -715,7 +715,7 @@ describe( 'Manual link entry', () => {
 				await user.click( submitButton );
 
 				submitButton = screen.queryByRole( 'button', {
-					name: 'Apply',
+					name: 'Save',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -901,7 +901,7 @@ describe( 'Default search suggestions', () => {
 
 		expect(
 			await screen.findByRole( 'listbox', {
-				name: 'Recently updated',
+				name: 'Suggestions',
 			} )
 		).toBeVisible();
 
@@ -991,7 +991,7 @@ describe( 'Default search suggestions', () => {
 		expect( searchInput ).toHaveValue( '' );
 
 		const initialResultsList = await screen.findByRole( 'listbox', {
-			name: 'Recently updated',
+			name: 'Suggestions',
 		} );
 
 		expect(
@@ -1008,7 +1008,7 @@ describe( 'Default search suggestions', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		const searchResultsField = screen.queryByRole( 'listbox', {
-			name: 'Recently updated',
+			name: 'Suggestions',
 		} );
 
 		expect( searchResultsField ).not.toBeInTheDocument();
@@ -1598,7 +1598,7 @@ describe( 'Selecting links', () => {
 
 			expect(
 				await screen.findByRole( 'listbox', {
-					name: 'Recently updated',
+					name: 'Suggestions',
 				} )
 			).toBeVisible();
 
@@ -1610,7 +1610,7 @@ describe( 'Selecting links', () => {
 
 			const searchResultElements = within(
 				screen.getByRole( 'listbox', {
-					name: 'Recently updated',
+					name: 'Suggestions',
 				} )
 			).getAllByRole( 'option' );
 
@@ -1809,7 +1809,7 @@ describe( 'Addition Settings UI', () => {
 
 		// check that the "Apply" button is disabled by default.
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Apply',
+			name: 'Save',
 		} );
 
 		expect( submitButton ).toBeDisabled();
@@ -2242,7 +2242,7 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toHaveValue( textValue );
 
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Apply',
+			name: 'Save',
 		} );
 
 		await user.click( submitButton );

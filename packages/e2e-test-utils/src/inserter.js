@@ -261,7 +261,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 
 	// Extra wait for the reusable block to be ready.
 	if ( category === 'Reusable' ) {
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.block-library-block__reusable-block-container'
 		);
 	}

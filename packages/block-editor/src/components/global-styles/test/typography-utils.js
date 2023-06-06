@@ -172,6 +172,58 @@ describe( 'typography utils', () => {
 
 			{
 				message:
+					'returns clamp value where min and max fluid values defined',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+			},
+
+			{
+				message:
+					'should apply maxViewPortWidth as maximum viewport width',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: {
+						maxViewPortWidth: '1100px',
+					},
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 7.051), 125px)',
+			},
+
+			{
+				message: 'returns clamp value where max is equal to size',
+				preset: {
+					size: '7.8125rem',
+					fluid: {
+						min: '4.375rem',
+						max: '7.8125rem',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
+			},
+
+			{
+				message:
 					'should return clamp value if min font size is greater than max',
 				preset: {
 					size: '3rem',

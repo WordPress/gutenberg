@@ -21,9 +21,32 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deleteAllPosts();
 	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
+	test.beforeEach( async ( { admin, page, requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( true );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
+	} );
+
+	test.afterEach( async ( { admin, page, requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
 	} );
 
 	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
@@ -192,6 +215,43 @@ test.describe( 'Testing behaviors functionality', () => {
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
 		await expect( select ).toHaveValue( '' );
+	} );
+
+	test( 'Lightbox behavior is disabled if the Image has a link', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				linkDestination: 'custom',
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.click();
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
+		} );
+
+		// The behaviors dropdown should be present but disabled.
+		await expect( select ).toBeDisabled();
 	} );
 } );
 

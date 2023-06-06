@@ -81,3 +81,42 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 .wp-block-search.aligncenter .wp-block-search__inside-wrapper {
 	margin: auto;
 }
+
+.wp-block-search__button-behavior-expand {
+	.wp-block-search__inside-wrapper {
+		transition-property: width;
+		min-width: 0 !important;
+	}
+
+	.wp-block-search__input {
+		transition-duration: 300ms;
+		flex-basis: 100%;
+	}
+
+	// !important here to override inline styles on button only deselected view.
+	&.wp-block-search__searchfield-hidden {
+		overflow: hidden;
+
+		.wp-block-search__inside-wrapper {
+			overflow: hidden;
+		}
+
+		.wp-block-search__input {
+			width: 0 !important;
+			min-width: 0 !important;
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+			border-left-width: 0 !important;
+			border-right-width: 0 !important;
+			flex-grow: 0;
+			margin: 0;
+			flex-basis: 0;
+		}
+	}
+}
+
+.wp-block[data-align="right"] .wp-block-search__button-behavior-expand {
+	.wp-block-search__inside-wrapper {
+		float: right;
+	}
+}

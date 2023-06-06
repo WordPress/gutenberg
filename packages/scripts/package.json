@@ -82,7 +82,7 @@
 		"sass-loader": "^12.1.0",
 		"source-map-loader": "^3.0.0",
 		"stylelint": "^14.2.0",
-		"terser-webpack-plugin": "^5.1.4",
+		"terser-webpack-plugin": "^5.3.9",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.47.1",
 		"webpack-bundle-analyzer": "^4.4.2",

@@ -7,6 +7,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,6 +19,8 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
+
+const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -48,6 +51,33 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
 		/>
+	);
+}
+
+function SidebarNavigationScreenGlobalStylesContent() {
+	const { storedSettings } = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( editSiteStore ) );
+
+		return {
+			storedSettings: getSettings( false ),
+		};
+	}, [] );
+
+	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
+	// loaded. This is necessary because the Iframe component waits until
+	// the block editor store's `__internalIsInitialized` is true before
+	// rendering the iframe. Without this, the iframe previews will not render
+	// in mobile viewport sizes, where the editor canvas is hidden.
+	return (
+		<BlockEditorProvider
+			settings={ storedSettings }
+			onChange={ noop }
+			onInput={ noop }
+		>
+			<div className="edit-site-sidebar-navigation-screen-global-styles__content">
+				<StyleVariationsContainer />
+			</div>
+		</BlockEditorProvider>
 	);
 }
 
@@ -86,9 +116,9 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
-				content={ <StyleVariationsContainer /> }
+				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				actions={
-					<div>
+					<>
 						{ ! isMobileViewport && (
 							<SidebarButton
 								icon={ seen }
@@ -108,7 +138,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 							label={ __( 'Edit styles' ) }
 							onClick={ async () => await openGlobalStyles() }
 						/>
-					</div>
+					</>
 				}
 			/>
 			{ isStyleBookOpened && ! isMobileViewport && (
