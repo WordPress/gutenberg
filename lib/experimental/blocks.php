@@ -181,3 +181,26 @@ END;
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_auto_insert_blocks', 10, 2 );
+
+function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
+	if ( ! isset( $metadata['autoInsert'] ) ) {
+		return $settings;
+	}
+
+	$property_mappings = array(
+		'before'     => 'before',
+		'after'      => 'after',
+		'firstChild' => 'first_child',
+		'lastChild'  => 'last_child',
+	);
+
+	$auto_insert = $metadata['autoInsert'];
+	foreach ( $property_mappings as $key => $mapped_key ) {
+		if ( isset( $auto_insert[ $key ] ) ) {
+			$settings['auto_insert'][ $mapped_key ] = $auto_insert[ $key ];
+		}
+	}
+
+	return $settings;
+}
+add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
