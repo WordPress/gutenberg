@@ -23,11 +23,11 @@ function gutenberg_interactivity_process_directives_in_root_blocks( $block_conte
 
 	// TODO: Add some directive/components registration mechanism.
 	$directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+		'data-wp-context' => array( 'gutenberg_interactivity_process_wp_context', 5 ),
+		'data-wp-bind'    => array( 'gutenberg_interactivity_process_wp_bind', 10 ),
+		'data-wp-class'   => array( 'gutenberg_interactivity_process_wp_class', 10 ),
+		'data-wp-style'   => array( 'gutenberg_interactivity_process_wp_style', 10 ),
+		'data-wp-text'    => array( 'gutenberg_interactivity_process_wp_text', 10 ),
 	);
 
 	$tags = new WP_Directive_Processor( $block_content );
@@ -93,10 +93,17 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			$get_directive_type = function ( $attr ) {
 				return explode( '--', $attr )[0];
 			};
+			$compare_priority   = function ( $a, $b ) use ( $directives ) {
+				if ( $directives[ $a ][1] === $directives[ $b ][1] ) {
+					return 0;
+				}
+				return ( $directives[ $a ][1] < $directives[ $b ][1] ) ? -1 : 1;
+			};
 
 			$attributes = $tags->get_attribute_names_with_prefix( $prefix );
 			$attributes = array_map( $get_directive_type, $attributes );
 			$attributes = array_intersect( $attributes, array_keys( $directives ) );
+			usort( $attributes, $compare_priority );
 
 			// If this is an open tag, and if it either has attribute directives, or
 			// if we're inside a tag that does, take note of this tag and its
@@ -111,7 +118,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 		}
 
 		foreach ( $attributes as $attribute ) {
-			call_user_func( $directives[ $attribute ], $tags, $context );
+			call_user_func( $directives[ $attribute ][0], $tags, $context );
 		}
 	}
 
