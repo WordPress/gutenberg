@@ -47,6 +47,19 @@ function FontLibraryProvider( { children } ) {
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
+	const handleSetLibraryFontSelected = ( font ) => {
+		// If font is null, reset the selected font
+		if ( ! font ){
+			setLibraryFontSelected( null );
+			return;
+		}
+
+		// Tries to find the font in the installed fonts 
+		const installedFontSelected = installedFonts.find( ( f ) => f.slug === font.slug );
+		// If the font is not found (it is only defined in custom styles), use the font from custom styles
+		setLibraryFontSelected ( installedFontSelected || font );
+	};
+
 	const toggleModal = ( tabName ) => {
 		setModalTabOepn( tabName || null );
 	};
@@ -275,7 +288,7 @@ function FontLibraryProvider( { children } ) {
 				updateDemoConfig,
 				setDefaultDemoConfig,
 				libraryFontSelected,
-				setLibraryFontSelected,
+				handleSetLibraryFontSelected,
 				themeFonts,
 				customFonts,
 				libraryFonts,

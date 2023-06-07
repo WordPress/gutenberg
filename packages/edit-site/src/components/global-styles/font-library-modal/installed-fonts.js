@@ -20,14 +20,14 @@ import PreviewControls from './preview-controls';
 import LibraryFontCard from './library-font-card';
 
 function InstalledFonts() {
-	const { themeFonts, libraryFonts, libraryFontSelected, setLibraryFontSelected } = useContext( FontLibraryContext );
+	const { themeFonts, libraryFonts, libraryFontSelected, handleSetLibraryFontSelected } = useContext( FontLibraryContext );
 
 	const handleUnselectFont = () => {
-		setLibraryFontSelected( null );
+		handleSetLibraryFontSelected( null );
 	};
 
 	const handleSelectFont = ( font ) => {
-		setLibraryFontSelected( font );
+		handleSetLibraryFontSelected( font );
 	};
 
 	const tabDescription = !! libraryFontSelected

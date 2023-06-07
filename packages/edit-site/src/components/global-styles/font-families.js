@@ -24,7 +24,7 @@ import { unlock } from '../../private-apis';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOepn, toggleModal } = useContext( FontLibraryContext );
+	const { modalTabOepn, toggleModal  } = useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 
 	const fonts = Array.isArray( fontFamilies?.custom )

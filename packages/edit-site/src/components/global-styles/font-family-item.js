@@ -15,12 +15,12 @@ import { useContext } from '@wordpress/element';
 import { FontLibraryContext } from './font-library-modal/context';
 
 function FontFamilyItem ({ font }) {
-    const { setLibraryFontSelected, toggleModal, libraryFonts } = useContext( FontLibraryContext );
+    const { handleSetLibraryFontSelected, toggleModal } = useContext( FontLibraryContext );
 
     const variantsCount = font?.fontFace?.length || 1;
     
     const handleClick = () => {
-        setLibraryFontSelected( font );
+        handleSetLibraryFontSelected( font );
         toggleModal( "installed-fonts" );
     };
 
