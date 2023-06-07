@@ -35,11 +35,14 @@ import { unlock } from '../../lock-unlock';
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
 		( select ) => {
-			const { getClientIdsOfDescendants, getBlockEditingMode } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getClientIdsOfDescendants,
+				getBlockName,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 			return getClientIdsOfDescendants( [ topLevelLockedBlock ] ).filter(
 				( clientId ) =>
+					getBlockName( clientId ) !== 'core/list-item' &&
 					getBlockEditingMode( clientId ) === 'contentOnly'
 			);
 		},
