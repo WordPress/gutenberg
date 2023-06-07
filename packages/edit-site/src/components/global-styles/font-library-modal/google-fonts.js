@@ -40,7 +40,7 @@ const filterFonts = ( fonts, filters ) => {
 		);
 	}
 
-	return filteredFonts.slice( 0, 96 );
+	return filteredFonts;
 };
 
 function GoogleFonts() {
