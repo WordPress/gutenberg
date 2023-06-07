@@ -358,3 +358,24 @@ function block_core_social_link_get_color_classes( $context ) {
 
 	return ' ' . implode( ' ', $classes );
 }
+
+/**
+ * Registers the `core/social-link` auto-insert block pattern.
+ */
+function register_social_link_auto_insert_block_pattern() {
+	register_block_pattern(
+		'core/social-link-auto-insert',
+		array(
+			'title'       => __( 'Social Link Auto-insert block pattern' ),
+			'autoInsert'  => array( 'after' ),
+			'blockTypes'  => array( 'core/post-content' ),
+			'description' => _x( 'Automatically add a WordPress Social Link block to the end of your posts.', 'Block pattern description'),
+			'categories'  => array( 'text' ),
+			'keywords'    => array( 'avatar', 'user', 'author', 'comment' ),
+			'content'     => '<!-- wp:social-links -->' .
+				'<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>' .
+				'<!-- /wp:social-links -->',
+		)
+	);
+}
+add_action( 'init', 'register_social_link_auto_insert_block_pattern', 100 );

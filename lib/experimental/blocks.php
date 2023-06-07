@@ -164,29 +164,42 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
  * @param array  $block         The full block, including name and attributes.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block ) {
-	// TODO: Implement an API for users to set the following two parameters.
-	$block_name     = 'core/post-content';
-	$block_position = 'after';
+	$block_patterns  = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
-	// Can we avoid infinite loops?
+	foreach ( $block_patterns as $block_pattern ) {
+		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
+			continue;
+		}
 
-	if ( $block_name !== $block['blockName'] ) {
-		return $block_content;
-	}
+		// Is the current block listed among possible anchor blocks for the block pattern?
+		$index = array_search( $block['blockName'], $block_pattern['blockTypes'], true );
+		if ( false === $index ) {
+			continue;
+		}
 
-	$inserted_block_markup = <<<END
-<!-- wp:social-links -->
-<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /--></ul>
-<!-- /wp:social-links -->'
-END;
+		// Determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert.
+		if ( is_array( $block_pattern['autoInsert'] ) ) {
+			$index = $index % count( $block_pattern['autoInsert'] ); // Wrap around in case the array is too short.
+			if ( isset( $block_pattern['autoInsert'][ $index ] ) ) {
+				$relative_position = $block_pattern['autoInsert'][ $index ];
+			} // What if we don't have an autoInsert for this index?
+		} else {
+			$relative_position = $block_pattern['autoInsert'];
+		}
 
-	$inserted_blocks  = parse_blocks( $inserted_block_markup );
-	$inserted_content = render_block( $inserted_blocks[0] );
+		// Is the relative position of the block pattern set to before or after?
+		if ( 'before' !== $relative_position && 'after' !== $relative_position ) {
+			continue;
+		}
 
-	if ( 'before' === $block_position ) {
-		$block_content = $inserted_content . $block_content;
-	} elseif ( 'after' === $block_position ) {
-		$block_content = $block_content . $inserted_content;
+		$inserted_blocks   = parse_blocks( $block_pattern['content'] );
+		$inserted_content  = render_block( $inserted_blocks[0] );
+
+		if ( 'before' === $relative_position ) {
+			$block_content = $inserted_content . $block_content;
+		} elseif ( 'after' === $relative_position ) {
+			$block_content = $block_content . $inserted_content;
+		}
 	}
 
 	return $block_content;
