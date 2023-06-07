@@ -22,7 +22,7 @@ import {
 import { unlock } from '../../../private-apis';
 import { DEFAULT_DEMO_CONFIG } from './constants';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import { setFallbackValues } from './utils';
+import { setFallbackValues, isUrlEncoded } from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -267,15 +267,24 @@ function FontLibraryProvider( { children } ) {
 		if ( loadedFontUrls.has( src ) ) {
 			return;
 		}
+		
+		if ( ! isUrlEncoded ) {
+			src = encodeURI( src );
+		}
 
 		const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
 			style: fontFace.fontStyle,
 			weight: fontFace.fontWeight,
 		} );
 
-		const loadedFace = await newFont.load();
+		try {
+			const loadedFace = await newFont.load();
+			document.fonts.add( loadedFace );
+		} catch ( e ) { // If the url is not valid we mark the font as loaded
+			console.error( e );
+		}
+
 		loadedFontUrls.add( src );
-		document.fonts.add( loadedFace );
 	};
 
 	return (
