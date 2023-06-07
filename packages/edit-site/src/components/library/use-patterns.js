@@ -117,7 +117,7 @@ const useBlockPatternsByCategory = ( categoryId, postType = PATTERNS ) => {
 	}
 
 	return patterns.filter( ( pattern ) =>
-		pattern.categories?.includes( category.name )
+		pattern.categories?.includes( category.slug )
 	);
 };
 
