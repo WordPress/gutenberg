@@ -54,19 +54,17 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	// This can't be done in the beforeAll hook because the page object is not
-	// available there, as it's created on a per-test basis.
-	test( 'Create the test page', async ( { page, admin } ) => {
+	test( 'Loading', async ( { browser, page, admin, editor } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
 		// Turn the large post HTML into blocks and insert.
 		await loadBlocksFromHtml(
 			page,
-			path.join( __dirname, '../../assets/large-post.html' )
+			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
 
-		// Save the page draft.
+		// Save the draft.
 		await page
 			.getByRole( 'button', { name: 'Save draft' } )
 			.click( { timeout: 60_000 } );
@@ -78,55 +76,83 @@ test.describe( 'Site Editor Performance', () => {
 		testPageId = await page.evaluate( () =>
 			new URL( document.location ).searchParams.get( 'post' )
 		);
-	} );
 
-	// Number of loading measurements to take.
-	const loadingSamples = 3;
-	// Number of throwaway measurements to perform before recording samples.
-	// Having at least one helps ensure that caching quirks don't manifest
-	// in the results.
-	const loadingSamplesThrowaway = 1;
-	const loadingIterations = loadingSamples + loadingSamplesThrowaway;
+		// Open the test page in Site Editor.
+		await admin.visitSiteEditor( {
+			postId: testPageId,
+			postType: 'page',
+		} );
 
-	for ( let i = 1; i <= loadingIterations; i++ ) {
-		test( `Loading (${ i } of ${ loadingIterations })`, async ( {
-			page,
-			admin,
-			editor,
-		} ) => {
-			// Open the test page in Site Editor.
-			await admin.visitSiteEditor( {
-				postId: testPageId,
-				postType: 'page',
-			} );
+		// Get the URL that we will be testing against.
+		const targetUrl = await page.evaluate( 'document.location.href' );
+
+		// Wait for the content to finish loading.
+		await editor.canvas
+			.getByText( 'Lorem ipsum dolor sit amet' )
+			.first()
+			.waitFor( { timeout: 60_000 } );
+
+		// Start the measurements.
+		const sampleCount = 3;
+		for ( let i = 1; i <= sampleCount; i++ ) {
+			// Open a fresh page in a new context to prevent caching.
+			const freshPage = await browser.newPage();
+
+			// Go to the target URL.
+			await freshPage.goto( targetUrl );
 
 			// Wait for the first block.
-			await editor.canvas
+			await freshPage
+				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
 				.waitFor( { timeout: 60_000 } );
 
 			// Save results.
-			if ( i > loadingSamplesThrowaway ) {
-				const {
-					serverResponse,
-					firstPaint,
-					domContentLoaded,
-					loaded,
-					firstContentfulPaint,
-					firstBlock,
-				} = await getLoadingDurations( page );
-				results.serverResponse.push( serverResponse );
-				results.firstPaint.push( firstPaint );
-				results.domContentLoaded.push( domContentLoaded );
-				results.loaded.push( loaded );
-				results.firstContentfulPaint.push( firstContentfulPaint );
-				results.firstBlock.push( firstBlock );
-			}
-		} );
-	}
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations( freshPage );
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
 
-	test( 'Typing', async ( { browser, page, admin, editor } ) => {
+			await freshPage.close();
+		}
+	} );
+
+	test( 'Typing', async ( { browser, page, pageUtils, admin, editor } ) => {
+		// Start a new page.
+		await admin.createNewPost( { postType: 'page' } );
+
+		// Turn the large post HTML into blocks and insert.
+		await loadBlocksFromHtml(
+			page,
+			path.join( process.env.ASSETS_PATH, 'large-post.html' )
+		);
+
+		// Save the draft.
+		await page
+			.getByRole( 'button', { name: 'Save draft' } )
+			// Loading the large post HTML can take some time so we need a higher
+			// timeout value here.
+			.click( { timeout: 60_000 } );
+		await expect(
+			page.getByRole( 'button', { name: 'Saved' } )
+		).toBeDisabled();
+
+		// Get the ID of the saved page.
+		testPageId = await page.evaluate( () =>
+			new URL( document.location ).searchParams.get( 'post' )
+		);
+
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
 			postId: testPageId,
@@ -143,8 +169,13 @@ test.describe( 'Site Editor Performance', () => {
 		await editor.canvas.click( 'body' );
 
 		// Insert a new paragraph right under the first one.
-		await firstParagraph.focus();
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Post Content' } )
+			.click();
+		await firstParagraph.click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
 
 		// Start tracing.
 		const traceFilePath = getTraceFilePath();

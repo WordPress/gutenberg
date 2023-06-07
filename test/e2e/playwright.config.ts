@@ -11,6 +11,7 @@ process.env.STORAGE_STATE_PATH ??= path.join(
 	process.env.WP_ARTIFACTS_PATH,
 	'storage-states/admin.json'
 );
+process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
 	reporter: process.env.CI
