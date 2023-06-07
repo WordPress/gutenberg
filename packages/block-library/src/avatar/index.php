@@ -157,7 +157,7 @@ function register_avatar_auto_insert_block_pattern() {
 		'core/avatar-auto-insert',
 		array(
 			'title'       => __( 'Avatar Auto-insert block pattern' ),
-			'autoInsert'  => 'lastChild',
+			'autoInsert'  => array( 'lastChild' ),
 			'blockTypes'  => array( 'core/comment-template' ),
 			'description' => _x( 'Display an avatar of a user, author, or comment.', 'Block pattern description' ),
 			'categories'  => array( 'text' ),

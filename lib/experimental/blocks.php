@@ -115,18 +115,26 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 		}
 
 		// Is the current block listed among possible anchor blocks for the block pattern?
-		if ( ! in_array( $parsed_block['blockName'], $block_pattern['blockTypes'], true ) ) {
+		$index = array_search( $parsed_block['blockName'], $block_pattern['blockTypes'], true );
+		if ( false === $index ) {
 			continue;
 		}
 
-		// TODO: Maybe determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert?
+		// Determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert.
+		if ( is_array( $block_pattern['autoInsert'] ) ) {
+			$index = $index % count( $block_pattern['autoInsert'] ); // Wrap around in case the array is too short.
+			if ( isset( $block_pattern['autoInsert'][ $index ] ) ) {
+				$relative_position = $block_pattern['autoInsert'][ $index ];
+			} // What if we don't have an autoInsert for this index?
+		} else {
+			$relative_position = $block_pattern['autoInsert'];
+		}
 
 		// Is the relative position of the block pattern set to first or last child?
-		if ( 'firstChild' !== $block_pattern['autoInsert'] && 'lastChild' !== $block_pattern['autoInsert'] ) {
+		if ( 'firstChild' !== $relative_position && 'lastChild' !== $relative_position ) {
 			continue;
 		}
 
-		$relative_position = $block_pattern['autoInsert'];
 		$inserted_blocks   = parse_blocks( $block_pattern['content'] );
 		$inserted_block    = $inserted_blocks[0];
 
