@@ -20,11 +20,11 @@ import {
 	getSelectionEventDurations,
 	getLoadingDurations,
 	loadBlocksFromHtml,
+	load1000Paragraphs,
 	saveResultsFile,
 	sum,
+	getTraceFilePath,
 } from './utils';
-
-const assetsDir = path.join( __dirname, '../../assets' );
 
 const results = {
 	serverResponse: [],
@@ -42,36 +42,12 @@ const results = {
 	inserterSearch: [],
 };
 
-async function load1000Paragraphs( page ) {
-	await page.evaluate( () => {
-		const { createBlock } = window.wp.blocks;
-		const { dispatch } = window.wp.data;
-		const blocks = Array.from( { length: 1000 } ).map( () =>
-			createBlock( 'core/paragraph' )
-		);
-		dispatch( 'core/block-editor' ).resetBlocks( blocks );
-	} );
-}
-
-async function openGlobalBlockInserter( page ) {
-	await page
-		.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} )
-		.click();
-}
-
-async function openListView( pageUtils ) {
-	await pageUtils.pressKeys( 'access+o' );
-}
-
 test.describe( 'Post Editor Performance', () => {
-	const traceFile = __dirname + '/trace.json';
-	let traceResults;
+	const traceFilePath = getTraceFilePath();
 
 	test.afterAll( async () => {
 		saveResultsFile( __filename, results );
-		deleteFile( traceFile );
+		deleteFile( traceFilePath );
 	} );
 
 	test.beforeEach( async ( { admin, page } ) => {
@@ -88,7 +64,7 @@ test.describe( 'Post Editor Performance', () => {
 	test( 'Loading', async ( { page, editor } ) => {
 		await loadBlocksFromHtml(
 			page,
-			path.join( assetsDir, 'large-post.html' )
+			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
 
 		await page
@@ -125,12 +101,12 @@ test.describe( 'Post Editor Performance', () => {
 	test( 'Typing', async ( { browser, page, editor } ) => {
 		await loadBlocksFromHtml(
 			page,
-			path.join( assetsDir, 'large-post.html' )
+			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		await browser.startTracing( page, {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -146,7 +122,7 @@ test.describe( 'Post Editor Performance', () => {
 		}
 
 		await browser.stopTracing();
-		traceResults = JSON.parse( readFile( traceFile ) );
+		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		if (
@@ -166,7 +142,10 @@ test.describe( 'Post Editor Performance', () => {
 	test( 'Typing within containers', async ( { browser, page, editor } ) => {
 		await loadBlocksFromHtml(
 			page,
-			path.join( assetsDir, 'small-post-with-containers.html' )
+			path.join(
+				process.env.ASSETS_PATH,
+				'small-post-with-containers.html'
+			)
 		);
 		// Select the block where we type in
 		await editor.canvas
@@ -180,7 +159,7 @@ test.describe( 'Post Editor Performance', () => {
 
 		let i = 10;
 		await browser.startTracing( page, {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -194,7 +173,7 @@ test.describe( 'Post Editor Performance', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
 		await browser.stopTracing();
-		traceResults = JSON.parse( readFile( traceFile ) );
+		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		if (
@@ -217,7 +196,7 @@ test.describe( 'Post Editor Performance', () => {
 		const paragraphs = editor.canvas.locator( '.wp-block' );
 
 		await browser.startTracing( page, {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -231,7 +210,7 @@ test.describe( 'Post Editor Performance', () => {
 		}
 
 		await browser.stopTracing();
-		traceResults = JSON.parse( readFile( traceFile ) );
+		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
 	} );
@@ -245,13 +224,13 @@ test.describe( 'Post Editor Performance', () => {
 
 		for ( let j = 0; j < 10; j++ ) {
 			await browser.startTracing( page, {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await openListView( pageUtils );
 			await browser.stopTracing();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			const traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
 				results.listViewOpen.push( mouseClickEvents[ k ] );
@@ -263,13 +242,13 @@ test.describe( 'Post Editor Performance', () => {
 		await load1000Paragraphs( page );
 		for ( let j = 0; j < 10; j++ ) {
 			await browser.startTracing( page, {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await openGlobalBlockInserter( page );
 			await browser.stopTracing();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			const traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
 				results.inserterOpen.push( mouseClickEvents[ k ] );
@@ -285,13 +264,13 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 500 );
 			await browser.startTracing( page, {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await page.keyboard.type( 'p' );
 			await browser.stopTracing();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			const traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 				getTypingEventDurations( traceResults );
 			if (
@@ -315,7 +294,6 @@ test.describe( 'Post Editor Performance', () => {
 		const headingBlockItem =
 			'.block-editor-inserter__menu .editor-block-list-item-heading';
 		await openGlobalBlockInserter( page );
-		await page.waitForSelector( paragraphBlockItem );
 		await page.hover( paragraphBlockItem );
 		await page.hover( headingBlockItem );
 		for ( let j = 0; j < 10; j++ ) {
@@ -323,7 +301,7 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
 			await browser.startTracing( page, {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -331,7 +309,7 @@ test.describe( 'Post Editor Performance', () => {
 			await page.hover( headingBlockItem );
 			await browser.stopTracing();
 
-			traceResults = JSON.parse( readFile( traceFile ) );
+			const traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseOverEvents, mouseOutEvents ] =
 				getHoverEventDurations( traceResults );
 			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
@@ -342,3 +320,15 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 } );
+
+async function openGlobalBlockInserter( page ) {
+	await page
+		.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} )
+		.click();
+}
+
+async function openListView( pageUtils ) {
+	await pageUtils.pressKeys( 'access+o' );
+}
