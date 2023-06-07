@@ -27,30 +27,44 @@ function register_block_core_pattern_template() {
  *
  * @return WP_Block_List The compiled block list.
  */
-function block_core_pattern_template_insert_value_blocks_into_content( $content_block, $value_blocks ) {
-	$content_blocks        = $content_block->inner_blocks;
-	static $token_position = 0;
+function block_core_pattern_template_insert_value_blocks_into_content( $content_block, $value_blocks, $token_position = 0 ) {
+	$compiled_inner_blocks = array();
 
-	// If there are no blocks, there's nothing to do.
-	if ( 0 === count( $content_blocks ) ) {
-		return $content_blocks;
-	}
-
-	foreach ( $content_blocks as $index => $inner_block ) {
-		// Recurse and update any inner blocks of this block first.
-		if ( count( $inner_block->inner_blocks ) ) {
-			block_core_pattern_template_insert_value_blocks_into_content( $inner_block, $value_blocks );
-		}
-
+	// TODO - try turning this into a `while( $next_block )` loop.
+	foreach ( $content_block->inner_blocks as $inner_block ) {
 		// If this is a token, replace it with the placeholder that's in this position.
 		if ( 'core/pattern-template-token' === $inner_block->name ) {
 			if ( isset( $value_blocks[ $token_position ] ) ) {
-				// TODO - it might be better to create a new inner blocks list instead of overwriting the existing one.
-				$content_blocks[ $index ] = $value_blocks[ $token_position ];
-				$token_position           = $token_position + 1;
+				$value_block          = $value_blocks[ $token_position ];
+				$result               = block_core_pattern_template_insert_value_blocks_into_content( $inner_block, $value_blocks, $token_position );
+				$updated_inner_blocks = $result['blocks'];
+				$token_position       = $result['token_position'];
+				$updated_parsed_block = array_merge( $value_block->parsed_block, array( 'inner_blocks' => $updated_inner_blocks ) );
+				$updated_block        = new WP_Block( $updated_parsed_block );
+				array_push( $compiled_inner_blocks, $updated_block );
+				$token_position = $token_position + 1;
+			} else {
+				$result               = block_core_pattern_template_insert_value_blocks_into_content( $inner_block, $value_blocks, $token_position );
+				$updated_inner_blocks = $result['blocks'];
+				$token_position       = $result['token_position'];
+				$updated_parsed_block = array_merge( $inner_block->parsed_block, array( 'inner_blocks' => $updated_inner_blocks ) );
+				$updated_block        = new WP_Block( $updated_parsed_block );
+				array_push( $compiled_inner_blocks, $updated_block );
 			}
+		} else {
+			$result               = block_core_pattern_template_insert_value_blocks_into_content( $inner_block, $value_blocks, $token_position );
+			$updated_inner_blocks = $result['blocks'];
+			$token_position       = $result['token_position'];
+			$updated_parsed_block = array_merge( $inner_block->parsed_block, array( 'inner_blocks' => $updated_inner_blocks ) );
+			$updated_block        = new WP_Block( $updated_parsed_block );
+			array_push( $compiled_inner_blocks, $updated_block );
 		}
 	}
+
+	return array(
+		'blocks'         => $compiled_inner_blocks,
+		'token_position' => $token_position,
+	);
 }
 
 /**
@@ -62,14 +76,14 @@ function block_core_pattern_template_insert_value_blocks_into_content( $content_
  */
 function block_core_pattern_template_get_template_content( $blocks ) {
 	foreach ( $blocks as $block ) {
-		// If a template content block is found at this level return it.
-		if ( 'core/pattern-template-content' === $block->name ) {
-			return $block;
-		}
-
 		// If a nested template is found, search its inner blocks.
 		if ( 'core/pattern-template' === $block->name ) {
 			return block_core_pattern_template_get_template_content( $block->inner_blocks );
+		}
+
+		// If a template content block is found at this level return it.
+		if ( 'core/pattern-template-content' === $block->name ) {
+			return $block;
 		}
 	}
 }
@@ -86,7 +100,7 @@ function block_core_pattern_template_get_template_values( $blocks ) {
 
 	// If a nested template block is found at this level recurse down and get the children values.
 	foreach ( $blocks as $block ) {
-		if ( 'core/pattern-template' !== $block->name ) {
+		if ( 'core/pattern-template' === $block->name ) {
 			$values = block_core_pattern_template_get_template_values( $block->inner_blocks );
 		}
 	}
@@ -97,7 +111,7 @@ function block_core_pattern_template_get_template_values( $blocks ) {
 	$index = 0;
 	foreach ( $blocks as $block ) {
 		// If a template content block is found at this level return it.
-		if ( 'core/pattern-template-content' !== $block->name ) {
+		if ( 'core/pattern-template-content' !== $block->name && 'core/pattern-template' !== $block->name ) {
 			$values[ $index ] = $block;
 			$index            = $index + 1;
 		}
@@ -120,10 +134,11 @@ function render_block_core_pattern_template( $attributes, $content, $block ) {
 
 	$content_block = block_core_pattern_template_get_template_content( $inner_blocks );
 	$value_blocks  = block_core_pattern_template_get_template_values( $inner_blocks );
-	block_core_pattern_template_insert_value_blocks_into_content( $content_block, $value_blocks );
+
+	$result = block_core_pattern_template_insert_value_blocks_into_content( $content_block, $value_blocks );
 
 	$compiled_content = '';
-	foreach ( $content_block->inner_blocks as $inner_block ) {
+	foreach ( $result['blocks'] as $inner_block ) {
 		$compiled_content .= $inner_block->render();
 	}
 
