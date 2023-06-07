@@ -743,9 +743,24 @@
 			"description": "Blocks to auto-insert this block next to.",
 			"patternProperties": {
 				"[a-zA-Z]": {
-					"type": "string",
+					"type": "object",
 					"description": "Position relative to the block to auto-insert this block next to.",
-					"pattern": "^(nextSibling|previousSibling|firstChild|lastChild)$"
+					"properties": {
+						"position": {
+							"type": "string",
+							"description": "Position relative to the block to auto-insert this block next to.",
+							"enum": [
+								"before",
+								"after",
+								"firstChild",
+								"lastChild"
+							]
+						},
+						"attrs": {
+							"type": "object",
+							"description": "Attributes for the auto-inserted block."
+						}
+					}
 				}
 			}
 		}

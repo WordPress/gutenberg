@@ -34,5 +34,14 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-social-link-editor"
+	"editorStyle": "wp-block-social-link-editor",
+	"autoInsert": {
+		"core/post-content": {
+			"position": "after",
+			"attrs": {
+				"service": "wordpress",
+				"url": "https://wordpress.org/"
+			}
+		}
+	}
 }
