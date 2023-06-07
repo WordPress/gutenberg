@@ -109,6 +109,9 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
 function gutenberg_auto_insert_child_block( $parsed_block ) {
 	$block_patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
+	// TODO: Use a more efficient way to find block patterns anchored at this block.
+	// We might want to do this upon block pattern registration; a filter on `register_block_pattern`
+	// might come in handy, but alas, we don't have one yet.
 	foreach ( $block_patterns as $block_pattern ) {
 		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
 			continue;
@@ -166,6 +169,9 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
 function gutenberg_auto_insert_blocks( $block_content, $block ) {
 	$block_patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
+	// TODO: Use a more efficient way to find block patterns anchored at this block.
+	// We might want to do this upon block pattern registration; a filter on `register_block_pattern`
+	// might come in handy, but alas, we don't have one yet.
 	foreach ( $block_patterns as $block_pattern ) {
 		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
 			continue;
