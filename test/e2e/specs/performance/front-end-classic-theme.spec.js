@@ -23,11 +23,9 @@ test.describe( 'Front End Performance', () => {
 		saveResultsFile( __filename, results );
 	} );
 
-	const iterations = 16;
-	for ( let i = 1; i <= iterations; i++ ) {
-		test( `Measure TTFB, LCP, and LCP-TTFB (${ i } of ${ iterations })`, async ( {
-			browser,
-		} ) => {
+	test( 'Measure TTFB, LCP, and LCP-TTFB', async ( { browser } ) => {
+		const sampleCount = 16;
+		for ( let i = 1; i <= sampleCount; i++ ) {
 			// Create a new, logged-out page for each iteration.
 			const guestPage = await browser.newPage( {
 				storageState: undefined,
@@ -80,6 +78,6 @@ test.describe( 'Front End Performance', () => {
 
 			// Close the current page.
 			await guestPage.close();
-		} );
-	}
+		}
+	} );
 } );
