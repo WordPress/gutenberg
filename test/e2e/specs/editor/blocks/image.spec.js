@@ -782,6 +782,45 @@ test.describe( 'Image', () => {
 		await expect( imageDom ).toBeVisible();
 		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
 	} );
+
+	test( 'adding a link should reflect configuration in published post content', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await page
+			.getByLabel( 'Block tools' )
+			.getByLabel( 'Insert link' )
+			.click();
+
+		const form = page.locator( '.block-editor-url-popover__link-editor' );
+
+		const url = 'https://wordpress.org';
+
+		await form.getByLabel( 'URL' ).fill( url );
+
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const linkDom = figureDom.locator( 'a' );
+		await expect( linkDom ).toBeVisible();
+		await expect( linkDom ).toHaveAttribute( 'href', url );
+	} );
 } );
 
 test.describe( 'Image - interactivity', () => {
