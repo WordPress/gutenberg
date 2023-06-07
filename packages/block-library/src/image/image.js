@@ -155,7 +155,7 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const clientWidth = useClientWidth( containerRef );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&

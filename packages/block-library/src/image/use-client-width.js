@@ -3,14 +3,13 @@
  */
 import { useState, useEffect } from '@wordpress/element';
 
-export default function useClientWidth( ref, dependencies ) {
+export default function useClientWidth( ref ) {
 	const [ clientWidth, setClientWidth ] = useState();
-
 	function calculateClientWidth() {
 		setClientWidth( ref.current?.clientWidth );
 	}
 
-	useEffect( calculateClientWidth, dependencies );
+	useEffect( calculateClientWidth );
 	useEffect( () => {
 		const { defaultView } = ref.current.ownerDocument;
 
