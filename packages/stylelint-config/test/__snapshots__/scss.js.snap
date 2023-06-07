@@ -4,6 +4,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
 [
   {
     "column": 1,
+    "endColumn": 2,
+    "endLine": 16,
     "line": 14,
     "rule": "scss/at-else-empty-line-before",
     "severity": "error",
@@ -11,6 +13,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 12,
     "line": 12,
     "rule": "scss/at-if-closing-brace-newline-after",
     "severity": "error",
@@ -18,6 +22,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 12,
     "line": 12,
     "rule": "scss/at-if-closing-brace-space-after",
     "severity": "error",
@@ -25,6 +31,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 1,
+    "endColumn": 9,
+    "endLine": 1,
     "line": 1,
     "rule": "scss/at-rule-no-unknown",
     "severity": "error",
@@ -32,6 +40,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 2,
+    "endColumn": 15,
+    "endLine": 22,
     "line": 22,
     "rule": "at-rule-empty-line-before",
     "severity": "error",
@@ -39,6 +49,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 5,
+    "endColumn": 6,
+    "endLine": 14,
     "line": 14,
     "rule": "block-opening-brace-space-before",
     "severity": "error",
@@ -46,6 +58,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 15,
+    "endColumn": 16,
+    "endLine": 28,
     "line": 28,
     "rule": "no-extra-semicolons",
     "severity": "error",
@@ -53,6 +67,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 7,
+    "endColumn": 8,
+    "endLine": 31,
     "line": 31,
     "rule": "number-leading-zero",
     "severity": "error",

@@ -152,18 +152,18 @@ See https://bugs.webkit.org/show_bug.cgi?id=187903. */
 
 /*!rtl:begin:ignore*/
 .components-resizable-box__handle-right {
-	right: calc(#{$resize-handler-container-size * 0.5} * -1);
+	right: calc(#{ $resize-handler-container-size * 0.5 } * -1);
 }
 
 .components-resizable-box__handle-left {
-	left: calc(#{$resize-handler-container-size * 0.5} * -1);
+	left: calc(#{ $resize-handler-container-size * 0.5 } * -1);
 }
 
 .components-resizable-box__handle-top {
-	top: calc(#{$resize-handler-container-size * 0.5} * -1);
+	top: calc(#{ $resize-handler-container-size * 0.5 } * -1);
 }
 
 .components-resizable-box__handle-bottom {
-	bottom: calc(#{$resize-handler-container-size * 0.5} * -1);
+	bottom: calc(#{ $resize-handler-container-size * 0.5 } * -1);
 }
 /*!rtl:end:ignore*/
