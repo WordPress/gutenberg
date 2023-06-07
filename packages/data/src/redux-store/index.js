@@ -197,25 +197,31 @@ export default function createReduxStore( key, options ) {
 				} )
 			);
 
-			let selectors = mapSelectors(
-				{
-					...mapValues(
-						metadataSelectors,
-						( selector ) =>
-							( state, ...args ) =>
-								selector( state.metadata, ...args )
-					),
-					...mapValues( options.selectors, ( selector ) => {
-						if ( selector.isRegistrySelector ) {
-							selector.registry = registry;
-						}
+			function bindSelector( selector ) {
+				if ( selector.isRegistrySelector ) {
+					selector.registry = registry;
+				}
+				const boundSelector = ( ...args ) => {
+					const state = store.__unstableOriginalGetState();
+					return selector( state.root, ...args );
+				};
+				boundSelector.hasResolver = false;
+				return boundSelector;
+			}
 
-						return ( state, ...args ) =>
-							selector( state.root, ...args );
-					} ),
-				},
-				store
-			);
+			function bindMetadataSelector( selector ) {
+				const boundSelector = ( ...args ) => {
+					const state = store.__unstableOriginalGetState();
+					return selector( state.metadata, ...args );
+				};
+				boundSelector.hasResolver = false;
+				return boundSelector;
+			}
+
+			let selectors = {
+				...mapValues( metadataSelectors, bindMetadataSelector ),
+				...mapValues( options.selectors, bindSelector ),
+			};
 
 			let resolvers;
 			if ( options.resolvers ) {
@@ -232,19 +238,10 @@ export default function createReduxStore( key, options ) {
 				selectors,
 				new Proxy( privateSelectors, {
 					get: ( target, prop ) => {
-						return (
-							mapSelectors(
-								mapValues( privateSelectors, ( selector ) => {
-									if ( selector.isRegistrySelector ) {
-										selector.registry = registry;
-									}
-
-									return ( state, ...args ) =>
-										selector( state.root, ...args );
-								} ),
-								store
-							)[ prop ] || selectors[ prop ]
-						);
+						const privateSelector = privateSelectors[ prop ];
+						return privateSelector
+							? bindSelector( privateSelector )
+							: selectors[ prop ];
 					},
 				} )
 			);
@@ -360,26 +357,6 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 		{ root: initialState },
 		compose( enhancers )
 	);
-}
-
-/**
- * Maps selectors to a store.
- *
- * @param {Object} selectors Selectors to register. Keys will be used as the
- *                           public facing API. Selectors will get passed the
- *                           state as first argument.
- * @param {Object} store     The store to which the selectors should be mapped.
- * @return {Object} Selectors mapped to the provided store.
- */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( registrySelector ) => {
-		const selector = ( ...args ) =>
-			registrySelector( store.__unstableOriginalGetState(), ...args );
-		selector.hasResolver = false;
-		return selector;
-	};
-
-	return mapValues( selectors, createStateSelector );
 }
 
 /**
