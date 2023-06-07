@@ -94,7 +94,7 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 		onSelect,
 		className,
 		orientation = 'horizontal',
-		selectOnMove,
+		selectOnMove = true,
 		initialTabName,
 		activeClass = 'is-active',
 	} = props;
