@@ -28,7 +28,7 @@ const NON_CONVERTABLE_BLOCKS = [
 ];
 
 export default function PatternTemplateContentEdit( { clientId } ) {
-	useBlockEditingMode( 'disabled' );
+	// useBlockEditingMode( 'disabled' );
 	const registry = useRegistry();
 
 	const {
