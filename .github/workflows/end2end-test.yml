@@ -83,6 +83,12 @@ jobs:
               run: |
                   npx playwright install chromium firefox webkit --with-deps
 
+            - name: Get list of installed fonts
+              run: fc-list
+
+            - name: Install Ubuntu font
+              run: sudo apt-get install -y ttf-ubuntu-font-family
+
             - name: Install WordPress and start the server
               run: |
                   npm run wp-env start
