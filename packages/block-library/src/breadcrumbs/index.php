@@ -131,7 +131,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	);
 
 	return sprintf(
-		'<nav %1$s><ol itemscope itemtype="https://schema.org/BreadcrumbList">%2$s</ol></nav>',
+		'<nav %1$s><ol>%2$s</ol></nav>',
 		$wrapper_attributes,
 		$inner_markup
 	);
@@ -171,11 +171,10 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 	}
 
 	$markup .= sprintf(
-		'<a itemprop="item" href="%s"%s>%s%s</a>',
+		'<a href="%s"%s>%s</a>',
 		esc_url( $url ),
 		$is_current_page ? ' aria-current="page"' : '',
-		sprintf( '<span itemprop="name">%s</span>', wp_kses_post( $title ) ),
-		sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
+		wp_kses_post( $title )
 	);
 
 	if (
@@ -190,7 +189,7 @@ function build_block_core_breadcrumbs_inner_markup_item( $url, $title, $attribut
 	}
 
 	return sprintf(
-		'<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="%1$s">%2$s</li>',
+		'<li class="%1$s">%2$s</li>',
 		$li_class,
 		$markup
 	);

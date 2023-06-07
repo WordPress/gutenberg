@@ -50,8 +50,8 @@ Create and save content to reuse across your site. Update the block, and the cha
 Displays breadcrumbs of a page's hierarchy, or a post's categories ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
 
 -	**Name:** core/breadcrumbs
--	**Experimental:** true
--	**Category:** design
+-	**Experimental:** fse
+-	**Category:** theme
 -	**Supports:** align (full, wide), color (link, text, ~~background~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** contentJustification, separator, showCurrentPageTitle, showLeadingSeparator, showSiteTitle, siteTitleOverride
 

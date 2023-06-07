@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
+	"__experimental": "fse",
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
-	"category": "design",
+	"category": "theme",
 	"description": "Displays breadcrumbs of a page's hierarchy, or a post's categories",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
