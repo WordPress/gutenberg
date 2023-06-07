@@ -115,7 +115,7 @@ export default function SidebarNavigationScreenLibrary() {
 											type="pattern"
 											isActive={
 												currentCategory ===
-													category.id &&
+													`${ category.id }` &&
 												currentType === 'pattern'
 											}
 										/>
