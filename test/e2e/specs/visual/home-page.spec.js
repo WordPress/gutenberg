@@ -10,6 +10,9 @@ test.describe.only( 'Home page', () => {
 
 	test.beforeEach( async ( { page } ) => {
 		await page.goto( '/' );
+		await page.addStyleTag( {
+			content: `body { font-family: -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell,"Helvetica Neue", sans-serif !important; }`,
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
