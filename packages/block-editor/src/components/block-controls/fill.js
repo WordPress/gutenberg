@@ -35,10 +35,11 @@ export default function BlockControlsFill( {
 	return (
 		<StyleProvider document={ document }>
 			<Fill>
-				{ ( fillProps = [] ) => {
-					// `fillProps` is an array of context provider entries, provided by slot,
+				{ ( fillProps ) => {
+					// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
 					// that should wrap the fill markup.
-					return fillProps.reduce(
+					const { forwardedContext = [] } = fillProps;
+					return forwardedContext.reduce(
 						( inner, [ Provider, props ] ) => (
 							<Provider { ...props }>{ inner }</Provider>
 						),

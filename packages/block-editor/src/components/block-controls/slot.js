@@ -22,10 +22,12 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	const toolbarState = useContext( ToolbarContext );
 	const contextState = useContext( ComponentsContext );
 	const fillProps = useMemo(
-		() => [
-			[ ToolbarContext.Provider, { value: toolbarState } ],
-			[ ComponentsContext.Provider, { value: contextState } ],
-		],
+		() => ( {
+			forwardedContext: [
+				[ ToolbarContext.Provider, { value: toolbarState } ],
+				[ ComponentsContext.Provider, { value: contextState } ],
+			],
+		} ),
 		[ toolbarState, contextState ]
 	);
 
