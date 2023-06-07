@@ -187,6 +187,8 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		}
 
 		$mapped_position = $property_mappings[ $position ];
+
+		// TODO: In the long run, we'd likely want some sort of registry for auto-inserted blocks.
 		if ( 'before' === $mapped_position || 'after' === $mapped_position ) {
 			$inserter = gutenberg_auto_insert_blocks( $mapped_position, array( 'blockName' => $metadata['name'] ) );
 			add_filter( "render_block_$block", $inserter, 10, 2 );
