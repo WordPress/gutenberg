@@ -369,7 +369,7 @@ function register_social_link_auto_insert_block_pattern() {
 			'title'       => __( 'Social Link Auto-insert block pattern' ),
 			'autoInsert'  => array( 'after' ),
 			'blockTypes'  => array( 'core/post-content' ),
-			'description' => _x( 'Automatically add a WordPress Social Link block to the end of your posts.', 'Block pattern description'),
+			'description' => _x( 'Automatically add a WordPress Social Link block to the end of your posts.', 'Block pattern description' ),
 			'categories'  => array( 'text' ),
 			'keywords'    => array( 'avatar', 'user', 'author', 'comment' ),
 			'content'     => '<!-- wp:social-links -->' .

@@ -107,7 +107,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @param array $parsed_block The block being rendered.
  */
 function gutenberg_auto_insert_child_block( $parsed_block ) {
-	$block_patterns  = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
+	$block_patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
 	foreach ( $block_patterns as $block_pattern ) {
 		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
@@ -135,8 +135,8 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 			continue;
 		}
 
-		$inserted_blocks   = parse_blocks( $block_pattern['content'] );
-		$inserted_block    = $inserted_blocks[0];
+		$inserted_blocks = parse_blocks( $block_pattern['content'] );
+		$inserted_block  = $inserted_blocks[0];
 
 		if ( 'firstChild' === $relative_position ) {
 			array_unshift( $parsed_block['innerBlocks'], $inserted_block );
@@ -164,7 +164,7 @@ add_filter( 'render_block_data', 'gutenberg_auto_insert_child_block', 10, 1 );
  * @param array  $block         The full block, including name and attributes.
  */
 function gutenberg_auto_insert_blocks( $block_content, $block ) {
-	$block_patterns  = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
+	$block_patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
 	foreach ( $block_patterns as $block_pattern ) {
 		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
@@ -192,8 +192,8 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 			continue;
 		}
 
-		$inserted_blocks   = parse_blocks( $block_pattern['content'] );
-		$inserted_content  = render_block( $inserted_blocks[0] );
+		$inserted_blocks  = parse_blocks( $block_pattern['content'] );
+		$inserted_content = render_block( $inserted_blocks[0] );
 
 		if ( 'before' === $relative_position ) {
 			$block_content = $inserted_content . $block_content;
