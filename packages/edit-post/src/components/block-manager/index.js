@@ -67,7 +67,6 @@ function BlockManager( {
 					<Button
 						variant="tertiary"
 						onClick={ () => enableAllBlockTypes( blockTypes ) }
-						label={ __( 'Enable all' ) }
 					>
 						{ __( 'Enable all' ) }
 					</Button>
