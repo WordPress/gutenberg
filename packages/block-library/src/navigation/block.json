@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/navigation",
 	"title": "Navigation",
 	"category": "theme",
@@ -134,7 +134,7 @@
 			}
 		}
 	},
-	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
+	"viewScript": "file:./interactivity.min.js",
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

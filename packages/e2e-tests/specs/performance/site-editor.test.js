@@ -151,7 +151,8 @@ describe( 'Site Editor Performance', () => {
 		await enterEditMode();
 
 		// Insert a new paragraph right under the first one.
-		await firstParagraph.focus();
+		await firstParagraph.click(); // Once to select the block overlay.
+		await firstParagraph.click(); // Once again to select the paragraph.
 		await insertBlock( 'Paragraph' );
 
 		// Start tracing.

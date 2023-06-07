@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import {
@@ -37,17 +37,9 @@ function useTemplateTitleAndDescription( postType, postId ) {
 	let descriptionText = getDescription();
 
 	if ( ! descriptionText && addedBy.text ) {
-		if ( record.type === 'wp_template' && record.is_custom ) {
-			descriptionText = __(
-				'This is a custom template that can be applied manually to any Post or Page.'
-			);
-		} else if ( record.type === 'wp_template_part' ) {
-			descriptionText = sprintf(
-				// translators: %s: template part title e.g: "Header".
-				__( 'This is your %s template part.' ),
-				getTitle()
-			);
-		}
+		descriptionText = __(
+			'This is a custom template that can be applied manually to any Post or Page.'
+		);
 	}
 
 	const description = (
@@ -74,9 +66,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 
 					{ addedBy.isCustomized && (
 						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
-							{ postType === 'wp_template'
-								? _x( '(Customized)', 'template' )
-								: _x( '(Customized)', 'template part' ) }
+							{ _x( '(Customized)', 'template' ) }
 						</span>
 					) }
 				</span>
@@ -102,7 +92,7 @@ export default function SidebarNavigationScreenTemplate() {
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
-				<div>
+				<>
 					<TemplateActions
 						postType={ postType }
 						postId={ postId }
@@ -116,7 +106,7 @@ export default function SidebarNavigationScreenTemplate() {
 						label={ __( 'Edit' ) }
 						icon={ pencil }
 					/>
-				</div>
+				</>
 			}
 			description={ description }
 		/>
