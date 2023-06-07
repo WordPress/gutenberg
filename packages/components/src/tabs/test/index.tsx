@@ -872,36 +872,38 @@ describe.each( [
 				/>
 			);
 
-			// onSelect gets called on the initial render.
+			// onSelect gets called on the initial render with the default
+			// selected tab.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 			// Click on Alpha and make sure it is selected.
+			// onSelect shouldn't fire since the selected tab didn't change.
 			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Navigate forward with arrow keys. Make sure Beta is focused, but
 			// that the tab selection happens only when pressing the spacebar
 			// or enter key.
 			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveFocus();
 
 			await user.keyboard( '[Enter]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 			// Navigate forward with arrow keys. Make sure Gamma (last tab) is
 			// focused, but that tab selection happens only when pressing the
 			// spacebar or enter key.
 			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect(
 				screen.getByRole( 'tab', { name: 'Gamma' } )
 			).toHaveFocus();
 
 			await user.keyboard( '[Space]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
 	} );
