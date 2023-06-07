@@ -65,7 +65,7 @@ function BlockManager( {
 						numberOfHiddenBlocks
 					) }
 					<Button
-						variant="secondary"
+						variant="tertiary"
 						onClick={ () => enableAllBlockTypes( blockTypes ) }
 						label={ __( 'Enable all' ) }
 					>
