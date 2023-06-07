@@ -20,7 +20,7 @@ import { useMemo } from '@wordpress/element';
 import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import SidebarCard from '../sidebar-card';
-import ContentBlocksList from './content-blocks-list';
+import PageContent from './page-content';
 
 export default function PagePanels() {
 	const context = useSelect(
@@ -62,7 +62,7 @@ export default function PagePanels() {
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>
-				<ContentBlocksList />
+				<PageContent />
 			</PanelBody>
 			<PanelBody title={ __( 'Template' ) }>
 				<VStack>
