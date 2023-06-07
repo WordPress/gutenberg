@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.19.0 (2023-06-07)
+
 ### Enhancement
 
 -   Enable the `bugfixes` option in `@babel/preset-env` to remove unneeded transpilation ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).

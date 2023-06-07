@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.1.0 (2023-06-07)
+
 ### Enhancements
 
 -   `BorderControl`: Improve color code readability in aria-label ([#51197](https://github.com/WordPress/gutenberg/pull/51197)).

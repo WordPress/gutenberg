@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.6.0 (2023-06-07)
+
 ### Enhancements
 
 -   The bundled `terser-webpack-plugin` dependency has been updated from requiring `^5.1.4` to requiring `^5.3.9` ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
