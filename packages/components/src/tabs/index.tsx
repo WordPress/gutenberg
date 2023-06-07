@@ -151,9 +151,12 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 	return (
 		<RadixTabs.Root
 			className={ className }
-			onValueChange={ ( value ) => onSelect?.( value ) }
+			value={ selectedTab?.name }
+			onValueChange={ ( value ) => {
+				setSelected( value );
+				return onSelect?.( value );
+			} }
 			orientation={ orientation }
-			defaultValue={ initialTabName }
 			activationMode={ selectOnMove ? 'automatic' : 'manual' }
 		>
 			<TabsList>
