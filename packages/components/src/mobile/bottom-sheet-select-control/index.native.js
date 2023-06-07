@@ -71,7 +71,7 @@ const BottomSheetSelectControl = ( {
 					) }
 					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }

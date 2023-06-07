@@ -11,6 +11,7 @@ const { execSync } = require( 'child_process' );
 /**
  * Internal dependencies
  */
+const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 const {
@@ -109,6 +110,10 @@ module.exports = function cli() {
 		// Populates '--' in the command options with arguments after the double dash.
 		'populate--': true,
 	} );
+
+	// Since we might be running a different CLI version than the one that was called
+	// we need to set the version manually from the correct package.json.
+	yargs.version( pkg.version );
 
 	yargs.command(
 		'start',

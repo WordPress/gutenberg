@@ -1,0 +1,39 @@
+.edit-site-template-card {
+	&__template-areas {
+		margin-top: $grid-unit-20;
+	}
+
+	&__template-areas-list {
+		margin: 0;
+
+		> li {
+			margin: 0;
+		}
+	}
+
+	&__template-areas-item {
+		width: 100%;
+
+		// Override the default padding.
+		&.components-button.has-icon {
+			padding: 0;
+		}
+	}
+
+	&__actions {
+		line-height: 0;
+		> .components-button.is-small.has-icon {
+			padding: 0;
+			min-width: auto;
+		}
+	}
+}
+
+.edit-site-template-revisions {
+	margin-left: math.div(-$grid-unit-10, 2);
+}
+
+h3.edit-site-template-card__template-areas-title {
+	font-weight: 500;
+	margin: 0 0 $grid-unit-10;
+}

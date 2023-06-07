@@ -89,6 +89,11 @@ store( {
 				roleAttribute: ( { context } ) => {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
+				imageSrc: ( { context } ) => {
+					return context.core.image.initialized
+						? context.core.image.imageSrc
+						: '';
+				},
 			},
 		},
 	},

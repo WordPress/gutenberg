@@ -275,7 +275,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
+			static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
 			// END OF EXPERIMENTAL CODE.
 
 		}

@@ -26,6 +26,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 import TouchableRipple from './ripple';
+import LockIcon from './lock-icon';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
@@ -93,6 +94,7 @@ class BottomSheetCell extends Component {
 			accessibilityRole,
 			disabled = false,
 			disabledStyle = styles.cellDisabled,
+			showLockIcon = true,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -374,6 +376,7 @@ class BottomSheetCell extends Component {
 									] }
 								>
 									<Icon
+										lock
 										icon={ icon }
 										size={ 24 }
 										fill={
@@ -440,6 +443,11 @@ class BottomSheetCell extends Component {
 					>
 						{ children }
 					</View>
+					{ disabled && showLockIcon && (
+						<View style={ styles.cellDisabled }>
+							<LockIcon />
+						</View>
+					) }
 				</View>
 				{ help && (
 					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>

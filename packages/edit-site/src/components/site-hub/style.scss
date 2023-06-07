@@ -3,6 +3,31 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: $grid-unit-10;
+
+	.edit-site-site-hub__container {
+		gap: 0;
+	}
+
+	.edit-site-site-hub__site-view-link {
+		flex-grow: 0;
+		@include break-mobile() {
+			opacity: 0;
+			transition: opacity 0.2s ease-in-out;
+		}
+		&:focus {
+			outline: none;
+			box-shadow: none;
+			opacity: 1;
+		}
+		svg {
+			fill: $white;
+		}
+	}
+	&:hover {
+		.edit-site-site-hub__site-view-link {
+			opacity: 1;
+		}
+	}
 }
 
 .edit-site-site-hub__post-type {
@@ -29,6 +54,7 @@
 
 .edit-site-site-hub__site-title {
 	margin-left: $grid-unit-05;
+	flex-grow: 1;
 }
 
 .edit-site-site-hub_toggle-command-center {
