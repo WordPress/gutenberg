@@ -171,6 +171,7 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 							tab.className,
 							{ [ activeClass ]: tab.name === selected }
 						) }
+						disabled={ tab.disabled }
 					>
 						{ tab.title }
 					</Tab>
