@@ -32,7 +32,10 @@ test.describe( 'Image', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'can be inserted', async ( { editor, imageBlockUtils } ) => {
+	test( 'can be inserted via image upload', async ( {
+		editor,
+		imageBlockUtils,
+	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -704,7 +707,7 @@ test.describe( 'Image', () => {
 		);
 	} );
 
-	test( 'should appear in the frontend published post content', async ( {
+	test( 'image inserted via upload should appear in the frontend published post content', async ( {
 		editor,
 		imageBlockUtils,
 		page,
@@ -739,10 +742,51 @@ test.describe( 'Image', () => {
 			new RegExp( filename )
 		);
 	} );
+
+	test( 'image inserted via link should appear in the frontend published post content', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlock
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'.block-editor-media-placeholder__url-input-form'
+		);
+
+		const imgUrl =
+			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute( 'src', imgUrl );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
+	} );
 } );
 
 test.describe( 'Image - interactivity', () => {
 	let filename = null;
+	let imageBlock = null;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
@@ -768,7 +812,7 @@ test.describe( 'Image - interactivity', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = editor.canvas.locator(
+		imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();
@@ -835,7 +879,7 @@ test.describe( 'Image - interactivity', () => {
 		expect( blocks[ 0 ].attributes.url ).toContain( filename );
 	} );
 
-	test( 'should open and close the image in a lightbox using the mouse', async ( {
+	test( 'should open and close the image in a lightbox when using a mouse and dynamically load src', async ( {
 		editor,
 		page,
 	} ) => {
@@ -849,10 +893,12 @@ test.describe( 'Image - interactivity', () => {
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
 		await expect( lightbox ).toBeHidden();
+		const image = lightbox.locator( 'img' );
+
+		await expect( image ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-		const image = lightbox.locator( 'img' );
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
 		await expect( lightbox ).toBeVisible();
@@ -863,6 +909,89 @@ test.describe( 'Image - interactivity', () => {
 		await closeButton.click();
 
 		await expect( lightbox ).toBeHidden();
+	} );
+
+	test( 'lightbox should be overriden when link is configured for image', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		const behaviorSelect = page.getByRole( 'combobox', {
+			name: 'Behaviors',
+		} );
+		await behaviorSelect.selectOption( 'lightbox' );
+
+		await imageBlock.click();
+		await page
+			.getByLabel( 'Block tools' )
+			.getByLabel( 'Insert link' )
+			.click();
+
+		const form = page.locator( '.block-editor-url-popover__link-editor' );
+
+		const url = 'https://wordpress.org';
+
+		await form.getByLabel( 'URL' ).fill( url );
+
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+		await expect( behaviorSelect ).toBeDisabled();
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		expect( await page.locator( '.wp-lightbox-overlay' ).count() ).toEqual(
+			0
+		);
+	} );
+
+	test( 'lightbox should work as expected when inserting image from URL', async ( {
+		editor,
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlockFromUrl = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlockFromUrl ).toBeVisible();
+
+		await imageBlockFromUrl
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'.block-editor-media-placeholder__url-input-form'
+		);
+
+		const imgUrl =
+			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const image = imageBlockFromUrl.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', imgUrl );
+
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const lightbox = page.locator( '.wp-lightbox-overlay' );
+		const imageDom = lightbox.locator( 'img' );
+		await expect( imageDom ).toHaveAttribute( 'src', '' );
+
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
+
+		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
 	} );
 
 	test.describe( 'keyboard navigation', () => {
