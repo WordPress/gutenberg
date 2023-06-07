@@ -133,8 +133,8 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends Gutenberg_REST_Block_
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'source'       => array(
-					'description' => __('Where the pattern comes from e.g. core', 'gutenberg' ),
+				'source'         => array(
+					'description' => __( 'Where the pattern comes from e.g. core', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
