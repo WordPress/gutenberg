@@ -39,8 +39,12 @@ function FontLibraryProvider( { children } ) {
 		'typography.fontFamilies'
 	);
 
-	const themeFonts = fontFamilies.theme || null;
-	const customFonts = fontFamilies.custom || null;
+	const themeFonts = fontFamilies.theme
+		? fontFamilies.theme.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		: null;
+	const customFonts = fontFamilies.custom
+		? fontFamilies.custom.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		: null;
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
@@ -70,13 +74,9 @@ function FontLibraryProvider( { children } ) {
 			themeFonts.map( ( f ) => ( {
 				...f,
 				source: 'theme',
-				...( ! f.name ? { name: f.fontFamily } : {} ),
 			} ) ) || [];
 		const fromLibrary = libraryFonts || [];
-
-		return [ ...fromTheme, ...fromLibrary ].sort( ( a, b ) =>
-			( a.name || a.slug ).localeCompare( b.name || b.slug )
-		);
+		return [ ...fromTheme, ...fromLibrary ];
 	}, [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
