@@ -205,6 +205,10 @@ _Returns_
 
 -   `WPComponent`: The component to be rendered.
 
+### BlockRemovalWarningModal
+
+Undocumented declaration.
+
 ### BlockSelectionClearer
 
 Undocumented declaration.

@@ -1319,6 +1319,17 @@ export function isRemovalPromptDisplayed( state ) {
 }
 
 /**
+ * Returns true if removal prompt exists, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether removal prompt exists.
+ */
+export function removalPromptExists( state ) {
+	return state.removalPromptExists;
+}
+
+/**
  * Returns the block's editing mode, defaulting to "visual" if not explicitly
  * assigned.
  *

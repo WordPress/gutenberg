@@ -15,6 +15,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	BlockRemovalWarningModal,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -188,7 +189,10 @@ export default function Editor( { isLoading } ) {
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal />
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&

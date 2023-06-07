@@ -9,7 +9,7 @@ import {
 import { __, _n } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-
+import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -24,10 +24,10 @@ const blockTypePromptMessages = {
 };
 
 export function useBlockRemovalWarning() {
-	const { getBlockName, getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockName, getBlockOrder, removalPromptExists } =
+		useSelect( blockEditorStore );
 	const { displayRemovalPrompt, removeBlocks } =
 		useDispatch( blockEditorStore );
-
 	function getBlocksToPromptFor( clientIds ) {
 		return clientIds.flatMap( ( clientId ) => {
 			const found = [];
@@ -43,7 +43,7 @@ export function useBlockRemovalWarning() {
 	return ( clientIds, selectPrevious = true ) => {
 		const blocksToPromptFor = getBlocksToPromptFor( clientIds );
 
-		if ( blocksToPromptFor.length ) {
+		if ( blocksToPromptFor.length && removalPromptExists() ) {
 			displayRemovalPrompt( true, {
 				removalFunction: () => {
 					removeBlocks( clientIds, selectPrevious );
@@ -61,7 +61,13 @@ export function BlockRemovalWarningModal() {
 		select( blockEditorStore ).isRemovalPromptDisplayed()
 	);
 
-	const { displayRemovalPrompt } = useDispatch( blockEditorStore );
+	const { displayRemovalPrompt, removalPromptExists } =
+		useDispatch( blockEditorStore );
+
+	// Signalling the removal prompt is in place.
+	useEffect( () => {
+		removalPromptExists();
+	}, [] );
 
 	const { getBlockType } = useSelect( blocksStore );
 

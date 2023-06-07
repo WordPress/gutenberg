@@ -40,7 +40,6 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
-import { BlockRemovalWarningModal } from '../../utils/show-block-removal-warning';
 
 const elementContext = createContext();
 
@@ -116,14 +115,11 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 	return (
-		<>
-			<elementContext.Provider value={ element }>
-				<IntersectionObserver.Provider value={ intersectionObserver }>
-					<div { ...innerBlocksProps } />
-				</IntersectionObserver.Provider>
-			</elementContext.Provider>
-			<BlockRemovalWarningModal />
-		</>
+		<elementContext.Provider value={ element }>
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				<div { ...innerBlocksProps } />
+			</IntersectionObserver.Provider>
+		</elementContext.Provider>
 	);
 }
 

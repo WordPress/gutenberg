@@ -1256,6 +1256,18 @@ export function displayRemovalPrompt( displayPrompt, options = {} ) {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that a removal prompt display mechanism is available.
+ *
+ * @return {Object} Action object.
+ */
+
+export function removalPromptExists() {
+	return {
+		type: 'PROMPT_EXISTS',
+	};
+}
+
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the

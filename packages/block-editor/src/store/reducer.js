@@ -1491,6 +1491,23 @@ export function isRemovalPromptDisplayed( state = false, action ) {
 }
 
 /**
+ * Reducer prompt availability state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function removalPromptExists( state = false, action ) {
+	switch ( action.type ) {
+		case 'PROMPT_EXISTS':
+			return true;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
@@ -1903,6 +1920,7 @@ const combinedReducers = combineReducers( {
 	blockVisibility,
 	blockEditingModes,
 	isRemovalPromptDisplayed,
+	removalPromptExists,
 } );
 
 function withAutomaticChangeReset( reducer ) {
