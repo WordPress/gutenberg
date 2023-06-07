@@ -57,7 +57,7 @@ function useTemplateDetails( postType, postId ) {
 	let footer = null;
 	if ( !! record?.modified ) {
 		footer = (
-			<SidebarNavigationScreenDetailsPanelRow>
+			<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-page__footer">
 				<SidebarNavigationScreenDetailsPanelLabel>
 					{ __( 'Last modified' ) }
 				</SidebarNavigationScreenDetailsPanelLabel>
