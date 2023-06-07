@@ -60,7 +60,9 @@ window.addEventListener( 'DOMContentLoaded', () => {
 		searchButton.addEventListener( 'keydown', ( e ) => {
 			hideSearchField( e );
 		} );
-		searchLabel.addEventListener( 'click', handleButtonClick );
+		if ( searchLabel ) {
+			searchLabel.addEventListener( 'click', handleButtonClick );
+		}
 		document.body.addEventListener( 'click', hideSearchField );
 	} );
 } );
