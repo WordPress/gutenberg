@@ -29,12 +29,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Reusable blocks' ) }>
+		<InserterPanel title={ __( 'Local Patterns' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Reusable blocks' ) }
+				label={ __( 'Local Patterns' ) }
 			/>
 		</InserterPanel>
 	);
@@ -67,7 +67,7 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 						post_type: 'wp_block',
 					} ) }
 				>
-					{ __( 'Manage Reusable blocks' ) }
+					{ __( 'Manage Local Patterns' ) }
 				</Button>
 			</div>
 		</>

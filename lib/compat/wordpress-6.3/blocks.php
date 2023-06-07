@@ -40,8 +40,25 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to
  * @return array Register post type args.
  */
 function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
-
 	if ( 'wp_block' === $post_type ) {
+		$args['labels']['name']                     = _x( 'Patterns', 'post type general name' );
+		$args['labels']['singular_name']            = _x( 'Pattern', 'post type singular name' );
+		$args['labels']['add_new_item']             = __( 'Add new Pattern' );
+		$args['labels']['new_item']                 = __( 'New Pattern' );
+		$args['labels']['edit_item']                = __( 'Edit Pattern' );
+		$args['labels']['view_item']                = __( 'View Pattern' );
+		$args['labels']['all_items']                = __( 'All Patterns' );
+		$args['labels']['search_items']             = __( 'Search Patterns' );
+		$args['labels']['not_found']                = __( 'No Patterns found.' );
+		$args['labels']['not_found_in_trash']       = __( 'No Patterns found in Trash.' );
+		$args['labels']['filter_items_list']        = __( 'Filter Patterns list' );
+		$args['labels']['items_list_navigation']    = __( 'Patterns list navigation' );
+		$args['labels']['items_list']               = __( 'Patterns list' );
+		$args['labels']['item_published']           = __( 'Pattern published.' );
+		$args['labels']['item_published_privately'] = __( 'Pattern published privately.' );
+		$args['labels']['item_reverted_to_draft']   = __( 'Pattern reverted to draft.' );
+		$args['labels']['item_scheduled']           = __( 'Pattern scheduled.' );
+		$args['labels']['item_updated']             = __( 'Pattern updated.' );
 		array_push( $args['supports'], 'custom-fields' );
 	}
 
