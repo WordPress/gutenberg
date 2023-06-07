@@ -65,10 +65,10 @@ function BlockManager( {
 						numberOfHiddenBlocks
 					) }
 					<Button
-						variant="tertiary"
+						variant="link"
 						onClick={ () => enableAllBlockTypes( blockTypes ) }
 					>
-						{ __( 'Enable all' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</div>
 			) }
