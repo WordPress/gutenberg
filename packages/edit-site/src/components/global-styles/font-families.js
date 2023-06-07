@@ -10,7 +10,6 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { plus, typography } from '@wordpress/icons';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -20,16 +19,13 @@ import FontLibraryProvider, { FontLibraryContext } from './font-library-modal/co
 import FontLibraryModal from './font-library-modal';
 import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
-import { unlock } from '../../private-apis';
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOepn, toggleModal  } = useContext( FontLibraryContext );
-	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const { modalTabOepn, toggleModal, themeFonts, customFonts  } = useContext( FontLibraryContext );
 
-	const fonts = Array.isArray( fontFamilies?.custom )
-		? fontFamilies?.custom
-		: fontFamilies?.theme || [];
+	const fonts = Array.isArray( customFonts )
+		? customFonts
+		: themeFonts || [];
 
 	return (
 		<>
