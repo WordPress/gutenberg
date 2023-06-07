@@ -81,6 +81,12 @@ export default function QueryInspectorControls( props ) {
 		if ( newValue !== 'post' ) {
 			updateQuery.sticky = '';
 		}
+
+		// We need to reset `orderBy` and `order` to their default values if `orderBy` is set to `menu_order` because only pages support this ordering by default
+		if ( orderBy === 'menu_order' && newValue !== 'page' ) {
+			updateQuery.orderBy = 'date';
+			updateQuery.order = 'desc';
+		}
 		// We need to reset `parents` because they are tied to each post type.
 		updateQuery.parents = [];
 		setQuery( updateQuery );
@@ -190,7 +196,7 @@ export default function QueryInspectorControls( props ) {
 						) }
 						{ showOrderControl && (
 							<OrderControl
-								{ ...{ order, orderBy } }
+								{ ...{ order, orderBy, postType } }
 								onChange={ setQuery }
 							/>
 						) }
