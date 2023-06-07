@@ -6,6 +6,7 @@ import 'react-native-get-random-values';
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 import 'react-native-url-polyfill/auto';
+import EventSource from 'react-native-sse';
 
 /**
  * Babel polyfills
@@ -69,3 +70,6 @@ global.window.navigator.userAgent = global.window.navigator.userAgent ?? '';
 
 // Leverages existing console polyfill from react-native.
 global.nativeLoggingHook = nativeLoggingHook;
+
+// Use Server-Sent Events
+global.EventSource = EventSource;
