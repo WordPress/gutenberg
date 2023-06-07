@@ -170,3 +170,14 @@ export async function loadBlocksFromHtml( page, filepath ) {
 		dispatch( 'core/block-editor' ).resetBlocks( blocks );
 	}, readFile( filepath ) );
 }
+
+export async function load1000Paragraphs( page ) {
+	await page.evaluate( () => {
+		const { createBlock } = window.wp.blocks;
+		const { dispatch } = window.wp.data;
+		const blocks = Array.from( { length: 1000 } ).map( () =>
+			createBlock( 'core/paragraph' )
+		);
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	} );
+}
