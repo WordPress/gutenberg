@@ -120,7 +120,7 @@ function gutenberg_auto_insert_child_block( $parsed_block ) {
 			continue;
 		}
 
-		// Determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert.
+		// Determine index of anchor block in $block_pattern['blockTypes'] and use it to look up matching relative position.
 		if ( is_array( $block_pattern['autoInsert'] ) ) {
 			$index = $index % count( $block_pattern['autoInsert'] ); // Wrap around in case the array is too short.
 			if ( isset( $block_pattern['autoInsert'][ $index ] ) ) {
@@ -177,7 +177,7 @@ function gutenberg_auto_insert_blocks( $block_content, $block ) {
 			continue;
 		}
 
-		// Determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert.
+		// Determine index of anchor block in $block_pattern['blockTypes'] and use it to look up matching relative position.
 		if ( is_array( $block_pattern['autoInsert'] ) ) {
 			$index = $index % count( $block_pattern['autoInsert'] ); // Wrap around in case the array is too short.
 			if ( isset( $block_pattern['autoInsert'][ $index ] ) ) {
