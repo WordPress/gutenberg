@@ -95,6 +95,15 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	$inner_markup = '';
 
+	/**
+	 * Filters the list of breadcrumb links within the Breadcrumbs block render callback.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array[] An array of Breadcrumb arrays with `url` and `title` keys.
+	 */
+	$breadcrumbs = apply_filters( 'block_core_breadcrumbs_links', $breadcrumbs );
+
 	foreach ( $breadcrumbs as $index => $breadcrumb ) {
 		$show_separator = $index < count( $breadcrumbs ) - 1;
 		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
