@@ -3,12 +3,6 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-/**
- * External dependencies
- */
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-
 test.describe( 'data-wp-bind', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -24,20 +18,15 @@ test.describe( 'data-wp-bind', () => {
 		);
 	} );
 
-	let postId = '';
+	let postId: number | null;
 
 	test.beforeEach( async ( { admin, editor, page } ) => {
 		// We only need to publish a new post the first time. Subsequent tests
 		// will access to the same post.
 		if ( ! postId ) {
 			await admin.createNewPost();
-			await editor.setContent(
-				await readFile(
-					join( __dirname, './html/directive-bind.html' ),
-					'utf8'
-				)
-			);
-			postId = `${ await editor.publishPost() }`;
+			await editor.insertBlock( { name: 'test/directive-bind' } );
+			postId = await editor.publishPost();
 		}
 		await page.goto( `/?p=${ postId }` );
 	} );
