@@ -166,6 +166,10 @@ function GoogleFonts() {
 		setNewFonts( fontsToAdd );
 	};
 
+	const capitalize = ( str ) => {
+		return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+	};
+
 	const Footer = () => {
 		return (
 			<HStack justify="flex-end">
@@ -212,7 +216,7 @@ function GoogleFonts() {
 							{ googleFontsCategories &&
 								googleFontsCategories.map( ( category ) => (
 									<option value={ category }>
-										{ category }
+										{ capitalize( category ) }
 									</option>
 								) ) }
 						</SelectControl>

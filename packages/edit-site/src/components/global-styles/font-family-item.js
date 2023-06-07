@@ -30,7 +30,7 @@ function FontFamilyItem ({ font }) {
                 <FlexItem
                     style={ { fontFamily: font.fontFamily } }
                 >
-                    { font.name || font.fontFamily }
+                    { font.name }
                 </FlexItem>
                 <FlexItem
                     style={ { color: "#9e9e9e" } }

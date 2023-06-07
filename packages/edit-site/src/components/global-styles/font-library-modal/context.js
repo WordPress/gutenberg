@@ -1,9 +1,5 @@
 /**
  * WordPress dependencies
- *
- */
-/**
- * WordPress dependencies
  */
 import {
 	createContext,
@@ -16,10 +12,6 @@ import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
- *
- */
-/**
- * Internal dependencies
  */
 import {
 	fetchFontLibrary,
@@ -30,6 +22,7 @@ import {
 import { unlock } from '../../../private-apis';
 import { DEFAULT_DEMO_CONFIG } from './constants';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+import { setFallbackValues } from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -40,10 +33,14 @@ function FontLibraryProvider( { children } ) {
 	);
 
 	const themeFonts = fontFamilies.theme
-		? fontFamilies.theme.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		? fontFamilies.theme
+			.map( setFallbackValues )
+			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
 		: null;
 	const customFonts = fontFamilies.custom
-		? fontFamilies.custom.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		? fontFamilies.custom
+			.map( setFallbackValues )
+			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
 		: null;
 
 	// Library Fonts
