@@ -840,10 +840,10 @@ test.describe( 'Image - interactivity', () => {
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
 		await expect( lightbox ).toBeHidden();
 
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
+
 		const image = lightbox.locator( 'img' );
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-
-		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
 		await expect( lightbox ).toBeVisible();
 

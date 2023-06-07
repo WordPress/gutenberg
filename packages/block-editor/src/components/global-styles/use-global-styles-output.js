@@ -22,7 +22,10 @@ import { getCSSRules } from '@wordpress/style-engine';
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
@@ -396,21 +399,9 @@ export function getStylesDeclarations(
 			 * Values that already have a "clamp()" function will not pass the test,
 			 * and therefore the original $value will be returned.
 			 */
-			const typographySettings =
-				!! tree?.settings?.typography?.fluid &&
-				tree?.settings?.layout?.wideSize
-					? {
-							fluid: {
-								maxViewPortWidth: tree.settings.layout.wideSize,
-								...tree.settings.typography.fluid,
-							},
-					  }
-					: {
-							fluid: tree?.settings?.typography?.fluid,
-					  };
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				typographySettings
+				getFluidTypographyOptionsFromSettings( tree?.settings )
 			);
 		}
 

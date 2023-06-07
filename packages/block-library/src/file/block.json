@@ -67,7 +67,7 @@
 			}
 		}
 	},
-	"viewScript": "file:./view.min.js",
+	"viewScript": "file:./interactivity.min.js",
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
 }
