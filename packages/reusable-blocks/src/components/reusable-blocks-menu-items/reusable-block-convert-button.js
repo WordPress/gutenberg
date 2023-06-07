@@ -15,6 +15,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -48,7 +49,7 @@ export default function ReusableBlockConvertButton( {
 	);
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ blockType, setBlockType ] = useState( 'reusable' );
+	const [ syncType, setSyncType ] = useState( 'fully' );
 	const [ title, setTitle ] = useState( '' );
 	const [ categoryId, setCategoryId ] = useState( '' );
 	const { canConvert } = useSelect(
@@ -105,16 +106,16 @@ export default function ReusableBlockConvertButton( {
 				await convertBlocksToReusable(
 					clientIds,
 					reusableBlockTitle,
-					blockType,
+					syncType,
 					categoryId
 				);
 				createSuccessNotice(
 					sprintf(
 						// translators: %s: Type of block (i.e. Reusable or Pattern).
 						__( '%s created.' ),
-						blockType === 'reusable'
-							? __( 'Reusable block' )
-							: __( 'Pattern' )
+						syncType === 'synced'
+							? __( 'Synced Pattern' )
+							: __( 'Unsynced Pattern' )
 					),
 					{
 						type: 'snackbar',
@@ -129,7 +130,7 @@ export default function ReusableBlockConvertButton( {
 		[
 			convertBlocksToReusable,
 			clientIds,
-			blockType,
+			syncType,
 			categoryId,
 			createSuccessNotice,
 			createErrorNotice,
@@ -156,16 +157,6 @@ export default function ReusableBlockConvertButton( {
 					<MenuItem
 						icon={ symbol }
 						onClick={ () => {
-							setBlockType( 'reusable' );
-							setIsModalOpen( true );
-						} }
-					>
-						{ __( 'Create Reusable block' ) }
-					</MenuItem>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => {
-							setBlockType( 'pattern' );
 							setIsModalOpen( true );
 						} }
 					>
@@ -173,13 +164,7 @@ export default function ReusableBlockConvertButton( {
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ sprintf(
-								// translators: %s: Type of block (i.e. Reusable or Pattern).
-								__( 'Create %s' ),
-								blockType === 'reusable'
-									? __( 'Reusable block' )
-									: __( 'Pattern' )
-							) }
+							title={ __( 'CreatePattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -202,15 +187,30 @@ export default function ReusableBlockConvertButton( {
 										value={ title }
 										onChange={ setTitle }
 									/>
-									{ blockType === 'pattern' && (
-										<SelectControl
-											label={ __( 'Category' ) }
-											onChange={ setCategoryId }
-											options={ categoryOptions }
-											size="__unstable-large"
-											value={ categoryId }
-										/>
-									) }
+									<SelectControl
+										label={ __( 'Category' ) }
+										onChange={ setCategoryId }
+										options={ categoryOptions }
+										size="__unstable-large"
+										value={ categoryId }
+									/>
+
+									<ToggleControl
+										label="Synced"
+										help={
+											syncType === 'fully'
+												? __( 'Content is synced.' )
+												: __( 'Content is not synced.' )
+										}
+										checked={ syncType === 'fully' }
+										onChange={ () => {
+											setSyncType(
+												syncType === 'fully'
+													? 'unsynced'
+													: 'fully'
+											);
+										} }
+									/>
 									<HStack justify="right">
 										<Button
 											variant="tertiary"

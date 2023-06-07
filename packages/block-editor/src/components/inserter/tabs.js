@@ -14,12 +14,12 @@ const blocksTab = {
 const patternsTab = {
 	name: 'patterns',
 	/* translators: Patterns tab title in the block inserter. */
-	title: __( 'Patterns' ),
+	title: __( 'Imported Patterns' ),
 };
 const reusableBlocksTab = {
 	name: 'reusable',
 	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+	title: __( 'Local Patterns' ),
 	icon: reusableBlockIcon,
 };
 const mediaTab = {
@@ -45,11 +45,11 @@ function InserterTabs( {
 		if ( ! prioritizePatterns && showPatterns ) {
 			tempTabs.push( patternsTab );
 		}
-		if ( showMedia ) {
-			tempTabs.push( mediaTab );
-		}
 		if ( showReusableBlocks ) {
 			tempTabs.push( reusableBlocksTab );
+		}
+		if ( showMedia ) {
+			tempTabs.push( mediaTab );
 		}
 		return tempTabs;
 	}, [ prioritizePatterns, showPatterns, showReusableBlocks, showMedia ] );

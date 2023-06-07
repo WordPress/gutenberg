@@ -44,25 +44,25 @@ export const __experimentalConvertBlockToStatic =
  *
  * @param {string[]} clientIds  The client IDs of the block to detach.
  * @param {string}   title      Reusable block title.
- * @param {string}   blockType  They type of block being created, reusable or pattern.
+ * @param {string}   syncType   They way block is synced, current 'fully' and 'unSynced'.
  * @param {string}   categoryId The category of pattern being created.
  */
 export const __experimentalConvertBlocksToReusable =
-	( clientIds, title, blockType, categoryId ) =>
+	( clientIds, title, syncType, categoryId ) =>
 	async ( { registry, dispatch } ) => {
 		let meta;
 		let categories;
-		if ( blockType === 'pattern' ) {
+		if ( syncType === 'unsynced' ) {
 			meta = {
 				wp_block: {
-					sync_status: 'notSynced',
+					sync_status: 'unsynced',
 				},
 			};
 			categories = [ categoryId ];
 		}
 
 		const reusableBlock = {
-			title: title || __( 'Untitled Reusable block' ),
+			title: title || __( 'Untitled Pattern block' ),
 			content: serialize(
 				registry
 					.select( blockEditorStore )
@@ -77,7 +77,7 @@ export const __experimentalConvertBlocksToReusable =
 			.dispatch( 'core' )
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
 
-		if ( blockType === 'pattern' ) {
+		if ( syncType === 'unsynced' ) {
 			return;
 		}
 
