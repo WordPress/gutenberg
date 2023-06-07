@@ -155,7 +155,7 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef );
+	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
@@ -515,6 +515,10 @@ export default function Image( {
 			: naturalHeight;
 	}
 
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback om clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
@@ -522,7 +526,7 @@ export default function Image( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
+				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) =>
