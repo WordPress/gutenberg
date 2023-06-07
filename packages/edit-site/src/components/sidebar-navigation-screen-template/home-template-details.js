@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { debounce } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	CheckboxControl,
 	__experimentalUseNavigator as useNavigator,
 	Button,
 	Icon,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { header, footer, layout, chevronRightSmall } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,9 +58,10 @@ export default function HomeTemplateDetails() {
 	const {
 		params: { postType, postId },
 	} = navigator;
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const {
-		commentOrder,
+		allowCommentsOnNewPosts,
 		templatePartAreas,
 		isHomePageBlog,
 		postsPerPage,
@@ -82,16 +85,25 @@ export default function HomeTemplateDetails() {
 				isHomePageBlog:
 					siteSettings?.page_for_posts ===
 					siteSettings?.page_on_front,
+				allowCommentsOnNewPosts:
+					siteSettings?.default_comment_status === 'open',
 				siteTitle: siteSettings?.title,
 				postsPerPage: siteSettings?.posts_per_page,
-				commentOrder:
-					siteEditorSettings?.__experimentalDiscussionSettings
-						?.commentOrder,
 				templatePartAreas: siteEditorSettings?.defaultTemplatePartAreas,
 			};
 		},
 		[ postType, postId ]
 	);
+
+	const [ commentsOnNewPosts, setCommentsOnNewPosts ] = useState( null );
+	const [ postsCount, setPostsCount ] = useState( '' );
+	const [ siteTitleValue, setSiteTitleValue ] = useState( '' );
+
+	useEffect( () => {
+		setCommentsOnNewPosts( allowCommentsOnNewPosts );
+		setSiteTitleValue( siteTitle );
+		setPostsCount( postsPerPage );
+	}, [ siteTitle, allowCommentsOnNewPosts, postsPerPage ] );
 
 	const templateAreas = useMemo( () => {
 		return templateRecord?.blocks && templatePartAreas
@@ -111,7 +123,26 @@ export default function HomeTemplateDetails() {
 			: [];
 	}, [ templateRecord?.blocks, templatePartAreas ] );
 
-	const noop = () => {};
+	const setAllowCommentsOnNewPosts = ( newValue ) => {
+		setCommentsOnNewPosts( newValue );
+		editEntityRecord( 'root', 'site', undefined, {
+			default_comment_status: newValue ? 'open' : null,
+		} );
+	};
+
+	const setSiteTitle = ( newValue ) => {
+		setSiteTitleValue( newValue );
+		editEntityRecord( 'root', 'site', undefined, {
+			title: newValue,
+		} );
+	};
+
+	const setPostsPerPage = ( newValue ) => {
+		setPostsCount( newValue );
+		editEntityRecord( 'root', 'site', undefined, {
+			posts_per_page: newValue,
+		} );
+	};
 
 	return (
 		<>
@@ -122,7 +153,13 @@ export default function HomeTemplateDetails() {
 							{ __( 'Posts per page' ) }
 						</SidebarNavigationScreenDetailsPanelLabel>
 						<SidebarNavigationScreenDetailsPanelValue>
-							{ postsPerPage }
+							<InputControl
+								className="edit-site-sidebar-navigation-screen__input-control"
+								placeholder={ 0 }
+								value={ postsCount }
+								type="number"
+								onChange={ debounce( setPostsPerPage, 300 ) }
+							/>
 						</SidebarNavigationScreenDetailsPanelValue>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) }
@@ -131,7 +168,12 @@ export default function HomeTemplateDetails() {
 						{ __( 'Blog title' ) }
 					</SidebarNavigationScreenDetailsPanelLabel>
 					<SidebarNavigationScreenDetailsPanelValue>
-						{ siteTitle }
+						<InputControl
+							className="edit-site-sidebar-navigation-screen__input-control"
+							placeholder={ __( 'No Title' ) }
+							value={ siteTitleValue }
+							onChange={ debounce( setSiteTitle, 300 ) }
+						/>
 					</SidebarNavigationScreenDetailsPanelValue>
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
@@ -141,25 +183,9 @@ export default function HomeTemplateDetails() {
 					<CheckboxControl
 						label="Allow comments on new posts"
 						help="Individual posts may override these settings. Changes here will only be applied to new posts."
-						checked={ true }
-						onChange={ noop }
+						checked={ commentsOnNewPosts }
+						onChange={ debounce( setAllowCommentsOnNewPosts, 300 ) }
 					/>
-				</SidebarNavigationScreenDetailsPanelRow>
-				<SidebarNavigationScreenDetailsPanelRow>
-					<CheckboxControl
-						label="Allow guest comments"
-						help="Users do not have to be registered and logged in to comment."
-						checked={ true }
-						onChange={ noop }
-					/>
-				</SidebarNavigationScreenDetailsPanelRow>
-				<SidebarNavigationScreenDetailsPanelRow>
-					<SidebarNavigationScreenDetailsPanelLabel>
-						{ __( 'Comment order' ) }
-					</SidebarNavigationScreenDetailsPanelLabel>
-					<SidebarNavigationScreenDetailsPanelValue>
-						{ commentOrder }
-					</SidebarNavigationScreenDetailsPanelValue>
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Areas' ) }>
