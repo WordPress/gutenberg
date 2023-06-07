@@ -148,3 +148,22 @@ function register_block_core_avatar() {
 	);
 }
 add_action( 'init', 'register_block_core_avatar' );
+
+/**
+ * Registers the `core/avatar` auto-insert block pattern.
+ */
+function register_avatar_auto_insert_block_pattern() {
+	register_block_pattern(
+		'core/avatar-auto-insert',
+		array(
+			'title'       => __( 'Avatar Auto-insert block pattern' ),
+			'autoInsert'  => 'lastChild',
+			'blockTypes'  => array( 'core/comment-template' ),
+			'description' => _x( 'Display an avatar of a user, author, or comment.', 'Block pattern description' ),
+			'categories'  => array( 'text' ),
+			'keywords'    => array( 'avatar', 'user', 'author', 'comment' ),
+			'content'     => '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->',
+		)
+	);
+}
+add_action( 'init', 'register_avatar_auto_insert_block_pattern', 100 );

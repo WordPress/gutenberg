@@ -107,39 +107,42 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @param array $parsed_block The block being rendered.
  */
 function gutenberg_auto_insert_child_block( $parsed_block ) {
-	// TODO: Implement an API for users to set the following two parameters.
-	$block_name     = 'core/comment-template';
-	$block_position = 'last-child';
+	$block_patterns  = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
 
-	if ( $block_name !== $parsed_block['blockName'] ) {
-		return $parsed_block;
-	}
+	foreach ( $block_patterns as $block_pattern ) {
+		if ( ! isset( $block_pattern['autoInsert'] ) || ! isset( $block_pattern['blockTypes'] ) ) {
+			continue;
+		}
 
-	// parse_blocks( '<!-- wp:avatar {"size":40,"style":{"border":{"radius":"10px"}}} /-->' )[0].
-	$inserted_block = array(
-		'blockName'    => 'core/avatar',
-		'attrs'        => array(
-			'size'  => 40,
-			'style' => array(
-				'border' => array( 'radius' => '10px' ),
-			),
-		),
-		'innerHTML'    => '',
-		'innerContent' => array(),
-	);
+		// Is the current block listed among possible anchor blocks for the block pattern?
+		if ( ! in_array( $parsed_block['blockName'], $block_pattern['blockTypes'], true ) ) {
+			continue;
+		}
 
-	if ( 'first-child' === $block_position ) {
-		array_unshift( $parsed_block['innerBlocks'], $inserted_block );
-		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-		// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-		// location) to that array.
-		array_unshift( $parsed_block['innerContent'], null );
-	} elseif ( 'last-child' === $block_position ) {
-		array_push( $parsed_block['innerBlocks'], $inserted_block );
-		// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-		// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-		// location) to that array.
-		array_push( $parsed_block['innerContent'], null );
+		// TODO: Maybe determine index of $parsed_block['blockName'] in $block_pattern['blockTypes'] and use it to look for matching autoInsert?
+
+		// Is the relative position of the block pattern set to first or last child?
+		if ( 'firstChild' !== $block_pattern['autoInsert'] && 'lastChild' !== $block_pattern['autoInsert'] ) {
+			continue;
+		}
+
+		$relative_position = $block_pattern['autoInsert'];
+		$inserted_blocks   = parse_blocks( $block_pattern['content'] );
+		$inserted_block    = $inserted_blocks[0];
+
+		if ( 'firstChild' === $relative_position ) {
+			array_unshift( $parsed_block['innerBlocks'], $inserted_block );
+			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+			// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+			// location) to that array.
+			array_unshift( $parsed_block['innerContent'], null );
+		} elseif ( 'lastChild' === $relative_position ) {
+			array_push( $parsed_block['innerBlocks'], $inserted_block );
+			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+			// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+			// location) to that array.
+			array_push( $parsed_block['innerContent'], null );
+		}
 	}
 
 	return $parsed_block;
