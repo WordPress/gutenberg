@@ -4,6 +4,7 @@
 import { Popover } from '@wordpress/components';
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 export default function ListViewDropIndicator( {
 	listViewRef,
@@ -55,7 +56,9 @@ export default function ListViewDropIndicator( {
 			);
 			const rootBlockIconRect =
 				rootBlockIconElement.getBoundingClientRect();
-			return rootBlockIconRect.right - targetElementRect.left;
+			return isRTL()
+				? targetElementRect.right - rootBlockIconRect.left
+				: rootBlockIconRect.right - targetElementRect.left;
 		},
 		[ rootBlockElement ]
 	);
@@ -80,14 +83,23 @@ export default function ListViewDropIndicator( {
 				'horizontal'
 			);
 
-			if ( scrollContainer ) {
+			const ownerDocument = targetElement.ownerDocument;
+			const windowScroll =
+				scrollContainer === ownerDocument.body ||
+				scrollContainer === ownerDocument.documentElement;
+
+			if ( scrollContainer && ! windowScroll ) {
 				const scrollContainerRect =
 					scrollContainer.getBoundingClientRect();
+
+				const distanceBetweenContainerAndTarget = isRTL()
+					? scrollContainerRect.right - targetElementRect.right
+					: targetElementRect.left - scrollContainerRect.left;
 
 				if ( scrollContainer.clientWidth < width ) {
 					width =
 						scrollContainer.clientWidth -
-						( targetElementRect.left - scrollContainerRect.left );
+						distanceBetweenContainerAndTarget;
 				}
 			}
 
@@ -119,14 +131,55 @@ export default function ListViewDropIndicator( {
 			return undefined;
 		}
 
+		const rtl = isRTL();
+		const ownerDocument = targetElement.ownerDocument;
+
 		return {
-			ownerDocument: targetElement.ownerDocument,
+			ownerDocument,
 			getBoundingClientRect() {
 				const rect = targetElement.getBoundingClientRect();
 				const indent = getDropIndicatorIndent( rect );
-				const left = rect.left + indent;
+				// In RTL languages, the drop indicator should be positioned
+				// to the left of the target element, with the width of the
+				// indicator determining the indent at the right edge of the
+				// target element. In LTR languages, the drop indicator should
+				// end at the right edge of the target element, with the indent
+				// added to the position of the left edge of the target element.
+				let left = rtl ? rect.left : rect.left + indent;
 				let top = 0;
 				let bottom = 0;
+
+				if ( rtl ) {
+					// In deeply nested lists, where a scrollbar is present,
+					// the width of the drop indicator should be the width of
+					// the visible area of the scroll container. In RTL languages,
+					// the left edge of the drop indicator line needs to be
+					// offset by the distance the left edge of the target element
+					// and the left edge of the scroll container.
+					const scrollContainer = getScrollContainer(
+						targetElement,
+						'horizontal'
+					);
+
+					const windowScroll =
+						scrollContainer === ownerDocument.body ||
+						scrollContainer === ownerDocument.documentElement;
+
+					// If the scroll container is not the window, offset the left position.
+					if ( scrollContainer && ! windowScroll ) {
+						const scrollContainerRect =
+							scrollContainer.getBoundingClientRect();
+
+						const leftEdgeDifference =
+							rect.left - scrollContainerRect.left;
+
+						const scrollbarWidth =
+							scrollContainer.offsetWidth -
+							scrollContainer.clientWidth;
+
+						left = left - leftEdgeDifference + scrollbarWidth;
+					}
+				}
 
 				if ( dropPosition === 'top' ) {
 					top = rect.top;
