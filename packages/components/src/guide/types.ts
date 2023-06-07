@@ -50,6 +50,12 @@ export type GuideProps = {
 	 * @default []
 	 */
 	pages?: Page[];
+	/**
+	 * Used to control if the component re-focuses on the page content when the page changes.
+	 *
+	 * @default true
+	 */
+	focusOnPageChange?: boolean;
 };
 
 export type PageControlProps = {

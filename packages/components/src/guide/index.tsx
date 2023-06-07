@@ -58,6 +58,7 @@ function Guide( {
 	finishButtonText = __( 'Finish' ),
 	onFinish,
 	pages = [],
+	focusOnPageChange = true,
 }: GuideProps ) {
 	const guideContainer = useRef< HTMLDivElement >( null );
 	const [ currentPage, setCurrentPage ] = useState( 0 );
@@ -74,12 +75,12 @@ function Guide( {
 	useEffect( () => {
 		// Each time we change the current page, start from the first element of the page.
 		// This also solves any focus loss that can happen.
-		if ( guideContainer.current ) {
+		if ( guideContainer.current && focusOnPageChange ) {
 			(
 				focus.tabbable.find( guideContainer.current ) as HTMLElement[]
 			 )[ 0 ]?.focus();
 		}
-	}, [ currentPage ] );
+	}, [ currentPage, focusOnPageChange ] );
 
 	if ( Children.count( children ) ) {
 		pages =
