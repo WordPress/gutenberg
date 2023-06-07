@@ -8,10 +8,9 @@ import { Button,
 	DropZone,
 	FormFileUpload,
 	__experimentalSpacer as Spacer,
-	Spinner,
 } from '@wordpress/components';
-import { file, upload } from '@wordpress/icons';
-import { useState, useEffect, useContext } from '@wordpress/element';
+import { file } from '@wordpress/icons';
+import { useState, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -109,7 +108,6 @@ function LocalFonts() {
 					variant="primary"
 					isBusy={ isInstalling }
 					disabled={ !selectedFiles.length || isInstalling }
-					icon={ isInstalling ? <Spinner /> : upload }
 					onClick={ handleInstall }
 				>
 					{ __( 'Upload Fonts' ) }
