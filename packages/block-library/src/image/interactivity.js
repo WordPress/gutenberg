@@ -21,7 +21,7 @@ store( {
 	actions: {
 		core: {
 			image: {
-				showLightbox: ( { context } ) => {
+				showLightbox: ( { context, event } ) => {
 					context.core.image.initialized = true;
 					context.core.image.lightboxEnabled = true;
 					context.core.image.lastFocusedElement =
@@ -30,19 +30,69 @@ store( {
 					document.documentElement.classList.add(
 						'has-lightbox-open'
 					);
+
+					if ( context.core.image.lightboxAnimation === 'zoom' ) {
+						const { x: leftPosition, y: topPosition } =
+							event.target.nextElementSibling.getBoundingClientRect();
+						const scaleWidth =
+							event.target.nextElementSibling.offsetWidth /
+							event.target.nextElementSibling.naturalWidth;
+						const scaleHeight =
+							event.target.nextElementSibling.offsetHeight /
+							event.target.nextElementSibling.naturalHeight;
+						const root = document.documentElement;
+						root.style.setProperty(
+							'--lightbox-left-position',
+							leftPosition + 'px'
+						);
+						root.style.setProperty(
+							'--lightbox-top-position',
+							topPosition + 'px'
+						);
+						root.style.setProperty(
+							'--lightbox-scale-width',
+							scaleWidth
+						);
+						root.style.setProperty(
+							'--lightbox-scale-height',
+							scaleHeight
+						);
+					}
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
 						// If scrolling, wait a moment before closing the lightbox.
-						if (
-							event.type === 'mousewheel' &&
-							Math.abs(
-								window.scrollY -
-									context.core.image.scrollPosition
-							) < 5
+						if ( context.core.image.lightboxAnimation === 'fade' ) {
+							if (
+								event.type === 'mousewheel' &&
+								Math.abs(
+									window.scrollY -
+										context.core.image.scrollPosition
+								) < 5
+							) {
+								return;
+							}
+						} else if (
+							context.core.image.lightboxAnimation === 'zoom'
 						) {
-							return;
+							// Disable scroll until the zoom animation ends.
+							// Get the current page scroll position
+							const scrollTop =
+								window.pageYOffset ||
+								document.documentElement.scrollTop;
+							const scrollLeft =
+								window.pageXOffset ||
+								document.documentElement.scrollLeft;
+							// if any scroll is attempted, set this to the previous value.
+							window.onscroll = function () {
+								window.scrollTo( scrollLeft, scrollTop );
+							};
+							// Enable scrolling after the animation finishes
+							setTimeout( function () {
+								window.onscroll = function () {};
+							}, 400 );
 						}
+
 						document.documentElement.classList.remove(
 							'has-lightbox-open'
 						);
@@ -102,6 +152,8 @@ store( {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
 					if ( context.core.image.lightboxEnabled ) {
+						context.core.image.lightboxImage =
+							ref.querySelector( 'img' );
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
 						context.core.image.firstFocusableElement =

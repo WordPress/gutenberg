@@ -231,19 +231,50 @@
 		opacity: 0.9;
 	}
 
-	&.initialized {
-		animation: both turn-off-visibility 300ms;
-
-		img {
-			animation: both turn-off-visibility 250ms;
-		}
-
+	&.fade {
 		&.active {
 			visibility: visible;
 			animation: both turn-on-visibility 250ms;
 
 			img {
 				animation: both turn-on-visibility 300ms;
+			}
+		}
+		&.initialized {
+			&:not(.active) {
+				animation: both turn-off-visibility 300ms;
+
+				img {
+					animation: both turn-off-visibility 250ms;
+				}
+			}
+		}
+	}
+
+	&.zoom {
+		img {
+			position: absolute;
+			transform-origin: top left;
+		}
+
+		&.active {
+			opacity: 1;
+			visibility: visible;
+			.wp-block-image img {
+				animation: lightbox-zoom-in .4s forwards;
+			}
+			.scrim {
+				animation: turn-on-visibility .4s forwards;
+			}
+		}
+		&.initialized {
+			&:not(.active) {
+				.wp-block-image img {
+					animation: lightbox-zoom-out .4s forwards;
+				}
+				.scrim {
+					animation: turn-off-visibility .4s forwards;
+				}
 			}
 		}
 	}
@@ -273,6 +304,39 @@
 	}
 }
 
-html.has-lightbox-open {
-	overflow: hidden;
+// This line causes the zoom animation to jump
+//
+// html.has-lightbox-open {
+// 	overflow: hidden;
+// }
+
+@keyframes lightbox-zoom-in {
+	0% {
+		left: var(--lightbox-left-position);
+		top: var(--lightbox-top-position);
+		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+	}
+	100% {
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+}
+
+@keyframes lightbox-zoom-out {
+	0% {
+		visibility: visible;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+	99% {
+		visibility: visible;
+	}
+	100% {
+
+		left: var(--lightbox-left-position);
+		top: var(--lightbox-top-position);
+		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+	}
 }

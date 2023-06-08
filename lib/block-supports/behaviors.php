@@ -48,18 +48,18 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$lightbox = $block['attrs']['behaviors']['lightbox'];
+		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
 	} else {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
 		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
-			$lightbox = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
+			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
 		} else {
-			$lightbox = false;
+			$lightbox_settings = null;
 		}
 	}
 
-	if ( ! $lightbox || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
+	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
 		return $block_content;
 	}
 
@@ -75,11 +75,13 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
+	$lightbox_animation = $lightbox_settings['animation'];
+
 	$w = new WP_HTML_Tag_Processor( $content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
-	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }' );
+	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false, "lightboxAnimation": "' . $lightbox_animation . '" } } }' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -99,8 +101,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	} else {
 		$img_src = $m->get_attribute( 'src' );
 	}
-	$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . $img_src . '"} } }' );
-	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
+
+	// Need to figure out how to smoothly transition image animation when using larger image
+	//
+	// $m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . $img_src . '"} } }' );
+	// $m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
 	$modal_content = $m->get_updated_html();
 
 	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
@@ -111,7 +116,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$close_button_label = esc_attr__( 'Close', 'gutenberg' );
 
 	$lightbox_html = <<<HTML
-        <div data-wp-body="" class="wp-lightbox-overlay"
+        <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
             data-wp-bind--role="selectors.core.image.roleAttribute"
             aria-label="$dialog_label"
             data-wp-class--initialized="context.core.image.initialized"

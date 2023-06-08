@@ -87,17 +87,43 @@ function BehaviorsControl( {
 
 	return (
 		<InspectorControls group="advanced">
-			<SelectControl
-				label={ __( 'Behaviors' ) }
-				// At the moment we are only supporting one behavior (Lightbox)
-				value={ value() }
-				options={ options }
-				onChange={ onChange }
-				hideCancelButton={ true }
-				help={ helpText }
-				size="__unstable-large"
-				disabled={ disabled }
-			/>
+			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
+			<div>
+				<SelectControl
+					label={ __( 'Behaviors' ) }
+					// At the moment we are only supporting one behavior (Lightbox)
+					value={ value() }
+					options={ options }
+					onChange={ onChange }
+					hideCancelButton={ true }
+					help={ helpText }
+					size="__unstable-large"
+					disabled={ disabled }
+				/>
+				{ behaviors?.lightbox.enabled && (
+					<SelectControl
+						label={ __( 'Lightbox Animation' ) }
+						// At the moment we are only supporting one behavior (Lightbox)
+						value={
+							behaviors?.lightbox.animation
+								? behaviors?.lightbox.animation
+								: ''
+						}
+						options={ [
+							{
+								value: 'zoom',
+								label: __( 'Zoom' ),
+							},
+							{ value: 'fade', label: 'Fade' },
+						] }
+						onChange={ onChange }
+						hideCancelButton={ false }
+						help={ __( 'Select animation.' ) }
+						size="__unstable-large"
+						disabled={ disabled }
+					/>
+				) }
+			</div>
 		</InspectorControls>
 	);
 }
@@ -136,9 +162,22 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 						} else {
 							// If the user selects something, it means that they want to
 							// change the default value (true) so we save it in the attributes.
+							const enabled =
+								nextValue === 'lightbox' ||
+								nextValue === 'zoom' ||
+								nextValue === 'fade'
+									? true
+									: false;
+							const animation =
+								nextValue === 'zoom' || nextValue === 'fade'
+									? nextValue
+									: 'zoom';
 							props.setAttributes( {
 								behaviors: {
-									lightbox: nextValue === 'lightbox',
+									lightbox: {
+										enabled,
+										animation,
+									},
 								},
 							} );
 						}
