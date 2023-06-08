@@ -31,7 +31,8 @@ export function useActivateTheme() {
 				'&_wpnonce=' +
 				window.BLOCK_THEME_ACTIVATE_NONCE;
 			await window.fetch( activationURL );
-			const { theme_preview: themePreview, ...params } = location.params;
+			const { gutenberg_theme_preview: themePreview, ...params } =
+				location.params;
 			history.replace( params );
 		}
 	};

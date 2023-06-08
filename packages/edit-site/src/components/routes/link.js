@@ -37,7 +37,7 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 	if ( isPreviewingTheme() ) {
 		params = {
 			...params,
-			theme_preview: currentlyPreviewingTheme(),
+			gutenberg_theme_preview: currentlyPreviewingTheme(),
 		};
 	}
 
