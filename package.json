@@ -309,7 +309,7 @@
 		"test:e2e:playwright": "playwright test --config test/e2e/playwright.config.ts",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:ci": "xvfb-run --auto-servernum --server-args=\"-screen 0 1280x960x24\" -- npm run test:e2e:playwright",
-		"test:e2e:docker": "docker run --rm -e WP_BASE_URL=http://host.docker.internal:8889 -v $(pwd):/work/ -w /work/ mcr.microsoft.com/playwright:v1.32.0 npm run test:e2e:ci",
+		"test:e2e:docker": "docker run --rm -e WP_BASE_URL=http://host.docker.internal:8889 -v $(pwd):/work/ -w /work/ mcr.microsoft.com/playwright:v1.32.0-jammy npm run test:e2e:ci",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test:performance:debug": "wp-scripts --inspect-brk test-e2e --runInBand --no-cache --verbose --config packages/e2e-tests/jest.performance.config.js --puppeteer-devtools",

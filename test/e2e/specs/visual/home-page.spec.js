@@ -10,9 +10,6 @@ test.describe.only( 'Home page', () => {
 
 	test.beforeEach( async ( { page } ) => {
 		await page.goto( '/' );
-		await page.addStyleTag( {
-			content: `body { font-family: Ubuntu !important; }`,
-		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
