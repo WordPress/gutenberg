@@ -8,6 +8,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  */
 import { createNewPost } from './create-new-post';
 import { getPageError } from './get-page-error';
+import { openPostInEditor } from './open-post-in-editor';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './visit-site-editor';
 import type { PageUtils } from '../page-utils';
@@ -34,6 +35,8 @@ export class Admin {
 	createNewPost: typeof createNewPost = createNewPost.bind( this );
 	/** @borrows getPageError as this.getPageError */
 	getPageError: typeof getPageError = getPageError.bind( this );
+	/** @borrows openPostInEditor as this.openPostInEditor */
+	openPostInEditor: typeof openPostInEditor = openPostInEditor.bind( this );
 	/** @borrows visitAdminPage as this.visitAdminPage */
 	visitAdminPage: typeof visitAdminPage = visitAdminPage.bind( this );
 	/** @borrows visitSiteEditor as this.visitSiteEditor */
