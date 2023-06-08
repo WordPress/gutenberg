@@ -446,6 +446,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$class_names[] = 'is-nowrap';
 	}
 
+	// Ensure backwards compatibility for post template block by flagging the number of columns.
+	if ( isset( $used_layout['type'] ) && 'grid' === $used_layout['type'] && ! empty( $block['attrs']['layout']['columnCount'] ) ) {
+		$class_names[] = sanitize_title( 'columns-' . $block['attrs']['layout']['columnCount'] );
+	}
+
 	// Get classname for layout type.
 	if ( isset( $used_layout['type'] ) ) {
 		$layout_classname = _wp_array_get( $layout_definitions, array( $used_layout['type'], 'className' ), '' );
