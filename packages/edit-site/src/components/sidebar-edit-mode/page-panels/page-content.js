@@ -16,12 +16,12 @@ import { unlock } from '../../../private-apis';
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 export default function PageContent() {
-	const pageContentClientIds = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants, getBlockName } =
-			select( blockEditorStore );
-		return getClientIdsWithDescendants().filter( ( clientId ) =>
-			PAGE_CONTENT_BLOCK_TYPES.includes( getBlockName( clientId ) )
-		);
-	}, [] );
-	return <BlockQuickNavigation clientIds={ pageContentClientIds } />;
+	const clientIds = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+				PAGE_CONTENT_BLOCK_TYPES
+			),
+		[]
+	);
+	return <BlockQuickNavigation clientIds={ clientIds } />;
 }

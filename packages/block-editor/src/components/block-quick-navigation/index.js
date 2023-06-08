@@ -15,53 +15,60 @@ import { getBlockType, __experimentalGetBlockLabel } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-import { unlock } from '../../lock-unlock';
 
 export default function BlockQuickNavigation( { clientIds } ) {
-	const blocks = useSelect(
+	if ( ! clientIds.length ) {
+		return null;
+	}
+	return (
+		<VStack spacing={ 1 }>
+			{ clientIds.map( ( clientId ) => (
+				<BlockQuickNavigationItem
+					key={ clientId }
+					clientId={ clientId }
+				/>
+			) ) }
+		</VStack>
+	);
+}
+
+function BlockQuickNavigationItem( { clientId } ) {
+	const { name, attributes, isSelected } = useSelect(
 		( select ) => {
-			const { getBlock, isBlockSelected, hasSelectedInnerBlock } = unlock(
-				select( blockEditorStore )
-			);
-			return clientIds.map( ( clientId ) => ( {
-				block: getBlock( clientId ),
+			const {
+				getBlockName,
+				getBlockAttributes,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+			return {
+				name: getBlockName( clientId ),
+				attributes: getBlockAttributes( clientId ),
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
-			} ) );
+			};
 		},
-		[ clientIds ]
+		[ clientId ]
 	);
-
 	const { selectBlock } = useDispatch( blockEditorStore );
-
-	if ( ! blocks.length ) {
-		return null;
-	}
-
+	const blockType = getBlockType( name );
 	return (
-		<VStack spacing={ 1 }>
-			{ blocks.map( ( { block, isSelected } ) => {
-				const blockType = getBlockType( block.name );
-				return (
-					<Button
-						key={ block.clientId }
-						isPressed={ isSelected }
-						onClick={ () => selectBlock( block.clientId ) }
-					>
-						<HStack justify="flex-start">
-							<BlockIcon icon={ blockType.icon } />
-							<FlexItem>
-								{ __experimentalGetBlockLabel(
-									blockType,
-									block.attributes,
-									'list-view'
-								) }
-							</FlexItem>
-						</HStack>
-					</Button>
-				);
-			} ) }
-		</VStack>
+		<Button
+			key={ clientId }
+			isPressed={ isSelected }
+			onClick={ () => selectBlock( clientId ) }
+		>
+			<HStack justify="flex-start">
+				<BlockIcon icon={ blockType.icon } />
+				<FlexItem>
+					{ __experimentalGetBlockLabel(
+						blockType,
+						attributes,
+						'list-view'
+					) }
+				</FlexItem>
+			</HStack>
+		</Button>
 	);
 }
