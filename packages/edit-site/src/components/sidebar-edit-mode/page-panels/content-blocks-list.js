@@ -14,7 +14,7 @@ import { store as blockEditorStore, BlockIcon } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { CONTENT_BLOCK_TYPES } from '../../page-content-lock/constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../page-content-focus/constants';
 
 // TODO: This overlaps a lot with BlockInspectorLockedBlocks in
 // @wordpress/block-editor. DRY them into a single component.
@@ -29,7 +29,7 @@ export default function ContentBlocksList() {
 		} = select( blockEditorStore );
 		return getClientIdsWithDescendants().flatMap( ( clientId ) => {
 			const blockName = getBlockName( clientId );
-			if ( ! CONTENT_BLOCK_TYPES.includes( blockName ) ) {
+			if ( ! PAGE_CONTENT_BLOCK_TYPES.includes( blockName ) ) {
 				return [];
 			}
 			return [
