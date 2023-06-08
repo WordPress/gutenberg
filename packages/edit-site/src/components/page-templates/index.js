@@ -59,9 +59,11 @@ export default function PageTemplates() {
 							) }
 						</Link>
 					</Heading>
-					<Text variant="muted">
-						{ decodeEntities( template.description ) }
-					</Text>
+					{ template.description && (
+						<Text variant="muted">
+							{ decodeEntities( template.description ) }
+						</Text>
+					) }
 				</VStack>
 			),
 			maxWidth: 400,
