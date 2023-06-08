@@ -14,7 +14,7 @@ import { useBlockEditingMode } from './components/block-editing-mode';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { useLayoutClasses, useLayoutStyles } from './hooks';
-import { PrivateImageSizeControl } from './components/image-size-control';
+import { ImageSizeControl } from './components/image-size-control';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -34,5 +34,5 @@ lock( privateApis, {
 	LayoutStyle,
 	useLayoutClasses,
 	useLayoutStyles,
-	PrivateImageSizeControl,
+	ImageSizeControl,
 } );
