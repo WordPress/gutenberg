@@ -425,10 +425,10 @@ export default function Image( {
 						slug={ sizeSlug }
 						width={ width }
 						height={ height }
+						naturalWidth={ naturalWidth }
+						naturalHeight={ naturalHeight }
 						imageSizeOptions={ imageSizeOptions }
 						isResizable={ isResizable }
-						imageWidth={ naturalWidth }
-						imageHeight={ naturalHeight }
 						imageSizeHelp={ __(
 							'Select the size of the source image.'
 						) }
