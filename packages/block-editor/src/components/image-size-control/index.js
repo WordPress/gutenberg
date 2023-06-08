@@ -43,8 +43,8 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
  * @param {string}             [props.imageSizeHelp]       Help text for the image size select control.
  * @param {number}             [props.width]               Specified width for the image.
  * @param {number}             [props.height]              Specified height for the image.
- * @param {number}             [props.imageWidth]          Width of the image source.
- * @param {number}             [props.imageHeight]         Height of the image source.
+ * @param {number}             [props.naturalWidth]        Width of the image source.
+ * @param {number}             [props.naturalHeight]       Height of the image source.
  * @param {ImageSizeOptions[]} [props.imageSizeOptions=[]] Array of image size options.
  * @param {boolean}            [props.isResizable=true]    Whether the image is resizable.
  * @param {string}             [props.slug]                Slug of the selected image size.
@@ -53,12 +53,12 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
  *
  * @return {import('@wordpress/element').WPElement} Image size control.
  */
-export default function ImageSizeControl( {
+export function PrivateImageSizeControl( {
 	imageSizeHelp,
 	width,
 	height,
-	imageWidth: naturalWidth,
-	imageHeight: naturalHeight,
+	naturalWidth,
+	naturalHeight,
 	imageSizeOptions = [],
 	isResizable = true,
 	slug,
@@ -159,5 +159,20 @@ export default function ImageSizeControl( {
 				</div>
 			) }
 		</>
+	);
+}
+
+// Maintain backwards compatibility for the __experimentalImageSizeControl export.
+export default function ImageSizeControl( {
+	imageWidth,
+	imageHeight,
+	...props
+} ) {
+	return (
+		<PrivateImageSizeControl
+			naturalWidth={ imageWidth }
+			naturalHeight={ imageHeight }
+			{ ...props }
+		/>
 	);
 }
