@@ -7,7 +7,11 @@ exports[`Missing block renders without crashing 1`] = `
   accessibilityRole="button"
   accessibilityState={
     {
+      "busy": undefined,
+      "checked": undefined,
       "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
     }
   }
   accessible={true}
@@ -24,6 +28,14 @@ exports[`Missing block renders without crashing 1`] = `
     accessibilityHint="Tap here to show help"
     accessibilityLabel="Help button"
     accessibilityRole="button"
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
     accessible={true}
     focusable={true}
     onClick={[Function]}
