@@ -160,6 +160,9 @@ $preview-image-height: 140px;
 	.components-menu-item__item {
 		overflow: hidden;
 		text-overflow: ellipsis;
+		// Inline block required to preserve white space
+		// between `<mark>` elements and text nodes.
+		display: inline-block;
 	}
 
 	.components-menu-item__shortcut {
