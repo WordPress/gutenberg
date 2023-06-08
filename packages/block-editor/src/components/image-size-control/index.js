@@ -53,7 +53,7 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
  *
  * @return {import('@wordpress/element').WPElement} Image size control.
  */
-export function PrivateImageSizeControl( {
+export function ImageSizeControl( {
 	imageSizeHelp,
 	width,
 	height,
@@ -65,7 +65,7 @@ export function PrivateImageSizeControl( {
 	onChange,
 	onChangeImage,
 } ) {
-	const updateDimensions = ( dimensions ) => {
+	const updateDimensions = ( dimensions = {} ) => {
 		const newWidth = Number( dimensions.width );
 		const newHeight = Number( dimensions.height );
 		onChange( {
@@ -163,7 +163,7 @@ export function PrivateImageSizeControl( {
 }
 
 // Maintain backwards compatibility for the __experimentalImageSizeControl export.
-export default function ImageSizeControl( {
+export default function ExperimentalImageSizeControl( {
 	imageWidth,
 	imageHeight,
 	...props

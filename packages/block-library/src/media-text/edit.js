@@ -16,7 +16,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -46,7 +45,9 @@ import {
 } from './constants';
 import { unlock } from '../lock-unlock';
 
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
+const { useBlockEditingMode, ImageSizeControl } = unlock(
+	blockEditorPrivateApis
+);
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
