@@ -1,8 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,6 +17,29 @@ export default function usePatternCategories() {
 		'wp_pattern',
 		{ per_page: -1, hide_empty: false, context: 'view' }
 	);
+
+	const userPatterns = useSelect( ( select ) =>
+		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} )
+	);
+
+	const uncategorized = useMemo( () => {
+		const category = {
+			count: 0,
+			id: 'uncategorized',
+			slug: 'uncategorized',
+			name: __( 'Uncategorized' ),
+		};
+
+		( userPatterns || [] ).forEach( ( pattern ) => {
+			if ( ! pattern.wp_pattern?.length ) {
+				category.count += 1;
+			}
+		} );
+
+		return category;
+	}, [ userPatterns ] );
 
 	const themePatterns = useThemePatterns();
 	const patternCategories = useMemo( () => {
@@ -47,8 +72,12 @@ export default function usePatternCategories() {
 			}
 		} );
 
+		if ( uncategorized.count ) {
+			categoriesWithCounts.push( uncategorized );
+		}
+
 		return categoriesWithCounts;
-	}, [ categories, themePatterns ] );
+	}, [ categories, themePatterns, uncategorized ] );
 
 	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
