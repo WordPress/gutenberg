@@ -3,12 +3,12 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 // eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
+import { motion, MotionContext } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useContext, useMemo } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 /**
@@ -203,9 +203,47 @@ export const DoubleToggles: StoryFn<
 };
 
 // TODO: Remove before merging as well.
-const { Fill: InspectorControls, Slot } = createSlotFill( 'InspectorControls' );
-// @ts-expect-error
-InspectorControls.Slot = Slot;
+const ExampleSlotFill = createSlotFill( 'Example' );
+
+const Slot = () => {
+	const motionContextValue = useContext( MotionContext );
+
+	// Forwarding the content of the slot so that it can be used by the fill
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ MotionContext.Provider, { value: motionContextValue } ],
+			],
+		} ),
+		[ motionContextValue ]
+	);
+
+	return <ExampleSlotFill.Slot bubblesVirtually fillProps={ fillProps } />;
+};
+
+const Fill = ( { children }: { children: React.ReactNode } ) => {
+	const innerMarkup = <>{ children }</>;
+
+	return (
+		<ExampleSlotFill.Fill>
+			{ ( fillProps: {
+				forwardedContext?: [
+					React.Context< any >[ 'Provider' ],
+					{ value: any; [ key: string ]: any }
+				][];
+			} ) => {
+				const { forwardedContext = [] } = fillProps;
+
+				return forwardedContext.reduce(
+					( inner: JSX.Element, [ Provider, props ] ) => (
+						<Provider { ...props }>{ inner }</Provider>
+					),
+					innerMarkup
+				);
+			} }
+		</ExampleSlotFill.Fill>
+	);
+};
 
 export const RenderViaSlot: StoryFn<
 	typeof ToggleGroupControl
@@ -221,7 +259,7 @@ export const RenderViaSlot: StoryFn<
 			 * tree via Slot/Fill)
 			 */ }
 			<motion.div>
-				<InspectorControls>
+				<Fill>
 					<ToggleGroupControl
 						onChange={ ( value ) =>
 							setAlignState( value as string )
@@ -237,17 +275,10 @@ export const RenderViaSlot: StoryFn<
 							/>
 						) ) }
 					</ToggleGroupControl>
-				</InspectorControls>
+				</Fill>
 			</motion.div>
 			<div>
-				{ /* @ts-expect-error */ }
-				<InspectorControls.Slot bubblesVirtually />
-				<Button
-					onClick={ () => setAlignState( undefined ) }
-					variant="tertiary"
-				>
-					Reset
-				</Button>
+				<Slot />
 			</div>
 		</SlotFillProvider>
 	);
