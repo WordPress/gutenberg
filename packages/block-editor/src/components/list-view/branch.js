@@ -109,13 +109,7 @@ function ListViewBranch( props ) {
 			if ( ! parentId ) {
 				return true;
 			}
-
-			const isContentLocked =
-				select( blockEditorStore ).getTemplateLock( parentId ) ===
-				'contentOnly';
-			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
-
-			return isContentLocked ? false : canEdit;
+			return select( blockEditorStore ).canEditBlock( parentId );
 		},
 		[ parentId ]
 	);

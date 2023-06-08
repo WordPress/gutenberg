@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ export function getBlockCSSSelector(
 	const { fallback = false } = options;
 	const { name, selectors, supports } = blockType;
 
-	const hasSelectors = ! isEmpty( selectors );
+	const hasSelectors = selectors && Object.keys( selectors ).length > 0;
 	const path = Array.isArray( target ) ? target.join( '.' ) : target;
 
 	// Root selector.

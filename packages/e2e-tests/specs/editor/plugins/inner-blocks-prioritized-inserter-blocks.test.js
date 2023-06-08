@@ -8,6 +8,7 @@ import {
 	getAllBlockInserterItemTitles,
 	insertBlock,
 	closeGlobalBlockInserter,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const QUICK_INSERTER_RESULTS_SELECTOR =
@@ -108,7 +109,7 @@ describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 	describe( 'Slash inserter', () => {
 		it( 'uses the priority ordering if prioritzed blocks setting is set', async () => {
 			await insertBlock( 'Prioritized Inserter Blocks Set' );
-			await page.click( '[data-type="core/image"]' );
+			await canvas().click( '[data-type="core/image"]' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '/' );
 			// Wait for the results to display.

@@ -261,6 +261,53 @@ _Returns_
 
 -   `Object`: Action object.
 
+### removeAllNotices
+
+Removes all notices from a given context. Defaults to the default context.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+export const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button onClick={ () => removeAllNotices() }>
+				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+			</Button>
+			<Button onClick={ () => removeAllNotices( 'snackbar' ) }>
+				{ __(
+					'Clear all snackbar notices',
+					'woo-gutenberg-products-block'
+				) }
+			</Button>
+		</>
+	);
+};
+```
+
+_Parameters_
+
+-   _noticeType_ `string`: The context to remove all notices from.
+-   _context_ `string`: The context to remove all notices from.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### removeNotice
 
 Returns an action object used in signalling that a notice is to be removed.
@@ -304,6 +351,51 @@ _Parameters_
 
 -   _id_ `string`: Notice unique identifier.
 -   _context_ `[string]`: Optional context (grouping) in which the notice is intended to appear. Defaults to default context.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### removeNotices
+
+Returns an action object used in signalling that several notices are to be removed.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button
+				onClick={ () =>
+					removeNotices( notices.map( ( { id } ) => id ) )
+				}
+			>
+				{ __( 'Clear all notices' ) }
+			</Button>
+		</>
+	);
+};
+```
+
+_Parameters_
+
+-   _ids_ `string[]`: List of unique notice identifiers.
+-   _context_ `[string]`: Optional context (grouping) in which the notices are intended to appear. Defaults to default context.
 
 _Returns_
 

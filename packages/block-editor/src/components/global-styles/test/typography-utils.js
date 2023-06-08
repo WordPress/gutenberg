@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from '../typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../typography-utils';
 
 describe( 'typography utils', () => {
 	describe( 'getTypographyFontSizeValue', () => {
@@ -168,6 +171,58 @@ describe( 'typography utils', () => {
 				},
 				expected:
 					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+			},
+
+			{
+				message:
+					'returns clamp value where min and max fluid values defined',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+			},
+
+			{
+				message:
+					'should apply maxViewPortWidth as maximum viewport width',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: {
+						maxViewPortWidth: '1100px',
+					},
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 7.051), 125px)',
+			},
+
+			{
+				message: 'returns clamp value where max is equal to size',
+				preset: {
+					size: '7.8125rem',
+					fluid: {
+						min: '4.375rem',
+						max: '7.8125rem',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
 			},
 
 			{
@@ -428,6 +483,89 @@ describe( 'typography utils', () => {
 				expect(
 					getTypographyFontSizeValue( preset, typographySettings )
 				).toBe( expected );
+			} );
+		} );
+	} );
+
+	describe( 'typography utils', () => {
+		[
+			{
+				message:
+					'should return `undefined` when settings is `undefined`',
+				settings: undefined,
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `undefined` when typography is `undefined`',
+				settings: {},
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `undefined` when typography.fluid is `undefined`',
+				settings: { typography: {} },
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `false` when typography.fluid is disabled by `false`',
+				settings: { typography: { fluid: false } },
+				expected: { fluid: false },
+			},
+
+			{
+				message: 'should return `{}` when typography.fluid is empty',
+				settings: { typography: { fluid: {} } },
+				expected: { fluid: {} },
+			},
+
+			{
+				message:
+					'should return false when typography.fluid is disabled and layout.wideSize is defined',
+				settings: {
+					typography: { fluid: false },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: { fluid: false },
+			},
+
+			{
+				message:
+					'should return true when fluid is enabled by a boolean',
+				settings: { typography: { fluid: true } },
+				expected: { fluid: true },
+			},
+
+			{
+				message:
+					'should return fluid settings with merged `layout.wideSize`d',
+				settings: {
+					typography: { fluid: { minFontSize: '16px' } },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: {
+					fluid: { maxViewPortWidth: '1000rem', minFontSize: '16px' },
+				},
+			},
+
+			{
+				message:
+					'should prioritize fluid `maxViewPortWidth` over `layout.wideSize`',
+				settings: {
+					typography: { fluid: { maxViewPortWidth: '10px' } },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: { fluid: { maxViewPortWidth: '10px' } },
+			},
+		].forEach( ( { message, settings, expected } ) => {
+			it( `${ message }`, () => {
+				expect(
+					getFluidTypographyOptionsFromSettings( settings )
+				).toEqual( expected );
 			} );
 		} );
 	} );

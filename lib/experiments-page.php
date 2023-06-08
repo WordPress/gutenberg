@@ -66,18 +66,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-command-center',
-		__( 'Command center ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the command center; Open it using cmd + k in the site or post editors.', 'gutenberg' ),
-			'id'    => 'gutenberg-command-center',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-group-grid-variation',
 		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -86,18 +74,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
 			'id'    => 'gutenberg-group-grid-variation',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-details-blocks',
-		__( 'Details block', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the Details block', 'gutenberg' ),
-			'id'    => 'gutenberg-details-blocks',
 		)
 	);
 
@@ -115,12 +91,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-interactivity-api-core-blocks',
-		__( 'Core blocks', 'gutenberg' ),
+		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the core blocks using the Interactivity API', 'gutenberg' ),
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
 			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);

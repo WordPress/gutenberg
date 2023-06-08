@@ -78,7 +78,7 @@ test.describe( 'Post visibility', () => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await page.type( 'role=textbox[name="Add title"i]', 'Title' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', 'Title' );
 
 		await editor.openDocumentSettingsSidebar();
 

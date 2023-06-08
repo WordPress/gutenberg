@@ -18,7 +18,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -203,7 +203,6 @@ function GlobalStylesStyleBook() {
 
 function GlobalStylesBlockLink() {
 	const navigator = useNavigator();
-	const isMounted = useRef();
 	const { selectedBlockName, selectedBlockClientId } = useSelect(
 		( select ) => {
 			const { getSelectedBlockClientId, getBlockName } =
@@ -217,22 +216,56 @@ function GlobalStylesBlockLink() {
 		[]
 	);
 	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
+	// When we're in the `Blocks` screen enable deep linking to the selected block.
 	useEffect( () => {
-		// Avoid navigating to the block screen on mount.
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
-			return;
-		}
 		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
 			return;
 		}
-		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
+		const currentPath = navigator.location.path;
+		if (
+			currentPath !== '/blocks' &&
+			! currentPath.startsWith( '/blocks/' )
+		) {
+			return;
+		}
+		const newPath = '/blocks/' + encodeURIComponent( selectedBlockName );
 		// Avoid navigating to the same path. This can happen when selecting
 		// a new block of the same type.
-		if ( path !== navigator.location.path ) {
-			navigator.goTo( path, { skipFocus: true } );
+		if ( newPath !== currentPath ) {
+			navigator.goTo( newPath, { skipFocus: true } );
 		}
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
+}
+
+function GlobalStylesEditorCanvasContainerLink() {
+	const { goTo, location } = useNavigator();
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
+
+	// If the user switches the editor canvas container view, redirect
+	// to the appropriate screen. This effectively allows deep linking to the
+	// desired screens from outside the global styles navigation provider.
+	useEffect( () => {
+		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
+			// Switching to the revisions container view should
+			// redirect to the revisions screen.
+			goTo( '/revisions' );
+		} else if (
+			!! editorCanvasContainerView &&
+			location?.path === '/revisions'
+		) {
+			// Switching to any container other than revisions should
+			// redirect from the revisions screen to the root global styles screen.
+			goTo( '/' );
+		}
+		// location?.path is not a dependency because we don't want to track it.
+		// Doing so will cause an infinite loop. We could abstract logic to avoid
+		// having to disable the check later.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ editorCanvasContainerView, goTo ] );
 }
 
 function GlobalStylesUI() {
@@ -324,6 +357,7 @@ function GlobalStylesUI() {
 
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
+			<GlobalStylesEditorCanvasContainerLink />
 		</NavigatorProvider>
 	);
 }
