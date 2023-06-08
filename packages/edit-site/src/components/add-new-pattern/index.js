@@ -24,7 +24,7 @@ export default function AddNewPattern( { toggleProps } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 
-	async function createPattern( { name, categoryId } ) {
+	async function createPattern( { name, categoryId, syncType } ) {
 		if ( ! name ) {
 			createErrorNotice( __( 'Name is not defined.' ), {
 				type: 'snackbar',
@@ -32,12 +32,7 @@ export default function AddNewPattern( { toggleProps } ) {
 			return;
 		}
 
-		if ( ! categoryId ) {
-			createErrorNotice( __( 'Category has not been selected.' ), {
-				type: 'snackbar',
-			} );
-			return;
-		}
+		const categories = categoryId ? [ categoryId ] : undefined;
 
 		try {
 			// TODO: Enforce unique pattern names?
@@ -49,8 +44,8 @@ export default function AddNewPattern( { toggleProps } ) {
 					title: name || __( 'Untitled Pattern' ),
 					content: '',
 					status: 'publish',
-					meta: { wp_block: { sync_status: 'notSynced' } },
-					wp_pattern: [ categoryId ],
+					meta: { wp_block: { sync_status: syncType } },
+					wp_pattern: categories,
 				},
 				{ throwOnError: true }
 			);
