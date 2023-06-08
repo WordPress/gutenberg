@@ -10,29 +10,21 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import useDimensionHandler from './use-dimension-handler';
-
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 const noop = () => {};
 
 export default function ImageSizeControl( {
 	imageSizeHelp,
-	imageWidth,
-	imageHeight,
+	width,
+	height,
+	imageWidth: naturalWidth,
+	imageWidth: naturalHeight,
 	imageSizeOptions = [],
 	isResizable = true,
 	slug,
-	width,
-	height,
 	onChange,
 	onChangeImage = noop,
 } ) {
-	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
-		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
-
 	return (
 		<>
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
@@ -52,20 +44,22 @@ export default function ImageSizeControl( {
 						<NumberControl
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
-							value={ currentWidth }
+							placeholder={ __( 'Auto' ) }
+							value={ width }
 							min={ 1 }
-							onChange={ ( value ) =>
-								updateDimension( 'width', value )
+							onChange={ ( nextWidth ) =>
+								onChange( { height, width: nextWidth } )
 							}
 							size="__unstable-large"
 						/>
 						<NumberControl
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
-							value={ currentHeight }
+							placeholder={ __( 'Auto' ) }
+							value={ height }
 							min={ 1 }
-							onChange={ ( value ) =>
-								updateDimension( 'height', value )
+							onChange={ ( nextHeight ) =>
+								onChange( { height: nextHeight, width } )
 							}
 							size="__unstable-large"
 						/>
@@ -74,15 +68,15 @@ export default function ImageSizeControl( {
 						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
 							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 								const scaledWidth = Math.round(
-									imageWidth * ( scale / 100 )
+									naturalWidth * ( scale / 100 )
 								);
 								const scaledHeight = Math.round(
-									imageHeight * ( scale / 100 )
+									naturalHeight * ( scale / 100 )
 								);
 
 								const isCurrent =
-									currentWidth === scaledWidth &&
-									currentHeight === scaledHeight;
+									width === scaledWidth &&
+									height === scaledHeight;
 
 								return (
 									<Button
@@ -93,10 +87,10 @@ export default function ImageSizeControl( {
 										}
 										isPressed={ isCurrent }
 										onClick={ () =>
-											updateDimensions(
-												scaledHeight,
-												scaledWidth
-											)
+											onChange( {
+												width: scaledWidth,
+												height: scaledHeight,
+											} )
 										}
 									>
 										{ scale }%
@@ -104,7 +98,15 @@ export default function ImageSizeControl( {
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ () => updateDimensions() }>
+						<Button
+							isSmall
+							onClick={ () =>
+								onChange( {
+									width: undefined,
+									height: undefined,
+								} )
+							}
+						>
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>
