@@ -158,19 +158,20 @@ function editorCanvasContainerView( state = undefined, action ) {
 }
 
 /**
- * Reducer used to track whether the page content is locked.
+ * Reducer used to track whether the editor allows only page content to be
+ * edited.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {boolean} Updated state.
  */
-export function hasPageContentLock( state = false, action ) {
+export function hasPageContentFocus( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITED_POST':
 			return !! action.context?.postId;
-		case 'SET_HAS_PAGE_CONTENT_LOCK':
-			return action.hasPageContentLock;
+		case 'SET_HAS_PAGE_CONTENT_FOCUS':
+			return action.hasPageContentFocus;
 	}
 
 	return state;
@@ -185,5 +186,5 @@ export default combineReducers( {
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,
-	hasPageContentLock,
+	hasPageContentFocus,
 } );

@@ -11,7 +11,7 @@ import {
 	editedPost,
 	blockInserterPanel,
 	listViewPanel,
-	hasPageContentLock,
+	hasPageContentFocus,
 } from '../reducer';
 
 import { setIsInserterOpened, setIsListViewOpened } from '../actions';
@@ -137,14 +137,14 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'hasPageContentLocked()', () => {
+	describe( 'hasPageContentFocus()', () => {
 		it( 'defaults to false', () => {
-			expect( hasPageContentLock( undefined, {} ) ).toBe( false );
+			expect( hasPageContentFocus( undefined, {} ) ).toBe( false );
 		} );
 
 		it( 'becomes false when editing a template', () => {
 			expect(
-				hasPageContentLock( true, {
+				hasPageContentFocus( true, {
 					type: 'SET_EDITED_POST',
 					postType: 'wp_template',
 				} )
@@ -153,7 +153,7 @@ describe( 'state', () => {
 
 		it( 'becomes true when editing a page', () => {
 			expect(
-				hasPageContentLock( false, {
+				hasPageContentFocus( false, {
 					type: 'SET_EDITED_POST',
 					postType: 'wp_template',
 					context: {
@@ -166,15 +166,15 @@ describe( 'state', () => {
 
 		it( 'can be set', () => {
 			expect(
-				hasPageContentLock( false, {
-					type: 'SET_HAS_PAGE_CONTENT_LOCK',
-					hasPageContentLock: true,
+				hasPageContentFocus( false, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: true,
 				} )
 			).toBe( true );
 			expect(
-				hasPageContentLock( true, {
-					type: 'SET_HAS_PAGE_CONTENT_LOCK',
-					hasPageContentLock: false,
+				hasPageContentFocus( true, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: false,
 				} )
 			).toBe( false );
 		} );

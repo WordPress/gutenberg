@@ -36,9 +36,9 @@ export default function DocumentActions() {
 }
 
 function PageDocumentActions() {
-	const { hasPageContentLock, context } = useSelect(
+	const { hasPageContentFocus, context } = useSelect(
 		( select ) => ( {
-			hasPageContentLock: select( editSiteStore ).hasPageContentLock(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 			context: select( editSiteStore ).getEditedPostContext(),
 		} ),
 		[]
@@ -50,16 +50,16 @@ function PageDocumentActions() {
 		context.postId
 	);
 
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
 	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
-	const prevHasPageContentLock = useRef( false );
+	const prevHasPageContentFocus = useRef( false );
 	useEffect( () => {
-		if ( prevHasPageContentLock.current && ! hasPageContentLock ) {
+		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
 			setHasEditedTemplate( true );
 		}
-		prevHasPageContentLock.current = hasPageContentLock;
-	}, [ hasPageContentLock ] );
+		prevHasPageContentFocus.current = hasPageContentFocus;
+	}, [ hasPageContentFocus ] );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -73,7 +73,7 @@ function PageDocumentActions() {
 		);
 	}
 
-	return hasPageContentLock ? (
+	return hasPageContentFocus ? (
 		<BaseDocumentActions
 			className={ classnames( 'is-page', {
 				'is-animated': hasEditedTemplate,
@@ -85,7 +85,7 @@ function PageDocumentActions() {
 	) : (
 		<TemplateDocumentActions
 			className="is-animated"
-			onBack={ () => setHasPageContentLock( true ) }
+			onBack={ () => setHasPageContentFocus( true ) }
 		/>
 	);
 }

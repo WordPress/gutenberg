@@ -13,7 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
-import { setHasPageContentLock } from '../actions';
+import { setHasPageContentFocus } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -217,18 +217,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'setHasPageContentLock', () => {
+	describe( 'setHasPageContentFocus', () => {
 		it( 'toggles the page content lock on', () => {
 			const dispatch = jest.fn();
 			const clearSelectedBlock = jest.fn();
 			const registry = {
 				dispatch: () => ( { clearSelectedBlock } ),
 			};
-			setHasPageContentLock( true )( { dispatch, registry } );
+			setHasPageContentFocus( true )( { dispatch, registry } );
 			expect( clearSelectedBlock ).toHaveBeenCalled();
 			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'SET_HAS_PAGE_CONTENT_LOCK',
-				hasPageContentLock: true,
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: true,
 			} );
 		} );
 
@@ -238,11 +238,11 @@ describe( 'actions', () => {
 			const registry = {
 				dispatch: () => ( { clearSelectedBlock } ),
 			};
-			setHasPageContentLock( false )( { dispatch, registry } );
+			setHasPageContentFocus( false )( { dispatch, registry } );
 			expect( clearSelectedBlock ).not.toHaveBeenCalled();
 			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'SET_HAS_PAGE_CONTENT_LOCK',
-				hasPageContentLock: false,
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: false,
 			} );
 		} );
 	} );

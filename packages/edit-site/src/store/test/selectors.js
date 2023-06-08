@@ -16,7 +16,7 @@ import {
 	isListViewOpened,
 	__unstableGetPreference,
 	isPage,
-	hasPageContentLock,
+	hasPageContentFocus,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -169,16 +169,16 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'hasPageContentLock', () => {
+	describe( 'hasPageContentFocus', () => {
 		it( 'returns true if locked and the edited post type is a page', () => {
 			const state = {
 				editedPost: {
 					postType: 'wp_template',
 					context: { postType: 'page', postId: 123 },
 				},
-				hasPageContentLock: true,
+				hasPageContentFocus: true,
 			};
-			expect( hasPageContentLock( state ) ).toBe( true );
+			expect( hasPageContentFocus( state ) ).toBe( true );
 		} );
 
 		it( 'returns false if not locked and the edited post type is a page', () => {
@@ -187,9 +187,9 @@ describe( 'selectors', () => {
 					postType: 'wp_template',
 					context: { postType: 'page', postId: 123 },
 				},
-				hasPageContentLock: false,
+				hasPageContentFocus: false,
 			};
-			expect( hasPageContentLock( state ) ).toBe( false );
+			expect( hasPageContentFocus( state ) ).toBe( false );
 		} );
 
 		it( 'returns false if locked and the edited post type is a template', () => {
@@ -197,9 +197,9 @@ describe( 'selectors', () => {
 				editedPost: {
 					postType: 'wp_template',
 				},
-				hasPageContentLock: true,
+				hasPageContentFocus: true,
 			};
-			expect( hasPageContentLock( state ) ).toBe( false );
+			expect( hasPageContentFocus( state ) ).toBe( false );
 		} );
 	} );
 } );

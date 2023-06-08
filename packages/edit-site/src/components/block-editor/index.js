@@ -39,9 +39,9 @@ import EditorCanvas from './editor-canvas';
 import { unlock } from '../../private-apis';
 import EditorCanvasContainer from '../editor-canvas-container';
 import {
-	PageContentLock,
-	usePageContentLockNotifications,
-} from '../page-content-lock';
+	DisableNonPageContentBlocks,
+	usePageContentFocusNotifications,
+} from '../page-content-focus';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -53,21 +53,21 @@ const LAYOUT = {
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, templateType, canvasMode, hasPageContentLock } =
+	const { storedSettings, templateType, canvasMode, hasPageContentFocus } =
 		useSelect(
 			( select ) => {
 				const {
 					getSettings,
 					getEditedPostType,
 					getCanvasMode,
-					hasPageContentLock: _hasPageContentLock,
+					hasPageContentFocus: _hasPageContentFocus,
 				} = unlock( select( editSiteStore ) );
 
 				return {
 					storedSettings: getSettings( setIsInserterOpened ),
 					templateType: getEditedPostType(),
 					canvasMode: getCanvasMode(),
-					hasPageContentLock: _hasPageContentLock(),
+					hasPageContentFocus: _hasPageContentFocus(),
 				};
 			},
 			[ setIsInserterOpened ]
@@ -146,7 +146,7 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
-		usePageContentLockNotifications(),
+		usePageContentFocusNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -172,7 +172,7 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			{ hasPageContentLock && <PageContentLock /> }
+			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />

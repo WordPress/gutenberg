@@ -20,7 +20,7 @@ import { store as editSiteStore } from '../../store';
  *                                                  (using useMergeRefs()) to
  *                                                  the editor iframe canvas.
  */
-export function usePageContentLockNotifications() {
+export function usePageContentFocusNotifications() {
 	const ref = useEditTemplateNotification();
 	useBackToPageNotification();
 	return ref;
@@ -28,7 +28,7 @@ export function usePageContentLockNotifications() {
 
 /**
  * Hook that displays a 'Edit your template to edit this block' notification
- * when the user is focusing on editing page content and clicks on a locked
+ * when the user is focusing on editing page content and clicks on a disabled
  * template block.
  *
  * @return {import('react').RefObject<HTMLElement>} Ref which should be passed
@@ -36,22 +36,22 @@ export function usePageContentLockNotifications() {
  *                                                  the editor iframe canvas.
  */
 function useEditTemplateNotification() {
-	const hasPageContentLock = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentLock(),
+	const hasPageContentFocus = useSelect(
+		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
 
 	const alreadySeen = useRef( false );
 
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
 	return useRefEffect(
 		( node ) => {
 			const handleClick = ( event ) => {
 				if (
 					! alreadySeen.current &&
-					hasPageContentLock &&
+					hasPageContentFocus &&
 					event.target.classList.contains( 'is-root-container' )
 				) {
 					createInfoNotice(
@@ -63,7 +63,7 @@ function useEditTemplateNotification() {
 								{
 									label: __( 'Edit template' ),
 									onClick: () =>
-										setHasPageContentLock( false ),
+										setHasPageContentFocus( false ),
 								},
 							],
 						}
@@ -75,10 +75,10 @@ function useEditTemplateNotification() {
 			return () => node.removeEventListener( 'click', handleClick );
 		},
 		[
-			hasPageContentLock,
+			hasPageContentFocus,
 			alreadySeen,
 			createInfoNotice,
-			setHasPageContentLock,
+			setHasPageContentFocus,
 		]
 	);
 }
@@ -88,22 +88,22 @@ function useEditTemplateNotification() {
  * switches from focusing on editing page content to editing a template.
  */
 function useBackToPageNotification() {
-	const hasPageContentLock = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentLock(),
+	const hasPageContentFocus = useSelect(
+		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
 
 	const alreadySeen = useRef( false );
-	const prevHasPageContentLock = useRef( false );
+	const prevHasPageContentFocus = useRef( false );
 
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
 	useEffect( () => {
 		if (
 			! alreadySeen.current &&
-			prevHasPageContentLock.current &&
-			! hasPageContentLock
+			prevHasPageContentFocus.current &&
+			! hasPageContentFocus
 		) {
 			createInfoNotice( __( 'You are editing a template' ), {
 				isDismissible: true,
@@ -111,18 +111,18 @@ function useBackToPageNotification() {
 				actions: [
 					{
 						label: __( 'Back to page' ),
-						onClick: () => setHasPageContentLock( true ),
+						onClick: () => setHasPageContentFocus( true ),
 					},
 				],
 			} );
 			alreadySeen.current = true;
 		}
-		prevHasPageContentLock.current = hasPageContentLock;
+		prevHasPageContentFocus.current = hasPageContentFocus;
 	}, [
 		alreadySeen,
-		prevHasPageContentLock,
-		hasPageContentLock,
+		prevHasPageContentFocus,
+		hasPageContentFocus,
 		createInfoNotice,
-		setHasPageContentLock,
+		setHasPageContentFocus,
 	] );
 }

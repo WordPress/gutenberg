@@ -131,9 +131,9 @@ _Returns_
 
 -   `Object`: Settings.
 
-### hasPageContentLock
+### hasPageContentFocus
 
-Whether or not the editor is locked so that only page content can be edited.
+Whether or not the editor allows only page content to be edited.
 
 _Parameters_
 
@@ -141,7 +141,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether or not the editor is locked.
+-   `boolean`: Whether or not focus is on editing page content.
 
 ### isFeatureActive
 
@@ -280,13 +280,13 @@ _Returns_
 
 -   `number`: The resolved template ID for the page route.
 
-### setHasPageContentLock
+### setHasPageContentFocus
 
-Sets whether or not the editor is locked so that only page content can be edited.
+Sets whether or not the editor allows only page content to be edited.
 
 _Parameters_
 
--   _hasPageContentLock_ `boolean`: True to enable lock, false to disable.
+-   _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
 
 ### setHomeTemplateId
 

@@ -37,7 +37,7 @@ export default function PagePanels() {
 		record: template,
 	} = useEditedEntityRecord();
 
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
 	const blockContext = useMemo(
 		() => ( { ...context, postType: null, postId: null } ),
@@ -78,7 +78,7 @@ export default function PagePanels() {
 					<Button
 						className="edit-site-page-panels__edit-template-button"
 						variant="secondary"
-						onClick={ () => setHasPageContentLock( false ) }
+						onClick={ () => setHasPageContentFocus( false ) }
 					>
 						{ __( 'Edit template' ) }
 					</Button>

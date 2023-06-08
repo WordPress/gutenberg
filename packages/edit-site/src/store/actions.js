@@ -532,19 +532,20 @@ export const switchEditorMode =
 	};
 
 /**
- * Sets whether or not the editor is locked so that only page content can be
- * edited.
+ * Sets whether or not the editor allows only page content to be edited.
  *
- * @param {boolean} hasPageContentLock True to enable lock, false to disable.
+ * @param {boolean} hasPageContentFocus True to allow only page content to be
+ *                                      edited, false to allow template to be
+ *                                      edited.
  */
-export const setHasPageContentLock =
-	( hasPageContentLock ) =>
+export const setHasPageContentFocus =
+	( hasPageContentFocus ) =>
 	( { dispatch, registry } ) => {
-		if ( hasPageContentLock ) {
+		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 		dispatch( {
-			type: 'SET_HAS_PAGE_CONTENT_LOCK',
-			hasPageContentLock,
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
 		} );
 	};
