@@ -6,6 +6,7 @@ import {
 	Button,
 	Modal,
 	SelectControl,
+	ToggleControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -13,9 +14,15 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+const SYNC_TYPES = {
+	full: 'fully',
+	unsynced: 'unsynced',
+};
+
 export default function CreatePatternModal( { closeModal, onCreate } ) {
 	const [ name, setName ] = useState( '' );
 	const [ categoryId, setCategoryId ] = useState( '' );
+	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
 	const { records: categories } = useEntityRecords(
@@ -32,6 +39,12 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 		.concat( [
 			{ value: '', label: __( 'Select a category' ), disabled: true },
 		] );
+
+	const onSyncChange = () => {
+		setSyncType(
+			syncType === SYNC_TYPES.full ? SYNC_TYPES.unsynced : SYNC_TYPES.full
+		);
+	};
 
 	return (
 		<Modal
@@ -52,7 +65,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						return;
 					}
 					setIsSubmitting( true );
-					await onCreate( { name, categoryId } );
+					await onCreate( { name, categoryId, syncType } );
 				} }
 			>
 				<VStack spacing="4">
@@ -72,6 +85,16 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						size="__unstable-large"
 						value={ categoryId }
 					/>
+					<ToggleControl
+						label={ __( 'Synced' ) }
+						onChange={ onSyncChange }
+						help={
+							syncType === SYNC_TYPES.full
+								? __( 'Content is synced' )
+								: __( 'Content is not synced' )
+						}
+						checked={ syncType === SYNC_TYPES.full }
+					/>
 					<HStack justify="right">
 						<Button
 							variant="tertiary"
@@ -84,7 +107,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! name || ! categoryId }
+							disabled={ ! name }
 							isBusy={ isSubmitting }
 						>
 							{ __( 'Create' ) }
