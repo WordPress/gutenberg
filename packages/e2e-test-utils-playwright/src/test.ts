@@ -144,6 +144,7 @@ const test = base.extend<
 					'gutenberg-test-plugin-disables-the-css-animations'
 				),
 				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllPages(),
 				requestUtils.deleteAllBlocks(),
 				requestUtils.resetPreferences(),
 			] );
