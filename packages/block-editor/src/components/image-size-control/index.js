@@ -10,69 +10,29 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import useDimensionHandler from './use-dimension-handler';
+
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+const noop = () => {};
 
-/**
- * @typedef {Object} ImageSizeOptions
- * @property {string} value Image size slug.
- * @property {string} label Image size label.
- */
-
-/**
- * @typedef {Object} ImageSize
- * @property {number} [width]  Image width.
- * @property {number} [height] Image height.
- */
-
-/**
- * @callback OnChange
- * @param {ImageSize} newImageSize Image size object.
- * @return {void}
- */
-
-/**
- * @callback OnChangeImage
- * @param {string} [newSlug] Image size slug.
- * @return {void}
- */
-
-/**
- * Image size control.
- *
- * @param {Object}             props                       Component props.
- * @param {string}             [props.imageSizeHelp]       Help text for the image size select control.
- * @param {number}             [props.width]               Specified width for the image.
- * @param {number}             [props.height]              Specified height for the image.
- * @param {number}             [props.naturalWidth]        Width of the image source.
- * @param {number}             [props.naturalHeight]       Height of the image source.
- * @param {ImageSizeOptions[]} [props.imageSizeOptions=[]] Array of image size options.
- * @param {boolean}            [props.isResizable=true]    Whether the image is resizable.
- * @param {string}             [props.slug]                Slug of the selected image size.
- * @param {OnChange}           [props.onChange]            Function to call when the styled image size changes.
- * @param {OnChangeImage}      [props.onChangeImage]       Function to call when the source image resolution changes.
- *
- * @return {import('@wordpress/element').WPElement} Image size control.
- */
-export function ImageSizeControl( {
+export default function ImageSizeControl( {
 	imageSizeHelp,
-	width,
-	height,
-	naturalWidth,
-	naturalHeight,
+	imageWidth,
+	imageHeight,
 	imageSizeOptions = [],
 	isResizable = true,
 	slug,
+	width,
+	height,
 	onChange,
-	onChangeImage,
+	onChangeImage = noop,
 } ) {
-	const updateDimensions = ( dimensions = {} ) => {
-		const newWidth = Number( dimensions.width );
-		const newHeight = Number( dimensions.height );
-		onChange( {
-			width: Number.isNaN( newWidth ) ? undefined : newWidth,
-			height: Number.isNaN( newHeight ) ? undefined : newHeight,
-		} );
-	};
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+
 	return (
 		<>
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
@@ -92,28 +52,20 @@ export function ImageSizeControl( {
 						<NumberControl
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
-							placeholder={ __( 'Auto' ) }
-							value={ width }
+							value={ currentWidth }
 							min={ 1 }
-							onChange={ ( nextWidth ) =>
-								updateDimensions( {
-									width: nextWidth,
-									height,
-								} )
+							onChange={ ( value ) =>
+								updateDimension( 'width', value )
 							}
 							size="__unstable-large"
 						/>
 						<NumberControl
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
-							placeholder={ __( 'Auto' ) }
-							value={ height }
+							value={ currentHeight }
 							min={ 1 }
-							onChange={ ( nextHeight ) =>
-								updateDimensions( {
-									width,
-									height: nextHeight,
-								} )
+							onChange={ ( value ) =>
+								updateDimension( 'height', value )
 							}
 							size="__unstable-large"
 						/>
@@ -122,15 +74,15 @@ export function ImageSizeControl( {
 						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
 							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 								const scaledWidth = Math.round(
-									naturalWidth * ( scale / 100 )
+									imageWidth * ( scale / 100 )
 								);
 								const scaledHeight = Math.round(
-									naturalHeight * ( scale / 100 )
+									imageHeight * ( scale / 100 )
 								);
 
 								const isCurrent =
-									width === scaledWidth &&
-									height === scaledHeight;
+									currentWidth === scaledWidth &&
+									currentHeight === scaledHeight;
 
 								return (
 									<Button
@@ -141,10 +93,10 @@ export function ImageSizeControl( {
 										}
 										isPressed={ isCurrent }
 										onClick={ () =>
-											updateDimensions( {
-												width: scaledWidth,
-												height: scaledHeight,
-											} )
+											updateDimensions(
+												scaledHeight,
+												scaledWidth
+											)
 										}
 									>
 										{ scale }%
@@ -159,37 +111,5 @@ export function ImageSizeControl( {
 				</div>
 			) }
 		</>
-	);
-}
-
-// Maintain backwards compatibility for the __experimentalImageSizeControl export.
-export default function ExperimentalImageSizeControl( {
-	imageSizeHelp,
-	width,
-	height,
-	imageWidth,
-	imageHeight,
-	imageSizeOptions,
-	isResizable,
-	slug,
-	onChange,
-	onChangeImage,
-} ) {
-	deprecated( 'wp.blockEditor.__experimentalImageSizeControl', {
-		since: '6.3',
-	} );
-	return (
-		<PrivateImageSizeControl
-			imageSizeHelp={ imageSizeHelp }
-			width={ width }
-			height={ height }
-			naturalWidth={ imageWidth }
-			naturalHeight={ imageHeight }
-			imageSizeOptions={ imageSizeOptions }
-			isResizable={ isResizable }
-			slug={ slug }
-			onChange={ onChange }
-			onChangeImage={ onChangeImage }
-		/>
 	);
 }
