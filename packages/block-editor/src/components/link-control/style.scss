@@ -121,6 +121,11 @@ $preview-image-height: 140px;
 		&[aria-selected] {
 			background: $gray-100;
 		}
+
+		&:hover,
+		&:focus {
+			background-color: $gray-200;
+		}
 	}
 
 	.components-menu-item__item {
