@@ -37,7 +37,7 @@ export default function PostSyncStatus() {
 						? __( 'Fully synced' )
 						: __( 'Not synced' )
 				}
-				checked={ syncStatus === 'fully' }
+				checked={ syncStatus === 'fully' || ! syncStatus }
 				onChange={ () => {
 					onUpdateSync(
 						syncStatus === 'fully' ? 'unsynced' : 'fully'
