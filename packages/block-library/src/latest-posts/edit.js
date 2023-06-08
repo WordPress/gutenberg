@@ -273,16 +273,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					<>
 						<ImageSizeControl
 							onChange={ ( value ) => {
-								const newAttrs = {};
-								if ( value.hasOwnProperty( 'width' ) ) {
-									newAttrs.featuredImageSizeWidth =
-										value.width;
-								}
-								if ( value.hasOwnProperty( 'height' ) ) {
-									newAttrs.featuredImageSizeHeight =
-										value.height;
-								}
-								setAttributes( newAttrs );
+								setAttributes( {
+									featuredImageSizeWidth: value.width,
+									featuredImageSizeHeight: value.height,
+								} );
 							} }
 							slug={ featuredImageSizeSlug }
 							width={ featuredImageSizeWidth }
