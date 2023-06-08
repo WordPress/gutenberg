@@ -133,7 +133,6 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 
 const useUserPatterns = ( categoryId, categoryType = PATTERNS ) => {
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
-	const currentId = parseInt( categoryId );
 	const userPatterns = useSelect(
 		( select ) => {
 			if ( postType !== USER_PATTERNS ) {
@@ -155,6 +154,14 @@ const useUserPatterns = ( categoryId, categoryType = PATTERNS ) => {
 		},
 		[ postType ]
 	);
+
+	if ( categoryId === 'uncategorized' ) {
+		return userPatterns.filter(
+			( pattern ) => ! pattern.categories?.length
+		);
+	}
+
+	const currentId = parseInt( categoryId );
 
 	return userPatterns.filter( ( pattern ) =>
 		pattern.categories?.includes( currentId )
