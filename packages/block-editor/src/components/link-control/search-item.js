@@ -13,6 +13,7 @@ import {
 	file,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 const ICONS_MAP = {
 	post: postList,
@@ -51,10 +52,14 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	shouldShowType = false,
 } ) => {
+	const info = isURL
+		? __( 'Press ENTER to add this link' )
+		: filterURLForDisplay( safeDecodeURI( suggestion?.url ) );
+
 	return (
 		<MenuItem
 			{ ...itemProps }
-			info={ isURL && __( 'Press ENTER to add this link' ) } // perhaps add info for all items.
+			info={ info }
 			iconPosition="left"
 			icon={
 				<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
