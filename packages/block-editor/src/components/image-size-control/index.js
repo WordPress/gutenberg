@@ -65,6 +65,14 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage,
 } ) {
+	const updateDimensions = ( dimensions ) => {
+		const newWidth = Number( dimensions.width );
+		const newHeight = Number( dimensions.height );
+		onChange( {
+			width: Number.isNaN( newWidth ) ? undefined : newWidth,
+			height: Number.isNaN( newHeight ) ? undefined : newHeight,
+		} );
+	};
 	return (
 		<>
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
@@ -88,11 +96,8 @@ export default function ImageSizeControl( {
 							value={ width }
 							min={ 1 }
 							onChange={ ( nextWidth ) =>
-								onChange( {
-									width:
-										nextWidth !== undefined
-											? Number( nextWidth )
-											: undefined,
+								updateDimensions( {
+									width: nextWidth,
 									height,
 								} )
 							}
@@ -105,12 +110,9 @@ export default function ImageSizeControl( {
 							value={ height }
 							min={ 1 }
 							onChange={ ( nextHeight ) =>
-								onChange( {
+								updateDimensions( {
 									width,
-									height:
-										nextHeight !== undefined
-											? Number( nextHeight )
-											: undefined,
+									height: nextHeight,
 								} )
 							}
 							size="__unstable-large"
@@ -139,7 +141,7 @@ export default function ImageSizeControl( {
 										}
 										isPressed={ isCurrent }
 										onClick={ () =>
-											onChange( {
+											updateDimensions( {
 												width: scaledWidth,
 												height: scaledHeight,
 											} )
@@ -150,15 +152,7 @@ export default function ImageSizeControl( {
 								);
 							} ) }
 						</ButtonGroup>
-						<Button
-							isSmall
-							onClick={ () =>
-								onChange( {
-									width: undefined,
-									height: undefined,
-								} )
-							}
-						>
+						<Button isSmall onClick={ () => updateDimensions() }>
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>
