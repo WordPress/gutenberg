@@ -516,7 +516,7 @@ export default function Image( {
 	}
 
 	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
-	// So we try using the imageRef width first and fallback om clientWidth.
+	// So we try using the imageRef width first and fallback to clientWidth.
 	const fallbackClientWidth = imageRef.current?.width || clientWidth;
 
 	if ( canEditImage && isEditingImage ) {
