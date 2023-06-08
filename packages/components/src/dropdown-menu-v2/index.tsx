@@ -75,7 +75,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 
 	// Render the portal in the default slot used by the legacy Popover component.
 	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
-	const portalContainer = slot.ref?.current || null;
+	const portalContainer = slot.ref?.current;
 
 	const privateContextValue = useMemo(
 		() => ( {
