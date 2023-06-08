@@ -258,6 +258,10 @@ function FlexLayoutVerticalAlignmentControl( {
 	);
 }
 
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
 function FlexLayoutJustifyContentControl( {
 	layout,
 	onChange,
@@ -282,10 +286,7 @@ function FlexLayoutJustifyContentControl( {
 				allowedControls={ allowedControls }
 				value={ justifyContent }
 				onChange={ onJustificationChange }
-				popoverProps={ {
-					position: 'bottom right',
-					variant: 'toolbar',
-				} }
+				popoverProps={ POPOVER_PROPS }
 			/>
 		);
 	}
