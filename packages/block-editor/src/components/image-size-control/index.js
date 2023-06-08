@@ -164,15 +164,32 @@ export function ImageSizeControl( {
 
 // Maintain backwards compatibility for the __experimentalImageSizeControl export.
 export default function ExperimentalImageSizeControl( {
+	imageSizeHelp,
+	width,
+	height,
 	imageWidth,
 	imageHeight,
-	...props
+	imageSizeOptions,
+	isResizable,
+	slug,
+	onChange,
+	onChangeImage,
 } ) {
+	deprecated( 'wp.blockEditor.__experimentalImageSizeControl', {
+		since: '6.3',
+	} );
 	return (
 		<PrivateImageSizeControl
+			imageSizeHelp={ imageSizeHelp }
+			width={ width }
+			height={ height }
 			naturalWidth={ imageWidth }
 			naturalHeight={ imageHeight }
-			{ ...props }
+			imageSizeOptions={ imageSizeOptions }
+			isResizable={ isResizable }
+			slug={ slug }
+			onChange={ onChange }
+			onChangeImage={ onChangeImage }
 		/>
 	);
 }
