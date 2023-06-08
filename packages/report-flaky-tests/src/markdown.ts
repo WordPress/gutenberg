@@ -96,7 +96,6 @@ function formatTestErrorMessage( flakyTestResult: FlakyTestResult ) {
 		default: {
 			return stripAnsi(
 				formatResultsErrors(
-					// @ts-ignore
 					flakyTestResult.results,
 					{
 						rootDir: path.join(
