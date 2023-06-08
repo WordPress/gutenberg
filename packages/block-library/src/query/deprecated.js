@@ -143,6 +143,8 @@ const migrateToConstrainedLayout = ( attributes ) => {
 			},
 		};
 	}
+
+	return attributes;
 };
 
 const findPostTemplateBlock = ( innerBlocks = [] ) => {
