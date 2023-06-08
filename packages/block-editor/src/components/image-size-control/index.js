@@ -93,8 +93,11 @@ export default function ImageSizeControl( {
 							min={ 1 }
 							onChange={ ( nextWidth ) =>
 								onChange( {
+									width:
+										nextWidth !== undefined
+											? Number( nextWidth )
+											: undefined,
 									height,
-									width: Number( nextWidth ),
 								} )
 							}
 							size="__unstable-large"
@@ -107,8 +110,11 @@ export default function ImageSizeControl( {
 							min={ 1 }
 							onChange={ ( nextHeight ) =>
 								onChange( {
-									height: Number( nextHeight ),
 									width,
+									height:
+										nextHeight !== undefined
+											? Number( nextHeight )
+											: undefined,
 								} )
 							}
 							size="__unstable-large"
