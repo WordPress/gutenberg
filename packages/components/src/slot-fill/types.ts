@@ -15,12 +15,16 @@ export type FillProps = {
 	children: ReactNode;
 };
 
+export type BubblesVirtuallySlot = {
+	ref: MutableRefObject< HTMLElement >;
+	fillProps: FillProps;
+};
+
+export type BubblesVirtuallyFill = MutableRefObject< { rerender: () => {} } >[];
+
 export type SlotRegistry = {
-	slots: Map<
-		string,
-		{ ref: MutableRefObject< HTMLElement >; fillProps: FillProps }
-	>;
-	fills: Map< string, MutableRefObject< { rerender: () => {} } >[] >;
+	slots: Map< string, BubblesVirtuallySlot >;
+	fills: Map< string, BubblesVirtuallyFill >;
 	registerSlot: (
 		name: string,
 		ref: MutableRefObject< HTMLElement >,

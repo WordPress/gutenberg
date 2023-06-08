@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -14,7 +13,7 @@ import { useMemo, useContext } from '@wordpress/element';
  */
 import SlotFillContext from './slot-fill-context';
 
-export default function useSlot( name ) {
+export default function useSlot( name: string ) {
 	const registry = useContext( SlotFillContext );
 	const slots = useSnapshot( registry.slots, { sync: true } );
 	// The important bit here is that the `useSnapshot` call ensures that the
@@ -24,10 +23,18 @@ export default function useSlot( name ) {
 
 	const api = useMemo(
 		() => ( {
-			updateSlot: ( fillProps ) => registry.updateSlot( name, fillProps ),
-			unregisterSlot: ( ref ) => registry.unregisterSlot( name, ref ),
-			registerFill: ( ref ) => registry.registerFill( name, ref ),
-			unregisterFill: ( ref ) => registry.unregisterFill( name, ref ),
+			updateSlot: (
+				fillProps: Parameters< typeof registry.updateSlot >[ 1 ]
+			) => registry.updateSlot( name, fillProps ),
+			unregisterSlot: (
+				ref: Parameters< typeof registry.unregisterSlot >[ 1 ]
+			) => registry.unregisterSlot( name, ref ),
+			registerFill: (
+				ref: Parameters< typeof registry.registerFill >[ 1 ]
+			) => registry.registerFill( name, ref ),
+			unregisterFill: (
+				ref: Parameters< typeof registry.unregisterFill >[ 1 ]
+			) => registry.unregisterFill( name, ref ),
 		} ),
 		[ name, registry ]
 	);
