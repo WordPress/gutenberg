@@ -24,7 +24,7 @@ import type { BubblesVirtuallySlotProps } from '../types';
 
 function Slot(
 	props: WordPressComponentProps< BubblesVirtuallySlotProps, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		name,
@@ -38,7 +38,7 @@ function Slot(
 
 	const { registerSlot, unregisterSlot, ...registry } =
 		useContext( SlotFillContext );
-	const ref = useRef< HTMLDivElement >();
+	const ref = useRef();
 
 	useLayoutEffect( () => {
 		registerSlot( name, ref, fillProps );
