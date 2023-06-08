@@ -37,23 +37,19 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
  */
 
 /**
- * @typedef {Object} ImageSizeControlProps
- * @property {string}             [imageSizeHelp]       Help text for the image size select control.
- * @property {number}             [width]               Specified width for the image.
- * @property {number}             [height]              Specified height for the image.
- * @property {number}             [naturalWidth]        Width of the image source.
- * @property {number}             [naturalHeight]       Height of the image source.
- * @property {ImageSizeOptions[]} [imageSizeOptions=[]] Array of image size options.
- * @property {boolean}            [isResizable=true]    Whether the image is resizable.
- * @property {string}             [slug]                Slug of the selected image size.
- * @property {OnChange}           [onChange]            Function to call when the styled image size changes.
- * @property {OnChangeImage}      [onChangeImage]       Function to call when the source image resolution changes.
- */
-
-/**
  * Image size control.
  *
- * @param {ImageSizeControlProps} props Component props.
+ * @param {Object}             props                       Component props.
+ * @param {string}             [props.imageSizeHelp]       Help text for the image size select control.
+ * @param {number}             [props.width]               Specified width for the image.
+ * @param {number}             [props.height]              Specified height for the image.
+ * @param {number}             [props.naturalWidth]        Width of the image source.
+ * @param {number}             [props.naturalHeight]       Height of the image source.
+ * @param {ImageSizeOptions[]} [props.imageSizeOptions=[]] Array of image size options.
+ * @param {boolean}            [props.isResizable=true]    Whether the image is resizable.
+ * @param {string}             [props.slug]                Slug of the selected image size.
+ * @param {OnChange}           [props.onChange]            Function to call when the styled image size changes.
+ * @param {OnChangeImage}      [props.onChangeImage]       Function to call when the source image resolution changes.
  *
  * @return {import('@wordpress/element').WPElement} Image size control.
  */
