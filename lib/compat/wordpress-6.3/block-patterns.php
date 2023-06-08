@@ -70,7 +70,7 @@ function gutenberg_register_wp_patterns_taxonomy_categories() {
 		),
 		array(
 			'slug'        => 'query',
-			'label'       => _x( 'Posts', 'Block pattern category', 'gutenberg' ),
+			'label'       => _x( 'Post list', 'Block pattern category', 'gutenberg' ),
 			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
 		),
 		array(

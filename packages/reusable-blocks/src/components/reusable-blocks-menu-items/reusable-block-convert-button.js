@@ -142,6 +142,7 @@ export default function ReusableBlockConvertButton( {
 	}
 	const patternCategories = categories === null ? [] : categories;
 	const categoryOptions = patternCategories
+		.filter( ( category ) => category.slug !== 'query' )
 		.map( ( category ) => ( {
 			label: category.name,
 			value: category.id,
