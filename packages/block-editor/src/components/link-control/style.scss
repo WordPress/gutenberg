@@ -142,6 +142,7 @@ $preview-image-height: 140px;
 // 	border-bottom: 1px solid $gray-400; // its odd currently because there are no persistent controls in the foot.
 // }
 
+
 .block-editor-link-control__search-item {
 
 	&.components-button.components-menu-item__button {
@@ -149,6 +150,10 @@ $preview-image-height: 140px;
 		padding-right: $grid-unit-10;
 		height: auto;
 		text-align: left;
+
+		&[aria-selected] {
+			background: $gray-100;
+		}
 	}
 
 	.components-menu-item__item {
