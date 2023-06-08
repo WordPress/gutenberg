@@ -100,7 +100,7 @@ function NavigationMenuEditor( { navigationMenu } ) {
 					postType: attributes.type,
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						theme_preview: currentlyPreviewingTheme(),
+						gutenberg_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}
@@ -109,7 +109,7 @@ function NavigationMenuEditor( { navigationMenu } ) {
 					postType: 'page',
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						theme_preview: currentlyPreviewingTheme(),
+						gutenberg_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}
