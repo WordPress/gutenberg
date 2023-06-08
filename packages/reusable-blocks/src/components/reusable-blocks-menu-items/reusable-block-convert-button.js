@@ -113,7 +113,7 @@ export default function ReusableBlockConvertButton( {
 					sprintf(
 						// translators: %s: Type of block (i.e. Reusable or Pattern).
 						__( '%s created.' ),
-						syncType === 'synced'
+						syncType === 'fully'
 							? __( 'Synced Pattern' )
 							: __( 'Unsynced Pattern' )
 					),
