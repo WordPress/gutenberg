@@ -101,6 +101,21 @@ function createResolversCache() {
 	};
 }
 
+function createBindingCache( bind ) {
+	const cache = new WeakMap();
+
+	return {
+		get( item ) {
+			let boundItem = cache.get( item );
+			if ( ! boundItem ) {
+				boundItem = bind( item );
+				cache.set( item, boundItem );
+			}
+			return boundItem;
+		},
+	};
+}
+
 /**
  * Creates a data store descriptor for the provided Redux store configuration containing
  * properties describing reducer, actions, selectors, controls and resolvers.
@@ -147,17 +162,10 @@ export default function createReduxStore( key, options ) {
 			const thunkArgs = {
 				registry,
 				get dispatch() {
-					return Object.assign(
-						( action ) => store.dispatch( action ),
-						getActions()
-					);
+					return thunkActions;
 				},
 				get select() {
-					return Object.assign(
-						( selector ) =>
-							selector( store.__unstableOriginalGetState() ),
-						getSelectors()
-					);
+					return thunkSelectors;
 				},
 				get resolveSelect() {
 					return getResolveSelectors();
@@ -185,17 +193,22 @@ export default function createReduxStore( key, options ) {
 				...mapValues( options.actions, bindAction ),
 			};
 
-			lock(
-				actions,
-				new Proxy( privateActions, {
-					get: ( target, prop ) => {
-						const privateAction = privateActions[ prop ];
-						return privateAction
-							? bindAction( privateAction )
-							: actions[ prop ];
-					},
-				} )
-			);
+			const boundPrivateActions = createBindingCache( bindAction );
+			const allActions = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateAction = privateActions[ prop ];
+					return privateAction
+						? boundPrivateActions.get( privateAction )
+						: actions[ prop ];
+				},
+			} );
+
+			const thunkActions = new Proxy( allActions, {
+				apply: ( target, thisArg, [ action ] ) =>
+					store.dispatch( action ),
+			} );
+
+			lock( actions, allActions );
 
 			function bindSelector( selector ) {
 				if ( selector.isRegistrySelector ) {
@@ -234,17 +247,29 @@ export default function createReduxStore( key, options ) {
 				);
 			}
 
-			lock(
-				selectors,
-				new Proxy( privateSelectors, {
-					get: ( target, prop ) => {
-						const privateSelector = privateSelectors[ prop ];
-						return privateSelector
-							? bindSelector( privateSelector )
-							: selectors[ prop ];
-					},
-				} )
-			);
+			const boundPrivateSelectors = createBindingCache( bindSelector );
+
+			// Pre-bind the private selectors that have been registered by the time of
+			// instantiation, so that registry selectors are bound to the registry.
+			for ( const privateSelector of Object.values( privateSelectors ) ) {
+				boundPrivateSelectors.get( privateSelector );
+			}
+
+			const allSelectors = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateSelector = privateSelectors[ prop ];
+					return privateSelector
+						? boundPrivateSelectors.get( privateSelector )
+						: selectors[ prop ];
+				},
+			} );
+
+			const thunkSelectors = new Proxy( allSelectors, {
+				apply: ( target, thisArg, [ selector ] ) =>
+					selector( store.__unstableOriginalGetState() ),
+			} );
+
+			lock( selectors, allSelectors );
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
 			const suspendSelectors = mapSuspendSelectors( selectors, store );
