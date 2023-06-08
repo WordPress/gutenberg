@@ -129,6 +129,7 @@ function ListViewBlockSelectButton(
 					className
 				) }
 				onClick={ onClick }
+				onDoubleClick={ onToggleExpanded }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
 				tabIndex={ tabIndex }
