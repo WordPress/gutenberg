@@ -142,3 +142,13 @@
 		padding-right: calc((2/3) * 1em);
 	}
 }
+
+// Ensure the Snapchat label is visible when no custom
+// icon color or background color is set.
+.wp-block-social-links:not(.has-icon-color):not(.has-icon-background-color) {
+	.wp-social-link-snapchat {
+		.wp-block-social-link-label {
+			color: #000;
+		}
+	}
+}

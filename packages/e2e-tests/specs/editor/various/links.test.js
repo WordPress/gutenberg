@@ -665,7 +665,7 @@ describe( 'Links', () => {
 			await page.waitForXPath( `//label[text()='Open in new tab']` );
 
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 3 );
+			await pressKeyTimes( 'Tab', 4 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
