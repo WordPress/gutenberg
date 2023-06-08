@@ -200,20 +200,20 @@ $preview-image-height: 140px;
 		align-items: center;
 	}
 
-	// .block-editor-link-control__search-item-icon {
-	// 	position: relative;
-	// 	top: 0.2em;
-	// 	margin-right: $grid-unit-10;
-	// 	max-height: 24px;
-	// 	flex-shrink: 0;
-	// 	width: 24px;
-	// 	display: flex;
-	// 	justify-content: center;
+	.block-editor-link-control__search-item-icon {
+		position: relative;
+		top: 0.2em;
+		margin-right: $grid-unit-10;
+		max-height: 24px;
+		flex-shrink: 0;
+		width: 24px;
+		display: flex;
+		justify-content: center;
 
-	// 	img {
-	// 		width: 16px; // favicons often have a source of 32px
-	// 	}
-	// }
+		img {
+			width: 16px; // favicons often have a source of 32px
+		}
+	}
 
 	&.is-error .block-editor-link-control__search-item-icon {
 		top: 0;
