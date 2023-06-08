@@ -32,7 +32,7 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 
 /**
  * @callback OnChangeImage
- * @param {string} slug Image size slug.
+ * @param {string} [newSlug] Image size slug.
  * @return {void}
  */
 
