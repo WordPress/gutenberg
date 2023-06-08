@@ -17,7 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import {
 	isPreviewingTheme,

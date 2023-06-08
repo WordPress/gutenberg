@@ -39,7 +39,7 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 

@@ -28,7 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import Image from './image';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 /**
  * Module constants

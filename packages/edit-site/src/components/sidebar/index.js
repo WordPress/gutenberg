@@ -23,7 +23,7 @@ import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 

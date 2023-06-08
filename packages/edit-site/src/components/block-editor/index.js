@@ -36,7 +36,7 @@ import { store as editSiteStore } from '../../store';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import {
 	DisableNonPageContentBlocks,

@@ -27,7 +27,7 @@ import { store as commandsStore } from '@wordpress/commands';
  */
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 

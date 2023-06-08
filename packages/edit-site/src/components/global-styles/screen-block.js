@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { useBlockVariations, VariationsPanel } from './variations-panel';
 
