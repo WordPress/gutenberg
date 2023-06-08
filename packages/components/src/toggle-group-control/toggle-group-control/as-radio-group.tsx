@@ -14,6 +14,7 @@ import {
 	useRef,
 	useLayoutEffect,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -22,7 +23,10 @@ import {
 import { View } from '../../view';
 import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlMainControlProps } from '../types';
+import type {
+	ToggleGroupControlMainControlProps,
+	ToggleGroupControlContextProps,
+} from '../types';
 
 function UnforwardedToggleGroupControlAsRadioGroup(
 	{
@@ -52,32 +56,40 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	} );
 	const previousValue = usePrevious( value );
 
+	const groupContextValue = useMemo(
+		() =>
+			( {
+				...radio,
+				isBlock: ! isAdaptiveWidth,
+				size,
+			} as ToggleGroupControlContextProps ),
+		[ radio, isAdaptiveWidth, size ]
+	);
+
 	useEffect( () => {
 		mounted.current = true;
 	}, [] );
 
-	const { setState: radioSetState, state: radioState } = radio;
+	const { setState: groupSetState, state: groupState } = groupContextValue;
 
-	// Propagate radio.state change.
+	// Propagate groupContext.state change.
 	useLayoutEffect( () => {
-		// Avoid calling onChange if radio state changed
+		// Avoid calling onChange if groupContext state changed
 		// from incoming value.
-		if ( mounted.current && previousValue !== radioState ) {
-			onChange( radioState );
+		if ( mounted.current && previousValue !== groupState ) {
+			onChange( groupState );
 		}
-	}, [ radioState, previousValue, onChange ] );
+	}, [ groupState, onChange, previousValue ] );
 
-	// Sync incoming value with radio.state.
+	// Sync incoming value with groupContext.state.
 	useLayoutEffect( () => {
-		if ( mounted.current && value !== radioState ) {
-			radioSetState( value );
+		if ( mounted.current && value !== groupState ) {
+			groupSetState( value );
 		}
-	}, [ value, radioSetState, radioState ] );
+	}, [ groupSetState, groupState, value ] );
 
 	return (
-		<ToggleGroupControlContext.Provider
-			value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
-		>
+		<ToggleGroupControlContext.Provider value={ groupContextValue }>
 			<RadioGroup
 				{ ...radio }
 				aria-label={ label }

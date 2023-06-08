@@ -7,16 +7,25 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { forwardRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useMemo,
+	useState,
+	useRef,
+	useLayoutEffect,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
 import ToggleGroupControlContext from '../context';
-import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlMainControlProps } from '../types';
+import type {
+	ToggleGroupControlMainControlProps,
+	ToggleGroupControlContextProps,
+} from '../types';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -34,43 +43,52 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
+	const mounted = useRef( false );
+
 	const baseId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
 	const [ selectedValue, setSelectedValue ] = useState( value );
-	const groupContext = {
-		baseId,
-		state: selectedValue,
-		setState: setSelectedValue,
-	};
 	const previousValue = usePrevious( value );
 
-	// Propagate groupContext.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if groupContext state changed
-		// from incoming value.
-		if ( previousValue !== groupContext.state ) {
-			onChange( groupContext.state );
-		}
-	}, [ groupContext.state ] );
-
-	// Sync incoming value with groupContext.state.
-	useUpdateEffect( () => {
-		if ( value !== groupContext.state ) {
-			groupContext.setState( value );
-		}
-	}, [ value ] );
-
-	return (
-		<ToggleGroupControlContext.Provider
-			value={ {
-				...groupContext,
+	const groupContextValue = useMemo(
+		() =>
+			( {
+				baseId,
+				state: selectedValue,
+				setState: setSelectedValue,
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,
-			} }
-		>
+			} as ToggleGroupControlContextProps ),
+		[ baseId, selectedValue, isAdaptiveWidth, size ]
+	);
+
+	useEffect( () => {
+		mounted.current = true;
+	}, [] );
+
+	const { setState: groupSetState, state: groupState } = groupContextValue;
+
+	// Propagate groupContext.state change.
+	useLayoutEffect( () => {
+		// Avoid calling onChange if groupContext state changed
+		// from incoming value.
+		if ( mounted.current && previousValue !== groupState ) {
+			onChange( groupState );
+		}
+	}, [ groupState, onChange, previousValue ] );
+
+	// Sync incoming value with groupContext.state.
+	useLayoutEffect( () => {
+		if ( value !== groupState ) {
+			groupSetState( value );
+		}
+	}, [ groupSetState, groupState, value ] );
+
+	return (
+		<ToggleGroupControlContext.Provider value={ groupContextValue }>
 			<View
 				aria-label={ label }
 				{ ...otherProps }
