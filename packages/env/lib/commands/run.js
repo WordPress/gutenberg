@@ -78,6 +78,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 	);
 
 	const composeCommand = [
+		'compose',
 		'-f',
 		config.dockerComposeConfigPath,
 		'exec',
@@ -98,7 +99,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		// cannot use it to spawn an interactive command. Thus, we run docker-
 		// compose on the CLI directly.
 		const childProc = spawn(
-			'docker-compose',
+			'docker',
 			composeCommand,
 			{ stdio: 'inherit' },
 			spinner
