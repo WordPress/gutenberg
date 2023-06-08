@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.0 (2023-06-07)
+
 ### New feature
 
 -   Execute the local package's `wp-env` instead of the globally installed version if one is available.

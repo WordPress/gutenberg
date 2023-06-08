@@ -10,7 +10,7 @@ import {
 /**
  * Internal dependencies
  */
-import { CONTENT_BLOCK_TYPES } from '../../page-content-lock/constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../page-content-focus/constants';
 import { unlock } from '../../../private-apis';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
@@ -20,7 +20,7 @@ export default function PageContent() {
 		const { getClientIdsWithDescendants, getBlockName } =
 			select( blockEditorStore );
 		return getClientIdsWithDescendants().filter( ( clientId ) =>
-			CONTENT_BLOCK_TYPES.includes( getBlockName( clientId ) )
+			PAGE_CONTENT_BLOCK_TYPES.includes( getBlockName( clientId ) )
 		);
 	}, [] );
 	return <BlockQuickNavigation clientIds={ pageContentClientIds } />;

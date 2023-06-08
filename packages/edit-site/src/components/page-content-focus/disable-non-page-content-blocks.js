@@ -10,20 +10,28 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-import { CONTENT_BLOCK_TYPES } from './constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 /**
+ * Component that when rendered, makes it so that the site editor allows only
+ * page content to be edited.
+ */
+export function DisableNonPageContentBlocks() {
+	useDisableNonPageContentBlocks();
+}
+
+/**
  * Disables non-content blocks using the `useBlockEditingMode` hook.
  */
-export function useDisableNonContentBlocks() {
+export function useDisableNonPageContentBlocks() {
 	useBlockEditingMode( 'disabled' );
 	useEffect( () => {
 		addFilter(
 			'editor.BlockEdit',
 			'core/edit-site/disable-non-content-blocks',
-			withDisableNonContentBlocks
+			withDisableNonPageContentBlocks
 		);
 		return () =>
 			removeFilter(
@@ -33,12 +41,12 @@ export function useDisableNonContentBlocks() {
 	}, [] );
 }
 
-const withDisableNonContentBlocks = createHigherOrderComponent(
+const withDisableNonPageContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isContent = CONTENT_BLOCK_TYPES.includes( props.name );
+		const isContent = PAGE_CONTENT_BLOCK_TYPES.includes( props.name );
 		const mode = isContent ? 'contentOnly' : undefined;
 		useBlockEditingMode( mode );
 		return <BlockEdit { ...props } />;
 	},
-	'withBlockEditingMode'
+	'withDisableNonPageContentBlocks'
 );
