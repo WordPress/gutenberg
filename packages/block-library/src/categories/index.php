@@ -46,12 +46,16 @@ function render_block_core_categories( $attributes ) {
 			);
 		}
 	} else {
-		$wrapper_markup = '<ul %1$s>%2$s</ul>';
-		$items_markup   = wp_list_categories( $args );
-		$type           = 'list';
+		$wrapper_markup  = '<ul %1$s>%2$s</ul>';
+		$items_markup    = wp_list_categories( $args );
+		$type            = 'list';
+		$list_style_type = $attributes['listStyleType'];
 	}
-
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "wp-block-categories-{$type}" ) );
+	$attribute_array = array( 'class' => "wp-block-categories-{$type}" );
+	if ( ! empty( $list_style_type ) && $list_style_type !== 'inherit' ) {
+		$attribute_array['style'] = "list-style-type: {$list_style_type}";
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( $attribute_array );
 
 	return sprintf(
 		$wrapper_markup,
