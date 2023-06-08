@@ -261,7 +261,9 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// redirect from the revisions screen to the root global styles screen.
 			goTo( '/' );
 		}
-	}, [ editorCanvasContainerView, location?.path, goTo ] );
+		// location?.path is not a dependency because we don't want to track it.
+		// Doing so will cause an infinite loop.
+	}, [ editorCanvasContainerView, goTo ] );
 }
 
 function GlobalStylesUI() {
