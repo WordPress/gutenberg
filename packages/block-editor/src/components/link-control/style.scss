@@ -99,34 +99,6 @@ $preview-image-height: 140px;
 	order: 20;
 }
 
-// .block-editor-link-control__search-results-wrapper {
-// 	position: relative;
-// 	margin-top: -$grid-unit-20 + 1px;
-
-// 	&::before,
-// 	&::after {
-// 		content: "";
-// 		position: absolute;
-// 		left: -1px;
-// 		right: $grid-unit-20; // avoid overlaying scrollbars
-// 		display: block;
-// 		pointer-events: none;
-// 		z-index: 100;
-// 	}
-
-// 	&::before {
-// 		height: $grid-unit-20 * 0.5;
-// 		top: 0;
-// 		bottom: auto;
-// 	}
-
-// 	&::after {
-// 		height: $grid-unit-20;
-// 		bottom: 0;
-// 		top: auto;
-// 	}
-// }
-
 .block-editor-link-control__search-results {
 	margin-top: -$grid-unit-20;
 	padding: $grid-unit-10;
@@ -137,11 +109,6 @@ $preview-image-height: 140px;
 		opacity: 0.2;
 	}
 }
-
-// .block-editor-link-control__search-results-wrapper {
-// 	border-bottom: 1px solid $gray-400; // its odd currently because there are no persistent controls in the foot.
-// }
-
 
 .block-editor-link-control__search-item {
 
