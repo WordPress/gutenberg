@@ -7,6 +7,8 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
 	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -83,43 +85,40 @@ function GlobalStylesActionMenu() {
 			<DropdownMenu
 				icon={ moreVertical }
 				label={ __( 'Styles actions' ) }
-				controls={ [
-					{
-						title: __( 'Reset to defaults' ),
-						onClick: onReset,
-						isDisabled: ! canReset,
-					},
-					{
-						title: __( 'Welcome Guide' ),
-						onClick: () =>
-							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
-					},
-					...( canEditCSS
-						? [
-								{
-									title: __( 'Additional CSS' ),
-									onClick: loadCustomCSS,
-								},
-						  ]
-						: [] ),
-					...( hasRevisions
-						? [
-								{
-									title: sprintf(
-										/* translators: %d: number of revisions */
-										_n(
-											'%d Revision',
-											'%d Revisions',
-											revisionsCount
-										),
+			>
+				{ () => (
+					<MenuGroup>
+						{ canEditCSS && (
+							<MenuItem onClick={ loadCustomCSS }>
+								{ __( 'Additional CSS' ) }
+							</MenuItem>
+						) }
+						<MenuItem
+							onClick={ () =>
+								toggle( 'core/edit-site', 'welcomeGuideStyles' )
+							}
+						>
+							{ __( 'Welcome Guide' ) }
+						</MenuItem>
+						{ hasRevisions && (
+							<MenuItem onClick={ loadRevisions }>
+								{ sprintf(
+									/* translators: %d: number of revisions */
+									_n(
+										'%d Revision',
+										'%d Revisions',
 										revisionsCount
 									),
-									onClick: loadRevisions,
-								},
-						  ]
-						: [] ),
-				] }
-			/>
+									revisionsCount
+								) }
+							</MenuItem>
+						) }
+						<MenuItem onClick={ onReset } disabled={ ! canReset }>
+							{ __( 'Reset to defaults' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
 		</GlobalStylesMenuFill>
 	);
 }
