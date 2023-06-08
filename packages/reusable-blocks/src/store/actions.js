@@ -55,7 +55,7 @@ export const __experimentalConvertBlocksToReusable =
 				sync_status: syncType,
 			},
 		};
-		const categories = [ categoryId ];
+		const categories = categoryId ? [ categoryId ] : undefined;
 
 		const reusableBlock = {
 			title: title || __( 'Untitled Pattern block' ),

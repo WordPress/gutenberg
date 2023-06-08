@@ -157,6 +157,7 @@ export default function ReusableBlockConvertButton( {
 					<MenuItem
 						icon={ symbol }
 						onClick={ () => {
+							setCategoryId( '' );
 							setIsModalOpen( true );
 						} }
 					>
