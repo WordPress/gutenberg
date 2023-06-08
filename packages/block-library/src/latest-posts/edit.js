@@ -281,8 +281,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							slug={ featuredImageSizeSlug }
 							width={ featuredImageSizeWidth }
 							height={ featuredImageSizeHeight }
-							naturalWidth={ defaultImageWidth }
-							naturalHeight={ defaultImageHeight }
+							imageWidth={ defaultImageWidth }
+							imageHeight={ defaultImageHeight }
 							imageSizeOptions={ imageSizeOptions }
 							imageSizeHelp={ __(
 								'Select the size of the source image.'

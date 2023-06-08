@@ -43,8 +43,8 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
  * @param {string}             [props.imageSizeHelp]       Help text for the image size select control.
  * @param {number}             [props.width]               Specified width for the image.
  * @param {number}             [props.height]              Specified height for the image.
- * @param {number}             [props.naturalWidth]        Width of the image source.
- * @param {number}             [props.naturalHeight]       Height of the image source.
+ * @param {number}             [props.imageWidth]          Width of the image source.
+ * @param {number}             [props.imageHeight]         Height of the image source.
  * @param {ImageSizeOptions[]} [props.imageSizeOptions=[]] Array of image size options.
  * @param {boolean}            [props.isResizable=true]    Whether the image is resizable.
  * @param {string}             [props.slug]                Slug of the selected image size.
@@ -57,8 +57,8 @@ export default function ImageSizeControl( {
 	imageSizeHelp,
 	width,
 	height,
-	naturalWidth,
-	naturalHeight,
+	imageWidth: naturalWidth,
+	imageHeight: naturalHeight,
 	imageSizeOptions = [],
 	isResizable = true,
 	slug,
