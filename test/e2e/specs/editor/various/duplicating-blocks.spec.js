@@ -43,11 +43,6 @@ test.describe( 'Duplicating blocks', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Clone me' );
 
-		// Select the test we just typed
-		// This doesn't do anything but we previously had a duplicationi bug
-		// When the selection was not collapsed.
-		await pageUtils.pressKeys( 'primary+a' );
-
 		// Duplicate using the keyboard shortccut.
 		await pageUtils.pressKeys( 'primaryShift+d' );
 
