@@ -28,6 +28,10 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
 export default function ButtonsEdit( {
 	attributes: { layout, align },
 	clientId,
@@ -137,10 +141,7 @@ export default function ButtonsEdit( {
 								},
 							} )
 						}
-						popoverProps={ {
-							position: 'bottom right',
-							variant: 'toolbar',
-						} }
+						popoverProps={ POPOVER_PROPS }
 					/>
 				</BlockControls>
 			) }
