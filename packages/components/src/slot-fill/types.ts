@@ -4,8 +4,28 @@
 import type { MutableRefObject, ReactNode } from 'react';
 
 export type BubblesVirtuallySlotProps = {
+	/**
+	 * Slot name.
+	 */
 	name: string;
-	fillProps: any;
+	/**
+	 * props to pass from `Slot` to `Fill`.
+	 *
+	 * @default {}
+	 */
+	fillProps?: any;
+};
+
+export type BubblesVirtuallyFillProps = {
+	/**
+	 * Slot name.
+	 */
+	name: string;
+
+	/**
+	 * Children elements.
+	 */
+	children: ReactNode;
 };
 
 export type BubblesVirtuallySlotFillContext = {

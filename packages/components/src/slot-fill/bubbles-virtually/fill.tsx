@@ -9,6 +9,7 @@ import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
  */
 import useSlot from './use-slot';
 import StyleProvider from '../../style-provider';
+import type { BubblesVirtuallyFillProps } from '../types';
 
 function useForceUpdate() {
 	const [ , setState ] = useState( {} );
@@ -28,7 +29,8 @@ function useForceUpdate() {
 	};
 }
 
-export default function Fill( { name, children } ) {
+export default function Fill( props: BubblesVirtuallyFillProps ) {
+	const { name, children } = props;
 	const { registerFill, unregisterFill, ...slot } = useSlot( name );
 	const rerender = useForceUpdate();
 	const ref = useRef( { rerender } );
@@ -47,8 +49,9 @@ export default function Fill( { name, children } ) {
 		return null;
 	}
 
+	let newChildren = children;
 	if ( typeof children === 'function' ) {
-		children = children( slot.fillProps );
+		newChildren = children( slot.fillProps );
 	}
 
 	// When using a `Fill`, the `children` will be rendered in the document of the
@@ -57,7 +60,7 @@ export default function Fill( { name, children } ) {
 	// context of the `Fill`'s parent).
 	const wrappedChildren = (
 		<StyleProvider document={ slot.ref.current.ownerDocument }>
-			{ children }
+			{ newChildren }
 		</StyleProvider>
 	);
 
