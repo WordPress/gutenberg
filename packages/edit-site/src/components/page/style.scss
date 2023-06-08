@@ -20,6 +20,7 @@
 	background: $white;
 	position: sticky;
 	top: 0;
+	z-index: z-index(".edit-site-page-header");
 	.components-text {
 		color: $gray-800;
 	}
