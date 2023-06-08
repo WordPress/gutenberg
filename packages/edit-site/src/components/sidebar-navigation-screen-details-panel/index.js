@@ -19,12 +19,14 @@ function SidebarNavigationScreenDetailsPanel( { title, children } ) {
 			className="edit-site-sidebar-navigation-details-screen-panel"
 			spacing={ 5 }
 		>
-			<Heading
-				className="edit-site-sidebar-navigation-details-screen-panel__heading"
-				level={ 3 }
-			>
-				{ title }
-			</Heading>
+			{ title && (
+				<Heading
+					className="edit-site-sidebar-navigation-details-screen-panel__heading"
+					level={ 3 }
+				>
+					{ title }
+				</Heading>
+			) }
 			{ children }
 		</VStack>
 	);

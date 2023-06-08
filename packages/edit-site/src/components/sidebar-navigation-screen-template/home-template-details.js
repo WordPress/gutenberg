@@ -11,6 +11,7 @@ import {
 	Button,
 	Icon,
 	__experimentalInputControl as InputControl,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { header, footer, layout, chevronRightSmall } from '@wordpress/icons';
 import { useMemo, useState, useEffect } from '@wordpress/element';
@@ -21,8 +22,6 @@ import { useMemo, useState, useEffect } from '@wordpress/element';
 import {
 	SidebarNavigationScreenDetailsPanel,
 	SidebarNavigationScreenDetailsPanelRow,
-	SidebarNavigationScreenDetailsPanelLabel,
-	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
@@ -30,10 +29,15 @@ import { useLink } from '../routes/link';
 
 const EMPTY_OBJECT = {};
 
-function TemplateAreaButton( { postId, icon, label } ) {
+function TemplateAreaButton( { area, postId, icon, title } ) {
 	const icons = {
 		header,
 		footer,
+	};
+	// Generic area labels - not the same as the template part title defined in "templateParts" in theme.json.
+	const areaLabels = {
+		header: __( 'Header' ),
+		footer: __( 'Footer' ),
 	};
 	const linkInfo = useLink( {
 		postType: 'wp_template_part',
@@ -44,11 +48,23 @@ function TemplateAreaButton( { postId, icon, label } ) {
 		<Button
 			as="a"
 			className="edit-site-sidebar-navigation-screen-template__template-area-button"
-			icon={ icons[ icon ] ?? layout }
 			{ ...linkInfo }
 		>
-			{ label }
-			<Icon icon={ chevronRightSmall } />
+			<span className="edit-site-sidebar-navigation-screen-template__template-area-name">
+				{ areaLabels[ area ] ?? __( 'Template part' ) }
+			</span>
+			<span className="edit-site-sidebar-navigation-screen-template__template-area-label">
+				<Icon icon={ icons[ icon ] ?? layout } />
+				<Truncate
+					limit={ 20 }
+					ellipsizeMode="tail"
+					numberOfLines={ 1 }
+					className="edit-site-sidebar-navigation-screen-template__template-area-label-text"
+				>
+					{ title }
+				</Truncate>
+				<Icon icon={ chevronRightSmall } />
+			</span>
 		</Button>
 	);
 }
@@ -95,8 +111,8 @@ export default function HomeTemplateDetails() {
 		[ postType, postId ]
 	);
 
-	const [ commentsOnNewPosts, setCommentsOnNewPosts ] = useState( null );
-	const [ postsCount, setPostsCount ] = useState( '' );
+	const [ commentsOnNewPosts, setCommentsOnNewPosts ] = useState( '' );
+	const [ postsCount, setPostsCount ] = useState( 1 );
 	const [ siteTitleValue, setSiteTitleValue ] = useState( '' );
 
 	useEffect( () => {
@@ -111,12 +127,12 @@ export default function HomeTemplateDetails() {
 					.filter(
 						( { name, attributes } ) =>
 							name === 'core/template-part' &&
-							( attributes?.slug === 'header' ||
-								attributes?.slug === 'footer' )
+							( attributes?.tagName === 'header' ||
+								attributes?.tagName === 'footer' )
 					)
 					.map( ( { attributes } ) => ( {
 						...templatePartAreas?.find(
-							( { area } ) => area === attributes?.slug
+							( { area } ) => area === attributes?.tagName
 						),
 						...attributes,
 					} ) )
@@ -146,36 +162,34 @@ export default function HomeTemplateDetails() {
 
 	return (
 		<>
-			<SidebarNavigationScreenDetailsPanel title={ __( 'Settings' ) }>
+			<SidebarNavigationScreenDetailsPanel>
+				<SidebarNavigationScreenDetailsPanelRow>
+					<InputControl
+						className="edit-site-sidebar-navigation-screen__input-control"
+						placeholder={ __( 'No Title' ) }
+						value={ siteTitleValue }
+						onChange={ debounce( setSiteTitle, 300 ) }
+						label={ __( 'Site title' ) }
+						help={ __( 'Update the title of your site' ) }
+					/>
+				</SidebarNavigationScreenDetailsPanelRow>
 				{ isHomePageBlog && (
 					<SidebarNavigationScreenDetailsPanelRow>
-						<SidebarNavigationScreenDetailsPanelLabel>
-							{ __( 'Posts per page' ) }
-						</SidebarNavigationScreenDetailsPanelLabel>
-						<SidebarNavigationScreenDetailsPanelValue>
-							<InputControl
-								className="edit-site-sidebar-navigation-screen__input-control"
-								placeholder={ 0 }
-								value={ postsCount }
-								type="number"
-								onChange={ debounce( setPostsPerPage, 300 ) }
-							/>
-						</SidebarNavigationScreenDetailsPanelValue>
-					</SidebarNavigationScreenDetailsPanelRow>
-				) }
-				<SidebarNavigationScreenDetailsPanelRow>
-					<SidebarNavigationScreenDetailsPanelLabel>
-						{ __( 'Blog title' ) }
-					</SidebarNavigationScreenDetailsPanelLabel>
-					<SidebarNavigationScreenDetailsPanelValue>
 						<InputControl
 							className="edit-site-sidebar-navigation-screen__input-control"
-							placeholder={ __( 'No Title' ) }
-							value={ siteTitleValue }
-							onChange={ debounce( setSiteTitle, 300 ) }
+							placeholder={ 0 }
+							value={ postsCount }
+							step="1"
+							min="1"
+							type="number"
+							onChange={ debounce( setPostsPerPage, 300 ) }
+							label={ __( 'Posts per page' ) }
+							help={ __(
+								'The maximum amount of posts to display on a page. This setting applies to all blog pages including category and tag archives.'
+							) }
 						/>
-					</SidebarNavigationScreenDetailsPanelValue>
-				</SidebarNavigationScreenDetailsPanelRow>
+					</SidebarNavigationScreenDetailsPanelRow>
+				) }
 			</SidebarNavigationScreenDetailsPanel>
 
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Discussion' ) }>
@@ -189,18 +203,14 @@ export default function HomeTemplateDetails() {
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Areas' ) }>
-				{ templateAreas.map( ( { label, icon, theme, slug } ) => (
+				{ templateAreas.map( ( { label, icon, area, theme, slug } ) => (
 					<SidebarNavigationScreenDetailsPanelRow key={ slug }>
-						<SidebarNavigationScreenDetailsPanelLabel>
-							{ label }
-						</SidebarNavigationScreenDetailsPanelLabel>
-						<SidebarNavigationScreenDetailsPanelValue>
-							<TemplateAreaButton
-								postId={ `${ theme }//${ slug }` }
-								label={ label }
-								icon={ icon }
-							/>
-						</SidebarNavigationScreenDetailsPanelValue>
+						<TemplateAreaButton
+							postId={ `${ theme }//${ slug }` }
+							title={ label }
+							icon={ icon }
+							area={ area }
+						/>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) ) }
 			</SidebarNavigationScreenDetailsPanel>
