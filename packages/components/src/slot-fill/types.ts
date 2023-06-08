@@ -3,37 +3,30 @@
  */
 import type { MutableRefObject, ReactNode } from 'react';
 
-export type FillProps = {
-	/**
-	 * Slot name.
-	 */
+export type BubblesVirtuallySlotProps = {
 	name: string;
-
-	/**
-	 * The children to stack.
-	 */
-	children: ReactNode;
+	fillProps: any;
 };
 
 export type SlotRegistry = {
 	slots: Map<
 		string,
 		{
-			ref: MutableRefObject< HTMLElement >;
-			fillProps: FillProps;
+			ref: MutableRefObject< HTMLElement | undefined >;
+			fillProps: any;
 		}
 	>;
 	fills: Map< string, MutableRefObject< { rerender: () => {} } >[] >;
 	registerSlot: (
 		name: string,
-		ref: MutableRefObject< HTMLElement >,
-		fillProps: FillProps
+		ref: MutableRefObject< HTMLElement | undefined >,
+		fillProps: any
 	) => void;
 	unregisterSlot: (
 		name: string,
-		ref: MutableRefObject< HTMLElement >
+		ref: MutableRefObject< HTMLElement | undefined >
 	) => void;
-	updateSlot: ( name: string, fillProps: FillProps ) => void;
+	updateSlot: ( name: string, fillProps: any ) => void;
 	registerFill: (
 		name: string,
 		ref: MutableRefObject< { rerender: () => {} } >
