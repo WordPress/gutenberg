@@ -197,7 +197,7 @@ export default function ReusableBlockConvertButton( {
 									/>
 
 									<ToggleControl
-										label="Synced"
+										label={ __( 'Synced' ) }
 										help={
 											syncType === 'fully'
 												? __( 'Content is synced.' )
