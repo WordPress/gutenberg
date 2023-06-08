@@ -11,7 +11,6 @@ import {
 import { __ } from '@wordpress/i18n';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
-const noop = () => {};
 
 /**
  * @typedef {Object} ImageSizeOptions
@@ -48,7 +47,7 @@ const noop = () => {};
  * @property {boolean}            [isResizable=true]    Whether the image is resizable.
  * @property {string}             [slug]                Slug of the selected image size.
  * @property {OnChange}           [onChange]            Function to call when the styled image size changes.
- * @property {OnChangeImage}      [onChangeImage=noop]  Function to call when the source image resolution changes.
+ * @property {OnChangeImage}      [onChangeImage]       Function to call when the source image resolution changes.
  */
 
 /**
@@ -68,7 +67,7 @@ export default function ImageSizeControl( {
 	isResizable = true,
 	slug,
 	onChange,
-	onChangeImage = noop,
+	onChangeImage,
 } ) {
 	return (
 		<>
