@@ -277,13 +277,14 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					getCustomValueFromPreset( width, spacingSizes ) ||
 					'100px';
+				const nonZeroNewSize = newSize === '0px' ? '100px' : newSize;
 				setAttributes( {
 					height: '0px',
 					style: {
 						...blockStyle,
 						layout: {
 							...layout,
-							flexSize: newSize,
+							flexSize: nonZeroNewSize,
 							selfStretch: 'fixed',
 						},
 					},
@@ -299,7 +300,8 @@ const SpacerEdit = ( {
 				} );
 			} else {
 				setAttributes( {
-					height: undefined,
+					// The height value is required for block validation.
+					height: '0px',
 				} );
 			}
 		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
