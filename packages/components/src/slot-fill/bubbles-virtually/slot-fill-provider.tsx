@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,13 +14,25 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
+import type {
+	BubblesVirtuallySlotFillProviderProps,
+	SlotRegistry,
+} from '../types';
 
-function createSlotRegistry() {
-	const slots = proxyMap();
-	const fills = proxyMap();
+function createSlotRegistry(): SlotRegistry {
+	const slots: SlotRegistry[ 'slots' ] = proxyMap();
+	const fills: SlotRegistry[ 'fills' ] = proxyMap();
 
-	function registerSlot( name, ref, fillProps ) {
-		const slot = slots.get( name ) || {};
+	const registerSlot: SlotRegistry[ 'registerSlot' ] = (
+		name,
+		ref,
+		fillProps
+	) => {
+		const slot = ( slots.get( name ) || {} ) as {
+			ref: typeof ref;
+			fillProps: typeof fillProps;
+		};
+
 		slots.set(
 			name,
 			valRef( {
@@ -30,17 +41,17 @@ function createSlotRegistry() {
 				fillProps: fillProps || slot.fillProps || {},
 			} )
 		);
-	}
+	};
 
-	function unregisterSlot( name, ref ) {
+	const unregisterSlot: SlotRegistry[ 'unregisterSlot' ] = ( name, ref ) => {
 		// Make sure we're not unregistering a slot registered by another element
 		// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
 		if ( slots.get( name )?.ref === ref ) {
 			slots.delete( name );
 		}
-	}
+	};
 
-	function updateSlot( name, fillProps ) {
+	const updateSlot: SlotRegistry[ 'updateSlot' ] = ( name, fillProps ) => {
 		const slot = slots.get( name );
 		if ( ! slot ) {
 			return;
@@ -56,13 +67,13 @@ function createSlotRegistry() {
 			// Force update fills.
 			slotFills.map( ( fill ) => fill.current.rerender() );
 		}
-	}
+	};
 
-	function registerFill( name, ref ) {
+	const registerFill: SlotRegistry[ 'registerFill' ] = ( name, ref ) => {
 		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
-	}
+	};
 
-	function unregisterFill( name, ref ) {
+	const unregisterFill: SlotRegistry[ 'registerFill' ] = ( name, ref ) => {
 		const fillsForName = fills.get( name );
 		if ( ! fillsForName ) {
 			return;
@@ -72,7 +83,7 @@ function createSlotRegistry() {
 			name,
 			valRef( fillsForName.filter( ( fillRef ) => fillRef !== ref ) )
 		);
-	}
+	};
 
 	return {
 		slots,
@@ -85,7 +96,9 @@ function createSlotRegistry() {
 	};
 }
 
-export default function SlotFillProvider( { children } ) {
+export default function SlotFillProvider( {
+	children,
+}: BubblesVirtuallySlotFillProviderProps ) {
 	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>
