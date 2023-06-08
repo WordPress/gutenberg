@@ -22,7 +22,7 @@ export default function AddNewPattern( { toggleProps } ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 
 	async function createPattern( { name, categoryId } ) {
 		if ( ! name ) {
@@ -54,6 +54,14 @@ export default function AddNewPattern( { toggleProps } ) {
 				},
 				{ throwOnError: true }
 			);
+
+			// Invalidate pattern category taxonomy so nav screen can reflect
+			// up-to-date counts.
+			invalidateResolution( 'getEntityRecords', [
+				'taxonomy',
+				'wp_pattern',
+				{ per_page: -1, hide_empty: false, context: 'view' },
+			] );
 
 			setIsModalOpen( false );
 
