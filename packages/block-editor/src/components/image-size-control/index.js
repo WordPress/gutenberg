@@ -48,7 +48,10 @@ export default function ImageSizeControl( {
 							value={ width }
 							min={ 1 }
 							onChange={ ( nextWidth ) =>
-								onChange( { height, width: nextWidth } )
+								onChange( {
+									height,
+									width: Number( nextWidth ),
+								} )
 							}
 							size="__unstable-large"
 						/>
@@ -59,7 +62,10 @@ export default function ImageSizeControl( {
 							value={ height }
 							min={ 1 }
 							onChange={ ( nextHeight ) =>
-								onChange( { height: nextHeight, width } )
+								onChange( {
+									height: Number( nextHeight ),
+									width,
+								} )
 							}
 							size="__unstable-large"
 						/>
