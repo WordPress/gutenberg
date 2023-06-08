@@ -8,7 +8,7 @@ export type BubblesVirtuallySlotProps = {
 	fillProps: any;
 };
 
-export type SlotRegistry = {
+export type BubblesVirtuallySlotFillContext = {
 	slots: Map<
 		string,
 		{

@@ -16,14 +16,14 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import SlotFillContext from './slot-fill-context';
 import type {
 	BubblesVirtuallySlotFillProviderProps,
-	SlotRegistry,
+	BubblesVirtuallySlotFillContext,
 } from '../types';
 
-function createSlotRegistry(): SlotRegistry {
-	const slots: SlotRegistry[ 'slots' ] = proxyMap();
-	const fills: SlotRegistry[ 'fills' ] = proxyMap();
+function createSlotRegistry(): BubblesVirtuallySlotFillContext {
+	const slots: BubblesVirtuallySlotFillContext[ 'slots' ] = proxyMap();
+	const fills: BubblesVirtuallySlotFillContext[ 'fills' ] = proxyMap();
 
-	const registerSlot: SlotRegistry[ 'registerSlot' ] = (
+	const registerSlot: BubblesVirtuallySlotFillContext[ 'registerSlot' ] = (
 		name,
 		ref,
 		fillProps
@@ -43,15 +43,19 @@ function createSlotRegistry(): SlotRegistry {
 		);
 	};
 
-	const unregisterSlot: SlotRegistry[ 'unregisterSlot' ] = ( name, ref ) => {
-		// Make sure we're not unregistering a slot registered by another element
-		// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
-		if ( slots.get( name )?.ref === ref ) {
-			slots.delete( name );
-		}
-	};
+	const unregisterSlot: BubblesVirtuallySlotFillContext[ 'unregisterSlot' ] =
+		( name, ref ) => {
+			// Make sure we're not unregistering a slot registered by another element
+			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+			if ( slots.get( name )?.ref === ref ) {
+				slots.delete( name );
+			}
+		};
 
-	const updateSlot: SlotRegistry[ 'updateSlot' ] = ( name, fillProps ) => {
+	const updateSlot: BubblesVirtuallySlotFillContext[ 'updateSlot' ] = (
+		name,
+		fillProps
+	) => {
 		const slot = slots.get( name );
 		if ( ! slot ) {
 			return;
@@ -69,11 +73,17 @@ function createSlotRegistry(): SlotRegistry {
 		}
 	};
 
-	const registerFill: SlotRegistry[ 'registerFill' ] = ( name, ref ) => {
+	const registerFill: BubblesVirtuallySlotFillContext[ 'registerFill' ] = (
+		name,
+		ref
+	) => {
 		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
 	};
 
-	const unregisterFill: SlotRegistry[ 'registerFill' ] = ( name, ref ) => {
+	const unregisterFill: BubblesVirtuallySlotFillContext[ 'registerFill' ] = (
+		name,
+		ref
+	) => {
 		const fillsForName = fills.get( name );
 		if ( ! fillsForName ) {
 			return;

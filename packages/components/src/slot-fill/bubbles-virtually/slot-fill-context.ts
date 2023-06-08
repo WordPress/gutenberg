@@ -11,9 +11,9 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import type { SlotRegistry } from '../types';
+import type { BubblesVirtuallySlotFillContext } from '../types';
 
-const initialContextValue: SlotRegistry = {
+const initialContextValue: BubblesVirtuallySlotFillContext = {
 	slots: proxyMap(),
 	fills: proxyMap(),
 	registerSlot: () => {
