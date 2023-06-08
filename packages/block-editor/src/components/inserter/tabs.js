@@ -13,12 +13,12 @@ const blocksTab = {
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Imported Patterns' ),
 };
 const reusableBlocksTab = {
 	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
+	/* translators: Locally created Patterns tab title in the block inserter. */
 	title: __( 'Local Patterns' ),
 	icon: reusableBlockIcon,
 };

@@ -111,7 +111,7 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					sprintf(
-						// translators: %s: Type of block (i.e. Reusable or Pattern).
+						// translators: %s: The sync status of the block that is created.
 						__( '%s created.' ),
 						syncType === 'fully'
 							? __( 'Synced Pattern' )

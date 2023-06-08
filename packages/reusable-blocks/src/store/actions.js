@@ -40,10 +40,10 @@ export const __experimentalConvertBlockToStatic =
 	};
 
 /**
- * Returns a generator converting one or more static blocks into a reusable block.
+ * Returns a generator converting one or more static blocks into a pattern.
  *
  * @param {string[]} clientIds  The client IDs of the block to detach.
- * @param {string}   title      Reusable block title.
+ * @param {string}   title      Pattern title.
  * @param {string}   syncType   They way block is synced, current 'fully' and 'unSynced'.
  * @param {string}   categoryId The category of pattern being created.
  */
