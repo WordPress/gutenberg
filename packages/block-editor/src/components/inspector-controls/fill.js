@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalStyleProvider as StyleProvider,
-	__experimentalToolsPanelContext as ToolsPanelContext,
-} from '@wordpress/components';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 import { useEffect } from '@wordpress/element';
@@ -73,15 +70,19 @@ function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
 		};
 	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
 
+	// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
+	// that should wrap the fill markup.
+	const { forwardedContext = [] } = fillProps;
+
 	// Children passed to InspectorControlsFill will not have
 	// access to any React Context whose Provider is part of
 	// the InspectorControlsSlot tree. So we re-create the
 	// Provider in this subtree.
-	const value =
-		fillProps && Object.keys( fillProps ).length > 0 ? fillProps : null;
-	return (
-		<ToolsPanelContext.Provider value={ value }>
-			{ children }
-		</ToolsPanelContext.Provider>
+	const innerMarkup = <>{ children }</>;
+	return forwardedContext.reduce(
+		( inner, [ Provider, props ] ) => (
+			<Provider { ...props }>{ inner }</Provider>
+		),
+		innerMarkup
 	);
 }
