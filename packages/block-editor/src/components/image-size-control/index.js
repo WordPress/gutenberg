@@ -8,6 +8,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -30,6 +31,10 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
+	deprecated( 'wp.blockEditor.__experimentalImageSizeControl', {
+		version: '6.3',
+	} );
+
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
