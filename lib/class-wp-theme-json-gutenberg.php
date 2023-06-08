@@ -510,7 +510,7 @@ class WP_Theme_JSON_Gutenberg {
 		// The block classes are necessary to target older content that won't use the new class names.
 		'caption'   => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 		'cite'      => 'cite',
-		'textInput' => 'textarea, input:not([type=checkbox|type=radio|type=submit])',
+		'textInput' => 'textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit])',
 	);
 
 	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
