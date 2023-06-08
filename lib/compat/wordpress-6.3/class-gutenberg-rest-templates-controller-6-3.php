@@ -154,7 +154,7 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	 */
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
-			$template = gutenberg_get_block_file_template( $request['id'], $this->post_type );
+			$template = get_block_file_template( $request['id'], $this->post_type );
 		} else {
 			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		}
