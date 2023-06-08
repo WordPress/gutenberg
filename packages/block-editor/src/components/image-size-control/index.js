@@ -26,7 +26,7 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 
 /**
  * @callback OnChange
- * @param {ImageSize} imageSize Image size object.
+ * @param {ImageSize} newImageSize Image size object.
  * @return {void}
  */
 
