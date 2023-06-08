@@ -1,11 +1,10 @@
 .edit-site-page {
 	color: $gray-800;
-	background: #fff;
+	background: $white;
 	flex-grow: 1;
 	overflow: auto;
 	margin: 0;
 	@include break-medium() {
-		border-radius: 0;
 		border-radius: 8px;
 		margin: $grid-unit-30 $grid-unit-30 $grid-unit-30 0;
 	}
@@ -17,9 +16,8 @@
 	padding-left: $header-height + $grid-unit-40;
 	margin-bottom: $grid-unit-40;
 	border-bottom: 1px solid $gray-100;
-	background: #fff;
+	background: $white;
 	position: sticky;
-	z-index: 2;
 	top: 0;
 	@include break-medium() {
 		padding-left: $grid-unit-40;
