@@ -499,8 +499,14 @@ const UnforwardedPopover = (
 							// to use `translateX` and `translateY` because those values would
 							// be overridden by the return value of the
 							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
-							x: Math.round( x ?? 0 ) || undefined,
-							y: Math.round( y ?? 0 ) || undefined,
+							x:
+								x === null || Number.isNaN( x )
+									? 0
+									: Math.round( x ),
+							y:
+								y === null || Number.isNaN( y )
+									? 0
+									: Math.round( y ),
 					  }
 			}
 		>
