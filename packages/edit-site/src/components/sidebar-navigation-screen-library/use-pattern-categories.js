@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -17,18 +16,7 @@ export default function usePatternCategories() {
 		{ per_page: -1, hide_empty: false, context: 'view' }
 	);
 
-	// We're collecting the both user & theme patterns along with the taxonomy
-	// categories so that we can recalculate the category counts to reflect
-	// merged patterns, additions, or deletions.
 	const themePatterns = useThemePatterns();
-	const userPatterns = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
-				per_page: -1,
-			} ),
-		[]
-	);
-
 	const patternCategories = useMemo( () => {
 		if ( ! categories ) {
 			return [];
@@ -38,21 +26,11 @@ export default function usePatternCategories() {
 		const categoriesWithCounts = [];
 
 		// Create a map that we can easily update category counts
-		// for both user and theme patterns that match.
+		// for theme patterns that match.
 		categories.forEach( ( patternCategory ) => {
-			if ( ! categoryMap[ patternCategory.id ] ) {
-				const category = { ...patternCategory, count: 0 };
-				categoryMap[ category.id ] = category;
-				categoryMap[ category.slug ] = category;
+			if ( ! categoryMap[ patternCategory.slug ] ) {
+				categoryMap[ patternCategory.slug ] = { ...patternCategory };
 			}
-		} );
-
-		( userPatterns || [] ).forEach( ( pattern ) => {
-			pattern.wp_pattern?.forEach( ( categoryId ) => {
-				if ( categoryMap[ categoryId ] ) {
-					categoryMap[ categoryId ].count += 1;
-				}
-			} );
 		} );
 
 		themePatterns.forEach( ( pattern ) => {
@@ -64,13 +42,13 @@ export default function usePatternCategories() {
 		} );
 
 		categories.forEach( ( category ) => {
-			if ( categoryMap[ category.id ].count ) {
-				categoriesWithCounts.push( categoryMap[ category.id ] );
+			if ( categoryMap[ category.slug ].count ) {
+				categoriesWithCounts.push( categoryMap[ category.slug ] );
 			}
 		} );
 
 		return categoriesWithCounts;
-	}, [ categories, themePatterns, userPatterns ] );
+	}, [ categories, themePatterns ] );
 
 	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
