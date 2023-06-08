@@ -1,5 +1,40 @@
 == Changelog ==
 
+= 16.0.0-rc.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Global styles revisions: Ensure redirect runs once for back button. ([51316](https://github.com/WordPress/gutenberg/pull/51316))
+
+#### Block Library
+- Query: Fix deprecation error when migrating layout. ([51311](https://github.com/WordPress/gutenberg/pull/51311))
+
+
+### Code Quality
+
+#### Site Editor
+- Rename 'page content lock' to 'page content focus'. ([51280](https://github.com/WordPress/gutenberg/pull/51280))
+
+
+### Various
+
+- Post title: Fix autofocus when iframed. ([51331](https://github.com/WordPress/gutenberg/pull/51331))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @ellatrix @noisysocks @ramonjd
+
+
 = 16.0.0-rc.1 =
 
 ## Changelog
