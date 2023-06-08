@@ -318,3 +318,15 @@ export const getReferenceElement = ( {
 	// Convert any `undefined` value to `null`.
 	return referenceElement ?? null;
 };
+
+/**
+ * Computes the final coordinate that needs to be applied to the floating
+ * element when applying transform inline styles, defaulting to `0`
+ * when appropriate.
+ *
+ * @param c input coordinate (usually as returned from floating-ui)
+ * @return The coordinate's value to be used for inline styles. An `undefined`
+ *         return value means "no style set" for this coordinate.
+ */
+export const computePopoverPosition = ( c: number | null ) =>
+	c === null || Number.isNaN( c ) ? 0 : Math.round( c );
