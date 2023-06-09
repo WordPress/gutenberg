@@ -11,7 +11,7 @@ import {
  * Internal dependencies
  */
 import { PAGE_CONTENT_BLOCK_TYPES } from '../../page-content-focus/constants';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
