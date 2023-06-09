@@ -585,7 +585,9 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			// Tabbing back should land us in the text input.
+			// Tabbing forward should land us in the "Text" input.
+			await page.keyboard.press( 'Tab' );
+
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
 			);
@@ -612,7 +614,9 @@ describe( 'Links', () => {
 			);
 			await editButton.click();
 
-			// Tabbing should land us in the text input.
+			// tab forward to the text input.
+			await page.keyboard.press( 'Tab' );
+
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
 			);
