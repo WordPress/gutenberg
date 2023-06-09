@@ -33,7 +33,7 @@ export default function PostSyncStatus() {
 			<ToggleControl
 				__nextHasNoMarginBottom
 				label={
-					syncStatus === 'fully'
+					syncStatus === 'fully' || ! syncStatus
 						? __( 'Fully synced' )
 						: __( 'Not synced' )
 				}
