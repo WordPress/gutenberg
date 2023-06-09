@@ -11,7 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
-export default function RenameModal( { onClose, menuTitle, handleSave } ) {
+export default function RenameModal( { menuTitle, onClose, onSave } ) {
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
 
 	return (
@@ -30,11 +30,14 @@ export default function RenameModal( { onClose, menuTitle, handleSave } ) {
 						</Button>
 
 						<Button
+							disabled={ editedMenuTitle === menuTitle }
 							variant="primary"
 							type="submit"
 							onClick={ ( e ) => {
 								e.preventDefault();
-								handleSave( { title: editedMenuTitle } );
+								onSave( { title: editedMenuTitle } );
+
+								// Immediate close avoids ability to hit save multiple times.
 								onClose();
 							} }
 						>

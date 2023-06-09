@@ -70,7 +70,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 				<RenameModal
 					onClose={ closeRenameModal }
 					menuTitle={ menuTitle }
-					handleSave={ handleSave }
+					onSave={ handleSave }
 				/>
 			) }
 		</>
