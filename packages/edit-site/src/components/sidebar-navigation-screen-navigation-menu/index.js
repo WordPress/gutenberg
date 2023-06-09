@@ -309,7 +309,7 @@ function ScreenNavigationMoreMenu( props ) {
 									type="submit"
 									onClick={ handleSave }
 								>
-									{ __( 'Ok' ) }
+									{ __( 'OK' ) }
 								</Button>
 							</HStack>
 						</VStack>
