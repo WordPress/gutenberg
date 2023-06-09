@@ -15,7 +15,6 @@
 	padding: 0 $grid-unit-40;
 	height: $header-height;
 	padding-left: $grid-unit-40;
-	margin-bottom: $grid-unit-40;
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;
@@ -34,5 +33,6 @@
 }
 
 .edit-site-page-content {
-	padding: 0 $grid-unit-40 $grid-unit-40;
+	padding: $grid-unit-40 $grid-unit-40;
+	overflow-x: auto;
 }
