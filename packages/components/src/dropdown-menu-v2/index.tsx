@@ -35,7 +35,7 @@ import type {
 	DropdownMenuRadioItemProps,
 	DropdownMenuSeparatorProps,
 	DropdownSubMenuTriggerProps,
-	DropdownMenuContext,
+	DropdownMenuInternalContext,
 	DropdownMenuPrivateContext as DropdownMenuPrivateContextType,
 } from './types';
 
@@ -70,7 +70,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 		variant,
 	} = useContextSystem<
 		// Adding `className` to the context type to avoid a TS error
-		DropdownMenuProps & DropdownMenuContext & { className?: string }
+		DropdownMenuProps & DropdownMenuInternalContext & { className?: string }
 	>( props, 'DropdownMenu' );
 
 	// Render the portal in the default slot used by the legacy Popover component.

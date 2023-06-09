@@ -20,9 +20,10 @@ describe( 'Block Toolbar', () => {
 		it( 'should not scroll page', async () => {
 			while (
 				await page.evaluate( () => {
-					const scrollable = wp.dom.getScrollContainer(
-						document.activeElement
-					);
+					const { activeElement } =
+						document.activeElement?.contentDocument ?? document;
+					const scrollable =
+						wp.dom.getScrollContainer( activeElement );
 					return ! scrollable || scrollable.scrollTop === 0;
 				} )
 			) {
@@ -31,21 +32,20 @@ describe( 'Block Toolbar', () => {
 
 			await page.keyboard.type( 'a' );
 
-			const scrollTopBefore = await page.evaluate(
-				() =>
-					wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
-			);
+			const scrollTopBefore = await page.evaluate( () => {
+				const { activeElement } =
+					document.activeElement?.contentDocument ?? document;
+				window.scrollContainer =
+					wp.dom.getScrollContainer( activeElement );
+				return window.scrollContainer.scrollTop;
+			} );
 
 			await pressKeyWithModifier( 'alt', 'F10' );
 			expect( await isInBlockToolbar() ).toBe( true );
 
-			const scrollTopAfter = await page.evaluate(
-				() =>
-					wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
-			);
-
+			const scrollTopAfter = await page.evaluate( () => {
+				return window.scrollContainer.scrollTop;
+			} );
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 

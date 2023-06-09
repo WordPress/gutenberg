@@ -17,7 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import {
 	isPreviewingTheme,
@@ -100,7 +100,7 @@ function NavigationMenuEditor( { navigationMenu } ) {
 					postType: attributes.type,
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						theme_preview: currentlyPreviewingTheme(),
+						gutenberg_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}
@@ -109,7 +109,7 @@ function NavigationMenuEditor( { navigationMenu } ) {
 					postType: 'page',
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						theme_preview: currentlyPreviewingTheme(),
+						gutenberg_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}

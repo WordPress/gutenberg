@@ -10,6 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,9 +54,11 @@ export default function QueryPaginationEdit( {
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	// Always show label text if paginationArrow is set to 'none'.
-	if ( paginationArrow === 'none' ) {
-		setAttributes( { showLabel: true } );
-	}
+	useEffect( () => {
+		if ( paginationArrow === 'none' && ! showLabel ) {
+			setAttributes( { showLabel: true } );
+		}
+	}, [ paginationArrow, setAttributes, showLabel ] );
 	return (
 		<>
 			{ hasNextPreviousBlocks && (

@@ -205,7 +205,7 @@ For example:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "gutenberg-examples/example-02-stylesheets",
 	"title": "Example: Stylesheets",
 	"icon": "universal-access-alt",

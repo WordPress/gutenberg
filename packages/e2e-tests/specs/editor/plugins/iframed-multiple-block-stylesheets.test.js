@@ -35,7 +35,7 @@ describe( 'iframed multiple block stylesheets', () => {
 	it( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.wp-block-test-iframed-multiple-stylesheets'
 		);
 		await createNewTemplate( 'Iframed Test' );

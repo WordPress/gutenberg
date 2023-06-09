@@ -19,7 +19,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 

@@ -330,8 +330,8 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
--	**Attributes:** align, alt, behaviors, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
+-	**Supports:** anchor, behaviors (lightbox), color (~~background~~, ~~text~~), filter (duotone)
+-	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -566,9 +566,9 @@ Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType, format, isLink, textAlign
 
-## Post Excerpt
+## Excerpt
 
-Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
+Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
@@ -600,7 +600,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** core/post-template
 -	**Category:** theme
 -	**Parent:** core/query
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Post Terms
@@ -622,7 +622,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 -	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
-## Post Title
+## Title
 
 Displays the title of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title))
 
@@ -656,7 +656,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Name:** core/query
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, ~~html~~
--	**Attributes:** displayLayout, namespace, query, queryId, tagName
+-	**Attributes:** namespace, query, queryId, tagName
 
 ## No results
 
@@ -751,7 +751,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), anchor, color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonBehavior, buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 

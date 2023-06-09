@@ -2,7 +2,7 @@
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'assets.php' should match snapshot 1`] = `
 "<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'cf268e19006bef774112'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => '7f3970305cf0aecb54ab'));
-"
+
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
@@ -73,7 +73,7 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`function-output-filename\` 
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`has-extension-suffix\` should produce expected output: Asset file 'index.min.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '49dba68ef238f954b358');
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'c3f17b34fdd974d57d0f');
 "
 `;
 
