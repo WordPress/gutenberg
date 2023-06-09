@@ -44,7 +44,7 @@ function useTemplateDetails( postType, postId ) {
 	}
 
 	let content = null;
-	if ( record?.slug === 'home' ) {
+	if ( record?.slug === 'home' || record?.slug === 'index' ) {
 		content = <HomeTemplateDetails />;
 	}
 
