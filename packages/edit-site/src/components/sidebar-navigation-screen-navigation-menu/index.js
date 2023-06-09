@@ -154,7 +154,11 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				'postType',
 				postType,
 				{
-					title: menuTitle + __( ' (Copy)' ),
+					title: sprintf(
+						/* translators: %s: Navigation menu title */
+						__( '%s (Copy)' ),
+						menuTitle
+					),
 					content: navigationMenu?.content?.raw,
 					status: 'publish',
 				},
