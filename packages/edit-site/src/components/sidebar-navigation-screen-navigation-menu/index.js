@@ -86,7 +86,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be renamed. */
 					__( `Unable to rename Navigation menu (%s).` ),
-					error
+					error?.message
 				),
 
 				{
@@ -118,7 +118,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be deleted. */
 					__( `Unable to delete Navigation menu (%s).` ),
-					error
+					error?.message
 				),
 
 				{
@@ -128,23 +128,38 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		}
 	};
 	const handleDuplicate = async () => {
-		const savedRecord = await saveEntityRecord(
-			'postType',
-			postType,
-			{
-				title: menuTitle + __( ' (Copy)' ),
-				content: navigationMenu?.content?.raw,
-				status: 'publish',
-			},
-			{
-				throwOnError: true,
+		try {
+			const savedRecord = await saveEntityRecord(
+				'postType',
+				postType,
+				{
+					title: menuTitle + __( ' (Copy)' ),
+					content: navigationMenu?.content?.raw,
+					status: 'publish',
+				},
+				{
+					throwOnError: true,
+				}
+			);
+
+			if ( savedRecord ) {
+				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
+					type: 'snackbar',
+				} );
+				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
 			}
-		);
-		if ( savedRecord ) {
-			createSuccessNotice( __( 'Duplicated Navigation menu' ), {
-				type: 'snackbar',
-			} );
-			goTo( `/navigation/${ postType }/${ savedRecord.id }` );
+		} catch ( error ) {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: error message describing why the navigation menu could not be deleted. */
+					__( `Unable to duplicate Navigation menu (%s).` ),
+					error?.message
+				),
+
+				{
+					type: 'snackbar',
+				}
+			);
 		}
 	};
 
