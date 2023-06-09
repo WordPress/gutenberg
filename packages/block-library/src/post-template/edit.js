@@ -222,7 +222,10 @@ export default function PostTemplateEdit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames ),
+		className: classnames( __unstableLayoutClassNames, {
+			[ `columns-${ columnCount }` ]:
+				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
+		} ),
 	} );
 
 	if ( ! posts ) {
