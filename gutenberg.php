@@ -71,3 +71,77 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
+
+/**
+ * Renders the block meta attributes.
+ *
+ * @param string $block_content Block Content.
+ * @param array  $block Block attributes.
+ * @param string $block_instance The block instance.
+ */
+function render_custom_sources( $block_content, $block, $block_instance ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	if ( null === $block_type ) {
+		return $block_content;
+	}
+
+
+	$custom_sources = _wp_array_get( $block_type->supports, 'customSources', false );
+	if ( ! $custom_sources ) {
+		// TODO: for some reason the "customSources" support is not being registered as it should.
+		//	return $block_content;
+	}
+
+	$attribute_sources = _wp_array_get( $block['attrs'], array( 'source' ), array() );
+	foreach ( $attribute_sources as $attribute_name => $attribute_source ) {
+		$attribute_config = _wp_array_get( $block_type->attributes, array( $attribute_name ), false );
+		if ( ! $attribute_config || ! $attribute_source || 'meta' !== $attribute_source['type'] ) {
+			continue;
+		}
+		$meta_field = $attribute_source['name'];
+		$meta_value = get_post_meta( $block_instance->context['postId'], $meta_field, true );
+		$p          = new WP_HTML_Tag_Processor( $block_content );
+		$found      = $p->next_tag(
+			array(
+				// TODO: build the query from CSS selector.
+				'tag_name' => $attribute_config['selector'],
+			)
+		);
+		if ( ! $found ) {
+			continue;
+		}
+		$tag_name = $p->get_tag();
+		$markup   = "<$tag_name>$meta_value</$tag_name>";
+		$p2       = new WP_HTML_Tag_Processor( $markup );
+		$p2->next_tag();
+		$names = $p->get_attribute_names_with_prefix( '' );
+		foreach ( $names as $name ) {
+			$p2->set_attribute( $name, $p->get_attribute( $name ) );
+		}
+
+		$block_content = $p2 . '';
+	}
+
+	return $block_content;
+}
+
+add_filter( 'render_block', 'render_custom_sources', 10, 3 );
+
+// ----- what follows is just random test code.
+
+/**
+ * Registers a custom meta for use by the test paragraph variation.
+ */
+function init_test_summary_meta_field() {
+	register_meta(
+		'post',
+		'summary',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
+}
+
+add_action( 'init', 'init_test_summary_meta_field' );

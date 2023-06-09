@@ -44,6 +44,22 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations: [
+		{
+			name: 'core/post-custom-field',
+			title: __( 'Post Summary' ),
+			description: __(
+				'Just a block to edit a custom field named "summary".'
+			),
+			attributes: {
+				source: { content: { type: 'meta', name: 'summary' } },
+			},
+			isActive: ( blockAttributes ) =>
+				blockAttributes.source?.content?.type === 'meta' &&
+				blockAttributes.source?.content?.name === 'summary',
+			scope: [ 'block', 'inserter', 'transform' ],
+		},
+	],
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
