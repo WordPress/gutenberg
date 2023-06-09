@@ -303,10 +303,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		if ( ! blockName ) {
 			return EMPTY_ARRAY;
 		}
+		const blockNames = Array.isArray( blockName )
+			? blockName
+			: [ blockName ];
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
 			const block = state.blocks.byClientId.get( clientId );
-			return block.name === blockName;
+			return blockNames.includes( block.name );
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
 	},
