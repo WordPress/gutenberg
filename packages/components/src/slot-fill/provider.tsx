@@ -7,7 +7,7 @@ import type { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import type { BaseSlotFillContext } from './types';
+import type { BaseFillObject, BaseSlotFillContext } from './types';
 import { useState } from '@wordpress/element';
 /**
  * External dependencies
@@ -37,7 +37,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		}
 	}
 
-	function registerFill( name: string, instance: unknown ) {
+	function registerFill( name: string, instance: BaseFillObject ) {
 		fills[ name ] = [ ...( fills[ name ] || [] ), instance ];
 		forceUpdateSlot( name );
 	}
@@ -54,7 +54,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		triggerListeners();
 	}
 
-	function unregisterFill( name: string, instance: unknown ) {
+	function unregisterFill( name: string, instance: BaseFillObject ) {
 		fills[ name ] =
 			fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
 		forceUpdateSlot( name );
@@ -64,7 +64,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		return slots[ name ];
 	}
 
-	function getFills( name: string, slotInstance: unknown ) {
+	function getFills( name: string, slotInstance: Component ) {
 		// Fills should only be returned for the current instance of the slot
 		// in which they occupy.
 		if ( slots[ name ] !== slotInstance ) {
