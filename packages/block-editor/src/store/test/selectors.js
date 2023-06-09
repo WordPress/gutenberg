@@ -73,6 +73,13 @@ const {
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
 } = selectors;
+import { getBlockEditingMode } from '../private-selectors';
+
+getBlockEditingMode.registry = {
+	select: () => ( {
+		__experimentalHasContentRoleAttribute: jest.fn( () => false ),
+	} ),
+};
 
 describe( 'selectors', () => {
 	let cachedSelectors;

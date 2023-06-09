@@ -122,9 +122,9 @@ describe( 'private selectors', () => {
 				() => false
 			);
 			getBlockEditingMode.registry = {
-				select: jest.fn( () => ( {
+				select: () => ( {
 					__experimentalHasContentRoleAttribute,
-				} ) ),
+				} ),
 			};
 
 			it( 'should return default by default', () => {
