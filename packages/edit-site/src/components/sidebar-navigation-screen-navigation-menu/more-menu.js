@@ -17,7 +17,7 @@ const POPOVER_PROPS = {
 };
 
 export default function ScreenNavigationMoreMenu( props ) {
-	const { handleDelete, handleSave, handleDuplicate, menuTitle } = props;
+	const { onDelete, onSave, onDuplicate, menuTitle } = props;
 
 	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
 
@@ -45,7 +45,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 							</MenuItem>
 							<MenuItem
 								onClick={ () => {
-									handleDuplicate();
+									onDuplicate();
 									onClose();
 								} }
 							>
@@ -55,7 +55,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 								isDestructive
 								isTertiary
 								onClick={ () => {
-									handleDelete();
+									onDelete();
 									onClose();
 								} }
 							>
@@ -70,7 +70,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 				<RenameModal
 					onClose={ closeRenameModal }
 					menuTitle={ menuTitle }
-					onSave={ handleSave }
+					onSave={ onSave }
 				/>
 			) }
 		</>

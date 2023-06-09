@@ -218,9 +218,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			actions={
 				<ScreenNavigationMoreMenu
 					menuTitle={ decodeEntities( menuTitle ) }
-					handleDelete={ handleDelete }
-					handleSave={ handleSave }
-					handleDuplicate={ handleDuplicate }
+					onDelete={ handleDelete }
+					onSave={ handleSave }
+					onDuplicate={ handleDuplicate }
 				/>
 			}
 			title={ decodeEntities( menuTitle ) }
