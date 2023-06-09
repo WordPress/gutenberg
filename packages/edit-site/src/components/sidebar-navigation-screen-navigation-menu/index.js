@@ -86,7 +86,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			status: 'publish',
 		} );
 		if ( savedRecord ) {
-			createSuccessNotice( 'Duplicated Navigation menu', {
+			createSuccessNotice( __( 'Duplicated Navigation menu' ), {
 				type: 'snackbar',
 			} );
 			goTo( `/navigation/${ postType }/${ savedRecord.id }` );
