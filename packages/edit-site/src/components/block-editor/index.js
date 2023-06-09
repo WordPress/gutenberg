@@ -38,10 +38,7 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
-import {
-	DisableNonPageContentBlocks,
-	usePageContentFocusNotifications,
-} from '../page-content-focus';
+import PageContentFocusManager from '../page-content-focus-manager';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -53,25 +50,20 @@ const LAYOUT = {
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, templateType, canvasMode, hasPageContentFocus } =
-		useSelect(
-			( select ) => {
-				const {
-					getSettings,
-					getEditedPostType,
-					getCanvasMode,
-					hasPageContentFocus: _hasPageContentFocus,
-				} = unlock( select( editSiteStore ) );
+	const { storedSettings, templateType, canvasMode } = useSelect(
+		( select ) => {
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-				return {
-					storedSettings: getSettings( setIsInserterOpened ),
-					templateType: getEditedPostType(),
-					canvasMode: getCanvasMode(),
-					hasPageContentFocus: _hasPageContentFocus(),
-				};
-			},
-			[ setIsInserterOpened ]
-		);
+			return {
+				storedSettings: getSettings( setIsInserterOpened ),
+				templateType: getEditedPostType(),
+				canvasMode: getCanvasMode(),
+			};
+		},
+		[ setIsInserterOpened ]
+	);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -146,7 +138,6 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
-		usePageContentFocusNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -172,7 +163,7 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
+			<PageContentFocusManager contentRef={ contentRef } />
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />

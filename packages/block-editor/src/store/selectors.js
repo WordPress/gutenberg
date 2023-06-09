@@ -2822,7 +2822,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
 	// can't be selected, and prevents non-disabled nested blocks from being
 	// selected.
-	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
 		return false;
 	}
 
