@@ -49,7 +49,7 @@ export default function ReusableBlockConvertButton( {
 	);
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ syncType, setSyncType ] = useState( 'fully' );
+	const [ syncType, setSyncType ] = useState( 'unsynced' );
 	const [ title, setTitle ] = useState( '' );
 	const [ categoryId, setCategoryId ] = useState( '' );
 	const { canConvert } = useSelect(
