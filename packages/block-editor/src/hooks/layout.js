@@ -98,10 +98,6 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		layoutClassnames.push( 'is-nowrap' );
 	}
 
-	if ( usedLayout?.type === 'grid' && usedLayout?.columnCount ) {
-		layoutClassnames.push( `columns-${ usedLayout.columnCount }` );
-	}
-
 	return layoutClassnames;
 }
 
