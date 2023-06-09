@@ -74,8 +74,10 @@ function PostTitle( _, forwardedRef ) {
 			return;
 		}
 
+		const { defaultView } = ref.current.ownerDocument;
+		const { name, parent } = defaultView;
 		const ownerDocument =
-			ref.current.ownerDocument.defaultView.parent.document;
+			name === 'editor-canvas' ? parent.document : defaultView.document;
 		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should
