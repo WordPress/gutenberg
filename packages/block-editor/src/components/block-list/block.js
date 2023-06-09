@@ -217,7 +217,7 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-editing-disabled': blockEditingMode === 'disabled',
+				// 'is-editing-disabled': blockEditingMode === 'disabled',
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

@@ -161,6 +161,31 @@
 	padding: 0;
 }
 
+// .is-root-container:after {
+// 	position: absolute;
+// 	content: "";
+// 	top: 0;
+// 	left: 0;
+// 	right: 0;
+// 	bottom: 0;
+// 	z-index: 9;
+// 	--color-a: #000;
+// 	--size:20px;
+// 	background-image:
+//       linear-gradient(45deg, #000 25%, transparent 25%),
+//       linear-gradient(45deg, transparent 75%, #000 75%),
+//       linear-gradient(45deg, transparent 75%, #000 75%),
+//       linear-gradient(45deg, #000 25%, #fff 25%);
+// 	background-size:var(--size) var(--size);
+// 	background-position:0 0, 0 0, calc(var(--size)*0.5) calc(var(--size)*0.5), calc(var(--size)*0.5) calc(var(--size)*0.5);
+// 	opacity: 0.2;
+// }
+
+// .block-editor-block-list__block:not(.is-editing-disabled) {
+// 	z-index: 10;
+// 	background: $white;
+// }
+
 .block-editor-block-list__layout .block-editor-block-list__block {
 	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
 	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of

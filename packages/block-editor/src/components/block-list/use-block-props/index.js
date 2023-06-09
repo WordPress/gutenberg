@@ -77,6 +77,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		adjustScrolling,
 		enableAnimation,
 		isSubtreeDisabled,
+		editingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -91,6 +92,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
 				isBlockSubtreeDisabled,
+				getBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation } = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
@@ -115,6 +117,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+				editingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId ]
@@ -162,12 +165,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? 'true' : undefined,
+		// inert: isSubtreeDisabled ? 'true' : undefined,
 		className: classnames(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
-				'has-block-overlay': hasOverlay,
+				'has-block-overlay': hasOverlay || isSubtreeDisabled,
 			} ),
 			className,
 			props.className,
