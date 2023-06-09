@@ -1,8 +1,14 @@
 <?php
-
 include(ABSPATH . "wp-admin/includes/admin.php");
-class WP_Fonts_Library {
 
+/**
+ * Font library class.
+ *
+ * @package gutenberg
+ * @since x.x.x
+ * 
+ */
+class WP_Fonts_Library {
     public function __construct() {
         $this->wp_fonts_dir = path_join( WP_CONTENT_DIR, 'fonts' );
         $this->relative_fonts_path = site_url('/wp-content/fonts/', 'relative');
@@ -457,11 +463,39 @@ class WP_Fonts_Library {
             // Updates the fonts library with the new fonts succesfully downloaded
             $new_library_fonts = $this->merge_fonts( $font_families, $new_fonts );
 
+            // Sanitizes the fonts library using WP_Theme_JSON
+            $sanitized_font_families = $this->sanitize_font_families( $new_library_fonts );
+
             // Updates the fonts library post content and returns it
             return $this->update_fonts_library( $new_library_fonts );
         }
         
         return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.' ), array( 'status' => 500 ) );
+    }
+
+    /**
+     * Sanitizes the font families data using WP_Theme_JSON.
+     *
+     * @param array $font_families An array of font families.
+     * @return array A sanitized array of font families.
+     */
+    function sanitize_font_families ( $font_families ) {
+        // Creates the structure of theme.json array with the new fonts
+        $fonts_json = array(
+            'version' => '2',
+            'settings' => array(
+                'typography' => array(
+                    'fontFamilies' => $font_families
+                )
+            )
+        );
+        // Creates a new WP_Theme_JSON object with the new fonts to mmake profit of the sanitization and validation
+        $theme_json = new WP_Theme_JSON( $fonts_json );
+        $theme_data = $theme_json->get_data();
+        $sanitized_font_families = !empty( $theme_data['settings']['typography']['fontFamilies'] )
+            ? $theme_data['settings']['typography']['fontFamilies']
+            : array();
+        return $sanitized_font_families;
     }
 
     /**
