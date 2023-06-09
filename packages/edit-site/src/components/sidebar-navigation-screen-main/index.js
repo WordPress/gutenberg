@@ -33,7 +33,7 @@ export default function SidebarNavigationScreenMain() {
 		if ( location?.path === '/' ) {
 			setEditorCanvasContainerView( undefined );
 		}
-	}, [ setEditorCanvasContainerView ] );
+	}, [ setEditorCanvasContainerView, location?.path ] );
 
 	return (
 		<SidebarNavigationScreen
