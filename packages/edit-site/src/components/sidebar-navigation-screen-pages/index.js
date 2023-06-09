@@ -23,7 +23,7 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarButton from '../sidebar-button';
 import AddNewPageModal from '../add-new-page';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 

@@ -27,7 +27,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, useBlockEditingMode } = unlock(
 	blockEditorPrivateApis

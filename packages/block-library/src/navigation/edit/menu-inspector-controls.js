@@ -19,7 +19,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
