@@ -35,8 +35,8 @@ const noop = () => {};
 export default function SidebarNavigationScreenNavigationMenu() {
 	const {
 		deleteEntityRecord,
-		editEntityRecord,
 		saveEntityRecord,
+		editEntityRecord,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 	const [ isOpen, setOpen ] = useState( false );
@@ -56,15 +56,14 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
-	const handleSave = async () => {
-		saveEditedEntityRecord( 'postType', postType, postId );
+	const handleSave = async ( edits = {} ) => {
+		editEntityRecord( 'postType', postType, postId, edits );
 		setOpen( false );
+		await saveEditedEntityRecord( 'postType', postType, postId );
 		createSuccessNotice( __( 'Renamed Navigation menu' ), {
 			type: 'snackbar',
 		} );
 	};
-	const editRecordTitle = ( title = '' ) =>
-		editEntityRecord( 'postType', postType, postId, { title } );
 
 	const handleDelete = () => {
 		deleteEntityRecord( 'postType', postType, postId, { force: true } );
@@ -87,24 +86,13 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		}
 	};
 
-	const entity = useSelect(
-		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
-
 	const modalProps = {
 		isOpen,
 		setOpen,
 		handleDelete,
 		handleSave,
-		onChange: editRecordTitle,
 		handleDuplicate,
-		editedMenuTitle: entity?.title || '',
+		menuTitle: decodeEntities( menuTitle ),
 	};
 
 	if ( isLoading ) {

@@ -9,13 +9,12 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
-export default function RenameModal( {
-	onClose,
-	editedMenuTitle,
-	onChange,
-	handleSave,
-} ) {
+export default function RenameModal( { onClose, menuTitle, handleSave } ) {
+	// create local state to store the editedMenuTitle
+	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
+
 	return (
 		<Modal title="Rename" onRequestClose={ onClose }>
 			<form>
@@ -24,7 +23,7 @@ export default function RenameModal( {
 						__nextHasNoMarginBottom
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
-						onChange={ onChange }
+						onChange={ setEditedMenuTitle }
 					/>
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onClose }>
@@ -34,7 +33,10 @@ export default function RenameModal( {
 						<Button
 							variant="primary"
 							type="submit"
-							onClick={ handleSave }
+							onClick={ ( e ) => {
+								e.preventDefault();
+								handleSave( { title: editedMenuTitle } );
+							} }
 						>
 							{ __( 'Save' ) }
 						</Button>
