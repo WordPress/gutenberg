@@ -32,7 +32,6 @@ import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
-import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -470,37 +469,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						/>
 					);
 
-					const needsReadMore =
-						excerptLength < excerpt.trim().split( ' ' ).length &&
-						post.excerpt.raw === '';
-
-					const postExcerpt = needsReadMore ? (
-						<>
-							{ excerpt
-								.trim()
-								.split( ' ', excerptLength )
-								.join( ' ' ) }
-							{ createInterpolateElement(
-								/* translators: excerpt truncation character, default …  */
-								__( ' … <a>Read more</a>' ),
-								{
-									a: (
-										// eslint-disable-next-line jsx-a11y/anchor-has-content
-										<a
-											href={ post.link }
-											rel="noopener noreferrer"
-											onClick={
-												showRedirectionPreventedNotice
-											}
-										/>
-									),
-								}
-							) }
-						</>
-					) : (
-						excerpt
-					);
-
 					return (
 						<li key={ post.id }>
 							{ renderFeaturedImage && (
@@ -555,7 +523,25 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							{ displayPostContent &&
 								displayPostContentRadio === 'excerpt' && (
 									<div className="wp-block-latest-posts__post-excerpt">
-										{ postExcerpt }
+										{ excerpt
+											.trim()
+											.split( ' ', excerptLength )
+											.join( ' ' ) }
+										{ /* translators: excerpt truncation character, default …  */ }
+										<a
+											href={ post.link }
+											rel="noopener noreferrer"
+											onClick={
+												showRedirectionPreventedNotice
+											}
+											aria-label={ sprintf(
+												/* translators: byline. %s: Read more about current post. */
+												__( 'Read more about %s' ),
+												titleTrimmed
+											) }
+										>
+											{ __( 'Read more' ) }
+										</a>
 									</div>
 								) }
 							{ displayPostContent &&

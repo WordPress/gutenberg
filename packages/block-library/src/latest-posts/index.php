@@ -159,6 +159,12 @@ function render_block_core_latest_posts( $attributes ) {
 				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
 				$trimmed_excerpt
 			);
+			$list_items_markup .= sprintf(
+				'<a class="wp-block-latest-posts__post-read-more" href="%1$s" aria-label="%2$s">%3$s</a>',
+				esc_url( $post_link ),
+				esc_attr( __( 'Read more about ' . $title ) ),
++				__( 'Read more' )
+			);
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
