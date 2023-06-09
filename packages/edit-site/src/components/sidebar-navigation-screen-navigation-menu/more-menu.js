@@ -1,18 +1,14 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	Button,
-	DropdownMenu,
-	TextControl,
-	MenuItem,
-	MenuGroup,
-	Modal,
-} from '@wordpress/components';
+import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import RenameModal from './rename-modal';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
@@ -74,34 +70,12 @@ export default function ScreenNavigationMoreMenu( props ) {
 			</DropdownMenu>
 
 			{ isOpen && (
-				<Modal title="Rename" onRequestClose={ closeModal }>
-					<form>
-						<VStack spacing="3">
-							<TextControl
-								__nextHasNoMarginBottom
-								value={ editedMenuTitle }
-								placeholder={ __( 'Navigation title' ) }
-								onChange={ handleChange }
-							/>
-							<HStack justify="right">
-								<Button
-									variant="tertiary"
-									onClick={ closeModal }
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-
-								<Button
-									variant="primary"
-									type="submit"
-									onClick={ handleSave }
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</HStack>
-						</VStack>
-					</form>
-				</Modal>
+				<RenameModal
+					onClose={ closeModal }
+					handleChange={ handleChange }
+					handleSave={ handleSave }
+					editedMenuTitle={ editedMenuTitle }
+				/>
 			) }
 		</>
 	);
