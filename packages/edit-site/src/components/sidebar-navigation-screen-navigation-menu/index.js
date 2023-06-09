@@ -66,7 +66,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const handleSave = async () => {
 		saveEditedEntityRecord( 'postType', postType, postId );
 		setOpen( false );
-		createSuccessNotice( 'Renamed Navigation menu', {
+		createSuccessNotice( __( 'Renamed Navigation menu' ), {
 			type: 'snackbar',
 		} );
 	};
@@ -74,7 +74,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		editEntityRecord( 'postType', postType, postId, { title } );
 	const handleDelete = () => {
 		deleteEntityRecord( 'postType', postType, postId, { force: true } );
-		createSuccessNotice( 'Deleted Navigation menu', {
+		createSuccessNotice( __( 'Deleted Navigation menu' ), {
 			type: 'snackbar',
 		} );
 		goTo( '/navigation' );
