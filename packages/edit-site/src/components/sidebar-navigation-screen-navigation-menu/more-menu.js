@@ -4,6 +4,7 @@
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,16 +17,12 @@ const POPOVER_PROPS = {
 };
 
 export default function ScreenNavigationMoreMenu( props ) {
-	const {
-		isOpen,
-		setOpen,
-		handleDelete,
-		handleSave,
-		handleDuplicate,
-		menuTitle,
-	} = props;
-	const closeModal = () => setOpen( false );
-	const openModal = () => setOpen( true );
+	const { handleDelete, handleSave, handleDuplicate, menuTitle } = props;
+
+	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
+
+	const closeRenameModal = () => setRenameModalOpen( false );
+	const openRenameModal = () => setRenameModalOpen( true );
 
 	return (
 		<>
@@ -39,7 +36,8 @@ export default function ScreenNavigationMoreMenu( props ) {
 						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
-									openModal();
+									openRenameModal();
+									// Close the dropdown after opening the modal.
 									onClose();
 								} }
 							>
@@ -68,9 +66,9 @@ export default function ScreenNavigationMoreMenu( props ) {
 				) }
 			</DropdownMenu>
 
-			{ isOpen && (
+			{ renameModalOpen && (
 				<RenameModal
-					onClose={ closeModal }
+					onClose={ closeRenameModal }
 					menuTitle={ menuTitle }
 					handleSave={ handleSave }
 				/>

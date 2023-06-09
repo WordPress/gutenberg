@@ -7,7 +7,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { BlockEditorProvider } from '@wordpress/block-editor';
@@ -39,7 +39,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		editEntityRecord,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
-	const [ isOpen, setOpen ] = useState( false );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const postType = `wp_navigation`;
@@ -58,7 +58,6 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const handleSave = async ( edits = {} ) => {
 		editEntityRecord( 'postType', postType, postId, edits );
-		setOpen( false );
 		await saveEditedEntityRecord( 'postType', postType, postId );
 		createSuccessNotice( __( 'Renamed Navigation menu' ), {
 			type: 'snackbar',
@@ -84,15 +83,6 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			} );
 			goTo( `/navigation/${ postType }/${ savedRecord.id }` );
 		}
-	};
-
-	const modalProps = {
-		isOpen,
-		setOpen,
-		handleDelete,
-		handleSave,
-		handleDuplicate,
-		menuTitle: decodeEntities( menuTitle ),
 	};
 
 	if ( isLoading ) {
@@ -126,7 +116,14 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	return (
 		<SidebarNavigationScreenWrapper
-			actions={ ScreenNavigationMoreMenu( modalProps ) }
+			actions={
+				<ScreenNavigationMoreMenu
+					menuTitle={ decodeEntities( menuTitle ) }
+					handleDelete={ handleDelete }
+					handleSave={ handleSave }
+					handleDuplicate={ handleDuplicate }
+				/>
+			}
 			title={ decodeEntities( menuTitle ) }
 			description={ __(
 				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'

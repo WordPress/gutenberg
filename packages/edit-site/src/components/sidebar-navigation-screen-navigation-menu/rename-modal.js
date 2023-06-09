@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
 export default function RenameModal( { onClose, menuTitle, handleSave } ) {
-	// create local state to store the editedMenuTitle
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
 
 	return (
@@ -36,6 +35,7 @@ export default function RenameModal( { onClose, menuTitle, handleSave } ) {
 							onClick={ ( e ) => {
 								e.preventDefault();
 								handleSave( { title: editedMenuTitle } );
+								onClose();
 							} }
 						>
 							{ __( 'Save' ) }
