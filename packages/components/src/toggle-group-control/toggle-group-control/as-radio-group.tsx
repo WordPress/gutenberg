@@ -9,18 +9,13 @@ import { RadioGroup, useRadioState } from 'reakit';
  * WordPress dependencies
  */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	forwardRef,
-	useRef,
-	useLayoutEffect,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
+import { useUpdateLayoutEffect } from '../utils';
 import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
@@ -44,8 +39,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const mounted = useRef( false );
-
 	const baseId = useInstanceId(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
@@ -66,24 +59,20 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		[ radio, isAdaptiveWidth, size ]
 	);
 
-	useEffect( () => {
-		mounted.current = true;
-	}, [] );
-
 	const { setState: groupSetState, state: groupState } = groupContextValue;
 
 	// Propagate groupContext.state change.
-	useLayoutEffect( () => {
+	useUpdateLayoutEffect( () => {
 		// Avoid calling onChange if groupContext state changed
 		// from incoming value.
-		if ( mounted.current && previousValue !== groupState ) {
+		if ( previousValue !== groupState ) {
 			onChange( groupState );
 		}
 	}, [ groupState, onChange, previousValue ] );
 
 	// Sync incoming value with groupContext.state.
-	useLayoutEffect( () => {
-		if ( mounted.current && value !== groupState ) {
+	useUpdateLayoutEffect( () => {
+		if ( value !== groupState ) {
 			groupSetState( value );
 		}
 	}, [ groupSetState, groupState, value ] );

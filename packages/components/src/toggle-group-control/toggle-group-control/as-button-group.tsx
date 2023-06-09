@@ -7,19 +7,13 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	forwardRef,
-	useMemo,
-	useState,
-	useRef,
-	useLayoutEffect,
-	useEffect,
-} from '@wordpress/element';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
+import { useUpdateLayoutEffect } from '../utils';
 import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
@@ -43,8 +37,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const mounted = useRef( false );
-
 	const baseId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
@@ -65,23 +57,19 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		[ baseId, selectedValue, isAdaptiveWidth, size ]
 	);
 
-	useEffect( () => {
-		mounted.current = true;
-	}, [] );
-
 	const { setState: groupSetState, state: groupState } = groupContextValue;
 
 	// Propagate groupContext.state change.
-	useLayoutEffect( () => {
+	useUpdateLayoutEffect( () => {
 		// Avoid calling onChange if groupContext state changed
 		// from incoming value.
-		if ( mounted.current && previousValue !== groupState ) {
+		if ( previousValue !== groupState ) {
 			onChange( groupState );
 		}
 	}, [ groupState, onChange, previousValue ] );
 
 	// Sync incoming value with groupContext.state.
-	useLayoutEffect( () => {
+	useUpdateLayoutEffect( () => {
 		if ( value !== groupState ) {
 			groupSetState( value );
 		}
