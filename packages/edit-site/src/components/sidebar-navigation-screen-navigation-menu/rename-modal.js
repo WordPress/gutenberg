@@ -15,7 +15,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
 
 	return (
-		<Modal title="Rename" onRequestClose={ onClose }>
+		<Modal title={ __( 'Rename' ) } onRequestClose={ onClose }>
 			<form>
 				<VStack spacing="3">
 					<TextControl
