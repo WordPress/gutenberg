@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 16.0.0-rc.4 =
+
+
+
+## Changelog
+
+### Various
+
+- Post title: Fix autofocus when iframed. ([51367](https://github.com/WordPress/gutenberg/pull/51367))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix
+
+
 = 16.0.0-rc.3 =
 
 
