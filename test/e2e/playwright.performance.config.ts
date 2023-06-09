@@ -1,25 +1,91 @@
 /**
  * External dependencies
  */
+import os from 'os';
+import path from 'path';
 import { fileURLToPath } from 'url';
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Internal dependencies
- */
-import baseConfig from './playwright.config';
+process.env.WP_ARTIFACTS_PATH ??= path.join( process.cwd(), 'artifacts' );
+process.env.STORAGE_STATE_PATH ??= path.join(
+	process.env.WP_ARTIFACTS_PATH,
+	'storage-states/admin.json'
+);
+process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
-	...baseConfig,
-	fullyParallel: false,
-	workers: 1,
-	testDir: fileURLToPath(
-		new URL( './specs/performance', 'file:' + __filename ).href
-	),
-	testIgnore: undefined,
 	reporter: process.env.CI
 		? undefined // We're using another reporter in CI.
 		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
+	forbidOnly: !! process.env.CI,
+	fullyParallel: false,
+	workers: 1,
+	retries: process.env.CI ? 2 : 0,
+	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
+	testDir: fileURLToPath(
+		new URL( './specs/performance', 'file:' + __filename ).href
+	),
+	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
+	snapshotPathTemplate:
+		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
+	globalSetup: fileURLToPath(
+		new URL( './config/global-setup.ts', 'file:' + __filename ).href
+	),
+	use: {
+		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+		headless: true,
+		viewport: {
+			width: 960,
+			height: 700,
+		},
+		ignoreHTTPSErrors: true,
+		locale: 'en-US',
+		contextOptions: {
+			reducedMotion: 'reduce',
+			strictSelectors: true,
+		},
+		storageState: process.env.STORAGE_STATE_PATH,
+		actionTimeout: 10_000, // 10 seconds.
+		trace: 'retain-on-failure',
+		screenshot: 'only-on-failure',
+		video: 'on-first-retry',
+	},
+	webServer: {
+		command: 'npm run wp-env start',
+		port: 8889,
+		timeout: 120_000, // 120 seconds.
+		reuseExistingServer: true,
+	},
+	projects: [
+		{
+			name: 'chromium',
+			use: { ...devices[ 'Desktop Chrome' ] },
+			grepInvert: /-chromium/,
+		},
+		{
+			name: 'webkit',
+			use: {
+				...devices[ 'Desktop Safari' ],
+				/**
+				 * Headless webkit won't receive dataTransfer with custom types in the
+				 * drop event on Linux. The solution is to use `xvfb-run` to run the tests.
+				 * ```sh
+				 * xvfb-run npm run test:e2e:playwright
+				 * ```
+				 * See `.github/workflows/end2end-test-playwright.yml` for advanced usages.
+				 */
+				headless: os.type() !== 'Linux',
+			},
+			grep: /@webkit/,
+			grepInvert: /-webkit/,
+		},
+		{
+			name: 'firefox',
+			use: { ...devices[ 'Desktop Firefox' ] },
+			grep: /@firefox/,
+			grepInvert: /-firefox/,
+		},
+	],
 } );
 
 export default config;
