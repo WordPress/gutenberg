@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import RenameModal from './rename-modal';
+import DeleteModal from './delete-modal';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
@@ -20,9 +21,14 @@ export default function ScreenNavigationMoreMenu( props ) {
 	const { onDelete, onSave, onDuplicate, menuTitle } = props;
 
 	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
+	const [ deleteModalOpen, setDeleteModalOpen ] = useState( false );
 
-	const closeRenameModal = () => setRenameModalOpen( false );
+	const closeModals = () => {
+		setRenameModalOpen( false );
+		setDeleteModalOpen( false );
+	};
 	const openRenameModal = () => setRenameModalOpen( true );
+	const openDeleteModal = () => setDeleteModalOpen( true );
 
 	return (
 		<>
@@ -55,7 +61,9 @@ export default function ScreenNavigationMoreMenu( props ) {
 								isDestructive
 								isTertiary
 								onClick={ () => {
-									onDelete();
+									openDeleteModal();
+
+									// Close the dropdown after opening the modal.
 									onClose();
 								} }
 							>
@@ -66,9 +74,13 @@ export default function ScreenNavigationMoreMenu( props ) {
 				) }
 			</DropdownMenu>
 
+			{ deleteModalOpen && (
+				<DeleteModal onClose={ closeModals } onConfirm={ onDelete } />
+			) }
+
 			{ renameModalOpen && (
 				<RenameModal
-					onClose={ closeRenameModal }
+					onClose={ closeModals }
 					menuTitle={ menuTitle }
 					onSave={ onSave }
 				/>
