@@ -187,6 +187,25 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * @covers WP_REST_Templates_Controller::update_item
+	 */
+	public function test_update_item() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/emptytheme//my_template' );
+		$request->set_body_params(
+			array(
+				'title' => 'My new Index Title',
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'My new Index Title', $data['title']['raw'] );
+		$this->assertSame( 'custom', $data['source'] );
+		$this->assertIsString( $data['modified'] );
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {}
@@ -195,11 +214,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 * @doesNotPerformAssertions
 	 */
 	public function test_create_item() {}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_update_item() {}
 
 	/**
 	 * @doesNotPerformAssertions
