@@ -14,7 +14,6 @@ import DeleteModal from './delete-modal';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	variant: 'toolbar',
 };
 
 export default function ScreenNavigationMoreMenu( props ) {
