@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import {
@@ -9,8 +9,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { createInterpolateElement } from '@wordpress/element';
-import { humanTimeDiff } from '@wordpress/date';
+
 /**
  * Internal dependencies
  */
@@ -22,11 +21,6 @@ import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
-import {
-	SidebarNavigationScreenDetailsPanelRow,
-	SidebarNavigationScreenDetailsPanelLabel,
-	SidebarNavigationScreenDetailsPanelValue,
-} from '../sidebar-navigation-screen-details-panel';
 
 function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -52,29 +46,6 @@ function useTemplateDetails( postType, postId ) {
 	let content = null;
 	if ( record?.slug === 'home' ) {
 		content = <HomeTemplateDetails />;
-	}
-
-	let footer = null;
-	if ( !! record?.modified ) {
-		footer = (
-			<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-page__footer">
-				<SidebarNavigationScreenDetailsPanelLabel>
-					{ __( 'Last modified' ) }
-				</SidebarNavigationScreenDetailsPanelLabel>
-				<SidebarNavigationScreenDetailsPanelValue>
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %s: is the relative time when the post was last modified. */
-							__( '<time>%s</time>' ),
-							humanTimeDiff( record.modified )
-						),
-						{
-							time: <time dateTime={ record.modified } />,
-						}
-					) }
-				</SidebarNavigationScreenDetailsPanelValue>
-			</SidebarNavigationScreenDetailsPanelRow>
-		);
 	}
 
 	const description = (
@@ -109,7 +80,7 @@ function useTemplateDetails( postType, postId ) {
 		</>
 	);
 
-	return { title, description, content, footer };
+	return { title, description, content };
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -118,7 +89,7 @@ export default function SidebarNavigationScreenTemplate() {
 		params: { postType, postId },
 	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, content, description, footer } = useTemplateDetails(
+	const { title, content, description } = useTemplateDetails(
 		postType,
 		postId
 	);
@@ -145,7 +116,6 @@ export default function SidebarNavigationScreenTemplate() {
 			}
 			description={ description }
 			content={ content }
-			footer={ footer }
 		/>
 	);
 }
