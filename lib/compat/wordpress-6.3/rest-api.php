@@ -76,3 +76,25 @@ function gutenberg_update_global_styles_rest_controller( $args, $post_type ) {
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_global_styles_rest_controller', 10, 2 );
+
+/**
+ * Add the `modified` value to the `wp_template` schema.
+ *
+ * @since 6.3.0 Added 'modified' property.
+ */
+function add_modified_wp_template_schema() {
+		register_rest_field(
+			array( 'wp_template', 'wp_template_part' ),
+			'modified',
+			array(
+				'schema' => array(
+					'description' => __( "The date the post was last modified, in the site's timezone.", 'gutenberg' ),
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+			)
+		);
+}
+add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
