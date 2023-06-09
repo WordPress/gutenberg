@@ -17,6 +17,7 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
  * Internal dependencies
  */
 import StatusLabel from './status-label';
+import PublishDate from './publish-date';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -33,6 +34,19 @@ function getPageDetails( page ) {
 			label: __( 'Status' ),
 			value: (
 				<StatusLabel
+					postId={ page.id }
+					postType={ page.type }
+					status={ page?.password ? 'protected' : page.status }
+					date={ page?.date }
+				/>
+			),
+		},
+		{
+			label: __( 'Publish on' ),
+			value: (
+				<PublishDate
+					postId={ page.id }
+					postType={ page.type }
 					status={ page?.password ? 'protected' : page.status }
 					date={ page?.date }
 				/>
