@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode } from 'react';
+import type { Component, MutableRefObject, ReactNode } from 'react';
 
 export type BubblesVirtuallySlotProps = {
 	/**
@@ -62,4 +62,15 @@ export type BubblesVirtuallySlotFillProviderProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+};
+
+export type BaseSlotFillContext = {
+	registerSlot: ( name: string, slot: Component ) => void;
+	unregisterSlot: ( name: string, slot: Component ) => void;
+	registerFill: ( name: string, instance: any ) => void;
+	unregisterFill: ( name: string, instance: any ) => void;
+	getSlot: ( name: string ) => any;
+	// TODO: getFill?
+	getFills: ( name: string, slotInstance: any ) => any;
+	subscribe: ( listener: () => {} ) => () => void;
 };
