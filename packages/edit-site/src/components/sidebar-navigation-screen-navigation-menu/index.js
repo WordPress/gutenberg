@@ -40,7 +40,10 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
+	const { getEditedEntityRecord } = useSelect( coreStore );
 
 	const postType = `wp_navigation`;
 	const {
@@ -57,11 +60,29 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
 	const handleSave = async ( edits = {} ) => {
+		// Prepare for revert in case of error.
+		const originalRecord = getEditedEntityRecord(
+			'postType',
+			'wp_navigation',
+			postId
+		);
+
+		// Apply the edits.
 		editEntityRecord( 'postType', postType, postId, edits );
-		await saveEditedEntityRecord( 'postType', postType, postId );
-		createSuccessNotice( __( 'Renamed Navigation menu' ), {
-			type: 'snackbar',
-		} );
+
+		// Attempt to persist.
+		try {
+			await saveEditedEntityRecord( 'postType', postType, postId );
+			createSuccessNotice( __( 'Renamed Navigation menu' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			// Revert to original in case of error.
+			editEntityRecord( 'postType', postType, postId, originalRecord );
+			createErrorNotice( __( 'Unable to rename Navigation menu' ), {
+				type: 'snackbar',
+			} );
+		}
 	};
 
 	const handleDelete = () => {
