@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { select } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import {
@@ -126,9 +121,11 @@ describe( 'private selectors', () => {
 			const __experimentalHasContentRoleAttribute = jest.fn(
 				() => false
 			);
-			select.mockReturnValue( {
-				__experimentalHasContentRoleAttribute,
-			} );
+			getBlockEditingMode.registry = {
+				select: jest.fn( () => ( {
+					__experimentalHasContentRoleAttribute,
+				} ) ),
+			};
 
 			it( 'should return default by default', () => {
 				expect(
