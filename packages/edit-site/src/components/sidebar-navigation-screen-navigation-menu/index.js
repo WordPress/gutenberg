@@ -43,19 +43,40 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getEditedEntityRecord } = useSelect( coreStore );
-
 	const postType = `wp_navigation`;
 	const {
 		goTo,
 		params: { postId },
 	} = useNavigator();
 
-	const { record: navigationMenu, isResolving: isLoading } = useEntityRecord(
+	const { record: navigationMenu, isResolving } = useEntityRecord(
 		'postType',
 		postType,
 		postId
 	);
+
+	const { getEditedEntityRecord, isSaving, isDeleting } = useSelect(
+		( select ) => {
+			const {
+				isSavingEntityRecord,
+				isDeletingEntityRecord,
+				getEditedEntityRecord: getEditedEntityRecordSelector,
+			} = select( coreStore );
+
+			return {
+				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
+				isDeleting: isDeletingEntityRecord(
+					'postType',
+					postType,
+					postId
+				),
+				getEditedEntityRecord: getEditedEntityRecordSelector,
+			};
+		},
+		[ postId, postType ]
+	);
+
+	const isLoading = isResolving || isSaving || isDeleting;
 
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
