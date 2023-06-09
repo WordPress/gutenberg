@@ -16,7 +16,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 
 	return (
 		<Modal title={ __( 'Rename' ) } onRequestClose={ onClose }>
-			<form>
+			<form className="sidebar-navigation__rename-modal-form">
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
