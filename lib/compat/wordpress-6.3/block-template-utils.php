@@ -15,7 +15,7 @@
  * @access private
  *
  * @param WP_Post $post Template post.
- * @return WP_Block_Template|WP_Error Template or error object.
+ * @return Gutenberg_Block_Template|WP_Error Template or error object.
  */
 function _gutenberg_build_block_template_result_from_post( $post ) {
 	$default_template_types = get_default_block_template_types();
@@ -130,7 +130,7 @@ function _gutenberg_build_block_template_result_from_post( $post ) {
 					}
 					break;
 				case 'page':
-					_wp_build_title_and_description_for_single_post_type_block_template( 'page', $slug_remaining, $template );
+					_gutenberg_build_title_and_description_for_single_post_type_block_template( 'page', $slug_remaining, $template );
 					break;
 				case 'single':
 					$post_types = get_post_types();
@@ -141,7 +141,7 @@ function _gutenberg_build_block_template_result_from_post( $post ) {
 						// If $slug_remaining starts with $post_type followed by a hyphen.
 						if ( 0 === strncmp( $slug_remaining, $post_type . '-', $post_type_length ) ) {
 							$slug  = substr( $slug_remaining, $post_type_length, strlen( $slug_remaining ) );
-							$found = _wp_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, $template );
+							$found = _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, $template );
 
 							if ( $found ) {
 								break;
@@ -150,10 +150,10 @@ function _gutenberg_build_block_template_result_from_post( $post ) {
 					}
 					break;
 				case 'tag':
-					_wp_build_title_and_description_for_taxonomy_block_template( 'post_tag', $slug_remaining, $template );
+					_gutenberg_build_title_and_description_for_taxonomy_block_template( 'post_tag', $slug_remaining, $template );
 					break;
 				case 'category':
-					_wp_build_title_and_description_for_taxonomy_block_template( 'category', $slug_remaining, $template );
+					_gutenberg_build_title_and_description_for_taxonomy_block_template( 'category', $slug_remaining, $template );
 					break;
 				case 'taxonomy':
 					$taxonomies = get_taxonomies();
@@ -164,7 +164,7 @@ function _gutenberg_build_block_template_result_from_post( $post ) {
 						// If $slug_remaining starts with $taxonomy followed by a hyphen.
 						if ( 0 === strncmp( $slug_remaining, $taxonomy . '-', $taxonomy_length ) ) {
 							$slug  = substr( $slug_remaining, $taxonomy_length, strlen( $slug_remaining ) );
-							$found = _wp_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, $template );
+							$found = _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, $template );
 
 							if ( $found ) {
 								break;
@@ -193,7 +193,7 @@ function _gutenberg_build_block_template_result_from_post( $post ) {
  *     @type string   $post_type Post type to get the templates for.
  * }
  * @param string $template_type 'wp_template' or 'wp_template_part'.
- * @return WP_Block_Template[] Array of block templates.
+ * @return Gutenberg_Block_Template[] Array of block templates.
  */
 function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template' ) {
 	/**
@@ -201,7 +201,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 * Return a non-null value to bypass the WordPress queries.
 	 *
-	 * @param WP_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
+	 * @param Gutenberg_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
 	 *                                                  or null to allow WP to run its normal queries.
 	 * @param array $query {
 	 *     Arguments to retrieve templates. All arguments are optional.
@@ -295,7 +295,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
-	 * @param WP_Block_Template[] $query_result Array of found block templates.
+	 * @param Gutenberg_Block_Template[] $query_result Array of found block templates.
 	 * @param array $query {
 	 *     Arguments to retrieve templates. All arguments are optional.
 	 *
@@ -318,7 +318,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @param string $id            Template unique identifier (example: 'theme_slug//template_slug').
  * @param string $template_type Optional. Template type: 'wp_template' or 'wp_template_part'.
  *                              Default 'wp_template'.
- * @return WP_Block_Template|null Template.
+ * @return Gutenberg_Block_Template|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	/**
@@ -328,7 +328,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
+	 * @param Gutenberg_Block_Template|null $block_template Return block template object to short-circuit the default query,
 	 *                                               or null to allow WP to run its normal queries.
 	 * @param string                 $id             Template unique identifier (example: 'theme_slug//template_slug').
 	 * @param string                 $template_type  Template type: 'wp_template' or 'wp_template_part'.
@@ -375,9 +375,166 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param WP_Block_Template|null $block_template The found block template, or null if there isn't one.
+	 * @param Gutenberg_Block_Template|null $block_template The found block template, or null if there isn't one.
 	 * @param string                 $id             Template unique identifier (example: 'theme_slug//template_slug').
 	 * @param array                  $template_type  Template type: 'wp_template' or 'wp_template_part'.
 	 */
 	return apply_filters( 'get_block_template', $block_template, $id, $template_type );
+}
+
+/**
+ * Builds the title and description of a post-specific template based on the underlying referenced post.
+ *
+ * Mutates the underlying template object.
+ *
+ * @since 6.1.0
+ * @access private
+ *
+ * @param string                   $post_type Post type, e.g. page, post, product.
+ * @param string                   $slug      Slug of the post, e.g. a-story-about-shoes.
+ * @param Gutenberg_Block_Template $template  Template to mutate adding the description and title computed.
+ * @return bool Returns true if the referenced post was found and false otherwise.
+ */
+function _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, Gutenberg_Block_Template $template ) {
+	$post_type_object = get_post_type_object( $post_type );
+
+	$default_args = array(
+		'post_type'              => $post_type,
+		'post_status'            => 'publish',
+		'posts_per_page'         => 1,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'ignore_sticky_posts'    => true,
+		'no_found_rows'          => true,
+	);
+
+	$args = array(
+		'name' => $slug,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$posts_query = new WP_Query( $args );
+
+	if ( empty( $posts_query->posts ) ) {
+		$template->title = sprintf(
+		/* translators: Custom template title in the Site Editor referencing a post that was not found. 1: Post type singular name, 2: Post type slug. */
+			__( 'Not found: %1$s (%2$s)' ),
+			$post_type_object->labels->singular_name,
+			$slug
+		);
+
+		return false;
+	}
+
+	$post_title = $posts_query->posts[0]->post_title;
+
+	$template->title = sprintf(
+	/* translators: Custom template title in the Site Editor. 1: Post type singular name, 2: Post title. */
+		__( '%1$s: %2$s' ),
+		$post_type_object->labels->singular_name,
+		$post_title
+	);
+
+	$template->description = sprintf(
+	/* translators: Custom template description in the Site Editor. %s: Post title. */
+		__( 'Template for %s' ),
+		$post_title
+	);
+
+	$args = array(
+		'title' => $post_title,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$posts_with_same_title_query = new WP_Query( $args );
+
+	if ( count( $posts_with_same_title_query->posts ) > 1 ) {
+		$template->title = sprintf(
+		/* translators: Custom template title in the Site Editor. 1: Template title, 2: Post type slug. */
+			__( '%1$s (%2$s)' ),
+			$template->title,
+			$slug
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Builds the title and description of a taxonomy-specific template based on the underlying entity referenced.
+ *
+ * Mutates the underlying template object.
+ *
+ * @since 6.1.0
+ * @access private
+ *
+ * @param string                   $taxonomy Identifier of the taxonomy, e.g. category.
+ * @param string                   $slug     Slug of the term, e.g. shoes.
+ * @param Gutenberg_Block_Template $template Template to mutate adding the description and title computed.
+ * @return bool True if the term referenced was found and false otherwise.
+ */
+function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, Gutenberg_Block_Template $template ) {
+	$taxonomy_object = get_taxonomy( $taxonomy );
+
+	$default_args = array(
+		'taxonomy'               => $taxonomy,
+		'hide_empty'             => false,
+		'update_term_meta_cache' => false,
+	);
+
+	$term_query = new WP_Term_Query();
+
+	$args = array(
+		'number' => 1,
+		'slug'   => $slug,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$terms_query = $term_query->query( $args );
+
+	if ( empty( $terms_query ) ) {
+		$template->title = sprintf(
+		/* translators: Custom template title in the Site Editor, referencing a taxonomy term that was not found. 1: Taxonomy singular name, 2: Term slug. */
+			__( 'Not found: %1$s (%2$s)' ),
+			$taxonomy_object->labels->singular_name,
+			$slug
+		);
+		return false;
+	}
+
+	$term_title = $terms_query[0]->name;
+
+	$template->title = sprintf(
+	/* translators: Custom template title in the Site Editor. 1: Taxonomy singular name, 2: Term title. */
+		__( '%1$s: %2$s' ),
+		$taxonomy_object->labels->singular_name,
+		$term_title
+	);
+
+	$template->description = sprintf(
+	/* translators: Custom template description in the Site Editor. %s: Term title. */
+		__( 'Template for %s' ),
+		$term_title
+	);
+
+	$term_query = new WP_Term_Query();
+
+	$args = array(
+		'number' => 2,
+		'name'   => $term_title,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$terms_with_same_title_query = $term_query->query( $args );
+
+	if ( count( $terms_with_same_title_query ) > 1 ) {
+		$template->title = sprintf(
+		/* translators: Custom template title in the Site Editor. 1: Template title, 2: Term slug. */
+			__( '%1$s (%2$s)' ),
+			$template->title,
+			$slug
+		);
+	}
+
+	return true;
 }
