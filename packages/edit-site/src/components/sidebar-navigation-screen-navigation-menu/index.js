@@ -93,7 +93,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		}
 	};
 
-	const element = useSelect(
+	const entity = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
@@ -110,7 +110,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		handleSave,
 		handleChange,
 		handleDuplicate,
-		editedMenuTitle: element.title,
+		editedMenuTitle: entity?.title || '',
 	};
 
 	if ( isLoading ) {
