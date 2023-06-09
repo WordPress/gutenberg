@@ -1416,9 +1416,19 @@ export function selection( state = {}, action ) {
 			}
 	}
 
+	const selectionStart = selectionHelper( state.selectionStart, action );
+	const selectionEnd = selectionHelper( state.selectionEnd, action );
+
+	if (
+		selectionStart === state.selectionStart &&
+		selectionEnd === state.selectionEnd
+	) {
+		return state;
+	}
+
 	return {
-		selectionStart: selectionHelper( state.selectionStart, action ),
-		selectionEnd: selectionHelper( state.selectionEnd, action ),
+		selectionStart,
+		selectionEnd,
 	};
 }
 
@@ -1594,18 +1604,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
+				let id = blockName;
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				const match = select( blocksStore ).getActiveBlockVariation(
 					blockName,
 					attributes
 				);
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				let id = match?.name
-					? `${ blockName }/${ match.name }`
-					: blockName;
-				const insert = { name: id };
+				if ( match?.name ) {
+					id += '/' + match.name;
+				}
 				if ( blockName === 'core/block' ) {
-					insert.ref = attributes.ref;
 					id += '/' + attributes.ref;
 				}
 
@@ -1618,7 +1627,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 							count: prevState.insertUsage[ id ]
 								? prevState.insertUsage[ id ].count + 1
 								: 1,
-							insert,
 						},
 					},
 				};
@@ -1751,45 +1759,6 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning automatic change state.
- *
- * @param {?string} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function automaticChangeStatus( state, action ) {
-	switch ( action.type ) {
-		case 'MARK_AUTOMATIC_CHANGE':
-			return 'pending';
-		case 'MARK_AUTOMATIC_CHANGE_FINAL':
-			if ( state === 'pending' ) {
-				return 'final';
-			}
-
-			return;
-		case 'SELECTION_CHANGE':
-			// As long as the state is not final, ignore any selection changes.
-			if ( state !== 'final' ) {
-				return state;
-			}
-
-			return;
-		// Undoing an automatic change should still be possible after mouse
-		// move or after visibility change.
-		case 'SET_BLOCK_VISIBILITY':
-		case 'START_TYPING':
-		case 'STOP_TYPING':
-		case 'UPDATE_BLOCK_LIST_SETTINGS':
-			return state;
-	}
-
-	// TODO: This is a source of bug, as each time there's a change in timing,
-	// or a new action is added, this could break.
-	// Reset the state by default (for any action not handled).
-}
-
-/**
  * Reducer returning current highlighted block.
  *
  * @param {boolean} state  Current highlighted block.
@@ -1863,7 +1832,33 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
-export default combineReducers( {
+/**
+ * Reducer returning a map of block client IDs to block editing modes.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function blockEditingModes( state = new Map(), action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EDITING_MODE':
+			return new Map( state ).set( action.clientId, action.mode );
+		case 'UNSET_BLOCK_EDITING_MODE': {
+			const newState = new Map( state );
+			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'RESET_BLOCKS': {
+			return state.has( '' )
+				? new Map().set( '', state.get( '' ) )
+				: state;
+		}
+	}
+	return state;
+}
+
+const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
 	isBlockInterfaceHidden,
@@ -1881,9 +1876,64 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	editorMode,
 	hasBlockMovingClientId,
-	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	blockEditingModes,
 } );
+
+function withAutomaticChangeReset( reducer ) {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( ! state ) {
+			return nextState;
+		}
+
+		// Take over the last value without creating a new reference.
+		nextState.automaticChangeStatus = state.automaticChangeStatus;
+
+		if ( action.type === 'MARK_AUTOMATIC_CHANGE' ) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'pending',
+			};
+		}
+
+		if (
+			action.type === 'MARK_AUTOMATIC_CHANGE_FINAL' &&
+			state.automaticChangeStatus === 'pending'
+		) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'final',
+			};
+		}
+
+		// If there's a change that doesn't affect blocks or selection, maintain
+		// the current status.
+		if (
+			nextState.blocks === state.blocks &&
+			nextState.selection === state.selection
+		) {
+			return nextState;
+		}
+
+		// As long as the state is not final, ignore any selection changes.
+		if (
+			nextState.automaticChangeStatus !== 'final' &&
+			nextState.selection !== state.selection
+		) {
+			return nextState;
+		}
+
+		// Reset the status if blocks change or selection changes (when status is final).
+		return {
+			...nextState,
+			automaticChangeStatus: undefined,
+		};
+	};
+}
+
+export default withAutomaticChangeReset( combinedReducers );

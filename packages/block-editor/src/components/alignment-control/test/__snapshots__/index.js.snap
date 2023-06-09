@@ -5,7 +5,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
   <div
     class="components-toolbar"
     icon="[object Object]"
-    label="Align"
+    label="Align text"
   >
     <div>
       <button
@@ -66,7 +66,7 @@ exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
     <button
       aria-expanded="false"
       aria-haspopup="true"
-      aria-label="Align"
+      aria-label="Align text"
       class="components-button components-dropdown-menu__toggle has-icon"
       data-toolbar-item="true"
       type="button"
@@ -93,7 +93,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
   <div
     class="components-toolbar"
     icon="[object Object]"
-    label="Align"
+    label="Align text"
   >
     <div>
       <button

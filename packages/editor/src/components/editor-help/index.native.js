@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
@@ -40,18 +39,31 @@ import HelpSectionTitle from './help-section-title';
 const HELP_TOPICS = [
 	{
 		label: __( 'What is a block?' ),
+		slug: 'what-is-a-block',
 		icon: helpFilled,
 		view: <IntroToBlocks />,
 	},
 	{
 		label: __( 'Add blocks' ),
+		slug: 'add-blocks',
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: moveBlocksIcon, view: <MoveBlocks /> },
-	{ label: __( 'Remove blocks' ), icon: trash, view: <RemoveBlocks /> },
+	{
+		label: __( 'Move blocks' ),
+		slug: 'move-blocks',
+		icon: moveBlocksIcon,
+		view: <MoveBlocks />,
+	},
+	{
+		label: __( 'Remove blocks' ),
+		slug: 'remove-blocks',
+		icon: trash,
+		view: <RemoveBlocks />,
+	},
 	{
 		label: __( 'Customize blocks' ),
+		slug: 'customize-blocks',
 		icon: cog,
 		view: <CustomizeBlocks />,
 	},
@@ -141,24 +153,20 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
 													(
-														{ label, icon },
+														{ label, icon, slug },
 														index
 													) => {
-														const labelSlug =
-															kebabCase( label );
 														const isLastItem =
 															index ===
 															HELP_TOPICS.length -
 																1;
 														return (
 															<HelpTopicRow
-																key={
-																	labelSlug
-																}
+																key={ slug }
 																label={ label }
 																icon={ icon }
 																screenName={
-																	labelSlug
+																	slug
 																}
 																isLastItem={
 																	isLastItem
@@ -177,12 +185,11 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 						</View>
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
-					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label );
+					{ HELP_TOPICS.map( ( { view, label, slug } ) => {
 						return (
 							<HelpDetailNavigationScreen
-								key={ labelSlug }
-								name={ labelSlug }
+								key={ slug }
+								name={ slug }
 								content={ view }
 								label={ label }
 								options={ {

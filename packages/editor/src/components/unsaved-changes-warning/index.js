@@ -26,7 +26,7 @@ export default function UnsavedChangesWarning() {
 	 *
 	 * @param {Event} event `beforeunload` event.
 	 *
-	 * @return {?string} Warning prompt message, if unsaved changes exist.
+	 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
 	 */
 	const warnIfUnsavedChanges = ( event ) => {
 		// We need to call the selector directly in the listener to avoid race

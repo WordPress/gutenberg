@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -28,9 +29,11 @@ function BlockPattern( {
 	isDraggable,
 	pattern,
 	onClick,
+	onHover,
 	composite,
 	showTooltip,
 } ) {
+	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
@@ -45,8 +48,19 @@ function BlockPattern( {
 				<div
 					className="block-editor-block-patterns-list__list-item"
 					draggable={ draggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
+					onDragStart={ ( event ) => {
+						setIsDragging( true );
+						if ( onDragStart ) {
+							onHover?.( null );
+							onDragStart( event );
+						}
+					} }
+					onDragEnd={ ( event ) => {
+						setIsDragging( false );
+						if ( onDragEnd ) {
+							onDragEnd( event );
+						}
+					} }
 				>
 					<WithToolTip
 						showTooltip={ showTooltip }
@@ -57,7 +71,17 @@ function BlockPattern( {
 							as="div"
 							{ ...composite }
 							className="block-editor-block-patterns-list__item"
-							onClick={ () => onClick( pattern, blocks ) }
+							onClick={ () => {
+								onClick( pattern, blocks );
+								onHover?.( null );
+							} }
+							onMouseEnter={ () => {
+								if ( isDragging ) {
+									return;
+								}
+								onHover?.( pattern );
+							} }
+							onMouseLeave={ () => onHover?.( null ) }
 							aria-label={ pattern.title }
 							aria-describedby={
 								pattern.description ? descriptionId : undefined
@@ -95,6 +119,7 @@ function BlockPatternList( {
 	isDraggable,
 	blockPatterns,
 	shownPatterns,
+	onHover,
 	onClickPattern,
 	orientation,
 	label = __( 'Block Patterns' ),
@@ -115,6 +140,7 @@ function BlockPatternList( {
 						key={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
+						onHover={ onHover }
 						isDraggable={ isDraggable }
 						composite={ composite }
 						showTooltip={ showTitlesAsTooltip }

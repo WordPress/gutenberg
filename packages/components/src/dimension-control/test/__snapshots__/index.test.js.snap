@@ -116,7 +116,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   width: 100%;
   max-width: none;
   cursor: pointer;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -126,6 +125,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   padding-bottom: 0;
   padding-left: 8px;
   padding-right: 26px;
+  overflow: hidden;
 }
 
 @media ( min-width: 600px ) {
@@ -387,7 +387,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   width: 100%;
   max-width: none;
   cursor: pointer;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -397,6 +396,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   padding-bottom: 0;
   padding-left: 8px;
   padding-right: 26px;
+  overflow: hidden;
 }
 
 @media ( min-width: 600px ) {
@@ -668,7 +668,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   width: 100%;
   max-width: none;
   cursor: pointer;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -678,6 +677,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   padding-bottom: 0;
   padding-left: 8px;
   padding-right: 26px;
+  overflow: hidden;
 }
 
 @media ( min-width: 600px ) {
@@ -961,7 +961,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   width: 100%;
   max-width: none;
   cursor: pointer;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -971,6 +970,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   padding-bottom: 0;
   padding-left: 8px;
   padding-right: 26px;
+  overflow: hidden;
 }
 
 @media ( min-width: 600px ) {

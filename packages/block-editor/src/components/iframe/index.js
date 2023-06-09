@@ -12,14 +12,17 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
+	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
 	useRefEffect,
+	useDisabled,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +30,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -67,7 +71,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'dragover' ];
+	const eventTypes = [ 'dragover', 'mousemove' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
@@ -97,29 +101,26 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe(
-	{
-		contentRef,
-		children,
-		head,
-		tabIndex = 0,
-		assets,
-		scale = 1,
-		frameSize = 0,
-		readonly,
-		...props
-	},
-	ref
-) {
+function Iframe( {
+	contentRef,
+	children,
+	tabIndex = 0,
+	scale = 1,
+	frameSize = 0,
+	expand = false,
+	readonly,
+	forwardedRef: ref,
+	...props
+} ) {
+	const assets = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
+		[]
+	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( assets?.styles );
-	const styleIds = styles.map( ( style ) => style.id );
 	const compatStyles = useCompatibilityStyles();
-	const neededCompatStyles = compatStyles.filter(
-		( style ) => ! styleIds.includes( style.id )
-	);
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -131,14 +132,10 @@ function Iframe(
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		function setDocumentIfReady() {
+		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
-			const { readyState, documentElement } = contentDocument;
+			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
 
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
@@ -157,8 +154,23 @@ function Iframe(
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
+
+			for ( const compatStyle of compatStyles ) {
+				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
+				}
+
+				contentDocument.head.appendChild(
+					compatStyle.cloneNode( true )
+				);
+
+				// eslint-disable-next-line no-console
+				console.warn(
+					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+					compatStyle
+				);
+			}
 
 			iFrameDocument.addEventListener(
 				'dragover',
@@ -170,14 +182,12 @@ function Iframe(
 				preventFileDropDefault,
 				false
 			);
-			return true;
 		}
 
-		// Document set with srcDoc is not immediately ready.
-		node.addEventListener( 'load', setDocumentIfReady );
+		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			node.removeEventListener( 'load', setDocumentIfReady );
+			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
 				preventFileDropDefault
@@ -202,82 +212,82 @@ function Iframe(
 				forceRender();
 			} );
 	}, [] );
-	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
+	const disabledRef = useDisabled( { isDisabled: ! readonly } );
+	const bodyRef = useMergeRefs( [
+		contentRef,
+		clearerRef,
+		writingFlowRef,
+		disabledRef,
+		headRef,
+	] );
 
-	head = (
-		<>
-			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ [ ...styles, ...neededCompatStyles ].map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
+	// Correct doctype is required to enable rendering in standards
+	// mode. Also preload the styles to avoid a flash of unstyled
+	// content.
+	const html =
+		'<!doctype html>' +
+		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		( assets?.styles ?? '' );
 
-					if ( TagName === 'style' ) {
-						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
-						);
-					}
+	const [ src, cleanup ] = useMemo( () => {
+		const _src = URL.createObjectURL(
+			new window.Blob( [ html ], { type: 'text/html' } )
+		);
+		return [ _src, () => URL.revokeObjectURL( _src ) ];
+	}, [ html ] );
 
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
-			{ head }
-		</>
-	);
+	useEffect( () => cleanup, [ cleanup ] );
+
+	// We need to counter the margin created by scaling the iframe. If the scale
+	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
+	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
+	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
 
 	return (
 		<>
 			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
+				style={ {
+					...props.style,
+					height: expand ? contentHeight : props.style?.height,
+					marginTop:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginTop,
+					marginBottom:
+						scale !== 1
+							? -marginFromScaling + frameSize
+							: props.style?.marginBottom,
+					transform:
+						scale !== 1
+							? `scale( ${ scale } )`
+							: props.style?.transform,
+					transition: 'all .3s',
+				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards mode
-				srcDoc="<!doctype html>"
+				// Correct doctype is required to enable rendering in standards
+				// mode. Also preload the styles to avoid a flash of unstyled
+				// content.
+				src={ src }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
 					createPortal(
-						<>
-							<head ref={ headRef }>
-								{ head }
-								<style>
-									{ `html { transition: background 5s; ${
-										frameSize
-											? 'background: #2f2f2f; transition: background 0s;'
-											: ''
-									} }` }
-								</style>
-							</head>
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-								style={ {
-									// This is the remaining percentage from the scaling down
-									// of the iframe body(`scale(0.45)`). We also need to subtract
-									// the body's bottom margin.
-									marginBottom: `-${
-										contentHeight * ( 1 - scale ) -
-										frameSize
-									}px`,
-									marginTop: frameSize,
-									transform: `scale( ${ scale } )`,
-								} }
-								inert={ readonly ? 'true' : undefined }
-							>
-								{ contentResizeListener }
-								<StyleProvider document={ iframeDocument }>
-									{ children }
-								</StyleProvider>
-							</body>
-						</>,
+						<body
+							ref={ bodyRef }
+							className={ classnames(
+								'block-editor-iframe__body',
+								'editor-styles-wrapper',
+								...bodyClasses
+							) }
+						>
+							{ contentResizeListener }
+							<StyleProvider document={ iframeDocument }>
+								{ children }
+							</StyleProvider>
+						</body>,
 						iframeDocument.documentElement
 					) }
 			</iframe>
@@ -286,4 +296,23 @@ function Iframe(
 	);
 }
 
-export default forwardRef( Iframe );
+function IframeIfReady( props, ref ) {
+	const isInitialised = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__internalIsInitialized,
+		[]
+	);
+
+	// We shouldn't render the iframe until the editor settings are initialised.
+	// The initial settings are needed to get the styles for the srcDoc, which
+	// cannot be changed after the iframe is mounted. srcDoc is used to to set
+	// the initial iframe HTML, which is required to avoid a flash of unstyled
+	// content.
+	if ( ! isInitialised ) {
+		return null;
+	}
+
+	return <Iframe { ...props } forwardedRef={ ref } />;
+}
+
+export default forwardRef( IframeIfReady );

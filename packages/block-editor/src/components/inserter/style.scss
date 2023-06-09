@@ -35,6 +35,7 @@ $block-inserter-tabs-height: 44px;
 	.components-popover__content {
 		border: none;
 		outline: none;
+		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -42,10 +43,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
 			}
 
 			&.components-button {
@@ -564,8 +567,10 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__media-panel {
-	height: 100%;
+	min-height: 100%;
 	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
 
 	@include break-medium {
 		padding: 0;
@@ -576,6 +581,7 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex: 1;
 	}
 
 	.block-editor-inserter__media-panel-search {
@@ -583,13 +589,19 @@ $block-inserter-tabs-height: 44px;
 			input[type="search"].components-search-control__input {
 				background: $white;
 			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
+			}
 		}
 	}
 }
 
 .block-editor-inserter__media-list {
 	margin-top: $grid-unit-20;
-	&__list-item {
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
 		cursor: pointer;
 		margin-bottom: $grid-unit-30;
 
@@ -600,33 +612,82 @@ $block-inserter-tabs-height: 44px;
 		&[draggable="true"] .block-editor-block-preview__container {
 			cursor: grab;
 		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
 	}
 
-	&__item {
+	.block-editor-inserter__media-list__item {
 		height: 100%;
 
-		&-preview {
+		.block-editor-inserter__media-list__item-preview {
 			display: flex;
 			align-items: center;
 			overflow: hidden;
-			border-radius: 4px;
+			border-radius: 2px;
 
 			> * {
 				margin: 0 auto;
 				max-width: 100%;
 			}
+
+			.block-editor-inserter__media-list__item-preview-spinner {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				justify-content: center;
+				background: rgba($white, 0.7);
+				align-items: center;
+				pointer-events: none;
+			}
 		}
 
-		&:hover &-preview {
-			box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
-		}
-
-		&:focus &-preview {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
 	}
 }
 
@@ -637,5 +698,16 @@ $block-inserter-tabs-height: 44px;
 
 	> * {
 		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
 	}
 }

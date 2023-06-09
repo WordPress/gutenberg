@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import ColorPalette from '..';
-
-jest.useFakeTimers();
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -21,6 +22,25 @@ const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 function getWrappingPopoverElement( element: HTMLElement ) {
 	return element.closest( '.components-popover' );
 }
+
+const ControlledColorPalette = ( {
+	onChange,
+}: {
+	onChange?: ( newColor?: string ) => void;
+} ) => {
+	const [ color, setColor ] = useState< string | undefined >( undefined );
+
+	return (
+		<ColorPalette
+			value={ color }
+			colors={ EXAMPLE_COLORS }
+			onChange={ ( newColor ) => {
+				setColor( newColor );
+				onChange?.( newColor );
+			} }
+		/>
+	);
+};
 
 describe( 'ColorPalette', () => {
 	it( 'should render a dynamic toolbar of colors', () => {
@@ -54,9 +74,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an active button with undefined', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -76,9 +94,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an inactive button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -104,9 +120,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -139,9 +153,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render dropdown and its content', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -152,6 +164,12 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
+		// Check that custom color popover is not visible by default.
+		expect(
+			screen.queryByLabelText( 'Hex color' )
+		).not.toBeInTheDocument();
+
+		// Click the dropdown button while the dropdown is not expanded.
 		await user.click(
 			screen.getByRole( 'button', {
 				name: /^Custom color picker/,
@@ -159,22 +177,12 @@ describe( 'ColorPalette', () => {
 			} )
 		);
 
+		// Confirm the dropdown is now expanded, and the button is still visible.
 		const dropdownButton = screen.getByRole( 'button', {
 			name: /^Custom color picker/,
 			expanded: true,
 		} );
-
 		expect( dropdownButton ).toBeVisible();
-
-		expect(
-			within( dropdownButton ).getByText( EXAMPLE_COLORS[ 0 ].name )
-		).toBeVisible();
-
-		expect(
-			within( dropdownButton ).getByText(
-				EXAMPLE_COLORS[ 0 ].color.replace( '#', '' )
-			)
-		).toBeVisible();
 
 		// Check that the popover with custom color input has appeared.
 		const dropdownColorInput = screen.getByLabelText( 'Hex color' );
@@ -209,6 +217,51 @@ describe( 'ColorPalette', () => {
 
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should display the selected color name and value', async () => {
+		const user = userEvent.setup();
+
+		render( <ControlledColorPalette /> );
+
+		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+
+		// Click the first unpressed button
+		await user.click(
+			screen.getAllByRole( 'button', {
+				name: /^Color:/,
+				pressed: false,
+			} )[ 0 ]
+		);
+
+		// Confirm the correct color name, color value, and button label are used
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
+		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: `Custom color picker. The currently selected color is called "${
+					EXAMPLE_COLORS[ 0 ].name
+				}" and has a value of "${ EXAMPLE_COLORS[ 0 ].color
+					.split( '' )
+					.join( '-' ) }".`,
+				expanded: false,
+			} )
+		).toBeInTheDocument();
+
+		// Clear the color, confirm that the relative values are cleared/updated.
+		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+		expect(
+			screen.queryByText( EXAMPLE_COLORS[ 0 ].name )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( EXAMPLE_COLORS[ 0 ].color )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', {
+				name: /^Custom color picker.$/,
+			} )
 		).toBeInTheDocument();
 	} );
 } );

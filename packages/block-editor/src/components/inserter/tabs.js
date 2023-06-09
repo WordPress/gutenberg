@@ -52,15 +52,7 @@ function InserterTabs( {
 			tempTabs.push( reusableBlocksTab );
 		}
 		return tempTabs;
-	}, [
-		prioritizePatterns,
-		blocksTab,
-		showPatterns,
-		patternsTab,
-		showReusableBlocks,
-		showMedia,
-		reusableBlocksTab,
-	] );
+	}, [ prioritizePatterns, showPatterns, showReusableBlocks, showMedia ] );
 
 	return (
 		<TabPanel

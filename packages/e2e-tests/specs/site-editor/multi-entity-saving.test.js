@@ -275,7 +275,7 @@ describe( 'Multi-entity save flow', () => {
 				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);
 			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close List View Sidebar"]' );
+			await page.click( 'button[aria-label="Close"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );
@@ -314,7 +314,12 @@ describe( 'Multi-entity save flow', () => {
 			// Open the block settings.
 			await page.click( 'button[aria-label="Settings"]' );
 
-			// Change the font size
+			// Wait for the font size picker controls.
+			await page.waitForSelector(
+				'.components-font-size-picker__controls'
+			);
+
+			// Change the font size.
 			await page.click(
 				'.components-font-size-picker__controls button[aria-label="Small"]'
 			);
@@ -322,7 +327,7 @@ describe( 'Multi-entity save flow', () => {
 			// Save all changes.
 			await saveAllChanges();
 
-			// Change the font size
+			// Change the font size.
 			await page.click(
 				'.components-font-size-picker__controls button[aria-label="Medium"]'
 			);

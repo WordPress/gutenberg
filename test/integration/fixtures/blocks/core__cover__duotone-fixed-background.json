@@ -12,6 +12,7 @@
 			"dimRatio": 10,
 			"backgroundType": "image",
 			"isDark": false,
+			"tagName": "div",
 			"style": {
 				"color": {
 					"duotone": [ "#8c00b7", "#fcff41" ]

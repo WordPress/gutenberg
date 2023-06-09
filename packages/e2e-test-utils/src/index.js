@@ -59,6 +59,7 @@ export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { logout } from './logout';
 export { createMenu, deleteAllMenus } from './menus';
 export {
 	enableFocusLossObservation,
@@ -81,6 +82,7 @@ export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
+export { switchBlockInspectorTab } from './switch-block-inspector-tab.js';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
@@ -102,7 +104,7 @@ export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
-export { openListView, closeListView } from './list-view';
+export { isListViewOpen, openListView, closeListView } from './list-view';
 export {
 	disableSiteEditorWelcomeGuide,
 	getCurrentSiteEditorContent,

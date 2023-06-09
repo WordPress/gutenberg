@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import {
 	Button,
 	Popover,
-	__experimentalPopoverPositionToPlacement as positionToPlacement,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -16,6 +16,11 @@ import deprecated from '@wordpress/deprecated';
  */
 import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
+import { unlock } from '../../lock-unlock';
+
+const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
+	componentsPrivateApis
+);
 
 const DEFAULT_PLACEMENT = 'bottom';
 
@@ -46,7 +51,8 @@ function URLPopover( {
 	if ( placement !== undefined ) {
 		computedPlacement = placement;
 	} else if ( position !== undefined ) {
-		computedPlacement = positionToPlacement( position );
+		computedPlacement =
+			__experimentalPopoverLegacyPositionToPlacement( position );
 	}
 	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 

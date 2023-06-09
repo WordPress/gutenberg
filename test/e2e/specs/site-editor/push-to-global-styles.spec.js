@@ -1,17 +1,7 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
-
-test.use( {
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
-	},
-} );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Push to Global Styles button', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -26,9 +16,9 @@ test.describe( 'Push to Global Styles button', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should apply Heading block styles to all Heading blocks', async ( {
@@ -45,7 +35,6 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Typography styles' } ).click();
 
 		// Headings should not have uppercase
 		await expect(
@@ -59,7 +48,7 @@ test.describe( 'Push to Global Styles button', () => {
 		// Push button should be disabled
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Push changes to Global Styles',
+				name: 'Apply globally',
 			} )
 		).toBeDisabled();
 
@@ -69,37 +58,36 @@ test.describe( 'Push to Global Styles button', () => {
 		// Push button should now be enabled
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Push changes to Global Styles',
+				name: 'Apply globally',
 			} )
 		).toBeEnabled();
 
 		// Press the Push button
-		await page
-			.getByRole( 'button', { name: 'Push changes to Global Styles' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Apply globally' } ).click();
 
 		// Snackbar notification should appear
 		await expect(
 			page.getByRole( 'button', {
 				name: 'Dismiss this notice',
-				text: 'Pushed styles to all Heading blocks.',
+				text: 'Heading styles applied.',
 			} )
 		).toBeVisible();
 
 		// Push button should be disabled again
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Push changes to Global Styles',
+				name: 'Apply globally',
 			} )
 		).toBeDisabled();
 
 		// Navigate again to Styles -> Blocks -> Heading -> Typography
-		await page.getByRole( 'button', { name: 'Styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Styles', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Typography styles' } ).click();
 
 		// Headings should now have uppercase
 		await expect(

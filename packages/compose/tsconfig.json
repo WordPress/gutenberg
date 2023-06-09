@@ -6,11 +6,12 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../element" },
-		{ "path": "../priority-queue" },
+		{ "path": "../deprecated" },
 		{ "path": "../dom" },
+		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" }
+		{ "path": "../keycodes" },
+		{ "path": "../priority-queue" }
 	],
 	"include": [ "src/**/*" ]
 }

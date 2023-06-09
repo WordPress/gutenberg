@@ -15,8 +15,16 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// To do: some drag an drop tests are failing, so run them without
+		// iframe for now.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -39,7 +47,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -116,7 +124,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -176,7 +184,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -244,7 +252,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -289,6 +297,31 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( beforeContent );
 	} );
+
+	// A test for https://github.com/WordPress/gutenberg/issues/43090.
+	test( 'should close the inserter when clicking on the toggle button', async ( {
+		page,
+		editor,
+	} ) => {
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		await inserterButton.click();
+
+		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/buttons' } ] );
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+	} );
 } );
 
 test.describe( 'insert media from inserter', () => {
@@ -303,7 +336,7 @@ test.describe( 'insert media from inserter', () => {
 		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
-		Promise.all( [
+		await Promise.all( [
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPosts(),
 		] );

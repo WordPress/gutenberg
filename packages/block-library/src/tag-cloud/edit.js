@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,6 +11,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	Disabled,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -68,15 +64,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			value: '',
 			disabled: true,
 		};
-		const taxonomyOptions = map(
-			taxonomies?.filter( ( tax ) => !! tax.show_cloud ),
-			( item ) => {
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( tax ) => !! tax.show_cloud )
+			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			}
-		);
+			} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
@@ -109,6 +104,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
 					value={ taxonomy }
@@ -117,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post counts' ) }
 					checked={ showTagCounts }
 					onChange={ () =>
@@ -168,11 +165,13 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<>
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				<ServerSideRender
-					skipBlockSupportAttributes
-					block="core/tag-cloud"
-					attributes={ attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						skipBlockSupportAttributes
+						block="core/tag-cloud"
+						attributes={ attributes }
+					/>
+				</Disabled>
 			</div>
 		</>
 	);

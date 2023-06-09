@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -256,7 +255,7 @@ export default compose( [
 				forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
-			isViewable: get( postType, [ 'viewable' ], false ),
+			isViewable: postType?.viewable ?? false,
 			isDraft:
 				[ 'draft', 'auto-draft' ].indexOf(
 					getEditedPostAttribute( 'status' )

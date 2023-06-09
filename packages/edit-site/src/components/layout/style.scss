@@ -1,5 +1,3 @@
-$hub-height: $grid-unit-20 * 2 + $button-size;
-
 .edit-site-layout {
 	height: 100%;
 	background: $gray-900;
@@ -10,24 +8,23 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 .edit-site-layout__hub {
 	position: fixed;
-	top: $canvas-padding;
-	left: $canvas-padding;
+	top: 0;
+	left: 0;
 	width: calc(100vw - #{$canvas-padding * 2});
-	height: $hub-height;
+	height: $header-height;
 	z-index: z-index(".edit-site-layout__hub");
 
-	background: $black;
-	padding: $grid-unit-20;
-	padding-left: 0;
-	border-radius: $radius-block-ui * 4;
-	box-shadow: $shadow-modal;
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		width: $header-height;
+		padding-right: 0;
+	}
+
+	@include break-medium {
+		width: calc(#{$nav-sidebar-width} - #{$canvas-padding});
+	}
 
 	.edit-site-layout.is-full-canvas & {
-		top: 0;
-		left: 0;
-		padding: 0;
 		padding-right: $grid-unit-20;
-		height: $header-height;
 		border-radius: 0;
 		width: 100vw;
 		box-shadow: none;
@@ -36,15 +33,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 			width: auto;
 			padding-right: 0;
 		}
-	}
-
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: auto;
-		padding-right: 0;
-	}
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
 	}
 }
 
@@ -61,18 +49,14 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 }
 
 .edit-site-layout__content {
+	height: 100%;
 	flex-grow: 1;
 	display: flex;
-
-	// Hide scrollbars during the edit/view animation.
-	overflow: hidden;
 }
 
 .edit-site-layout__sidebar {
 	z-index: z-index(".edit-site-layout__sidebar");
-	overflow-y: auto;
 	width: 100vw;
-	@include custom-scrollbars-on-hover;
 
 	@include break-medium {
 		width: $nav-sidebar-width;
@@ -80,10 +64,20 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
-		position: fixed;
+		position: fixed !important;
 		height: 100vh;
 		left: 0;
 		top: 0;
+	}
+
+	> div {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.resizable-editor__drag-handle {
+		right: 0;
 	}
 }
 
@@ -91,6 +85,18 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	position: relative;
 	flex-grow: 1;
 	z-index: z-index(".edit-site-layout__canvas-container");
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
+	}
 }
 
 .edit-site-layout__canvas {
@@ -99,12 +105,18 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&:has(.edit-site-layout__resizable-frame-oversized) {
+		justify-content: flex-end;
+	}
 
 	& > div {
 		color: $gray-900;
-		background: $white;
 	}
+
 	@include break-medium {
 		top: $canvas-padding;
 		bottom: $canvas-padding;
@@ -125,7 +137,10 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		top: 0;
 		bottom: 0;
 		width: 100%;
-		border-radius: 0;
+
+		& > div {
+			border-radius: 0;
+		}
 	}
 }
 
@@ -138,13 +153,20 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;
-	height: 100%;
-	width: 100%;
-	border-radius: $radius-block-ui;
+	border-radius: 0;
+	height: $header-height;
+	width: $header-height;
+	overflow: hidden;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border-bottom: 1px solid transparent;
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		border-bottom-color: $gray-200;
+		transition: border-bottom-color 0.15s 0.4s ease-out;
+	}
 
 	&:hover,
 	&:active {
@@ -179,5 +201,53 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
 		border-radius: $radius-block-ui;
+		height: $grid-unit-80;
+		width: $grid-unit-80;
+		justify-content: center;
+		align-items: center;
 	}
 }
+
+.edit-site-layout__actions {
+	z-index: z-index(".edit-site-layout__actions");
+	position: fixed !important; // Need to override the default relative positioning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	color: $gray-900;
+	background: $white;
+
+	&:focus,
+	&:focus-within {
+		top: auto;
+		bottom: 0;
+	}
+
+	&.is-entity-save-view-open {
+		&:focus,
+		&:focus-within {
+			top: 0;
+		}
+	}
+
+	@include break-medium {
+		border-left: $border-width solid $gray-300;
+	}
+}
+
+.edit-site-layout.has-fixed-toolbar {
+	// making the header be lower than the content
+	// so the fixed toolbar can be positioned on top of it
+	// but only on desktop
+	@include break-medium() {
+		.edit-site-site-hub {
+			z-index: 4;
+		}
+		.edit-site-layout__header:focus-within {
+			z-index: 3;
+		}
+	}
+}
+

@@ -54,18 +54,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-off-canvas-navigation-editor',
-		__( 'Off canvas navigation editor ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu', 'gutenberg' ),
-			'id'    => 'gutenberg-off-canvas-navigation-editor',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -78,30 +66,50 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-block-inspector-tabs',
-		__( 'Block inspector tabs ', 'gutenberg' ),
+		'gutenberg-group-grid-variation',
+		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs', 'gutenberg' ),
-			'id'    => 'gutenberg-block-inspector-tabs',
+			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
+			'id'    => 'gutenberg-group-grid-variation',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-global-styles-custom-css',
-		__( 'Global styles custom css ', 'gutenberg' ),
+		'gutenberg-theme-previews',
+		__( 'Block Theme Previews', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => sprintf(
-				/* translators: %s: WordPress documentation for roles and capabilities. */
-				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
-				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
-			),
-			'id'    => 'gutenberg-global-styles-custom-css',
+			'label' => __( 'Enable Block Theme Previews', 'gutenberg' ),
+			'id'    => 'gutenberg-theme-previews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-interactivity-api-core-blocks',
+		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-core-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-pattern-enhancements',
+		__( 'Pattern enhancements', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Pattern block enhancements', 'gutenberg' ),
+			'id'    => 'gutenberg-pattern-enhancements',
 		)
 	);
 

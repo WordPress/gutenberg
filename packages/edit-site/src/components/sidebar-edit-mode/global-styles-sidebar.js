@@ -1,95 +1,88 @@
 /**
  * WordPress dependencies
  */
-import {
-	DropdownMenu,
-	FlexItem,
-	FlexBlock,
-	Flex,
-	Button,
-} from '@wordpress/components';
+import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, moreVertical, seen } from '@wordpress/icons';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
-import { useState, useEffect } from '@wordpress/element';
+import { styles, seen } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
+import { GlobalStylesMenuSlot } from '../global-styles/ui';
+import { unlock } from '../../lock-unlock';
 
 export default function GlobalStylesSidebar() {
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { toggle } = useDispatch( preferencesStore );
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
-	const editorMode = useSelect(
-		( select ) => select( editSiteStore ).getEditorMode(),
+	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
+		( select ) => {
+			const { getActiveComplementaryArea } = select( interfaceStore );
+			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const _isVisualEditorMode =
+				'visual' === select( editSiteStore ).getEditorMode();
+			const _isEditCanvasMode = 'edit' === getCanvasMode();
+
+			return {
+				isStyleBookOpened:
+					'style-book' === getEditorCanvasContainerView(),
+				shouldClearCanvasContainerView:
+					'edit-site/global-styles' !==
+						getActiveComplementaryArea( 'core/edit-site' ) ||
+					! _isVisualEditorMode ||
+					! _isEditCanvasMode,
+			};
+		},
 		[]
 	);
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
 	useEffect( () => {
-		if ( editorMode !== 'visual' ) {
-			setIsStyleBookOpened( false );
+		if ( shouldClearCanvasContainerView ) {
+			setEditorCanvasContainerView( undefined );
 		}
-	}, [ editorMode ] );
+	}, [ shouldClearCanvasContainerView ] );
+
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
 			identifier="edit-site/global-styles"
 			title={ __( 'Styles' ) }
 			icon={ styles }
-			closeLabel={ __( 'Close Styles sidebar' ) }
+			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex>
-					<FlexBlock>
+				<Flex className="edit-site-global-styles-sidebar__header">
+					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
 					<FlexItem>
 						<Button
 							icon={ seen }
-							label={
-								isStyleBookOpened
-									? __( 'Close Style Book' )
-									: __( 'Open Style Book' )
-							}
+							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
-							disabled={ editorMode !== 'visual' }
-							onClick={ () => {
-								setIsStyleBookOpened( ! isStyleBookOpened );
-							} }
+							disabled={ shouldClearCanvasContainerView }
+							onClick={ () =>
+								setEditorCanvasContainerView(
+									isStyleBookOpened ? undefined : 'style-book'
+								)
+							}
 						/>
 					</FlexItem>
 					<FlexItem>
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'More Styles actions' ) }
-							controls={ [
-								{
-									title: __( 'Reset to defaults' ),
-									onClick: onReset,
-									isDisabled: ! canReset,
-								},
-								{
-									title: __( 'Welcome Guide' ),
-									onClick: () =>
-										toggle(
-											'core/edit-site',
-											'welcomeGuideStyles'
-										),
-								},
-							] }
-						/>
+						<GlobalStylesMenuSlot />
 					</FlexItem>
 				</Flex>
 			}
 		>
-			<GlobalStylesUI
-				isStyleBookOpened={ isStyleBookOpened }
-				onCloseStyleBook={ () => setIsStyleBookOpened( false ) }
-			/>
+			<GlobalStylesUI />
 		</DefaultSidebar>
 	);
 }

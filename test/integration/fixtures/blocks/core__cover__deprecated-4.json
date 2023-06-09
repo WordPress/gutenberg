@@ -11,7 +11,8 @@
 			"focalPoint": {
 				"x": "0.07",
 				"y": "0.07"
-			}
+			},
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

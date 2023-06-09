@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -13,8 +13,6 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import withFocusOutside from '../';
-
-jest.useFakeTimers();
 
 let onFocusOutside;
 
@@ -57,7 +55,7 @@ describe( 'withFocusOutside', () => {
 		document.hasFocus = origHasFocus;
 	} );
 
-	it( 'should not call handler if focus shifts to element within component', () => {
+	it( 'should not call handler if focus shifts to element within component', async () => {
 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
@@ -67,15 +65,11 @@ describe( 'withFocusOutside', () => {
 		input.blur();
 		button.focus();
 
-		jest.runAllTimers();
-
-		expect( onFocusOutside ).not.toHaveBeenCalled();
+		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
 	} );
 
 	it( 'should not call handler if focus transitions via click to button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
@@ -84,24 +78,20 @@ describe( 'withFocusOutside', () => {
 		input.focus();
 		await user.click( button );
 
-		jest.runAllTimers();
-
-		expect( onFocusOutside ).not.toHaveBeenCalled();
+		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
 	} );
 
-	it( 'should call handler if focus doesn’t shift to element within component', () => {
+	it( 'should call handler if focus doesn’t shift to element within component', async () => {
 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
 		input.focus();
 		input.blur();
 
-		jest.runAllTimers();
-
-		expect( onFocusOutside ).toHaveBeenCalled();
+		await waitFor( () => expect( onFocusOutside ).toHaveBeenCalled() );
 	} );
 
-	it( 'should not call handler if focus shifts outside the component when the document does not have focus', () => {
+	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		// Force document.hasFocus() to return false to simulate the window/document losing focus
@@ -112,12 +102,10 @@ describe( 'withFocusOutside', () => {
 		input.focus();
 		input.blur();
 
-		jest.runAllTimers();
-
-		expect( onFocusOutside ).not.toHaveBeenCalled();
+		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
 	} );
 
-	it( 'should cancel check when unmounting while queued', () => {
+	it( 'should cancel check when unmounting while queued', async () => {
 		const { rerender } = render(
 			<TestComponent onFocusOutside={ onFocusOutside } />
 		);
@@ -128,8 +116,6 @@ describe( 'withFocusOutside', () => {
 
 		rerender( <div /> );
 
-		jest.runAllTimers();
-
-		expect( onFocusOutside ).not.toHaveBeenCalled();
+		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
 	} );
 } );

@@ -4,52 +4,118 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
-	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import SidebarButton from '../sidebar-button';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SidebarNavigationScreen( {
-	path,
-	parentTitle,
+	isRoot,
 	title,
+	actions,
+	meta,
 	content,
+	footer,
+	description,
 } ) {
+	const { dashboardLink } = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( editSiteStore ) );
+		return {
+			dashboardLink: getSettings().__experimentalDashboardLink,
+		};
+	}, [] );
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
+
 	return (
-		<NavigatorScreen
-			className="edit-site-sidebar-navigation-screen"
-			path={ path }
-		>
-			<VStack spacing={ 2 }>
+		<>
+			<VStack
+				className="edit-site-sidebar-navigation-screen__main"
+				spacing={ 0 }
+				justify="flex-start"
+			>
 				<HStack
 					spacing={ 4 }
-					justify="flex-start"
+					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ parentTitle ? (
-						<NavigatorBackButton
-							className="edit-site-sidebar-navigation-screen__back"
+					{ ! isRoot ? (
+						<NavigatorToParentButton
+							as={ SidebarButton }
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							aria-label={ sprintf(
-								/* translators: %s: previous page. */
-								__( 'Navigate to the previous view: %s' ),
-								parentTitle
-							) }
+							label={ __( 'Back' ) }
 						/>
 					) : (
-						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
+						<SidebarButton
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							label={
+								! isPreviewingTheme()
+									? __( 'Go back to the Dashboard' )
+									: __( 'Go back to the theme showcase' )
+							}
+							href={
+								! isPreviewingTheme()
+									? dashboardLink || 'index.php'
+									: 'themes.php'
+							}
+						/>
 					) }
-
-					<div className="edit-site-sidebar-navigation-screen__title">
-						{ title }
-					</div>
+					<Heading
+						className="edit-site-sidebar-navigation-screen__title"
+						color={ 'white' }
+						level={ 2 }
+						size={ 20 }
+					>
+						{ ! isPreviewingTheme()
+							? title
+							: sprintf(
+									'Previewing %1$s: %2$s',
+									theme?.name?.rendered,
+									title
+							  ) }
+					</Heading>
+					{ actions && (
+						<div className="edit-site-sidebar-navigation-screen__actions">
+							{ actions }
+						</div>
+					) }
 				</HStack>
+				{ meta && (
+					<>
+						<div className="edit-site-sidebar-navigation-screen__meta">
+							{ meta }
+						</div>
+					</>
+				) }
 
-				<nav className="edit-site-sidebar-navigation-screen__content">
+				<div className="edit-site-sidebar-navigation-screen__content">
+					{ description && (
+						<p className="edit-site-sidebar-navigation-screen__description">
+							{ description }
+						</p>
+					) }
 					{ content }
-				</nav>
+				</div>
 			</VStack>
-		</NavigatorScreen>
+			{ footer && (
+				<footer className="edit-site-sidebar-navigation-screen__footer">
+					{ footer }
+				</footer>
+			) }
+		</>
 	);
 }

@@ -131,7 +131,21 @@ _Returns_
 
 -   `Object`: Settings.
 
+### hasPageContentFocus
+
+Whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not focus is on editing page content.
+
 ### isFeatureActive
+
+> **Deprecated**
 
 Returns whether the given feature is enabled or not.
 
@@ -171,6 +185,22 @@ _Returns_
 ### isNavigationOpened
 
 > **Deprecated**
+
+### isPage
+
+Whether or not the editor has a page loaded into it.
+
+_Related_
+
+-   setPage
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -250,6 +280,14 @@ _Returns_
 
 -   `number`: The resolved template ID for the page route.
 
+### setHasPageContentFocus
+
+Sets whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
+
 ### setHomeTemplateId
 
 > **Deprecated**
@@ -302,8 +340,7 @@ _Returns_
 
 ### setPage
 
-Resolves the template for a page and displays both. If no path is given, attempts
-to use the postId to generate a path like `?p=${ postId }`.
+Resolves the template for a page and displays both. If no path is given, attempts to use the postId to generate a path like `?p=${ postId }`.
 
 _Parameters_
 

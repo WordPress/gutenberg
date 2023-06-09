@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { canvas, visitAdminPage } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -10,6 +10,7 @@ import { addQueryArgs } from '@wordpress/url';
 
 const SELECTORS = {
 	visualEditor: '.edit-site-visual-editor iframe',
+	loadingSpinner: '.edit-site-canvas-spinner',
 };
 
 /**
@@ -128,6 +129,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 
 	await visitAdminPage( 'site-editor.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
+	await page.waitForSelector( SELECTORS.loadingSpinner, { hidden: true } );
 
 	if ( skipWelcomeGuide ) {
 		await disableSiteEditorWelcomeGuide();
@@ -166,11 +168,15 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
-	// This check is necessary for the performance tests in old branches
-	// where the site editor toggle was not implemented yet.
-	if ( ! editSiteToggle ) {
-		return;
+	try {
+		await page.waitForSelector(
+			'.edit-site-visual-editor__editor-canvas[role="button"]',
+			{ timeout: 3000 }
+		);
+
+		await canvas().click( 'body' );
+	} catch {
+		// This catch is necessary for the performance tests in old branches
+		// where the site editor toggle was not implemented yet.
 	}
-	await page.click( '.edit-site-site-hub__edit-button' );
 }

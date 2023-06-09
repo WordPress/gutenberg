@@ -74,7 +74,7 @@ const POSITION_TO_PLACEMENT: Record<
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
  * (used by `floating-ui`).
  *
- * @param  position The legacy position
+ * @param position The legacy position
  * @return The corresponding placement
  */
 export const positionToPlacement = (
@@ -105,13 +105,14 @@ const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
 	left: { originX: 1, originY: 0.5 }, // open from middle, right
 	'left-start': { originX: 1, originY: 0 }, // open from top, right
 	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
+	overlay: { originX: 0.5, originY: 0.5 }, // open from center, center
 };
 
 /**
  * Given the floating-ui `placement`, compute the framer-motion props for the
  * popover's entry animation.
  *
- * @param  placement A placement string from floating ui
+ * @param placement A placement string from floating ui
  * @return The object containing the motion props
  */
 export const placementToMotionAnimationProps = (
@@ -141,7 +142,7 @@ export const placementToMotionAnimationProps = (
 /**
  * Returns the offset of a document's frame element.
  *
- * @param  document The iframe's owner document.
+ * @param document The iframe's owner document.
  *
  * @return The offset of the document's frame element, or undefined if the
  * document has no frame element.
@@ -155,6 +156,23 @@ export const getFrameOffset = (
 	}
 	const iframeRect = frameElement.getBoundingClientRect();
 	return { x: iframeRect.left, y: iframeRect.top };
+};
+
+export const getFrameScale = (
+	document?: Document
+): {
+	x: number;
+	y: number;
+} => {
+	const frameElement = document?.defaultView?.frameElement as HTMLElement;
+	if ( ! frameElement ) {
+		return { x: 1, y: 1 };
+	}
+	const rect = frameElement.getBoundingClientRect();
+	return {
+		x: rect.width / frameElement.offsetWidth,
+		y: rect.height / frameElement.offsetHeight,
+	};
 };
 
 export const getReferenceOwnerDocument = ( {
@@ -213,11 +231,13 @@ export const getReferenceElement = ( {
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
+	scale,
 }: Pick<
 	PopoverProps,
 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
 > & {
 	fallbackReferenceElement: Element | null;
+	scale: { x: number; y: number };
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
@@ -277,6 +297,22 @@ export const getReferenceElement = ( {
 		// If no explicit ref is passed via props, fall back to
 		// anchoring to the popover's parent node.
 		referenceElement = fallbackReferenceElement.parentElement;
+	}
+
+	if ( referenceElement && ( scale.x !== 1 || scale.y !== 1 ) ) {
+		// If the popover is inside an iframe, the coordinates of the
+		// reference element need to be scaled to match the iframe's scale.
+		const rect = referenceElement.getBoundingClientRect();
+		referenceElement = {
+			getBoundingClientRect() {
+				return new window.DOMRect(
+					rect.x * scale.x,
+					rect.y * scale.y,
+					rect.width * scale.x,
+					rect.height * scale.y
+				);
+			},
+		};
 	}
 
 	// Convert any `undefined` value to `null`.

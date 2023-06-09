@@ -3,9 +3,6 @@
 }
 
 .wp-block-rss__placeholder-form {
-	display: flex;
-	align-items: stretch;
-
 	> * {
 		margin-bottom: $grid-unit-10;
 	}
@@ -15,18 +12,10 @@
 			margin-bottom: 0;
 		}
 	}
-}
 
-.wp-block-rss__placeholder-input {
-	display: flex;
-	align-items: stretch;
-	flex-grow: 1;
-
-	.components-base-control__field {
-		margin: 0;
-		display: flex;
-		align-items: stretch;
-		flex-grow: 1;
-		margin-right: $grid-unit-10;
+	.wp-block-rss__placeholder-input {
+		flex: 1;
+		min-width: 80%;
 	}
 }
+

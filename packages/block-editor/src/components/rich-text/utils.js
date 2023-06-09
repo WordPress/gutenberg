@@ -23,7 +23,7 @@ export function addActiveFormats( value, activeFormats ) {
  *
  * @param {?(string|boolean)} multiline The multiline prop.
  *
- * @return {?string} The multiline tag.
+ * @return {string | undefined} The multiline tag.
  */
 export function getMultilineTag( multiline ) {
 	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {

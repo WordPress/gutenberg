@@ -636,12 +636,9 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( blockEditorStore );
-
 		const hasInnerBlocks = getBlock( clientId )?.innerBlocks.length > 0;
 
 		return {
-			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 			hasInnerBlocks,
 		};

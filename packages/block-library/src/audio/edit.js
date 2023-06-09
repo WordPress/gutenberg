@@ -207,17 +207,20 @@ function AudioEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
 						checked={ autoplay }
 						help={ getAutoplayHelp }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Loop' ) }
 						onChange={ toggleAttribute( 'loop' ) }
 						checked={ loop }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
@@ -251,6 +254,7 @@ function AudioEdit( {
 				{ showCaption &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
+							identifier="caption"
 							tagName="figcaption"
 							className={ __experimentalGetElementClassName(
 								'caption'

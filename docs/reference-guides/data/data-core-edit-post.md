@@ -20,9 +20,7 @@ _Returns_
 
 ### getActiveGeneralSidebarName
 
-Returns the current active general sidebar name, or null if there is no
-general sidebar active. The active general sidebar is a unique name to
-identify either an editor or plugin sidebar.
+Returns the current active general sidebar name, or null if there is no general sidebar active. The active general sidebar is a unique name to identify either an editor or plugin sidebar.
 
 Examples:
 
@@ -152,8 +150,7 @@ _Returns_
 
 ### isEditorPanelEnabled
 
-Returns true if the given panel is enabled, or false otherwise. Panels are
-enabled by default.
+Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
 
 _Parameters_
 
@@ -166,8 +163,7 @@ _Returns_
 
 ### isEditorPanelOpened
 
-Returns true if the given panel is open, or false otherwise. Panels are
-closed by default.
+Returns true if the given panel is open, or false otherwise. Panels are closed by default.
 
 _Parameters_
 
@@ -180,8 +176,7 @@ _Returns_
 
 ### isEditorPanelRemoved
 
-Returns true if the given panel was programmatically removed, or false otherwise.
-All panels are not removed by default.
+Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
 
 _Parameters_
 
@@ -243,8 +238,7 @@ _Returns_
 
 ### isMetaBoxLocationActive
 
-Returns true if there is an active meta box in the given location, or false
-otherwise.
+Returns true if there is an active meta box in the given location, or false otherwise.
 
 _Parameters_
 
@@ -283,8 +277,7 @@ _Returns_
 
 ### isPluginItemPinned
 
-Returns true if the plugin item is pinned to the header.
-When the value is not set it defaults to true.
+Returns true if the plugin item is pinned to the header. When the value is not set it defaults to true.
 
 _Parameters_
 
@@ -351,8 +344,7 @@ _Returns_
 
 ### closePublishSidebar
 
-Returns an action object used in signalling that the user closed the
-publish sidebar.
+Returns an action object used in signalling that the user closed the publish sidebar.
 
 _Returns_
 
@@ -408,8 +400,7 @@ _Returns_
 
 ### openPublishSidebar
 
-Returns an action object used in signalling that the user opened the publish
-sidebar.
+Returns an action object used in signalling that the user opened the publish sidebar.
 
 _Returns_
 

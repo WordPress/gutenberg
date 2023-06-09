@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -54,6 +55,7 @@ function InserterSearchResults( {
 			sections={ [ createInserterSection( { key: 'search', items } ) ] }
 			onSelect={ handleSelect }
 			listProps={ listProps }
+			label={ __( 'Blocks' ) }
 		/>
 	);
 }

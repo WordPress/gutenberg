@@ -24,15 +24,14 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 ];
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 function AlignmentUI( {
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align' ),
+	label = __( 'Align text' ),
 	describedBy = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
