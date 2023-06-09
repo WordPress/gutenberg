@@ -283,6 +283,7 @@ function Navigation( {
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
 	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
@@ -292,7 +293,7 @@ function Navigation( {
 			'items-justified-center': justifyContent === 'center',
 			'is-vertical': orientation === 'vertical',
 			'no-wrap': flexWrap === 'nowrap',
-			'is-responsive': 'never' !== overlayMenu,
+			'is-responsive': isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName( 'color', textColor?.slug ) ]:
 				!! textColor?.slug,
@@ -474,7 +475,6 @@ function Navigation( {
 
 	const hasManagePermissions =
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
-	const isResponsive = 'never' !== overlayMenu;
 
 	const overlayMenuPreviewClasses = classnames(
 		'wp-block-navigation__overlay-menu-preview',
@@ -661,7 +661,7 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					hasIcon={ hasIcon }
 					icon={ icon }
-					isResponsive={ 'never' !== overlayMenu }
+					isResponsive={ isResponsive }
 					isHiddenByDefault={ 'always' === overlayMenu }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
