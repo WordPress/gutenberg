@@ -166,7 +166,7 @@ export default function ReusableBlockConvertButton( {
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'CreatePattern' ) }
+							title={ __( 'Create a pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -198,12 +198,12 @@ export default function ReusableBlockConvertButton( {
 									/>
 
 									<ToggleControl
-										label={ __( 'Synced' ) }
-										help={
-											syncType === 'fully'
-												? __( 'Content is synced.' )
-												: __( 'Content is not synced.' )
-										}
+										label={ __(
+											'Keep all pattern instances in sync'
+										) }
+										help={ __(
+											'Editing the original pattern will also update anywhere the pattern is used.'
+										) }
 										checked={ syncType === 'fully' }
 										onChange={ () => {
 											setSyncType(
