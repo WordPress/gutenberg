@@ -112,18 +112,15 @@ function block_theme_activate_nonce() {
 	<?php
 }
 
-// Hide this feature behind an experiment.
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gutenberg_experiments ) ) {
-	/**
-	 * Attaches filters to enable theme previews in the Site Editor.
-	 */
-	if ( ! empty( $_GET['gutenberg_theme_preview'] ) ) {
-		add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'template', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
-	}
-
-	add_action( 'admin_head', 'block_theme_activate_nonce' );
-	add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
+/**
+ * Attaches filters to enable theme previews in the Site Editor.
+ */
+if ( ! empty( $_GET['gutenberg_theme_preview'] ) ) {
+	add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'template', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
 }
+
+add_action( 'admin_head', 'block_theme_activate_nonce' );
+add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
+
