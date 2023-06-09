@@ -77,11 +77,19 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$lightbox_animation = $lightbox_settings['animation'];
 
+	$z = new WP_HTML_Tag_Processor( $content );
+	$z->next_tag('img');
+	if ( isset( $block['attrs']['id'] ) ) {
+		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
+	} else {
+		$img_src = $m->get_attribute( 'src' );
+	}
+
 	$w = new WP_HTML_Tag_Processor( $content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
-	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false, "lightboxAnimation": "' . $lightbox_animation . '" } } }' );
+	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "imageSrc": "' . $img_src . '", "lightboxEnabled": false, "lightboxAnimation": "' . $lightbox_animation . '" } } }' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -96,16 +104,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// Add directive to expand modal image if appropriate.
 	$m = new WP_HTML_Tag_Processor( $content );
 	$m->next_tag( 'img' );
-	if ( isset( $block['attrs']['id'] ) ) {
-		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
-	} else {
-		$img_src = $m->get_attribute( 'src' );
-	}
-
-	// Need to figure out how to smoothly transition image animation when using larger image
-	//
-	// $m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . $img_src . '"} } }' );
-	// $m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
+	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
 	$modal_content = $m->get_updated_html();
 
 	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );

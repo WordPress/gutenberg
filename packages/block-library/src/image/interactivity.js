@@ -31,33 +31,104 @@ store( {
 						'has-lightbox-open'
 					);
 
-					if ( context.core.image.lightboxAnimation === 'zoom' ) {
-						const { x: leftPosition, y: topPosition } =
-							event.target.nextElementSibling.getBoundingClientRect();
-						const scaleWidth =
-							event.target.nextElementSibling.offsetWidth /
-							event.target.nextElementSibling.naturalWidth;
-						const scaleHeight =
-							event.target.nextElementSibling.offsetHeight /
-							event.target.nextElementSibling.naturalHeight;
-						const root = document.documentElement;
-						root.style.setProperty(
-							'--lightbox-left-position',
-							leftPosition + 'px'
-						);
-						root.style.setProperty(
-							'--lightbox-top-position',
-							topPosition + 'px'
-						);
-						root.style.setProperty(
-							'--lightbox-scale-width',
-							scaleWidth
-						);
-						root.style.setProperty(
-							'--lightbox-scale-height',
-							scaleHeight
-						);
-					}
+					const imgDom = document.createElement( 'img' );
+					imgDom.setAttribute( 'src', context.core.image.imageSrc );
+					imgDom.onload = function () {
+						if ( context.core.image.lightboxAnimation === 'zoom' ) {
+							let targetWidth = imgDom.naturalWidth;
+							let targetHeight = imgDom.naturalHeight;
+
+							const figureStyle = window.getComputedStyle(
+								context.core.image.figureRef
+							);
+
+							const topPadding = parseInt(
+								figureStyle.getPropertyValue( 'padding-top' )
+							);
+							const bottomPadding = parseInt(
+								figureStyle.getPropertyValue( 'padding-bottom' )
+							);
+							const leftPadding = parseInt(
+								figureStyle.getPropertyValue( 'padding-left' )
+							);
+							const rightPadding = parseInt(
+								figureStyle.getPropertyValue( 'padding-right' )
+							);
+
+							const figureWidth =
+								context.core.image.figureRef.clientWidth -
+								leftPadding -
+								rightPadding;
+							const figureHeight =
+								context.core.image.figureRef.clientHeight -
+								topPadding -
+								bottomPadding;
+
+							// Check difference between the image and figure dimensions
+							const widthOverflow = Math.abs(
+								Math.min( figureWidth - targetWidth, 0 )
+							);
+							const heightOverflow = Math.abs(
+								Math.min( figureHeight - targetHeight, 0 )
+							);
+
+							// If image is larger than the figure, resize along its largest axis
+							if ( widthOverflow > 0 || heightOverflow > 0 ) {
+								if ( widthOverflow > heightOverflow ) {
+									targetWidth = figureWidth;
+									targetHeight =
+										context.core.image.imageRef
+											.naturalHeight *
+										( targetWidth /
+											context.core.image.imageRef
+												.naturalWidth );
+								} else {
+									targetHeight = figureHeight;
+									targetWidth =
+										context.core.image.imageRef
+											.naturalWidth *
+										( targetHeight /
+											context.core.image.imageRef
+												.naturalHeight );
+								}
+							}
+
+							const { x: leftPosition, y: topPosition } =
+								event.target.nextElementSibling.getBoundingClientRect();
+							const scaleWidth =
+								event.target.nextElementSibling.offsetWidth /
+								targetWidth;
+							const scaleHeight =
+								event.target.nextElementSibling.offsetHeight /
+								targetHeight;
+							const root = document.documentElement;
+
+							root.style.setProperty(
+								'--lightbox-image-max-width',
+								targetWidth + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-image-max-height',
+								targetHeight + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-left-position',
+								leftPosition + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-top-position',
+								topPosition + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-scale-width',
+								scaleWidth
+							);
+							root.style.setProperty(
+								'--lightbox-scale-height',
+								scaleHeight
+							);
+						}
+					};
 				},
 				hideLightbox: async ( { context, event } ) => {
 					if ( context.core.image.lightboxEnabled ) {
@@ -151,9 +222,10 @@ store( {
 		core: {
 			image: {
 				initLightbox: async ( { context, ref } ) => {
+					context.core.image.figureRef =
+						ref.querySelector( 'figure' );
+					context.core.image.imageRef = ref.querySelector( 'img' );
 					if ( context.core.image.lightboxEnabled ) {
-						context.core.image.lightboxImage =
-							ref.querySelector( 'img' );
 						const focusableElements =
 							ref.querySelectorAll( focusableSelectors );
 						context.core.image.firstFocusableElement =

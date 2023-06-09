@@ -255,6 +255,8 @@
 		img {
 			position: absolute;
 			transform-origin: top left;
+			width: var(--lightbox-image-max-width);
+			height: var(--lightbox-image-max-height);
 		}
 
 		&.active {
