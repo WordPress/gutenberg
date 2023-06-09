@@ -6,7 +6,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -79,18 +79,43 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		} catch ( error ) {
 			// Revert to original in case of error.
 			editEntityRecord( 'postType', postType, postId, originalRecord );
-			createErrorNotice( __( 'Unable to rename Navigation menu' ), {
-				type: 'snackbar',
-			} );
+
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: error message describing why the navigation menu could not be renamed. */
+					__( `Unable to rename Navigation menu (%s).` ),
+					error
+				),
+
+				{
+					type: 'snackbar',
+				}
+			);
 		}
 	};
 
-	const handleDelete = () => {
-		deleteEntityRecord( 'postType', postType, postId, { force: true } );
-		createSuccessNotice( __( 'Deleted Navigation menu' ), {
-			type: 'snackbar',
-		} );
-		goTo( '/navigation' );
+	const handleDelete = async () => {
+		try {
+			await deleteEntityRecord( 'postType', postType, postId, {
+				force: true,
+			} );
+			createSuccessNotice( __( 'Deleted Navigation menu' ), {
+				type: 'snackbar',
+			} );
+			goTo( '/navigation' );
+		} catch ( error ) {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: error message describing why the navigation menu could not be deleted. */
+					__( `Unable to delete Navigation menu (%s).` ),
+					error
+				),
+
+				{
+					type: 'snackbar',
+				}
+			);
+		}
 	};
 	const handleDuplicate = async () => {
 		const savedRecord = await saveEntityRecord( 'postType', postType, {
