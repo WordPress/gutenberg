@@ -264,6 +264,58 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	}
 
 	/**
+	 * Creates a single template.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		$prepared_post = $this->prepare_item_for_database( $request );
+
+		if ( is_wp_error( $prepared_post ) ) {
+			return $prepared_post;
+		}
+
+		$prepared_post->post_name = $request['slug'];
+		$post_id                  = wp_insert_post( wp_slash( (array) $prepared_post ), true );
+		if ( is_wp_error( $post_id ) ) {
+			if ( 'db_insert_error' === $post_id->get_error_code() ) {
+				$post_id->add_data( array( 'status' => 500 ) );
+			} else {
+				$post_id->add_data( array( 'status' => 400 ) );
+			}
+
+			return $post_id;
+		}
+		$posts = gutenberg_get_block_templates( array( 'wp_id' => $post_id ), $this->post_type );
+		if ( ! count( $posts ) ) {
+			return new WP_Error( 'rest_template_insert_error', __( 'No templates exist with that id.' ), array( 'status' => 400 ) );
+		}
+		$id            = $posts[0]->id;
+		$post          = get_post( $post_id );
+		$template      = gutenberg_get_block_template( $id, $this->post_type );
+		$fields_update = $this->update_additional_fields_for_object( $template, $request );
+		if ( is_wp_error( $fields_update ) ) {
+			return $fields_update;
+		}
+
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+		do_action( "rest_after_insert_{$this->post_type}", $post, $request, true );
+
+		wp_after_insert_post( $post, false, null );
+
+		$response = $this->prepare_item_for_response( $template, $request );
+		$response = rest_ensure_response( $response );
+
+		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $template->id ) ) );
+
+		return $response;
+	}
+
+	/**
 	 * Retrieves the block type' schema, conforming to JSON Schema.
 	 *
 	 * @since 5.8.0

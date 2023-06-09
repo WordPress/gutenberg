@@ -206,14 +206,55 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
-	 * @doesNotPerformAssertions
+	 * @covers WP_REST_Templates_Controller::create_item
 	 */
-	public function test_context_param() {}
+	public function test_create_item() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/templates' );
+		$request->set_body_params(
+			array(
+				'slug'        => 'my_custom_template',
+				'description' => 'Just a description',
+				'title'       => 'My Template',
+				'content'     => 'Content',
+				'author'      => self::$admin_id,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		unset( $data['_links'] );
+		unset( $data['wp_id'] );
+
+		$this->assertSame(
+			array(
+				'id'             => 'emptytheme//my_custom_template',
+				'theme'          => 'emptytheme',
+				'content'        => array(
+					'raw' => 'Content',
+				),
+				'slug'           => 'my_custom_template',
+				'source'         => 'custom',
+				'origin'         => null,
+				'type'           => 'wp_template',
+				'description'    => 'Just a description',
+				'title'          => array(
+					'raw'      => 'My Template',
+					'rendered' => 'My Template',
+				),
+				'status'         => 'publish',
+				'has_theme_file' => false,
+				'is_custom'      => true,
+				'author'         => self::$admin_id,
+				'modified'       => $data['modified'],
+			),
+			$data
+		);
+	}
 
 	/**
 	 * @doesNotPerformAssertions
 	 */
-	public function test_create_item() {}
+	public function test_context_param() {}
 
 	/**
 	 * @doesNotPerformAssertions
