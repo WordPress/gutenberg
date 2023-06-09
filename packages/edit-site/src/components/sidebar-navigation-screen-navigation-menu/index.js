@@ -4,15 +4,7 @@
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalUseNavigator as useNavigator,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	Button,
-	DropdownMenu,
 	Spinner,
-	TextControl,
-	MenuItem,
-	MenuGroup,
-	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
@@ -21,7 +13,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { moreVertical } from '@wordpress/icons';
+
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -35,6 +27,7 @@ import {
 } from '../../utils/is-previewing-theme';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
+import ScreenNavigationMoreMenu from './more-menu';
 
 const { useHistory } = unlock( routerPrivateApis );
 const noop = () => {};
@@ -224,98 +217,5 @@ function NavigationMenuEditor( { navigationMenu } ) {
 				/>
 			</div>
 		</BlockEditorProvider>
-	);
-}
-
-const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
-};
-
-function ScreenNavigationMoreMenu( props ) {
-	const {
-		isOpen,
-		setOpen,
-		handleDelete,
-		handleSave,
-		handleChange,
-		handleDuplicate,
-		editedMenuTitle,
-	} = props;
-	const closeModal = () => setOpen( false );
-	const openModal = () => setOpen( true );
-
-	return (
-		<>
-			<DropdownMenu
-				className="sidebar-navigation__more-menu"
-				icon={ moreVertical }
-				popoverProps={ POPOVER_PROPS }
-			>
-				{ ( { onClose } ) => (
-					<div>
-						<MenuGroup>
-							<MenuItem
-								onClick={ () => {
-									openModal();
-									onClose();
-								} }
-							>
-								{ __( 'Rename' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => {
-									handleDuplicate();
-									onClose();
-								} }
-							>
-								{ __( 'Duplicate' ) }
-							</MenuItem>
-							<MenuItem
-								isDestructive
-								isTertiary
-								onClick={ () => {
-									handleDelete();
-									onClose();
-								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						</MenuGroup>
-					</div>
-				) }
-			</DropdownMenu>
-
-			{ isOpen && (
-				<Modal title="Rename" onRequestClose={ closeModal }>
-					<form>
-						<VStack spacing="3">
-							<TextControl
-								__nextHasNoMarginBottom
-								value={ editedMenuTitle }
-								placeholder={ __( 'Navigation title' ) }
-								onChange={ handleChange }
-							/>
-							<HStack justify="right">
-								<Button
-									variant="tertiary"
-									onClick={ closeModal }
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-
-								<Button
-									variant="primary"
-									type="submit"
-									onClick={ handleSave }
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</HStack>
-						</VStack>
-					</form>
-				</Modal>
-			) }
-		</>
 	);
 }
