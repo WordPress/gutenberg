@@ -12,9 +12,9 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 ## 1.97.0
-- [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
-- [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
-- [*] Display lock icon in disabled state of `Cell` component [#50907]
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+-   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
 
 ## 1.96.1
 -   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
