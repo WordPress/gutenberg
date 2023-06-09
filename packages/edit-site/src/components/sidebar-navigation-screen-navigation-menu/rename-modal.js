@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 export default function RenameModal( {
 	onClose,
 	editedMenuTitle,
-	handleChange,
+	onChange,
 	handleSave,
 } ) {
 	return (
@@ -24,7 +24,7 @@ export default function RenameModal( {
 						__nextHasNoMarginBottom
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
-						onChange={ handleChange }
+						onChange={ onChange }
 					/>
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onClose }>

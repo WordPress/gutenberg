@@ -63,8 +63,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			type: 'snackbar',
 		} );
 	};
-	const handleChange = ( title ) =>
+	const editRecordTitle = ( title = '' ) =>
 		editEntityRecord( 'postType', postType, postId, { title } );
+
 	const handleDelete = () => {
 		deleteEntityRecord( 'postType', postType, postId, { force: true } );
 		createSuccessNotice( __( 'Deleted Navigation menu' ), {
@@ -101,7 +102,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		setOpen,
 		handleDelete,
 		handleSave,
-		handleChange,
+		onChange: editRecordTitle,
 		handleDuplicate,
 		editedMenuTitle: entity?.title || '',
 	};

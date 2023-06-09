@@ -21,7 +21,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 		setOpen,
 		handleDelete,
 		handleSave,
-		handleChange,
+		onChange,
 		handleDuplicate,
 		editedMenuTitle,
 	} = props;
@@ -72,7 +72,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 			{ isOpen && (
 				<RenameModal
 					onClose={ closeModal }
-					handleChange={ handleChange }
+					onChange={ onChange }
 					handleSave={ handleSave }
 					editedMenuTitle={ editedMenuTitle }
 				/>
