@@ -50,25 +50,35 @@ function useEditTemplateNotification() {
 		( node ) => {
 			const handleClick = ( event ) => {
 				if (
-					! alreadySeen.current &&
 					hasPageContentFocus &&
 					event.target.classList.contains( 'is-root-container' )
 				) {
-					createInfoNotice(
-						__( 'Edit your template to edit this block' ),
-						{
-							isDismissible: true,
-							type: 'snackbar',
-							actions: [
-								{
-									label: __( 'Edit template' ),
-									onClick: () =>
-										setHasPageContentFocus( false ),
-								},
-							],
-						}
-					);
-					alreadySeen.current = true;
+					node.ownerDocument
+						.querySelectorAll(
+							'.block-editor-block-list__block:not(.is-editing-disabled)'
+						)
+						.forEach( ( block ) => {
+							block.classList.remove( 'flash-outline' );
+							block.offsetWidth; // eslint-disable-line no-unused-expressions
+							block.classList.add( 'flash-outline' );
+						} );
+					if ( ! alreadySeen.current ) {
+						createInfoNotice(
+							__( 'Edit your template to edit this block' ),
+							{
+								isDismissible: true,
+								type: 'snackbar',
+								actions: [
+									{
+										label: __( 'Edit template' ),
+										onClick: () =>
+											setHasPageContentFocus( false ),
+									},
+								],
+							}
+						);
+						alreadySeen.current = true;
+					}
 				}
 			};
 			node.addEventListener( 'click', handleClick );
