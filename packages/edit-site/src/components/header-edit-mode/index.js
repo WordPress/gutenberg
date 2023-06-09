@@ -43,7 +43,7 @@ import {
 	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 

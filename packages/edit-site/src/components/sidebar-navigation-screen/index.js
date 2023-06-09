@@ -16,7 +16,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
 import {
 	isPreviewingTheme,

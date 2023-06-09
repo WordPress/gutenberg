@@ -17,7 +17,7 @@ import { useState, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting, useGlobalStyle, useGlobalStylesOutput } = unlock(
 	blockEditorPrivateApis

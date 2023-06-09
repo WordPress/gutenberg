@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 

@@ -16,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.

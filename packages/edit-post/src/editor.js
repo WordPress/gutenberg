@@ -23,7 +23,7 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );

@@ -6,7 +6,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const SIDEBAR_FIXED_BOTTOM_SLOT_FILL_NAME = 'SidebarFixedBottom';

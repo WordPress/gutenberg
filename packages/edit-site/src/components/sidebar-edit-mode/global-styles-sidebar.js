@@ -15,7 +15,7 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 export default function GlobalStylesSidebar() {
 	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(

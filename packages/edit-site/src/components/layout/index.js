@@ -43,7 +43,7 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
