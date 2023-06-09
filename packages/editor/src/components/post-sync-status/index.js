@@ -27,17 +27,16 @@ export default function PostSyncStatus() {
 			meta: { ...meta, wp_block: { sync_status: syncStatus } },
 		} );
 	const syncStatus = meta?.wp_block?.sync_status;
+	const isFullySynced = syncStatus === 'fully' || ! syncStatus;
 	return (
 		<PanelRow className="edit-post-sync-status">
-			<span>{ __( 'Sync status' ) }</span>
+			<span>{ __( 'Syncing' ) }</span>
 			<ToggleControl
 				__nextHasNoMarginBottom
 				label={
-					syncStatus === 'fully' || ! syncStatus
-						? __( 'Fully synced' )
-						: __( 'Not synced' )
+					isFullySynced ? __( 'Fully synced' ) : __( 'Not synced' )
 				}
-				checked={ syncStatus === 'fully' || ! syncStatus }
+				checked={ isFullySynced }
 				onChange={ () => {
 					onUpdateSync(
 						syncStatus === 'fully' ? 'unsynced' : 'fully'
