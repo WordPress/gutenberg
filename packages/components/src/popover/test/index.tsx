@@ -258,8 +258,8 @@ describe( 'Popover', () => {
 			[ 14, 14 ], // valid integers shouldn't be changes
 			[ 14.02, 14 ], // floating numbers are parsed to integers
 			[ 0, 0 ], // zero remains zero
-			[ null, 0 ],
-			[ NaN, 0 ],
+			[ null, undefined ],
+			[ NaN, undefined ],
 		] )(
 			'converts `%s` to `%s`',
 			( inputCoordinate, expectedCoordinated ) => {
