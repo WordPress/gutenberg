@@ -52,10 +52,9 @@ export default function ReusableBlockConvertButton( {
 	const [ categoryId, setCategoryId ] = useState( '' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
-	const { canConvert } = useSelect(
+	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-
 			const { getBlocksByClientId, canInsertBlockType } =
 				select( blockEditorStore );
 
@@ -88,9 +87,7 @@ export default function ReusableBlockConvertButton( {
 				// Hide when current doesn't have permission to do that.
 				!! canUser( 'create', 'blocks' );
 
-			return {
-				canConvert: _canConvert,
-			};
+			return _canConvert;
 		},
 		[ clientIds ]
 	);
