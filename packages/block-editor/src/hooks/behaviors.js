@@ -73,7 +73,7 @@ function BehaviorsControl( {
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
-		: __( 'Add behaviors.' );
+		: '';
 
 	const value = () => {
 		if ( blockBehaviors === undefined ) {
@@ -102,7 +102,7 @@ function BehaviorsControl( {
 				/>
 				{ behaviors?.lightbox.enabled && (
 					<SelectControl
-						label={ __( 'Lightbox Animation' ) }
+						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
 						value={
 							behaviors?.lightbox.animation
@@ -118,7 +118,6 @@ function BehaviorsControl( {
 						] }
 						onChange={ onChange }
 						hideCancelButton={ false }
-						help={ __( 'Select animation.' ) }
 						size="__unstable-large"
 						disabled={ disabled }
 					/>
