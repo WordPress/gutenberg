@@ -72,7 +72,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 		// Attempt to persist.
 		try {
-			await saveEditedEntityRecord( 'postType', postType, postId );
+			await saveEditedEntityRecord( 'postType', postType, postId, {
+				throwOnError: true,
+			} );
 			createSuccessNotice( __( 'Renamed Navigation menu' ), {
 				type: 'snackbar',
 			} );
@@ -96,9 +98,17 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const handleDelete = async () => {
 		try {
-			await deleteEntityRecord( 'postType', postType, postId, {
-				force: true,
-			} );
+			await deleteEntityRecord(
+				'postType',
+				postType,
+				postId,
+				{
+					force: true,
+				},
+				{
+					throwOnError: true,
+				}
+			);
 			createSuccessNotice( __( 'Deleted Navigation menu' ), {
 				type: 'snackbar',
 			} );
@@ -118,11 +128,18 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		}
 	};
 	const handleDuplicate = async () => {
-		const savedRecord = await saveEntityRecord( 'postType', postType, {
-			title: menuTitle + __( ' (Copy)' ),
-			content: navigationMenu?.content?.raw,
-			status: 'publish',
-		} );
+		const savedRecord = await saveEntityRecord(
+			'postType',
+			postType,
+			{
+				title: menuTitle + __( ' (Copy)' ),
+				content: navigationMenu?.content?.raw,
+				status: 'publish',
+			},
+			{
+				throwOnError: true,
+			}
+		);
 		if ( savedRecord ) {
 			createSuccessNotice( __( 'Duplicated Navigation menu' ), {
 				type: 'snackbar',
