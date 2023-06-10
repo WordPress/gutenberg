@@ -533,7 +533,7 @@ class WP_Duotone_Gutenberg {
 			if ( null === $color ) {
 				$error_message = sprintf(
 					/* translators: %s: duotone colors */
-					__( '"%s" is not a hex or rgb string in theme.json settings', 'gutenberg' ),
+					__( '"%s" is not a hex or rgb string in theme.json settings.', 'gutenberg' ),
 					$color_str
 				);
 				_doing_it_wrong( __METHOD__, $error_message, '6.3.0' );
