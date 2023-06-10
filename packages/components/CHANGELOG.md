@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+- `SlotFill`: Refactor SlotFill base ([#51385](https://github.com/WordPress/gutenberg/pull/51385)).
+
 ## 25.1.0 (2023-06-07)
 
 ### Enhancements
