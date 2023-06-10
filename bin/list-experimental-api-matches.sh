@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Exit if any command fails.
+set -e
+
+# Change to the root directory.
+cd "$(dirname "$0")"
+cd ..
+
 # POSIX: prefer standard grep over rg. Git is assumed present (ls-files), but
 # could be replaced with find.
 grep_experimental_apis() {
