@@ -7,7 +7,11 @@ import type { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import type { BaseFillObject, BaseSlotFillContext } from './types';
+import type {
+	BaseFillObject,
+	BaseSlotFillContext,
+	SlotComponentProps,
+} from './types';
 import { useState } from '@wordpress/element';
 /**
  * External dependencies
@@ -15,11 +19,14 @@ import { useState } from '@wordpress/element';
 import type { ReactNode } from 'react';
 
 export function createSlotRegistory(): BaseSlotFillContext {
-	const slots: Record< string, Component > = {};
-	const fills: Record< string, unknown[] > = {};
+	const slots: Record< string, Component< SlotComponentProps > > = {};
+	const fills: Record< string, BaseFillObject[] > = {};
 	let listeners: Array< () => void > = [];
 
-	function registerSlot( name: string, slot: Component ) {
+	function registerSlot(
+		name: string,
+		slot: Component< SlotComponentProps >
+	) {
 		const previousSlot = slots[ name ];
 		slots[ name ] = slot;
 		triggerListeners();
@@ -42,7 +49,10 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		forceUpdateSlot( name );
 	}
 
-	function unregisterSlot( name: string, instance: Component ) {
+	function unregisterSlot(
+		name: string,
+		instance: Component< SlotComponentProps >
+	) {
 		// If a previous instance of a Slot by this name unmounts, do nothing,
 		// as the slot and its fills should only be removed for the current
 		// known instance.
@@ -60,11 +70,16 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		forceUpdateSlot( name );
 	}
 
-	function getSlot( name: string ) {
+	function getSlot(
+		name: string
+	): Component< SlotComponentProps > | undefined {
 		return slots[ name ];
 	}
 
-	function getFills( name: string, slotInstance: Component ) {
+	function getFills(
+		name: string,
+		slotInstance: Component< SlotComponentProps >
+	): BaseFillObject[] {
 		// Fills should only be returned for the current instance of the slot
 		// in which they occupy.
 		if ( slots[ name ] !== slotInstance ) {
