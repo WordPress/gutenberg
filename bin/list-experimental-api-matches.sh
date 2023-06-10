@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# Generate a Markdown-formatted list of experimental APIs found across our
+# packages and lib, providing GitHub search links for each match.
+#
+# Experimental APIs must be regularly audited, particularly in the context of
+# major WordPress releases. This script allows release leads to generate a list
+# to share in release issues.
+#
+# @see example audit issue for WordPress 6.2:
+# https://github.com/WordPress/gutenberg/issues/47196
+
 # Exit if any command fails.
 set -e
 
