@@ -29,7 +29,7 @@
 		},
 		"taxonomy": {
 			"type": "string",
-			"default": 'category'
+			"default": "category"
 		}
 	},
 	"supports": {
