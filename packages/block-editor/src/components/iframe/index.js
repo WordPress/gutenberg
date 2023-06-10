@@ -212,7 +212,7 @@ function Iframe( {
 				forceRender();
 			} );
 	}, [] );
-	const disabledRef = useDisabled( { isDisabled: ! readonly } );
+	const disabledRef = useDisabled( { inert: readonly } );
 	const bodyRef = useMergeRefs( [
 		contentRef,
 		clearerRef,
