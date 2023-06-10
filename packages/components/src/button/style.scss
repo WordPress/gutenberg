@@ -291,11 +291,8 @@
 		}
 
 		.dashicon {
-			display: inline-flex;
-			justify-content: center;
-			align-items: center;
-			padding: 2px;
-			box-sizing: content-box;
+			margin-left: 2px;
+			margin-right: 2px;
 		}
 
 		&.has-text {
