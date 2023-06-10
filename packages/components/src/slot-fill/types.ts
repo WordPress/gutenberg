@@ -65,13 +65,22 @@ export type BubblesVirtuallySlotFillProviderProps = {
 };
 
 export type BaseSlotFillContext = {
-	registerSlot: ( name: string, slot: Component ) => void;
-	unregisterSlot: ( name: string, slot: Component ) => void;
+	registerSlot: (
+		name: string,
+		slot: Component< SlotComponentProps >
+	) => void;
+	unregisterSlot: (
+		name: string,
+		slot: Component< SlotComponentProps >
+	) => void;
 	registerFill: ( name: string, instance: BaseFillObject ) => void;
 	unregisterFill: ( name: string, instance: BaseFillObject ) => void;
-	getSlot: ( name: string ) => any;
-	getFills: ( name: string, slotInstance: any ) => any;
-	subscribe: ( listener: () => {} ) => () => void;
+	getSlot: ( name: string ) => Component< SlotComponentProps > | undefined;
+	getFills: (
+		name: string,
+		slotInstance: Component< SlotComponentProps >
+	) => BaseFillObject[];
+	subscribe: ( listener: () => void ) => () => void;
 };
 
 export type BaseSlotProps = {
@@ -81,9 +90,18 @@ export type BaseSlotProps = {
 };
 
 export type SlotComponentProps = {
-	registerSlot: ( name: string, slot: Component ) => void;
-	unregisterSlot: ( name: string, slot: Component ) => void;
-	getFills: ( name: string, slotInstance: Component ) => BaseFillObject[];
+	registerSlot: (
+		name: string,
+		slot: Component< SlotComponentProps >
+	) => void;
+	unregisterSlot: (
+		name: string,
+		slot: Component< SlotComponentProps >
+	) => void;
+	getFills: (
+		name: string,
+		slotInstance: Component< SlotComponentProps >
+	) => BaseFillObject[];
 } & BaseSlotProps;
 
 export type BaseFillObject = {

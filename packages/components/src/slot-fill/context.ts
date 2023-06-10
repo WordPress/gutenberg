@@ -12,8 +12,8 @@ const initialValue: BaseSlotFillContext = {
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
-	getSlot: () => {},
-	getFills: () => {},
+	getSlot: () => undefined,
+	getFills: () => [],
 	subscribe: () => () => {},
 };
 export const SlotFillContext = createContext( initialValue );
