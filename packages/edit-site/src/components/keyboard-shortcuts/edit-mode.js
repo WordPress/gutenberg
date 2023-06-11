@@ -77,7 +77,10 @@ function KeyboardShortcutsEditMode() {
 	} );
 
 	useShortcut( 'core/edit-site/toggle-list-view', () => {
-		setIsListViewOpened( ! isListViewOpen );
+		if ( isListViewOpen ) {
+			return;
+		}
+		setIsListViewOpened( true );
 	} );
 
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
