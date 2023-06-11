@@ -15,7 +15,7 @@ The editor keeps track of all these modifications and orchestrates the saving of
 To be able to edit an entity, you need to first fetch it and load it into the `core-data` store. For example, the following code loads the post with ID 1 into the store. (The entity is the post, the post 1 is the entity record).
 
 ````js
-wp.data.dispatch( 'core' ).getEntityRecord( 'postType', 'post', 1 );
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'post', 1 );
 ````
 
 Once the entity is loaded, you can edit it. For example, the following code sets the title of the post to "Hello World". For each fetched entity record, the `core-data` store keeps track of:
