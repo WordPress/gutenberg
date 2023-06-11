@@ -93,6 +93,7 @@ function KeyboardShortcuts() {
 		event.preventDefault();
 	} );
 
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
 	useShortcut( 'core/edit-site/toggle-list-view', () => {
 		if ( ! isListViewOpen ) {
 			return;
