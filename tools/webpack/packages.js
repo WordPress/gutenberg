@@ -148,7 +148,7 @@ module.exports = {
 				resourcePath = `${ resourcePath.split( '@wordpress' )[ 1 ] }`;
 				return `../../packages/${ resourcePath }`;
 			}
-			return `webpack://${ info.namespace }/${ resourcePath }?${ info.loaders }`;
+			return `webpack://${ info.namespace }/${ resourcePath }`;
 		},
 	},
 	plugins: [
