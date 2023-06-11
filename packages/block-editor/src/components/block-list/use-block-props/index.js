@@ -140,7 +140,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		useDisabled( { inert: hasOverlay } ),
+		useDisabled( { inert: !! hasOverlay } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
