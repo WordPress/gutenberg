@@ -143,12 +143,13 @@ module.exports = {
 		filename: './build/[name]/index.min.js',
 		path: join( __dirname, '..', '..' ),
 		devtoolModuleFilenameTemplate: ( info ) => {
-			let resourcePath = info.resourcePath;
 			if ( info.resourcePath.includes( '@wordpress' ) ) {
-				resourcePath = `${ resourcePath.split( '@wordpress' )[ 1 ] }`;
+				const resourcePath = `${
+					info.resourcePath.split( '@wordpress' )[ 1 ]
+				}`;
 				return `../../packages/${ resourcePath }`;
 			}
-			return `webpack://${ info.namespace }/${ resourcePath }`;
+			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
 	plugins: [
