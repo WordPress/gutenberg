@@ -221,17 +221,17 @@ const Slot = () => {
 	return <ExampleSlotFill.Slot bubblesVirtually fillProps={ fillProps } />;
 };
 
+type ForwardedContextTuple< P = {} > = [
+	React.ComponentType< React.PropsWithChildren< P > >,
+	P
+];
+
 const Fill = ( { children }: { children: React.ReactNode } ) => {
 	const innerMarkup = <>{ children }</>;
 
 	return (
 		<ExampleSlotFill.Fill>
-			{ ( fillProps: {
-				forwardedContext?: [
-					React.FunctionComponent<React.PropsWithChildren<any>>,
-					{ value: any; [ key: string ]: any }
-				][];
-			} ) => {
+			{ ( fillProps: { forwardedContext?: ForwardedContextTuple[] } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
