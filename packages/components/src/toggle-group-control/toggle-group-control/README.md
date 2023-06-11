@@ -17,10 +17,18 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 function Example() {
+	const [ orientation, setOrientation ] = useState( "vertical" );
+
 	return (
-		<ToggleGroupControl label="my label" value="vertical" isBlock>
+		<ToggleGroupControl
+			label="my label"
+			value={ orientation }
+			onChange={ setOrientation }
+			isBlock
+		>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
