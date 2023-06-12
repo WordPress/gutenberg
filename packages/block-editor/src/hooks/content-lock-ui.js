@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, MenuItem } from '@wordpress/components';
+import {
+	ToolbarButton,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -13,6 +16,9 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
+import { unlock } from '../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -124,9 +130,14 @@ export const withBlockControls = createHigherOrderComponent(
 				) }
 				{ showStartEditingAsBlocks && (
 					<BlockSettingsMenuControls>
-						{ ( { onClose } ) => (
-							<MenuItem
-								onClick={ () => {
+						{ (
+							{
+								/*onClose*/
+							}
+						) => (
+							/* TODO: check if this used in other legacy dropdown menus */
+							<DropdownMenuItemV2
+								onSelect={ () => {
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
 										templateLock: undefined,
@@ -143,11 +154,11 @@ export const withBlockControls = createHigherOrderComponent(
 									__unstableSetTemporarilyEditingAsBlocks(
 										props.clientId
 									);
-									onClose();
+									// onClose(); TODO: onClose
 								} }
 							>
 								{ __( 'Modify' ) }
-							</MenuItem>
+							</DropdownMenuItemV2>
 						) }
 					</BlockSettingsMenuControls>
 				) }

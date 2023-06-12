@@ -2,8 +2,18 @@
  * WordPress dependencies
  */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
+import {
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	selected.filter( ( id ) => ! allowed.includes( id ) ).length === 0;
@@ -87,19 +97,23 @@ const PluginBlockSettingsMenuItem = ( {
 	role,
 } ) => (
 	<BlockSettingsMenuControls>
-		{ ( { selectedBlocks, onClose } ) => {
+		{ ( { selectedBlocks /*onClose*/ } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
 			return (
-				<MenuItem
-					onClick={ compose( onClick, onClose ) }
-					icon={ icon }
-					label={ small ? label : undefined }
-					role={ role }
+				/* TODO: check if this used in other legacy dropdown menus */
+				<DropdownMenuItemV2
+					onClick={ compose(
+						onClick
+						// onClose TODO: onClose
+					) }
+					prefix={ <Icon icon={ icon } size={ 24 } /> }
+					label={ small ? label : undefined } // TODO: should item accept label? It's probably supposed to add an aria-label and potentially even a tooltip
+					role={ role } // TODO: should item accept role?
 				>
 					{ ! small && label }
-				</MenuItem>
+				</DropdownMenuItemV2>
 			);
 		} }
 	</BlockSettingsMenuControls>

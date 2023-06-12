@@ -11,7 +11,11 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import {
+	Spinner,
+	Modal,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -29,6 +33,9 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -157,8 +164,10 @@ export default function TemplatePartEdit( {
 				{ canReplace && (
 					<BlockSettingsMenuControls>
 						{ () => (
-							<MenuItem
-								onClick={ () => {
+							/* TODO: check if this used in other legacy dropdown menus */
+							<DropdownMenuItemV2
+								onSelect={ () => {
+									// TODO: should call preventDefault?
 									setIsTemplatePartSelectionOpen( true );
 								} }
 							>
@@ -173,7 +182,7 @@ export default function TemplatePartEdit( {
 										),
 									}
 								) }
-							</MenuItem>
+							</DropdownMenuItemV2>
 						) }
 					</BlockSettingsMenuControls>
 				) }

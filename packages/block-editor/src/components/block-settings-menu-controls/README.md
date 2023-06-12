@@ -6,12 +6,14 @@ Block Settings Menu Controls appear in the block settings dropdown menu when the
 
 ```jsx
 import { BlockSettingsMenuControls } from '@wordress/block-editor';
-import MyButton from './my-toggle-button';
+import MyToggleButton from './my-toggle-button';
 
 function ReusableBlocksMenuItems() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => <MyToggleButton onToggle={ onClose } /> }
+			{/* Is this a breaking change? */}
+			{/* Should this use a menu item example? */}
+			{ () => <MyToggleButton onToggle={ /* ... */ } /> }
 		</BlockSettingsMenuControls>
 	);
 }

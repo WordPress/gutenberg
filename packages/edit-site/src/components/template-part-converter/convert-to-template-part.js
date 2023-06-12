@@ -3,7 +3,10 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
+import {
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -21,6 +24,9 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -75,14 +81,16 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 
 	return (
 		<>
-			<MenuItem
-				icon={ symbolFilled }
-				onClick={ () => {
+			{ /* TODO: check if this used in other legacy dropdown menus */ }
+			<DropdownMenuItemV2
+				prefix={ <Icon icon={ symbolFilled } size={ 24 } /> }
+				onSelect={ () => {
 					setIsModalOpen( true );
+					// TODO: should call prevent default?
 				} }
 			>
 				{ __( 'Create Template part' ) }
-			</MenuItem>
+			</DropdownMenuItemV2>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => {
