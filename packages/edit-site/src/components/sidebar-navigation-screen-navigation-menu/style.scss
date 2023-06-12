@@ -1,0 +1,15 @@
+.sidebar-navigation__more-menu {
+	.components-button {
+		color: $gray-600;
+		&:hover,
+		&:focus,
+		&[aria-current] {
+			color: $white;
+		}
+	}
+}
+
+.sidebar-navigation__rename-modal-form {
+	// Fix for input focus style being cut off by the modal.
+	padding-top: 1px;
+}
