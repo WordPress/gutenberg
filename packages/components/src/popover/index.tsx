@@ -52,6 +52,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
+	computePopoverPosition,
 	getFrameOffset,
 	getFrameScale,
 	positionToPlacement,
@@ -499,8 +500,8 @@ const UnforwardedPopover = (
 							// to use `translateX` and `translateY` because those values would
 							// be overridden by the return value of the
 							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
-							x: Math.round( x ?? 0 ) || undefined,
-							y: Math.round( y ?? 0 ) || undefined,
+							x: computePopoverPosition( x ),
+							y: computePopoverPosition( y ),
 					  }
 			}
 		>

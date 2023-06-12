@@ -12,7 +12,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
+import {
+	computePopoverPosition,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
 
@@ -247,5 +251,22 @@ describe( 'Popover', () => {
 				}
 			);
 		} );
+	} );
+
+	describe( 'computePopoverPosition', () => {
+		it.each( [
+			[ 14, 14 ], // valid integers shouldn't be changes
+			[ 14.02, 14 ], // floating numbers are parsed to integers
+			[ 0, 0 ], // zero remains zero
+			[ null, undefined ],
+			[ NaN, undefined ],
+		] )(
+			'converts `%s` to `%s`',
+			( inputCoordinate, expectedCoordinated ) => {
+				expect( computePopoverPosition( inputCoordinate ) ).toEqual(
+					expectedCoordinated
+				);
+			}
+		);
 	} );
 } );
