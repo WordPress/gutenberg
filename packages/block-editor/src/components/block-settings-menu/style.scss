@@ -1,3 +1,7 @@
+// TODO: these styles are still probably relevant since they are used by other
+// dropdown menus using the same classname. Next steps:
+// - consider moving these styles closer to those components
+// - consider refactoring those menus too
 .block-editor-block-settings-menu__popover .components-dropdown-menu__menu {
 	padding: 0;
 }
