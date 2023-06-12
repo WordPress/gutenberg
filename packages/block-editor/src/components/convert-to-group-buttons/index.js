@@ -17,6 +17,7 @@ function ConvertToGroupButton( {
 	clientIds,
 	isGroupable,
 	isUngroupable,
+	onUngroup,
 	blocksSelection,
 	groupingBlockName,
 	onClose = () => {},
@@ -34,9 +35,15 @@ function ConvertToGroupButton( {
 	};
 
 	const onConvertFromGroup = () => {
-		const innerBlocks = blocksSelection[ 0 ].innerBlocks;
+		let innerBlocks = blocksSelection[ 0 ].innerBlocks;
 		if ( ! innerBlocks.length ) {
 			return;
+		}
+		if ( onUngroup ) {
+			innerBlocks = onUngroup(
+				blocksSelection[ 0 ].attributes,
+				blocksSelection[ 0 ].innerBlocks
+			);
 		}
 		replaceBlocks( clientIds, innerBlocks );
 	};
@@ -66,7 +73,7 @@ function ConvertToGroupButton( {
 				>
 					{ _x(
 						'Ungroup',
-						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
 					) }
 				</MenuItem>
 			) }

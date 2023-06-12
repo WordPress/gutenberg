@@ -15,10 +15,10 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	.components-button {
+	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
-			color: $gray-900;
+			color: inherit;
 		}
 
 		// Ensure that on hover, the admin color is still used.
@@ -123,7 +123,6 @@
 		border-radius: 0;
 	}
 
-
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
@@ -214,19 +213,17 @@
 		line-height: 0;
 		width: $button-size;
 		vertical-align: middle;
-		@include reduce-motion("transition");
 
 		> * {
-			will-change: opacity;
 			opacity: 0;
 		}
 
-		// Show on hover, visible, and show above to keep the hit area size.
+		// Show on hover, visible, when focused, and show above to keep the hit area size.
 		&:hover,
+		&:focus-within,
 		&.is-visible {
 			> * {
 				opacity: 1;
-				@include edit-post__fade-in-animation;
 			}
 		}
 
@@ -343,11 +340,6 @@
 	}
 }
 
-.block-editor-list-view-block-select-button__description,
-.block-editor-list-view-appender__description {
-	display: none;
-}
-
 .block-editor-list-view-block__contents-cell,
 .block-editor-list-view-appender__cell {
 	.block-editor-list-view-block__contents-container,
@@ -376,6 +368,9 @@ $block-navigation-max-indent: 8;
 	}
 }
 
+// When updating the margin for each indentation level, the corresponding
+// indentation in `use-list-view-drop-zone.js` must be updated as well
+// to ensure the drop zone is aligned with the indentation.
 @for $i from 0 to $block-navigation-max-indent {
 	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"] .block-editor-list-view__expander {
 		@if $i - 1 >= 0 {

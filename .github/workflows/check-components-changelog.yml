@@ -42,8 +42,8 @@ jobs:
                     exit 1
                   fi
 
-                  pr_link_pattern="\(\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)\)"
-                  pr_link_grep_pattern="(\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}))"
+                  pr_link_pattern="\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)"
+                  pr_link_grep_pattern="\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER})"
 
                   unreleased_section=$(sed -n '/^## Unreleased$/,/^## /p' "${changelog_path}")
 

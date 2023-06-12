@@ -180,3 +180,8 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 -   **Type:** `Function`
 -   **Default:** - `undefined`. The placeholder is an optional function that can be passed in to be a rendered component placed in front of the appender. This can be used to represent an example state prior to any blocks being placed. See the Social Links for an implementation example.
+
+### `prioritizedInserterBlocks`
+
+-   **Type:** `Array`
+-   **Default:** - `undefined`. Determines which block types should be shown in the block inserter. For example, when inserting a block within the Navigation block we specify `core/navigation-link` and `core/navigation-link/page` as these are the most commonly used inner blocks. `prioritizedInserterBlocks` takes an array of the form {blockName}/{variationName}, where {variationName} is optional.

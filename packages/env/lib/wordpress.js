@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -14,7 +15,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
@@ -86,6 +87,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--rm' ],
 			log: config.debug,
 		}
 	);
@@ -147,30 +149,13 @@ async function setupWordPressDirectories( config ) {
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
 	}
-
-	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
-		}
-	}
-}
-
-async function createUploadsDir( corePath ) {
-	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
 }
 
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig[]} envs An array of environments to check.
+ * @param {WPEnvironmentConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */

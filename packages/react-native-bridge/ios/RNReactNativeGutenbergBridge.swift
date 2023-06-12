@@ -1,3 +1,5 @@
+import React
+
 struct GutenbergEvent {
     let name: String
     let body: Any?

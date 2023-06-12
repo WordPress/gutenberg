@@ -1,3 +1,5 @@
+import React
+
 public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?

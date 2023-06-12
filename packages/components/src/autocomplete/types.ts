@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import type { WPElement } from '@wordpress/element';
+import type { RichTextValue } from '@wordpress/rich-text';
+
 /**
  * Internal dependencies
  */
@@ -157,24 +159,6 @@ export type CancelablePromise< T = void > = Promise< T > & {
 	canceled?: boolean;
 };
 
-/**
- * When `@wordpress/rich-text` is fully typed, the following
- * types should be moved to and imported from there
- *
- * @see /packages/rich-text/src/create.js
- */
-type RichTextFormat = {
-	type: string;
-};
-type RichTextFormatList = Array< RichTextFormat >;
-type RichTextValue = {
-	text: string;
-	formats?: Array< RichTextFormatList >;
-	replacements?: Array< RichTextFormat >;
-	start: number | undefined;
-	end: number | undefined;
-};
-
 export type UseAutocompleteProps = {
 	/**
 	 * The rich text value object the autocompleter is being applied to.
@@ -187,7 +171,7 @@ export type UseAutocompleteProps = {
 	 * A function to be called when an option is selected to insert into the
 	 * existing text.
 	 */
-	onChange: ( value: string ) => void;
+	onChange: ( value: RichTextValue ) => void;
 	/**
 	 * A function to be called when an option is selected to replace the
 	 * existing text.

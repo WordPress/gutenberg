@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 } from '@wordpress/components';
-import { chevronRight, Icon } from '@wordpress/icons';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 
 export default function SidebarNavigationItem( {
 	className,
@@ -28,24 +28,23 @@ export default function SidebarNavigationItem( {
 			) }
 			{ ...props }
 		>
-			{ icon && (
-				<HStack justify="flex-start">
+			<HStack justify="flex-start">
+				{ icon && (
 					<Icon
 						style={ { fill: 'currentcolor' } }
 						icon={ icon }
 						size={ 24 }
 					/>
-					<FlexBlock>{ children }</FlexBlock>
-					{ withChevron && (
-						<Icon
-							style={ { fill: 'currentcolor' } }
-							icon={ chevronRight }
-							size={ 24 }
-						/>
-					) }
-				</HStack>
-			) }
-			{ ! icon && children }
+				) }
+				<FlexBlock>{ children }</FlexBlock>
+				{ withChevron && (
+					<Icon
+						icon={ chevronRightSmall }
+						className="edit-site-sidebar-navigation-item__drilldown-indicator"
+						size={ 24 }
+					/>
+				) }
+			</HStack>
 		</Item>
 	);
 }

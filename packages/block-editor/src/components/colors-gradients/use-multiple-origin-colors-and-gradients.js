@@ -61,7 +61,12 @@ export default function useMultipleOriginColorsAndGradients() {
 			} );
 		}
 		return result;
-	}, [ defaultColors, themeColors, customColors ] );
+	}, [
+		defaultColors,
+		themeColors,
+		customColors,
+		shouldDisplayDefaultColors,
+	] );
 
 	const customGradients = useSetting( 'color.gradients.custom' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
@@ -103,7 +108,16 @@ export default function useMultipleOriginColorsAndGradients() {
 			} );
 		}
 		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
+	}, [
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
+	] );
+
+	colorGradientSettings.hasColorsOrGradients =
+		!! colorGradientSettings.colors.length ||
+		!! colorGradientSettings.gradients.length;
 
 	return colorGradientSettings;
 }

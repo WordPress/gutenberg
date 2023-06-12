@@ -35,26 +35,4 @@ test.describe( 'Site editor browser history', () => {
 		await page.goBack();
 		await expect( page ).toHaveURL( '/wp-admin/index.php' );
 	} );
-
-	test( 'Opens the template list from the template details view', async ( {
-		admin,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postType: 'wp_template',
-			postId: 'emptytheme//index',
-			canvas: 'edit',
-		} );
-
-		// Navigate to the template list
-		await page.click( 'role=button[name="Show template details"]' );
-		await page.click( 'role=link[name="Manage all templates"]' );
-
-		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?path=%2Fwp_template%2Fall'
-		);
-
-		const title = page.getByRole( 'heading', { level: 1 } );
-		await expect( title ).toHaveText( 'Templates' );
-	} );
 } );

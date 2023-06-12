@@ -189,6 +189,9 @@ $z-layers: (
 	".edit-site-layout__canvas-container.is-resizing::after": 100,
 	// Title needs to appear above other UI the section content.
 	".edit-site-sidebar-navigation-screen__title-icon": 1,
+
+	// Ensure modal footer actions appear above modal contents
+	".edit-site-start-template-options__modal__actions": 1,
 );
 
 @function z-index( $key ) {
