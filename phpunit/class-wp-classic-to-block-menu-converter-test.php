@@ -1,21 +1,25 @@
 <?php
-
 /**
+ * Tests WP_Classic_To_Block_Menu_Converter_Test
  *
- *
- * @package Gutenberg
+ * @package WordPress
  */
 
+ /**
+ * Tests for the WP_Classic_To_Block_Menu_Converter_Test class.
+ */
 class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
+	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::get_fallback
+	 */
 	public function test_class_exists() {
 		$this->assertTrue( class_exists( 'WP_Classic_To_Block_Menu_Converter' ) );
 	}
 
 	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::convert
 	 * @dataProvider provider_test_passing_non_menu_object_to_converter_returns_wp_error
-	 *
-	 * @return void
 	 */
 	public function test_passing_non_menu_object_to_converter_returns_wp_error( $data ) {
 
@@ -28,6 +32,9 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'The menu provided is not a valid menu.', $result->get_error_message(), 'Error message should communicate invalidity of menu argument.' );
 	}
 
+	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::convert
+	 */
 	public function provider_test_passing_non_menu_object_to_converter_returns_wp_error() {
 		return array(
 			array( 1 ),
@@ -41,6 +48,9 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::convert
+	 */
 	public function test_can_convert_classic_menu_to_blocks() {
 
 		$menu_id = wp_create_nav_menu( 'Classic Menu' );
@@ -94,10 +104,6 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( '/classic-menu-item-1', $first_block['attrs']['url'], 'First block URL should match.' );
 
-		// echo "<pre>";
-		// var_dump($parsed_blocks);
-		// echo "</pre>";
-
 		// Assert parent of nested menu item is a submenu block.
 		$this->assertEquals( 'core/navigation-submenu', $second_block['blockName'], 'Second block name should be "core/navigation-submenu"' );
 
@@ -114,6 +120,9 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 		wp_delete_nav_menu( $menu_id );
 	}
 
+	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::convert
+	 */
 	public function test_does_not_convert_menu_items_with_non_publish_status() {
 
 			$menu_id = wp_create_nav_menu( 'Classic Menu' );
@@ -187,6 +196,9 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 			wp_delete_nav_menu( $menu_id );
 	}
 
+	/**
+	 * @covers WP_Classic_To_Block_Menu_Converter::convert
+	 */
 	public function test_returns_empty_array_for_menus_with_no_items() {
 		$menu_id = wp_create_nav_menu( 'Empty Menu' );
 
