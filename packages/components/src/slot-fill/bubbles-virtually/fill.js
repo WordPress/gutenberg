@@ -30,7 +30,8 @@ function useForceUpdate() {
 
 export default function Fill( { name, children } ) {
 	const { registerFill, unregisterFill, ...slot } = useSlot( name );
-	const ref = useRef( { rerender: useForceUpdate() } );
+	const rerender = useForceUpdate();
+	const ref = useRef( { rerender } );
 
 	useEffect( () => {
 		// We register fills so we can keep track of their existence.

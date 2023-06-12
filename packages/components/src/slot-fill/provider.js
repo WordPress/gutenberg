@@ -19,7 +19,6 @@ export default class SlotFillProvider extends Component {
 		this.unregisterFill = this.unregisterFill.bind( this );
 		this.getSlot = this.getSlot.bind( this );
 		this.getFills = this.getFills.bind( this );
-		this.hasFills = this.hasFills.bind( this );
 		this.subscribe = this.subscribe.bind( this );
 
 		this.slots = {};
@@ -32,7 +31,6 @@ export default class SlotFillProvider extends Component {
 			unregisterFill: this.unregisterFill,
 			getSlot: this.getSlot,
 			getFills: this.getFills,
-			hasFills: this.hasFills,
 			subscribe: this.subscribe,
 		};
 	}
@@ -89,10 +87,6 @@ export default class SlotFillProvider extends Component {
 			return [];
 		}
 		return this.fills[ name ];
-	}
-
-	hasFills( name ) {
-		return this.fills[ name ] && !! this.fills[ name ].length;
 	}
 
 	forceUpdateSlot( name ) {

@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 7.6.0 (2023-06-07)
+
+## 7.5.0 (2023-05-24)
+
+## 7.4.0 (2023-05-10)
+
+## 7.3.0 (2023-04-26)
+
+## 7.2.0 (2023-04-12)
+
+## 7.1.0 (2023-03-29)
+
+## 7.0.0 (2023-03-15)
+
+### Breaking Changes
+
+-  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+
+## 6.5.0 (2023-03-01)
+
 ## 6.4.0 (2023-02-15)
 
 ## 6.3.0 (2023-02-01)

@@ -93,8 +93,10 @@ test.describe( 'Toolbar roving tabindex', () => {
 		editor,
 		page,
 		ToolbarRovingTabindexUtils,
+		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
+		await page.keyboard.press( 'ArrowLeft' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Block: Table',
 			'Table'
@@ -102,8 +104,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
-		await page.click( `role=button[name="Create Table"i]` );
-		await page.keyboard.press( 'Tab' );
+		await editor.canvas.click( `role=button[name="Create Table"i]` );
+		await pageUtils.pressKeys( 'Tab' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Body cell text',
 			'Table'
@@ -144,8 +146,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await ToolbarRovingTabindexUtils.focusBlockToolbar();
 		await page.keyboard.press( 'ArrowRight' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
-		await page.keyboard.press( 'Tab' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
 	} );
 
@@ -154,7 +156,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		pageUtils,
 		ToolbarRovingTabindexUtils,
 	} ) => {
-		await pageUtils.pressKeyWithModifier( 'alt', 'F10' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Bold' );
@@ -168,7 +170,7 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async focusBlockToolbar() {
-		await this.pageUtils.pressKeyWithModifier( 'alt', 'F10' );
+		await this.pageUtils.pressKeys( 'alt+F10' );
 	}
 
 	async testBlockToolbarKeyboardNavigation(
@@ -179,22 +181,26 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Move up' );
-		await this.page.keyboard.press( 'Tab' );
+		await this.pageUtils.pressKeys( 'Tab' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
-		await this.pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Move up' );
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		let ariaLabel = await this.page.evaluate( () =>
-			document.activeElement.getAttribute( 'aria-label' )
-		);
+		let ariaLabel = await this.page.evaluate( () => {
+			const { activeElement } =
+				document.activeElement.contentDocument ?? document;
+			return activeElement.getAttribute( 'aria-label' );
+		} );
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			);
+			ariaLabel = await this.page.evaluate( () => {
+				const { activeElement } =
+					document.activeElement.contentDocument ?? document;
+				return activeElement.getAttribute( 'aria-label' );
+			} );
 		}
 		expect( ariaLabel ).toBe( label );
 	}
@@ -208,7 +214,7 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( 'Block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
-		await this.pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );

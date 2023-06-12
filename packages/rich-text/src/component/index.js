@@ -17,6 +17,7 @@ import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
 import { useInputAndSelection } from './use-input-and-selection';
+import { useSelectionChangeCompat } from './use-selection-change-compat';
 import { useDelete } from './use-delete';
 
 export function useRichText( {
@@ -240,6 +241,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
+		useSelectionChangeCompat(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

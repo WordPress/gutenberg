@@ -19,6 +19,7 @@ export default function ListViewExpander( { onClick } ) {
 			className="block-editor-list-view__expander"
 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
 			aria-hidden="true"
+			data-testid="list-view-expander"
 		>
 			<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
 		</span>

@@ -36,8 +36,12 @@ import { store as editSiteStore } from '../../store';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
-import StyleBook from '../style-book';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+import EditorCanvasContainer from '../editor-canvas-container';
+import {
+	DisableNonPageContentBlocks,
+	usePageContentFocusNotifications,
+} from '../page-content-focus';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -49,20 +53,25 @@ const LAYOUT = {
 
 export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, templateType, canvasMode } = useSelect(
-		( select ) => {
-			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
+	const { storedSettings, templateType, canvasMode, hasPageContentFocus } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getEditedPostType,
+					getCanvasMode,
+					hasPageContentFocus: _hasPageContentFocus,
+				} = unlock( select( editSiteStore ) );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpened ),
-				templateType: getEditedPostType(),
-				canvasMode: getCanvasMode(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
+				return {
+					storedSettings: getSettings( setIsInserterOpened ),
+					templateType: getEditedPostType(),
+					canvasMode: getCanvasMode(),
+					hasPageContentFocus: _hasPageContentFocus(),
+				};
+			},
+			[ setIsInserterOpened ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -137,12 +146,14 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
+		usePageContentFocusNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
+
 	const hasBlocks = blocks.length !== 0;
 	const enableResizing =
 		isTemplatePart &&
@@ -161,23 +172,22 @@ export default function BlockEditor() {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
-			<StyleBook.Slot>
-				{ ( [ styleBook ] ) =>
-					styleBook ? (
+			<EditorCanvasContainer.Slot>
+				{ ( [ editorCanvasView ] ) =>
+					editorCanvasView ? (
 						<div className="edit-site-visual-editor is-focus-mode">
-							<ResizableEditor enableResizing>
-								{ styleBook }
-							</ResizableEditor>
+							{ editorCanvasView }
 						</div>
 					) : (
 						<BlockTools
 							className={ classnames( 'edit-site-visual-editor', {
-								'is-focus-mode': isTemplatePart || !! styleBook,
+								'is-focus-mode':
+									isTemplatePart || !! editorCanvasView,
 								'is-view-mode': isViewMode,
 							} ) }
 							__unstableContentRef={ contentRef }
@@ -211,7 +221,7 @@ export default function BlockEditor() {
 						</BlockTools>
 					)
 				}
-			</StyleBook.Slot>
+			</EditorCanvasContainer.Slot>
 			<ReusableBlocksMenuItems />
 		</ExperimentalBlockEditorProvider>
 	);

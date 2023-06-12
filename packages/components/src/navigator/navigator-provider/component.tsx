@@ -147,6 +147,7 @@ function UnconnectedNavigatorProvider(
 			const {
 				focusTargetSelector,
 				isBack = false,
+				skipFocus = false,
 				...restOptions
 			} = options;
 
@@ -168,6 +169,7 @@ function UnconnectedNavigatorProvider(
 					path,
 					isBack,
 					hasRestoredFocus: false,
+					skipFocus,
 				};
 
 				if ( prevLocationHistory.length < 1 ) {

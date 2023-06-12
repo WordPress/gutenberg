@@ -80,32 +80,38 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 
 	/**
 	 * Abstract methods that we must implement.
+	 *
+	 * @doesNotPerformAssertions
 	 */
-	public function test_context_param() {
-		$this->markTestIncomplete();
-	}
+	public function test_context_param() {}
 
-	public function test_get_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item() {}
 
-	public function test_create_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_create_item() {}
 
-	public function test_update_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_update_item() {}
 
-	public function test_delete_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_delete_item() {}
 
-	public function test_prepare_item() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_prepare_item() {}
 
-	public function test_get_item_schema() {
-		$this->markTestIncomplete();
-	}
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item_schema() {}
 }

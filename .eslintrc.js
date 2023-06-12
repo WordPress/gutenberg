@@ -81,12 +81,14 @@ const restrictedImports = [
 			'flowRight',
 			'forEach',
 			'fromPairs',
+			'groupBy',
 			'has',
 			'identity',
 			'includes',
 			'invoke',
 			'isArray',
 			'isBoolean',
+			'isEmpty',
 			'isEqual',
 			'isFinite',
 			'isFunction',
@@ -104,6 +106,7 @@ const restrictedImports = [
 			'lowerCase',
 			'map',
 			'mapKeys',
+			'mapValues',
 			'maxBy',
 			'memoize',
 			'merge',
@@ -350,7 +353,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'error',

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
-import type { ComponentProps } from 'react';
 
 /**
  * WordPress dependencies
@@ -32,20 +31,33 @@ const meta: ComponentMeta< typeof SelectControl > = {
 };
 export default meta;
 
-const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
-	onChange,
-	...args
-} ) => {
-	const [ selection, setSelection ] =
-		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
+const SelectControlWithState: ComponentStory< typeof SelectControl > = (
+	props
+) => {
+	const [ selection, setSelection ] = useState< string[] >();
+
+	if ( props.multiple ) {
+		return (
+			<SelectControl
+				{ ...props }
+				multiple
+				value={ selection }
+				onChange={ ( value ) => {
+					setSelection( value );
+					props.onChange?.( value );
+				} }
+			/>
+		);
+	}
 
 	return (
 		<SelectControl
-			{ ...args }
-			value={ selection }
+			{ ...props }
+			multiple={ false }
+			value={ selection?.[ 0 ] }
 			onChange={ ( value ) => {
-				setSelection( value );
-				onChange?.( value );
+				setSelection( [ value ] );
+				props.onChange?.( value );
 			} }
 		/>
 	);
@@ -70,7 +82,7 @@ WithLabelAndHelpText.args = {
 
 /**
  * As an alternative to the `options` prop, `optgroup`s and `options` can be
- * passed in as `children` for more customizability.
+ * passed in as `children` for more customizeability.
  */
 export const WithCustomChildren: ComponentStory< typeof SelectControl > = (
 	args

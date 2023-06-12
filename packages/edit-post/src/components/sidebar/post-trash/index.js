@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
 import { PostTrash as PostTrashLink, PostTrashCheck } from '@wordpress/editor';
+import { FlexItem } from '@wordpress/components';
 
 export default function PostTrash() {
 	return (
 		<PostTrashCheck>
-			<PanelRow>
+			<FlexItem isBlock>
 				<PostTrashLink />
-			</PanelRow>
+			</FlexItem>
 		</PostTrashCheck>
 	);
 }

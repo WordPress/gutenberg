@@ -25,64 +25,68 @@ import { store as blockEditorStore } from '../../store';
  * It is used in `BlockSettingsMenuControls` to know if `ConvertToGroupButton`
  * should be rendered, to avoid ending up with an empty MenuGroup.
  *
+ * @param {?string[]} selectedClientIds An optional array of clientIds to group. The selected blocks
+ *                                      from the block editor store are used if this is not provided.
+ *
  * @return {ConvertToGroupButtonProps} Returns the properties needed by `ConvertToGroupButton`.
  */
-export default function useConvertToGroupButtonProps() {
-	const {
-		clientIds,
-		isGroupable,
-		isUngroupable,
-		blocksSelection,
-		groupingBlockName,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockRootClientId,
-			getBlocksByClientId,
-			canInsertBlockType,
-			getSelectedBlockClientIds,
-		} = select( blockEditorStore );
-		const { getGroupingBlockName } = select( blocksStore );
+export default function useConvertToGroupButtonProps( selectedClientIds ) {
+	return useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlocksByClientId,
+				canInsertBlockType,
+				getSelectedBlockClientIds,
+			} = select( blockEditorStore );
+			const { getGroupingBlockName, getBlockType } =
+				select( blocksStore );
+			const clientIds = selectedClientIds?.length
+				? selectedClientIds
+				: getSelectedBlockClientIds();
+			const groupingBlockName = getGroupingBlockName();
 
-		const _clientIds = getSelectedBlockClientIds();
-		const _groupingBlockName = getGroupingBlockName();
+			const rootClientId = clientIds?.length
+				? getBlockRootClientId( clientIds[ 0 ] )
+				: undefined;
 
-		const rootClientId = !! _clientIds?.length
-			? getBlockRootClientId( _clientIds[ 0 ] )
-			: undefined;
+			const groupingBlockAvailable = canInsertBlockType(
+				groupingBlockName,
+				rootClientId
+			);
 
-		const groupingBlockAvailable = canInsertBlockType(
-			_groupingBlockName,
-			rootClientId
-		);
+			const blocksSelection = getBlocksByClientId( clientIds );
+			const isSingleBlockSelected = blocksSelection.length === 1;
+			const [ firstSelectedBlock ] = blocksSelection;
+			// A block is ungroupable if it is a single grouping block with inner blocks.
+			// If a block has an `ungroup` transform, it is also ungroupable, without the
+			// requirement of being the default grouping block.
+			// Do we have a single grouping Block selected and does that group have inner blocks?
+			const isUngroupable =
+				isSingleBlockSelected &&
+				( firstSelectedBlock.name === groupingBlockName ||
+					getBlockType( firstSelectedBlock.name )?.transforms
+						?.ungroup ) &&
+				!! firstSelectedBlock.innerBlocks.length;
 
-		const _blocksSelection = getBlocksByClientId( _clientIds );
+			// Do we have
+			// 1. Grouping block available to be inserted?
+			// 2. One or more blocks selected
+			const isGroupable =
+				groupingBlockAvailable && blocksSelection.length;
 
-		const isSingleGroupingBlock =
-			_blocksSelection.length === 1 &&
-			_blocksSelection[ 0 ]?.name === _groupingBlockName;
-
-		// Do we have
-		// 1. Grouping block available to be inserted?
-		// 2. One or more blocks selected
-		const _isGroupable = groupingBlockAvailable && _blocksSelection.length;
-
-		// Do we have a single Group Block selected and does that group have inner blocks?
-		const _isUngroupable =
-			isSingleGroupingBlock &&
-			!! _blocksSelection[ 0 ].innerBlocks.length;
-		return {
-			clientIds: _clientIds,
-			isGroupable: _isGroupable,
-			isUngroupable: _isUngroupable,
-			blocksSelection: _blocksSelection,
-			groupingBlockName: _groupingBlockName,
-		};
-	}, [] );
-	return {
-		clientIds,
-		isGroupable,
-		isUngroupable,
-		blocksSelection,
-		groupingBlockName,
-	};
+			return {
+				clientIds,
+				isGroupable,
+				isUngroupable,
+				blocksSelection,
+				groupingBlockName,
+				onUngroup:
+					isUngroupable &&
+					getBlockType( firstSelectedBlock.name )?.transforms
+						?.ungroup,
+			};
+		},
+		[ selectedClientIds ]
+	);
 }

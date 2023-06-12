@@ -14,6 +14,7 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
@@ -38,7 +39,13 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import {
+	getEditorCanvasContainerTitle,
+	useHasEditorCanvasContainer,
+} from '../editor-canvas-container';
+import { unlock } from '../../lock-unlock';
+
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +63,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		editorCanvasView,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -88,6 +96,9 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editorCanvasView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
 		};
 	}, [] );
 
@@ -117,7 +128,19 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const hasStyleBook = useHasStyleBook();
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		fixedToolbarCanBeFocused;
+
+	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -138,10 +161,13 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
+			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
+					shouldUseKeyboardFocusShortcut={
+						! blockToolbarCanBeFocused
+					}
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
 						<ToolbarItem
@@ -223,12 +249,16 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ ! hasDefaultEditorCanvasView ? (
+					getEditorCanvasContainerTitle( editorCanvasView )
+				) : (
+					<DocumentActions />
+				) }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

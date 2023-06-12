@@ -31,6 +31,7 @@ class PostTitle extends Component {
 		super( props );
 
 		this.setRef = this.setRef.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
 		// Unselect if any other block is selected and blur the RichText.
@@ -60,16 +61,31 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, plainText } ) {
+	onPaste( { value, onChange, plainText, html } ) {
+		const { title, onInsertBlockAfter, onUpdate } = this.props;
+
 		const content = pasteHandler( {
+			HTML: html,
 			plainText,
-			mode: 'INLINE',
-			tagName: 'p',
 		} );
 
-		if ( typeof content === 'string' ) {
-			const valueToInsert = create( { html: content } );
-			onChange( insert( value, valueToInsert ) );
+		if ( content.length ) {
+			if ( typeof content === 'string' ) {
+				const valueToInsert = create( { html: content } );
+				onChange( insert( value, valueToInsert ) );
+			} else {
+				const [ firstBlock ] = content;
+				if (
+					! title &&
+					( firstBlock.name === 'core/heading' ||
+						firstBlock.name === 'core/paragraph' )
+				) {
+					onUpdate( firstBlock.attributes.content );
+					onInsertBlockAfter( content.slice( 1 ) );
+				} else {
+					onInsertBlockAfter( content );
+				}
+			}
 		}
 	}
 
@@ -181,6 +197,7 @@ export default compose(
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),
+			title: getEditedPostAttribute( 'title' ),
 			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
 			isDimmed: selectionIsNested,
@@ -188,10 +205,10 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } =
+		const { undo, redo, togglePostTitleSelection, editPost } =
 			dispatch( editorStore );
 
-		const { clearSelectedBlock, insertDefaultBlock } =
+		const { clearSelectedBlock, insertDefaultBlock, insertBlocks } =
 			dispatch( blockEditorStore );
 
 		return {
@@ -206,6 +223,12 @@ export default compose(
 			},
 			onUnselect() {
 				togglePostTitleSelection( false );
+			},
+			onUpdate( title ) {
+				editPost( { title } );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, 0 );
 			},
 		};
 	} ),

@@ -27,7 +27,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should disable toolbar butons when open', async ( { page } ) => {
+	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
 		).not.toBeVisible();
@@ -39,9 +39,6 @@ test.describe( 'Style Book', () => {
 		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Redo"i]' )
-		).not.toBeVisible();
-		await expect(
-			page.locator( 'role=button[name="Show template details"i]' )
 		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="View"i]' )
@@ -59,37 +56,45 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
 
+		// Buttons to select block examples are rendered within the Style Book iframe.
+		const styleBookIframe = page.frameLocator(
+			'[name="style-book-canvas"]'
+		);
+
 		await expect(
-			page.locator(
-				'role=button[name="Open Headings styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Headings styles in Styles panel',
+			} )
 		).toBeVisible();
 		await expect(
-			page.locator(
-				'role=button[name="Open Paragraph styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Paragraph styles in Styles panel',
+			} )
 		).toBeVisible();
 
 		await page.click( 'role=tab[name="Media"i]' );
 
 		await expect(
-			page.locator(
-				'role=button[name="Open Image styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Image styles in Styles panel',
+			} )
 		).toBeVisible();
 		await expect(
-			page.locator(
-				'role=button[name="Open Gallery styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Gallery styles in Styles panel',
+			} )
 		).toBeVisible();
 	} );
 
 	test( 'should open correct Global Styles panel when example is clicked', async ( {
 		page,
 	} ) => {
-		await page.click(
-			'role=button[name="Open Headings styles in Styles panel"i]'
-		);
+		await page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'button', {
+				name: 'Open Headings styles in Styles panel',
+			} )
+			.click();
 
 		await expect(
 			page.locator(
@@ -103,11 +108,13 @@ test.describe( 'Style Book', () => {
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
 		await page.click( 'role=button[name="Heading block styles"]' );
-		await page.click( 'role=button[name="Typography styles"]' );
 
-		await page.click(
-			'role=button[name="Open Quote styles in Styles panel"i]'
-		);
+		await page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'button', {
+				name: 'Open Quote styles in Styles panel',
+			} )
+			.click();
 
 		await page.click( 'role=button[name="Navigate to the previous view"]' );
 		await page.click( 'role=button[name="Navigate to the previous view"]' );
@@ -155,18 +162,11 @@ class StyleBook {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async open() {
-		await this.disableWelcomeGuide();
-		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Style Book"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+		await this.page.getByRole( 'button', { name: 'Style Book' } ).click();
 	}
 }

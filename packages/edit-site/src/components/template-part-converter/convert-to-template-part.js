@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -78,18 +75,14 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 
 	return (
 		<>
-			<BlockSettingsMenuControls>
-				{ () => (
-					<MenuItem
-						icon={ symbolFilled }
-						onClick={ () => {
-							setIsModalOpen( true );
-						} }
-					>
-						{ __( 'Create Template part' ) }
-					</MenuItem>
-				) }
-			</BlockSettingsMenuControls>
+			<MenuItem
+				icon={ symbolFilled }
+				onClick={ () => {
+					setIsModalOpen( true );
+				} }
+			>
+				{ __( 'Create Template part' ) }
+			</MenuItem>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => {

@@ -126,16 +126,19 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						required
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display author' ) }
 						checked={ displayAuthor }
 						onChange={ toggleAttribute( 'displayAuthor' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display date' ) }
 						checked={ displayDate }
 						onChange={ toggleAttribute( 'displayDate' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display excerpt' ) }
 						checked={ displayExcerpt }
 						onChange={ toggleAttribute( 'displayExcerpt' ) }

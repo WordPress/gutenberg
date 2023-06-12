@@ -93,6 +93,31 @@ describe( 'Columns block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
+		it( 'adds at least 15 Column blocks without limitation', async () => {
+			const screen = await initializeEditor( {
+				initialHtml: TWO_COLUMNS_BLOCK_HTML,
+			} );
+			const { getByLabelText } = screen;
+
+			// Get block
+			const columnsBlock = await getBlock( screen, 'Columns' );
+			fireEvent.press( columnsBlock );
+
+			// Open block settings
+			await openBlockSettings( screen );
+
+			// Update the number of columns
+			const columnsControl = getByLabelText( /Number of columns/ );
+
+			for ( let x = 0; x < 15; x++ ) {
+				fireEvent( columnsControl, 'accessibilityAction', {
+					nativeEvent: { actionName: 'increment' },
+				} );
+			}
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
 		it( 'removes a column block when decrementing the value', async () => {
 			const screen = await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,

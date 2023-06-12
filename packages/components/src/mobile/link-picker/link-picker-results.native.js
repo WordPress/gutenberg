@@ -74,6 +74,9 @@ export default function LinkPickerResults( {
 		return {
 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
+		// Disable eslint rule for now, to avoid introducing a regression
+		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	// Prevent setting state when unmounted.

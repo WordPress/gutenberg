@@ -146,7 +146,7 @@ export function usePostTypeArchiveMenuItems() {
 						description: sprintf(
 							// translators: %s: Name of the post type e.g: "Post".
 							__(
-								'Displays an archive with the latests posts of type: %s.'
+								'Displays an archive with the latest posts of type: %s.'
 							),
 							postType.labels.singular_name
 						),

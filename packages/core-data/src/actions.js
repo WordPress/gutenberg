@@ -18,6 +18,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
+import { getUndoEdits, getRedoEdits } from './private-selectors';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -211,6 +212,25 @@ export function receiveThemeSupports() {
 }
 
 /**
+ * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {number} currentId The post id.
+ * @param {Array}  revisions The global styles revisions.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
+		currentId,
+		revisions,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  * Ignored from documentation as it's internal to the data store.
@@ -387,14 +407,14 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoEdit();
+		// Todo: we shouldn't have to pass "root" here.
+		const undoEdit = select( ( state ) => getUndoEdits( state.root ) );
 		if ( ! undoEdit ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...undoEdit,
-			meta: { isUndo: true },
+			type: 'UNDO',
+			stackedEdits: undoEdit,
 		} );
 	};
 
@@ -405,14 +425,14 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getRedoEdit();
+		// Todo: we shouldn't have to pass "root" here.
+		const redoEdit = select( ( state ) => getRedoEdits( state.root ) );
 		if ( ! redoEdit ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...redoEdit,
-			meta: { isRedo: true },
+			type: 'REDO',
+			stackedEdits: redoEdit,
 		} );
 	};
 
@@ -832,5 +852,19 @@ export function receiveAutosaves( postId, autosaves ) {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
+	};
+}
+
+/**
+ * Returns an action object signalling that the fallback Navigation
+ * Menu id has been received.
+ *
+ * @param {integer} fallbackId the id of the fallback Navigation Menu
+ * @return {Object} Action object.
+ */
+export function receiveNavigationFallbackId( fallbackId ) {
+	return {
+		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',
+		fallbackId,
 	};
 }

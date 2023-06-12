@@ -83,7 +83,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		isListViewOpened,
 		showIconLabels,
-		isDistractionFreeMode,
+		isDistractionFree,
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
@@ -116,7 +116,7 @@ function Layout( { styles } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFreeMode:
+			isDistractionFree:
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
@@ -125,8 +125,6 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
-
-	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -164,7 +162,7 @@ function Layout( { styles } ) {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
-		'is-distraction-free': isDistractionFree,
+		'is-distraction-free': isDistractionFree && isLargeViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
 
@@ -206,7 +204,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				isDistractionFree={ isDistractionFree }
+				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -252,7 +250,7 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isTemplateMode && (
+						{ ! isDistractionFree && ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
@@ -265,8 +263,8 @@ function Layout( { styles } ) {
 				}
 				footer={
 					! isDistractionFree &&
-					showBlockBreadcrumbs &&
 					! isMobileViewport &&
+					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">

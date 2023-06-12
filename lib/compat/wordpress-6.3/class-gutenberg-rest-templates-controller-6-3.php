@@ -9,7 +9,7 @@
 /**
  * Base Templates REST API Controller.
  */
-class Gutenberg_REST_Templates_Controller_6_3 extends Gutenberg_REST_Templates_Controller {
+class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controller {
 
 	/**
 	 * Registers the controllers routes.

@@ -3,11 +3,37 @@
  */
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation, useHistory } from '../routes';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+
+export function getPathFromURL( urlParams ) {
+	let path = urlParams?.path ?? '/';
+
+	// Compute the navigator path based on the URL params.
+	if ( urlParams?.postType && urlParams?.postId ) {
+		switch ( urlParams.postType ) {
+			case 'wp_template':
+			case 'wp_template_part':
+			case 'page':
+				path = `/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
+				break;
+			default:
+				path = `/navigation/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
+		}
+	}
+
+	return path;
+}
 
 export default function useSyncPathWithURL() {
 	const history = useHistory();
@@ -18,13 +44,17 @@ export default function useSyncPathWithURL() {
 		goTo,
 	} = useNavigator();
 	const currentUrlParams = useRef( urlParams );
-	const currentPath = useRef();
+	const currentPath = useRef( navigatorLocation.path );
+	const isMounting = useRef( true );
 
 	useEffect( () => {
-		// Don't trust the navigator path on initial render.
-		if ( currentPath.current === null ) {
+		// The navigatorParams are only initially filled properly when the
+		// navigator screens mount. so we ignore the first synchronisation.
+		if ( isMounting.current ) {
+			isMounting.current = false;
 			return;
 		}
+
 		function updateUrlParams( newUrlParams ) {
 			if (
 				Object.entries( newUrlParams ).every( ( [ key, value ] ) => {
@@ -47,51 +77,33 @@ export default function useSyncPathWithURL() {
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );
-		} else if ( navigatorParams?.postType && ! navigatorParams?.postId ) {
+		} else if (
+			navigatorLocation.path.startsWith( '/page/' ) &&
+			navigatorParams?.postId
+		) {
 			updateUrlParams( {
-				postType: navigatorParams?.postType,
-				path: navigatorLocation.path,
-				postId: undefined,
+				postType: 'page',
+				postId: navigatorParams?.postId,
+				path: undefined,
 			} );
 		} else {
 			updateUrlParams( {
 				postType: undefined,
 				postId: undefined,
-				path: navigatorLocation.path,
+				path:
+					navigatorLocation.path === '/'
+						? undefined
+						: navigatorLocation.path,
 			} );
 		}
 	}, [ navigatorLocation?.path, navigatorParams, history ] );
 
 	useEffect( () => {
 		currentUrlParams.current = urlParams;
-		let path = urlParams?.path ?? '/';
-
-		// Compute the navigator path based on the URL params.
-		if (
-			urlParams?.postType &&
-			urlParams?.postId &&
-			// This is just a special case to support old WP versions that perform redirects.
-			// This code should be removed when we minimum WP version becomes 6.2.
-			urlParams?.postId !== 'none'
-		) {
-			switch ( urlParams.postType ) {
-				case 'wp_template':
-				case 'wp_template_part':
-					path = `/${ encodeURIComponent(
-						urlParams.postType
-					) }/${ encodeURIComponent( urlParams.postId ) }`;
-					break;
-				default:
-					path = `/navigation/${ encodeURIComponent(
-						urlParams.postType
-					) }/${ encodeURIComponent( urlParams.postId ) }`;
-			}
-		}
-
+		const path = getPathFromURL( urlParams );
 		if ( currentPath.current !== path ) {
 			currentPath.current = path;
 			goTo( path );
 		}
-		goTo( path );
 	}, [ urlParams, goTo ] );
 }

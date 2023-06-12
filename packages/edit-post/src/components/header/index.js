@@ -15,9 +15,10 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import TemplateTitle from './template-title';
+import DocumentTitle from './document-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -69,7 +70,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar />
-				<TemplateTitle />
+				<div className="edit-post-header__document-title">
+					<DocumentTitle />
+				</div>
 			</motion.div>
 			<motion.div
 				variants={ slideY }
@@ -88,6 +91,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
+				<ViewLink />
 				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
