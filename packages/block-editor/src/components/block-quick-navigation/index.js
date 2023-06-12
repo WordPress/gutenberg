@@ -69,7 +69,6 @@ function BlockQuickNavigationItem( { clientId } ) {
 
 	return (
 		<Button
-			key={ clientId }
 			isPressed={ isSelected }
 			onClick={ () => selectBlock( clientId ) }
 		>
