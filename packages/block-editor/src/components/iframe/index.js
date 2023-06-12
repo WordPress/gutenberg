@@ -226,7 +226,7 @@ function Iframe( {
 	// content.
 	const html =
 		'<!doctype html>' +
-		'<style>html{height:auto!important;}body{margin:0}</style>' +
+		'<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>' +
 		( assets?.styles ?? '' );
 
 	const [ src, cleanup ] = useMemo( () => {
