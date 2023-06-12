@@ -3,7 +3,7 @@
 // on apiFetch this query is limited to 100.
 export const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	per_page: 100,
-	status: 'publish',
+	status: [ 'publish', 'draft' ],
 	order: 'desc',
 	orderby: 'date',
 };
