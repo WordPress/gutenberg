@@ -247,50 +247,6 @@ export function BlockSettingsDropdown( {
 					align="start"
 					side="bottom"
 					sideOffset={ 12 }
-					menuProps={ {
-						/**
-						 * @param {KeyboardEvent} event
-						 */
-						onKeyDown( event ) {
-							if ( event.defaultPrevented ) return;
-
-							if (
-								isMatch( 'core/block-editor/remove', event ) &&
-								canRemove
-							) {
-								event.preventDefault();
-								updateSelectionAfterRemove( onRemove() );
-							} else if (
-								isMatch(
-									'core/block-editor/duplicate',
-									event
-								) &&
-								canDuplicate
-							) {
-								event.preventDefault();
-								updateSelectionAfterDuplicate( onDuplicate() );
-							} else if (
-								isMatch(
-									'core/block-editor/insert-after',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								onInsertAfter();
-							} else if (
-								isMatch(
-									'core/block-editor/insert-before',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								onInsertBefore();
-							}
-						},
-					} }
-					// Missing: onkeydown on the menu
 					// Missing: pressing esc is not just closing the menu, but also the toolbar?
 					{ ...props }
 				>
