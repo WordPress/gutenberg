@@ -6,7 +6,10 @@ import {
 	serialize,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import {
@@ -32,11 +35,14 @@ import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-it
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
 import { useShowMoversGestures } from '../block-toolbar/utils';
+import { unlock } from '../../lock-unlock';
 
-const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover',
-	placement: 'bottom-start',
-};
+const {
+	DropdownMenuV2,
+	DropdownMenuGroupV2,
+	DropdownMenuItemV2,
+	DropdownMenuSeparatorV2,
+} = unlock( componentsPrivateApis );
 
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
@@ -51,6 +57,8 @@ export function BlockSettingsDropdown( {
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
+	toggleProps,
+	// Investigate which props are usually forwarded to this component
 	...props
 } ) {
 	const blockClientIds = Array.isArray( clientIds )
@@ -203,12 +211,18 @@ export function BlockSettingsDropdown( {
 				onMoveTo,
 				blocks,
 			} ) => (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Options' ) }
-					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
-					noIcons
+				<DropdownMenuV2
+					trigger={
+						<Button
+							{ ...toggleProps }
+							__next40pxDefaultSize
+							label={ __( 'Options' ) }
+							icon={ moreVertical }
+						/>
+					}
+					align="start"
+					side="bottom"
+					sideOffset={ 12 }
 					menuProps={ {
 						/**
 						 * @param {KeyboardEvent} event
@@ -252,6 +266,8 @@ export function BlockSettingsDropdown( {
 							}
 						},
 					} }
+					// Missing: onkeydown on the menu
+					// Missing: pressing esc is not just closing the menu, but also the toolbar?
 					{ ...props }
 				>
 					{ ( { onClose } ) => (
@@ -378,7 +394,7 @@ export function BlockSettingsDropdown( {
 							) }
 						</>
 					) }
-				</DropdownMenu>
+				</DropdownMenuV2>
 			) }
 		</BlockActions>
 	);
