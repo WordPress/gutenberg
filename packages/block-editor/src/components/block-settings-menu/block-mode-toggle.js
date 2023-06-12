@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -11,6 +11,9 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 const noop = () => {};
 
@@ -32,7 +35,13 @@ export function BlockModeToggle( {
 	const label =
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
+	return (
+		// TODO: should prevent default?
+		// TODO: check if this used in other legacy dropdown menus
+		<DropdownMenuItemV2 onSelect={ onToggleMode }>
+			{ ! small && label }
+		</DropdownMenuItemV2>
+	);
 }
 
 export default compose( [

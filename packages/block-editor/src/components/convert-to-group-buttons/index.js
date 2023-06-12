@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
@@ -12,6 +12,9 @@ import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
 import BlockGroupToolbar from './toolbar';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 function ConvertToGroupButton( {
 	clientIds,
@@ -20,7 +23,8 @@ function ConvertToGroupButton( {
 	onUngroup,
 	blocksSelection,
 	groupingBlockName,
-	onClose = () => {},
+	// TODO: onclose
+	// onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
@@ -52,30 +56,31 @@ function ConvertToGroupButton( {
 		return null;
 	}
 
+	// TODO: check if this used in other legacy dropdown menus
 	return (
 		<>
 			{ isGroupable && (
-				<MenuItem
-					onClick={ () => {
+				<DropdownMenuItemV2
+					onSelect={ () => {
 						onConvertToGroup();
-						onClose();
+						// onClose();
 					} }
 				>
 					{ _x( 'Group', 'verb' ) }
-				</MenuItem>
+				</DropdownMenuItemV2>
 			) }
 			{ isUngroupable && (
-				<MenuItem
+				<DropdownMenuItemV2
 					onClick={ () => {
 						onConvertFromGroup();
-						onClose();
+						// onClose();
 					} }
 				>
 					{ _x(
 						'Ungroup',
 						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
 					) }
-				</MenuItem>
+				</DropdownMenuItemV2>
 			) }
 		</>
 	);

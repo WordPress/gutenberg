@@ -3,9 +3,8 @@
  */
 import {
 	createSlotFill,
-	MenuGroup,
-	MenuItem,
 	__experimentalStyleProvider as StyleProvider,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { pipe } from '@wordpress/compose';
@@ -21,8 +20,13 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
+import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
+
+const { DropdownMenuGroupV2, DropdownMenuItemV2 } = unlock(
+	componentsPrivateApis
+);
 
 const BlockSettingsMenuControlsSlot = ( {
 	fillProps,
@@ -77,7 +81,9 @@ const BlockSettingsMenuControlsSlot = ( {
 				}
 
 				return (
-					<MenuGroup>
+					// TODO: separator?
+					// TODO: check if this used in other legacy dropdown menus
+					<DropdownMenuGroupV2>
 						{ showConvertToGroupButton && (
 							<ConvertToGroupButton
 								{ ...convertToGroupButtonProps }
@@ -91,14 +97,15 @@ const BlockSettingsMenuControlsSlot = ( {
 						) }
 						{ fills }
 						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
-							<MenuItem
-								onClick={ pipe(
-									fillProps?.onClose,
+							<DropdownMenuItemV2
+								onSelect={ pipe(
+									// TODO: onclose?
+									// fillProps?.onClose,
 									fillProps?.onMoveTo
 								) }
 							>
 								{ __( 'Move to' ) }
-							</MenuItem>
+							</DropdownMenuItemV2>
 						) }
 						{ fillProps?.count === 1 && (
 							<BlockModeToggle
@@ -106,7 +113,7 @@ const BlockSettingsMenuControlsSlot = ( {
 								onToggle={ fillProps?.onClose }
 							/>
 						) }
-					</MenuGroup>
+					</DropdownMenuGroupV2>
 				);
 			} }
 		</Slot>
