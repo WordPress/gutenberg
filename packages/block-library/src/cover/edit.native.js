@@ -393,7 +393,11 @@ const Cover = ( {
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
-						bottomLabelText={ __( 'Select a color' ) }
+						bottomLabelText={
+							customOverlayColor
+								? customOverlayColor
+								: __( 'Select a color' )
+						}
 					/>
 				) }
 			</BottomSheetConsumer>
