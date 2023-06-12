@@ -45,6 +45,7 @@
 						"name": "core/post-template",
 						"isValid": true,
 						"attributes": {
+							"tagName": "ul",
 							"fontSize": "large",
 							"layout": {
 								"type": "grid",

@@ -2,7 +2,9 @@
 	{
 		"name": "core/post-template",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"tagName": "ul"
+		},
 		"innerBlocks": []
 	}
 ]
