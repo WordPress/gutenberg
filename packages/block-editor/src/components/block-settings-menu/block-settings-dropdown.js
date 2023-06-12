@@ -49,7 +49,11 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+	return (
+		<DropdownMenuItemV2 ref={ ref }>
+			{ copyMenuItemLabel }
+		</DropdownMenuItemV2>
+	);
 }
 
 const ShortcutItemSuffix = ( { shortcut, className } ) => {
@@ -294,128 +298,135 @@ export function BlockSettingsDropdown( {
 					// Missing: pressing esc is not just closing the menu, but also the toolbar?
 					{ ...props }
 				>
-					{ ( { onClose } ) => (
-						<>
-							<MenuGroup>
-								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
-								/>
-								{ ! parentBlockIsSelected &&
-									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
-											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
-									) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-								/>
-								{ canDuplicate && (
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onDuplicate,
-											updateSelectionAfterDuplicate
-										) }
-										shortcut={ shortcuts.duplicate }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
-								) }
-								{ canInsertDefaultBlock && (
-									<>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertBefore
-											) }
-											shortcut={ shortcuts.insertBefore }
-										>
-											{ __( 'Add before' ) }
-										</MenuItem>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertAfter
-											) }
-											shortcut={ shortcuts.insertAfter }
-										>
-											{ __( 'Add after' ) }
-										</MenuItem>
-									</>
-								) }
-							</MenuGroup>
-							{ canCopyStyles && (
-								<MenuGroup>
-									<CopyMenuItem
-										blocks={ blocks }
-										onCopy={ onCopy }
-										label={ __( 'Copy styles' ) }
-									/>
-									<MenuItem onClick={ onPasteStyles }>
-										{ __( 'Paste styles' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<BlockSettingsMenuControls.Slot
-								fillProps={ {
-									onClose,
-									canMove,
-									onMoveTo,
-									onlyBlock,
-									count,
-									firstBlockClientId,
-								} }
-								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
+					<DropdownMenuGroupV2>
+						<__unstableBlockSettingsMenuFirstItem.Slot
+						// fillProps={ { onClose } } TODO: onClose missing
+						/>
+						{ ! parentBlockIsSelected && !! firstParentClientId && (
+							<DropdownMenuItemV2
+								// TODO: add onMouseMove and onMouseLeave to dropdownmenuitem
+								{ ...showParentOutlineGestures }
+								ref={ selectParentButtonRef }
+								prefix={
+									<BlockIcon icon={ parentBlockType.icon } />
 								}
+								onSelect={ () =>
+									selectBlock( firstParentClientId )
+								}
+							>
+								{ sprintf(
+									/* translators: %s: Name of the block's parent. */
+									__( 'Select parent block (%s)' ),
+									parentBlockType.title
+								) }
+							</DropdownMenuItemV2>
+						) }
+						{ count === 1 && (
+							<BlockHTMLConvertButton
+								clientId={ firstBlockClientId }
 							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
-							{ canRemove && (
-								<MenuGroup>
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onRemove,
-											updateSelectionAfterRemove
-										) }
-										shortcut={ shortcuts.remove }
-									>
-										{ removeBlockLabel }
-									</MenuItem>
-								</MenuGroup>
-							) }
+						) }
+						<CopyMenuItem blocks={ blocks } onCopy={ onCopy } />
+						{ canDuplicate && (
+							<DropdownMenuItemV2
+								onSelect={ pipe(
+									// onClose, TODO: missing onClose
+									onDuplicate,
+									updateSelectionAfterDuplicate
+								) }
+								suffix={
+									<ShortcutItemSuffix
+										shortcut={ shortcuts.duplicate }
+									/>
+								}
+							>
+								{ __( 'Duplicate' ) }
+							</DropdownMenuItemV2>
+						) }
+						{ canInsertDefaultBlock && (
+							<>
+								<DropdownMenuItemV2
+									onSelect={ pipe(
+										// onClose, TODO: add onClose
+										onInsertBefore
+									) }
+									suffix={
+										<ShortcutItemSuffix
+											shortcut={ shortcuts.insertBefore }
+										/>
+									}
+								>
+									{ __( 'Add before' ) }
+								</DropdownMenuItemV2>
+								<DropdownMenuItemV2
+									onSelect={ pipe(
+										// onClose, TODO: add onClose
+										onInsertAfter
+									) }
+									suffix={
+										<ShortcutItemSuffix
+											shortcut={ shortcuts.insertAfter }
+										/>
+									}
+								>
+									{ __( 'Add after' ) }
+								</DropdownMenuItemV2>
+							</>
+						) }
+					</DropdownMenuGroupV2>
+					<DropdownMenuSeparatorV2 />
+					{ canCopyStyles && (
+						<DropdownMenuGroupV2>
+							<CopyMenuItem
+								blocks={ blocks }
+								onCopy={ onCopy }
+								label={ __( 'Copy styles' ) }
+							/>
+							<DropdownMenuItemV2 onSelect={ onPasteStyles }>
+								{ __( 'Paste styles' ) }
+							</DropdownMenuItemV2>
+						</DropdownMenuGroupV2>
+					) }
+					<BlockSettingsMenuControls.Slot
+						fillProps={ {
+							// onClose,
+							canMove,
+							onMoveTo,
+							onlyBlock,
+							count,
+							firstBlockClientId,
+						} }
+						clientIds={ clientIds }
+						__unstableDisplayLocation={ __unstableDisplayLocation }
+					/>
+					{ typeof children === 'function'
+						? children( {
+								/*onClose*/
+						  } )
+						: Children.map( ( child ) =>
+								cloneElement( child, {
+									/*onClose*/
+								} )
+						  ) }
+					{ canRemove && (
+						<>
+							<DropdownMenuSeparatorV2 />
+							<DropdownMenuGroupV2>
+								<DropdownMenuItemV2
+									onClick={ pipe(
+										// onClose,
+										onRemove,
+										updateSelectionAfterRemove
+									) }
+									suffix={
+										<ShortcutItemSuffix
+											shortcut={ shortcuts.remove }
+										/>
+									}
+								>
+									{ removeBlockLabel }
+								</DropdownMenuItemV2>
+							</DropdownMenuGroupV2>
 						</>
 					) }
 				</DropdownMenuV2>
