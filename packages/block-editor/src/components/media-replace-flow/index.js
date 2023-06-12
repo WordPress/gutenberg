@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -38,6 +38,7 @@ import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+let uniqueId = 0;
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -58,15 +59,14 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	popoverProps,
 } ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
+	const canUpload = !! mediaUpload;
 	const editMediaButtonRef = useRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
+	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -94,7 +94,6 @@ const MediaReplaceFlow = ( {
 			onToggleFeaturedImage();
 		}
 		closeMenu();
-		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
@@ -138,13 +137,9 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
-	const POPOVER_PROPS = {
-		isAlternate: true,
-	};
-
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={ popoverProps }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarButton
@@ -160,7 +155,7 @@ const MediaReplaceFlow = ( {
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
-						<>
+						<MediaUploadCheck>
 							<MediaUpload
 								gallery={ gallery }
 								addToGallery={ addToGallery }
@@ -179,28 +174,26 @@ const MediaReplaceFlow = ( {
 									</MenuItem>
 								) }
 							/>
-							<MediaUploadCheck>
-								<FormFileUpload
-									onChange={ ( event ) => {
-										uploadFiles( event, onClose );
-									} }
-									accept={ accept }
-									multiple={ multiple }
-									render={ ( { openFileDialog } ) => {
-										return (
-											<MenuItem
-												icon={ upload }
-												onClick={ () => {
-													openFileDialog();
-												} }
-											>
-												{ __( 'Upload' ) }
-											</MenuItem>
-										);
-									} }
-								/>
-							</MediaUploadCheck>
-						</>
+							<FormFileUpload
+								onChange={ ( event ) => {
+									uploadFiles( event, onClose );
+								} }
+								accept={ accept }
+								multiple={ multiple }
+								render={ ( { openFileDialog } ) => {
+									return (
+										<MenuItem
+											icon={ upload }
+											onClick={ () => {
+												openFileDialog();
+											} }
+										>
+											{ __( 'Upload' ) }
+										</MenuItem>
+									);
+								} }
+							/>
+						</MediaUploadCheck>
 						{ onToggleFeaturedImage && (
 							<MenuItem
 								icon={ postFeaturedImage }
@@ -214,19 +207,26 @@ const MediaReplaceFlow = ( {
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						<form className="block-editor-media-flow__url-input">
+						<form
+							className={ classnames(
+								'block-editor-media-flow__url-input',
+								{
+									'has-siblings':
+										canUpload || onToggleFeaturedImage,
+								}
+							) }
+						>
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURLValue } position="bottom">
+							<Tooltip text={ mediaURL } position="bottom">
 								<div>
 									<LinkControl
-										value={ { url: mediaURLValue } }
+										value={ { url: mediaURL } }
 										settings={ [] }
 										showSuggestions={ false }
 										onChange={ ( { url } ) => {
-											setMediaURLValue( url );
 											onSelectURL( url );
 											editMediaButtonRef.current.focus();
 										} }

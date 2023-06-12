@@ -100,6 +100,22 @@ describe( 'block parser', () => {
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
+		it( 'skips adding paragraph tags if __unstableSkipAutop is passed as an option', () => {
+			registerBlockType( 'core/freeform-block', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform-block' );
+
+			const block = parseRawBlock(
+				{
+					innerHTML: 'content',
+				},
+				{
+					__unstableSkipAutop: true,
+				}
+			);
+			expect( block.name ).toEqual( 'core/freeform-block' );
+			expect( block.attributes ).toEqual( { content: 'content' } );
+		} );
+
 		it( 'should not create a block if no unknown type handler', () => {
 			const block = parseRawBlock( {
 				blockName: 'core/test-block',

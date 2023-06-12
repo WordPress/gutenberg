@@ -17,7 +17,8 @@
 }
 
 .wp-block-spacer.is-hovered .block-library-spacer__resize-container,
-.block-library-spacer__resize-container.has-show-handle {
+.block-library-spacer__resize-container.has-show-handle,
+.wp-block-spacer.is-selected.custom-sizes-disabled {
 	background: rgba($black, 0.1);
 
 	.is-dark-theme & {

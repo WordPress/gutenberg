@@ -1,40 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BlockView should match snapshot 1`] = `
-<div
-  className="class"
->
+<div>
   <div
-    className="block-editor-block-compare__content"
+    class="class"
   >
-    <h2
-      className="block-editor-block-compare__heading"
-    >
-      title
-    </h2>
     <div
-      className="block-editor-block-compare__html"
+      class="block-editor-block-compare__content"
     >
-      raw
+      <h2
+        class="block-editor-block-compare__heading"
+      >
+        title
+      </h2>
+      <div
+        class="block-editor-block-compare__html"
+      >
+        raw
+      </div>
+      <div
+        class="block-editor-block-compare__preview edit-post-visual-editor"
+      >
+        <div>
+          render
+        </div>
+      </div>
     </div>
     <div
-      className="block-editor-block-compare__preview edit-post-visual-editor"
+      class="block-editor-block-compare__action"
     >
-      <RawHTML>
-        render
-      </RawHTML>
+      <button
+        class="components-button is-secondary"
+        tabindex="0"
+        type="button"
+      >
+        action
+      </button>
     </div>
-  </div>
-  <div
-    className="block-editor-block-compare__action"
-  >
-    <ForwardRef(Button)
-      onClick={[Function]}
-      tabIndex="0"
-      variant="secondary"
-    >
-      action
-    </ForwardRef(Button)>
   </div>
 </div>
 `;

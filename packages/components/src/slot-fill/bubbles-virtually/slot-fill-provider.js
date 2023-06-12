@@ -1,8 +1,14 @@
 // @ts-nocheck
 /**
+ * External dependencies
+ */
+import { ref as valRef } from 'valtio';
+import { proxyMap } from 'valtio/utils';
+
+/**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -10,102 +16,77 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import SlotFillContext from './slot-fill-context';
 
-function useSlotRegistry() {
-	const [ slots, setSlots ] = useState( {} );
-	const [ fills, setFills ] = useState( {} );
+function createSlotRegistry() {
+	const slots = proxyMap();
+	const fills = proxyMap();
 
-	const registerSlot = useCallback( ( name, ref, fillProps ) => {
-		setSlots( ( prevSlots ) => {
-			const slot = prevSlots[ name ] || {};
-			return {
-				...prevSlots,
-				[ name ]: {
-					...slot,
-					ref: ref || slot.ref,
-					fillProps: fillProps || slot.fillProps || {},
-				},
-			};
-		} );
-	}, [] );
+	function registerSlot( name, ref, fillProps ) {
+		const slot = slots.get( name ) || {};
+		slots.set(
+			name,
+			valRef( {
+				...slot,
+				ref: ref || slot.ref,
+				fillProps: fillProps || slot.fillProps || {},
+			} )
+		);
+	}
 
-	const unregisterSlot = useCallback( ( name, ref ) => {
-		setSlots( ( prevSlots ) => {
-			const { [ name ]: slot, ...nextSlots } = prevSlots;
-			// Make sure we're not unregistering a slot registered by another element
-			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
-			if ( slot?.ref === ref ) {
-				return nextSlots;
-			}
-			return prevSlots;
-		} );
-	}, [] );
+	function unregisterSlot( name, ref ) {
+		// Make sure we're not unregistering a slot registered by another element
+		// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+		if ( slots.get( name )?.ref === ref ) {
+			slots.delete( name );
+		}
+	}
 
-	const updateSlot = useCallback(
-		( name, fillProps ) => {
-			const slot = slots[ name ];
-			if ( ! slot ) {
-				return;
-			}
-			if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
-				slot.fillProps = fillProps;
-				const slotFills = fills[ name ];
-				if ( slotFills ) {
-					// Force update fills.
-					slotFills.map( ( fill ) => fill.current.rerender() );
-				}
-			}
-		},
-		[ slots, fills ]
-	);
+	function updateSlot( name, fillProps ) {
+		const slot = slots.get( name );
+		if ( ! slot ) {
+			return;
+		}
 
-	const registerFill = useCallback( ( name, ref ) => {
-		setFills( ( prevFills ) => ( {
-			...prevFills,
-			[ name ]: [ ...( prevFills[ name ] || [] ), ref ],
-		} ) );
-	}, [] );
+		if ( isShallowEqual( slot.fillProps, fillProps ) ) {
+			return;
+		}
 
-	const unregisterFill = useCallback( ( name, ref ) => {
-		setFills( ( prevFills ) => {
-			if ( prevFills[ name ] ) {
-				return {
-					...prevFills,
-					[ name ]: prevFills[ name ].filter(
-						( fillRef ) => fillRef !== ref
-					),
-				};
-			}
-			return prevFills;
-		} );
-	}, [] );
+		slot.fillProps = fillProps;
+		const slotFills = fills.get( name );
+		if ( slotFills ) {
+			// Force update fills.
+			slotFills.map( ( fill ) => fill.current.rerender() );
+		}
+	}
 
-	// Memoizing the return value so it can be directly passed to Provider value
-	const registry = useMemo(
-		() => ( {
-			slots,
-			fills,
-			registerSlot,
-			updateSlot,
-			unregisterSlot,
-			registerFill,
-			unregisterFill,
-		} ),
-		[
-			slots,
-			fills,
-			registerSlot,
-			updateSlot,
-			unregisterSlot,
-			registerFill,
-			unregisterFill,
-		]
-	);
+	function registerFill( name, ref ) {
+		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
+	}
 
-	return registry;
+	function unregisterFill( name, ref ) {
+		const fillsForName = fills.get( name );
+		if ( ! fillsForName ) {
+			return;
+		}
+
+		fills.set(
+			name,
+			valRef( fillsForName.filter( ( fillRef ) => fillRef !== ref ) )
+		);
+	}
+
+	return {
+		slots,
+		fills,
+		registerSlot,
+		updateSlot,
+		unregisterSlot,
+		registerFill,
+		unregisterFill,
+	};
 }
 
 export default function SlotFillProvider( { children } ) {
-	const registry = useSlotRegistry();
+	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>
 			{ children }

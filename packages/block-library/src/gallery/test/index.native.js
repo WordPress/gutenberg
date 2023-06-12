@@ -3,17 +3,24 @@
  */
 import {
 	act,
+	typeInRichText,
+	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
-	fireEvent,
+	openBlockSettings,
+	setupCoreBlocks,
+	setupMediaPicker,
+	setupMediaUpload,
+	triggerBlockListLayout,
 	within,
+	setupPicker,
 } from 'test/helpers';
+import { ActionSheetIOS } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import { Platform } from '@wordpress/element';
 import {
 	getOtherMediaOptions,
@@ -28,13 +35,14 @@ import {
 	addGalleryBlock,
 	initializeWithGalleryBlock,
 	getGalleryItem,
-	setupMediaUpload,
 	generateGalleryBlock,
-	setCaption,
-	setupMediaPicker,
-	triggerGalleryLayout,
-	openBlockSettings,
 } from './helpers';
+
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'WordPress Media Library',
+];
 
 const media = [
 	{
@@ -57,23 +65,13 @@ const media = [
 	},
 ];
 
-beforeAll( () => {
-	// Register all core blocks
-	registerCoreBlocks();
-} );
-
-afterAll( () => {
-	// Clean up registered blocks
-	getBlockTypes().forEach( ( block ) => {
-		unregisterBlockType( block.name );
-	} );
-} );
+setupCoreBlocks();
 
 describe( 'Gallery block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel } = await addGalleryBlock();
+		const screen = await addGalleryBlock();
 
-		expect( getByA11yLabel( /Gallery Block\. Row 1/ ) ).toBeVisible();
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
@@ -106,11 +104,46 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 	} );
 
+	it( 'displays correct media options picker', async () => {
+		// Initialize with an empty gallery
+		const screen = await initializeEditor( {
+			initialHtml: generateGalleryBlock( 0 ),
+		} );
+		const { getByText } = screen;
+
+		// Tap on Gallery block
+		const block = await getBlock( screen, 'Gallery' );
+		fireEvent.press( block );
+		fireEvent.press( within( block ).getByText( 'ADD MEDIA' ) );
+
+		// Observe that media options picker is displayed
+		/* eslint-disable jest/no-conditional-expect */
+		if ( Platform.isIOS ) {
+			// On iOS the picker is rendered natively, so we have
+			// to check the arguments passed to `ActionSheetIOS`.
+			expect(
+				ActionSheetIOS.showActionSheetWithOptions
+			).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Choose images',
+					options: [ 'Cancel', ...MEDIA_OPTIONS ],
+				} ),
+				expect.any( Function )
+			);
+		} else {
+			expect( getByText( 'Choose images' ) ).toBeVisible();
+			MEDIA_OPTIONS.forEach( ( option ) =>
+				expect( getByText( option ) ).toBeVisible()
+			);
+		}
+		/* eslint-enable jest/no-conditional-expect */
+	} );
+
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'displays media options picker when selecting the block', async () => {
+	it.skip( 'block remains selected after dimissing the media options picker', async () => {
 		// Initialize with an empty gallery
-		const { getByA11yLabel, getByText, getByTestId } =
+		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
 				initialHtml: generateGalleryBlock( 0 ),
 			} );
@@ -131,7 +164,7 @@ describe( 'Gallery block', () => {
 
 		// Observe that the block is selected, this is done by checking if the block settings
 		// button is visible
-		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		expect( blockActionsButton ).toBeVisible();
 	} );
 
@@ -170,20 +203,20 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc003
 	it( 'sets caption to gallery', async () => {
 		// Initialize with a gallery that contains one item
-		const { getByA11yLabel } = await initializeWithGalleryBlock( {
+		const { getByLabelText } = await initializeWithGalleryBlock( {
 			numberOfItems: 1,
 			media,
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByA11yLabel( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption
 		const captionField = within(
-			getByA11yLabel( /Gallery caption. Empty/ )
+			getByLabelText( /Gallery caption. Empty/ )
 		).getByPlaceholderText( 'Add caption' );
-		setCaption(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption'
 		);
@@ -207,7 +240,7 @@ describe( 'Gallery block', () => {
 		// Set gallery item caption
 		const captionField =
 			within( galleryItem ).getByPlaceholderText( 'Add caption' );
-		setCaption(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption'
 		);
@@ -223,18 +256,20 @@ describe( 'Gallery block', () => {
 			setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
+		const screen = await initializeWithGalleryBlock();
+		const { galleryBlock, getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		fireEvent.press( getByText( 'Choose from device' ) );
+		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
 		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -272,7 +307,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -326,7 +361,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( media[ 0 ] );
 
 		// Check gallery item is visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem = getGalleryItem( galleryBlock, 1 );
 		expect( galleryItem ).toBeVisible();
 
@@ -382,7 +417,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Check that gallery items are visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -420,7 +455,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( media[ 0 ], media[ 1 ] );
 
 		// Check that gallery items are visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -466,7 +501,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem3 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem3 ).getByA11yLabel(
+				within( galleryItem3 ).getByLabelText(
 					/Move block left from position 3 to position 2/
 				)
 			)
@@ -475,7 +510,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem1 ).getByA11yLabel(
+				within( galleryItem1 ).getByLabelText(
 					/Move block right from position 1 to position 2/
 				)
 			)
@@ -519,7 +554,7 @@ describe( 'Gallery block', () => {
 		await mediaPickerCallback( otherAppsMedia[ 0 ], otherAppsMedia[ 1 ] );
 
 		// Check that gallery items are visible
-		await triggerGalleryLayout( galleryBlock );
+		await triggerBlockListLayout( galleryBlock );
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
 		const galleryItem2 = getGalleryItem( galleryBlock, 2 );
 		expect( galleryItem1 ).toBeVisible();
@@ -547,7 +582,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
@@ -573,14 +608,14 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			await openBlockSettings( screen );
 
 			// Can't increment due to maximum value
 			// NOTE: Default columns value is 3
 			fireEvent(
-				getByA11yLabel( /Columns\. Value is 3/ ),
+				getByLabelText( /Columns\. Value is 3/ ),
 				'accessibilityAction',
 				{
 					nativeEvent: { actionName: 'increment' },
@@ -595,13 +630,13 @@ describe( 'Gallery block', () => {
 				numberOfItems: 3,
 				media,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			await openBlockSettings( screen );
 
 			// Decrement columns
 			fireEvent(
-				getByA11yLabel( /Columns\. Value is 3/ ),
+				getByLabelText( /Columns\. Value is 3/ ),
 				'accessibilityAction',
 				{
 					nativeEvent: { actionName: 'decrement' },

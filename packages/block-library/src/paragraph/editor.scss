@@ -3,7 +3,7 @@
 	min-height: auto !important;
 }
 
-// Hide multiple sequential paragraphs.
+// Hide multiple sequential paragraphs, but don't hide placeholders if a custom placeholder is set.
 .block-editor-block-list__block[data-empty="true"] {
 	[data-rich-text-placeholder] {
 		opacity: 1;
@@ -11,7 +11,9 @@
 }
 
 .block-editor-block-list__block[data-empty="true"] + .block-editor-block-list__block[data-empty="true"] {
-	[data-rich-text-placeholder] {
-		opacity: 0;
+	&:not([data-custom-placeholder="true"]) {
+		[data-rich-text-placeholder] {
+			opacity: 0;
+		}
 	}
 }

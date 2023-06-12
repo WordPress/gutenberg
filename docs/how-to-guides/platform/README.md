@@ -28,9 +28,9 @@ Many components include CSS to add style, you will need to include for the compo
 
 ## Development Scripts
 
-The [wp-scripts package](https://developer.wordpress.org/block-editor/packages/packages-scripts/) is a collection of reusable scripts for JavaScript development — includes scripts for building, linting, and testing — all with no additional configuration files.
+The [`@wordpress/scripts` package](/packages/scripts/README.md) is a collection of reusable scripts for JavaScript development — includes scripts for building, linting, and testing — all with no additional configuration files.
 
-Here is a quick example, on how to use wp-scripts in your project.
+Here is a quick example, on how to use `wp-scripts` tool in your project.
 
 Install the dependency:
 
@@ -49,12 +49,12 @@ You can then add a scripts section to your package.json file, for example:
 	}
 ```
 
-You can then use `npm run build` to build your project with all the default webpack settings already configured, likewise for formating and linting. The `start` command is used for development mode. See [the scripts package](https://www.npmjs.com/package/@wordpress/scripts) for full documentation.
+You can then use `npm run build` to build your project with all the default webpack settings already configured, likewise for formatting and linting. The `start` command is used for development mode. See the [`@wordpress/scripts` package](/packages/scripts/README.md) for full documentation.
 
-You can also play with the [Gutenberg Example #03](https://github.com/WordPress/gutenberg-examples/tree/HEAD/03-editable-esnext) for a complete setup using the wp-scripts package.
+For more info, see the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/js-build-setup.md) in the Block Editor Handbook.
 
 ## Block Editor
 
 The [`@wordpress/block-editor` package](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) allows you to create and use standalone block editors.
 
-You can learn more by reading the [tutorial "Building a custom block editor"](/docs/reference-guides/platform/custom-block-editor/README.md).
+You can learn more by reading the [tutorial "Building a custom block editor"](/docs/how-to-guides/platform/custom-block-editor/README.md).

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,6 +19,7 @@ import {
  */
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * An array which includes all possible valid alignments,
@@ -72,7 +72,9 @@ export function getValidAlignments(
 		! hasWideEnabled ||
 		( blockAlign === true && ! hasWideBlockSupport )
 	) {
-		return without( validAlignments, ...WIDE_ALIGNMENTS );
+		return validAlignments.filter(
+			( alignment ) => ! WIDE_ALIGNMENTS.includes( alignment )
+		);
 	}
 
 	return validAlignments;
@@ -87,7 +89,7 @@ export function getValidAlignments(
  */
 export function addAttribute( settings ) {
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.align ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'align' ) ) {
@@ -116,6 +118,7 @@ export function addAttribute( settings ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const blockEdit = <BlockEdit key="edit" { ...props } />;
 		const { name: blockName } = props;
 		// Compute the block valid alignments by taking into account,
 		// if the theme supports wide alignments or not and the layout's
@@ -129,6 +132,10 @@ export const withToolbarControls = createHigherOrderComponent(
 		const validAlignments = useAvailableAlignments(
 			blockAllowedAlignments
 		).map( ( { name } ) => name );
+		const blockEditingMode = useBlockEditingMode();
+		if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
+			return blockEdit;
+		}
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
@@ -143,19 +150,14 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				{ !! validAlignments.length && (
-					<BlockControls
-						group="block"
-						__experimentalShareWithChildBlocks
-					>
-						<BlockAlignmentControl
-							value={ props.attributes.align }
-							onChange={ updateAlignment }
-							controls={ validAlignments }
-						/>
-					</BlockControls>
-				) }
-				<BlockEdit { ...props } />
+				<BlockControls group="block" __experimentalShareWithChildBlocks>
+					<BlockAlignmentControl
+						value={ props.attributes.align }
+						onChange={ updateAlignment }
+						controls={ validAlignments }
+					/>
+				</BlockControls>
+				{ blockEdit }
 			</>
 		);
 	},
@@ -195,7 +197,8 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withDataAlign'
 );
 
 /**

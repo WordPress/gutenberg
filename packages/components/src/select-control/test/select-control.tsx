@@ -1,21 +1,26 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import SelectControl from '..';
 
+const setupUser = () => userEvent.setup();
+
 describe( 'SelectControl', () => {
 	it( 'should not render when no options or children are provided', () => {
-		const { container } = render( <SelectControl /> );
+		render( <SelectControl /> );
 
-		expect( container.firstChild ).toBeNull();
+		// use `queryByRole` to avoid throwing an error with `getByRole`
+		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render its children', async () => {
+		const user = setupUser();
 		const handleChangeMock = jest.fn();
 
 		render(
@@ -30,13 +35,12 @@ describe( 'SelectControl', () => {
 			</SelectControl>
 		);
 
-		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'option', { name: 'Option 1' } )
+		).toBeInTheDocument();
 
-		const selectElement = screen.getByLabelText( 'Select' );
-
-		fireEvent.change( selectElement, {
-			target: { value: 'option-group-option-1' },
-		} );
+		const selectElement = screen.getByRole( 'combobox' );
+		await user.selectOptions( selectElement, 'option-group-option-1' );
 
 		expect( handleChangeMock ).toHaveBeenCalledWith(
 			'option-group-option-1',
@@ -45,6 +49,7 @@ describe( 'SelectControl', () => {
 	} );
 
 	it( 'should not render its options', async () => {
+		const user = setupUser();
 		const handleChangeMock = jest.fn();
 
 		render(
@@ -66,13 +71,12 @@ describe( 'SelectControl', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'option', { name: 'Option 1' } )
+		).toBeInTheDocument();
 
-		const selectElement = screen.getByLabelText( 'Select' );
-
-		fireEvent.change( selectElement, {
-			target: { value: 'option-2' },
-		} );
+		const selectElement = screen.getByRole( 'combobox' );
+		await user.selectOptions( selectElement, 'option-2' );
 
 		expect( handleChangeMock ).toHaveBeenCalledWith(
 			'option-2',

@@ -19,7 +19,7 @@ import '@wordpress/format-library';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import styles from './style.lazy.scss';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -27,6 +27,14 @@ function App() {
 	useEffect( () => {
 		registerCoreBlocks();
 	}, [] );
+
+	// Ensures that the CSS intended for the playground (especially the style resets)
+	// are only loaded for the playground and don't leak into other stories.
+	useEffect( () => {
+		styles.use();
+
+		return styles.unuse;
+	} );
 
 	return (
 		<div className="playground">
@@ -62,6 +70,9 @@ function App() {
 
 export default {
 	title: 'Playground/Block Editor',
+	parameters: {
+		sourceLink: 'storybook/stories/playground',
+	},
 };
 
 export const _default = () => {

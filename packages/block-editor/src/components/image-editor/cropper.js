@@ -23,6 +23,7 @@ export default function ImageCropper( {
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
+	borderProps,
 } ) {
 	const {
 		isInProgress,
@@ -44,10 +45,15 @@ export default function ImageCropper( {
 
 	return (
 		<div
-			className={ classnames( 'wp-block-image__crop-area', {
-				'is-applying': isInProgress,
-			} ) }
+			className={ classnames(
+				'wp-block-image__crop-area',
+				borderProps?.className,
+				{
+					'is-applying': isInProgress,
+				}
+			) }
 			style={ {
+				...borderProps?.style,
 				width: width || clientWidth,
 				height: editedHeight,
 			} }
@@ -60,7 +66,9 @@ export default function ImageCropper( {
 				crop={ position }
 				zoom={ zoom / 100 }
 				aspect={ aspect }
-				onCropChange={ setPosition }
+				onCropChange={ ( pos ) => {
+					setPosition( pos );
+				} }
 				onCropComplete={ ( newCropPercent ) => {
 					setCrop( newCropPercent );
 				} }

@@ -3,7 +3,7 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>pullquote</p>",
+			"value": "pullquote",
 			"citation": "",
 			"textColor": "secondary",
 			"style": {

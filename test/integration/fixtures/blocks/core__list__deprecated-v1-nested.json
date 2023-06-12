@@ -1,0 +1,112 @@
+[
+	{
+		"name": "core/list",
+		"isValid": true,
+		"attributes": {
+			"ordered": false,
+			"values": ""
+		},
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "<strong>Item</strong>"
+				},
+				"innerBlocks": [
+					{
+						"name": "core/list",
+						"isValid": true,
+						"attributes": {
+							"ordered": false,
+							"values": ""
+						},
+						"innerBlocks": [
+							{
+								"name": "core/list-item",
+								"isValid": true,
+								"attributes": {
+									"content": "<strong>Item</strong>"
+								},
+								"innerBlocks": [
+									{
+										"name": "core/list",
+										"isValid": true,
+										"attributes": {
+											"ordered": false,
+											"values": ""
+										},
+										"innerBlocks": [
+											{
+												"name": "core/list-item",
+												"isValid": true,
+												"attributes": {
+													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
+												},
+												"innerBlocks": []
+											}
+										]
+									}
+								]
+							},
+							{
+								"name": "core/list-item",
+								"isValid": true,
+								"attributes": {
+									"content": "<strong>Item</strong>"
+								},
+								"innerBlocks": [
+									{
+										"name": "core/list",
+										"isValid": true,
+										"attributes": {
+											"ordered": false,
+											"values": ""
+										},
+										"innerBlocks": [
+											{
+												"name": "core/list-item",
+												"isValid": true,
+												"attributes": {
+													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
+												},
+												"innerBlocks": []
+											}
+										]
+									}
+								]
+							},
+							{
+								"name": "core/list-item",
+								"isValid": true,
+								"attributes": {
+									"content": "<strong>Item</strong>"
+								},
+								"innerBlocks": [
+									{
+										"name": "core/list",
+										"isValid": true,
+										"attributes": {
+											"ordered": false,
+											"values": ""
+										},
+										"innerBlocks": [
+											{
+												"name": "core/list-item",
+												"isValid": true,
+												"attributes": {
+													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
+												},
+												"innerBlocks": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

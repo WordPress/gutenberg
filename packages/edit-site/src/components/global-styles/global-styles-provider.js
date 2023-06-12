@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	mergeWith,
-	pickBy,
-	isEmpty,
-	isObject,
-	identity,
-	mapValues,
-} from 'lodash';
+import { mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,11 +9,17 @@ import {
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from './context';
+import CanvasSpinner from '../canvas-spinner';
+import { unlock } from '../../lock-unlock';
+
+const { GlobalStylesContext, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -35,34 +34,45 @@ export function mergeBaseAndUserConfigs( base, user ) {
 	return mergeWith( {}, base, user, mergeTreesCustomizer );
 }
 
-const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
-		return object;
-	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
-
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-		const record = _globalStylesId
-			? select( coreStore ).getEditedEntityRecord(
-					'root',
-					'globalStyles',
-					_globalStylesId
-			  )
-			: undefined;
-		return {
-			globalStylesId: _globalStylesId,
-			settings: record?.settings,
-			styles: record?.styles,
-		};
-	}, [] );
+	const { globalStylesId, isReady, settings, styles } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const _globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+			const record = _globalStylesId
+				? getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+				  )
+				: undefined;
+
+			let hasResolved = false;
+			if (
+				hasFinishedResolution(
+					'__experimentalGetCurrentGlobalStylesId'
+				)
+			) {
+				hasResolved = _globalStylesId
+					? hasFinishedResolution( 'getEditedEntityRecord', [
+							'root',
+							'globalStyles',
+							_globalStylesId,
+					  ] )
+					: true;
+			}
+
+			return {
+				globalStylesId: _globalStylesId,
+				isReady: hasResolved,
+				settings: record?.settings,
+				styles: record?.styles,
+			};
+		},
+		[]
+	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -74,7 +84,7 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles ] );
 
 	const setConfig = useCallback(
-		( callback ) => {
+		( callback, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -85,15 +95,21 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: cleanEmptyObject( updatedConfig.styles ) || {},
-				settings: cleanEmptyObject( updatedConfig.settings ) || {},
-			} );
+			editEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				{
+					styles: cleanEmptyObject( updatedConfig.styles ) || {},
+					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				},
+				options
+			);
 		},
 		[ globalStylesId ]
 	);
 
-	return [ !! settings || !! styles, config, setConfig ];
+	return [ isReady, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {
@@ -139,7 +155,7 @@ function useGlobalStylesContext() {
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
 	if ( ! context.isReady ) {
-		return null;
+		return <CanvasSpinner />;
 	}
 
 	return (

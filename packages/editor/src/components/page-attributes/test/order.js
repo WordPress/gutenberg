@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -9,92 +10,76 @@ import { mount } from 'enzyme';
 import { PageAttributesOrder } from '../order';
 
 describe( 'PageAttributesOrder', () => {
-	it( 'should reject invalid input', () => {
+	/**
+	 * When starting to type inside the spinbutton, select the current value
+	 * in order to override it with the new value afterwards.
+	 */
+	const typeOptions = {
+		initialSelectionStart: 0,
+		initialSelectionEnd: 1,
+	};
+
+	it( 'should reject invalid input', async () => {
+		const user = userEvent.setup();
+
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
 
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: 'bad',
-			},
-		} );
+		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '----+++',
-			},
-		} );
-
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '-',
-			},
-		} );
-
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '+',
-			},
-		} );
-
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '',
-			},
-		} );
-
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: ' ',
-			},
-		} );
+		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
+		await user.type( input, 'bad', typeOptions );
+		await user.type( input, '----+++', typeOptions );
+		await user.type( input, '-', typeOptions );
+		await user.type( input, '+', typeOptions );
+		await user.type( input, ' ', typeOptions );
 
 		expect( onUpdateOrder ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should update with zero input', () => {
+	it( 'should update with zero input', async () => {
+		const user = userEvent.setup();
+
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
+
+		render(
+			<PageAttributesOrder order={ 4 } onUpdateOrder={ onUpdateOrder } />
 		);
 
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: 0,
-			},
-		} );
+		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
+
+		await user.type( input, '0', typeOptions );
 
 		expect( onUpdateOrder ).toHaveBeenCalledWith( 0 );
 	} );
 
-	it( 'should update with valid positive input', () => {
-		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+	it( 'should update with valid positive input', async () => {
+		const user = userEvent.setup();
 
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '4',
-			},
-		} );
+		const onUpdateOrder = jest.fn();
+
+		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Order' } ),
+			'4',
+			typeOptions
+		);
 
 		expect( onUpdateOrder ).toHaveBeenCalledWith( 4 );
 	} );
 
-	it( 'should update with valid negative input', () => {
-		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+	it( 'should update with valid negative input', async () => {
+		const user = userEvent.setup();
 
-		wrapper.find( 'input' ).simulate( 'change', {
-			target: {
-				value: '-1',
-			},
-		} );
+		const onUpdateOrder = jest.fn();
+
+		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Order' } ),
+			'-1',
+			typeOptions
+		);
 
 		expect( onUpdateOrder ).toHaveBeenCalledWith( -1 );
 	} );

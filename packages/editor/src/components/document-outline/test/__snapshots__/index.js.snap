@@ -1,67 +1,111 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DocumentOutline header blocks present should match snapshot 1`] = `
-<div
-  className="document-outline"
->
-  <ul>
-    <TableOfContentsItem
+<ul>
+  <li
+    class="document-outline__item is-h2"
+  >
+    <a
+      class="document-outline__button"
       href="#block-clientId_0"
-      isValid={true}
-      key="0"
-      level="H2"
     >
-      Heading 2
-    </TableOfContentsItem>
-    <TableOfContentsItem
+      <span
+        aria-hidden="true"
+        class="document-outline__emdash"
+      />
+      <strong
+        class="document-outline__level"
+      >
+        H2
+      </strong>
+      <span
+        class="document-outline__item-content"
+      >
+        Heading 2
+      </span>
+    </a>
+  </li>
+  <li
+    class="document-outline__item is-h3"
+  >
+    <a
+      class="document-outline__button"
       href="#block-clientId_1"
-      isValid={true}
-      key="1"
-      level="H3"
     >
-      Heading 3
-    </TableOfContentsItem>
-  </ul>
-</div>
+      <span
+        aria-hidden="true"
+        class="document-outline__emdash"
+      />
+      <strong
+        class="document-outline__level"
+      >
+        H3
+      </strong>
+      <span
+        class="document-outline__item-content"
+      >
+        Heading 3
+      </span>
+    </a>
+  </li>
+</ul>
 `;
 
 exports[`DocumentOutline header blocks present should render warnings for multiple h1 headings 1`] = `
-<div
-  className="document-outline"
->
-  <ul>
-    <TableOfContentsItem
+<ul>
+  <li
+    class="document-outline__item is-h1 is-invalid"
+  >
+    <a
+      class="document-outline__button"
       href="#block-clientId_0"
-      isValid={false}
-      key="0"
-      level="H1"
     >
-      Heading 1
-      <br
-        key="incorrect-break-multiple-h1"
+      <span
+        aria-hidden="true"
+        class="document-outline__emdash"
       />
-      <em
-        key="incorrect-message-multiple-h1"
+      <strong
+        class="document-outline__level"
       >
-        (Multiple H1 headings are not recommended)
-      </em>
-    </TableOfContentsItem>
-    <TableOfContentsItem
+        H1
+      </strong>
+      <span
+        class="document-outline__item-content"
+      >
+        Heading 1
+        <br />
+        <em>
+          (Multiple H1 headings are not recommended)
+        </em>
+      </span>
+    </a>
+  </li>
+  <li
+    class="document-outline__item is-h1 is-invalid"
+  >
+    <a
+      class="document-outline__button"
       href="#block-clientId_2"
-      isValid={false}
-      key="1"
-      level="H1"
     >
-      Heading 1
-      <br
-        key="incorrect-break-multiple-h1"
+      <span
+        aria-hidden="true"
+        class="document-outline__emdash"
       />
-      <em
-        key="incorrect-message-multiple-h1"
+      <strong
+        class="document-outline__level"
       >
-        (Multiple H1 headings are not recommended)
-      </em>
-    </TableOfContentsItem>
-  </ul>
-</div>
+        H1
+      </strong>
+      <span
+        class="document-outline__item-content"
+      >
+        Heading 1
+        <br />
+        <em>
+          (Multiple H1 headings are not recommended)
+        </em>
+      </span>
+    </a>
+  </li>
+</ul>
 `;

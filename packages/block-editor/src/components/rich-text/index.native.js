@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +36,6 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -48,7 +46,6 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
-import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
 import {
 	addActiveFormats,
@@ -59,7 +56,6 @@ import {
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
 
-const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
 
 function RichTextWrapper(
@@ -78,7 +74,6 @@ function RichTextWrapper(
 		onReplace,
 		placeholder,
 		allowedFormats,
-		formattingControls,
 		withoutInteractiveFormatting,
 		onRemove,
 		onMerge,
@@ -101,7 +96,6 @@ function RichTextWrapper(
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -113,6 +107,8 @@ function RichTextWrapper(
 		setRef,
 		disableSuggestions,
 		disableAutocorrection,
+		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -123,7 +119,6 @@ function RichTextWrapper(
 
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
-	const nativeProps = useNativeProps();
 	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
@@ -195,7 +190,6 @@ function RichTextWrapper(
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
-		formattingControls,
 		disableFormats,
 	} );
 	const hasFormats =
@@ -223,6 +217,7 @@ function RichTextWrapper(
 				selectionChangeEnd
 			);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
 
@@ -344,6 +339,10 @@ function RichTextWrapper(
 				}
 			}
 
+			if ( onCustomEnter ) {
+				onCustomEnter();
+			}
+
 			if ( multiline ) {
 				if ( shiftKey ) {
 					if ( ! disableLineBreaks ) {
@@ -372,6 +371,7 @@ function RichTextWrapper(
 				}
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			onReplace,
 			onSplit,
@@ -577,7 +577,7 @@ function RichTextWrapper(
 
 	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
 
-	const content = (
+	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
@@ -614,7 +614,6 @@ function RichTextWrapper(
 			}
 			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
-			{ ...nativeProps }
 			blockIsSelected={
 				originalIsSelected !== undefined
 					? originalIsSelected
@@ -627,7 +626,6 @@ function RichTextWrapper(
 			textAlign={ textAlign }
 			selectionColor={ selectionColor }
 			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
 			disableEditingMenu={ disableEditingMenu }
 			fontSize={ fontSize }
 			fontFamily={ fontFamily }
@@ -639,6 +637,7 @@ function RichTextWrapper(
 			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
+			containerWidth={ containerWidth }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -704,22 +703,6 @@ function RichTextWrapper(
 			) }
 		</RichText>
 	);
-
-	if ( ! wrapperClassName ) {
-		return content;
-	}
-
-	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
-		since: '5.4',
-		alternative: 'className prop or create your own wrapper div',
-		version: '6.2',
-	} );
-
-	return (
-		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
-			{ content }
-		</div>
-	);
 }
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
@@ -744,7 +727,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

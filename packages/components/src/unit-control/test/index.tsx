@@ -85,15 +85,6 @@ const ControlledSyncUnits = () => {
 };
 
 describe( 'UnitControl', () => {
-	beforeEach( () => {
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
-	} );
-
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			render( <UnitControl /> );
@@ -111,9 +102,14 @@ describe( 'UnitControl', () => {
 				<UnitControl className="hello" />
 			);
 
-			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
-				withClassName.firstChild
-			);
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				withoutClassName.querySelector( '.components-unit-control' )
+			).not.toHaveClass( 'hello' );
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				withClassName.querySelector( '.components-unit-control' )
+			).toHaveClass( 'hello' );
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
@@ -140,9 +136,7 @@ describe( 'UnitControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should update value on change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '50px';
 			const setState = jest.fn( ( value ) => ( state = value ) );
@@ -162,9 +156,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | undefined = '50px';
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -179,9 +171,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | undefined = '50px';
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -196,9 +186,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | number | undefined = 50;
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -213,9 +201,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | number | undefined = 50;
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -230,9 +216,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should cancel change when ESCAPE key is pressed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | number | undefined = 50;
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -261,9 +245,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should run onBlur callback when quantity input is blurred', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 			const onBlurSpy = jest.fn();
@@ -296,9 +278,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onUnitChangeSpy = jest.fn();
 			const onChangeSpy = jest.fn();
@@ -341,9 +321,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 			render(
@@ -377,9 +355,7 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | undefined = '14rem';
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -421,9 +397,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should reset value on unit change, if unit has default value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | number | undefined = 50;
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -454,9 +428,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not reset value on unit change, if disabled', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | number | undefined = 50;
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
@@ -487,9 +459,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should set correct unit if single units', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state: string | undefined = '50%';
 			const setState: UnitControlOnChangeCallback = ( value ) =>
@@ -511,9 +481,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should update unit value when a new raw value is passed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <ControlledSyncUnits /> );
 
@@ -543,9 +511,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const units = [
 				{ value: 'pt', label: 'pt' },
@@ -564,9 +530,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should run onBlur callback when the unit select is blurred', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onUnitChangeSpy = jest.fn();
 			const onBlurSpy = jest.fn();
@@ -597,9 +561,7 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit Parser', () => {
 		it( 'should parse unit from input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
@@ -622,9 +584,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse PX unit from input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
@@ -647,9 +607,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse EM unit from input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
@@ -672,9 +630,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse % unit from input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
@@ -697,9 +653,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse REM unit from input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );

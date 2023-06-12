@@ -28,10 +28,10 @@ const QUERY_DEFAULTS = {
 		},
 	],
 	maxItems: 20,
-	minItems: 1,	
+	minItems: 1,
 	numberOfItems: 10,
 	order: 'asc',
-	orderBy: 'title',	
+	orderBy: 'title',
 };
 
 const MyQueryControls = () => {
@@ -66,24 +66,35 @@ The `QueryControls` component now supports multiple category selection, to repla
 const QUERY_DEFAULTS = {
 	orderBy: 'title',
 	order: 'asc',
-	selectedCategories: [ 1 ],
-	categories: [
+	selectedCategories: [
 		{
 			id: 1,
-			name: 'Category 1',
+			value: 'Category 1',
 			parent: 0,
 		},
 		{
 			id: 2,
+			value: 'Category 1b',
+			parent: 1,
+		},
+	],
+	categories: {
+		'Category 1': {
+			id: 1,
+			name: 'Category 1',
+			parent: 0,
+		},
+		'Category 1b': {
+			id: 2,
 			name: 'Category 1b',
 			parent: 1,
 		},
-		{
+		'Category 2': {
 			id: 3,
 			name: 'Category 2',
 			parent: 0,
 		},
-	],
+	},
 	numberOfItems: 10,
 };
 
@@ -111,132 +122,121 @@ const MyQueryControls = () => {
 };
 ```
 
-The format of the categories list also needs to be updated to match what `FormTokenField` expects for making suggestions.
+The format of the categories list also needs to be updated to match the expected type for the category suggestions.
 
 ### Props
 
-#### authorList
+#### `authorList`: `Author[]`
 
-An array of author IDs that is passed into an `AuthorSelect` sub-component.
+An array of the authors to select from.
 
--   Type: `Array`
 -   Required: No
 -   Platform: Web
 
-#### selectedAuthorId
+#### `categoriesList`: `Category[]`
 
-The selected author ID.
+An array of categories. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that allows selecting one category at a time.
 
--   Type: `Number`
 -   Required: No
 -   Platform: Web
 
-#### categoriesList
+#### `categorySuggestions`: `Record< Category[ 'name' ], Category >`
 
-An array of category IDs; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
+An object of categories with the category name as the key. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that enables multiple selection.
 
--   Type: `Array`
 -   Required: No
 -   Platform: Web
 
-#### categorySuggestions
+#### `maxItems`: `number`
 
-An array of category names; renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
+The maximum number of items.
 
--   Type: `Array`
--   Required: No
--   Platform: Web
-
-#### maxItems
-
--   Type: `Number`
 -   Required: No
 -   Default: 100
 -   Platform: Web
 
-#### minItems
+#### `minItems`: `number`
 
--   Type: `Number`
+The minimum number of items.
+
 -   Required: No
 -   Default: 1
 -   Platform: Web
 
-#### numberOfItems
+#### `numberOfItems`: `number`
 
 The selected number of items to retrieve via the query.
 
--   Type: `Number`
 -   Required: No
 -   Platform: Web
 
-#### onAuthorChange
+#### `onAuthorChange`: `( newAuthor: string ) => void`
 
-A function that receives the new author value. If this is not specified, the author controls are not included.
+A function that receives the new author value. If not specified, the author controls are not rendered.
 
--   Type: `Function`
 -   Required: No
 -   Platform: Web
 
-#### onCategoryChange
+#### `onCategoryChange`: `( newCategory: string ) => void | FormTokenFieldProps[ 'onChange' ]`
 
-A function that receives the new category value. If this is not specified, the category controls are not included.
+A function that receives the new category value. If not specified, the category controls are not rendered.
+The function's signature changes depending on whether multiple category selection is enabled or not.
 
--   Type: `Function`
 -   Required: No
 -   Platform: Web
 
-#### onNumberOfItemsChange
+#### `onNumberOfItemsChange`: `( newNumber?: number ) => void`
 
-A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
+A function that receives the new number of items. If not specified, then the number of items range control is not rendered.
 
--   Type: `Function`
 -   Required: No
 -   Platform: Web
 
-#### onOrderChange
+#### `onOrderChange`: `( newOrder: 'asc' | 'desc' ) => void`
 
-A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
+A function that receives the new order value. If this prop or the `onOrderByChange` prop are not specified, then the order controls are not rendered.
 
--   Type: `Function`
 -   Required: No
 -   Platform: Web
 
-#### onOrderByChange
+#### `onOrderByChange`: `( newOrderBy: 'date' | 'title' ) => void`
 
-A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
+A function that receives the new orderby value. If this prop or the `onOrderChange` prop are not specified, then the order controls are not rendered.
 
--   Type: `Function`
 -   Required: No
 -   Platform: Web
 
-#### order
+#### `order`: `'asc' | 'desc'`
 
-The order in which to retrieve posts. Can be 'asc' or 'desc'.
+The order in which to retrieve posts.
 
--   Type: `String`
 -   Required: No
 -   Platform: Web
 
-#### orderBy
+#### `orderBy`: `'date' | 'title'`
 
-The meta key by which to order posts. Can be 'date' or 'title'.
+The meta key by which to order posts.
 
--   Type: `String`
 -   Required: No
 -   Platform: Web
 
-#### selectedCategories
+#### `selectedAuthorId`: `number`
 
-The selected categories for the `categorySuggestions`.
+The selected author ID.
 
--   Type: `Array`
 -   Required: No
 -   Platform: Web
 
-#### selectedCategoryId
+#### `selectedCategories`: `Category[]`
 
-The selected category for the `categoriesList`.
+The selected categories for the `categorySuggestions` prop.
 
--   Type: `Number`
+-   Required: No
+-   Platform: Web
+
+#### `selectedCategoryId`: `number`
+
+The selected category for the `categoriesList` prop.
+
 -   Required: No
 -   Platform: Web

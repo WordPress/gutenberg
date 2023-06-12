@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
+import { PostSwitchToDraftButton } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -19,6 +23,8 @@ import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
+import PostTemplate from '../post-template';
+import PostURL from '../post-url';
 
 /**
  * Module Constants
@@ -29,7 +35,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
 		<PanelBody
 			className="edit-post-post-status"
-			title={ __( 'Status & visibility' ) }
+			title={ __( 'Summary' ) }
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
@@ -38,13 +44,23 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 					<>
 						<PostVisibility />
 						<PostSchedule />
-						<PostFormat />
+						<PostTemplate />
+						<PostURL />
 						<PostSticky />
 						<PostPendingStatus />
+						<PostFormat />
 						<PostSlug />
 						<PostAuthor />
 						{ fills }
-						<PostTrash />
+						<HStack
+							style={ {
+								marginTop: '16px',
+							} }
+							spacing={ 4 }
+						>
+							<PostSwitchToDraftButton />
+							<PostTrash />
+						</HStack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>

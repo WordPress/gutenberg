@@ -2,12 +2,15 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, some, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
 
@@ -95,9 +98,11 @@ function runV2Migration( attributes ) {
 		return getImageBlock( image, attributes.sizeSlug, linkTo );
 	} );
 
+	const { images, ids, ...restAttributes } = attributes;
+
 	return [
 		{
-			...omit( attributes, [ 'images', 'ids' ] ),
+			...restAttributes,
 			linkTo,
 			allowResize: false,
 		},
@@ -124,6 +129,127 @@ export function getImageBlock( image, sizeSlug, linkTo ) {
 		...getHrefAndDestination( image, linkTo ),
 	} );
 }
+
+// In #41140 support was added to global styles for caption elements which added a `wp-element-caption` classname
+// to the gallery figcaption element.
+const v7 = {
+	attributes: {
+		images: {
+			type: 'array',
+			default: [],
+			source: 'query',
+			selector: '.blocks-gallery-item',
+			query: {
+				url: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'src',
+				},
+				fullUrl: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-full-url',
+				},
+				link: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-link',
+				},
+				alt: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'alt',
+					default: '',
+				},
+				id: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-id',
+				},
+				caption: {
+					type: 'string',
+					source: 'html',
+					selector: '.blocks-gallery-item__caption',
+				},
+			},
+		},
+		ids: {
+			type: 'array',
+			items: {
+				type: 'number',
+			},
+			default: [],
+		},
+		shortCodeTransforms: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+			},
+		},
+		columns: {
+			type: 'number',
+			minimum: 1,
+			maximum: 8,
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: '.blocks-gallery-caption',
+		},
+		imageCrop: {
+			type: 'boolean',
+			default: true,
+		},
+		fixedHeight: {
+			type: 'boolean',
+			default: true,
+		},
+		linkTarget: {
+			type: 'string',
+		},
+		linkTo: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+			default: 'large',
+		},
+		allowResize: {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	save( { attributes } ) {
+		const { caption, columns, imageCrop } = attributes;
+
+		const className = classnames( 'has-nested-images', {
+			[ `columns-${ columns }` ]: columns !== undefined,
+			[ `columns-default` ]: columns === undefined,
+			'is-cropped': imageCrop,
+		} );
+		const blockProps = useBlockProps.save( { className } );
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+		return (
+			<figure { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						tagName="figcaption"
+						className="blocks-gallery-caption"
+						value={ caption }
+					/>
+				) }
+			</figure>
+		);
+	},
+};
 
 const v6 = {
 	attributes: {
@@ -541,7 +667,7 @@ const v4 = {
 
 		return {
 			...attributes,
-			ids: map( attributes.ids, ( id ) => {
+			ids: ( attributes.ids ?? [] ).map( ( id ) => {
 				const parsedId = parseInt( id, 10 );
 				return Number.isInteger( parsedId ) ? parsedId : null;
 			} ),
@@ -657,8 +783,8 @@ const v3 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},
@@ -777,8 +903,8 @@ const v2 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},
@@ -801,7 +927,7 @@ const v2 = {
 			images.length > 0 &&
 			( ( ! ids && images ) ||
 				( ids && images && ids.length !== images.length ) ||
-				some( images, ( id, index ) => {
+				images.some( ( id, index ) => {
 					if ( ! id && ids[ index ] !== null ) {
 						return true;
 					}
@@ -815,7 +941,7 @@ const v2 = {
 		}
 		return {
 			...attributes,
-			ids: map( attributes.images, ( { id } ) => {
+			ids: ( attributes.images ?? [] ).map( ( { id } ) => {
 				if ( ! id ) {
 					return null;
 				}
@@ -982,4 +1108,4 @@ const v1 = {
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+export default [ v7, v6, v5, v4, v3, v2, v1 ];

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -31,8 +26,8 @@ async function importReusableBlock( file ) {
 		parsedContent.__file !== 'wp_block' ||
 		! parsedContent.title ||
 		! parsedContent.content ||
-		! isString( parsedContent.title ) ||
-		! isString( parsedContent.content )
+		typeof parsedContent.title !== 'string' ||
+		typeof parsedContent.content !== 'string'
 	) {
 		throw new Error( 'Invalid Reusable block JSON file' );
 	}

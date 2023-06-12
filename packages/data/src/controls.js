@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isObject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createRegistryControl } from './factory';
@@ -13,6 +8,10 @@ import { createRegistryControl } from './factory';
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
 const DISPATCH = '@@data/DISPATCH';
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Dispatches a control action for triggering a synchronous registry select.

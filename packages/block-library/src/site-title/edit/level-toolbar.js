@@ -21,6 +21,7 @@ export default function LevelControl( { level, onChange } ) {
 					  sprintf( __( 'Heading %d' ), currentLevel ),
 			isActive,
 			onClick: () => onChange( currentLevel ),
+			role: 'menuitemradio',
 		};
 	} );
 	return (

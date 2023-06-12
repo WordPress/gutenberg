@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/verse",
 	"title": "Verse",
 	"category": "text",
@@ -38,13 +38,21 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true
 			}
 		},
 		"spacing": {
+			"margin": true,
 			"padding": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"width": true,
+			"color": true,
+			"style": true
 		}
 	},
 	"style": "wp-block-verse",

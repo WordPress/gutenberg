@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
@@ -57,13 +52,13 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 			}
 
 			componentDidMount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
+				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
 					listener.add( eventType, this );
 				} );
 			}
 
 			componentWillUnmount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
+				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
 					listener.remove( eventType, this );
 				} );
 			}

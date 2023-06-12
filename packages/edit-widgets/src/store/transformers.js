@@ -12,7 +12,9 @@ import { addWidgetIdToBlock } from '@wordpress/widgets';
  */
 export function transformWidgetToBlock( widget ) {
 	if ( widget.id_base === 'block' ) {
-		const parsedBlocks = parse( widget.instance.raw.content );
+		const parsedBlocks = parse( widget.instance.raw.content, {
+			__unstableSkipAutop: true,
+		} );
 		if ( ! parsedBlocks.length ) {
 			return addWidgetIdToBlock(
 				createBlock( 'core/paragraph', {}, [] ),

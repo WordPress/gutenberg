@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -68,11 +67,11 @@ const EmbedPlaceholder = ( {
 		},
 	};
 
-	const options = compact( [
+	const options = [
 		cannotEmbed && errorPickerOptions.retry,
 		cannotEmbed && errorPickerOptions.convertToLink,
 		cannotEmbed && errorPickerOptions.editLink,
-	] );
+	].filter( Boolean );
 
 	function onPickerSelect( value ) {
 		const selectedItem = options.find( ( item ) => item.value === value );

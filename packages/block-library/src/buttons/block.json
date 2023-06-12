@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/buttons",
 	"title": "Buttons",
 	"category": "design",
@@ -10,12 +10,26 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
+		"html": false,
 		"__experimentalExposeControlsToChildren": true,
 		"spacing": {
 			"blockGap": true,
 			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
 			}
 		},
 		"__experimentalLayout": {

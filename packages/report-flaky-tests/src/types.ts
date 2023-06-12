@@ -29,3 +29,10 @@ export type MetaData = {
 	totalCommits?: number;
 	baseCommit?: string;
 };
+
+export type ReportedIssue = {
+	testTitle: string;
+	testPath: string;
+	issueNumber: number;
+	issueUrl: string;
+};

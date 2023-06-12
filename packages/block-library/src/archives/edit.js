@@ -12,13 +12,14 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showPostCounts, displayAsDropdown, type } = attributes;
+	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ () =>
@@ -27,7 +28,20 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							} )
 						}
 					/>
+					{ displayAsDropdown && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show label' ) }
+							checked={ showLabel }
+							onChange={ () =>
+								setAttributes( {
+									showLabel: ! showLabel,
+								} )
+							}
+						/>
+					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ () =>
@@ -37,6 +51,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Group by:' ) }
 						options={ [
 							{ label: __( 'Year' ), value: 'yearly' },
@@ -55,6 +70,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
+						skipBlockSupportAttributes
 						attributes={ attributes }
 					/>
 				</Disabled>

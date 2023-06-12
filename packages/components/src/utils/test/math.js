@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { add, subtract, roundClamp } from '../math';
+import { add, clamp, subtract, roundClamp } from '../math';
 
 describe( 'add', () => {
 	it( 'should add string and number values', () => {
@@ -34,6 +34,27 @@ describe( 'subtract', () => {
 
 	it( 'should subtract multiple arguments', () => {
 		expect( subtract( '105', '30', 10, 5 ) ).toBe( 60 );
+	} );
+} );
+
+describe( 'clamp', () => {
+	it( 'should clamp a value between min and max', () => {
+		expect( clamp( 10, 1, 10 ) ).toBe( 10 );
+		expect( clamp( 1, 1, 10 ) ).toBe( 1 );
+		expect( clamp( 0, 1, 10 ) ).toBe( 1 );
+
+		expect( clamp( 50, 1, 10 ) ).toBe( 10 );
+		expect( clamp( 50, -10, 10 ) ).toBe( 10 );
+		expect( clamp( -50, -10, 10 ) ).toBe( -10 );
+
+		expect( clamp( Infinity, -10, 10 ) ).toBe( 10 );
+		expect( clamp( -Infinity, -10, 10 ) ).toBe( -10 );
+	} );
+
+	it( 'should clamp number or string values', () => {
+		expect( clamp( '50', 1, 10 ) ).toBe( 10 );
+		expect( clamp( '50', -10, 10 ) ).toBe( 10 );
+		expect( clamp( -50, -10, '10' ) ).toBe( -10 );
 	} );
 } );
 

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, some, flatten, values } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,8 +42,7 @@ export const isEditorSidebarOpened = createRegistrySelector(
 			select( interfaceStore ).getActiveComplementaryArea(
 				'core/edit-post'
 			);
-		return includes(
-			[ 'edit-post/document', 'edit-post/block' ],
+		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
 	}
@@ -65,8 +63,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
 			);
 		return (
 			!! activeGeneralSidebar &&
-			! includes(
-				[ 'edit-post/document', 'edit-post/block' ],
+			! [ 'edit-post/document', 'edit-post/block' ].includes(
 				activeGeneralSidebar
 			)
 		);
@@ -254,7 +251,7 @@ export function isPublishSidebarOpened( state ) {
  * @return {boolean} Whether or not the panel is removed.
  */
 export function isEditorPanelRemoved( state, panelName ) {
-	return includes( state.removedPanels, panelName );
+	return state.removedPanels.includes( panelName );
 }
 
 /**
@@ -369,7 +366,7 @@ export const getActiveMetaBoxLocations = createSelector(
 export function isMetaBoxLocationVisible( state, location ) {
 	return (
 		isMetaBoxLocationActive( state, location ) &&
-		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
+		getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 			return isEditorPanelEnabled( state, `meta-box-${ id }` );
 		} )
 	);
@@ -410,7 +407,7 @@ export function getMetaBoxesPerLocation( state, location ) {
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
-		return flatten( values( state.metaBoxes.locations ) );
+		return Object.values( state.metaBoxes.locations ).flat();
 	},
 	( state ) => [ state.metaBoxes.locations ]
 );

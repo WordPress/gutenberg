@@ -10,24 +10,21 @@
 		justify-content: space-between;
 		align-items: flex-start;
 
-		> .components-unit-control-wrapper {
-			width: 110px;
+		.components-border-radius-control__unit-control {
+			width: calc((100% - #{$grid-unit-20}) / 2);
 			margin-bottom: 0;
-			margin-right: #{ $grid-unit-15 };
+			margin-right: $grid-unit-20;
 			flex-shrink: 0;
 		}
 
-		.components-range-control {
+		.components-border-radius-control__range-control {
 			flex: 1;
-			margin-bottom: 0;
+			margin-right: $grid-unit-15;
 
-			.components-base-control__field {
-				margin-bottom: 0;
-				height: 30px;
-			}
-
-			.components-range-control__wrapper {
-				margin-right: 10px;
+			> div {
+				height: 40px;
+				display: flex;
+				align-items: center;
 			}
 		}
 
@@ -37,22 +34,16 @@
 	}
 
 	.components-border-radius-control__input-controls-wrapper {
-		display: flex;
-		width: 70%;
-		flex-wrap: wrap;
-
-		.components-border-radius-control__tooltip-wrapper {
-			width: calc(50% - #{ $grid-unit-10 });
-			margin-bottom: $grid-unit-10;
-			margin-right: $grid-unit-10;
-		}
+		display: grid;
+		gap: $grid-unit-20;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		margin-right: $grid-unit-15;
 	}
 
-	.component-border-radius-control__linked-button.has-icon {
+	.component-border-radius-control__linked-button {
 		display: flex;
 		justify-content: center;
-		margin-left: 2px;
-		margin-top: 3px;
+		margin-top: $grid-unit-10;
 
 		svg {
 			margin-right: 0;

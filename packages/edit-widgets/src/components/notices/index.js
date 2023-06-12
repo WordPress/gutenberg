@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { NoticeList, SnackbarList } from '@wordpress/components';
@@ -18,17 +13,15 @@ function Notices() {
 		};
 	}, [] );
 
-	const dismissibleNotices = filter( notices, {
-		isDismissible: true,
-		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
-		isDismissible: false,
-		type: 'default',
-	} );
-	const snackbarNotices = filter( notices, {
-		type: 'snackbar',
-	} );
+	const dismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => isDismissible && type === 'default'
+	);
+	const nonDismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => ! isDismissible && type === 'default'
+	);
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
 
 	return (
 		<>

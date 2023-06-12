@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize, xor } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,9 @@ import { isAppleOS } from './platform';
  *
  * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
-/** @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
+/** @typedef {(event: import('react').KeyboardEvent<HTMLElement> | KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
+
+/** @typedef {( isApple: () => boolean ) => WPModifierPart[]} WPModifier */
 
 /**
  * Keycode for BACKSPACE key.
@@ -144,6 +146,27 @@ export const SHIFT = 'shift';
  */
 export const ZERO = 48;
 
+export { isAppleOS };
+
+/**
+ * Map the values of an object with a specified callback and return the result object.
+ *
+ * @template {{ [s: string]: any; } | ArrayLike<any>} T
+ *
+ * @param {T}                     object Object to map values of.
+ * @param {( value: any ) => any} mapFn  Mapping function
+ *
+ * @return {any} Active modifier constants.
+ */
+function mapValues( object, mapFn ) {
+	return Object.fromEntries(
+		Object.entries( object ).map( ( [ key, value ] ) => [
+			key,
+			mapFn( value ),
+		] )
+	);
+}
+
 /**
  * Object that contains functions that return the available modifier
  * depending on platform.
@@ -182,14 +205,19 @@ export const modifiers = {
  * @type {WPModifierHandler<WPKeyHandler<string>>} Keyed map of functions to raw
  *                                                 shortcuts.
  */
-export const rawShortcut = mapValues( modifiers, ( modifier ) => {
-	return /** @type {WPKeyHandler<string>} */ (
-		character,
-		_isApple = isAppleOS
-	) => {
-		return [ ...modifier( _isApple ), character.toLowerCase() ].join( '+' );
-	};
-} );
+export const rawShortcut = mapValues(
+	modifiers,
+	( /** @type {WPModifier} */ modifier ) => {
+		return /** @type {WPKeyHandler<string>} */ (
+			character,
+			_isApple = isAppleOS
+		) => {
+			return [ ...modifier( _isApple ), character.toLowerCase() ].join(
+				'+'
+			);
+		};
+	}
+);
 
 /**
  * Return an array of the parts of a keyboard shortcut chord for display.
@@ -204,36 +232,45 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  * @type {WPModifierHandler<WPKeyHandler<string[]>>} Keyed map of functions to
  *                                                   shortcut sequences.
  */
-export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
-	return /** @type {WPKeyHandler<string[]>} */ (
-		character,
-		_isApple = isAppleOS
-	) => {
-		const isApple = _isApple();
-		const replacementKeyMap = {
-			[ ALT ]: isApple ? '⌥' : 'Alt',
-			[ CTRL ]: isApple ? '⌃' : 'Ctrl', // Make sure ⌃ is the U+2303 UP ARROWHEAD unicode character and not the caret character.
-			[ COMMAND ]: '⌘',
-			[ SHIFT ]: isApple ? '⇧' : 'Shift',
+export const displayShortcutList = mapValues(
+	modifiers,
+	( /** @type {WPModifier} */ modifier ) => {
+		return /** @type {WPKeyHandler<string[]>} */ (
+			character,
+			_isApple = isAppleOS
+		) => {
+			const isApple = _isApple();
+			const replacementKeyMap = {
+				[ ALT ]: isApple ? '⌥' : 'Alt',
+				[ CTRL ]: isApple ? '⌃' : 'Ctrl', // Make sure ⌃ is the U+2303 UP ARROWHEAD unicode character and not the caret character.
+				[ COMMAND ]: '⌘',
+				[ SHIFT ]: isApple ? '⇧' : 'Shift',
+			};
+
+			const modifierKeys = modifier( _isApple ).reduce(
+				( accumulator, key ) => {
+					const replacementKey = replacementKeyMap[ key ] ?? key;
+					// If on the Mac, adhere to platform convention and don't show plus between keys.
+					if ( isApple ) {
+						return [ ...accumulator, replacementKey ];
+					}
+
+					return [ ...accumulator, replacementKey, '+' ];
+				},
+				/** @type {string[]} */ ( [] )
+			);
+
+			// Symbols (~`,.) are removed by the default regular expression,
+			// so override the rule to allow symbols used for shortcuts.
+			// see: https://github.com/blakeembrey/change-case#options
+			const capitalizedCharacter = capitalCase( character, {
+				stripRegexp: /[^A-Z0-9~`,\.\\\-]/gi,
+			} );
+
+			return [ ...modifierKeys, capitalizedCharacter ];
 		};
-
-		const modifierKeys = modifier( _isApple ).reduce(
-			( accumulator, key ) => {
-				const replacementKey = get( replacementKeyMap, key, key );
-				// If on the Mac, adhere to platform convention and don't show plus between keys.
-				if ( isApple ) {
-					return [ ...accumulator, replacementKey ];
-				}
-
-				return [ ...accumulator, replacementKey, '+' ];
-			},
-			/** @type {string[]} */ ( [] )
-		);
-
-		const capitalizedCharacter = capitalize( character );
-		return [ ...modifierKeys, capitalizedCharacter ];
-	};
-} );
+	}
+);
 
 /**
  * An object that contains functions to display shortcuts.
@@ -250,7 +287,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  */
 export const displayShortcut = mapValues(
 	displayShortcutList,
-	( shortcutList ) => {
+	( /** @type {WPKeyHandler<string[]>} */ shortcutList ) => {
 		return /** @type {WPKeyHandler<string>} */ (
 			character,
 			_isApple = isAppleOS
@@ -272,36 +309,44 @@ export const displayShortcut = mapValues(
  * @type {WPModifierHandler<WPKeyHandler<string>>} Keyed map of functions to
  *                                                 shortcut ARIA labels.
  */
-export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
-	return /** @type {WPKeyHandler<string>} */ (
-		character,
-		_isApple = isAppleOS
-	) => {
-		const isApple = _isApple();
-		const replacementKeyMap = {
-			[ SHIFT ]: 'Shift',
-			[ COMMAND ]: isApple ? 'Command' : 'Control',
-			[ CTRL ]: 'Control',
-			[ ALT ]: isApple ? 'Option' : 'Alt',
-			/* translators: comma as in the character ',' */
-			',': __( 'Comma' ),
-			/* translators: period as in the character '.' */
-			'.': __( 'Period' ),
-			/* translators: backtick as in the character '`' */
-			'`': __( 'Backtick' ),
-		};
+export const shortcutAriaLabel = mapValues(
+	modifiers,
+	( /** @type {WPModifier} */ modifier ) => {
+		return /** @type {WPKeyHandler<string>} */ (
+			character,
+			_isApple = isAppleOS
+		) => {
+			const isApple = _isApple();
+			/** @type {Record<string,string>} */
+			const replacementKeyMap = {
+				[ SHIFT ]: 'Shift',
+				[ COMMAND ]: isApple ? 'Command' : 'Control',
+				[ CTRL ]: 'Control',
+				[ ALT ]: isApple ? 'Option' : 'Alt',
+				/* translators: comma as in the character ',' */
+				',': __( 'Comma' ),
+				/* translators: period as in the character '.' */
+				'.': __( 'Period' ),
+				/* translators: backtick as in the character '`' */
+				'`': __( 'Backtick' ),
+				/* translators: tilde as in the character '~' */
+				'~': __( 'Tilde' ),
+			};
 
-		return [ ...modifier( _isApple ), character ]
-			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
-			.join( isApple ? ' ' : ' + ' );
-	};
-} );
+			return [ ...modifier( _isApple ), character ]
+				.map( ( key ) =>
+					capitalCase( replacementKeyMap[ key ] ?? key )
+				)
+				.join( isApple ? ' ' : ' + ' );
+		};
+	}
+);
 
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for
  * the event.
  *
- * @param {KeyboardEvent} event Keyboard event.
+ * @param {import('react').KeyboardEvent<HTMLElement> | KeyboardEvent} event Keyboard event.
  *
  * @return {Array<WPModifierPart>} Active modifier constants.
  */
@@ -335,34 +380,65 @@ function getEventModifiers( event ) {
  * @type {WPModifierHandler<WPEventKeyHandler>} Keyed map of functions
  *                                                       to match events.
  */
-export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
-	return /** @type {WPEventKeyHandler} */ (
-		event,
-		character,
-		_isApple = isAppleOS
-	) => {
-		const mods = getModifiers( _isApple );
-		const eventMods = getEventModifiers( event );
+export const isKeyboardEvent = mapValues(
+	modifiers,
+	( /** @type {WPModifier} */ getModifiers ) => {
+		return /** @type {WPEventKeyHandler} */ (
+			event,
+			character,
+			_isApple = isAppleOS
+		) => {
+			const mods = getModifiers( _isApple );
+			const eventMods = getEventModifiers( event );
+			/** @type {Record<string,string>} */
+			const replacementWithShiftKeyMap = {
+				Comma: ',',
+				Backslash: '\\',
+				// Windows returns `\` for both IntlRo and IntlYen.
+				IntlRo: '\\',
+				IntlYen: '\\',
+			};
 
-		if ( xor( mods, eventMods ).length ) {
-			return false;
-		}
+			const modsDiff = mods.filter(
+				( mod ) => ! eventMods.includes( mod )
+			);
+			const eventModsDiff = eventMods.filter(
+				( mod ) => ! mods.includes( mod )
+			);
 
-		let key = event.key.toLowerCase();
+			if ( modsDiff.length > 0 || eventModsDiff.length > 0 ) {
+				return false;
+			}
 
-		if ( ! character ) {
-			return includes( mods, key );
-		}
+			let key = event.key.toLowerCase();
 
-		if ( event.altKey && character.length === 1 ) {
-			key = String.fromCharCode( event.keyCode ).toLowerCase();
-		}
+			if ( ! character ) {
+				return mods.includes( /** @type {WPModifierPart} */ ( key ) );
+			}
 
-		// For backwards compatibility.
-		if ( character === 'del' ) {
-			character = 'delete';
-		}
+			if ( event.altKey && character.length === 1 ) {
+				key = String.fromCharCode( event.keyCode ).toLowerCase();
+			}
 
-		return key === character.toLowerCase();
-	};
-} );
+			// `event.key` returns the value of the key pressed, taking into the state of
+			// modifier keys such as `Shift`. If the shift key is pressed, a different
+			// value may be returned depending on the keyboard layout. It is necessary to
+			// convert to the physical key value that don't take into account keyboard
+			// layout or modifier key state.
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				replacementWithShiftKeyMap[ event.code ]
+			) {
+				key = replacementWithShiftKeyMap[ event.code ];
+			}
+
+			// For backwards compatibility.
+			if ( character === 'del' ) {
+				character = 'delete';
+			}
+
+			return key === character.toLowerCase();
+		};
+	}
+);

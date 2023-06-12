@@ -40,7 +40,7 @@ _Note:_ In this example that we render `AlignmentControl` as a child of the `Blo
 
 -   **Type:** `String`
 -   **Default:** `undefined`
--   **Options:**: `left`, `center`, `right`
+-   **Options:** `left`, `center`, `right`
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 

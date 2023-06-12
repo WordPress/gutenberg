@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { text, number } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -11,19 +6,21 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Slot, Fill, Provider } from '../';
+import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 export default {
 	title: 'Components/SlotFill',
+	subcomponents: { Fill, SlotFillProvider },
 	component: Slot,
 	parameters: {
-		knobs: { disable: false },
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
 
 export const _default = () => {
 	return (
-		<Provider>
+		<SlotFillProvider>
 			<h2>Profile</h2>
 			<p>
 				Name: <Slot bubblesVirtually as="span" name="name" />
@@ -33,15 +30,13 @@ export const _default = () => {
 			</p>
 			<Fill name="name">Grace</Fill>
 			<Fill name="age">33</Fill>
-		</Provider>
+		</SlotFillProvider>
 	);
 };
 
 export const withFillProps = () => {
-	const name = text( 'name', 'Grace' );
-	const age = number( 'age', 33 );
 	return (
-		<Provider>
+		<SlotFillProvider>
 			<h2>Profile</h2>
 			<p>
 				Name:{ ' ' }
@@ -49,7 +44,7 @@ export const withFillProps = () => {
 					bubblesVirtually
 					as="span"
 					name="name"
-					fillProps={ { name } }
+					fillProps={ { name: 'Grace' } }
 				/>
 			</p>
 			<p>
@@ -58,12 +53,12 @@ export const withFillProps = () => {
 					bubblesVirtually
 					as="span"
 					name="age"
-					fillProps={ { age } }
+					fillProps={ { age: 33 } }
 				/>
 			</p>
 			<Fill name="name">{ ( fillProps ) => fillProps.name }</Fill>
 			<Fill name="age">{ ( fillProps ) => fillProps.age }</Fill>
-		</Provider>
+		</SlotFillProvider>
 	);
 };
 
@@ -74,7 +69,7 @@ export const withContext = () => {
 		return <Fill name={ name }>{ value }</Fill>;
 	};
 	return (
-		<Provider>
+		<SlotFillProvider>
 			<h2>Profile</h2>
 			<p>
 				Name: <Slot bubblesVirtually as="span" name="name" />
@@ -88,6 +83,6 @@ export const withContext = () => {
 			<Context.Provider value={ 33 }>
 				<ContextFill name="age" />
 			</Context.Provider>
-		</Provider>
+		</SlotFillProvider>
 	);
 };

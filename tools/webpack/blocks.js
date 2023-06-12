@@ -2,7 +2,6 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { escapeRegExp } = require( 'lodash' );
 const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
@@ -28,7 +27,23 @@ const blockViewRegex = new RegExp(
  * but have been declared elsewhere. This way we can call Gutenberg override functions, but
  * the block will still call the core function when updates are back ported.
  */
-const prefixFunctions = [ 'build_query_vars_from_query_block' ];
+const prefixFunctions = [
+	'build_query_vars_from_query_block',
+	'wp_enqueue_block_support_styles',
+	'wp_get_typography_font_size_value',
+	'wp_style_engine_get_styles',
+];
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
 
 const createEntrypoints = () => {
 	/*
@@ -59,130 +74,227 @@ const createEntrypoints = () => {
 	}, {} );
 };
 
-module.exports = {
-	...baseConfig,
-	name: 'blocks',
-	entry: createEntrypoints(),
-	output: {
-		devtoolNamespace: 'wp',
-		filename: './build/block-library/blocks/[name].min.js',
-		path: join( __dirname, '..', '..' ),
+module.exports = [
+	{
+		...baseConfig,
+		name: 'blocks',
+		entry: createEntrypoints(),
+		output: {
+			devtoolNamespace: 'wp',
+			filename: './build/block-library/blocks/[name].min.js',
+			path: join( __dirname, '..', '..' ),
+		},
+		plugins: [
+			...plugins,
+			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+			new CopyWebpackPlugin( {
+				patterns: [].concat(
+					[
+						'style',
+						'style-rtl',
+						'editor',
+						'editor-rtl',
+						'theme',
+						'theme-rtl',
+					].map( ( filename ) => ( {
+						from: `./packages/block-library/build-style/*/${ filename }.css`,
+						to( { absoluteFilename } ) {
+							const [ , dirname ] = absoluteFilename.match(
+								new RegExp(
+									`([\\w-]+)${ escapeRegExp(
+										sep
+									) }${ filename }\\.css$`
+								)
+							);
+
+							return join(
+								'build/block-library/blocks',
+								dirname,
+								filename + '.css'
+							);
+						},
+						transform: stylesTransform,
+					} ) ),
+					Object.entries( {
+						'./packages/block-library/src/':
+							'build/block-library/blocks/',
+						'./packages/edit-widgets/src/blocks/':
+							'build/edit-widgets/blocks/',
+						'./packages/widgets/src/blocks/':
+							'build/widgets/blocks/',
+					} ).flatMap( ( [ from, to ] ) => [
+						{
+							from: `${ from }/**/index.php`,
+							to( { absoluteFilename } ) {
+								const [ , dirname ] = absoluteFilename.match(
+									new RegExp(
+										`([\\w-]+)${ escapeRegExp(
+											sep
+										) }index\\.php$`
+									)
+								);
+
+								return join( to, `${ dirname }.php` );
+							},
+							transform: ( content ) => {
+								const prefix = 'gutenberg_';
+								content = content.toString();
+
+								// Within content, search and prefix any function calls from
+								// `prefixFunctions` list. This is needed because some functions
+								// are called inside block files, but have been declared elsewhere.
+								// So with the rename we can call Gutenberg override functions, but the
+								// block will still call the core function when updates are back ported.
+								content = content.replace(
+									new RegExp(
+										prefixFunctions.join( '|' ),
+										'g'
+									),
+									( match ) =>
+										`${ prefix }${ match.replace(
+											/^wp_/,
+											''
+										) }`
+								);
+
+								// Within content, search for any function definitions. For
+								// each, replace every other reference to it in the file.
+								return (
+									Array.from(
+										content.matchAll(
+											/^\s*function ([^\(]+)/gm
+										)
+									)
+										.reduce(
+											( result, [ , functionName ] ) => {
+												// Prepend the Gutenberg prefix, substituting any
+												// other core prefix (e.g. "wp_").
+												return result.replace(
+													new RegExp(
+														functionName,
+														'g'
+													),
+													( match ) =>
+														prefix +
+														match.replace(
+															/^wp_/,
+															''
+														)
+												);
+											},
+											content
+										)
+										// The core blocks override procedure takes place in
+										// the init action default priority to ensure that core
+										// blocks would have been registered already. Since the
+										// blocks implementations occur at the default priority
+										// and due to WordPress hooks behavior not considering
+										// mutations to the same priority during another's
+										// callback, the Gutenberg build blocks are modified
+										// to occur at a later priority.
+										.replace(
+											/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+											'$1, 20'
+										)
+								);
+							},
+							noErrorOnMissing: true,
+						},
+						{
+							from: `${ from }/*/block.json`,
+							to( { absoluteFilename } ) {
+								const [ , dirname ] = absoluteFilename.match(
+									new RegExp(
+										`([\\w-]+)${ escapeRegExp(
+											sep
+										) }block\\.json$`
+									)
+								);
+
+								return join( to, dirname, 'block.json' );
+							},
+						},
+					] )
+				),
+			} ),
+		].filter( Boolean ),
 	},
-	plugins: [
-		...plugins,
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
-		new CopyWebpackPlugin( {
-			patterns: [].concat(
-				[
-					'style',
-					'style-rtl',
-					'editor',
-					'editor-rtl',
-					'theme',
-					'theme-rtl',
-				].map( ( filename ) => ( {
-					from: `./packages/block-library/build-style/*/${ filename }.css`,
-					to( { absoluteFilename } ) {
-						const [ , dirname ] = absoluteFilename.match(
-							new RegExp(
-								`([\\w-]+)${ escapeRegExp(
-									sep
-								) }${ filename }\\.css$`
-							)
-						);
-
-						return join(
-							'build/block-library/blocks',
-							dirname,
-							filename + '.css'
-						);
+	{
+		...baseConfig,
+		watchOptions: {
+			aggregateTimeout: 200,
+		},
+		name: 'interactivity',
+		entry: {
+			file: './packages/block-library/src/file/interactivity.js',
+			navigation:
+				'./packages/block-library/src/navigation/interactivity.js',
+			image: './packages/block-library/src/image/interactivity.js',
+		},
+		output: {
+			devtoolNamespace: 'wp',
+			filename: './blocks/[name]/interactivity.min.js',
+			path: join( __dirname, '..', '..', 'build', 'block-library' ),
+		},
+		optimization: {
+			...baseConfig.optimization,
+			runtimeChunk: {
+				name: 'vendors',
+			},
+			splitChunks: {
+				cacheGroups: {
+					vendors: {
+						name: 'vendors',
+						test: /[\\/]node_modules[\\/]/,
+						filename: './interactivity/[name].min.js',
+						minSize: 0,
+						chunks: 'all',
 					},
-					transform: stylesTransform,
-				} ) ),
-				Object.entries( {
-					'./packages/block-library/src/':
-						'build/block-library/blocks/',
-					'./packages/edit-widgets/src/blocks/':
-						'build/edit-widgets/blocks/',
-					'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
-				} ).flatMap( ( [ from, to ] ) => [
-					{
-						from: `${ from }/**/index.php`,
-						to( { absoluteFilename } ) {
-							const [ , dirname ] = absoluteFilename.match(
-								new RegExp(
-									`([\\w-]+)${ escapeRegExp(
-										sep
-									) }index\\.php$`
-								)
-							);
-
-							return join( to, `${ dirname }.php` );
-						},
-						transform: ( content ) => {
-							const prefix = 'gutenberg_';
-							content = content.toString();
-
-							// Within content, search and prefix any function calls from
-							// `prefixFunctions` list. This is needed because some functions
-							// are called inside block files, but have been declared elsewhere.
-							// So with the rename we can call Gutenberg override functions, but the
-							// block will still call the core function when updates are back ported.
-							content = content.replace(
-								new RegExp( prefixFunctions.join( '|' ), 'g' ),
-								( match ) => `${ prefix }${ match }`
-							);
-
-							// Within content, search for any function definitions. For
-							// each, replace every other reference to it in the file.
-							return (
-								Array.from(
-									content.matchAll(
-										/^\s*function ([^\(]+)/gm
-									)
-								)
-									.reduce( ( result, [ , functionName ] ) => {
-										// Prepend the Gutenberg prefix, substituting any
-										// other core prefix (e.g. "wp_").
-										return result.replace(
-											new RegExp( functionName, 'g' ),
-											( match ) =>
-												prefix +
-												match.replace( /^wp_/, '' )
-										);
-									}, content )
-									// The core blocks override procedure takes place in
-									// the init action default priority to ensure that core
-									// blocks would have been registered already. Since the
-									// blocks implementations occur at the default priority
-									// and due to WordPress hooks behavior not considering
-									// mutations to the same priority during another's
-									// callback, the Gutenberg build blocks are modified
-									// to occur at a later priority.
-									.replace(
-										/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-										'$1, 20'
-									)
-							);
-						},
-						noErrorOnMissing: true,
+					runtime: {
+						name: 'runtime',
+						test: /[\\/]utils[\\/]interactivity[\\/]/,
+						filename: './interactivity/[name].min.js',
+						chunks: 'all',
+						minSize: 0,
+						priority: -10,
 					},
-					{
-						from: `${ from }/*/block.json`,
-						to( { absoluteFilename } ) {
-							const [ , dirname ] = absoluteFilename.match(
-								new RegExp(
-									`([\\w-]+)${ escapeRegExp(
-										sep
-									) }block\\.json$`
-								)
-							);
-
-							return join( to, dirname, 'block.json' );
+				},
+			},
+		},
+		module: {
+			rules: [
+				{
+					test: /\.(j|t)sx?$/,
+					exclude: /node_modules/,
+					use: [
+						{
+							loader: require.resolve( 'babel-loader' ),
+							options: {
+								cacheDirectory:
+									process.env.BABEL_CACHE_DIRECTORY || true,
+								babelrc: false,
+								configFile: false,
+								presets: [
+									[
+										'@babel/preset-react',
+										{
+											runtime: 'automatic',
+											importSource: 'preact',
+										},
+									],
+								],
+							},
 						},
-					},
-				] )
-			),
-		} ),
-	].filter( Boolean ),
-};
+					],
+				},
+			],
+		},
+		plugins: [
+			...plugins,
+			new DependencyExtractionWebpackPlugin( {
+				__experimentalInjectInteractivityRuntime: true,
+				injectPolyfill: false,
+			} ),
+		].filter( Boolean ),
+	},
+];

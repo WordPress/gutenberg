@@ -138,11 +138,7 @@
 				}
 			],
 			"foot": [],
-			"style": {
-				"color": {
-					"background": "#e7f5fe"
-				}
-			}
+			"backgroundColor": "subtle-pale-blue"
 		},
 		"innerBlocks": []
 	}

@@ -17,10 +17,11 @@ export const AsyncModeConsumer = Consumer;
  *
  * ```js
  * import { useSelect, AsyncModeProvider } from '@wordpress/data';
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
  *
  * function BlockCount() {
  *   const count = useSelect( ( select ) => {
- *     return select( 'core/block-editor' ).getBlockCount()
+ *     return select( blockEditorStore ).getBlockCount()
  *   }, [] );
  *
  *   return count;

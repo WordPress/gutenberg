@@ -10,7 +10,8 @@
 			"dimRatio": 100,
 			"backgroundType": "image",
 			"gradient": "luminous-dusk",
-			"isDark": false
+			"isDark": false,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

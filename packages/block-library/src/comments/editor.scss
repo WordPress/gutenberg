@@ -1,3 +1,12 @@
+@import "./style.scss";
+
 .block-library-comments-toolbar__popover .components-popover__content {
 	min-width: 230px;
+}
+
+.wp-block-comments__legacy-placeholder {
+	@extend .wp-block-post-comments;
+	* {
+		pointer-events: none;
+	}
 }

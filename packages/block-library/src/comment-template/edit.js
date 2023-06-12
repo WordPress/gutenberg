@@ -37,6 +37,7 @@ const TEMPLATE = [
  *
  * @param {Object}  settings                       Discussion Settings.
  * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
+ * @param {boolean} [settings.pageComments]        - Enable break comments into pages setting.
  * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
  * @param {number}  [settings.threadCommentsDepth] - Level deep of threaded comments.
  *
@@ -45,42 +46,53 @@ const TEMPLATE = [
  */
 const getCommentsPlaceholder = ( {
 	perPage,
+	pageComments,
 	threadComments,
 	threadCommentsDepth,
 } ) => {
-	// In case that `threadCommentsDepth` is falsy, we default to a somewhat
-	// arbitrary value of 3.
-	// In case that the value is set but larger than 3 we truncate it to 3.
-	const commentsDepth = Math.min( threadCommentsDepth || 3, 3 );
+	// Limit commentsDepth to 3
+	const commentsDepth = ! threadComments
+		? 1
+		: Math.min( threadCommentsDepth, 3 );
 
-	// We set a limit in order not to overload the editor of empty comments.
-	const defaultCommentsToShow =
-		perPage <= commentsDepth ? perPage : commentsDepth;
-	if ( ! threadComments || defaultCommentsToShow === 1 ) {
-		// If displaying threaded comments is disabled, we only show one comment
-		// A commentId is negative in order to avoid conflicts with the actual comments.
-		return [ { commentId: -1, children: [] } ];
-	} else if ( defaultCommentsToShow === 2 ) {
-		return [
-			{
-				commentId: -1,
-				children: [ { commentId: -2, children: [] } ],
-			},
-		];
+	const buildChildrenComment = ( commentsLevel ) => {
+		// Render children comments until commentsDepth is reached
+		if ( commentsLevel < commentsDepth ) {
+			const nextLevel = commentsLevel + 1;
+
+			return [
+				{
+					commentId: -( commentsLevel + 3 ),
+					children: buildChildrenComment( nextLevel ),
+				},
+			];
+		}
+		return [];
+	};
+
+	// Add the first comment and its children
+	const placeholderComments = [
+		{ commentId: -1, children: buildChildrenComment( 1 ) },
+	];
+
+	// Add a second comment unless the break comments setting is active and set to less than 2, and there is one nested comment max
+	if ( ( ! pageComments || perPage >= 2 ) && commentsDepth < 3 ) {
+		placeholderComments.push( {
+			commentId: -2,
+			children: [],
+		} );
+	}
+
+	// Add a third comment unless the break comments setting is active and set to less than 3, and there aren't nested comments
+	if ( ( ! pageComments || perPage >= 3 ) && commentsDepth < 2 ) {
+		placeholderComments.push( {
+			commentId: -3,
+			children: [],
+		} );
 	}
 
 	// In case that the value is set but larger than 3 we truncate it to 3.
-	return [
-		{
-			commentId: -1,
-			children: [
-				{
-					commentId: -2,
-					children: [ { commentId: -3, children: [] } ],
-				},
-			],
-		},
-	];
+	return placeholderComments;
 };
 
 /**
@@ -114,12 +126,11 @@ function CommentTemplateInnerBlocks( {
 				: null }
 
 			{ /* To avoid flicker when switching active block contexts, a preview
-			is ALWAYS rendered and the preview for the active block is hidden.
-			This ensures that when switching the active block, the component is not
-			mounted again but rather it only toggles the `isHidden` prop.
-
-			The same strategy is used for preventing the flicker in the Post Template
-			block. */ }
+			 is ALWAYS rendered and the preview for the active block is hidden.
+			 This ensures that when switching the active block, the component is not
+			 mounted again but rather it only toggles the `isHidden` prop.
+			 The same strategy is used for preventing the flicker in the Post Template
+			 block. */ }
 			<MemoizedCommentTemplatePreview
 				blocks={ blocks }
 				commentId={ comment.commentId }
@@ -239,6 +250,7 @@ export default function CommentTemplateEdit( {
 		threadCommentsDepth,
 		threadComments,
 		commentsPerPage,
+		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
@@ -282,6 +294,7 @@ export default function CommentTemplateEdit( {
 	if ( ! postId ) {
 		commentTree = getCommentsPlaceholder( {
 			perPage: commentsPerPage,
+			pageComments,
 			threadComments,
 			threadCommentsDepth,
 		} );

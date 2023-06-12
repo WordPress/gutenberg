@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { first } from 'lodash';
-
 /** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
 /**
@@ -13,9 +8,8 @@ import { first } from 'lodash';
  * @return {?ElementHandle} Object that represents an in-page DOM element.
  */
 export async function findSidebarPanelToggleButtonWithTitle( panelTitle ) {
-	return first(
-		await page.$x(
-			`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ panelTitle }")]`
-		)
+	const buttons = await page.$x(
+		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ panelTitle }")]`
 	);
+	return buttons[ 0 ];
 }

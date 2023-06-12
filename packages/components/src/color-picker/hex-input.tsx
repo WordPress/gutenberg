@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, Colord } from 'colord';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -11,18 +11,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
-import { ColorHexInputControl } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { StateReducer } from '../input-control/reducer/state';
-
-interface HexInputProps {
-	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
-	enableAlpha: boolean;
-}
+import type { HexInputProps } from './types';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
@@ -49,11 +44,11 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	};
 
 	return (
-		<ColorHexInputControl
+		<InputControl
 			prefix={
 				<Spacer
 					as={ Text }
-					marginLeft={ space( 3.5 ) }
+					marginLeft={ space( 4 ) }
 					color={ COLORS.ui.theme }
 					lineHeight={ 1 }
 				>
@@ -65,7 +60,9 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			size="__unstable-large"
 			__unstableStateReducer={ stateReducer }
+			__unstableInputWidth="9em"
 		/>
 	);
 };

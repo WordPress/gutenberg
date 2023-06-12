@@ -31,15 +31,11 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const isNavigationTool = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
+	const mode = useSelect(
+		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( blockEditorStore );
-
-	const onSwitchMode = ( mode ) => {
-		setNavigationMode( mode === 'edit' ? false : true );
-	};
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -47,7 +43,7 @@ function ToolSelector( props, ref ) {
 				<Button
 					{ ...props }
 					ref={ ref }
-					icon={ isNavigationTool ? selectIcon : editIcon }
+					icon={ mode === 'navigation' ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
@@ -55,13 +51,15 @@ function ToolSelector( props, ref ) {
 					label={ __( 'Tools' ) }
 				/>
 			) }
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			renderContent={ () => (
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={ isNavigationTool ? 'select' : 'edit' }
-							onSelect={ onSwitchMode }
+							value={
+								mode === 'navigation' ? 'navigation' : 'edit'
+							}
+							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
 									value: 'edit',
@@ -73,7 +71,7 @@ function ToolSelector( props, ref ) {
 									),
 								},
 								{
-									value: 'select',
+									value: 'navigation',
 									label: (
 										<>
 											{ selectIcon }

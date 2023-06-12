@@ -16,8 +16,9 @@ describe( 'Block Switcher', () => {
 
 	it( 'Should show the expected block transforms on the list block when the blocks are removed', async () => {
 		// Insert a list block.
-		await insertBlock( 'List' );
-		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '- List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -28,11 +29,9 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Quote',
 				'Heading',
-				'Pullquote',
+				'Quote',
 				'Columns',
-				'Table of Contents',
 			] )
 		);
 	} );
@@ -44,8 +43,9 @@ describe( 'Block Switcher', () => {
 		} );
 
 		// Insert a list block.
-		await insertBlock( 'List' );
-		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '- List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -56,14 +56,17 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Pullquote',
 				'Heading',
-				'Table of Contents',
+				'Columns',
 			] )
 		);
 	} );
 
 	it( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async () => {
+		// Insert a list block.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '- List content' );
+
 		// Remove the paragraph and quote block from the list of registered blocks.
 		await page.evaluate( () => {
 			[
@@ -73,13 +76,10 @@ describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
-				'core/table-of-contents',
-			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
+			].forEach( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
-		// Insert a list block.
-		await insertBlock( 'List' );
-		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -91,8 +91,9 @@ describe( 'Block Switcher', () => {
 	describe( 'Conditional tranformation options', () => {
 		describe( 'Columns tranforms', () => {
 			it( 'Should show Columns block only if selected blocks are between limits (1-6)', async () => {
-				await insertBlock( 'List' );
-				await page.keyboard.type( 'List content' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( '- List content' );
+				await page.keyboard.press( 'ArrowUp' );
 				await insertBlock( 'Heading' );
 				await page.keyboard.type( 'I am a header' );
 				await page.keyboard.down( 'Shift' );
@@ -103,8 +104,9 @@ describe( 'Block Switcher', () => {
 				);
 			} );
 			it( 'Should NOT show Columns transform only if selected blocks are more than max limit(6)', async () => {
-				await insertBlock( 'List' );
-				await page.keyboard.type( 'List content' );
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( '- List content' );
+				await page.keyboard.press( 'ArrowUp' );
 				await insertBlock( 'Heading' );
 				await page.keyboard.type( 'I am a header' );
 				await page.keyboard.press( 'Enter' );

@@ -33,87 +33,93 @@ function Example() {
 
 ## Props
 
+### `children`: `ReactNode`
+
+The children elements.
+
+-   Required: No
+
 ### `margin`: `number`
 
 Adjusts all margins.
 
-- Required: No
-
-### `marginY`: `number`
-
-Adjusts top and bottom margins, potentially overriding the value from the more generic `margin` prop.
-
-- Required: No
-
-### `marginX`: `number`
-
-Adjusts left and right margins, potentially overriding the value from the more generic `margin` prop.
-
-- Required: No
-
-### `marginTop`: `number`
-
-Adjusts top margin, potentially overriding the value from the more generic `margin` and `marginY` props.
-
-- Required: No
+-   Required: No
 
 ### `marginBottom`: `number`
 
 Adjusts bottom margin, potentially overriding the value from the more generic `margin` and `marginY` props.
 
-- Required: No
-- Default: `2`
+-   Required: No
+-   Default: `2`
 
 ### `marginLeft`: `number`
 
 Adjusts left margin, potentially overriding the value from the more generic `margin` and `marginX` props.
 
-- Required: No
+-   Required: No
 
 ### `marginRight`: `number`
 
 Adjusts right margin, potentially overriding the value from the more generic `margin` and `marginX` props.
 
-- Required: No
+-   Required: No
+
+### `marginTop`: `number`
+
+Adjusts top margin, potentially overriding the value from the more generic `margin` and `marginY` props.
+
+-   Required: No
+
+### `marginX`: `number`
+
+Adjusts left and right margins, potentially overriding the value from the more generic `margin` prop.
+
+-   Required: No
+
+### `marginY`: `number`
+
+Adjusts top and bottom margins, potentially overriding the value from the more generic `margin` prop.
+
+-   Required: No
 
 ### `padding`: `number`
 
 Adjusts all padding.
 
-- Required: No
-
-### `paddingY`: `number`
-
-Adjusts top and bottom padding, potentially overriding the value from the more generic `padding` prop.
-
-- Required: No
-
-### `paddingX`: `number`
-
-Adjusts left and right padding, potentially overriding the value from the more generic `padding` prop.
-
-- Required: No
-
-### `paddingTop`: `number`
-
-Adjusts top padding, potentially overriding the value from the more generic `padding` and `paddingY` props.
-
-- Required: No
+-   Required: No
 
 ### `paddingBottom`: `number`
 
 Adjusts bottom padding, potentially overriding the value from the more generic `padding` and `paddingY` props.
 
-- Required: No
+-   Required: No
 
 ### `paddingLeft`: `number`
 
 Adjusts left padding, potentially overriding the value from the more generic `padding` and `paddingX` props.
 
-- Required: No
+-   Required: No
 
 ### `paddingRight`: `number`
 
 Adjusts right padding, potentially overriding the value from the more generic `padding` and `paddingX` props.
 
-- Required: No
+-   Required: No
+
+### `paddingTop`: `number`
+
+Adjusts top padding, potentially overriding the value from the more generic `padding` and `paddingY` props.
+
+-   Required: No
+
+### `paddingX`: `number`
+
+Adjusts left and right padding, potentially overriding the value from the more generic `padding` prop.
+
+-   Required: No
+
+### `paddingY`: `number`
+
+Adjusts top and bottom padding, potentially overriding the value from the more generic `padding` prop.
+
+-   Required: No

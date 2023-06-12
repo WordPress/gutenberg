@@ -1,6 +1,9 @@
 package com.gutenberg;
 
+import static org.wordpress.mobile.WPAndroidGlue.Media.createRNMediaUsingMimeType;
+
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -11,10 +14,10 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
@@ -23,6 +26,7 @@ import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeInterface;
@@ -30,7 +34,6 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergWebViewActivity;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
-import org.wordpress.mobile.WPAndroidGlue.Media;
 
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -38,13 +41,14 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.RNGestureHandlerPackage;
-import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import org.wordpress.mobile.WPAndroidGlue.Media;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -80,20 +84,27 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 List<RNMedia> rnMediaList = new ArrayList<>();
+                WritableNativeMap emptyMetadata = new WritableNativeMap();
 
                 switch (mediaType) {
                     case IMAGE:
-                        rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", ""));
+                        Media image = new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground", emptyMetadata);
+                        rnMediaList.add(image);
                         break;
                     case VIDEO:
-                        rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        WritableNativeMap metadata = new WritableNativeMap();
+                        metadata.putString("extraID", "AbCdE");
+                        Media video = new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", "", "", metadata);
+                        rnMediaList.add(video);
                         break;
                     case ANY:
                     case OTHER:
-                        rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
+                        Media other = new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip", "", emptyMetadata);
+                        rnMediaList.add(other);
                         break;
                     case AUDIO:
-                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        Media audio = new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", "", "", emptyMetadata);
+                        rnMediaList.add(audio);
                         break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
@@ -145,13 +156,19 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection) {
                 if (mediaSource.equals("1")) {
                     List<RNMedia> rnMediaList = new ArrayList<>();
-                    rnMediaList.add(new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
+                    Media pdf = new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf", "", new WritableNativeMap());
+                    rnMediaList.add(pdf);
                     mediaSelectedCallback.onMediaFileSelected(rnMediaList);
                 }
             }
 
             @Override
             public void requestImageFullscreenPreview(String mediaUrl) {
+
+            }
+
+            @Override
+            public void requestEmbedFullscreenPreview(String content, String title) {
 
             }
 
@@ -188,7 +205,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performGetRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+
+            @Override
+            public void performPostRequest(String path, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
@@ -303,17 +323,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new RNPromptPackage(),
                         new RNCWebViewPackage(),
                         new ClipboardPackage(),
+                        new FastImageViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
             @Override
             protected String getJSMainModuleName() {
                 return "index";
-            }
-
-            @Override
-            protected JSIModulePackage getJSIModulePackage() {
-                return new ReanimatedJSIModulePackage();
             }
         };
     }
@@ -350,6 +366,38 @@ public class MainApplication extends Application implements ReactApplication, Gu
     public void onCreate() {
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
+        initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    }
+
+    /**
+     * Loads Flipper in React Native templates. Call this in the onCreate method with something like
+     * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+     *
+     * @param context
+     * @param reactInstanceManager
+     */
+    private static void initializeFlipper(
+            Context context, ReactInstanceManager reactInstanceManager) {
+        if (BuildConfig.DEBUG) {
+            try {
+        /*
+         We use reflection here to pick up the class that initializes Flipper,
+        since Flipper library is not available in release mode
+        */
+                Class<?> aClass = Class.forName("com.gutenberg.ReactNativeFlipper");
+                aClass
+                        .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
+                        .invoke(null, context, reactInstanceManager);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void createCustomDevOptions(ReactNativeHost reactNativeHost) {

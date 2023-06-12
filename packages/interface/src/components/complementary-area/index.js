@@ -47,26 +47,29 @@ function useAdjustComplementaryListener(
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	useEffect( () => {
-		// If the complementary area is active and the editor is switching from a big to a small window size.
+		// If the complementary area is active and the editor is switching from
+		// a big to a small window size.
 		if ( isActive && isSmall && ! previousIsSmall.current ) {
-			// Disable the complementary area.
 			disableComplementaryArea( scope );
-			// Flag the complementary area to be reopened when the window size goes from small to big.
+			// Flag the complementary area to be reopened when the window size
+			// goes from small to big.
 			shouldOpenWhenNotSmall.current = true;
 		} else if (
-			// If there is a flag indicating the complementary area should be enabled when we go from small to big window size
-			// and we are going from a small to big window size.
+			// If there is a flag indicating the complementary area should be
+			// enabled when we go from small to big window size and we are going
+			// from a small to big window size.
 			shouldOpenWhenNotSmall.current &&
 			! isSmall &&
 			previousIsSmall.current
 		) {
-			// Remove the flag indicating the complementary area should be enabled.
+			// Remove the flag indicating the complementary area should be
+			// enabled.
 			shouldOpenWhenNotSmall.current = false;
-			// Enable the complementary area.
 			enableComplementaryArea( scope, identifier );
 		} else if (
-			// If the flag is indicating the current complementary should be reopened but another complementary area becomes active,
-			// remove the flag.
+			// If the flag is indicating the current complementary should be
+			// reopened but another complementary area becomes active, remove
+			// the flag.
 			shouldOpenWhenNotSmall.current &&
 			activeArea &&
 			activeArea !== identifier
@@ -97,21 +100,29 @@ function ComplementaryArea( {
 	isActiveByDefault,
 	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea, isItemPinned } =
-				select( interfaceStore );
-			const _activeArea = getActiveComplementaryArea( scope );
-			return {
-				isActive: _activeArea === identifier,
-				isPinned: isItemPinned( scope, identifier ),
-				activeArea: _activeArea,
-				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
-				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
-			};
-		},
-		[ identifier, scope ]
-	);
+	const { isLoading, isActive, isPinned, activeArea, isSmall, isLarge } =
+		useSelect(
+			( select ) => {
+				const {
+					getActiveComplementaryArea,
+					isComplementaryAreaLoading,
+					isItemPinned,
+				} = select( interfaceStore );
+
+				const _activeArea = getActiveComplementaryArea( scope );
+
+				return {
+					isLoading: isComplementaryAreaLoading( scope ),
+					isActive: _activeArea === identifier,
+					isPinned: isItemPinned( scope, identifier ),
+					activeArea: _activeArea,
+					isSmall:
+						select( viewportStore ).isViewportMatch( '< medium' ),
+					isLarge: select( viewportStore ).isViewportMatch( 'large' ),
+				};
+			},
+			[ identifier, scope ]
+		);
 	useAdjustComplementaryListener(
 		scope,
 		identifier,
@@ -127,8 +138,12 @@ function ComplementaryArea( {
 	} = useDispatch( interfaceStore );
 
 	useEffect( () => {
+		// Set initial visibility: For large screens, enable if it's active by
+		// default. For small screens, always initially disable.
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
 			enableComplementaryArea( scope, identifier );
+		} else if ( activeArea === undefined && isSmall ) {
+			disableComplementaryArea( scope, identifier );
 		}
 	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
 
@@ -144,6 +159,7 @@ function ComplementaryArea( {
 								isActive && ( ! showIconLabels || isLarge )
 							}
 							aria-expanded={ isActive }
+							aria-disabled={ isLoading }
 							label={ title }
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }

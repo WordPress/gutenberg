@@ -37,6 +37,7 @@ export * from './twitch';
 export * from './twitter';
 export * from './vimeo';
 export * from './vk';
+export * from './whatsapp';
 export * from './wordpress';
 export * from './yelp';
 export * from './youtube';

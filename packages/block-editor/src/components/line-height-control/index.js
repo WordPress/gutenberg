@@ -21,6 +21,7 @@ const LineHeightControl = ( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
+	...otherProps
 } ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
@@ -83,20 +84,36 @@ const LineHeightControl = ( {
 		? undefined
 		: { marginBottom: 24 };
 
+	const handleOnChange = ( nextValue, { event } ) => {
+		if ( nextValue === '' ) {
+			onChange();
+			return;
+		}
+
+		if ( event.type === 'click' ) {
+			onChange( adjustNextValue( `${ nextValue }`, false ) );
+			return;
+		}
+
+		onChange( `${ nextValue }` );
+	};
+
 	return (
 		<div
 			className="block-editor-line-height-control"
 			style={ deprecatedStyles }
 		>
 			<NumberControl
+				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
-				onChange={ onChange }
+				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				value={ value }
 				min={ 0 }
+				spinControls="custom"
 			/>
 		</div>
 	);

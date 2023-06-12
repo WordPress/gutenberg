@@ -37,7 +37,7 @@ SlotFills are created using `createSlotFill`. This creates two components, `Slot
 
 ```js
 /**
- * Defines as extensibility slot for the Status & visibility panel.
+ * Defines as extensibility slot for the Summary panel.
  */
 
 /**
@@ -58,7 +58,7 @@ PluginPostStatusInfo.Slot = Slot;
 export default PluginPostStatusInfo;
 ```
 
-This new Slot is then exposed in the editor. The example below is from core and represents the Status & visibility panel.
+This new Slot is then exposed in the editor. The example below is from core and represents the Summary panel.
 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
 Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed between the `<PostAuthor/>` and `<PostTrash/>` components.
@@ -69,13 +69,13 @@ See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-p
 const PostStatus = ( { isOpened, onTogglePanel } ) => (
 	<PanelBody
 		className="edit-post-post-status"
-		title={ __( 'Status & visibility' ) }
+		title={ __( 'Summary' ) }
 		opened={ isOpened }
 		onToggle={ onTogglePanel }
 	>
 		<PluginPostStatusInfo.Slot>
 			{ ( fills ) => (
-				<Fragment>
+				<>
 					<PostVisibility />
 					<PostSchedule />
 					<PostFormat />
@@ -84,7 +84,7 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 					<PostAuthor />
 					{ fills }
 					<PostTrash />
-				</Fragment>
+				</>
 			) }
 		</PluginPostStatusInfo.Slot>
 	</PanelBody>

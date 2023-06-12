@@ -4,9 +4,7 @@
 import type {
 	CSSProperties,
 	ReactNode,
-	ChangeEvent,
 	SyntheticEvent,
-	PointerEvent,
 	HTMLInputTypeAttribute,
 } from 'react';
 import type { useDrag } from '@use-gesture/react';
@@ -17,6 +15,7 @@ import type { useDrag } from '@use-gesture/react';
 import type { StateReducer } from './reducer/state';
 import type { WordPressComponentProps } from '../ui/context';
 import type { FlexProps } from '../flex/types';
+import type { BaseControlProps } from '../base-control/types';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -62,10 +61,10 @@ interface BaseProps {
 	size?: Size;
 }
 
-export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
-	P = {}
-> = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
+export type InputChangeCallback< P = {} > = (
+	nextValue: string | undefined,
+	extra: { event: SyntheticEvent } & P
+) => void;
 
 export interface InputFieldProps extends BaseProps {
 	/**
@@ -102,6 +101,8 @@ export interface InputFieldProps extends BaseProps {
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >
 	) => void;
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	/**
@@ -123,10 +124,38 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	children: ReactNode;
 	/**
 	 * Renders an element on the left side of the input.
+	 *
+	 * By default, the prefix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlPrefixWrapper>` component.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
+	 * />
 	 */
 	prefix?: ReactNode;
 	/**
 	 * Renders an element on the right side of the input.
+	 *
+	 * By default, the suffix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlSuffixWrapper>` component.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
+	 * />
 	 */
 	suffix?: ReactNode;
 	/**
@@ -135,8 +164,6 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * @default false
 	 */
 	disabled?: boolean;
-	className?: string;
-	id?: string;
 	/**
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
@@ -145,6 +172,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 
 export interface InputControlProps
 	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
+		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
@@ -152,12 +180,17 @@ export interface InputControlProps
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
 		 *
-		 * `isFocused` and `setIsFocused` are managed internally by the InputControl, but the rest of the props
-		 * for InputField are passed through.
+		 * `isFocused`, `setIsFocused`, `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
+		 * the InputControl, but the rest of the props for InputField are passed through.
 		 */
 		Omit<
 			WordPressComponentProps< InputFieldProps, 'input', false >,
-			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
+			| 'stateReducer'
+			| 'prefix'
+			| 'isFocused'
+			| 'setIsFocused'
+			| 'paddingInlineStart'
+			| 'paddingInlineEnd'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }
@@ -168,3 +201,17 @@ export interface InputControlLabelProps {
 	labelPosition?: BaseProps[ 'labelPosition' ];
 	size?: BaseProps[ 'size' ];
 }
+
+export type InputControlPrefixWrapperProps = {
+	/**
+	 * The prefix to be inserted.
+	 */
+	children: ReactNode;
+};
+
+export type InputControlSuffixWrapperProps = {
+	/**
+	 * The suffix to be inserted.
+	 */
+	children: ReactNode;
+};

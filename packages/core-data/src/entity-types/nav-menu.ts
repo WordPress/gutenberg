@@ -4,7 +4,6 @@
 import type { Context, ContextualField, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -49,5 +48,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type NavMenu< C extends Context = DefaultContextOf< 'root', 'menu' > > =
-	OmitNevers< _BaseEntityRecords.NavMenu< C > >;
+export type NavMenu< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.NavMenu< C >
+>;

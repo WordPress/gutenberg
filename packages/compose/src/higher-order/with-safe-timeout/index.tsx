@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -64,7 +59,9 @@ const withSafeTimeout = createHigherOrderComponent(
 
 			clearTimeout( id: number ) {
 				clearTimeout( id );
-				this.timeouts = without( this.timeouts, id );
+				this.timeouts = this.timeouts.filter(
+					( timeoutId ) => timeoutId !== id
+				);
 			}
 
 			render() {

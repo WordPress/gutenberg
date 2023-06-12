@@ -9,73 +9,35 @@ import {
 	mode,
 } from '../utils';
 
+const defaultUnitSelections = {
+	flat: undefined,
+	topLeft: '%',
+	topRight: 'rem',
+	bottomLeft: 'rem',
+	bottomRight: 'vw',
+};
+
 describe( 'getAllUnit', () => {
-	describe( 'when provided string based values', () => {
-		it( 'should return valid unit when passed a valid unit', () => {
-			expect( getAllUnit( '32em' ) ).toBe( 'em' );
-		} );
-
-		it( 'should fall back to px when passed an invalid unit', () => {
-			expect( getAllUnit( '32apples' ) ).toBe( 'px' );
-		} );
-
-		it( 'should fall back to px when passed a value without a unit', () => {
-			expect( getAllUnit( '32' ) ).toBe( 'px' );
-		} );
+	it( 'should return flat radius unit when selected', () => {
+		const selectedUnits = { ...defaultUnitSelections, flat: 'em' };
+		expect( getAllUnit( selectedUnits ) ).toBe( 'em' );
 	} );
 
-	describe( 'when provided object based values', () => {
-		it( 'should return the most common value', () => {
-			const values = {
-				bottomLeft: '2em',
-				bottomRight: '2em',
-				topLeft: '0',
-				topRight: '2px',
-			};
-			expect( getAllUnit( values ) ).toBe( 'em' );
-		} );
-
-		it( 'should return the real value when the most common value is undefined', () => {
-			const values = {
-				bottomLeft: '0',
-				bottomRight: '0',
-				topLeft: '0',
-				topRight: '2em',
-			};
-			expect( getAllUnit( values ) ).toBe( 'em' );
-		} );
-
-		it( 'should return the most common value there are no undefined values', () => {
-			const values = {
-				bottomLeft: '1em',
-				bottomRight: '1em',
-				topLeft: '2px',
-				topRight: '2em',
-			};
-			expect( getAllUnit( values ) ).toBe( 'em' );
-		} );
-
-		it( 'should fall back to px when all values are undefined or equivalent', () => {
-			const values = {
-				bottomLeft: '0',
-				bottomRight: undefined,
-				topLeft: undefined,
-				topRight: '0',
-			};
-			expect( getAllUnit( values ) ).toBe( 'px' );
-		} );
+	it( 'should return most common corner unit', () => {
+		expect( getAllUnit( defaultUnitSelections ) ).toBe( 'rem' );
 	} );
 
-	describe( 'when provided invalid values', () => {
-		it( 'should return px when passed an array', () => {
-			expect( getAllUnit( [] ) ).toBe( 'px' );
-		} );
-		it( 'should return px when passed a boolean', () => {
-			expect( getAllUnit( false ) ).toBe( 'px' );
-		} );
-		it( 'should return px when passed undefined', () => {
-			expect( getAllUnit( false ) ).toBe( 'px' );
-		} );
+	it( 'should return a real unit when the most common is undefined', () => {
+		expect( getAllUnit( { bottomRight: '%' } ) ).toBe( '%' );
+	} );
+
+	it( 'should return most common corner unit when some are unselected', () => {
+		const selectedUnits = { ...defaultUnitSelections, topLeft: undefined };
+		expect( getAllUnit( selectedUnits ) ).toBe( 'rem' );
+	} );
+
+	it( 'should fallback to px when all values are undefined', () => {
+		expect( getAllUnit( {} ) ).toBe( 'px' );
 	} );
 } );
 

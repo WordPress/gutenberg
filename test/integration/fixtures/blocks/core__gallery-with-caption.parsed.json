@@ -42,13 +42,13 @@
 				]
 			}
 		],
-		"innerHTML": "\n<figure\n\tclass=\"wp-block-gallery has-nested-images columns-default is-cropped columns-2\"\n>\n\t\n\n\t\n\t<figcaption class=\"blocks-gallery-caption\">Gallery Caption</figcaption>\n</figure>\n",
+		"innerHTML": "\n<figure\n\tclass=\"wp-block-gallery has-nested-images columns-default is-cropped columns-2\"\n>\n\t\n\n\t\n\t<figcaption class=\"blocks-gallery-caption wp-element-caption\">Gallery Caption</figcaption>\n</figure>\n",
 		"innerContent": [
 			"\n<figure\n\tclass=\"wp-block-gallery has-nested-images columns-default is-cropped columns-2\"\n>\n\t",
 			null,
 			"\n\n\t",
 			null,
-			"\n\t<figcaption class=\"blocks-gallery-caption\">Gallery Caption</figcaption>\n</figure>\n"
+			"\n\t<figcaption class=\"blocks-gallery-caption wp-element-caption\">Gallery Caption</figcaption>\n</figure>\n"
 		]
 	}
 ]

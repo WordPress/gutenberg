@@ -17,6 +17,8 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
+import { pasteHandler } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -71,14 +73,22 @@ export function MediaPlaceholder( {
 	onSelect,
 	onCancel,
 	onSelectURL,
+	onToggleFeaturedImage,
 	onDoubleClick,
 	onFilesPreUpload = noop,
-	onHTMLDrop = noop,
+	onHTMLDrop: deprecatedOnHTMLDrop,
 	children,
 	mediaLibraryButton,
 	placeholder,
 	style,
 } ) {
+	if ( deprecatedOnHTMLDrop ) {
+		deprecated( 'wp.blockEditor.MediaPlaceholder onHTMLDrop prop', {
+			since: '6.2',
+			version: '6.4',
+		} );
+	}
+
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -175,6 +185,70 @@ export function MediaPlaceholder( {
 			onError,
 		} );
 	};
+
+	async function handleBlocksDrop( blocks ) {
+		if ( ! blocks || ! Array.isArray( blocks ) ) {
+			return;
+		}
+
+		function recursivelyFindMediaFromBlocks( _blocks ) {
+			return _blocks.flatMap( ( block ) =>
+				( block.name === 'core/image' ||
+					block.name === 'core/audio' ||
+					block.name === 'core/video' ) &&
+				block.attributes.url
+					? [ block ]
+					: recursivelyFindMediaFromBlocks( block.innerBlocks )
+			);
+		}
+
+		const mediaBlocks = recursivelyFindMediaFromBlocks( blocks );
+
+		if ( ! mediaBlocks.length ) {
+			return;
+		}
+
+		const uploadedMediaList = await Promise.all(
+			mediaBlocks.map( ( block ) =>
+				block.attributes.id
+					? block.attributes
+					: new Promise( ( resolve, reject ) => {
+							window
+								.fetch( block.attributes.url )
+								.then( ( response ) => response.blob() )
+								.then( ( blob ) =>
+									mediaUpload( {
+										filesList: [ blob ],
+										additionalData: {
+											title: block.attributes.title,
+											alt_text: block.attributes.alt,
+											caption: block.attributes.caption,
+										},
+										onFileChange: ( [ media ] ) => {
+											if ( media.id ) {
+												resolve( media );
+											}
+										},
+										allowedTypes,
+										onError: reject,
+									} )
+								)
+								.catch( () => resolve( block.attributes.url ) );
+					  } )
+			)
+		).catch( ( err ) => onError( err ) );
+
+		if ( multiple ) {
+			onSelect( uploadedMediaList );
+		} else {
+			onSelect( uploadedMediaList[ 0 ] );
+		}
+	}
+
+	async function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML } );
+		return await handleBlocksDrop( blocks );
+	}
 
 	const onUpload = ( event ) => {
 		onFilesUpload( event.target.files );
@@ -307,6 +381,22 @@ export function MediaPlaceholder( {
 		);
 	};
 
+	const renderFeaturedImageToggle = () => {
+		return (
+			onToggleFeaturedImage && (
+				<div className="block-editor-media-placeholder__url-input-container">
+					<Button
+						className="block-editor-media-placeholder__button"
+						onClick={ onToggleFeaturedImage }
+						variant="tertiary"
+					>
+						{ __( 'Use featured image' ) }
+					</Button>
+				</div>
+			)
+		);
+	};
+
 	const renderMediaUploadChecked = () => {
 		const defaultButton = ( { open } ) => {
 			return (
@@ -328,6 +418,7 @@ export function MediaPlaceholder( {
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
+				mode={ 'browse' }
 				value={
 					Array.isArray( value )
 						? value.map( ( { id } ) => id )
@@ -360,6 +451,7 @@ export function MediaPlaceholder( {
 									</Button>
 									{ uploadMediaLibraryButton }
 									{ renderUrlSelectionUI() }
+									{ renderFeaturedImageToggle() }
 									{ renderCancelLink() }
 								</>
 							);
@@ -388,6 +480,7 @@ export function MediaPlaceholder( {
 					</FormFileUpload>
 					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
+					{ renderFeaturedImageToggle() }
 					{ renderCancelLink() }
 				</>
 			);

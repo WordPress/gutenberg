@@ -40,14 +40,10 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function TextareaControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to TextareaControl.
-	props: Omit<
-		WordPressComponentProps< TextareaControlProps, 'textarea', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		hideLabelFromVision,
 		value,
@@ -64,6 +60,7 @@ export function TextareaControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }

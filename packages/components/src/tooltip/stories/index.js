@@ -1,15 +1,4 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-import { text, select, number } from '@storybook/addon-knobs';
-
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import Tooltip from '../';
@@ -17,64 +6,80 @@ import Tooltip from '../';
 export default {
 	title: 'Components/ToolTip',
 	component: Tooltip,
+	argTypes: {
+		delay: { control: 'number' },
+		position: {
+			control: {
+				type: 'select',
+				options: [
+					'top left',
+					'top center',
+					'top right',
+					'bottom left',
+					'bottom center',
+					'bottom right',
+				],
+			},
+		},
+		text: { control: 'text' },
+	},
 	parameters: {
-		knobs: { disable: false },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-export const _default = () => {
-	const positionOptions = {
-		'top left': 'top left',
-		'top center ': 'top center',
-		'top right': 'top right',
-		'bottom left': 'bottom left',
-		'bottom center ': 'bottom center',
-		'bottom right': 'bottom right',
-	};
-	const tooltipText = text( 'Text', 'More information' );
-	const position = select( 'Position', positionOptions, 'top center' );
-	const delay = number( 'Delay', 700 );
-	return (
-		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
-			<div
-				style={ {
-					margin: '50px auto',
-					width: '200px',
-					padding: '20px',
-					textAlign: 'center',
-					border: '1px solid #ccc',
-				} }
-			>
-				Hover for more information
-			</div>
-		</Tooltip>
-	);
+const Template = ( args ) => {
+	return <Tooltip { ...args } />;
 };
 
-const Button = styled.button`
-	margin: 0 10px;
-`;
+export const Default = Template.bind( {} );
+Default.args = {
+	text: 'More information',
+	children: (
+		<div
+			style={ {
+				margin: '50px auto',
+				width: '200px',
+				padding: '20px',
+				textAlign: 'center',
+				border: '1px solid #ccc',
+			} }
+		>
+			Hover for more information
+		</div>
+	),
+};
 
-export const DisabledElement = () => {
-	const [ showMessage, toggleMessage ] = useState( false );
+export const SmallTarget = Template.bind( {} );
+SmallTarget.args = {
+	...Default.args,
+	children: (
+		<div
+			style={ {
+				margin: '50px auto',
+				width: 'min-content',
+				padding: '4px',
+				textAlign: 'center',
+				border: '1px solid #ccc',
+			} }
+		>
+			Small target
+		</div>
+	),
+};
 
-	return (
-		<>
-			<Tooltip text="Hey, I am tooltip" position="bottom center">
-				<Button onClick={ () => toggleMessage( ! showMessage ) }>
-					Hover me!
-				</Button>
-			</Tooltip>
-			<Tooltip text="Hey, I am tooltip" position="bottom center">
-				<Button
-					disabled
-					onClick={ () => toggleMessage( ! showMessage ) }
-				>
-					Hover me, but I am disabled
-				</Button>
-			</Tooltip>
-			<br />
-			{ showMessage ? <p>Hello World!</p> : null }
-		</>
-	);
+export const DisabledChild = Template.bind( {} );
+DisabledChild.args = {
+	...Default.args,
+	children: (
+		<button
+			disabled
+			onClick={ () =>
+				// eslint-disable-next-line no-alert
+				window.alert( 'This alert should not be triggered' )
+			}
+		>
+			Hover me, but I am disabled
+		</button>
+	),
 };

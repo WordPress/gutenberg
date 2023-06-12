@@ -2,6 +2,78 @@
 
 ## Unreleased
 
+## 9.5.0 (2023-06-07)
+
+## 9.4.0 (2023-05-24)
+
+## 9.3.0 (2023-05-10)
+
+## 9.2.0 (2023-04-26)
+
+## 9.1.0 (2023-04-12)
+
+## 9.0.0 (2023-03-29)
+
+### Breaking Changes
+
+-   The `registry.register` function will no longer register a store if another instance is registered with the same name.
+
+## 8.6.0 (2023-03-15)
+
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   The `registry.subscribe` function can now subscribe to updates only from one specific store, with a new optional parameter.
+
+## 7.6.0 (2022-11-16)
+
+## 7.5.0 (2022-11-02)
+
+## 7.4.0 (2022-10-19)
+
+## 7.3.0 (2022-10-05)
+
+## 7.2.0 (2022-09-21)
+
+## 7.1.0 (2022-09-13)
+
+## 7.0.0 (2022-08-24)
+
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 6.15.0 (2022-08-10)
+
+## 6.14.0 (2022-07-27)
+
+## 6.13.0 (2022-07-13)
+
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
+## 6.12.0 (2022-06-29)
+
 ## 6.11.0 (2022-06-15)
 
 ## 6.10.0 (2022-06-01)

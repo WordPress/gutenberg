@@ -1,39 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export default function useNavigationMenu( ref ) {
+	const permissions = useResourcePermissions( 'navigation', ref );
+
 	return useSelect(
 		( select ) => {
+			const {
+				canCreate,
+				canUpdate,
+				canDelete,
+				isResolving,
+				hasResolved,
+			} = permissions;
+
 			const {
 				navigationMenus,
 				isResolvingNavigationMenus,
 				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select, ref );
+			} = selectNavigationMenus( select );
 
 			const {
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
 			} = selectExistingMenu( select, ref );
-
-			const {
-				canUserCreateNavigationMenu,
-				isResolvingCanUserCreateNavigationMenu,
-				hasResolvedCanUserCreateNavigationMenu,
-			} = selectMenuCreatePermissions( select );
-
-			const {
-				canUserUpdateNavigationMenu,
-				hasResolvedCanUserUpdateNavigationMenu,
-			} = selectMenuUpdatePermissions( select, ref );
-
-			const {
-				canUserDeleteNavigationMenu,
-				hasResolvedCanUserDeleteNavigationMenu,
-			} = selectMenuDeletePermissions( select, ref );
 
 			return {
 				navigationMenus,
@@ -44,22 +41,26 @@ export default function useNavigationMenu( ref ) {
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
 
-				canUserCreateNavigationMenu,
-				isResolvingCanUserCreateNavigationMenu,
-				hasResolvedCanUserCreateNavigationMenu,
-
-				canUserUpdateNavigationMenu,
-				hasResolvedCanUserUpdateNavigationMenu,
-
-				canUserDeleteNavigationMenu,
-				hasResolvedCanUserDeleteNavigationMenu,
-
 				canSwitchNavigationMenu: ref
 					? navigationMenus?.length > 1
 					: navigationMenus?.length > 0,
+
+				canUserCreateNavigationMenu: canCreate,
+				isResolvingCanUserCreateNavigationMenu: isResolving,
+				hasResolvedCanUserCreateNavigationMenu: hasResolved,
+
+				canUserUpdateNavigationMenu: canUpdate,
+				hasResolvedCanUserUpdateNavigationMenu: ref
+					? hasResolved
+					: undefined,
+
+				canUserDeleteNavigationMenu: canDelete,
+				hasResolvedCanUserDeleteNavigationMenu: ref
+					? hasResolved
+					: undefined,
 			};
 		},
-		[ ref ]
+		[ ref, permissions ]
 	);
 }
 
@@ -70,7 +71,7 @@ function selectNavigationMenus( select ) {
 	const args = [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{ per_page: -1, status: [ 'publish', 'draft' ] },
 	];
 	return {
 		navigationMenus: getEntityRecords( ...args ),
@@ -101,70 +102,24 @@ function selectExistingMenu( select, ref ) {
 		args
 	);
 
+	// Only published Navigation posts are considered valid.
+	// Draft Navigation posts are valid only on the editor,
+	// requiring a post update to publish to show in frontend.
+	// To achieve that, index.php must reflect this validation only for published.
+	const isNavigationMenuPublishedOrDraft =
+		editedNavigationMenu.status === 'publish' ||
+		editedNavigationMenu.status === 'draft';
+
 	return {
 		isNavigationMenuResolved: hasResolvedNavigationMenu,
-		isNavigationMenuMissing: hasResolvedNavigationMenu && ! navigationMenu,
+		isNavigationMenuMissing:
+			hasResolvedNavigationMenu &&
+			( ! navigationMenu || ! isNavigationMenuPublishedOrDraft ),
 
 		// getEditedEntityRecord will return the post regardless of status.
 		// Therefore if the found post is not published then we should ignore it.
-		navigationMenu:
-			editedNavigationMenu.status === 'publish'
-				? editedNavigationMenu
-				: null,
-	};
-}
-
-function selectMenuCreatePermissions( select ) {
-	const { hasFinishedResolution, isResolving, canUser } = select( coreStore );
-
-	const args = [ 'create', 'navigation' ];
-	return {
-		canUserCreateNavigationMenu: !! canUser( ...args ),
-		isResolvingCanUserCreateNavigationMenu: !! isResolving(
-			'canUser',
-			args
-		),
-		hasResolvedCanUserCreateNavigationMenu: !! hasFinishedResolution(
-			'canUser',
-			args
-		),
-	};
-}
-
-function selectMenuUpdatePermissions( select, ref ) {
-	if ( ! ref ) {
-		return {
-			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
-		};
-	}
-
-	const { hasFinishedResolution, canUser } = select( coreStore );
-	const args = [ 'update', 'navigation', ref ];
-	return {
-		canUserUpdateNavigationMenu: !! canUser( ...args ),
-		hasResolvedCanUserUpdateNavigationMenu: !! hasFinishedResolution(
-			'canUser',
-			args
-		),
-	};
-}
-
-function selectMenuDeletePermissions( select, ref ) {
-	if ( ! ref ) {
-		return {
-			canUserDeleteNavigationMenu: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-		};
-	}
-
-	const { hasFinishedResolution, canUser } = select( coreStore );
-	const args = [ 'delete', 'navigation', ref ];
-	return {
-		canUserDeleteNavigationMenu: !! canUser( ...args ),
-		hasResolvedCanUserDeleteNavigationMenu: !! hasFinishedResolution(
-			'canUser',
-			args
-		),
+		navigationMenu: isNavigationMenuPublishedOrDraft
+			? editedNavigationMenu
+			: null,
 	};
 }

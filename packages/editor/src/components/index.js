@@ -13,6 +13,7 @@ export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as EditorSnackbars } from './editor-snackbars';
 export { default as EntitiesSavedStates } from './entities-saved-states';
+export { useIsDirty as useEntitiesSavedStatesIsDirty } from './entities-saved-states/hooks/use-is-dirty';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -41,28 +42,39 @@ export { default as PostPublishPanel } from './post-publish-panel';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';
-export { default as PostScheduleLabel } from './post-schedule/label';
+export {
+	default as PostScheduleLabel,
+	usePostScheduleLabel,
+} from './post-schedule/label';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
 export { default as PostTaxonomies } from './post-taxonomies';
-export { default as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
-export { default as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
+export { FlatTermSelector as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
+export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
+export { default as PostURL } from './post-url';
+export { default as PostURLCheck } from './post-url/check';
+export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
 export { default as PostVisibility } from './post-visibility';
-export { default as PostVisibilityLabel } from './post-visibility/label';
+export {
+	default as PostVisibilityLabel,
+	usePostVisibilityLabel,
+} from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
 export { default as ThemeSupportCheck } from './theme-support-check';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
+export { default as TimeToRead } from './time-to-read';
+export { default as CharacterCount } from './character-count';
 
 // State Related Components.
 export { default as EditorProvider } from './provider';

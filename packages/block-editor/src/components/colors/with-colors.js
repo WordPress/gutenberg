@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,16 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -73,18 +83,14 @@ const withEditorColorPalette = () =>
  * @return {WPComponent} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
-	const colorMap = reduce(
-		colorTypes,
-		( colorObject, colorType ) => {
-			return {
-				...colorObject,
-				...( isString( colorType )
-					? { [ colorType ]: kebabCase( colorType ) }
-					: colorType ),
-			};
-		},
-		{}
-	);
+	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
+		return {
+			...colorObject,
+			...( typeof colorType === 'string'
+				? { [ colorType ]: kebabCase( colorType ) }
+				: colorType ),
+		};
+	}, {} );
 
 	return compose( [
 		withColorPalette,
@@ -108,13 +114,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 				}
 
 				createSetters() {
-					return reduce(
-						colorMap,
-						(
-							settersAccumulator,
-							colorContext,
-							colorAttributeName
-						) => {
+					return Object.keys( colorMap ).reduce(
+						( settersAccumulator, colorAttributeName ) => {
 							const upperFirstColorAttributeName =
 								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
@@ -153,9 +154,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					{ attributes, colors },
 					previousState
 				) {
-					return reduce(
-						colorMap,
-						( newState, colorContext, colorAttributeName ) => {
+					return Object.entries( colorMap ).reduce(
+						( newState, [ colorAttributeName, colorContext ] ) => {
 							const colorObject = getColorObjectByAttributeValues(
 								colors,
 								attributes[ colorAttributeName ],

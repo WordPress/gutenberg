@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -46,11 +41,11 @@ export class MediaEdit extends Component {
 	getMediaOptionsItems() {
 		const { pickerOptions, openReplaceMediaOptions, source } = this.props;
 
-		return compact( [
+		return [
 			source?.uri && editOption,
 			openReplaceMediaOptions && replaceOption,
 			...( pickerOptions ? pickerOptions : [] ),
-		] );
+		].filter( Boolean );
 	}
 
 	getDestructiveButtonIndex() {

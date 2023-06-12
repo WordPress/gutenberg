@@ -7,6 +7,7 @@ function BaseOption( { help, label, isChecked, onChange, children } ) {
 	return (
 		<div className="interface-preferences-modal__option">
 			<ToggleControl
+				__nextHasNoMarginBottom
 				help={ help }
 				label={ label }
 				checked={ isChecked }

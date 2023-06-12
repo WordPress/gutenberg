@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRevertUtils: async ( { page }, use ) => {
-		await use( new TemplateRevertUtils( { page } ) );
+	templateRevertUtils: async ( { editor, page }, use ) => {
+		await use( new TemplateRevertUtils( { editor, page } ) );
 	},
 } );
 
@@ -20,9 +20,10 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
-	test.beforeEach( async ( { admin, requestUtils } ) => {
+	test.beforeEach( async ( { admin, requestUtils, editor } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await admin.visitSiteEditor();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -34,15 +35,26 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
-		await page.click( 'role=button[name="Show template details"i]' );
+		const isTemplateTabVisible = await page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			);
+		}
 
 		// The revert button isn't visible anymore.
 		await expect(
-			page.locator( 'role=menuitem[name=/Clear customizations/i]' )
+			page.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+			)
 		).not.toBeVisible();
 	} );
 
@@ -57,9 +69,9 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
@@ -78,9 +90,9 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
 		const contentAfter =
@@ -97,20 +109,20 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		// Revert template and check state.
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		const contentAfterSave =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterSave ).not.toEqual( contentBefore );
 
 		// Undo revert by clicking header button and check state again.
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 		const contentAfterUndo =
 			await templateRevertUtils.getCurrentSiteEditorContent();
@@ -126,12 +138,12 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		// Click the snackbar "Undo" button.
 		await page.click(
@@ -155,11 +167,11 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
 		const contentAfterUndo =
@@ -167,7 +179,7 @@ test.describe( 'Template Revert', () => {
 		expect( contentAfterUndo ).not.toEqual( contentBefore );
 
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Redo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
 		);
 
 		const contentAfterRedo =
@@ -187,9 +199,9 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		// Click undo in the snackbar. This reverts revert template action.
 		await page.click(
@@ -203,7 +215,7 @@ test.describe( 'Template Revert', () => {
 
 		// Click undo again, this time in the header. Reverts initial dummy content.
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
 		// Check dummy content is gone.
@@ -222,18 +234,18 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await admin.visitSiteEditor();
 
@@ -252,20 +264,20 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await page.click(
 			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
-
+		await editor.canvas.click( 'body' );
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
@@ -273,25 +285,26 @@ test.describe( 'Template Revert', () => {
 } );
 
 class TemplateRevertUtils {
-	constructor( { page } ) {
+	constructor( { editor, page } ) {
+		this.editor = editor;
 		this.page = page;
 	}
 
-	async save() {
-		await this.page.click(
-			'role=region[name="Header"i] >> role=button[name="Save"i]'
-		);
-		// Second Save button in the entities panel.
-		await this.page.click(
-			'role=region[name="Publish"i] >> role=button[name="Save"i]'
-		);
-		await this.page.waitForSelector(
-			'role=region[name="Header"i] >> role=button[name="Save"i][disabled]'
-		);
-	}
-
 	async revertTemplate() {
-		await this.page.click( 'role=button[name="Show template details"i]' );
+		await this.editor.openDocumentSettingsSidebar();
+		const isTemplateTabVisible = await this.page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await this.page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			);
+		}
+		await this.page.click(
+			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+		);
 		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'

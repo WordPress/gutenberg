@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
+import type { FocusEventHandler } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { StateReducer } from '../input-control/reducer/state';
 import type {
 	InputChangeCallback,
 	InputControlProps,
 	Size as InputSize,
 } from '../input-control/types';
+import type { NumberControlProps } from '../number-control/types';
 
 export type SelectSize = InputSize;
 
@@ -38,12 +38,11 @@ export type WPUnitControlUnit = {
 	step?: number;
 };
 
-export type UnitControlOnChangeCallback = InputChangeCallback<
-	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
-	{ data?: WPUnitControlUnit }
->;
+export type UnitControlOnChangeCallback = InputChangeCallback< {
+	data?: WPUnitControlUnit;
+} >;
 
-export type UnitSelectControlProps = {
+export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
 	 *
@@ -54,12 +53,6 @@ export type UnitSelectControlProps = {
 	 * A callback function invoked when the value is changed.
 	 */
 	onChange?: UnitControlOnChangeCallback;
-	/**
-	 * Size of the control option. Supports "default" and "small".
-	 *
-	 * @default 'default'
-	 */
-	size?: SelectSize;
 	/**
 	 * Current unit.
 	 */
@@ -72,14 +65,8 @@ export type UnitSelectControlProps = {
 	units?: WPUnitControlUnit[];
 };
 
-// TODO: when available, should (partially) extend `NumberControl` props.
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
-	Pick<
-		InputControlProps,
-		'hideLabelFromVision' | '__next36pxDefaultSize'
-	> & {
-		__unstableStateReducer?: StateReducer;
-		__unstableInputWidth?: CSSProperties[ 'width' ];
+	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
@@ -87,23 +74,12 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		 */
 		disableUnits?: boolean;
 		/**
-		 * If `true`, the `ENTER` key press is required in order to trigger an `onChange`.
-		 * If enabled, a change is also triggered when tabbing away (`onBlur`).
-		 *
-		 * @default false
-		 */
-		isPressEnterToChange?: boolean;
-		/**
 		 * If `true`, and the selected unit provides a `default` value, this value is set
 		 * when changing units.
 		 *
 		 * @default false
 		 */
 		isResetValueOnUnitChange?: boolean;
-		/**
-		 * If this property is added, a label will be generated using label property as the content.
-		 */
-		label?: string;
 		/**
 		 * Callback when the `unit` changes.
 		 */
@@ -120,22 +96,11 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		 */
 		value?: string | number;
 		/**
-		 * If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment
-		 * the value by the `shiftStep` value.
-		 *
-		 * @default true
-		 */
-		isShiftStepEnabled?: boolean;
-		/**
-		 * Amount to increment by when the `SHIFT` key is held down. This shift value
-		 * is a multiplier to the `step` value. For example, if the `step` value is `5`,
-		 * and `shiftStep` is `10`, each jump would increment/decrement by `50`.
-		 *
-		 * @default 10
-		 */
-		shiftStep?: number;
-		/**
 		 * Callback when either the quantity or the unit inputs lose focus.
 		 */
 		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+		/**
+		 * Callback when either the quantity or the unit inputs gains focus.
+		 */
+		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
 	};

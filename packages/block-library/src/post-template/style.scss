@@ -1,10 +1,4 @@
-.wp-block-post-template,
-// We have kept `wp-block-query-loop` class as well for backwards
-// compatibility with existing `QueryLoop` blocks that haven't been
-// updated, after the renaming of the block to `Post Template`.
-// See: https://github.com/WordPress/gutenberg/pull/32514.
-// TODO: Remove this class when WordPress 5.9 is released.
-.wp-block-query-loop {
+.wp-block-post-template {
 	margin-top: 0;
 	margin-bottom: 0;
 	max-width: 100%;
@@ -15,14 +9,14 @@
 	&.wp-block-post-template {
 		background: none;
 	}
-
+	// These rules no longer apply but should be kept for backwards compatibility.
 	&.is-flex-container {
 		flex-direction: row;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 1.25em;
 
-		li {
+		> li {
 			margin: 0;
 			width: 100%;
 		}
@@ -34,5 +28,12 @@
 				}
 			}
 		}
+	}
+}
+
+@media ( max-width: $break-small ) {
+	// Temporary specificity bump until "wp-container" layout specificity is revisited.
+	.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid {
+		grid-template-columns: 1fr;
 	}
 }

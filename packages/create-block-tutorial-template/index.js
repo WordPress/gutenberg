@@ -22,6 +22,17 @@ module.exports = {
 			html: false,
 		},
 	},
+	variants: {
+		static: {},
+		dynamic: {
+			attributes: {
+				message: {
+					type: 'string',
+				},
+			},
+			render: 'file:./render.php',
+		},
+	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),
 	assetsPath: join( __dirname, 'assets' ),

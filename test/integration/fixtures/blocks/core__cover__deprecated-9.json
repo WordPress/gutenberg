@@ -10,7 +10,8 @@
 			"overlayColor": "primary",
 			"backgroundType": "image",
 			"minHeightUnit": "%",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

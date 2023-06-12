@@ -4,6 +4,7 @@
 import { insertBlock } from './inserter';
 import { clickMenuItem } from './click-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { canvas } from './canvas';
 
 /**
  * Creates a simple reusable block with a paragraph block.
@@ -19,7 +20,7 @@ export const createReusableBlock = async ( content, title ) => {
 	await page.keyboard.type( content );
 
 	await clickBlockToolbarButton( 'Options' );
-	await clickMenuItem( 'Add to Reusable blocks' );
+	await clickMenuItem( 'Create Reusable block' );
 	const nameInput = await page.waitForSelector(
 		reusableBlockNameInputSelector
 	);
@@ -33,7 +34,7 @@ export const createReusableBlock = async ( content, title ) => {
 	);
 
 	// Check that we have a reusable block on the page
-	const block = await page.waitForSelector(
+	const block = await canvas().waitForSelector(
 		'.block-editor-block-list__block[data-type="core/block"]'
 	);
 	expect( block ).not.toBeNull();

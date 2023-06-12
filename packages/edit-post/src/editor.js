@@ -1,24 +1,21 @@
 /**
- * External dependencies
- */
-import { forEach, size, map, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { CommandMenu } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -26,19 +23,18 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
+import { unlock } from './lock-unlock';
 
-function Editor( {
-	postId,
-	postType,
-	settings,
-	initialEdits,
-	onError,
-	...props
-} ) {
+const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { useCommands } = unlock( coreCommandsPrivateApis );
+
+function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	useCommands();
 	const {
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
+		hasInlineToolbar,
 		hasThemeStyles,
 		post,
 		preferredStyleVariations,
@@ -56,7 +52,7 @@ function Editor( {
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } =
+			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
 				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -77,13 +73,15 @@ function Editor( {
 			const supportsTemplateMode =
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
 				hasFixedToolbar:
 					isFeatureActive( 'fixedToolbar' ) ||
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
-				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				isDistractionFree: isFeatureActive( 'distractionFree' ),
+				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
@@ -94,7 +92,7 @@ function Editor( {
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
-					supportsTemplateMode && isViewable
+					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
@@ -115,7 +113,8 @@ function Editor( {
 			},
 			hasFixedToolbar,
 			focusMode,
-			hasReducedUI,
+			isDistractionFree,
+			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -126,18 +125,17 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
-			result.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
@@ -145,8 +143,9 @@ function Editor( {
 	}, [
 		settings,
 		hasFixedToolbar,
+		hasInlineToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
@@ -158,7 +157,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		forEach( settings.styles, ( style ) => {
+		settings.styles?.forEach( ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {
@@ -179,28 +178,25 @@ function Editor( {
 	}
 
 	return (
-		<StrictMode>
-			<ShortcutProvider>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ post }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						__unstableTemplate={
-							isTemplateMode ? template : undefined
-						}
-						{ ...props }
-					>
-						<ErrorBoundary onError={ onError }>
-							<EditorInitialization postId={ postId } />
-							<Layout styles={ styles } />
-						</ErrorBoundary>
-						<PostLockedModal />
-					</EditorProvider>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</StrictMode>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<ExperimentalEditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					__unstableTemplate={ isTemplateMode ? template : undefined }
+					{ ...props }
+				>
+					<ErrorBoundary>
+						<CommandMenu />
+						<EditorInitialization postId={ postId } />
+						<Layout styles={ styles } />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</ExperimentalEditorProvider>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }
 

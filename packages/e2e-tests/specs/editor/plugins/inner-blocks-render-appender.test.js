@@ -98,6 +98,9 @@ describe( 'RenderAppender prop of InnerBlocks', () => {
 		// Insert a quote block.
 		await quoteButton.click();
 
+		// Select the quote block.
+		await page.keyboard.press( 'ArrowDown' );
+
 		// Verify if the custom block appender text changed as expected.
 		await page.waitForXPath(
 			`//*[contains(@class, "${ DYNAMIC_APPENDER_SELECTOR }")]/span[contains(@class, "single-blocks-appender")][contains(text(), "Single Blocks Appender")]`

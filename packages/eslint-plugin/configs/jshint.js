@@ -9,7 +9,7 @@ module.exports = {
 		'no-trailing-spaces': 'error',
 		'no-undef': 'error',
 		'no-unused-expressions': 'error',
-		'no-unused-vars': 'error',
+		'no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
 		'one-var': [ 'error', 'always' ],
 		quotes: [ 'error', 'single' ],
 		'wrap-iife': [ 'error', 'any' ],

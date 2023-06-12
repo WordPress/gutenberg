@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { keyBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -36,7 +31,16 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 		buildWidgetsQuery()
 	);
 
-	return keyBy( widgets, 'id' );
+	return (
+		// Key widgets by their ID.
+		widgets?.reduce(
+			( allWidgets, widget ) => ( {
+				...allWidgets,
+				[ widget.id ]: widget,
+			} ),
+			{}
+		) || {}
+	);
 } );
 
 /**

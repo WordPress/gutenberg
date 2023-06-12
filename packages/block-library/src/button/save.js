@@ -12,12 +12,21 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
-	const { fontSize, linkTarget, rel, style, text, title, url, width } =
-		attributes;
+	const {
+		textAlign,
+		fontSize,
+		linkTarget,
+		rel,
+		style,
+		text,
+		title,
+		url,
+		width,
+	} = attributes;
 
 	if ( ! text ) {
 		return null;
@@ -31,11 +40,12 @@ export default function save( { attributes, className } ) {
 		colorProps.className,
 		borderProps.className,
 		{
+			[ `has-text-align-${ textAlign }` ]: textAlign,
 			// For backwards compatibility add style that isn't provided via
 			// block support.
 			'no-border-radius': style?.border?.radius === 0,
 		},
-		__experimentalElementButtonClassName
+		__experimentalGetElementClassName( 'button' )
 	);
 	const buttonStyle = {
 		...borderProps.style,

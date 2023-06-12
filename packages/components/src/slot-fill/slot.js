@@ -1,10 +1,5 @@
 // @ts-nocheck
 /**
- * External dependencies
- */
-import { isString, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -34,12 +29,11 @@ class SlotComponent extends Component {
 		super( ...arguments );
 
 		this.isUnmounted = false;
-		this.bindNode = this.bindNode.bind( this );
 	}
 
 	componentDidMount() {
 		const { registerSlot } = this.props;
-
+		this.isUnmounted = false;
 		registerSlot( this.props.name, this );
 	}
 
@@ -58,10 +52,6 @@ class SlotComponent extends Component {
 		}
 	}
 
-	bindNode( node ) {
-		this.node = node;
-	}
-
 	forceUpdate() {
 		if ( this.isUnmounted ) {
 			return;
@@ -72,25 +62,27 @@ class SlotComponent extends Component {
 	render() {
 		const { children, name, fillProps = {}, getFills } = this.props;
 
-		const fills = map( getFills( name, this ), ( fill ) => {
-			const fillChildren = isFunction( fill.children )
-				? fill.children( fillProps )
-				: fill.children;
+		const fills = ( getFills( name, this ) ?? [] )
+			.map( ( fill ) => {
+				const fillChildren = isFunction( fill.children )
+					? fill.children( fillProps )
+					: fill.children;
 
-			return Children.map( fillChildren, ( child, childIndex ) => {
-				if ( ! child || isString( child ) ) {
-					return child;
-				}
+				return Children.map( fillChildren, ( child, childIndex ) => {
+					if ( ! child || typeof child === 'string' ) {
+						return child;
+					}
 
-				const childKey = child.key || childIndex;
-				return cloneElement( child, { key: childKey } );
-			} );
-		} ).filter(
-			// In some cases fills are rendered only when some conditions apply.
-			// This ensures that we only use non-empty fills when rendering, i.e.,
-			// it allows us to render wrappers only when the fills are actually present.
-			( element ) => ! isEmptyElement( element )
-		);
+					const childKey = child.key || childIndex;
+					return cloneElement( child, { key: childKey } );
+				} );
+			} )
+			.filter(
+				// In some cases fills are rendered only when some conditions apply.
+				// This ensures that we only use non-empty fills when rendering, i.e.,
+				// it allows us to render wrappers only when the fills are actually present.
+				( element ) => ! isEmptyElement( element )
+			);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
 	}

@@ -3,7 +3,8 @@
 		"name": "core/post-date",
 		"isValid": true,
 		"attributes": {
-			"isLink": false
+			"isLink": false,
+			"displayType": "date"
 		},
 		"innerBlocks": []
 	}

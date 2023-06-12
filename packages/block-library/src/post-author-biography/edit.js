@@ -55,7 +55,10 @@ function PostAuthorBiographyEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockProps }> { displayAuthorBiography } </div>
+			<div
+				{ ...blockProps }
+				dangerouslySetInnerHTML={ { __html: displayAuthorBiography } }
+			/>
 		</>
 	);
 }

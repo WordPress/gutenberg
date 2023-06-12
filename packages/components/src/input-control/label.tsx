@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
-import { Label as BaseLabel } from './styles/input-control-styles';
+import {
+	Label as BaseLabel,
+	LabelWrapper,
+} from './styles/input-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
 import type { InputControlLabelProps } from './types';
 
@@ -23,8 +26,10 @@ export default function Label( {
 	}
 
 	return (
-		<BaseLabel htmlFor={ htmlFor } { ...props }>
-			{ children }
-		</BaseLabel>
+		<LabelWrapper>
+			<BaseLabel htmlFor={ htmlFor } { ...props }>
+				{ children }
+			</BaseLabel>
+		</LabelWrapper>
 	);
 }

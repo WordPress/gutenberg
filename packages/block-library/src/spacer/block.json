@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/spacer",
 	"title": "Spacer",
 	"category": "design",
@@ -17,7 +17,13 @@
 	},
 	"usesContext": [ "orientation" ],
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"margin": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-spacer-editor",
 	"style": "wp-block-spacer"

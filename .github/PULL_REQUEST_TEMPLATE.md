@@ -16,4 +16,7 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 <!-- 2. Insert a Heading Block. -->
 <!-- 3. etc. -->
 
+### Testing Instructions for Keyboard
+<!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
+
 ## Screenshots or screencast <!-- if applicable -->

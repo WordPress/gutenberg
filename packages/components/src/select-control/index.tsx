@@ -1,25 +1,23 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classNames from 'classnames';
-import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useState, forwardRef } from '@wordpress/element';
-import { Icon, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
-import { Select, DownArrowWrapper } from './styles/select-control-styles';
+import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
 import type { SelectControlProps } from './types';
+import SelectControlChevronDown from './chevron-down';
 
 const noop = () => {};
 
@@ -31,7 +29,10 @@ function useUniqueId( idProp?: string ) {
 }
 
 function UnforwardedSelectControl(
-	{
+	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+	ref: React.ForwardedRef< HTMLSelectElement >
+) {
+	const {
 		className,
 		disabled = false,
 		help,
@@ -40,7 +41,7 @@ function UnforwardedSelectControl(
 		label,
 		multiple = false,
 		onBlur = noop,
-		onChange = noop,
+		onChange,
 		onFocus = noop,
 		options = [],
 		size = 'default',
@@ -49,44 +50,44 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		__next36pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
-		...props
-	}: WordPressComponentProps< SelectControlProps, 'select', false >,
-	ref: ForwardedRef< HTMLSelectElement >
-) {
+		...restProps
+	} = props;
 	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning.
-	if ( isEmpty( options ) && ! children ) return null;
+	if ( ! options?.length && ! children ) return null;
 
-	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
+	const handleOnBlur = ( event: React.FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
 		setIsFocused( false );
 	};
 
-	const handleOnFocus = ( event: FocusEvent< HTMLSelectElement > ) => {
+	const handleOnFocus = ( event: React.FocusEvent< HTMLSelectElement > ) => {
 		onFocus( event );
 		setIsFocused( true );
 	};
 
-	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
-		if ( multiple ) {
+	const handleOnChange = (
+		event: React.ChangeEvent< HTMLSelectElement >
+	) => {
+		if ( props.multiple ) {
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
 			const newValues = selectedOptions.map( ( { value } ) => value );
-			onChange( newValues );
+			props.onChange?.( newValues, { event } );
 			return;
 		}
 
-		onChange( event.target.value, { event } );
+		props.onChange?.( event.target.value, { event } );
 	};
 
 	const classes = classNames( 'components-select-control', className );
 
-	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<BaseControl
 			help={ help }
@@ -102,17 +103,15 @@ function UnforwardedSelectControl(
 				label={ label }
 				size={ size }
 				suffix={
-					suffix || (
-						<DownArrowWrapper>
-							<Icon icon={ chevronDown } size={ 18 } />
-						</DownArrowWrapper>
-					)
+					suffix || ( ! multiple && <SelectControlChevronDown /> )
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 			>
 				<Select
-					{ ...props }
+					{ ...restProps }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
@@ -145,7 +144,6 @@ function UnforwardedSelectControl(
 			</InputBase>
 		</BaseControl>
 	);
-	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 /**

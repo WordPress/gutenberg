@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -118,10 +117,10 @@ export function getShortcutAliases( state, name ) {
 
 export const getAllShortcutKeyCombinations = createSelector(
 	( state, name ) => {
-		return compact( [
+		return [
 			getShortcutKeyCombination( state, name ),
 			...getShortcutAliases( state, name ),
-		] );
+		].filter( Boolean );
 	},
 	( state, name ) => [ state[ name ] ]
 );

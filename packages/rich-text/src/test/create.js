@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
 import { create, removeReservedCharacters } from '../create';
@@ -13,9 +7,6 @@ import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { getSparseArrayLength, spec, specWithRegistration } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 describe( 'create', () => {
 	const em = { type: 'em' };

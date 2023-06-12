@@ -3,6 +3,11 @@
  */
 import styled from '@emotion/styled';
 
-export const CalendarHelp = styled.div`
-	min-width: 260px;
+/**
+ * Internal dependencies
+ */
+import { VStack } from '../../v-stack';
+
+export const Wrapper = styled( VStack )`
+	box-sizing: border-box;
 `;

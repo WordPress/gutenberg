@@ -38,7 +38,6 @@ function PatternsExplorerModal( { onModalClose, ...restProps } ) {
 	return (
 		<Modal
 			title={ __( 'Patterns' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onModalClose }
 			isFullScreen
 		>

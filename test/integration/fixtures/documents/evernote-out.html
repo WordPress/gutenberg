@@ -7,11 +7,39 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>An</li><li>Unordered<ul><li>Indented</li></ul></li><li>List</li></ul>
+<ul><!-- wp:list-item -->
+<li>An</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Unordered<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Indented</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
-<!-- wp:list {"ordered":true} -->
-<ol><li>One</li><li>Two<ol><li>Indented</li></ol></li><li>Three</li></ol>
+<!-- wp:list {"ordered":true,"start":1} -->
+<ol start="1"><!-- wp:list-item -->
+<li>One</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Two<!-- wp:list {"ordered":true} -->
+<ol><!-- wp:list-item -->
+<li>Indented</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Three</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:separator -->

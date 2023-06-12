@@ -81,4 +81,14 @@ describe( 'shouldDismissPastedFiles', () => {
 			)
 		).toBe( true );
 	} );
+
+	it( 'should return true when pasting an image-containing MS Word document via Chrome', () => {
+		expect(
+			shouldDismissPastedFiles(
+				[ mocks.pngImageFile ],
+				'<p>A</p><img src="file:////.../clip_image001.png" alt="..."><p>B</p>',
+				'A\nB'
+			)
+		).toBe( true );
+	} );
 } );

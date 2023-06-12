@@ -3,10 +3,10 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
+			"value": "pullquote",
 			"className": "is-style-solid-color",
 			"backgroundColor": "black",
 			"textAlign": "left",
-			"value": "<p>pullquote</p>",
 			"citation": "before block supports",
 			"textColor": "white"
 		},

@@ -9,7 +9,6 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -75,12 +74,18 @@ const SegmentedControls = ( {
 	useEffect( () => {
 		setActiveSegmentIndex( selectedSegmentIndex );
 		segmentHandler( segments[ selectedSegmentIndex ] );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ segmentsDimensions ] );
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -101,11 +106,13 @@ const SegmentedControls = ( {
 		const { paddingLeft: offset } = isIOS
 			? styles.containerIOS
 			: styles.container;
-		const widths = map( values( segmentsDimensions ), 'width' );
+		const widths = Object.values( segmentsDimensions ).map(
+			( dimension ) => dimension.width
+		);
 		const widthsDistance = widths.slice( 0, index );
-		const widthsDistanceSum = reduce(
-			widthsDistance,
-			( sum, n ) => sum + n
+		const widthsDistanceSum = widthsDistance.reduce(
+			( sum, n ) => sum + n,
+			0
 		);
 
 		const endValue = index === 0 ? 0 : widthsDistanceSum;
@@ -133,8 +140,8 @@ const SegmentedControls = ( {
 		styles.selectedDark
 	);
 
-	const width = segmentsDimensions[ activeSegmentIndex ].width;
-	const height = segmentsDimensions[ activeSegmentIndex ].height;
+	const width = segmentsDimensions[ activeSegmentIndex ]?.width;
+	const height = segmentsDimensions[ activeSegmentIndex ]?.height;
 
 	const outlineStyle = [ styles.outline, isIOS && styles.outlineIOS ];
 

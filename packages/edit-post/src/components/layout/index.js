@@ -16,7 +16,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -66,6 +66,7 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -82,7 +83,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		isListViewOpened,
 		showIconLabels,
-		hasReducedUI,
+		isDistractionFree,
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
@@ -115,8 +116,8 @@ function Layout( { styles } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			hasReducedUI:
-				select( editPostStore ).isFeatureActive( 'reducedUI' ),
+			isDistractionFree:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -124,12 +125,7 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
-		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
-	} );
+
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
@@ -161,8 +157,17 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+		'is-sidebar-opened': sidebarIsOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
+		'is-distraction-free': isDistractionFree && isLargeViewport,
+		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+	} );
+
 	const secondarySidebarLabel = isListViewOpened
-		? __( 'List View' )
+		? __( 'Document Overview' )
 		: __( 'Block Library' );
 
 	const secondarySidebar = () => {
@@ -199,6 +204,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
+				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -211,6 +217,7 @@ function Layout( { styles } ) {
 						}
 					/>
 				}
+				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					( ! isMobileViewport || sidebarIsOpened ) && (
@@ -236,14 +243,14 @@ function Layout( { styles } ) {
 				notices={ <EditorSnackbars /> }
 				content={
 					<>
-						<EditorNotices />
+						{ ! isDistractionFree && <EditorNotices /> }
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isTemplateMode && (
+						{ ! isDistractionFree && ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
@@ -252,13 +259,12 @@ function Layout( { styles } ) {
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
-						<BlockStyles.Slot scope="core/block-inspector" />
 					</>
 				}
 				footer={
-					! hasReducedUI &&
-					showBlockBreadcrumbs &&
+					! isDistractionFree &&
 					! isMobileViewport &&
+					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -27,13 +28,13 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		const { queryByText } = render(
+		render(
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
 		);
-		const author = queryByText( `by ${ plugin.author }` );
-		const description = queryByText( plugin.description );
-		expect( author ).not.toBeNull();
-		expect( description ).not.toBeNull();
+		const author = screen.queryByText( `by ${ plugin.author }` );
+		const description = screen.queryByText( plugin.description );
+		expect( author ).toBeInTheDocument();
+		expect( description ).toBeInTheDocument();
 	} );
 
 	it( 'should show installing status when installing the block', () => {
@@ -42,11 +43,11 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		const { queryByText } = render(
+		render(
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
 		);
-		const statusLabel = queryByText( 'Installing…' );
-		expect( statusLabel ).not.toBeNull();
+		const statusLabel = screen.queryByText( 'Installing…' );
+		expect( statusLabel ).toBeInTheDocument();
 	} );
 
 	it( "should be disabled when a plugin can't be installed", () => {
@@ -55,27 +56,28 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: false,
 		} ) );
 
-		const { getByRole } = render(
+		render(
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
 		);
-		const button = getByRole( 'option' );
+		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
 		expect( button.disabled ).toBe( false );
-		expect( button.getAttribute( 'aria-disabled' ) ).toBe( 'true' );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'should try to install the block plugin', () => {
+	it( 'should try to install the block plugin', async () => {
+		const user = userEvent.setup();
+
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,
 			isInstallable: true,
 		} ) );
 		const onClick = jest.fn();
-		const { getByRole } = render(
+		render(
 			<DownloadableBlockListItem onClick={ onClick } item={ plugin } />
 		);
 
-		const button = getByRole( 'option' );
-		fireEvent.click( button );
+		await user.click( screen.getByRole( 'option' ) );
 
 		expect( onClick ).toHaveBeenCalledTimes( 1 );
 	} );

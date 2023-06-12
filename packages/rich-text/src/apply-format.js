@@ -1,17 +1,11 @@
 /**
- * External dependencies
- */
-
-import { find, reject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 function replace( array, index, value ) {
 	array = array.slice();
@@ -42,9 +36,9 @@ export function applyFormat(
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
-		const startFormat = find( newFormats[ startIndex ], {
-			type: format.type,
-		} );
+		const startFormat = newFormats[ startIndex ]?.find(
+			( { type } ) => type === format.type
+		);
 
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
@@ -110,7 +104,9 @@ export function applyFormat(
 		// inputs with the format so new input appears with the format applied,
 		// and ensures a format of the same type uses the latest values.
 		activeFormats: [
-			...reject( activeFormats, { type: format.type } ),
+			...( activeFormats?.filter(
+				( { type } ) => type !== format.type
+			) || [] ),
 			format,
 		],
 	} );

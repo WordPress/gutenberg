@@ -52,7 +52,8 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 
 /**
  * @typedef  {Object}  ParseOptions
- * @property {boolean} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
+ * @property {boolean?} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
+ * @property {boolean?} __unstableSkipAutop         Whether to skip autop when processing freeform content.
  */
 
 /**
@@ -81,11 +82,12 @@ function convertLegacyBlocks( rawBlock ) {
  * Normalize the raw block by applying the fallback block name if none given,
  * sanitize the parsed HTML...
  *
- * @param {WPRawBlock} rawBlock The raw block object.
+ * @param {WPRawBlock}    rawBlock The raw block object.
+ * @param {ParseOptions?} options  Extra options for handling block parsing.
  *
  * @return {WPRawBlock} The normalized block object.
  */
-export function normalizeRawBlock( rawBlock ) {
+export function normalizeRawBlock( rawBlock, options ) {
 	const fallbackBlockName = getFreeformContentHandlerName();
 
 	// If the grammar parsing don't produce any block name, use the freeform block.
@@ -97,7 +99,10 @@ export function normalizeRawBlock( rawBlock ) {
 	// Fallback content may be upgraded from classic content expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( rawBlockName === fallbackBlockName ) {
+	if (
+		rawBlockName === fallbackBlockName &&
+		! options?.__unstableSkipAutop
+	) {
 		rawInnerHTML = autop( rawInnerHTML ).trim();
 	}
 
@@ -185,10 +190,10 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
  * @param {WPRawBlock}   rawBlock The raw block object.
  * @param {ParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock} Fully parsed block.
+ * @return {WPBlock | undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
-	let normalizedBlock = normalizeRawBlock( rawBlock );
+	let normalizedBlock = normalizeRawBlock( rawBlock, options );
 
 	// During the lifecycle of the project, we renamed some old blocks
 	// and transformed others to new blocks. To avoid breaking existing content,

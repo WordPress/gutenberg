@@ -3,6 +3,8 @@
 	const createBlock = wp.blocks.createBlock;
 	const el = wp.element.createElement;
 	const InnerBlocks = wp.blockEditor.InnerBlocks;
+	const useState = window.wp.element.useState;
+
 	const TEMPLATE = [
 		[
 			'core/paragraph',
@@ -171,4 +173,31 @@
 
 		save,
 	} );
+
+
+	function InnerBlocksAsyncTemplateEdit() {
+		const [ template, setTemplate ] = useState( [] );
+
+		setInterval( () => {
+			setTemplate( TEMPLATE_TWO_PARAGRAPHS );
+		}, 1000 );
+
+		return el( InnerBlocks, {
+			template,
+		} );
+	}
+
+	registerBlockType(
+		'test/test-inner-blocks-async-template',
+		{
+			title: 'Test Inner Blocks Async Template',
+			icon: 'cart',
+			category: 'text',
+
+			edit: InnerBlocksAsyncTemplateEdit,
+
+			// Purposely do not save inner blocks so that it's possible to test template resolution.
+			save() {},
+		}
+	);
 } )();

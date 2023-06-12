@@ -8,15 +8,16 @@ import { createReduxStore, registerStore } from '@wordpress/data';
  */
 import reducer from './reducer';
 import * as selectors from './selectors';
+import * as privateActions from './private-actions';
+import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /**
  * Block editor data store configuration.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
- *
- * @type {Object}
  */
 export const storeConfig = {
 	reducer,
@@ -28,16 +29,17 @@ export const storeConfig = {
  * Store definition for the block editor namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
 
-// Ideally we'd use register instead of register stores.
-registerStore( STORE_NAME, {
+// We will be able to use the `register` function once we switch
+// the "preferences" persistence to use the new preferences package.
+const registeredStore = registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
+unlock( registeredStore ).registerPrivateActions( privateActions );
+unlock( registeredStore ).registerPrivateSelectors( privateSelectors );

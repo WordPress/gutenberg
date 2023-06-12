@@ -28,11 +28,23 @@ export const getActiveComplementaryArea = createRegistrySelector(
 		}
 
 		// Return `null` to indicate the user hid the complementary area.
-		if ( ! isComplementaryAreaVisible ) {
+		if ( isComplementaryAreaVisible === false ) {
 			return null;
 		}
 
 		return state?.complementaryAreas?.[ scope ];
+	}
+);
+
+export const isComplementaryAreaLoading = createRegistrySelector(
+	( select ) => ( state, scope ) => {
+		const isVisible = select( preferencesStore ).get(
+			scope,
+			'isComplementaryAreaVisible'
+		);
+		const identifier = state?.complementaryAreas?.[ scope ];
+
+		return isVisible && identifier === undefined;
 	}
 );
 

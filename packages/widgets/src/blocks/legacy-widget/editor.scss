@@ -5,7 +5,9 @@
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-900;
-	padding: $grid-unit-15 - 1px; //Subtract the border width.
+	padding: $grid-unit-15 - 1px; // Subtract the border width.
+	max-height: calc(100vh - 2px); // Subtract the border width (both top and bottom).
+	overflow-y: scroll;
 
 	.wp-block-legacy-widget__edit-form-title {
 		color: $black;
@@ -161,12 +163,3 @@
 	min-width: 400px;
 }
 
-.wp-block-legacy-widget {
-	.components-base-control {
-		width: 100%;
-	}
-	.components-select-control__input {
-		padding: 0;
-		font-family: system-ui;
-	}
-}
