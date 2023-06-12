@@ -19,7 +19,7 @@ export default function StatusLabel( { date: currentDate, postId, postType } ) {
 		setDate( newDate );
 		try {
 			await editEntityRecord( 'postType', postType, postId, {
-				date,
+				date: newDate,
 			} );
 		} catch ( error ) {
 			setDate( currentDate );

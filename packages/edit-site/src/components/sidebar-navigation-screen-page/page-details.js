@@ -18,6 +18,7 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
  */
 import StatusLabel from './status-label';
 import PublishDate from './publish-date';
+import Password from './password';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -49,6 +50,17 @@ function getPageDetails( page ) {
 					postType={ page.type }
 					status={ page?.password ? 'protected' : page.status }
 					date={ page?.date }
+				/>
+			),
+		},
+		{
+			label: __( 'Visibility' ),
+			value: (
+				<Password
+					postId={ page.id }
+					postType={ page.type }
+					status={ page.status }
+					password={ page.password }
 				/>
 			),
 		},
