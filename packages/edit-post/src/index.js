@@ -79,7 +79,7 @@ export function initializeEditor(
 	}
 
 	/*
-	 * Prevent adding template part and post content block in the post editor.
+	 * Prevent adding template part in the post editor.
 	 * Only add the filter when the post editor is initialized, not imported.
 	 * Also only add the filter(s) after registerCoreBlocks()
 	 * so that common filters in the block library are not overwritten.
@@ -90,12 +90,32 @@ export function initializeEditor(
 		( canInsert, blockType ) => {
 			if (
 				! select( editPostStore ).isEditingTemplate() &&
-				( blockType.name === 'core/template-part' ||
-					blockType.name === 'core/post-content' )
+				blockType.name === 'core/template-part'
 			) {
 				return false;
 			}
 			return canInsert;
+		}
+	);
+	/*
+	 * Prevent adding post content block in the post editor unless in a query block.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removePostConentFromInserter',
+		( canInsert, blockType, rootClientId, { getBlock } ) => {
+			if ( blockType.name !== 'core/post-content' ) {
+				return canInsert;
+			}
+			const parentBlock = getBlock( rootClientId );
+
+			if ( parentBlock?.name === 'core/query' ) {
+				return canInsert;
+			}
+			return false;
 		}
 	);
 
