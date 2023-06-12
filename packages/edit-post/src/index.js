@@ -105,17 +105,18 @@ export function initializeEditor(
 	 */
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
-		'removePostConentFromInserter',
-		( canInsert, blockType, rootClientId, { getBlock } ) => {
+		'removePostContentFromInserter',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlockParentsByBlockName }
+		) => {
 			if ( blockType.name !== 'core/post-content' ) {
 				return canInsert;
 			}
-			const parentBlock = getBlock( rootClientId );
-
-			if ( parentBlock?.name === 'core/query' ) {
-				return canInsert;
-			}
-			return false;
+			return getBlockParentsByBlockName( rootClientId, 'core/query' )
+				.length;
 		}
 	);
 
