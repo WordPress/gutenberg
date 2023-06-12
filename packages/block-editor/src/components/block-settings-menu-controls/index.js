@@ -24,9 +24,8 @@ import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const { DropdownMenuGroupV2, DropdownMenuItemV2 } = unlock(
-	componentsPrivateApis
-);
+const { DropdownMenuGroupV2, DropdownMenuItemV2, DropdownMenuSeparatorV2 } =
+	unlock( componentsPrivateApis );
 
 const BlockSettingsMenuControlsSlot = ( {
 	fillProps,
@@ -81,39 +80,42 @@ const BlockSettingsMenuControlsSlot = ( {
 				}
 
 				return (
-					// TODO: separator?
-					// TODO: check if this used in other legacy dropdown menus
-					<DropdownMenuGroupV2>
-						{ showConvertToGroupButton && (
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
-							/>
-						) }
-						{ showLockButton && (
-							<BlockLockMenuItem
-								clientId={ selectedClientIds[ 0 ] }
-							/>
-						) }
-						{ fills }
-						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
-							<DropdownMenuItemV2
-								onSelect={ pipe(
-									// TODO: onclose?
-									// fillProps?.onClose,
-									fillProps?.onMoveTo
-								) }
-							>
-								{ __( 'Move to' ) }
-							</DropdownMenuItemV2>
-						) }
-						{ fillProps?.count === 1 && (
-							<BlockModeToggle
-								clientId={ fillProps?.firstBlockClientId }
-								onToggle={ fillProps?.onClose }
-							/>
-						) }
-					</DropdownMenuGroupV2>
+					<>
+						{ /* TODO: check if this used in other legacy dropdown
+						menus */ }
+						<DropdownMenuSeparatorV2 />
+						<DropdownMenuGroupV2>
+							{ showConvertToGroupButton && (
+								<ConvertToGroupButton
+									{ ...convertToGroupButtonProps }
+									onClose={ fillProps?.onClose }
+								/>
+							) }
+							{ showLockButton && (
+								<BlockLockMenuItem
+									clientId={ selectedClientIds[ 0 ] }
+								/>
+							) }
+							{ fills }
+							{ fillProps?.canMove && ! fillProps?.onlyBlock && (
+								<DropdownMenuItemV2
+									onSelect={ pipe(
+										// TODO: onclose?
+										// fillProps?.onClose,
+										fillProps?.onMoveTo
+									) }
+								>
+									{ __( 'Move to' ) }
+								</DropdownMenuItemV2>
+							) }
+							{ fillProps?.count === 1 && (
+								<BlockModeToggle
+									clientId={ fillProps?.firstBlockClientId }
+									onToggle={ fillProps?.onClose }
+								/>
+							) }
+						</DropdownMenuGroupV2>
+					</>
 				);
 			} }
 		</Slot>
