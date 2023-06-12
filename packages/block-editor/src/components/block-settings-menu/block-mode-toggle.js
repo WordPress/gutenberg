@@ -36,9 +36,9 @@ export function BlockModeToggle( {
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
 	return (
-		// TODO: should prevent default?
 		// TODO: check if this used in other legacy dropdown menus
 		<DropdownMenuItemV2 onSelect={ onToggleMode }>
+			{ /* TODO: what if `small` is true? What contents are displayed? */ }
 			{ ! small && label }
 		</DropdownMenuItemV2>
 	);

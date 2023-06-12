@@ -88,7 +88,6 @@ const BlockSettingsMenuControlsSlot = ( {
 							{ showConvertToGroupButton && (
 								<ConvertToGroupButton
 									{ ...convertToGroupButtonProps }
-									onClose={ fillProps?.onClose }
 								/>
 							) }
 							{ showLockButton && (
@@ -99,11 +98,7 @@ const BlockSettingsMenuControlsSlot = ( {
 							{ fills }
 							{ fillProps?.canMove && ! fillProps?.onlyBlock && (
 								<DropdownMenuItemV2
-									onSelect={ pipe(
-										// TODO: onclose?
-										// fillProps?.onClose,
-										fillProps?.onMoveTo
-									) }
+									onSelect={ fillProps?.onMoveTo }
 								>
 									{ __( 'Move to' ) }
 								</DropdownMenuItemV2>
@@ -111,7 +106,6 @@ const BlockSettingsMenuControlsSlot = ( {
 							{ fillProps?.count === 1 && (
 								<BlockModeToggle
 									clientId={ fillProps?.firstBlockClientId }
-									onToggle={ fillProps?.onClose }
 								/>
 							) }
 						</DropdownMenuGroupV2>

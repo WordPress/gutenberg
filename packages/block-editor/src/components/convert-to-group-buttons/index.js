@@ -23,8 +23,6 @@ function ConvertToGroupButton( {
 	onUngroup,
 	blocksSelection,
 	groupingBlockName,
-	// TODO: onclose
-	// onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
@@ -63,7 +61,6 @@ function ConvertToGroupButton( {
 				<DropdownMenuItemV2
 					onSelect={ () => {
 						onConvertToGroup();
-						// onClose();
 					} }
 				>
 					{ _x( 'Group', 'verb' ) }

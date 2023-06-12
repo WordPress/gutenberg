@@ -130,11 +130,7 @@ export const withBlockControls = createHigherOrderComponent(
 				) }
 				{ showStartEditingAsBlocks && (
 					<BlockSettingsMenuControls>
-						{ (
-							{
-								/*onClose*/
-							}
-						) => (
+						{ () => (
 							/* TODO: check if this used in other legacy dropdown menus */
 							<DropdownMenuItemV2
 								onSelect={ () => {
@@ -154,7 +150,6 @@ export const withBlockControls = createHigherOrderComponent(
 									__unstableSetTemporarilyEditingAsBlocks(
 										props.clientId
 									);
-									// onClose(); TODO: onClose
 								} }
 							>
 								{ __( 'Modify' ) }

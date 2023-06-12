@@ -42,7 +42,11 @@ export default function BlockLockMenuItem( { clientId } ) {
 						size={ 24 }
 					/>
 				}
-				onClick={ toggleModal }
+				onSelect={ ( event ) => {
+					toggleModal();
+					// Keep the dropdown menu open
+					event.preventDefault();
+				} }
 			>
 				{ label }
 			</DropdownMenuItemV2>

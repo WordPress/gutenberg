@@ -84,9 +84,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 			{ /* TODO: check if this used in other legacy dropdown menus */ }
 			<DropdownMenuItemV2
 				prefix={ <Icon icon={ symbolFilled } size={ 24 } /> }
-				onSelect={ () => {
+				onSelect={ ( event ) => {
 					setIsModalOpen( true );
-					// TODO: should call prevent default?
+					// Keep the dropdown menu open
+					event.preventDefault();
 				} }
 			>
 				{ __( 'Create Template part' ) }

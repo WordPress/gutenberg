@@ -139,12 +139,7 @@ export default function SidebarBlockEditor( {
 			</SidebarEditorProvider>
 
 			<__unstableBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
-					<BlockInspectorButton
-						inspector={ inspector }
-						closeMenu={ onClose }
-					/>
-				) }
+				<BlockInspectorButton inspector={ inspector } />
 			</__unstableBlockSettingsMenuFirstItem>
 		</>
 	);

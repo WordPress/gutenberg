@@ -15,6 +15,7 @@ import { store as editSiteStore } from '../../store';
 import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 
+// Is this dead code?
 export default function BlockInspectorButton( { onClick = () => {} } ) {
 	const { shortcut, isBlockInspectorOpen } = useSelect(
 		( select ) => ( {

@@ -112,12 +112,14 @@ export default function ReusableBlockConvertButton( {
 	/* TODO: check if this used in other legacy dropdown menus */
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
+			{ () => (
 				<>
 					<DropdownMenuItemV2
 						prefix={ <Icon icon={ symbol } size={ 24 } /> }
-						onSelect={ () => {
+						onSelect={ ( event ) => {
 							setIsModalOpen( true );
+							// Keep the dropdown menu open
+							event.preventDefault();
 						} }
 					>
 						{ __( 'Create Reusable block' ) }
@@ -137,7 +139,12 @@ export default function ReusableBlockConvertButton( {
 									onConvert( title );
 									setIsModalOpen( false );
 									setTitle( '' );
-									onClose();
+									// TODO: the modal is expected to close the dropdown!
+									// - can we keep it open?
+									// - can we close the dropdown when the modal is opened instead?
+									// - otherwise, how do we go about it? We'd need to switch to
+									//   controlled mode at the root, and pass `onClose` around
+									// onClose();
 								} }
 							>
 								<VStack spacing="5">

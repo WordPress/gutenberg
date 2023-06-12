@@ -16,17 +16,16 @@ import ConvertToTemplatePart from './convert-to-template-part';
 export default function TemplatePartConverter() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, onClose } ) => (
+			{ ( { selectedClientIds } ) => (
 				<TemplatePartConverterMenuItem
 					clientIds={ selectedClientIds }
-					onClose={ onClose }
 				/>
 			) }
 		</BlockSettingsMenuControls>
 	);
 }
 
-function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
+function TemplatePartConverterMenuItem( { clientIds } ) {
 	const blocks = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlocksByClientId( clientIds ),
@@ -35,12 +34,7 @@ function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
 
 	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {
-		return (
-			<ConvertToRegularBlocks
-				clientId={ clientIds[ 0 ] }
-				onClose={ onClose }
-			/>
-		);
+		return <ConvertToRegularBlocks clientId={ clientIds[ 0 ] } />;
 	}
 	return <ConvertToTemplatePart clientIds={ clientIds } blocks={ blocks } />;
 }

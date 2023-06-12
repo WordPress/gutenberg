@@ -34,6 +34,7 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		: __( 'Show more settings' );
 
 	return (
+		// Is this dead code?
 		<MenuItem
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {

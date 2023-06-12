@@ -104,10 +104,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				/* TODO: check if this used in other legacy dropdown menus */
 				<DropdownMenuItemV2
-					onClick={ compose(
-						onClick
-						// onClose TODO: onClose
-					) }
+					onSelect={ onClick }
 					prefix={ <Icon icon={ icon } size={ 24 } /> }
 					label={ small ? label : undefined } // TODO: should item accept label? It's probably supposed to add an aria-label and potentially even a tooltip
 					role={ role } // TODO: should item accept role?

@@ -13,7 +13,7 @@ import { unlock } from '../../lock-unlock';
 
 const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
-export default function ConvertToRegularBlocks( { clientId /*onClose*/ } ) {
+export default function ConvertToRegularBlocks( { clientId } ) {
 	const { getBlocks } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
@@ -31,7 +31,6 @@ export default function ConvertToRegularBlocks( { clientId /*onClose*/ } ) {
 		<DropdownMenuItemV2
 			onSelect={ () => {
 				replaceBlocks( clientId, getBlocks( clientId ) );
-				// onClose(); TODO: onClose
 			} }
 		>
 			{ __( 'Detach blocks from template part' ) }

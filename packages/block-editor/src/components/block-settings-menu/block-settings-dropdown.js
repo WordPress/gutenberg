@@ -12,16 +12,11 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import {
-	Children,
-	cloneElement,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
-	__unstableUseShortcutEventMatch,
+	// __unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
@@ -50,7 +45,13 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return (
-		<DropdownMenuItemV2 ref={ ref }>
+		<DropdownMenuItemV2
+			ref={ ref }
+			onSelect={ ( event ) => {
+				// Keep the dropdown menu open.
+				event.preventDefault();
+			} }
+		>
 			{ copyMenuItemLabel }
 		</DropdownMenuItemV2>
 	);
@@ -152,7 +153,7 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-	const isMatch = __unstableUseShortcutEventMatch();
+	// const isMatch = __unstableUseShortcutEventMatch();
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
@@ -251,12 +252,9 @@ export function BlockSettingsDropdown( {
 					{ ...props }
 				>
 					<DropdownMenuGroupV2>
-						<__unstableBlockSettingsMenuFirstItem.Slot
-						// fillProps={ { onClose } } TODO: onClose missing
-						/>
+						<__unstableBlockSettingsMenuFirstItem.Slot />
 						{ ! parentBlockIsSelected && !! firstParentClientId && (
 							<DropdownMenuItemV2
-								// TODO: add onMouseMove and onMouseLeave to dropdownmenuitem
 								{ ...showParentOutlineGestures }
 								ref={ selectParentButtonRef }
 								prefix={
@@ -282,7 +280,6 @@ export function BlockSettingsDropdown( {
 						{ canDuplicate && (
 							<DropdownMenuItemV2
 								onSelect={ pipe(
-									// onClose, TODO: missing onClose
 									onDuplicate,
 									updateSelectionAfterDuplicate
 								) }
@@ -298,10 +295,7 @@ export function BlockSettingsDropdown( {
 						{ canInsertDefaultBlock && (
 							<>
 								<DropdownMenuItemV2
-									onSelect={ pipe(
-										// onClose, TODO: add onClose
-										onInsertBefore
-									) }
+									onSelect={ onInsertBefore }
 									suffix={
 										<Shortcut
 											shortcut={ shortcuts.insertBefore }
@@ -311,10 +305,7 @@ export function BlockSettingsDropdown( {
 									{ __( 'Add before' ) }
 								</DropdownMenuItemV2>
 								<DropdownMenuItemV2
-									onSelect={ pipe(
-										// onClose, TODO: add onClose
-										onInsertAfter
-									) }
+									onSelect={ onInsertAfter }
 									suffix={
 										<Shortcut
 											shortcut={ shortcuts.insertAfter }
@@ -334,14 +325,19 @@ export function BlockSettingsDropdown( {
 								onCopy={ onCopy }
 								label={ __( 'Copy styles' ) }
 							/>
-							<DropdownMenuItemV2 onSelect={ onPasteStyles }>
+							<DropdownMenuItemV2
+								onSelect={ ( event ) => {
+									onPasteStyles();
+									// Keep the dropdown menu open.
+									event.preventDefault();
+								} }
+							>
 								{ __( 'Paste styles' ) }
 							</DropdownMenuItemV2>
 						</DropdownMenuGroupV2>
 					) }
 					<BlockSettingsMenuControls.Slot
 						fillProps={ {
-							// onClose,
 							canMove,
 							onMoveTo,
 							onlyBlock,
@@ -351,22 +347,13 @@ export function BlockSettingsDropdown( {
 						clientIds={ clientIds }
 						__unstableDisplayLocation={ __unstableDisplayLocation }
 					/>
-					{ typeof children === 'function'
-						? children( {
-								/*onClose*/
-						  } )
-						: Children.map( ( child ) =>
-								cloneElement( child, {
-									/*onClose*/
-								} )
-						  ) }
+					{ typeof children === 'function' ? children() : children }
 					{ canRemove && (
 						<>
 							<DropdownMenuSeparatorV2 />
 							<DropdownMenuGroupV2>
 								<DropdownMenuItemV2
 									onClick={ pipe(
-										// onClose,
 										onRemove,
 										updateSelectionAfterRemove
 									) }

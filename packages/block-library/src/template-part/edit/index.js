@@ -166,9 +166,10 @@ export default function TemplatePartEdit( {
 						{ () => (
 							/* TODO: check if this used in other legacy dropdown menus */
 							<DropdownMenuItemV2
-								onSelect={ () => {
-									// TODO: should call preventDefault?
+								onSelect={ ( event ) => {
 									setIsTemplatePartSelectionOpen( true );
+									// Keep the dropdown menu open
+									event.preventDefault();
 								} }
 							>
 								{ createInterpolateElement(
