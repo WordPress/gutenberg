@@ -29,11 +29,12 @@ function buildMenuLabel( title, id, status ) {
 		return decodeEntities( title?.rendered );
 	}
 
-	// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
-	return sprintf( __( '%1$s (%2$s)' ), [
+	return sprintf(
+		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
+		__( '%1$s (%2$s)' ),
 		decodeEntities( title?.rendered ),
-		status,
-	] );
+		status
+	);
 }
 
 function NavigationMenuSelector( {
