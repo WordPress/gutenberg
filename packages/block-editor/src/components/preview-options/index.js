@@ -27,7 +27,7 @@ export default function PreviewOptions( {
 			className,
 			'block-editor-post-preview__dropdown-content'
 		),
-		position: 'bottom left',
+		placement: 'bottom-end',
 	};
 	const toggleProps = {
 		variant: 'tertiary',

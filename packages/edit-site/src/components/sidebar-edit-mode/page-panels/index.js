@@ -20,7 +20,7 @@ import { useMemo } from '@wordpress/element';
 import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import SidebarCard from '../sidebar-card';
-import ContentBlocksList from './content-blocks-list';
+import PageContent from './page-content';
 
 export default function PagePanels() {
 	const context = useSelect(
@@ -37,7 +37,7 @@ export default function PagePanels() {
 		record: template,
 	} = useEditedEntityRecord();
 
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
 	const blockContext = useMemo(
 		() => ( { ...context, postType: null, postId: null } ),
@@ -62,7 +62,7 @@ export default function PagePanels() {
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>
-				<ContentBlocksList />
+				<PageContent />
 			</PanelBody>
 			<PanelBody title={ __( 'Template' ) }>
 				<VStack>
@@ -78,7 +78,7 @@ export default function PagePanels() {
 					<Button
 						className="edit-site-page-panels__edit-template-button"
 						variant="secondary"
-						onClick={ () => setHasPageContentLock( false ) }
+						onClick={ () => setHasPageContentFocus( false ) }
 					>
 						{ __( 'Edit template' ) }
 					</Button>

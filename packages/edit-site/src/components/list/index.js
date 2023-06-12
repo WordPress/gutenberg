@@ -16,7 +16,7 @@ import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
 import Table from './table';
 import useTitle from '../routes/use-title';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 

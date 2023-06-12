@@ -38,7 +38,7 @@ import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
@@ -261,7 +261,11 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// redirect from the revisions screen to the root global styles screen.
 			goTo( '/' );
 		}
-	}, [ editorCanvasContainerView, location?.path, goTo ] );
+		// location?.path is not a dependency because we don't want to track it.
+		// Doing so will cause an infinite loop. We could abstract logic to avoid
+		// having to disable the check later.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ editorCanvasContainerView, goTo ] );
 }
 
 function GlobalStylesUI() {
