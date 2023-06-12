@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/social-links",
 	"title": "Social Icons",
 	"category": "widgets",
@@ -41,7 +41,9 @@
 	"providesContext": {
 		"openInNewTab": "openInNewTab",
 		"showLabels": "showLabels",
+		"iconColor": "iconColor",
 		"iconColorValue": "iconColorValue",
+		"iconBackgroundColor": "iconBackgroundColor",
 		"iconBackgroundColorValue": "iconBackgroundColorValue"
 	},
 	"supports": {

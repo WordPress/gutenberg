@@ -26,6 +26,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
 	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
@@ -35,6 +36,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_font_weight_support
 		|| $has_letter_spacing_support
 		|| $has_line_height_support
+		|| $has_text_columns_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support;
 
@@ -91,6 +93,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
 	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
@@ -100,6 +103,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_font_style      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
 	$should_skip_font_weight     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
 	$should_skip_line_height     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
+	$should_skip_text_columns    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
@@ -133,6 +137,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_line_height_support && ! $should_skip_line_height ) {
 			$typography_block_styles['lineHeight'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null );
+	}
+
+	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumns'] ) ) {
+		$typography_block_styles['textColumns'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'textColumns' ), null );
 	}
 
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
@@ -204,44 +212,6 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 }
 
 /**
- * This method is no longer used and has been deprecated in Core since 6.1.0.
- *
- * It can be deleted once Gutenberg's minimum supported WordPress version is >= 6.1
- *
- * Generates an inline style for a typography feature e.g. text decoration,
- * text transform, and font style.
- *
- * @since 5.8.0
- * @deprecated 6.1.0
- *
- * @param array  $attributes   Block's attributes.
- * @param string $feature      Key for the feature within the typography styles.
- * @param string $css_property Slug for the CSS property the inline style sets.
- *
- * @return string              CSS inline style.
- */
-function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
-	// Retrieve current attribute value or skip if not found.
-	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
-	if ( ! $style_value ) {
-		return;
-	}
-
-	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
-		return sprintf( '%s:%s;', $css_property, $style_value );
-	}
-
-	// We have a preset CSS variable as the style.
-	// Get the style value from the string and return CSS style.
-	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	$slug            = substr( $style_value, $index_to_splice );
-
-	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
-	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
-}
-
-/**
  * Renders typography styles/content to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -295,12 +265,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
 
-	// Converts numbers to pixel values by default.
+	// Converts numeric values to pixel values by default.
 	if ( is_numeric( $raw_value ) ) {
 		$raw_value = $raw_value . 'px';
 	}
@@ -459,7 +428,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	}
 
 	// Checks if fluid font sizes are activated.
-	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
+	$global_settings     = gutenberg_get_global_settings();
+	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
+	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+
 	$should_use_fluid_typography
 		= isset( $typography_settings['fluid'] ) &&
 		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
@@ -473,12 +445,13 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
 
 	// Defaults.
-	$default_maximum_viewport_width   = '1600px';
-	$default_minimum_viewport_width   = '768px';
-	$default_minimum_font_size_factor = 0.75;
-	$default_scale_factor             = 1;
-	$has_min_font_size                = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
-	$default_minimum_font_size_limit  = $has_min_font_size ? $fluid_settings['minFontSize'] : '14px';
+	$default_maximum_viewport_width       = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : '1600px';
+	$default_minimum_viewport_width       = '320px';
+	$default_minimum_font_size_factor_max = 0.75;
+	$default_minimum_font_size_factor_min = 0.25;
+	$default_scale_factor                 = 1;
+	$has_min_font_size                    = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
+	$default_minimum_font_size_limit      = $has_min_font_size ? $fluid_settings['minFontSize'] : '14px';
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
@@ -530,7 +503,16 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	 * the given font size multiplied by the min font size scale factor.
 	 */
 	if ( ! $minimum_font_size_raw ) {
-		$calculated_minimum_font_size = round( $preferred_size['value'] * $default_minimum_font_size_factor, 3 );
+		$preferred_font_size_in_px = 'px' === $preferred_size['unit'] ? $preferred_size['value'] : $preferred_size['value'] * 16;
+
+		/*
+		 * The scale factor is a multiplier that affects how quickly the curve will move towards the minimum,
+		 * that is, how quickly the size factor reaches 0 given increasing font size values.
+		 * For a - b * log2(), lower values of b will make the curve move towards the minimum faster.
+		 * The scale factor is constrained between min and max values.
+		 */
+		$minimum_font_size_factor     = min( max( 1 - 0.075 * log( $preferred_font_size_in_px, 2 ), $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
+		$calculated_minimum_font_size = round( $preferred_size['value'] * $minimum_font_size_factor, 3 );
 
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.
 		if ( ! empty( $minimum_font_size_limit ) && $calculated_minimum_font_size <= $minimum_font_size_limit['value'] ) {

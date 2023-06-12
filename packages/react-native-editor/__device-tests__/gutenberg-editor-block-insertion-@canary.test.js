@@ -65,14 +65,14 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		} );
 		await titleElement.click();
 
+		// Wait for editor to finish scrolling to the title
+		await editorPage.driver.sleep( 2000 );
+
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const emptyParagraphBlock = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
 		);
 		expect( emptyParagraphBlock ).toBeTruthy();
-		const emptyParagraphBlockElement =
-			await editorPage.getTextBlockAtPosition( blockNames.paragraph );
-		expect( emptyParagraphBlockElement ).toBeTruthy();
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
 		const html = await editorPage.getHtmlContent();

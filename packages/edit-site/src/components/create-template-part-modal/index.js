@@ -13,6 +13,7 @@ import {
 	Modal,
 	__experimentalRadioGroup as RadioGroup,
 	__experimentalRadio as Radio,
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -106,31 +107,24 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 							) }
 						</RadioGroup>
 					</BaseControl>
-					<Flex
-						className="edit-site-create-template-part-modal__modal-actions"
-						justify="flex-end"
-					>
-						<FlexItem>
-							<Button
-								variant="secondary"
-								onClick={ () => {
-									closeModal();
-								} }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</FlexItem>
-						<FlexItem>
-							<Button
-								variant="primary"
-								type="submit"
-								disabled={ ! title }
-								isBusy={ isSubmitting }
-							>
-								{ __( 'Create' ) }
-							</Button>
-						</FlexItem>
-					</Flex>
+					<HStack justify="right">
+						<Button
+							variant="tertiary"
+							onClick={ () => {
+								closeModal();
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							type="submit"
+							disabled={ ! title }
+							isBusy={ isSubmitting }
+						>
+							{ __( 'Create' ) }
+						</Button>
+					</HStack>
 				</VStack>
 			</form>
 		</Modal>

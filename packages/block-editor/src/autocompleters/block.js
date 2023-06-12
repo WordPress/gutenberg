@@ -16,6 +16,7 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
 import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
+import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
 
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
@@ -34,23 +35,26 @@ function createBlockCompleter() {
 		triggerPrefix: '/',
 
 		useItems( filterValue ) {
-			const { rootClientId, selectedBlockName } = useSelect(
-				( select ) => {
+			const { rootClientId, selectedBlockName, prioritizedBlocks } =
+				useSelect( ( select ) => {
 					const {
 						getSelectedBlockClientId,
 						getBlockName,
 						getBlockInsertionPoint,
+						getBlockListSettings,
 					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
+					const _rootClientId = getBlockInsertionPoint().rootClientId;
 					return {
 						selectedBlockName: selectedBlockClientId
 							? getBlockName( selectedBlockClientId )
 							: null,
-						rootClientId: getBlockInsertionPoint().rootClientId,
+						rootClientId: _rootClientId,
+						prioritizedBlocks:
+							getBlockListSettings( _rootClientId )
+								?.prioritizedInserterBlocks,
 					};
-				},
-				[]
-			);
+				}, [] );
 			const [ items, categories, collections ] = useBlockTypesState(
 				rootClientId,
 				noop
@@ -64,7 +68,10 @@ function createBlockCompleter() {
 							collections,
 							filterValue
 					  )
-					: orderBy( items, 'frecency', 'desc' );
+					: orderInserterBlockItems(
+							orderBy( items, 'frecency', 'desc' ),
+							prioritizedBlocks
+					  );
 
 				return initialFilteredItems
 					.filter( ( item ) => item.name !== selectedBlockName )
@@ -75,6 +82,7 @@ function createBlockCompleter() {
 				items,
 				categories,
 				collections,
+				prioritizedBlocks,
 			] );
 
 			const options = useMemo(

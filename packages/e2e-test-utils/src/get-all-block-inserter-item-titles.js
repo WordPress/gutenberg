@@ -20,5 +20,5 @@ export async function getAllBlockInserterItemTitles() {
 			return inserterItem.innerText;
 		} );
 	} );
-	return [ ...new Set( inserterItemTitles ) ].sort();
+	return [ ...new Set( inserterItemTitles ) ];
 }

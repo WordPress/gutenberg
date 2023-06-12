@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isEmpty, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -117,37 +112,36 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) =>
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => [
+						name,
 						getUniqueItemsByName( [
-							...get( blockType, [ 'styles' ], [] ).map(
-								( style ) => ( {
-									...style,
-									source: 'block',
-								} )
-							),
-							...get( state, [ blockType.name ], [] ).filter(
+							...( blockType.styles ?? [] ).map( ( style ) => ( {
+								...style,
+								source: 'block',
+							} ) ),
+							...( state[ blockType.name ] ?? [] ).filter(
 								( { source } ) => 'block' !== source
 							),
-						] )
+						] ),
+					] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
 				[ action.blockName ]: getUniqueItemsByName( [
-					...get( state, [ action.blockName ], [] ),
+					...( state[ action.blockName ] ?? [] ),
 					...action.styles,
 				] ),
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: get(
-					state,
-					[ action.blockName ],
-					[]
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
 				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
@@ -170,38 +164,40 @@ export function blockVariations( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) => {
-						return getUniqueItemsByName( [
-							...get( blockType, [ 'variations' ], [] ).map(
-								( variation ) => ( {
-									...variation,
-									source: 'block',
-								} )
-							),
-							...get( state, [ blockType.name ], [] ).filter(
-								( { source } ) => 'block' !== source
-							),
-						] );
-					}
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => {
+						return [
+							name,
+							getUniqueItemsByName( [
+								...( blockType.variations ?? [] ).map(
+									( variation ) => ( {
+										...variation,
+										source: 'block',
+									} )
+								),
+								...( state[ blockType.name ] ?? [] ).filter(
+									( { source } ) => 'block' !== source
+								),
+							] ),
+						];
+					} )
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
 				[ action.blockName ]: getUniqueItemsByName( [
-					...get( state, [ action.blockName ], [] ),
+					...( state[ action.blockName ] ?? [] ),
 					...action.variations,
 				] ),
 			};
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: get(
-					state,
-					[ action.blockName ],
-					[]
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
 				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
@@ -262,7 +258,10 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 		case 'SET_CATEGORIES':
 			return action.categories || [];
 		case 'UPDATE_CATEGORY': {
-			if ( ! action.category || isEmpty( action.category ) ) {
+			if (
+				! action.category ||
+				! Object.keys( action.category ).length
+			) {
 				return state;
 			}
 			const categoryToChange = state.find(

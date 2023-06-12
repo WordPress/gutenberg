@@ -27,9 +27,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, useBlockEditingMode } = unlock(
+	blockEditorPrivateApis
+);
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -45,6 +47,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.button.color.background': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
+	'elements.caption.color.text': 'color',
 	'elements.heading.color': 'color',
 	'elements.heading.color.background': 'color',
 	'elements.heading.typography.fontFamily': 'font-family',
@@ -207,15 +210,19 @@ function PushChangesToGlobalStylesControl( {
 }
 
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) =>
-		(
+	( BlockEdit ) => ( props ) => {
+		const blockEditingMode = useBlockEditingMode();
+		return (
 			<>
 				<BlockEdit { ...props } />
-				<InspectorAdvancedControls>
-					<PushChangesToGlobalStylesControl { ...props } />
-				</InspectorAdvancedControls>
+				{ blockEditingMode === 'default' && (
+					<InspectorAdvancedControls>
+						<PushChangesToGlobalStylesControl { ...props } />
+					</InspectorAdvancedControls>
+				) }
 			</>
-		)
+		);
+	}
 );
 
 addFilter(

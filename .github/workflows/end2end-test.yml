@@ -27,18 +27,13 @@ jobs:
                 totalParts: [4]
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Install WordPress
               run: |
@@ -76,18 +71,13 @@ jobs:
                 totalParts: [2]
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Install Playwright dependencies
               run: |
@@ -125,7 +115,7 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
               with:
                   ref: trunk
 
@@ -137,19 +127,14 @@ jobs:
                   name: flaky-tests-report
                   path: flaky-tests
 
-            - name: Use desired version of NodeJS
+            - name: Setup Node.js and install dependencies
               if: ${{ steps.download_artifact.outcome == 'success' }}
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               if: ${{ steps.download_artifact.outcome == 'success' }}
               # TODO: We don't have to build the entire project, just the action itself.
-              run: |
-                  npm ci
-                  npm run build:packages
+              run: npm run build:packages
 
             - name: Report flaky tests
               if: ${{ steps.download_artifact.outcome == 'success' }}

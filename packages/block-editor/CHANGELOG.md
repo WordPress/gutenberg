@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 12.3.0 (2023-06-07)
+
+## 12.2.0 (2023-05-24)
+
+## 12.1.0 (2023-05-10)
+
+-   `MediaPlaceholder`: Remove the undocumented `onHTMLDrop` prop ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+
+## 12.0.0 (2023-04-26)
+
+### Breaking Changes
+
+- Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+
+## 11.8.0 (2023-04-12)
+
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
+## 11.6.0 (2023-03-15)
+
+## 11.5.0 (2023-03-01)
+
 ### Bug Fix
 
 -   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).

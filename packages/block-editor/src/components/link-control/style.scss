@@ -97,10 +97,6 @@ $preview-image-height: 140px;
 	order: 20;
 }
 
-.components-button .block-editor-link-control__search-submit .has-icon {
-	margin: -1px;
-}
-
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
 	margin-top: -$grid-unit-20 + 1px;
@@ -127,12 +123,6 @@ $preview-image-height: 140px;
 		bottom: 0;
 		top: auto;
 	}
-}
-
-.block-editor-link-control__search-results-label {
-	padding: $grid-unit-20 $grid-unit-40 0;
-	display: block;
-	font-weight: 600;
 }
 
 .block-editor-link-control__search-results {
@@ -498,6 +488,11 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
+
+	// Cancel left margin inherited from WP Admin Forms CSS.
+	input {
+		margin-left: 0;
+	}
 
 	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;

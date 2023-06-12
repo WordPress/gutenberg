@@ -57,7 +57,19 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       }
     >
       <View>
-        Svg
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
       </View>
       <View
         style={{}}
@@ -66,7 +78,15 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
           59IrU0WJtq
         </Text>
         <View>
-          Svg
+          <Svg
+            height={16}
+            style={{}}
+            viewBox="-2 -2 24 24"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
           <Text
             style={{}}
           >
@@ -221,7 +241,19 @@ exports[`Audio block renders audio file without crashing 1`] = `
       }
     >
       <View>
-        Svg
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
       </View>
       <View
         style={{}}
@@ -394,7 +426,15 @@ exports[`Audio block renders placeholder without crashing 1`] = `
         <View
           style={{}}
         >
-          Svg
+          <Svg
+            height={24}
+            style={{}}
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
         </View>
       </View>
       <Text>

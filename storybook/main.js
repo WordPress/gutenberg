@@ -3,6 +3,8 @@ const stories = [
 	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
 	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/edit-site/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/components/README.mdx',
 ].filter( Boolean );
 
 module.exports = {
@@ -13,7 +15,7 @@ module.exports = {
 	addons: [
 		{
 			name: '@storybook/addon-docs',
-			options: { configureJSX: true },
+			options: { configureJSX: true, transcludeMarkdown: true },
 		},
 		'@storybook/addon-controls',
 		'@storybook/addon-viewport',

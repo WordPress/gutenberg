@@ -27,7 +27,7 @@ test.describe( 'Buttons', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
@@ -50,13 +50,13 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.locator( 'role=combobox[name="URL"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'WordPress' );
 
@@ -78,7 +78,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.locator( 'role=combobox[name="URL"i]' )
 		).toBeFocused();
@@ -91,7 +91,7 @@ test.describe( 'Buttons', () => {
 
 		// Focus should move from the link control to the button block's text.
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 
 		// The link control should still be visible when a URL is set.
@@ -107,7 +107,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const urlInput = page.locator( 'role=combobox[name="URL"i]' );
 
@@ -116,7 +116,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move to "Edit" and switch UI back to edit mode
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// Check the value of the URL input has had http:// prepended.
@@ -130,7 +130,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained
@@ -182,11 +182,11 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
 		);
 		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=button[name="Color: Vivid red"i]' );
 
@@ -211,13 +211,13 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
@@ -246,7 +246,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
@@ -275,7 +275,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click(

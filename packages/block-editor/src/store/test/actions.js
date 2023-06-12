@@ -625,7 +625,8 @@ describe( 'actions', () => {
 			removeBlocks( clientIds )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -734,7 +735,8 @@ describe( 'actions', () => {
 			removeBlock( clientId )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {

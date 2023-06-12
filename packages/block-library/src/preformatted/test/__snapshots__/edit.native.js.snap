@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/more/edit/native should match snapshot when content is empty 1`] = `
+exports[`Preformatted should match snapshot when content is empty 1`] = `
 <View
   style={
     [
@@ -46,7 +46,7 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
 </View>
 `;
 
-exports[`core/more/edit/native should match snapshot when content is not empty 1`] = `
+exports[`Preformatted should match snapshot when content is not empty 1`] = `
 <View
   style={
     [

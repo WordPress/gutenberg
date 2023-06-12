@@ -34,9 +34,27 @@ exports[`Missing block renders without crashing 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
   >
-    Svg
+    <Svg
+      height={24}
+      label="Help icon"
+      style={{}}
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      Path
+    </Svg>
   </View>
-  Svg
+  <Svg
+    color="white"
+    height={24}
+    style={{}}
+    viewBox="0 0 24 24"
+    width={24}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    Path
+  </Svg>
   <Text>
     missing/block/title
   </Text>

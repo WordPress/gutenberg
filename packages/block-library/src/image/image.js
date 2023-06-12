@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
@@ -79,7 +74,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
-	isContentLocked,
+	blockEditingMode,
 } ) {
 	const {
 		url = '',
@@ -122,7 +117,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, clientId ]
+		[ id, isSelected ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -161,21 +156,28 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
-		! isContentLocked &&
+		hasNonContentControls &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
 	useEffect( () => {
-		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+		if (
+			! isExternalImage( id, url ) ||
+			! isSelected ||
+			! canUploadMedia ||
+			externalBlob
+		) {
 			return;
 		}
 
@@ -185,7 +187,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob ] );
+	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
@@ -326,13 +328,13 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
@@ -401,19 +403,18 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 										{ __(
-											'Describe the purpose of the image'
+											'Describe the purpose of the image.'
 										) }
 									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
 								</>
 							}
 						/>
@@ -428,6 +429,9 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							'Select the size of the source image.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -472,7 +476,8 @@ export default function Image( {
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 	const hasCustomBorder =
-		!! borderProps.className || ! isEmpty( borderProps.style );
+		!! borderProps.className ||
+		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -510,6 +515,10 @@ export default function Image( {
 			: naturalHeight;
 	}
 
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback to clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
@@ -517,7 +526,7 @@ export default function Image( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
+				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) =>

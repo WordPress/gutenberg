@@ -2,11 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -71,16 +78,19 @@ const TabButton = ( {
  * );
  * ```
  */
-export function TabPanel( {
-	className,
-	children,
-	tabs,
-	selectOnMove = true,
-	initialTabName,
-	orientation = 'horizontal',
-	activeClass = 'is-active',
-	onSelect,
-}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
+const UnforwardedTabPanel = (
+	{
+		className,
+		children,
+		tabs,
+		selectOnMove = true,
+		initialTabName,
+		orientation = 'horizontal',
+		activeClass = 'is-active',
+		onSelect,
+	}: WordPressComponentProps< TabPanelProps, 'div', false >,
+	ref: ForwardedRef< any >
+) => {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
@@ -96,7 +106,7 @@ export function TabPanel( {
 	// to show the `tab-panel` associated with the clicked tab.
 	const activateTabAutomatically = (
 		_childIndex: number,
-		child: HTMLButtonElement
+		child: HTMLElement
 	) => {
 		child.click();
 	};
@@ -104,7 +114,7 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	// Handle selecting the initial tab.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// If there's a selected tab, don't override it.
 		if ( selectedTab ) {
 			return;
@@ -146,7 +156,7 @@ export function TabPanel( {
 	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
 
 	return (
-		<div className={ className }>
+		<div className={ className } ref={ ref }>
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
@@ -191,6 +201,7 @@ export function TabPanel( {
 			) }
 		</div>
 	);
-}
+};
 
+export const TabPanel = forwardRef( UnforwardedTabPanel );
 export default TabPanel;

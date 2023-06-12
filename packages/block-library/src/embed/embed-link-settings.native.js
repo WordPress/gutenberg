@@ -39,7 +39,7 @@ const EmbedLinkSettings = ( {
 			label: (
 				<FooterMessageLink
 					href={ __(
-						'https://wordpress.org/support/article/embeds/'
+						'https://wordpress.org/documentation/article/embeds/'
 					) }
 					value={ __( 'Learn more about embeds' ) }
 				/>

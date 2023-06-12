@@ -13,7 +13,7 @@ export const POSITIONS = {
 	corner: 'corner',
 } as const;
 
-export type Position = typeof POSITIONS[ keyof typeof POSITIONS ];
+export type Position = ( typeof POSITIONS )[ keyof typeof POSITIONS ];
 
 interface UseResizeLabelProps {
 	/** The label value. */
