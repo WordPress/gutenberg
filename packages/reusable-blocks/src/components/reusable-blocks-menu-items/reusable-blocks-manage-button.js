@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -16,6 +16,9 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as reusableBlocksStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 function ReusableBlocksManageButton( { clientId } ) {
 	const { canRemove, isVisible, innerBlockCount } = useSelect(
@@ -50,17 +53,20 @@ function ReusableBlocksManageButton( { clientId } ) {
 
 	return (
 		<BlockSettingsMenuControls>
-			<MenuItem
+			{ /* TODO: check if this used in other legacy dropdown menus */ }
+			<DropdownMenuItemV2
 				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 			>
 				{ __( 'Manage Reusable blocks' ) }
-			</MenuItem>
+			</DropdownMenuItemV2>
 			{ canRemove && (
-				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
+				<DropdownMenuItemV2
+					onSelect={ () => convertBlockToStatic( clientId ) }
+				>
 					{ innerBlockCount > 1
 						? __( 'Convert to regular blocks' )
 						: __( 'Convert to regular block' ) }
-				</MenuItem>
+				</DropdownMenuItemV2>
 			) }
 		</BlockSettingsMenuControls>
 	);

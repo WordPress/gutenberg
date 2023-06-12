@@ -8,12 +8,13 @@ import {
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
-	MenuItem,
+	Icon,
 	Modal,
 	Button,
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -25,6 +26,9 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -105,18 +109,19 @@ export default function ReusableBlockConvertButton( {
 		return null;
 	}
 
+	/* TODO: check if this used in other legacy dropdown menus */
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
 				<>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => {
+					<DropdownMenuItemV2
+						prefix={ <Icon icon={ symbol } size={ 24 } /> }
+						onSelect={ () => {
 							setIsModalOpen( true );
 						} }
 					>
 						{ __( 'Create Reusable block' ) }
-					</MenuItem>
+					</DropdownMenuItemV2>
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create Reusable block' ) }
