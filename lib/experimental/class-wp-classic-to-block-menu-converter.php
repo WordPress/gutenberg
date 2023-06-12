@@ -20,7 +20,19 @@ class WP_Classic_To_Block_Menu_Converter {
 	 * @return string the serialized and normalized parsed blocks.
 	 */
 	public static function convert( $menu ) {
+
+		if ( ! is_nav_menu( $menu ) ) {
+			return new WP_Error(
+				'invalid_menu',
+				__( 'The menu provided is not a valid menu.', 'gutenberg' )
+			);
+		}
+
 		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
+
+		if ( empty( $menu_items ) ) {
+			return array();
+		}
 
 		// Set up the $menu_item variables.
 		// Adds the class property classes for the current context, if applicable.
