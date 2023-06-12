@@ -5,7 +5,7 @@
  * @package WordPress
  */
 
- /**
+/**
  * Tests for the WP_Classic_To_Block_Menu_Converter_Test class.
  */
 class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
@@ -55,7 +55,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 		$menu_id = wp_create_nav_menu( 'Classic Menu' );
 
-		$first_menu_item_id = wp_update_nav_menu_item(
+		wp_update_nav_menu_item(
 			$menu_id,
 			0,
 			array(
@@ -127,7 +127,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 			$menu_id = wp_create_nav_menu( 'Classic Menu' );
 
-			$first_menu_item_id = wp_update_nav_menu_item(
+			wp_update_nav_menu_item(
 				$menu_id,
 				0,
 				array(
