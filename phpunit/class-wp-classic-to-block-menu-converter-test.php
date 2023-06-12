@@ -97,4 +97,35 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 2, $parsed_blocks, 'Draft menu item should not be included in blocks.' );
 
 	}
+
+	/**
+	 * @dataProvider provider_test_passing_non_menu_object_to_converter_returns_wp_error
+	 *
+	 * @return void
+	 */
+	public function test_passing_non_menu_object_to_converter_returns_wp_error( $data ) {
+
+		$result = WP_Classic_To_Block_Menu_Converter::convert( $data );
+
+		$this->assertTrue( is_wp_error( $result ), 'Should be a WP_Error instance' );
+
+		$this->assertEquals( 'invalid_menu', $result->get_error_code(), 'Error code should indicate invalidity of menu argument.' );
+
+		$this->assertEquals( 'The menu provided is not a valid menu.', $result->get_error_message(), 'Error message should communicate invalidity of menu argument.' );
+	}
+
+	public function provider_test_passing_non_menu_object_to_converter_returns_wp_error() {
+        return array(
+            array( 1 ),
+            array( -1 ),
+            array( '1' ),
+            array( 'not a menu object' ),
+            array( true ),
+            array( false ),
+            array( array() ),
+            array( new stdClass() ),
+        );
+	}
+
+
 }
