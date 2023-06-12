@@ -16,7 +16,7 @@ export default function RenameModal( { onClose, onConfirm } ) {
 				<VStack spacing="3">
 					<p>
 						{ __(
-							'Are you sure you wish to delete this Navigation menu?'
+							'Are you sure you want to delete this Navigation menu?'
 						) }
 					</p>
 					<HStack justify="right">
