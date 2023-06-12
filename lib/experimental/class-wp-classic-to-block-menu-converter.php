@@ -30,6 +30,10 @@ class WP_Classic_To_Block_Menu_Converter {
 
 		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
 
+		if ( empty( $menu_items ) ) {
+			return array();
+		}
+
 		// Set up the $menu_item variables.
 		// Adds the class property classes for the current context, if applicable.
 		_wp_menu_item_classes_by_context( $menu_items );
