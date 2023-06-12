@@ -42,7 +42,7 @@ export default function StatusLabel( { date: currentDate, postId, postType } ) {
 	const statusLabel = createInterpolateElement(
 		sprintf(
 			/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
-			__( 'Scheduled for <time>%s</time>' ),
+			__( '<time>%s</time>' ),
 			formattedDate
 		),
 		{ time: <time dateTime={ date } /> }
