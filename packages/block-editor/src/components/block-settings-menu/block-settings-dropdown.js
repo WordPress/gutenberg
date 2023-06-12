@@ -52,6 +52,30 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
+const ShortcutItemSuffix = ( { shortcut, className } ) => {
+	if ( ! shortcut ) {
+		return null;
+	}
+
+	let displayText;
+	let ariaLabel;
+
+	if ( typeof shortcut === 'string' ) {
+		displayText = shortcut;
+	}
+
+	if ( shortcut !== null && typeof shortcut === 'object' ) {
+		displayText = shortcut.display;
+		ariaLabel = shortcut.ariaLabel;
+	}
+
+	return (
+		<span className={ className } aria-label={ ariaLabel }>
+			{ displayText }
+		</span>
+	);
+};
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
