@@ -39,13 +39,14 @@ export const __unstableGetPreference = createRegistrySelector(
 /**
  * Returns whether the given feature is enabled or not.
  *
+ * @deprecated
  * @param {Object} state       Global application state.
  * @param {string} featureName Feature slug.
  *
  * @return {boolean} Is active.
  */
 export function isFeatureActive( state, featureName ) {
-	deprecated( `select( 'core/interface' ).isFeatureActive`, {
+	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
 		since: '6.0',
 		alternative: `select( 'core/preferences' ).get`,
 	} );
@@ -319,4 +320,28 @@ export function isNavigationOpened() {
 		since: '6.2',
 		version: '6.4',
 	} );
+}
+
+/**
+ * Whether or not the editor has a page loaded into it.
+ *
+ * @see setPage
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor has a page loaded into it.
+ */
+export function isPage( state ) {
+	return !! state.editedPost.context?.postId;
+}
+
+/**
+ * Whether or not the editor allows only page content to be edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not focus is on editing page content.
+ */
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }

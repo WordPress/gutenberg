@@ -152,7 +152,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				'role=button[name="Add default block"i]'
 			);
 			await page.keyboard.type( 'Stuck in the middle with you.' );
-			await pageUtils.pressKeyTimes( 'ArrowLeft', 'you.'.length );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
@@ -276,7 +276,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
-			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 6 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect
@@ -462,9 +462,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	} ) => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '@' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'f' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'r' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )

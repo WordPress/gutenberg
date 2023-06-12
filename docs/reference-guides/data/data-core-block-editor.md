@@ -34,8 +34,7 @@ _Returns_
 
 ### canInsertBlocks
 
-Determines if the given blocks are allowed to be inserted into the block
-list.
+Determines if the given blocks are allowed to be inserted into the block list.
 
 _Parameters_
 
@@ -144,10 +143,7 @@ _Returns_
 
 ### getAdjacentBlockClientId
 
-Returns the client ID of the block adjacent one at the given reference
-startClientId and modifier directionality. Defaults start startClientId to
-the selected block, and direction as next block. Returns null if there is no
-adjacent block.
+Returns the client ID of the block adjacent one at the given reference startClientId and modifier directionality. Defaults start startClientId to the selected block, and direction as next block. Returns null if there is no adjacent block.
 
 _Parameters_
 
@@ -172,22 +168,34 @@ _Returns_
 
 -   `Array?`: The list of allowed block types.
 
+### getBehaviors
+
+Returns the behaviors registered with the editor.
+
+Behaviors are named, reusable pieces of functionality that can be attached to blocks. They are registered with the editor using the `theme.json` file.
+
+_Usage_
+
+```js
+const behaviors = select( blockEditorStore ).getBehaviors();
+if ( behaviors?.lightbox ) {
+	// Do something with the lightbox.
+}
+```
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: The editor behaviors object.
+
 ### getBlock
 
-Returns a block given its client ID. This is a parsed copy of the block,
-containing its `blockName`, `clientId`, and current `attributes` state. This
-is not the block's registration settings, which must be retrieved from the
-blocks module registration store.
+Returns a block given its client ID. This is a parsed copy of the block, containing its `blockName`, `clientId`, and current `attributes` state. This is not the block's registration settings, which must be retrieved from the blocks module registration store.
 
-getBlock recurses through its inner blocks until all its children blocks have
-been retrieved. Note that getBlock will not return the child inner blocks of
-an inner block controller. This is because an inner block controller syncs
-itself with its own entity, and should therefore not be included with the
-blocks of a different entity. For example, say you call `getBlocks( TP )` to
-get the blocks of a template part. If another template part is a child of TP,
-then the nested template part's child blocks will not be returned. This way,
-the template block itself is considered part of the parent, but the children
-are not.
+getBlock recurses through its inner blocks until all its children blocks have been retrieved. Note that getBlock will not return the child inner blocks of an inner block controller. This is because an inner block controller syncs itself with its own entity, and should therefore not be included with the blocks of a different entity. For example, say you call `getBlocks( TP )` to get the blocks of a template part. If another template part is a child of TP, then the nested template part's child blocks will not be returned. This way, the template block itself is considered part of the parent, but the children are not.
 
 _Parameters_
 
@@ -200,8 +208,7 @@ _Returns_
 
 ### getBlockAttributes
 
-Returns a block's attributes given its client ID, or null if no block exists with
-the client ID.
+Returns a block's attributes given its client ID, or null if no block exists with the client ID.
 
 _Parameters_
 
@@ -240,8 +247,7 @@ _Returns_
 
 ### getBlockIndex
 
-Returns the index at which the block corresponding to the specified client
-ID occurs within the block order, or `-1` if the block does not exist.
+Returns the index at which the block corresponding to the specified client ID occurs within the block order, or `-1` if the block does not exist.
 
 _Parameters_
 
@@ -254,8 +260,7 @@ _Returns_
 
 ### getBlockInsertionPoint
 
-Returns the insertion point, the index at which the new inserted block would
-be placed. Defaults to the last index.
+Returns the insertion point, the index at which the new inserted block would be placed. Defaults to the last index.
 
 _Parameters_
 
@@ -280,8 +285,7 @@ _Returns_
 
 ### getBlockMode
 
-Returns the block's editing mode, defaulting to "visual" if not explicitly
-assigned.
+Returns the block's editing mode, defaulting to "visual" if not explicitly assigned.
 
 _Parameters_
 
@@ -294,8 +298,7 @@ _Returns_
 
 ### getBlockName
 
-Returns a block's name given its client ID, or null if no block exists with
-the client ID.
+Returns a block's name given its client ID, or null if no block exists with the client ID.
 
 _Parameters_
 
@@ -308,8 +311,7 @@ _Returns_
 
 ### getBlockNamesByClientId
 
-Given an array of block client IDs, returns the corresponding array of block
-names.
+Given an array of block client IDs, returns the corresponding array of block names.
 
 _Parameters_
 
@@ -322,9 +324,7 @@ _Returns_
 
 ### getBlockOrder
 
-Returns an array containing all block client IDs in the editor in the order
-they appear. Optionally accepts a root client ID of the block list for which
-the order should be returned, defaulting to the top-level block order.
+Returns an array containing all block client IDs in the editor in the order they appear. Optionally accepts a root client ID of the block list for which the order should be returned, defaulting to the top-level block order.
 
 _Parameters_
 
@@ -351,11 +351,7 @@ _Returns_
 
 ### getBlockParentsByBlockName
 
-Given a block client ID and a block name, returns the list of all its parents
-from top to bottom, filtered by the given name(s). For example, if passed
-'core/group' as the blockName, it will only return parents which are group
-blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
-return parents which are group blocks and parents which are cover blocks.
+Given a block client ID and a block name, returns the list of all its parents from top to bottom, filtered by the given name(s). For example, if passed 'core/group' as the blockName, it will only return parents which are group blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will return parents which are group blocks and parents which are cover blocks.
 
 _Parameters_
 
@@ -370,9 +366,7 @@ _Returns_
 
 ### getBlockRootClientId
 
-Given a block client ID, returns the root block from which the block is
-nested, an empty string for top-level blocks, or null if the block does not
-exist.
+Given a block client ID, returns the root block from which the block is nested, an empty string for top-level blocks, or null if the block does not exist.
 
 _Parameters_
 
@@ -385,9 +379,7 @@ _Returns_
 
 ### getBlocks
 
-Returns all block objects for the current post being edited as an array in
-the order they appear in the post. Note that this will exclude child blocks
-of nested inner block controllers.
+Returns all block objects for the current post being edited as an array in the order they appear in the post. Note that this will exclude child blocks of nested inner block controllers.
 
 _Parameters_
 
@@ -400,8 +392,7 @@ _Returns_
 
 ### getBlocksByClientId
 
-Given an array of block client IDs, returns the corresponding array of block
-objects.
+Given an array of block client IDs, returns the corresponding array of block objects.
 
 _Parameters_
 
@@ -414,9 +405,7 @@ _Returns_
 
 ### getBlockSelectionEnd
 
-Returns the current block selection end. This value may be null, and it
-may represent either a singular block selection or multi-selection end.
-A selection is singular if its start and end match.
+Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.
 
 _Parameters_
 
@@ -428,9 +417,7 @@ _Returns_
 
 ### getBlockSelectionStart
 
-Returns the current block selection start. This value may be null, and it
-may represent either a singular block selection or multi-selection start.
-A selection is singular if its start and end match.
+Returns the current block selection start. This value may be null, and it may represent either a singular block selection or multi-selection start. A selection is singular if its start and end match.
 
 _Parameters_
 
@@ -444,11 +431,9 @@ _Returns_
 
 Determines the items that appear in the available block transforms list.
 
-Each item object contains what's necessary to display a menu item in the
-transform list and handle its selection.
+Each item object contains what's necessary to display a menu item in the transform list and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
-that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
 
 Items are returned ordered descendingly by their 'frecency'.
 
@@ -477,9 +462,7 @@ _Properties_
 
 ### getClientIdsOfDescendants
 
-Returns an array containing the clientIds of all descendants of the blocks
-given. Returned ids are ordered first by the order of the ids given, then
-by the order that they appear in the editor.
+Returns an array containing the clientIds of all descendants of the blocks given. Returned ids are ordered first by the order of the ids given, then by the order that they appear in the editor.
 
 _Parameters_
 
@@ -492,9 +475,7 @@ _Returns_
 
 ### getClientIdsWithDescendants
 
-Returns an array containing the clientIds of the top-level blocks and
-their descendants of any depth (for nested blocks). Ids are returned
-in the same order that they appear in the editor.
+Returns an array containing the clientIds of the top-level blocks and their descendants of any depth (for nested blocks). Ids are returned in the same order that they appear in the editor.
 
 _Parameters_
 
@@ -520,8 +501,7 @@ _Returns_
 
 ### getFirstMultiSelectedBlockClientId
 
-Returns the client ID of the first block in the multi-selection set, or null
-if there is no multi-selection.
+Returns the client ID of the first block in the multi-selection set, or null if there is no multi-selection.
 
 _Parameters_
 
@@ -533,8 +513,7 @@ _Returns_
 
 ### getGlobalBlockCount
 
-Returns the total number of blocks, or the total number of blocks with a specific name in a post.
-The number returned includes nested blocks.
+Returns the total number of blocks, or the total number of blocks with a specific name in a post. The number returned includes nested blocks.
 
 _Parameters_
 
@@ -547,14 +526,11 @@ _Returns_
 
 ### getInserterItems
 
-Determines the items that appear in the inserter. Includes both static
-items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+Determines the items that appear in the inserter. Includes both static items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
 
-Each item object contains what's necessary to display a button in the
-inserter and handle its selection.
+Each item object contains what's necessary to display a button in the inserter and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
-that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
 
 Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
@@ -585,8 +561,7 @@ _Properties_
 
 ### getLastMultiSelectedBlockClientId
 
-Returns the client ID of the last block in the multi-selection set, or null
-if there is no multi-selection.
+Returns the client ID of the last block in the multi-selection set, or null if there is no multi-selection.
 
 _Parameters_
 
@@ -611,8 +586,7 @@ _Returns_
 
 ### getMultiSelectedBlockClientIds
 
-Returns the current multi-selection set of block client IDs, or an empty
-array if there is no multi-selection.
+Returns the current multi-selection set of block client IDs, or an empty array if there is no multi-selection.
 
 _Parameters_
 
@@ -624,8 +598,7 @@ _Returns_
 
 ### getMultiSelectedBlocks
 
-Returns the current multi-selection set of blocks, or an empty array if
-there is no multi-selection.
+Returns the current multi-selection set of blocks, or an empty array if there is no multi-selection.
 
 _Parameters_
 
@@ -637,8 +610,7 @@ _Returns_
 
 ### getMultiSelectedBlocksEndClientId
 
-Returns the client ID of the block which ends the multi-selection set, or
-null if there is no multi-selection.
+Returns the client ID of the block which ends the multi-selection set, or null if there is no multi-selection.
 
 This is not necessarily the last client ID in the selection.
 
@@ -656,8 +628,7 @@ _Returns_
 
 ### getMultiSelectedBlocksStartClientId
 
-Returns the client ID of the block which begins the multi-selection set, or
-null if there is no multi-selection.
+Returns the client ID of the block which begins the multi-selection set, or null if there is no multi-selection.
 
 This is not necessarily the first client ID in the selection.
 
@@ -675,9 +646,7 @@ _Returns_
 
 ### getNextBlockClientId
 
-Returns the next block's client ID from the given reference start ID.
-Defaults start to the selected block. Returns null if there is no next
-block.
+Returns the next block's client ID from the given reference start ID. Defaults start to the selected block. Returns null if there is no next block.
 
 _Parameters_
 
@@ -690,11 +659,7 @@ _Returns_
 
 ### getPatternsByBlockTypes
 
-Returns the list of patterns based on their declared `blockTypes`
-and a block's name.
-Patterns can use `blockTypes` to integrate in work flows like
-suggesting appropriate patterns in a Placeholder state(during insertion)
-or blocks transformations.
+Returns the list of patterns based on their declared `blockTypes` and a block's name. Patterns can use `blockTypes` to integrate in work flows like suggesting appropriate patterns in a Placeholder state(during insertion) or blocks transformations.
 
 _Parameters_
 
@@ -708,9 +673,7 @@ _Returns_
 
 ### getPreviousBlockClientId
 
-Returns the previous block's client ID from the given reference start ID.
-Defaults start to the selected block. Returns null if there is no previous
-block.
+Returns the previous block's client ID from the given reference start ID. Defaults start to the selected block. Returns null if there is no previous block.
 
 _Parameters_
 
@@ -735,8 +698,7 @@ _Returns_
 
 ### getSelectedBlockClientId
 
-Returns the currently selected block client ID, or null if there is no
-selected block.
+Returns the currently selected block client ID, or null if there is no selected block.
 
 _Parameters_
 
@@ -772,9 +734,7 @@ _Returns_
 
 ### getSelectedBlocksInitialCaretPosition
 
-Returns the initial caret position for the selected block.
-This position is to used to position the caret properly when the selected block changes.
-If the current block is not a RichText, having initial position set to 0 means "focus block"
+Returns the initial caret position for the selected block. This position is to used to position the caret properly when the selected block changes. If the current block is not a RichText, having initial position set to 0 means "focus block"
 
 _Parameters_
 
@@ -786,8 +746,7 @@ _Returns_
 
 ### getSelectionEnd
 
-Returns the current selection end block client ID, attribute key and text
-offset.
+Returns the current selection end block client ID, attribute key and text offset.
 
 _Parameters_
 
@@ -799,8 +758,7 @@ _Returns_
 
 ### getSelectionStart
 
-Returns the current selection start block client ID, attribute key and text
-offset.
+Returns the current selection start block client ID, attribute key and text offset.
 
 _Parameters_
 
@@ -836,8 +794,7 @@ _Returns_
 
 ### getTemplateLock
 
-Returns the defined block template lock. Optionally accepts a root block
-client ID as context, otherwise defaulting to the global context.
+Returns the defined block template lock. Optionally accepts a root block client ID as context, otherwise defaulting to the global context.
 
 _Parameters_
 
@@ -859,6 +816,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Client Id of moving block.
+
+### hasDraggedInnerBlock
+
+Returns true if one of the block's inner blocks is dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block client ID.
+-   _deep_ `boolean`: Perform a deep check.
+
+_Returns_
+
+-   `boolean`: Whether the block has an inner block dragged
 
 ### hasInserterItems
 
@@ -909,7 +880,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the block as an inner block selected
+-   `boolean`: Whether the block has an inner block selected
 
 ### isAncestorBeingDragged
 
@@ -926,8 +897,7 @@ _Returns_
 
 ### isAncestorMultiSelected
 
-Returns true if an ancestor of the block is multi-selected, or false
-otherwise.
+Returns true if an ancestor of the block is multi-selected, or false otherwise.
 
 _Parameters_
 
@@ -942,9 +912,7 @@ _Returns_
 
 Returns whether the block is being dragged.
 
-Only returns true if the block is being directly dragged,
-not if the block is a child of a parent being dragged.
-See `isAncestorBeingDragged` for child blocks.
+Only returns true if the block is being directly dragged, not if the block is a child of a parent being dragged. See `isAncestorBeingDragged` for child blocks.
 
 _Parameters_
 
@@ -982,8 +950,7 @@ _Returns_
 
 ### isBlockMultiSelected
 
-Returns true if the client ID occurs within the block multi-selection, or
-false otherwise.
+Returns true if the client ID occurs within the block multi-selection, or false otherwise.
 
 _Parameters_
 
@@ -996,8 +963,7 @@ _Returns_
 
 ### isBlockSelected
 
-Returns true if the block corresponding to the specified client ID is
-currently selected and no multi-selection exists, or false otherwise.
+Returns true if the block corresponding to the specified client ID is currently selected and no multi-selection exists, or false otherwise.
 
 _Parameters_
 
@@ -1036,10 +1002,7 @@ _Returns_
 
 ### isBlockWithinSelection
 
-Returns true if the block corresponding to the specified client ID is
-currently selected but isn't the last of the selected blocks. Here "last"
-refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.selectionEnd` isn't used.
+Returns true if the block corresponding to the specified client ID is currently selected but isn't the last of the selected blocks. Here "last" refers to the block sequence in the document, _not_ the sequence of multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 
@@ -1074,9 +1037,7 @@ _Returns_
 
 ### isFirstMultiSelectedBlock
 
-Returns true if a multi-selection exists, and the block corresponding to the
-specified client ID is the first block of the multi-selection set, or false
-otherwise.
+Returns true if a multi-selection exists, and the block corresponding to the specified client ID is the first block of the multi-selection set, or false otherwise.
 
 _Parameters_
 
@@ -1089,9 +1050,7 @@ _Returns_
 
 ### isLastBlockChangePersistent
 
-Returns true if the most recent block change is be considered persistent, or
-false otherwise. A persistent change is one committed by BlockEditorProvider
-via its `onChange` callback, in addition to `onInput`.
+Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
 
 _Parameters_
 
@@ -1103,9 +1062,7 @@ _Returns_
 
 ### isMultiSelecting
 
-Whether in the process of multi-selecting or not. This flag is only true
-while the multi-selection is being selected (by mouse move), and is false
-once the multi-selection has been settled.
+Whether in the process of multi-selecting or not. This flag is only true while the multi-selection is being selected (by mouse move), and is false once the multi-selection has been settled.
 
 _Related_
 
@@ -1256,6 +1213,8 @@ _Parameters_
 
 Action that inserts a single block, optionally at a specific index respective a root block list.
 
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
+
 _Parameters_
 
 -   _block_ `Object`: Block object to insert.
@@ -1271,6 +1230,8 @@ _Returns_
 ### insertBlocks
 
 Action that inserts an array of blocks, optionally at a specific index respective a root block list.
+
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
 
 _Parameters_
 
@@ -1348,9 +1309,7 @@ _Parameters_
 
 > **Deprecated**
 
-Returns an action object used in signalling that blocks have been received.
-Unlike resetBlocks, these should be appended to the existing known set, not
-replacing.
+Returns an action object used in signalling that blocks have been received. Unlike resetBlocks, these should be appended to the existing known set, not replacing.
 
 _Parameters_
 
@@ -1362,8 +1321,7 @@ _Returns_
 
 ### removeBlock
 
-Returns an action object used in signalling that the block with the
-specified client ID is to be removed.
+Returns an action object used in signalling that the block with the specified client ID is to be removed.
 
 _Parameters_
 
@@ -1376,13 +1334,12 @@ _Returns_
 
 ### removeBlocks
 
-Yields action objects used in signalling that the blocks corresponding to
-the set of specified client IDs are to be removed.
+Yields action objects used in signalling that the blocks corresponding to the set of specified client IDs are to be removed.
 
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
--   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
+-   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
 
 ### replaceBlock
 
@@ -1415,8 +1372,7 @@ _Returns_
 
 ### replaceInnerBlocks
 
-Returns an action object used in signalling that the inner blocks with the
-specified client ID should be replaced.
+Returns an action object used in signalling that the inner blocks with the specified client ID should be replaced.
 
 _Parameters_
 
@@ -1431,8 +1387,7 @@ _Returns_
 
 ### resetBlocks
 
-Action that resets blocks state to the specified array of blocks, taking precedence
-over any other content reflected as an edit in state.
+Action that resets blocks state to the specified array of blocks, taking precedence over any other content reflected as an edit in state.
 
 _Parameters_
 
@@ -1440,8 +1395,7 @@ _Parameters_
 
 ### resetSelection
 
-Returns an action object used in signalling that selection state should be
-reset to the specified selection.
+Returns an action object used in signalling that selection state should be reset to the specified selection.
 
 _Parameters_
 
@@ -1455,10 +1409,7 @@ _Returns_
 
 ### selectBlock
 
-Returns an action object used in signalling that the block with the
-specified client ID has been selected, optionally accepting a position
-value reflecting its selection directionality. An initialPosition of -1
-reflects a reverse selection.
+Returns an action object used in signalling that the block with the specified client ID has been selected, optionally accepting a position value reflecting its selection directionality. An initialPosition of -1 reflects a reverse selection.
 
 _Parameters_
 
@@ -1486,8 +1437,7 @@ _Returns_
 
 ### selectNextBlock
 
-Yields action objects used in signalling that the block following the given
-clientId should be selected.
+Yields action objects used in signalling that the block following the given clientId should be selected.
 
 _Parameters_
 
@@ -1495,12 +1445,12 @@ _Parameters_
 
 ### selectPreviousBlock
 
-Yields action objects used in signalling that the block preceding the given
-clientId should be selected.
+Yields action objects used in signalling that the block preceding the given clientId (or optionally, its first parent from bottom to top) should be selected.
 
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockMovingClientId
 
@@ -1637,8 +1587,7 @@ _Parameters_
 
 ### toggleBlockMode
 
-Returns an action object used to toggle the block editing mode between
-visual and HTML modes.
+Returns an action object used to toggle the block editing mode between visual and HTML modes.
 
 _Parameters_
 
@@ -1714,10 +1663,7 @@ _Returns_
 
 ### validateBlocksToTemplate
 
-Block validity is a function of blocks state (at the point of a
-reset) and the template setting. As a compromise to its placement
-across distinct parts of state, it is implemented here as a side-
-effect of the block reset action.
+Block validity is a function of blocks state (at the point of a reset) and the template setting. As a compromise to its placement across distinct parts of state, it is implemented here as a side effect of the block reset action.
 
 _Parameters_
 

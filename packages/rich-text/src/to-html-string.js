@@ -14,7 +14,7 @@ import {
 
 import { toTree } from './to-tree';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is

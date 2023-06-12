@@ -13,13 +13,16 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
+	'@wordpress/commands',
 	'@wordpress/components',
+	'@wordpress/core-commands',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/router',
 ];
 
 /**
@@ -49,12 +52,15 @@ const requiredConsent =
 
 /** @type {boolean} */
 let allowReRegistration;
-// Use try/catch to force "false" if the environment variable is not explicitly
-// set to true (e.g. when building WordPress core).
+// The safety measure is meant for WordPress core where IS_WORDPRESS_CORE
+// is set to true.
+// For the general use-case, the re-registration should be allowed by default
+// Let's default to true, then. Try/catch will fall back to "true" even if the
+// environment variable is not explicitly defined.
 try {
-	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? false;
+	allowReRegistration = process.env.IS_WORDPRESS_CORE ? false : true;
 } catch ( error ) {
-	allowReRegistration = false;
+	allowReRegistration = true;
 }
 
 /**

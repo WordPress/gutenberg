@@ -92,7 +92,7 @@ _Example:_
                 "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
--               "jest": "^27.4.4",
+-               "jest": "^29.5.0",
                 "minimist": "^1.2.0",
                 "npm-package-json-lint": "^3.6.0",
 ```

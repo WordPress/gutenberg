@@ -4,8 +4,6 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useRealTimers();
-
 describe( 'controls', () => {
 	let registry;
 
@@ -283,6 +281,7 @@ describe( 'resolveSelect', () => {
 
 	it( 'returns only store native selectors and excludes all meta ones', () => {
 		expect( Object.keys( registry.resolveSelect( 'store' ) ) ).toEqual( [
+			'hasResolvingSelectors',
 			'getItems',
 			'getItemsNoResolver',
 		] );

@@ -1,7 +1,7 @@
 // Lower specificity - target list element.
 ol.wp-block-latest-comments {
 	// Removes left spacing in Customizer Widgets screen.
-	// Due to low specificity this will be safely overriden
+	// Due to low specificity this will be safely overridden
 	// by default wp-block layout styles in the Post/Site editor
 	margin-left: 0;
 

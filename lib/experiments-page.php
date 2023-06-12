@@ -65,6 +65,42 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-group-grid-variation',
+		__( 'Grid variation for Group block ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
+			'id'    => 'gutenberg-group-grid-variation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-interactivity-api-core-blocks',
+		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-core-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-pattern-enhancements',
+		__( 'Pattern enhancements', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Pattern block enhancements', 'gutenberg' ),
+			'id'    => 'gutenberg-pattern-enhancements',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

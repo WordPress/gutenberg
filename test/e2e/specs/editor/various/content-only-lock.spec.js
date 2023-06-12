@@ -14,7 +14,7 @@ test.describe( 'Content-only lock', () => {
 		pageUtils,
 	} ) => {
 		// Add content only locked block in the code editor
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 		await page.click( '.editor-post-text-editor' );
 		await page.keyboard
 			.type( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
@@ -22,9 +22,9 @@ test.describe( 'Content-only lock', () => {
         <p>Hello</p>
         <!-- /wp:paragraph --></div>
         <!-- /wp:group -->` );
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' );
-
-		await page.click( 'role=document[name="Paragraph block"i]' );
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await editor.canvas.click( 'role=document[name="Paragraph block"i]' );
 		await page.keyboard.type( ' World' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

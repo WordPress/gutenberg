@@ -20,19 +20,18 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasVariationsPanel } from './variations-panel';
+import { useBlockVariations } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { unlock } from '../../private-apis';
-import { useSupportedStyles } from './hooks';
+import { unlock } from '../../lock-unlock';
 
 const {
+	useHasDimensionsPanel,
 	useHasTypographyPanel,
+	useHasBorderPanel,
 	useGlobalSetting,
-	overrideSettingsWithSupports,
+	useSettingsForBlockElement,
+	useHasColorPanel,
 } = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
@@ -58,25 +57,25 @@ function useSortedBlockTypes() {
 	return [ ...coreItems, ...nonCoreItems ];
 }
 
-function BlockMenuItem( { block } ) {
-	const [ rawSettings ] = useGlobalSetting( '', block.name );
-	const supports = useSupportedStyles( block.name );
-	const settings = useMemo(
-		() => overrideSettingsWithSupports( rawSettings, supports ),
-		[ rawSettings, supports ]
-	);
+export function useBlockHasGlobalStyles( blockName ) {
+	const [ rawSettings ] = useGlobalSetting( '', blockName );
+	const settings = useSettingsForBlockElement( rawSettings, blockName );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
-	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
-	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
+	const hasColorPanel = useHasColorPanel( settings );
+	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
-	const hasVariationsPanel = useHasVariationsPanel( block.name );
-	const hasBlockMenuItem =
+	const hasVariationsPanel = !! useBlockVariations( blockName )?.length;
+	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||
 		hasLayoutPanel ||
 		hasVariationsPanel;
+	return hasGlobalStyles;
+}
 
+function BlockMenuItem( { block } ) {
+	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
 	}

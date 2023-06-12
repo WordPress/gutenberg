@@ -12,10 +12,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import {
-	switchToBlockType,
-	getPossibleBlockTransformations,
-} from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -25,16 +21,25 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
+const SIDEBARS_QUERY = {
+	per_page: -1,
+	_fields: 'id,name,description,status,widgets',
+};
+
 export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
 	const registry = useRegistry();
-	const sidebars = useSelect( ( select ) => {
-		return select( coreStore ).getSidebars( {
-			per_page: -1,
-			_fields: 'id,name,description,status,widgets',
-		} );
+	const { sidebars, hasResolved } = useSelect( ( select ) => {
+		const { getSidebars, hasFinishedResolution } = select( coreStore );
+
+		return {
+			sidebars: getSidebars( SIDEBARS_QUERY ),
+			hasResolved: hasFinishedResolution( 'getSidebars', [
+				SIDEBARS_QUERY,
+			] ),
+		};
 	}, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -67,6 +72,16 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		];
 	}, [ sidebars ] );
 
+	// Render an empty node while data is loading to avoid SlotFill re-positioning bug.
+	// See: https://github.com/WordPress/gutenberg/issues/15641.
+	if ( ! hasResolved ) {
+		return <Spacer marginBottom="0" />;
+	}
+
+	if ( hasResolved && ! options.length ) {
+		return null;
+	}
+
 	async function createFromWidgets( event ) {
 		event.preventDefault();
 
@@ -91,36 +106,13 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		const blocks = widgets.flatMap( ( widget ) => {
 			const block = transformWidgetToBlock( widget );
 
-			if ( block.name !== 'core/legacy-widget' ) {
-				return block;
-			}
-
-			const transforms = getPossibleBlockTransformations( [
-				block,
-			] ).filter( ( item ) => {
-				// The block without any transformations can't be a wildcard.
-				if ( ! item.transforms ) {
-					return true;
-				}
-
-				const hasWildCardFrom = item.transforms?.from?.find(
-					( from ) => from.blocks && from.blocks.includes( '*' )
-				);
-				const hasWildCardTo = item.transforms?.to?.find(
-					( to ) => to.blocks && to.blocks.includes( '*' )
-				);
-
-				return ! hasWildCardFrom && ! hasWildCardTo;
-			} );
-
 			// Skip the block if we have no matching transformations.
-			if ( ! transforms.length ) {
+			if ( ! block ) {
 				skippedWidgets.add( widget.id_base );
 				return [];
 			}
 
-			// Try transforming the Legacy Widget into a first matching block.
-			return switchToBlockType( block, transforms[ 0 ].name );
+			return block;
 		} );
 
 		await createFromBlocks(

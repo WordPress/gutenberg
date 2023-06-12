@@ -93,7 +93,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								icon={ external }
 								role="menuitem"
 								href={ __(
-									'https://wordpress.org/support/article/site-editor/'
+									'https://wordpress.org/documentation/article/site-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"

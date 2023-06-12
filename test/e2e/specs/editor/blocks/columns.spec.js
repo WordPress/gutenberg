@@ -18,7 +18,9 @@ test.describe( 'Columns', () => {
 	} ) => {
 		// Open Columns
 		await editor.insertBlock( { name: 'core/columns' } );
-		await page.locator( '[aria-label="Two columns; equal split"]' ).click();
+		await editor.canvas
+			.locator( '[aria-label="Two columns; equal split"]' )
+			.click();
 
 		// Open List view toggle
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
@@ -26,7 +28,7 @@ test.describe( 'Columns', () => {
 		// block column add
 		await page
 			.locator(
-				'role=treegrid[name="Block navigation structure"i] >> role=gridcell[name="Column link"i]'
+				'role=treegrid[name="Block navigation structure"i] >> role=gridcell[name="Column"i]'
 			)
 			.first()
 			.click();
@@ -42,5 +44,82 @@ test.describe( 'Columns', () => {
 		);
 		await expect( inserterOptions ).toHaveCount( 1 );
 		await expect( inserterOptions ).toHaveText( 'Column' );
+	} );
+
+	test( 'prevent the removal of locked column block from the column count change UI', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Open Columns
+		await editor.insertBlock( { name: 'core/columns' } );
+		await editor.canvas
+			.locator( '[aria-label="Three columns; equal split"]' )
+			.click();
+
+		// Lock last column block
+		await editor.selectBlocks(
+			editor.canvas.locator(
+				'role=document[name="Block: Column (3 of 3)"i]'
+			)
+		);
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.click( 'role=menuitem[name="Lock"i]' );
+		await page.locator( 'role=checkbox[name="Prevent removal"i]' ).check();
+		await page.click( 'role=button[name="Apply"i]' );
+
+		// Select columns block
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Columns"i]' )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const columnsChangeInput = page.locator(
+			'role=spinbutton[name="Columns"i]'
+		);
+
+		// The min attribute should take into account locked columns
+		await expect( columnsChangeInput ).toHaveAttribute( 'min', '3' );
+
+		// Changing the number of columns should take into account locked columns
+		await page.fill( 'role=spinbutton[name="Columns"i]', '1' );
+		await pageUtils.pressKeys( 'Tab' );
+		await expect( columnsChangeInput ).toHaveValue( '3' );
+	} );
+	test( 'Ungroup properly', async ( { editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+			],
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Ungroup' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
 	} );
 } );

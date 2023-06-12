@@ -12,7 +12,7 @@ import type { Icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { ButtonAsButtonProps } from '../button/types';
-import type Dropdown from '../dropdown';
+import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 export type CircularOptionPickerProps = {
@@ -44,10 +44,7 @@ export type DropdownLinkActionProps = {
 		'children'
 	>;
 	linkText: string;
-	dropdownProps: Omit<
-		React.ComponentProps< typeof Dropdown >,
-		'className' | 'renderToggle'
-	>;
+	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
 	className?: string;
 };
 
@@ -57,7 +54,7 @@ export type OptionProps = Omit<
 > & {
 	className?: string;
 	tooltipText?: string;
-	isSelected: boolean;
+	isSelected?: boolean;
 	// `icon` is explicitly defined as 'check' by CircleOptionPicker.Option
 	// and is not intended to be overridden.
 	// `size` relies on the `Icon` component's default size of `24` to fit

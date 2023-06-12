@@ -26,9 +26,20 @@ export const getMergedGlobalStyles = (
 	blockName,
 	fontSizes
 ) => {
+	// Current support for general styles and blocks.
 	const baseGlobalColors = {
-		baseColors: baseGlobalStyles || {},
+		baseColors: {
+			color: baseGlobalStyles?.color,
+			typography: baseGlobalStyles?.typography,
+			elements: {
+				link: baseGlobalStyles?.elements?.link,
+			},
+			blocks: {
+				'core/button': baseGlobalStyles?.blocks?.[ 'core/button' ],
+			},
+		},
 	};
+
 	const blockStyleAttributes = Object.fromEntries(
 		Object.entries( blockAttributes ?? {} ).filter( ( [ key ] ) =>
 			BLOCK_STYLE_ATTRIBUTES.includes( key )

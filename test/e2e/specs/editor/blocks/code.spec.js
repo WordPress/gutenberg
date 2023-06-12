@@ -12,7 +12,7 @@ test.describe( 'Code', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '```' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<?php' );
@@ -40,7 +40,7 @@ test.describe( 'Code', () => {
 		// Test to see if HTML and white space is kept.
 		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
