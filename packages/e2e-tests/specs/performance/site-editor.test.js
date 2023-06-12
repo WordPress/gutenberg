@@ -143,7 +143,7 @@ describe( 'Site Editor Performance', () => {
 		} );
 
 		// Wait for the first paragraph to be ready.
-		const firstParagraph = await canvas().waitForXPath(
+		await canvas().waitForXPath(
 			'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
 		);
 
@@ -151,6 +151,9 @@ describe( 'Site Editor Performance', () => {
 		await enterEditMode();
 
 		// Insert a new paragraph right under the first one.
+		const firstParagraph = await canvas().waitForXPath(
+			'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
+		);
 		await firstParagraph.click(); // Once to select the block overlay.
 		await firstParagraph.click(); // Once again to select the paragraph.
 		await insertBlock( 'Paragraph' );
