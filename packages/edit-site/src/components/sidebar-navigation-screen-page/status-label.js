@@ -27,7 +27,7 @@ export default function StatusLabel( {
 		setStatus( newStatus );
 		try {
 			await editEntityRecord( 'postType', postType, postId, {
-				status,
+				status: newStatus,
 			} );
 		} catch ( error ) {
 			setStatus( currentStatus );
@@ -70,6 +70,10 @@ export default function StatusLabel( {
 					{
 						label: 'Pending',
 						value: 'pending',
+					},
+					{
+						label: 'Private',
+						value: 'private',
 					},
 				] }
 			/>
