@@ -2,5 +2,5 @@
  * Internal dependencies
  */
 import './custom-sources-backwards-compatibility';
-import './custom-sources-v2';
+import './custom-sources';
 import './default-autocompleters';

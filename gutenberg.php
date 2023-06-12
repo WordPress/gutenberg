@@ -80,11 +80,11 @@ function gutenberg_pre_init() {
  * @param string $block_instance The block instance.
  */
 function render_custom_sources( $block_content, $block, $block_instance ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$meta_custom_source = require __DIR__ . '/lib/custom-sources/meta.php';
+	$block_type         = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	if ( null === $block_type ) {
 		return $block_content;
 	}
-
 
 	$custom_sources = _wp_array_get( $block_type->supports, 'customSources', false );
 	if ( ! $custom_sources ) {
@@ -95,31 +95,10 @@ function render_custom_sources( $block_content, $block, $block_instance ) {
 	$attribute_sources = _wp_array_get( $block['attrs'], array( 'source' ), array() );
 	foreach ( $attribute_sources as $attribute_name => $attribute_source ) {
 		$attribute_config = _wp_array_get( $block_type->attributes, array( $attribute_name ), false );
-		if ( ! $attribute_config || ! $attribute_source || 'meta' !== $attribute_source['type'] ) {
+		if ( ! $attribute_config || ! $attribute_source || $meta_custom_source['name'] !== $attribute_source['type'] ) {
 			continue;
 		}
-		$meta_field = $attribute_source['name'];
-		$meta_value = get_post_meta( $block_instance->context['postId'], $meta_field, true );
-		$p          = new WP_HTML_Tag_Processor( $block_content );
-		$found      = $p->next_tag(
-			array(
-				// TODO: build the query from CSS selector.
-				'tag_name' => $attribute_config['selector'],
-			)
-		);
-		if ( ! $found ) {
-			continue;
-		}
-		$tag_name = $p->get_tag();
-		$markup   = "<$tag_name>$meta_value</$tag_name>";
-		$p2       = new WP_HTML_Tag_Processor( $markup );
-		$p2->next_tag();
-		$names = $p->get_attribute_names_with_prefix( '' );
-		foreach ( $names as $name ) {
-			$p2->set_attribute( $name, $p->get_attribute( $name ) );
-		}
-
-		$block_content = $p2 . '';
+		$block_content = $meta_custom_source['apply_source']( $block_type, $block_content, $block_instance, $attribute_source, $attribute_config );
 	}
 
 	return $block_content;
