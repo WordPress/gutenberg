@@ -139,3 +139,13 @@ function filter_block_pattern_response( $response, $raw_pattern ) {
 	return $response;
 }
 add_filter( 'rest_prepare_block_pattern', 'filter_block_pattern_response', 10, 2 );
+
+
+/**
+ * Registers the block pattern directory.
+ */
+function gutenberg_register_rest_pattern_directory() {
+	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
+	$pattern_directory_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );

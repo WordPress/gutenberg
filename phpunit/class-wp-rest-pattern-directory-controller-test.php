@@ -53,7 +53,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 
 		self::$http_request_urls = array();
 
-		static::$controller = new Gutenberg_REST_Pattern_Directory_Controller_6_3();
+		static::$controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -78,38 +78,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/wp/v2/pattern-directory/patterns', $routes );
-		$this->assertArrayHasKey( '/wp/v2/pattern-directory/categories', $routes );
 	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::prepare_pattern_category_for_response
-	 *
-	 * @since 6.2.0
-	 */
-	public function test_prepare_pattern_category_for_response() {
-		$raw_categories = array(
-			(object) array(
-				'id'          => 3,
-				'name'        => 'Columns',
-				'slug'        => 'columns',
-				'description' => 'A description',
-			),
-		);
-
-		$prepared_category = static::$controller->prepare_response_for_collection(
-			static::$controller->prepare_pattern_category_for_response( $raw_categories[0], new WP_REST_Request() )
-		);
-
-		$this->assertSame(
-			array(
-				'id'   => 3,
-				'name' => 'Columns',
-				'slug' => 'columns',
-			),
-			$prepared_category
-		);
-	}
-
 
 	/**
 	 * Tests if the provided query args are passed through to the wp.org API.
@@ -317,5 +286,4 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	public function test_get_item_schema() {
 		// The controller's schema is hardcoded, so tests would not be meaningful.
 	}
-
 }
