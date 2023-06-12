@@ -211,6 +211,14 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	if ( ! navigationMenu?.content?.raw ) {
 		return (
 			<SidebarNavigationScreenWrapper
+				actions={
+					<ScreenNavigationMoreMenu
+						menuTitle={ decodeEntities( menuTitle ) }
+						onDelete={ handleDelete }
+						onSave={ handleSave }
+						onDuplicate={ handleDuplicate }
+					/>
+				}
 				title={ decodeEntities( menuTitle ) }
 				description={ __( 'This Navigation Menu is empty.' ) }
 			/>
