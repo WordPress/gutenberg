@@ -25,12 +25,15 @@ function buildMenuLabel( title, id, status ) {
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
-	if ( status === 'draft' ) {
-		/* translators: %s is the title of the menu. */
-		return sprintf( __( '%s (draft)' ), decodeEntities( title?.rendered ) );
+	if ( status === 'publish' ) {
+		return decodeEntities( title?.rendered );
 	}
 
-	return decodeEntities( title?.rendered );
+	// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
+	return sprintf( __( '%1$s (%2$s)' ), [
+		decodeEntities( title?.rendered ),
+		status,
+	] );
 }
 
 function NavigationMenuSelector( {
