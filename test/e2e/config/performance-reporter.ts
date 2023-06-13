@@ -14,7 +14,7 @@ import { average, round } from '../specs/performance/utils';
 const title = chalk.bold;
 const success = chalk.bold.green;
 
-class MyReporter implements Reporter {
+class PerformanceReporter implements Reporter {
 	onTestEnd( test: TestCase ) {
 		const basename = path.basename( test.location.file, '.js' );
 		const filepath = path.join(
@@ -168,4 +168,4 @@ Fastest time to move mouse between two block item in the inserter: ${ success(
 	}
 }
 
-export default MyReporter;
+export default PerformanceReporter;
