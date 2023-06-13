@@ -233,15 +233,14 @@ const getAllBlocks = () => {
 	// and when either of the following is true:
 	// - TinyMCE experiment is disabled;
 	// - there is a classic block in the current post's content;
-	// - the cookie to require TinyMCE is set.
+	// - the query argument to require TinyMCE is set.
 	if (
 		window?.wp?.oldEditor &&
 		( window?.wp?.needsClassicBlock ||
 			! window?.__experimentalDisableTinymce ||
-			( '; ' + document.cookie )
-				.split( '; requiresTinymce=' )
-				.pop()
-				.split( ';' )[ 0 ] )
+			!! new URLSearchParams( window?.location?.search ).get(
+				'requiresTinymce'
+			) )
 	) {
 		blocks.push( classic );
 	}

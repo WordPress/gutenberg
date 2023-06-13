@@ -19,7 +19,7 @@ function gutenberg_declare_classic_block_necessary() {
 add_action( 'admin_footer', 'gutenberg_declare_classic_block_necessary' );
 
 // If user has already requested TinyMCE, we're ending the experiment.
-if ( isset( $_COOKIE['requiresTinymce'] ) || gutenberg_current_content_contains_classic_block() ) {
+if ( ! empty( $_GET['requiresTinymce'] ) || gutenberg_current_content_contains_classic_block() ) {
 	return;
 }
 
@@ -35,7 +35,7 @@ add_action( 'admin_init', 'gutenberg_disable_tinymce' );
 
 /**
  * Enqueue TinyMCE proxy script.
- * Detects TinyMCE usage and sets the `requiresTinymce` cookie to stop disabling TinyMCE loading.
+ * Detects TinyMCE usage and sets the `requiresTinymce` query argument to stop disabling TinyMCE loading.
  */
 function gutenberg_enqueue_tinymce_proxy() {
 	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js', __FILE__ ) );
