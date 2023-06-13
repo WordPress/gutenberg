@@ -79,27 +79,44 @@ export function initializeEditor(
 	}
 
 	/*
-	 * Prevent adding template part and post content (except in query block) in the post editor.
+	 * Prevent adding template part and post content block in the post editor.
 	 * Only add the filter when the post editor is initialized, not imported.
 	 * Also only add the filter(s) after registerCoreBlocks()
 	 * so that common filters in the block library are not overwritten.
 	 */
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsAndPostContentFromInserter',
+		'removeTemplatePartsFromInserter',
+		( canInsert, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
+
+	/*
+	 * Prevent adding post content (except in query block) in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removePostContentFromInserter',
 		(
 			canInsert,
 			blockType,
 			rootClientId,
 			{ getBlockParentsByBlockName }
 		) => {
-			if ( select( editPostStore ).isEditingTemplate() ) {
-				return canInsert;
-			}
-			if ( blockType.name === 'core/template-part' ) {
-				return false;
-			}
-			if ( blockType.name === 'core/post-content' ) {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/post-content'
+			) {
 				return (
 					getBlockParentsByBlockName( rootClientId, 'core/query' )
 						.length > 0
