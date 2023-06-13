@@ -16,7 +16,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
-	// __unstableUseShortcutEventMatch,
+	__unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
 import { pipe } from '@wordpress/compose';
 
@@ -236,7 +236,7 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-	// const isMatch = __unstableUseShortcutEventMatch();
+	const isMatch = __unstableUseShortcutEventMatch();
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
@@ -331,6 +331,41 @@ export function BlockSettingsDropdown( {
 					align="start"
 					side="bottom"
 					sideOffset={ 12 }
+					onKeyDown={ ( event ) => {
+						if ( event.defaultPrevented ) return;
+
+						if (
+							isMatch( 'core/block-editor/remove', event ) &&
+							canRemove
+						) {
+							event.preventDefault();
+							updateSelectionAfterRemove( onRemove() );
+						} else if (
+							isMatch( 'core/block-editor/duplicate', event ) &&
+							canDuplicate
+						) {
+							event.preventDefault();
+							updateSelectionAfterDuplicate( onDuplicate() );
+						} else if (
+							isMatch(
+								'core/block-editor/insert-after',
+								event
+							) &&
+							canInsertDefaultBlock
+						) {
+							event.preventDefault();
+							onInsertAfter();
+						} else if (
+							isMatch(
+								'core/block-editor/insert-before',
+								event
+							) &&
+							canInsertDefaultBlock
+						) {
+							event.preventDefault();
+							onInsertBefore();
+						}
+					} }
 					// Missing: pressing esc is not just closing the menu, but also the toolbar?
 					{ ...props }
 				>
