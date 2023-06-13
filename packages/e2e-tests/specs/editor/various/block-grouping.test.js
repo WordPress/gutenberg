@@ -191,10 +191,11 @@ describe( 'Block Grouping', () => {
 		it( 'does not show group option in the options toolbar if Grouping block is disabled', async () => {
 			await clickBlockToolbarButton( 'Options' );
 
+			// TODO: need to improve the selector / maybe even use puppeteer-testing-library
 			const blockOptionsDropdownHTML = await page.evaluate(
 				() =>
 					document.querySelector(
-						'.block-editor-block-settings-menu__popover'
+						'[data-radix-menu-content][role="menu"]'
 					).innerHTML
 			);
 
