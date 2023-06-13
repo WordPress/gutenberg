@@ -1,8 +1,26 @@
-.edit-site-library {
-	width: 100%;
+$library-color: #e0e0e0;
 
-	.interface-interface-skeleton__content {
-		border-radius: 0;
+.edit-site-layout {
+	.edit-site-library {
+		width: 100%;
+
+		.interface-interface-skeleton__editor {
+			.interface-interface-skeleton__body {
+				.interface-interface-skeleton__content {
+					border-radius: 0;
+				}
+			}
+		}
+	}
+}
+
+.edit-site-library__section-header {
+	p {
+		color: $library-color;
+	}
+
+	h5 {
+		color: #fff;
 	}
 }
 
@@ -13,8 +31,6 @@
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
-	padding-left: $grid-unit-15;
-	padding-right: $grid-unit-15;
 
 	.edit-site-library__pattern {
 		break-inside: avoid-column;
@@ -31,7 +47,7 @@
 
 		.edit-site-library__footer,
 		.edit-site-library__button {
-			color: #e0e0e0;
+			color: $library-color;
 		}
 		// END: temp styles for testing.
 	}
@@ -40,4 +56,39 @@
 		flex: 1;
 		margin-bottom: $grid-unit-30;
 	}
+}
+
+// The increased specificity here is to overcome component styles
+// without relying on internal component class names.
+.edit-site-library__search {
+	&#{&} input[type="search"] {
+		background: $gray-800;
+		color: $library-color;
+
+		&:focus {
+			background: $gray-800;
+		}
+	}
+
+	svg {
+		fill: $library-color;
+	}
+}
+
+.edit-site-library__pattern-title {
+	color: $library-color;
+
+	svg {
+		border-radius: $grid-unit-05;
+		background: var(--wp-block-synced-color);
+		fill: $library-color;
+	}
+}
+
+.edit-site-library__no-results {
+	color: $library-color;
+	// height: 100%,
+	// display: flex,
+	// alignItems: center,
+	// justifyContent: center,
 }

@@ -12,7 +12,7 @@ import { getQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import Grid from './grid';
+import PatternsList from './patterns-list';
 import useLibrarySettings from './use-library-settings';
 import useTitle from '../routes/use-title';
 import { unlock } from '../../private-apis';
@@ -56,7 +56,7 @@ export default function Library() {
 				// This ensures 'styles' that are needed for the previews are synced
 				// from the site editor store to the block editor store.
 				<ExperimentalBlockEditorProvider settings={ settings }>
-					<Grid
+					<PatternsList
 						type={ type }
 						categoryId={ category }
 						label={ __( 'Patterns list' ) }
