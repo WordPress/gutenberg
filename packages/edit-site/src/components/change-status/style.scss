@@ -1,5 +1,5 @@
 .edit-site-change-status {
-	min-width: 480px;
+	width: 540px;
 	min-height: 400px;
 	.components-radio-control__option.with-hint {
 		display: flex;
@@ -60,8 +60,6 @@
 
 		fieldset:first-child {
 			.components-datetime__time-wrapper {
-				flex-direction: column;
-				align-items: flex-start;
 				> .components-flex-item {
 					display: none;
 				}

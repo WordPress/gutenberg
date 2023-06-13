@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, getDate, getSettings, humanTimeDiff } from '@wordpress/date';
+import { dateI18n, getDate, humanTimeDiff } from '@wordpress/date';
 import { createInterpolateElement } from '@wordpress/element';
 import { Path, SVG } from '@wordpress/primitives';
 
@@ -41,7 +41,7 @@ const pendingIcon = (
 	</SVG>
 );
 
-export default function StatusLabel( { status, date } ) {
+export default function StatusLabel( { status, date, short } ) {
 	const relateToNow = humanTimeDiff( date );
 	let statusLabel = '';
 	let statusIcon = pendingIcon;
@@ -59,13 +59,13 @@ export default function StatusLabel( { status, date } ) {
 			break;
 		case 'future':
 			const formattedDate = dateI18n(
-				getSettings().formats.date,
+				short ? 'M j' : 'F j',
 				getDate( date )
 			);
 			statusLabel = createInterpolateElement(
 				sprintf(
 					/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
-					__( 'Scheduled for <time>%s</time>' ),
+					__( 'Scheduled: <time>%s</time>' ),
 					formattedDate
 				),
 				{ time: <time dateTime={ date } /> }

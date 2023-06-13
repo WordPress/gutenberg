@@ -17,12 +17,21 @@ import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+/**
+ * Internal dependencies
+ */
+import StatusLabel from '../sidebar-navigation-screen-page/status-label';
 
 const STATUS_OPTIONS = [
 	{
 		label: __( 'Draft' ),
 		value: 'draft',
 		hint: __( 'Not ready to publish' ),
+	},
+	{
+		label: __( 'Published' ),
+		value: 'publish',
+		hint: __( 'Anyone with the url can access' ),
 	},
 	{
 		label: __( 'Private' ),
@@ -38,11 +47,6 @@ const STATUS_OPTIONS = [
 		label: __( 'Scheduled' ),
 		value: 'future',
 		hint: __( 'Publish automatically on a chosen date' ),
-	},
-	{
-		label: __( 'Published' ),
-		value: 'publish',
-		hint: __( 'Anyone with the url can access' ),
 	},
 ];
 
@@ -102,10 +106,24 @@ export default function ChangeStatus( { post } ) {
 		}
 	};
 
+	const handleStatus = ( value ) => {
+		if ( value === 'published' ) {
+			setDate( undefined );
+		}
+		setStatus( value );
+	};
+
 	return (
 		<>
-			<Button variant="secondary" onClick={ openModal }>
-				Change status
+			<Button
+				className="edit-site-change-status__trigger"
+				variant="tertiary"
+				onClick={ openModal }
+			>
+				<StatusLabel
+					status={ post?.password ? 'protected' : post.status }
+					date={ post?.date }
+				/>
 			</Button>
 			{ isOpen && (
 				<Modal
@@ -136,7 +154,7 @@ export default function ChangeStatus( { post } ) {
 											name={ `edit-site-change-status__status` }
 											value={ option.value }
 											onChange={ ( e ) =>
-												setStatus( e.target.value )
+												handleStatus( e.target.value )
 											}
 											checked={ option.value === status }
 										/>
@@ -161,6 +179,7 @@ export default function ChangeStatus( { post } ) {
 								<DateTimePicker
 									className="components-datetime__time__one-row"
 									currentDate={ date }
+									is12Hour
 									onChange={ setDate }
 								/>
 							</div>
