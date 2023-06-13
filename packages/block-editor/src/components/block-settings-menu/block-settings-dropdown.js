@@ -12,13 +12,13 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
 	// __unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,20 +39,103 @@ const {
 	DropdownMenuSeparatorV2,
 } = unlock( componentsPrivateApis );
 
+const clipboardPermissionCache = {
+	read: undefined,
+	write: undefined,
+};
+
+async function hasClipboardPermission( type ) {
+	if ( type !== 'write' && type !== 'read' ) {
+		return false;
+	}
+	if ( clipboardPermissionCache[ type ] !== undefined ) {
+		return clipboardPermissionCache[ type ];
+	}
+
+	let hasSupport = false;
+	try {
+		const result = await window.navigator.permissions.query( {
+			name: `clipboard-${ type }`,
+		} );
+		hasSupport = result.state === 'granted' || result.state === 'prompt';
+	} catch ( error ) {
+		// Possibly the permission is denied.
+		// TODO: show an error notice
+	}
+
+	clipboardPermissionCache[ type ] = hasSupport;
+	return hasSupport;
+}
+
+async function writeToClipboard( { text, onSuccess } ) {
+	try {
+		// Only available on sites using `https` (and localhost)
+		if ( ! window.navigator.clipboard ) {
+			// TODO: show an error notice
+			return;
+		}
+
+		await window.navigator.clipboard.writeText( text );
+		onSuccess?.();
+	} catch ( error ) {
+		// Possibly the permission is denied.
+		// TODO: show an error notice
+	}
+}
+
 function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+	const [ supportsClipboard, setSupportsClipboard ] = useState( false );
 	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
+
+	useEffect( () => {
+		async function testSupport() {
+			const hasPermission = await hasClipboardPermission( 'write' );
+			setSupportsClipboard( hasPermission );
+		}
+
+		testSupport();
+	}, [] );
+
 	return (
 		<DropdownMenuItemV2
-			ref={ ref }
-			onSelect={ ( event ) => {
+			disabled={ ! supportsClipboard }
+			onSelect={ async ( event ) => {
+				await writeToClipboard( {
+					text: serialize( blocks ),
+					onSuccess: onCopy,
+				} );
 				// Keep the dropdown menu open.
 				event.preventDefault();
 			} }
 		>
 			{ copyMenuItemLabel }
+		</DropdownMenuItemV2>
+	);
+}
+
+function PasteStylesMenuItem( { onSelect } ) {
+	const [ supportsClipboard, setSupportsClipboard ] = useState( false );
+	useEffect( () => {
+		async function testSupport() {
+			const hasPermission = await hasClipboardPermission( 'read' );
+			setSupportsClipboard( hasPermission );
+		}
+
+		testSupport();
+	}, [] );
+
+	return (
+		<DropdownMenuItemV2
+			disabled={ ! supportsClipboard }
+			onSelect={ ( event ) => {
+				onSelect?.();
+				// Keep the dropdown menu open.
+				event.preventDefault();
+			} }
+		>
+			{ __( 'Paste styles' ) }
 		</DropdownMenuItemV2>
 	);
 }
@@ -325,15 +408,7 @@ export function BlockSettingsDropdown( {
 								onCopy={ onCopy }
 								label={ __( 'Copy styles' ) }
 							/>
-							<DropdownMenuItemV2
-								onSelect={ ( event ) => {
-									onPasteStyles();
-									// Keep the dropdown menu open.
-									event.preventDefault();
-								} }
-							>
-								{ __( 'Paste styles' ) }
-							</DropdownMenuItemV2>
+							<PasteStylesMenuItem onSelect={ onPasteStyles } />
 						</DropdownMenuGroupV2>
 					) }
 					<BlockSettingsMenuControls.Slot
