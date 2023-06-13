@@ -6,9 +6,13 @@
  */
 
 /**
- * Return the layout definitions.
+ * Returns layout definitions, keyed by layout type.
  *
- * @return array Layout definitions.
+ * Provides a common definition of slugs, classnames, base styles, and spacing styles for each layout type.
+ * When making changes or additions to layout definitions, the corresponding JavaScript definitions should
+ * also be updated.
+ *
+ * @return array[] Layout definitions.
  */
 function gutenberg_get_layout_definitions() {
 	$layout_definitions = array(
