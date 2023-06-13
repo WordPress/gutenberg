@@ -972,7 +972,6 @@ test.describe( 'Image - interactivity', () => {
 			} );
 			await behaviorSelect.selectOption( 'lightbox' );
 
-			//await imageBlock.click();
 			await page
 				.getByLabel( 'Block tools' )
 				.getByLabel( 'Insert link' )
