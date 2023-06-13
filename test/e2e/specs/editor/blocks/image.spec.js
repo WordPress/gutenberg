@@ -991,6 +991,7 @@ test.describe( 'Image - interactivity', () => {
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 
+			// The lightbox overlay should not appear in the DOM at all
 			expect(
 				await page.locator( '.wp-lightbox-overlay' ).count()
 			).toEqual( 0 );
