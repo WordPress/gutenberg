@@ -8,7 +8,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import PageTemplates from '../page-templates';
 import PageLibrary from '../page-library';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
