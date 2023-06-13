@@ -19,6 +19,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
+const { PrivateListView } = unlock( blockEditorPrivateApis );
+
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
@@ -37,35 +39,31 @@ const PAGES_QUERY = [
 
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
-	const { clientIdsTree, shouldKeepLoading, isSinglePageList } = useSelect(
+	const { shouldKeepLoading, isSinglePageList, pageListClientId } = useSelect(
 		( select ) => {
-			const {
-				__unstableGetClientIdsTree,
-				areInnerBlocksControlled,
-				getBlockName,
-			} = select( blockEditorStore );
+			const { areInnerBlocksControlled, getBlockName, getBlockOrder } =
+				select( blockEditorStore );
 			const { isResolving } = select( coreStore );
 
-			const _clientIdsTree = __unstableGetClientIdsTree( rootClientId );
+			const blockClientIds = getBlockOrder( rootClientId );
 			const hasOnlyPageListBlock =
-				_clientIdsTree.length === 1 &&
-				getBlockName( _clientIdsTree[ 0 ].clientId ) ===
-					'core/page-list';
+				blockClientIds.length === 1 &&
+				getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
+
 			const isLoadingPages = isResolving(
 				'getEntityRecords',
 				PAGES_QUERY
 			);
 			return {
-				clientIdsTree: _clientIdsTree,
+				pageListClientId: hasOnlyPageListBlock
+					? blockClientIds[ 0 ]
+					: undefined,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
 				shouldKeepLoading:
 					! areInnerBlocksControlled( rootClientId ) ||
 					isLoadingPages,
-				isSinglePageList:
-					hasOnlyPageListBlock &&
-					! isLoadingPages &&
-					_clientIdsTree[ 0 ].innerBlocks.length > 0,
+				isSinglePageList: hasOnlyPageListBlock && ! isLoadingPages,
 			};
 		},
 		[ rootClientId ]
@@ -90,9 +88,8 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 				clearTimeout( timeoutId );
 			}
 		};
-	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
+	}, [ shouldKeepLoading, isLoading ] );
 
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	const offCanvasOnselect = useCallback(
 		( block ) => {
 			if (
@@ -117,10 +114,8 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		<>
 			{ ! isLoading && (
 				<PrivateListView
-					blocks={
-						isSinglePageList
-							? clientIdsTree[ 0 ].innerBlocks
-							: clientIdsTree
+					rootClientId={
+						isSinglePageList ? pageListClientId : rootClientId
 					}
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
