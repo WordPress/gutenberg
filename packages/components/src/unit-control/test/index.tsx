@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UnitControl from '..';
-import { parseQuantityAndUnitFromRawValue } from '../utils';
+import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
 import type { UnitControlOnChangeCallback } from '../types';
 
 const getInput = ( {
@@ -588,15 +588,20 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit switching convenience', () => {
-		it( 'should focus unit select when a charater matches the first of one of the units', async () => {
-			const user = userEvent.setup();
-			render( <UnitControl value={ '10%' } /> );
+		it.each( CSS_UNITS.map( ( { value } ) => value ) )(
+			'should move focus from the input to the unit select when typing the first character of %p',
+			async ( testUnit ) => {
+				const user = userEvent.setup();
+				render( <UnitControl value={ '10%' } /> );
 
-			const input = getInput();
-			await user.clear( input );
-			await user.type( input, '55 e' );
+				const input = getInput();
+				await user.clear( input );
+				await user.type( input, `55${ testUnit }` );
 
-			expect( getSelect() ).toHaveFocus();
-		} );
+				expect( getSelect() ).toHaveFocus();
+				// The unit character was not entered in the input.
+				expect( input ).toHaveValue( 55 );
+			}
+		);
 	} );
 } );
