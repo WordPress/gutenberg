@@ -583,13 +583,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	$global_settings        = gutenberg_get_global_settings();
-	$global_layout_settings = _wp_array_get( $global_settings, array( 'layout' ), null );
-	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-
-	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
-		return $block_content;
-	}
+	$global_settings = gutenberg_get_global_settings();
+	$used_layout     = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();

@@ -337,6 +337,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
+	 * @since 6.3.0 Removed `layout.definitions`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -371,7 +372,6 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'layout'                        => array(
 			'contentSize' => null,
-			'definitions' => null,
 			'wideSize'    => null,
 		),
 		'position'                      => array(
