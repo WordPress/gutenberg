@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-// import { useSelect, useDispatch } from '@wordpress/data';
-// import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,10 +16,10 @@ export default function PageContentFlash( { contentRef } ) {
 }
 
 export function usePageContentFlash( contentRef ) {
-	// const { __experimentalGetGlobalBlocksByName } =
-	// 	useSelect( blockEditorStore );
+	const { __experimentalGetGlobalBlocksByName } =
+		useSelect( blockEditorStore );
 
-	// const { flashBlock } = useDispatch( blockEditorStore );
+	const { flashBlock } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const canvas = contentRef.current;
@@ -27,29 +27,12 @@ export function usePageContentFlash( contentRef ) {
 			return;
 		}
 		const flashContentBlocks = () => {
-			// const clientIds = __experimentalGetGlobalBlocksByName(
-			// 	PAGE_CONTENT_BLOCK_TYPES
-			// );
-			// for ( const clientId of clientIds ) {
-			// 	flashBlock( clientId );
-			// }
-			canvas
-				.querySelectorAll(
-					PAGE_CONTENT_BLOCK_TYPES.map(
-						( blockType ) => `[data-type="${ blockType }"]`
-					).join( ',' )
-					// '.block-editor-block-list__block:not(.is-editing-disabled)'
-				)
-				.forEach( ( block ) => {
-					const flash = async () => {
-						block.classList.add( 'is-highlighted' );
-						await new Promise( ( resolve ) =>
-							setTimeout( resolve, 150 )
-						);
-						block.classList.remove( 'is-highlighted' );
-					};
-					flash();
-				} );
+			const clientIds = __experimentalGetGlobalBlocksByName(
+				PAGE_CONTENT_BLOCK_TYPES
+			);
+			for ( const clientId of clientIds ) {
+				flashBlock( clientId );
+			}
 		};
 		let timeout;
 		const handleClick = ( event ) => {
