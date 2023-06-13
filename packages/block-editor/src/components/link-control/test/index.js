@@ -582,44 +582,6 @@ describe( 'Searching for a link', () => {
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
-	it.each( [
-		[ 'couldbeurlorentitysearchterm' ],
-		[ 'ThisCouldAlsoBeAValidURL' ],
-	] )(
-		'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.',
-		async ( searchTerm ) => {
-			const user = userEvent.setup();
-			render( <LinkControl /> );
-
-			// Search Input UI.
-			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
-
-			// Simulate searching for a term.
-			await user.type( searchInput, searchTerm );
-
-			const searchResultElements = within(
-				await screen.findByRole( 'listbox', {
-					name: /Search results for.*/,
-				} )
-			).getAllByRole( 'option' );
-
-			const lastSearchResultItem =
-				searchResultElements[ searchResultElements.length - 1 ];
-
-			// We should see a search result for each of the expect search suggestions.
-			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length
-			);
-
-			// The URL search suggestion should not exist.
-			expect( lastSearchResultItem ).not.toHaveTextContent( searchTerm );
-			expect( lastSearchResultItem ).not.toHaveTextContent( 'URL' );
-			expect( lastSearchResultItem ).not.toHaveTextContent(
-				'Press ENTER to add this link'
-			);
-		}
-	);
-
 	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
 		const user = userEvent.setup();
 		render( <LinkControl noURLSuggestion /> );
@@ -981,8 +943,6 @@ describe( 'Default search suggestions', () => {
 		const initialValue = fauxEntitySuggestions[ 0 ];
 		render( <LinkControl showInitialSuggestions value={ initialValue } /> );
 
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
-
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
 		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
@@ -992,23 +952,18 @@ describe( 'Default search suggestions', () => {
 		await user.click( currentLinkBtn );
 
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+
 		// Search input is set to the URL value.
 		expect( searchInput ).toHaveValue( initialValue.url );
 
-		// Focus the search input to display suggestions
-		await user.click( searchInput );
-
-		const searchResultElements = within(
-			await screen.findByRole( 'listbox', {
+		// Ensure no initial suggestions are shown.
+		expect(
+			screen.queryByRole( 'listbox', {
 				name: /Search results for.*/,
 			} )
-		).getAllByRole( 'option' );
+		).not.toBeInTheDocument();
 
-		expect( searchResultElements ).toHaveLength( 4 );
-
-		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
-
-		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should display initial suggestions when input value is manually deleted', async () => {
@@ -1701,6 +1656,40 @@ describe( 'Selecting links', () => {
 				firstSearchSuggestion
 			);
 
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should not show search results on URL input focus when the URL has not changed', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+
+			render( <LinkControl value={ selectedLink } forceIsEditingLink /> );
+
+			// focus the search input
+			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+
+			fireEvent.focus( searchInput );
+
+			// check that the search results are not visible
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).not.toBeInTheDocument();
+
+			// check that the mock fetch function was not called
+			expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+
+			// check that typing in the search input to make the value dirty
+			// does trigger search results
+			fireEvent.change( searchInput, { target: { value: 'changes' } } );
+
+			expect(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).toBeVisible();
+
+			// check the mock fetch function was called
 			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
