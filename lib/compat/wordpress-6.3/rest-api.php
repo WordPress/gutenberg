@@ -97,8 +97,8 @@ function add_modified_wp_template_schema() {
 				'get_callback' => function( $object ) {
 					if ( ! empty( $object['wp_id'] ) ) {
 						$post = get_post( $object['wp_id'] );
-						if ( $post ) {
-							return $post->post_modified;
+						if ( $post && isset( $post->post_modified ) ) {
+							return mysql_to_rfc3339( $post->post_modified );
 						}
 					}
 					return null;
