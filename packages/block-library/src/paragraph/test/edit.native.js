@@ -40,9 +40,9 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	it( 'renders without crashing', () => {
+	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
-		expect( screen.container ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
