@@ -58,13 +58,17 @@
 	}
 }
 
-.edit-site-document-actions__shortcut {
-	color: $gray-700;
-	text-align: right;
+.edit-site-document-actions__shortcut,
+.edit-site-document-actions__back {
+	color: darken($gray-700, 3%); // Darken the secondary color to meet requirements against a gray background.
 
-	&:hover {
-		color: $gray-700;
+	.edit-site-document-actions:hover & {
+		color: $gray-900;
 	}
+}
+
+.edit-site-document-actions__shortcut {
+	text-align: right;
 }
 
 .edit-site-document-actions__back {
