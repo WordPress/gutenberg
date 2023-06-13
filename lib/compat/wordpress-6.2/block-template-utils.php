@@ -110,7 +110,7 @@ function gutenberg_get_template_hierarchy( $slug, $is_custom = false, $template_
 function gutenberg_get_default_block_template_types( $default_template_types ) {
 	if ( isset( $default_template_types['index'] ) ) {
 		$default_template_types['index'] = array(
-			'title'       => _x( 'All Posts & Pages', 'Template name', 'gutenberg' ),
+			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
 			'description' => __(
 				'Used as a fallback template for all pages when a more specific template is not defined.',
 				'gutenberg'
