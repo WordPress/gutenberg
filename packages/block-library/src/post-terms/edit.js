@@ -69,10 +69,6 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ blockInformation.title }</div>;
-	}
-
 	return (
 		<>
 			<BlockControls>
@@ -96,7 +92,7 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && <Spinner /> }
+				{ isLoading && hasPost && <Spinner /> }
 				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
@@ -111,7 +107,11 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ! isLoading &&
+				{ ( ! hasPost || ! term ) && (
+					<span>{ blockInformation.title }</span>
+				) }
+				{ hasPost &&
+					! isLoading &&
 					hasPostTerms &&
 					postTerms
 						.map( ( postTerm ) => (
@@ -132,7 +132,8 @@ export default function PostTermsEdit( {
 								{ curr }
 							</>
 						) ) }
-				{ ! isLoading &&
+				{ hasPost &&
+					! isLoading &&
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
