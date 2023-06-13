@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import {
-	SelectControl,
-	Button,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -48,6 +44,11 @@ function BehaviorsControl( {
 		label: __( 'No behaviors' ),
 	};
 
+	const defaultBehaviorsOption = {
+		value: 'default',
+		label: __( 'Default' ),
+	};
+
 	const behaviorsOptions = Object.entries( settings )
 		.filter(
 			( [ behaviorName, behaviorValue ] ) =>
@@ -65,7 +66,11 @@ function BehaviorsControl( {
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) return null;
 
-	const options = [ noBehaviorsOption, ...behaviorsOptions ];
+	const options = [
+		defaultBehaviorsOption,
+		noBehaviorsOption,
+		...behaviorsOptions,
+	];
 
 	// Block behaviors take precedence over theme behaviors.
 	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
@@ -77,28 +82,17 @@ function BehaviorsControl( {
 	return (
 		<InspectorControls group="advanced">
 			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
-			<div>
-				<SelectControl
-					label={ __( 'Behaviors' ) }
-					// At the moment we are only supporting one behavior (Lightbox)
-					value={ behaviors?.lightbox ? 'lightbox' : '' }
-					options={ options }
-					onChange={ onChange }
-					hideCancelButton={ true }
-					help={ helpText }
-					size="__unstable-large"
-					disabled={ disabled }
-				/>
-			</div>
-			<HStack justify="flex-end">
-				<Button
-					isSmall
-					disabled={ disabled }
-					onClick={ () => onChange( undefined ) }
-				>
-					{ __( 'Reset' ) }
-				</Button>
-			</HStack>
+			<SelectControl
+				label={ __( 'Behaviors' ) }
+				// At the moment we are only supporting one behavior (Lightbox)
+				value={ behaviors?.lightbox ? 'lightbox' : '' }
+				options={ options }
+				onChange={ onChange }
+				hideCancelButton={ true }
+				help={ helpText }
+				size="__unstable-large"
+				disabled={ disabled }
+			/>
 		</InspectorControls>
 	);
 }
@@ -130,7 +124,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
 					onChange={ ( nextValue ) => {
-						if ( nextValue === undefined ) {
+						if ( nextValue === 'default' ) {
 							props.setAttributes( {
 								behaviors: undefined,
 							} );
