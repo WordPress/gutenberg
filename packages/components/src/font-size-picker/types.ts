@@ -22,7 +22,14 @@ export type FontSizePickerProps = {
 	 * attending to what reset means in that context, e.g., set the font size to
 	 * undefined or set the font size a starting value.
 	 */
-	onChange?: ( value: number | string | undefined ) => void;
+	onChange?: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
+	/**
+	 * Available units for custom font size selection.
+	 */
+	units?: string[];
 	/**
 	 * The current font size value.
 	 */

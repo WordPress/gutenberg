@@ -67,6 +67,12 @@ Callback invoked when either the quantity or unit inputs fire the `blur` event.
 
 -   Required: No
 
+### `onFocus`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
+
+Callback invoked when either the quantity or unit inputs fire the `focus` event.
+
+-   Required: No
+
 ### `onChange`: `UnitControlOnChangeCallback`
 
 Callback when the `value` changes.
@@ -121,7 +127,9 @@ const Example = () => {
 		{ value: 'em', label: 'em', default: 0 },
 	];
 
-	return <UnitControl onChange={ setValue } value={ value } units={units} />;
+	return (
+		<UnitControl onChange={ setValue } value={ value } units={ units } />
+	);
 };
 ```
 

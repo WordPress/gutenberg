@@ -98,7 +98,7 @@ const BlockMobileToolbar = ( {
 			</BlockSettingsButton.Slot>
 
 			<BlockActionsMenu
-				clientIds={ [ clientId ] }
+				clientId={ clientId }
 				wrapBlockMover={ wrapBlockMover }
 				wrapBlockSettings={ wrapBlockSettings && fillsLength }
 				isStackedHorizontally={ isStackedHorizontally }

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Switch } from 'react-native';
-import { isEmpty } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -12,15 +12,17 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  */
 import Cell from './cell';
 
+const EMPTY_STYLE = {};
+
 export default function BottomSheetSwitchCell( props ) {
-	const { value, onValueChange, ...cellProps } = props;
+	const { value, onValueChange, disabled, ...cellProps } = props;
 
 	const onPress = () => {
 		onValueChange( ! value );
 	};
 
 	const getAccessibilityLabel = () => {
-		if ( isEmpty( cellProps.help ) ) {
+		if ( ! cellProps.help ) {
 			return value
 				? sprintf(
 						/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
@@ -60,8 +62,14 @@ export default function BottomSheetSwitchCell( props ) {
 			onPress={ onPress }
 			editable={ false }
 			value={ '' }
+			disabled={ disabled }
+			disabledStyle={ EMPTY_STYLE }
 		>
-			<Switch value={ value } onValueChange={ onValueChange } />
+			<Switch
+				value={ value }
+				onValueChange={ onValueChange }
+				disabled={ disabled }
+			/>
 		</Cell>
 	);
 }

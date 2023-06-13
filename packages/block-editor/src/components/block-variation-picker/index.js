@@ -43,16 +43,17 @@ function BlockVariationPicker( {
 					<li key={ variation.name }>
 						<Button
 							variant="secondary"
-							icon={ variation.icon }
+							icon={
+								variation.icon && variation.icon.src
+									? variation.icon.src
+									: variation.icon
+							}
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
-						<span
-							className="block-editor-block-variation-picker__variation-label"
-							role="presentation"
-						>
+						<span className="block-editor-block-variation-picker__variation-label">
 							{ variation.title }
 						</span>
 					</li>

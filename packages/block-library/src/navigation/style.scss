@@ -533,7 +533,6 @@ button.wp-block-navigation-item__content {
 			}
 
 			// Always expand/unfold submenus inside the modal.
-			.has-child .submenu-container,
 			.has-child .wp-block-navigation__submenu-container {
 				// Unset CSS that hides dropdown menus.
 				opacity: 1;
@@ -655,6 +654,14 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
@@ -668,16 +675,26 @@ button.wp-block-navigation-item__content {
 	top: 0;
 	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
+
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
 }
 
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
-	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
-	max-width: var(--wp--style--global--wide-size, 100%);
-	margin-left: auto;
-	margin-right: auto;
+	.has-modal-open & {
+		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+		max-width: var(--wp--style--global--wide-size, 100%);
+		margin-left: auto;
+		margin-right: auto;
+	}
 
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,

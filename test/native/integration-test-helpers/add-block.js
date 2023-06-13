@@ -1,23 +1,38 @@
 /**
+ * WordPress dependencies
+ */
+import { Platform } from '@wordpress/element';
+
+/**
  * External dependencies
  */
-import { fireEvent } from '@testing-library/react-native';
+import { act, fireEvent } from '@testing-library/react-native';
+import { AccessibilityInfo } from 'react-native';
 
 /**
  * Internal dependencies
  */
 import { waitFor } from './wait-for';
+import { withFakeTimers } from './with-fake-timers';
 
 /**
  * Adds a block via the block picker.
  *
- * @param {import('@testing-library/react-native').RenderAPI} screen    A Testing Library screen.
- * @param {string}                                            blockName Name of the block to be inserted as shown in the block picker.
+ * @param {import('@testing-library/react-native').RenderAPI} screen                   A Testing Library screen.
+ * @param {string}                                            blockName                Name of the block to be inserted as shown in the block picker.
+ * @param {Object}                                            options                  Configuration options for adding a block.
+ * @param {boolean}                                           [options.isPickerOpened] Option to skip opening the inserter picker.
  */
-export const addBlock = async ( screen, blockName ) => {
+export const addBlock = async (
+	screen,
+	blockName,
+	{ isPickerOpened } = {}
+) => {
 	const { getByLabelText, getByTestId, getByText } = screen;
 
-	fireEvent.press( getByLabelText( 'Add block' ) );
+	if ( ! isPickerOpened ) {
+		fireEvent.press( getByLabelText( 'Add block' ) );
+	}
 
 	const blockList = getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items
@@ -30,4 +45,13 @@ export const addBlock = async ( screen, blockName ) => {
 	} );
 
 	fireEvent.press( await waitFor( () => getByText( blockName ) ) );
+
+	// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
+	// Hence, we need to wait for the different steps until the the block is inserted.
+	if ( Platform.isIOS ) {
+		await withFakeTimers( async () => {
+			await AccessibilityInfo.isScreenReaderEnabled();
+			act( () => jest.runOnlyPendingTimers() );
+		} );
+	}
 };

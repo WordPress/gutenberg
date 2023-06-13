@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clone } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -15,7 +10,7 @@ import { userAutocompleter } from '../components';
 
 function setDefaultCompleters( completers = [] ) {
 	// Provide copies so filters may directly modify them.
-	completers.push( clone( userAutocompleter ) );
+	completers.push( { ...userAutocompleter } );
 
 	return completers;
 }

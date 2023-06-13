@@ -17,7 +17,7 @@
 	}
 
 	// Enable pointer events for the toolbar's content.
-	&:not(.block-editor-block-popover__inbetween, .block-editor-block-popover__drop-zone) .components-popover__content {
+	&:not(.block-editor-block-popover__inbetween, .block-editor-block-popover__drop-zone, .block-editor-block-list__block-side-inserter-popover) .components-popover__content {
 		* {
 			pointer-events: all;
 		}

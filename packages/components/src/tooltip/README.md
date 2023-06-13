@@ -46,6 +46,13 @@ The tooltip text to show on focus or hover.
 -   Type: `String`
 -   Required: No
 
+### shortcut (web only)
+
+-   Type: `string` or `object`
+-   Required: No
+
+If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display` (string) and `ariaLabel` (string).
+
 ### delay (web only)
 
 Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.

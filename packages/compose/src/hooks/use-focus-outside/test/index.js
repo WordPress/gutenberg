@@ -27,9 +27,7 @@ const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
 describe( 'useFocusOutside', () => {
 	it( 'should not call handler if focus shifts to element within component', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -50,9 +48,7 @@ describe( 'useFocusOutside', () => {
 
 	it( 'should not call handler if focus transitions via click to button', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -69,9 +65,7 @@ describe( 'useFocusOutside', () => {
 
 	it( 'should call handler if focus shifts to element outside component', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -99,9 +93,7 @@ describe( 'useFocusOutside', () => {
 			.spyOn( document, 'hasFocus' )
 			.mockImplementation( () => false );
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -126,9 +118,7 @@ describe( 'useFocusOutside', () => {
 
 	it( 'should cancel check when unmounting while queued', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { unmount } = render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -144,8 +134,6 @@ describe( 'useFocusOutside', () => {
 		// handler is queued
 		button.blur();
 		unmount();
-
-		jest.runAllTimers();
 
 		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
 	} );

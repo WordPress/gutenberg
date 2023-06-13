@@ -39,8 +39,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+	const { canRemove, innerBlockCount } = useSelect(
+		( select ) => {
+			const { canRemoveBlock, getBlockCount } =
+				select( blockEditorStore );
+			return {
+				canRemove: canRemoveBlock( clientId ),
+				innerBlockCount: getBlockCount( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 
@@ -109,7 +116,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
+							label={
+								innerBlockCount > 1
+									? __( 'Convert to regular blocks' )
+									: __( 'Convert to regular block' )
+							}
 							icon={ ungroup }
 							showTooltip
 						/>
@@ -119,6 +130,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

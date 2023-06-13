@@ -3,9 +3,12 @@
  */
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
-function Subtitle( { children } ) {
+function Subtitle( { children, level } ) {
 	return (
-		<Heading className="edit-site-global-styles-subtitle" level={ 2 }>
+		<Heading
+			className="edit-site-global-styles-subtitle"
+			level={ level ?? 2 }
+		>
 			{ children }
 		</Heading>
 	);

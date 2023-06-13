@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { isEqual, merge } from 'lodash';
+import deepmerge from 'deepmerge';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { isPlainObject } from 'is-plain-object';
 
 /**
  * WordPress dependencies
@@ -42,7 +44,7 @@ function useContextSystemBridge( { value } ) {
 	useUpdateEffect( () => {
 		if (
 			// Objects are equivalent.
-			isEqual( valueRef.current, value ) &&
+			fastDeepEqual( valueRef.current, value ) &&
 			// But not the same reference.
 			valueRef.current !== value
 		) {
@@ -53,7 +55,7 @@ function useContextSystemBridge( { value } ) {
 	// `parentContext` will always be memoized (i.e., the result of this hook itself)
 	// or the default value from when the `ComponentsContext` was originally
 	// initialized (which will never change, it's a static variable)
-	// so this memoization will prevent `merge` and `JSON.parse/stringify` from rerunning unless
+	// so this memoization will prevent `deepmerge()` from rerunning unless
 	// the references to `value` change OR the `parentContext` has an actual material change
 	// (because again, it's guaranteed to be memoized or a static reference to the empty object
 	// so we know that the only changes for `parentContext` are material ones... i.e., why we
@@ -61,10 +63,12 @@ function useContextSystemBridge( { value } ) {
 	// need to bother with the `value`). The `useUpdateEffect` above will ensure that we are
 	// correctly warning when the `value` isn't being properly memoized. All of that to say
 	// that this should be super safe to assume that `useMemo` will only run on actual
-	// changes to the two dependencies, therefore saving us calls to `merge` and `JSON.parse/stringify`!
+	// changes to the two dependencies, therefore saving us calls to `deepmerge()`!
 	const config = useMemo( () => {
 		// Deep clone `parentContext` to avoid mutating it later.
-		return merge( JSON.parse( JSON.stringify( parentContext ) ), value );
+		return deepmerge( parentContext ?? {}, value ?? {}, {
+			isMergeableObject: isPlainObject,
+		} );
 	}, [ parentContext, value ] );
 
 	return config;

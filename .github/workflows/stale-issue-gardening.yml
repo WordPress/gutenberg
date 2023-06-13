@@ -42,7 +42,7 @@ jobs:
 
         steps:
             - name: Update issues
-              uses: actions/stale@5ebf00ea0e4c1561e9b43a292ed34424fb1d4578 # v6.0.1
+              uses: actions/stale@1160a2240286f5da8ec72b1c0816ce2481aabf84 # v8.0.0
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: ${{ matrix.message }}

@@ -16,5 +16,10 @@
 		"allowJs": true,
 		"checkJs": false
 	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../keycodes" },
+		{ "path": "../url" }
+	],
 	"include": [ "src/**/*" ]
 }

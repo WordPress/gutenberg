@@ -36,7 +36,8 @@ describe( 'withGlobalEvents', () => {
 		}
 
 		render() {
-			return <div>{ this.props.children }</div>;
+			const { children } = this.props;
+			return <div>{ children }</div>;
 		}
 	}
 

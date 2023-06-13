@@ -98,12 +98,12 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
+	$classes[]       = 'wp-block-navigation-item';
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
-	$css_classes     = trim( implode( ' ', $classes ) ) . ' wp-block-navigation-item';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => $css_classes,
+			'class' => implode( ' ', $classes ),
 			'style' => $style_attribute,
 		)
 	);
@@ -128,7 +128,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
 
 	return sprintf(
-		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" "rel="home"%3$s>%4$s</a></li>',
+		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" rel="home"%3$s>%4$s</a></li>',
 		block_core_home_link_build_li_wrapper_attributes( $block->context ),
 		esc_url( home_url() ),
 		$aria_current,

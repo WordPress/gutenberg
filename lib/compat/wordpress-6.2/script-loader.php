@@ -63,3 +63,13 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 		$priority
 	);
 }
+
+add_filter(
+	'block_editor_settings_all',
+	static function( $settings ) {
+		// We must override what core is passing now.
+		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
+		return $settings;
+	},
+	100
+);

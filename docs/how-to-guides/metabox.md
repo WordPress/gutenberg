@@ -152,7 +152,7 @@ function myguten_render_paragraph( $block_attributes, $content ) {
 }
 
 register_block_type( 'core/paragraph', array(
-	'api_version' => 2,
+	'api_version' => 3,
 	'render_callback' => 'myguten_render_paragraph',
 ) );
 ```

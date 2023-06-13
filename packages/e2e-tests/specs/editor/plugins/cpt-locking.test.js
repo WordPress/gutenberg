@@ -12,6 +12,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	setPostContent,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'cpt locking', () => {
@@ -35,25 +36,23 @@ describe( 'cpt locking', () => {
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
-		await page.type(
+		await canvas().type(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
 		await clickBlockToolbarButton( 'Options' );
 		expect(
-			await page.$x(
-				'//button/span[contains(text(), "Remove Paragraph")]'
-			)
+			await page.$x( '//button/span[contains(text(), "Delete")]' )
 		).toHaveLength( 0 );
 	};
 
 	const shouldAllowBlocksToBeMoved = async () => {
-		await page.click(
+		await canvas().click(
 			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
-		await page.type(
+		await canvas().type(
 			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
@@ -73,14 +72,14 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
 		} );
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			const textToType = 'Paragraph';
@@ -90,7 +89,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should insert line breaks when using enter and shift-enter', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'First line' );
@@ -120,12 +119,14 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should not allow blocks to be inserted in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
+			await canvas().click(
+				'button[aria-label="Two columns; equal split"]'
+			);
 			await page.evaluate(
 				() => new Promise( window.requestIdleCallback )
 			);
 			expect(
-				await page.$(
+				await canvas().$(
 					'.wp-block-column .block-editor-button-block-appender'
 				)
 			).toBeNull();
@@ -175,12 +176,12 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be removed', async () => {
-			await page.type(
+			await canvas().type(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove Paragraph' );
+			await clickMenuItem( 'Delete' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
@@ -195,12 +196,12 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be removed', async () => {
-			await page.type(
+			await canvas().type(
 				'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Remove Paragraph' );
+			await clickMenuItem( 'Delete' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -221,7 +222,7 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
@@ -241,7 +242,7 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();

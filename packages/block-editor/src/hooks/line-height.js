@@ -60,36 +60,3 @@ export function useIsLineHeightDisabled( { name: blockName } = {} ) {
 		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
 	);
 }
-
-/**
- * Checks if there is a current value set for the line height block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a line height value set.
- */
-export function hasLineHeightValue( props ) {
-	return !! props.attributes.style?.typography?.lineHeight;
-}
-
-/**
- * Resets the line height block support attribute. This can be used when
- * disabling the line height support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetLineHeight( { attributes = {}, setAttributes } ) {
-	const { style } = attributes;
-
-	setAttributes( {
-		style: cleanEmptyObject( {
-			...style,
-			typography: {
-				...style?.typography,
-				lineHeight: undefined,
-			},
-		} ),
-	} );
-}

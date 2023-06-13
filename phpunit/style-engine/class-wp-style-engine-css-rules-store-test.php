@@ -9,6 +9,7 @@
 /**
  * Tests for registering, storing and retrieving a collection of CSS Rules (a store).
  *
+ * @group style-engine
  * @coversDefaultClass WP_Style_Engine_CSS_Rules_Store_Gutenberg
  */
 class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {

@@ -8,7 +8,8 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { createRoot } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -43,31 +44,15 @@ const disabledBlocks = [
 ];
 
 /**
- * Reinitializes the editor after the user chooses to reboot the editor after
- * an unhandled error occurs, replacing previously mounted editor element using
- * an initial state from prior to the crash.
- *
- * @param {Element} target   DOM node in which editor is rendered.
- * @param {?Object} settings Editor settings object.
- */
-export function reinitializeEditor( target, settings ) {
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-	render(
-		<Layout blockEditorSettings={ settings } onError={ reboot } />,
-		target
-	);
-}
-
-/**
  * Initializes the block editor in the widgets screen.
  *
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Block editor settings.
  */
-export function initialize( id, settings ) {
+export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
+	const root = createRoot( target );
+
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
 			disabledBlocks.includes( block.name ) ||
@@ -105,10 +90,22 @@ export function initialize( id, settings ) {
 	// do this will result in errors in the default block parser.
 	// see: https://github.com/WordPress/gutenberg/issues/33097
 	setFreeformContentHandlerName( 'core/html' );
-	render(
-		<Layout blockEditorSettings={ settings } onError={ reboot } />,
-		target
-	);
+
+	root.render( <Layout blockEditorSettings={ settings } /> );
+
+	return root;
+}
+
+/**
+ * Compatibility export under the old `initialize` name.
+ */
+export const initialize = initializeEditor;
+
+export function reinitializeEditor() {
+	deprecated( 'wp.editWidgets.reinitializeEditor', {
+		since: '6.2',
+		version: '6.3',
+	} );
 }
 
 /**

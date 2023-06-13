@@ -322,10 +322,10 @@ The following properties are provided by URLInput:
 -   suggestions
 -   selectedSuggestion
 -   suggestionsListProps
+-   currentInputValue
 
 The following extra properties are provided by LinkControlSearchInput:
 
--   currentInputValue
 -   createSuggestionButtonText
 -   handleSuggestionClick
 -   instanceId

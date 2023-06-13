@@ -4,8 +4,8 @@ type EventHandler< T extends Event > = ( event: T ) => void;
  * Merges event handlers together.
  *
  * @template TEvent
- * @param  handler
- * @param  otherHandler
+ * @param    handler
+ * @param    otherHandler
  */
 function mergeEvent< TEvent extends Event >(
 	handler: EventHandler< TEvent >,
@@ -25,8 +25,8 @@ function mergeEvent< TEvent extends Event >(
  * Merges two sets of event handlers together.
  *
  * @template TEvent
- * @param  handlers
- * @param  extraHandlers
+ * @param    handlers
+ * @param    extraHandlers
  */
 export function mergeEventHandlers<
 	TEvent extends Event,

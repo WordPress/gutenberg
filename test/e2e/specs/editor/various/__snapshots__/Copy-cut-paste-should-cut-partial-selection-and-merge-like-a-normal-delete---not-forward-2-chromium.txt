@@ -1,5 +1,5 @@
 <!-- wp:heading -->
-<h2>ading</h2>
+<h2 class="wp-block-heading">ading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -7,5 +7,5 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>Heph</h2>
+<h2 class="wp-block-heading">Heph</h2>
 <!-- /wp:heading -->

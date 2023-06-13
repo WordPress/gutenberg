@@ -32,8 +32,9 @@
  * External dependencies
  */
 
+const deepmerge = require( 'deepmerge' );
+const { isPlainObject } = require( 'is-plain-object' );
 const { po } = require( 'gettext-parser' );
-const { pick, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -110,7 +111,7 @@ function getNodeAsString( node ) {
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                   the original node passed.
  *
- * @return {?string} Extracted comment.
+ * @return {string | undefined} Extracted comment.
  */
 function getExtractedComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;
@@ -182,10 +183,7 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual(
-		pick( a, VALID_TRANSLATION_KEYS ),
-		pick( b, VALID_TRANSLATION_KEYS )
-	);
+	return VALID_TRANSLATION_KEYS.every( ( key ) => a[ key ] === b[ key ] );
 }
 
 /**
@@ -315,7 +313,10 @@ module.exports = () => {
 				},
 				exit( path, state ) {
 					const { filename } = this.file.opts;
-					if ( isEmpty( strings[ filename ] ) ) {
+					if (
+						! strings[ filename ] ||
+						! Object.values( strings[ filename ] ).length
+					) {
 						delete strings[ filename ];
 						return;
 					}
@@ -341,7 +342,7 @@ module.exports = () => {
 								if (
 									isSameTranslation(
 										translation,
-										memo[ msgctxt ][ msgid ]
+										memo[ msgctxt ][ msgid ] ?? {}
 									)
 								) {
 									translation.comments.reference = [
@@ -365,7 +366,13 @@ module.exports = () => {
 					}, {} );
 
 					// Merge translations from individual files into headers
-					const data = merge( {}, baseData, { translations } );
+					const data = deepmerge(
+						baseData,
+						{ translations },
+						{
+							isMergeableObject: isPlainObject,
+						}
+					);
 
 					// Ideally we could wait until Babel has finished parsing
 					// all files or at least asynchronously write, but the

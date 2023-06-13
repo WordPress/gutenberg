@@ -61,8 +61,9 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { store as noticesStore } from '@wordpress/notices';
+// eslint-disable-next-line no-restricted-imports
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -577,7 +578,7 @@ export class ImageEdit extends Component {
 				footerNote={
 					<>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
+							'Describe the purpose of the image. Leave empty if decorative.'
 						) }{ ' ' }
 						<FooterMessageLink
 							href={
@@ -912,8 +913,7 @@ export default compose( [
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes, imageDefaultSize, shouldUseFastImage } =
-			getSettings();
+		const { imageSizes, imageDefaultSize, capabilities } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
@@ -931,7 +931,7 @@ export default compose( [
 			image,
 			imageSizes,
 			imageDefaultSize,
-			shouldUseFastImage,
+			shouldUseFastImage: capabilities?.shouldUseFastImage === true,
 			featuredImageId,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,

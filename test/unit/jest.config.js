@@ -17,10 +17,12 @@ module.exports = {
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/is-gutenberg-plugin.js',
+		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
-	testURL: 'http://localhost',
+	testEnvironmentOptions: {
+		url: 'http://localhost/',
+	},
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
@@ -33,6 +35,7 @@ module.exports = {
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
+	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
@@ -40,6 +43,10 @@ module.exports = {
 		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',

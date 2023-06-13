@@ -29,17 +29,19 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches @wordpress/base-styles
+// Matches the Modern admin scheme in @wordpress/base-styles
 const ADMIN = {
-	theme: 'var( --wp-admin-theme-color, #007cba)',
-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+	themeDark10:
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
 };
 
 const UI = {
 	theme: ADMIN.theme,
+	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
-	border: GRAY[ 700 ],
+	border: GRAY[ 600 ],
 	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: GRAY[ 400 ],

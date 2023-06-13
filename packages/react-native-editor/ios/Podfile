@@ -6,16 +6,21 @@ require_relative '../../../node_modules/@react-native-community/cli-platform-ios
 # Uncomment the next line to define a global platform for your project
 app_ios_deployment_target = Gem::Version.new('13.0')
 platform :ios, app_ios_deployment_target.version
+install! 'cocoapods', :deterministic_uuids => false
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   config = use_native_modules!
+
   use_react_native!(
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
-    :hermes_enabled => false
+    :hermes_enabled => false,
+    :fabric_enabled => false,
+    # An absolute path to the application root
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   target 'GutenbergDemoTests' do

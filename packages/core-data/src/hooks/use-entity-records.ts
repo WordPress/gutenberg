@@ -37,10 +37,10 @@ const EMPTY_ARRAY = [];
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
- * @param  name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param  queryArgs Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
- * @param  options   Optional hook options.
+ * @param    kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param    name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param    queryArgs Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+ * @param    options   Optional hook options.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';

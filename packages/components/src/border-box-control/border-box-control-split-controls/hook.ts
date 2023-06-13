@@ -21,7 +21,6 @@ export function useBorderBoxControlSplitControls(
 		enableAlpha = false,
 		enableStyle = true,
 		size = 'default',
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
@@ -49,7 +48,6 @@ export function useBorderBoxControlSplitControls(
 		enableStyle,
 		rightAlignedClassName,
 		size,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 	};
 }

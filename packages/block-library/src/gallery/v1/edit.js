@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, find, get, isEmpty, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -105,17 +100,10 @@ function GalleryEdit( props ) {
 					}
 					const image = getMedia( id );
 					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-						const defaultUrl = get( image, [
-							'sizes',
-							size.slug,
-							'url',
-						] );
-						const mediaDetailsUrl = get( image, [
-							'media_details',
-							'sizes',
-							size.slug,
-							'source_url',
-						] );
+						const defaultUrl = image?.sizes?.[ size.slug ]?.url;
+						const mediaDetailsUrl =
+							image?.media_details?.sizes?.[ size.slug ]
+								?.source_url;
 						return {
 							...currentSizes,
 							[ size.slug ]: defaultUrl || mediaDetailsUrl,
@@ -148,7 +136,7 @@ function GalleryEdit( props ) {
 				...newAttrs,
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+				ids: newAttrs.images.map( ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -195,7 +183,7 @@ function GalleryEdit( props ) {
 
 	function onRemoveImage( index ) {
 		return () => {
-			const newImages = filter( images, ( img, i ) => index !== i );
+			const newImages = images.filter( ( img, i ) => index !== i );
 			setSelectedImage();
 			setAttributes( {
 				images: newImages,
@@ -211,7 +199,7 @@ function GalleryEdit( props ) {
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
 		const newImageId = newImage.id.toString();
-		const currentImage = find( images, { id: newImageId } );
+		const currentImage = images.find( ( { id } ) => id === newImageId );
 		const currentImageCaption = currentImage
 			? currentImage.caption
 			: newImage.caption;
@@ -220,9 +208,9 @@ function GalleryEdit( props ) {
 			return currentImageCaption;
 		}
 
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
+		const attachment = attachmentCaptions.find(
+			( { id } ) => id === newImageId
+		);
 
 		// If the attachment caption is updated.
 		if ( attachment && attachment.caption !== newImage.caption ) {
@@ -298,23 +286,20 @@ function GalleryEdit( props ) {
 
 	function getImagesSizeOptions() {
 		const resizedImageSizes = Object.values( resizedImages );
-		return map(
-			filter( imageSizes, ( { slug } ) =>
+		return imageSizes
+			.filter( ( { slug } ) =>
 				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+			)
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
+		const updatedImages = ( images ?? [] ).map( ( image ) => {
 			if ( ! image.id ) {
 				return image;
 			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				newSizeSlug,
-			] );
+			const url =
+				resizedImages[ parseInt( image.id, 10 ) ]?.[ newSizeSlug ];
 			return {
 				...image,
 				...( url && { url } ),
@@ -331,7 +316,7 @@ function GalleryEdit( props ) {
 			images.length > 0 &&
 			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			const filesList = images.map( ( { url } ) => getBlobByURL( url ) );
 			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
@@ -395,7 +380,7 @@ function GalleryEdit( props ) {
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = hasImages && imageSizeOptions.length > 0;
 
 	return (
 		<>
@@ -403,6 +388,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ setColumnsNumber }
@@ -413,12 +399,14 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -427,6 +415,7 @@ function GalleryEdit( props ) {
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }

@@ -3,7 +3,7 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { filter, get, map } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -553,12 +553,11 @@ export function getGroupingBlockName( state ) {
  */
 export const getChildBlockNames = createSelector(
 	( state, blockName ) => {
-		return map(
-			filter( state.blockTypes, ( blockType ) => {
+		return getBlockTypes( state )
+			.filter( ( blockType ) => {
 				return blockType.parent?.includes( blockName );
-			} ),
-			( { name } ) => name
-		);
+			} )
+			.map( ( { name } ) => name );
 	},
 	( state ) => [ state.blockTypes ]
 );

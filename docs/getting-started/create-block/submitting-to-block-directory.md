@@ -71,7 +71,7 @@ Wondering where to input all this information? Read the next section :)
 
 Each block in your plugin should have a corresponding `block.json` file with the [block metadata](/docs/reference-guides/block-api/block-metadata.md). This file provides the Block Directory important information about your block. Along with being the place to store contextual information about your block like the: `name`, `description`, `keywords` and `category`, the `block.json` file stores the location of your block’s files.
 
-Block plugins submitted to the Block Directory can contain mutliple blocks only if they are children of a single parent/ancestor. There should only be one main block. For example, a list block can contain list-item blocks. Children blocks must set the `parent` property in their `block.json` file.
+Block plugins submitted to the Block Directory can contain multiple blocks only if they are children of a single parent/ancestor. There should only be one main block. For example, a list block can contain list-item blocks. Children blocks must set the `parent` property in their `block.json` file.
 
 Double check that the following is true for your block:
 

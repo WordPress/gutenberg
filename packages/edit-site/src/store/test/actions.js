@@ -13,8 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
-
-jest.useRealTimers();
+import { setHasPageContentFocus } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -81,7 +80,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 
 		it( 'should set the template by fetching the template slug', async () => {
@@ -109,7 +108,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 	} );
 
@@ -146,7 +145,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 	} );
 
@@ -170,21 +169,13 @@ describe( 'actions', () => {
 			const ID = 'emptytheme//single';
 			const SLUG = 'single';
 
-			window.fetch = async ( path ) => {
-				if ( path === '/?_wp-find-template=true' ) {
-					return {
-						json: async () => ( { data: { id: ID, slug: SLUG } } ),
-					};
-				}
-
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ path }`,
-				};
-			};
-
 			apiFetch.setFetchHandler( async ( options ) => {
-				const { method = 'GET', path } = options;
+				const { method = 'GET', path, url } = options;
+
+				// Called with url arg in `__experimentalGetTemplateForLink`
+				if ( url ) {
+					return { data: { id: ID, slug: SLUG } };
+				}
 
 				if ( method === 'GET' ) {
 					if ( path.startsWith( '/wp/v2/types' ) ) {
@@ -207,18 +198,6 @@ describe( 'actions', () => {
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( 'emptytheme//single' );
 			expect( select.getEditedPostType() ).toBe( 'wp_template' );
-			expect( select.getPage().path ).toBe( '/' );
-		} );
-	} );
-
-	describe( 'setHomeTemplateId', () => {
-		it( 'should set the home template ID', () => {
-			const registry = createRegistryWithStores();
-
-			registry.dispatch( editSiteStore ).setHomeTemplateId( 90 );
-			expect( registry.select( editSiteStore ).getHomeTemplateId() ).toBe(
-				90
-			);
 		} );
 	} );
 
@@ -235,6 +214,36 @@ describe( 'actions', () => {
 			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'setHasPageContentFocus', () => {
+		it( 'toggles the page content lock on', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentFocus( true )( { dispatch, registry } );
+			expect( clearSelectedBlock ).toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: true,
+			} );
+		} );
+
+		it( 'toggles the page content lock off', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentFocus( false )( { dispatch, registry } );
+			expect( clearSelectedBlock ).not.toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: false,
+			} );
 		} );
 	} );
 } );
