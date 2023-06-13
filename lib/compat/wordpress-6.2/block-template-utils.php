@@ -137,7 +137,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	}
 	if ( isset( $default_template_types['singular'] ) ) {
 		$default_template_types['singular'] = array(
-			'title'       => _x( 'Single Entires', 'Template name', 'gutenberg' ),
+			'title'       => _x( 'Single Entries', 'Template name', 'gutenberg' ),
 			'description' => __(
 				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g., Single Post, Page, or Attachment) cannot be found.',
 				'gutenberg'
