@@ -83,7 +83,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( select ).toHaveValue( '' );
 
 		// By default, you should be able to select the Lightbox behavior.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
@@ -162,8 +162,8 @@ test.describe( 'Testing behaviors functionality', () => {
 		// attributes takes precedence over the theme's value.
 		await expect( select ).toHaveValue( 'lightbox' );
 
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+		// There should be 3 options available: `No behaviors` and `Lightbox`.
+		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
 
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
@@ -210,7 +210,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( select ).toHaveValue( 'lightbox' );
 
 		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
 
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
@@ -254,7 +254,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( select ).toBeDisabled();
 	} );
 
-	test( 'Lightbox behavior control has a Reset button that removes the markup', async ( {
+	test( 'Lightbox behavior control has a default option that removes the markup', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -293,13 +293,11 @@ test.describe( 'Testing behaviors functionality', () => {
 			.last()
 			.click();
 
-		const resetButton = editorSettings.getByRole( 'button', {
-			name: 'Reset',
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
 		} );
 
-		expect( resetButton ).toBeDefined();
-
-		await resetButton.last().click();
+		await select.selectOption( { label: 'Default' } );
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:image {"id":${ media.id }} -->
 <figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
