@@ -5,6 +5,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalUseNavigator as useNavigator,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -147,29 +148,32 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
+
 							{ ! isMobileViewport && (
-								<>
-									<SidebarNavigationItem
-										className="edit-site-sidebar-navigation-screen-templates__see-all"
-										withChevron
-										{ ...browseAllLink }
-									>
-										{ config[ postType ].labels.manage }
-									</SidebarNavigationItem>
-									{ !! config[ postType ].labels
-										.reusableBlocks && (
+								<VStack className="edit-site-sidebar-navigation-screen__sticky-section">
+									<>
 										<SidebarNavigationItem
-											as="a"
-											href="edit.php?post_type=wp_block"
+											className="edit-site-sidebar-navigation-screen-templates__see-all"
 											withChevron
+											{ ...browseAllLink }
 										>
-											{
-												config[ postType ].labels
-													.reusableBlocks
-											}
+											{ config[ postType ].labels.manage }
 										</SidebarNavigationItem>
-									) }
-								</>
+										{ !! config[ postType ].labels
+											.reusableBlocks && (
+											<SidebarNavigationItem
+												as="a"
+												href="edit.php?post_type=wp_block"
+												withChevron
+											>
+												{
+													config[ postType ].labels
+														.reusableBlocks
+												}
+											</SidebarNavigationItem>
+										) }
+									</>
+								</VStack>
 							) }
 						</ItemGroup>
 					) }
