@@ -4,12 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor List View', () => {
-	test.use( {
-		listViewUtils: async ( { page, pageUtils, editor }, use ) => {
-			await use( new ListViewUtils( { page, pageUtils, editor } ) );
-		},
-	} );
-
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -100,69 +94,15 @@ test.describe( 'Site Editor List View', () => {
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'List View' } )
+				.getByRole( 'button', {
+					name: 'Close',
+				} )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).not.toBeVisible();
 		await expect( openNavigationButton ).toBeFocused();
 	} );
 } );
-
-/** @typedef {import('@playwright/test').Locator} Locator */
-class ListViewUtils {
-	#page;
-	#pageUtils;
-	#editor;
-
-	constructor( { page, pageUtils, editor } ) {
-		this.#page = page;
-		this.#pageUtils = pageUtils;
-		this.#editor = editor;
-
-		/** @type {Locator} */
-		this.listView = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
-	}
-
-	/**
-	 * @return {Promise<Locator>} The list view locator.
-	 */
-	openListView = async () => {
-		await this.#pageUtils.pressKeys( 'access+o' );
-		return this.listView;
-	};
-
-	getBlocksWithA11yAttributes = async () => {
-		const selectedRows = await this.listView
-			.getByRole( 'row' )
-			.filter( {
-				has: this.#page.getByRole( 'gridcell', { selected: true } ),
-			} )
-			.all();
-		const selectedClientIds = await Promise.all(
-			selectedRows.map( ( row ) => row.getAttribute( 'data-block' ) )
-		);
-		const focusedRows = await this.listView
-			.getByRole( 'row' )
-			.filter( { has: this.#page.locator( ':focus' ) } )
-			.all();
-		const focusedClientId =
-			focusedRows.length > 0
-				? await focusedRows[ focusedRows.length - 1 ].getAttribute(
-						'data-block'
-				  )
-				: null;
-		// Don't use the util to get the unmodified default block when it's empty.
-		const blocks = await this.#page.evaluate( () =>
-			window.wp.data.select( 'core/block-editor' ).getBlocks()
-		);
-		function recursivelyApplyAttributes( _blocks ) {
-			return _blocks.map( ( block ) => ( {
-				name: block.name,
-				selected: selectedClientIds.includes( block.clientId ),
-				focused: block.clientId === focusedClientId,
-				innerBlocks: recursivelyApplyAttributes( block.innerBlocks ),
-			} ) );
-		}
-		return recursivelyApplyAttributes( blocks );
-	};
-}
