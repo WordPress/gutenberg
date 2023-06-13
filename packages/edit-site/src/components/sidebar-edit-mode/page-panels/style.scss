@@ -8,3 +8,9 @@
 .edit-site-page-panels__edit-template-button {
 	justify-content: center;
 }
+
+.edit-site-sidebar-card__description {
+	.edit-site-change-status__trigger {
+		margin-left: -$grid-unit-15;
+	}
+}
