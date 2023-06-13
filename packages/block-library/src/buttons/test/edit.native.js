@@ -8,7 +8,6 @@ import {
 	within,
 	getBlock,
 	initializeEditor,
-	render,
 	triggerBlockListLayout,
 	typeInRichText,
 	waitFor,
@@ -20,11 +19,6 @@ import {
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { BACKSPACE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import { Button } from '@wordpress/components';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -41,10 +35,6 @@ afterAll( () => {
 		unregisterBlockType( block.name );
 	} );
 } );
-
-const getTestComponentWithContent = () => {
-	return render( <Button /> );
-};
 
 describe( 'Buttons block', () => {
 	describe( 'when a button is shown', () => {
@@ -276,11 +266,6 @@ describe( 'Buttons block', () => {
 				} );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
-
-				const component = getTestComponentWithContent();
-
-				const rendered = component.toJSON();
-				expect( rendered ).toMatchSnapshot();
 			} );
 		} );
 	} );
