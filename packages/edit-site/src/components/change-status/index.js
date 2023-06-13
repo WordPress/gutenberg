@@ -5,9 +5,9 @@ import {
 	Button,
 	Modal,
 	BaseControl,
-	CustomSelectControl,
 	ToggleControl,
 	DateTimePicker,
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	TextControl,
@@ -20,34 +20,29 @@ import { store as noticesStore } from '@wordpress/notices';
 
 const STATUS_OPTIONS = [
 	{
-		name: __( 'Published' ),
-		value: 'publish',
-		key: 'publish',
-	},
-	{
-		name: __( 'Draft' ),
+		label: __( 'Draft' ),
 		value: 'draft',
-		key: 'draft',
+		hint: __( 'Not ready to publish' ),
 	},
 	{
-		name: __( 'Pending' ),
-		value: 'pending',
-		key: 'pending',
-		__experimentalHint: __( 'Awaiting admin review' ),
-	},
-	{
-		name: __( 'Private' ),
+		label: __( 'Private' ),
 		value: 'private',
-		key: 'private',
-		__experimentalHint: __(
-			'Published, but only visible to admins and site editors'
-		),
+		hint: __( 'Published, but only visible to admins and site editors' ),
 	},
 	{
-		name: __( 'Scheduled' ),
+		label: __( 'Pending' ),
+		value: 'pending',
+		hint: __( 'Awaiting admin review' ),
+	},
+	{
+		label: __( 'Scheduled' ),
 		value: 'future',
-		key: 'future',
-		__experimentalHint: __( 'Publish automatically on a chosen date' ),
+		hint: __( 'Publish automatically on a chosen date' ),
+	},
+	{
+		label: __( 'Published' ),
+		value: 'publish',
+		hint: __( 'Anyone with the url can access' ),
 	},
 ];
 
@@ -79,9 +74,12 @@ export default function ChangeStatus( { post } ) {
 				password,
 			} );
 
-			createSuccessNotice( __( 'Updated status successfully' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				__( 'Save your changes for your status to take affect' ),
+				{
+					type: 'snackbar',
+				}
+			);
 			setOpen( false );
 		} catch ( error ) {
 			const errorMessage =
@@ -119,18 +117,45 @@ export default function ChangeStatus( { post } ) {
 						className="edit-site-change-status__content"
 						spacing={ 5 }
 					>
-						<CustomSelectControl
-							value={
-								STATUS_OPTIONS.find(
-									( option ) => option.value === status
-								) || STATUS_OPTIONS[ 0 ]
-							}
+						<BaseControl
+							hideLabelFromVision
 							label={ __( 'Status' ) }
-							options={ STATUS_OPTIONS }
-							onChange={ ( { selectedItem } ) => {
-								setStatus( selectedItem.value );
-							} }
-						/>
+							id={ `edit-site-change-status__status` }
+							className={ 'components-radio-control' }
+						>
+							<VStack spacing={ 3 }>
+								{ STATUS_OPTIONS.map( ( option, index ) => (
+									<div
+										key={ `edit-site-change-status__status-${ index }` }
+										className="components-radio-control__option with-hint"
+									>
+										<input
+											id={ `edit-site-change-status__status-${ index }` }
+											className="components-radio-control__input"
+											type="radio"
+											name={ `edit-site-change-status__status` }
+											value={ option.value }
+											onChange={ ( e ) =>
+												setStatus( e.target.value )
+											}
+											checked={ option.value === status }
+										/>
+										<VStack spacing={ 1 }>
+											<label
+												htmlFor={ `edit-site-change-status__status-${ index }` }
+											>
+												{ option.label }
+											</label>
+											{ option.hint && (
+												<Text variant="muted">
+													{ option.hint }
+												</Text>
+											) }
+										</VStack>
+									</div>
+								) ) }
+							</VStack>
+						</BaseControl>
 						{ status === 'future' && (
 							<div className="edit-site-change-status__date-time-picker">
 								<DateTimePicker
@@ -145,7 +170,9 @@ export default function ChangeStatus( { post } ) {
 							label={ __( 'Password' ) }
 						>
 							<ToggleControl
-								label={ __( 'Hide behind a password' ) }
+								label={ __(
+									'Hide this page behind a password'
+								) }
 								checked={ showPassword }
 								onChange={ handleTogglePassword }
 							/>
@@ -153,11 +180,13 @@ export default function ChangeStatus( { post } ) {
 								<TextControl
 									onChange={ setPassword }
 									value={ password }
-									placeholder={ __( 'Enter your password' ) }
-									type="password"
-									help={ __(
-										'Anyone with the password will be able to access this page'
+									/* eslint-disable jsx-a11y/no-autofocus */
+									autoFocus
+									/* eslint-enable jsx-a11y/no-autofocus */
+									placeholder={ __(
+										'Enter a secure password'
 									) }
+									type="password"
 								/>
 							) }
 						</BaseControl>
@@ -167,10 +196,10 @@ export default function ChangeStatus( { post } ) {
 						alignment="right"
 					>
 						<Button variant="tertiary" onClick={ closeModal }>
-							Cancel
+							{ __( 'Cancel' ) }
 						</Button>
 						<Button variant="primary" onClick={ saveStatus }>
-							Done
+							{ __( 'Done' ) }
 						</Button>
 					</HStack>
 				</Modal>

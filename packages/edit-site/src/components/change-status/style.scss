@@ -1,6 +1,11 @@
 .edit-site-change-status {
 	min-width: 480px;
 	min-height: 400px;
+	.components-radio-control__option.with-hint {
+		display: flex;
+		gap: $grid-unit-10;
+		align-items: center;
+	}
 	.components-modal__content {
 		padding: 0;
 		.components-modal__header + div {
