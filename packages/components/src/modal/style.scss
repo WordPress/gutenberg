@@ -8,6 +8,7 @@
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
+	pointer-events: all;
 	// backdrop-filter: blur($grid-unit);
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
