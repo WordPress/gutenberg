@@ -71,7 +71,12 @@ function selectNavigationMenus( select ) {
 	const args = [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{
+			per_page: -1,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	];
 	return {
 		navigationMenus: getEntityRecords( ...args ),
