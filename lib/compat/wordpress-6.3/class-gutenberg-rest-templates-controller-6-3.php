@@ -69,7 +69,7 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	/**
 	 * Add revisions to the response.
 	 *
-	 * @since 6.3.0 Added prepare_revision_links() method to get revision links, and added `modified` property to the response.
+	 * @since 6.3.0 Added prepare_revision_links() method to get revision links.
 	 *
 	 * @param WP_Block_Template $item    Template instance.
 	 * @param WP_REST_Request   $request Request object.
@@ -81,14 +81,6 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 		$fields = $this->get_fields_for_response( $request );
 
 		$response = parent::prepare_item_for_response( $item, $request );
-
-		// Adds modified date to the response.
-		if ( rest_is_field_included( 'modified', $fields ) && ! empty( $response->data['wp_id'] ) ) {
-			$post = get_post( $response->data['wp_id'] );
-			if ( $post ) {
-				$response->data['modified'] = $post->post_modified;
-			}
-		}
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_revision_links( $template );
