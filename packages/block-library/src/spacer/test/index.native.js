@@ -5,7 +5,7 @@ import {
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
-	waitFor,
+	waitForModalVisible,
 } from 'test/helpers';
 
 /**
@@ -65,9 +65,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
 		fireEvent.press( screen.getByText( '100' ) );
@@ -92,9 +91,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Set vh unit
 		fireEvent.press( screen.getByText( 'px' ) );
@@ -123,9 +121,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Increment height
 		fireEvent(
@@ -154,9 +151,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Increment height
 		fireEvent(
@@ -212,9 +208,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
 		fireEvent.press( screen.getByText( '60' ) );
@@ -239,9 +234,8 @@ describe( 'Spacer block', () => {
 
 		// Open block settings
 		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-		await waitFor(
-			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
 		fireEvent.press( screen.getByText( '100' ) );
