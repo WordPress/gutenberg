@@ -9,7 +9,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );

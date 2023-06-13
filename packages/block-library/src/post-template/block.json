@@ -19,7 +19,6 @@
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"anchor": true,
 		"__experimentalLayout": true,
 		"color": {
 			"gradients": true,

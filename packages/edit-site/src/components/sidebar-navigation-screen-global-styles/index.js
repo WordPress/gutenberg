@@ -21,7 +21,7 @@ import { useCallback } from '@wordpress/element';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import StyleVariationsContainer from '../global-styles/style-variations-container';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';

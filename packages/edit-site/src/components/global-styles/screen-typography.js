@@ -17,7 +17,7 @@ import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
