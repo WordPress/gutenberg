@@ -163,28 +163,26 @@ export default function TemplatePartEdit( {
 				) }
 				{ canReplace && (
 					<BlockSettingsMenuControls>
-						{ () => (
-							/* TODO: check if this used in other legacy dropdown menus */
-							<DropdownMenuItemV2
-								onSelect={ ( event ) => {
-									setIsTemplatePartSelectionOpen( true );
-									// Keep the dropdown menu open
-									event.preventDefault();
-								} }
-							>
-								{ createInterpolateElement(
-									__( 'Replace <BlockTitle />' ),
-									{
-										BlockTitle: (
-											<BlockTitle
-												clientId={ clientId }
-												maximumLength={ 25 }
-											/>
-										),
-									}
-								) }
-							</DropdownMenuItemV2>
-						) }
+						{ /* TODO: check if this used in other legacy dropdown menus */ }
+						<DropdownMenuItemV2
+							onSelect={ ( event ) => {
+								setIsTemplatePartSelectionOpen( true );
+								// Keep the dropdown menu open
+								event.preventDefault();
+							} }
+						>
+							{ createInterpolateElement(
+								__( 'Replace <BlockTitle />' ),
+								{
+									BlockTitle: (
+										<BlockTitle
+											clientId={ clientId }
+											maximumLength={ 25 }
+										/>
+									),
+								}
+							) }
+						</DropdownMenuItemV2>
 					</BlockSettingsMenuControls>
 				) }
 				{ isEntityAvailable && (

@@ -13,7 +13,7 @@ function ReusableBlocksMenuItems() {
 		<BlockSettingsMenuControls>
 			{/* Is this a breaking change? */}
 			{/* Should this use a menu item example? */}
-			{ () => <MyToggleButton onToggle={ /* ... */ } /> }
+			<MyToggleButton onToggle={ /* ... */ } />
 		</BlockSettingsMenuControls>
 	);
 }

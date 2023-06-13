@@ -428,7 +428,7 @@ export function BlockSettingsDropdown( {
 							<DropdownMenuSeparatorV2 />
 							<DropdownMenuGroupV2>
 								<DropdownMenuItemV2
-									onClick={ pipe(
+									onSelect={ pipe(
 										onRemove,
 										updateSelectionAfterRemove
 									) }

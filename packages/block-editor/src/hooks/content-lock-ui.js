@@ -130,31 +130,27 @@ export const withBlockControls = createHigherOrderComponent(
 				) }
 				{ showStartEditingAsBlocks && (
 					<BlockSettingsMenuControls>
-						{ () => (
-							/* TODO: check if this used in other legacy dropdown menus */
-							<DropdownMenuItemV2
-								onSelect={ () => {
-									__unstableMarkNextChangeAsNotPersistent();
-									updateBlockAttributes( props.clientId, {
-										templateLock: undefined,
-									} );
-									updateBlockListSettings( props.clientId, {
-										...getBlockListSettings(
-											props.clientId
-										),
-										templateLock: false,
-									} );
-									focusModeToRevert.current =
-										getSettings().focusMode;
-									updateSettings( { focusMode: true } );
-									__unstableSetTemporarilyEditingAsBlocks(
-										props.clientId
-									);
-								} }
-							>
-								{ __( 'Modify' ) }
-							</DropdownMenuItemV2>
-						) }
+						{ /* TODO: check if this used in other legacy dropdown menus */ }
+						<DropdownMenuItemV2
+							onSelect={ () => {
+								__unstableMarkNextChangeAsNotPersistent();
+								updateBlockAttributes( props.clientId, {
+									templateLock: undefined,
+								} );
+								updateBlockListSettings( props.clientId, {
+									...getBlockListSettings( props.clientId ),
+									templateLock: false,
+								} );
+								focusModeToRevert.current =
+									getSettings().focusMode;
+								updateSettings( { focusMode: true } );
+								__unstableSetTemporarilyEditingAsBlocks(
+									props.clientId
+								);
+							} }
+						>
+							{ __( 'Modify' ) }
+						</DropdownMenuItemV2>
 					</BlockSettingsMenuControls>
 				) }
 				<BlockEdit key="edit" { ...props } />

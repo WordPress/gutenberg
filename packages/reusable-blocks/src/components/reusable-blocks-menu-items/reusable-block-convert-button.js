@@ -112,69 +112,67 @@ export default function ReusableBlockConvertButton( {
 	/* TODO: check if this used in other legacy dropdown menus */
 	return (
 		<BlockSettingsMenuControls>
-			{ () => (
-				<>
-					<DropdownMenuItemV2
-						prefix={ <Icon icon={ symbol } size={ 24 } /> }
-						onSelect={ ( event ) => {
-							setIsModalOpen( true );
-							// Keep the dropdown menu open
-							event.preventDefault();
+			<>
+				<DropdownMenuItemV2
+					prefix={ <Icon icon={ symbol } size={ 24 } /> }
+					onSelect={ ( event ) => {
+						setIsModalOpen( true );
+						// Keep the dropdown menu open
+						event.preventDefault();
+					} }
+				>
+					{ __( 'Create Reusable block' ) }
+				</DropdownMenuItemV2>
+				{ isModalOpen && (
+					<Modal
+						title={ __( 'Create Reusable block' ) }
+						onRequestClose={ () => {
+							setIsModalOpen( false );
+							setTitle( '' );
 						} }
+						overlayClassName="reusable-blocks-menu-items__convert-modal"
 					>
-						{ __( 'Create Reusable block' ) }
-					</DropdownMenuItemV2>
-					{ isModalOpen && (
-						<Modal
-							title={ __( 'Create Reusable block' ) }
-							onRequestClose={ () => {
+						<form
+							onSubmit={ ( event ) => {
+								event.preventDefault();
+								onConvert( title );
 								setIsModalOpen( false );
 								setTitle( '' );
+								// TODO: the modal is expected to close the dropdown!
+								// - can we keep it open?
+								// - can we close the dropdown when the modal is opened instead?
+								// - otherwise, how do we go about it? We'd need to switch to
+								//   controlled mode at the root, and pass `onClose` around
+								// onClose();
 							} }
-							overlayClassName="reusable-blocks-menu-items__convert-modal"
 						>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onConvert( title );
-									setIsModalOpen( false );
-									setTitle( '' );
-									// TODO: the modal is expected to close the dropdown!
-									// - can we keep it open?
-									// - can we close the dropdown when the modal is opened instead?
-									// - otherwise, how do we go about it? We'd need to switch to
-									//   controlled mode at the root, and pass `onClose` around
-									// onClose();
-								} }
-							>
-								<VStack spacing="5">
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Name' ) }
-										value={ title }
-										onChange={ setTitle }
-									/>
-									<HStack justify="right">
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												setIsModalOpen( false );
-												setTitle( '' );
-											} }
-										>
-											{ __( 'Cancel' ) }
-										</Button>
+							<VStack spacing="5">
+								<TextControl
+									__nextHasNoMarginBottom
+									label={ __( 'Name' ) }
+									value={ title }
+									onChange={ setTitle }
+								/>
+								<HStack justify="right">
+									<Button
+										variant="tertiary"
+										onClick={ () => {
+											setIsModalOpen( false );
+											setTitle( '' );
+										} }
+									>
+										{ __( 'Cancel' ) }
+									</Button>
 
-										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
-										</Button>
-									</HStack>
-								</VStack>
-							</form>
-						</Modal>
-					) }
-				</>
-			) }
+									<Button variant="primary" type="submit">
+										{ __( 'Save' ) }
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					</Modal>
+				) }
+			</>
 		</BlockSettingsMenuControls>
 	);
 }

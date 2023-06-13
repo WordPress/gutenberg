@@ -7,7 +7,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { pipe } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**

@@ -6,7 +6,6 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -97,7 +96,7 @@ const PluginBlockSettingsMenuItem = ( {
 	role,
 } ) => (
 	<BlockSettingsMenuControls>
-		{ ( { selectedBlocks /*onClose*/ } ) => {
+		{ ( { selectedBlocks } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
