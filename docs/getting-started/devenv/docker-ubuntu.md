@@ -34,7 +34,7 @@ If docker is not running, try to start the service using:
 sudo systemctl start docker.service
 ```
 
-If docker is running, then it is not listening how the WordPress environment is trying to communicate. Try adding the following service override file to include listening on tcp.
+If docker is running, then it is not listening how the WordPress environment is trying to communicate. Try adding the following service override file to include listening on tcp. See [this Docker documentation](https://docs.docker.com/config/daemon/remote-access/) on how to configure remote access for Docker daemon.
 
 ```
 # /etc/systemd/system/docker.service.d/override.conf
