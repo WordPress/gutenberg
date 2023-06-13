@@ -37,43 +37,6 @@ function useEditModeCommandLoader() {
 
 	const commands = [];
 
-	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
-		const label =
-			template.type === 'wp_template'
-				? __( 'Delete template' )
-				: __( 'Delete template part' );
-		commands.push( {
-			name: 'core/remove-template',
-			label,
-			icon: trash,
-			context: 'site-editor-edit',
-			callback: ( { close } ) => {
-				removeTemplate( template );
-				// Navigate to the template list
-				history.push( {
-					path: '/' + template.type,
-				} );
-				close();
-			},
-		} );
-	}
-
-	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
-		const label =
-			template.type === 'wp_template'
-				? __( 'Reset template' )
-				: __( 'Reset template part' );
-		commands.push( {
-			name: 'core/reset-template',
-			label,
-			icon: backup,
-			callback: ( { close } ) => {
-				revertTemplate( template );
-				close();
-			},
-		} );
-	}
-
 	if ( isPage ) {
 		if ( hasPageContentFocus ) {
 			commands.push( {
@@ -98,6 +61,43 @@ function useEditModeCommandLoader() {
 				},
 			} );
 		}
+	}
+
+	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Reset template' )
+				: __( 'Reset template part' );
+		commands.push( {
+			name: 'core/reset-template',
+			label,
+			icon: backup,
+			callback: ( { close } ) => {
+				revertTemplate( template );
+				close();
+			},
+		} );
+	}
+
+	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Delete template' )
+				: __( 'Delete template part' );
+		commands.push( {
+			name: 'core/remove-template',
+			label,
+			icon: trash,
+			context: 'site-editor-edit',
+			callback: ( { close } ) => {
+				removeTemplate( template );
+				// Navigate to the template list
+				history.push( {
+					path: '/' + template.type,
+				} );
+				close();
+			},
+		} );
 	}
 
 	return {
