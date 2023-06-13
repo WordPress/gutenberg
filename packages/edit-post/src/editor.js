@@ -180,8 +180,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		) {
 			defaultEditorStyles.push( {
 				css: getLayoutStyles( {
-					layoutDefinitions:
-						settings.__experimentalFeatures?.layout?.definitions,
 					style: {},
 					selector: 'body',
 					hasBlockGapSupport: false,

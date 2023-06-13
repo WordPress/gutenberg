@@ -31,6 +31,7 @@ import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
+import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -425,7 +426,7 @@ export function getStylesDeclarations(
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
-	layoutDefinitions,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	style,
 	selector,
 	hasBlockGapSupport,
@@ -877,7 +878,6 @@ export const toStyles = (
 				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
 			) {
 				ruleset += getLayoutStyles( {
-					layoutDefinitions: tree?.settings?.layout?.definitions,
 					style: styles,
 					selector,
 					hasBlockGapSupport,

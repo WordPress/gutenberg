@@ -30,6 +30,7 @@ import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
@@ -47,8 +48,6 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		return getSettings().__experimentalFeatures
 			?.useRootPaddingAwareAlignments;
 	}, [] );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
-
 	const { layout } = blockAttributes;
 
 	const { default: defaultBlockLayout } =
@@ -60,13 +59,9 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 
 	const layoutClassnames = [];
 
-	if (
-		globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
-			?.className
-	) {
+	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
-			globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
-				?.className;
+			LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className;
 		const compoundClassName = `wp-block-${ blockName
 			.split( '/' )
 			.pop() }-${ baseClassName }`;
@@ -118,14 +113,12 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 			? { ...layout, type: 'constrained' }
 			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
 	const blockGapSupport = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 	const css = fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
 		layout,
-		layoutDefinitions: globalLayoutSettings?.definitions,
 		style,
 		hasBlockGapSupport,
 	} );
@@ -361,7 +354,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const shouldRenderLayoutStyles =
 			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
-		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
@@ -389,7 +381,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 				blockName: name,
 				selector,
 				layout: usedLayout,
-				layoutDefinitions: defaultThemeLayout?.definitions,
 				style: attributes?.style,
 				hasBlockGapSupport,
 			} );
