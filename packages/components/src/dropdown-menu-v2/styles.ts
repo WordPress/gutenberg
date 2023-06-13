@@ -174,15 +174,17 @@ const baseItem = css`
 	position: relative;
 	user-select: none;
 	outline: none;
+	cursor: pointer;
 
 	&[data-disabled] {
 		/*
-			TODO:
-			  - we need a disabled color in the Theme variables
-			  - design specs use opacity instead of setting a new text color
+		TODO:
+		- we need a disabled color in the Theme variables
+		- design specs use opacity instead of setting a new text color
 		*/
 		opacity: 0.5;
 		pointer-events: none;
+		cursor: default;
 	}
 
 	/* Hover and Focus styles */
