@@ -8,18 +8,18 @@ import classnames from 'classnames';
  */
 import { BaseControl, Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
-import { arrowRight, arrowDown } from '@wordpress/icons';
+import { textHorizontal, textVertical } from '@wordpress/icons';
 
 const WRITING_MODES = [
 	{
 		name: __( 'Horizontal' ),
 		value: 'horizontal-tb',
-		icon: arrowRight,
+		icon: textHorizontal,
 	},
 	{
 		name: __( 'Vertical' ),
 		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
-		icon: arrowDown,
+		icon: textVertical,
 	},
 ];
 
