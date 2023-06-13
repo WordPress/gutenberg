@@ -78,25 +78,13 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-theme-previews',
-		__( 'Block Theme Previews', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Block Theme Previews', 'gutenberg' ),
-			'id'    => 'gutenberg-theme-previews',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-interactivity-api-core-blocks',
 		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Use the Interactivity API in File, Navigation and Image core blocks. It also enables the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
 			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);

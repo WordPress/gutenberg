@@ -336,12 +336,12 @@ export function isPage( state ) {
 }
 
 /**
- * Whether or not the editor is locked so that only page content can be edited.
+ * Whether or not the editor allows only page content to be edited.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Whether or not the editor is locked.
+ * @return {boolean} Whether or not focus is on editing page content.
  */
-export function hasPageContentLock( state ) {
-	return isPage( state ) ? state.hasPageContentLock : false;
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }
