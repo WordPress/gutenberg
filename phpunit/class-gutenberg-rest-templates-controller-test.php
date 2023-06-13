@@ -147,7 +147,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'has_theme_file' => false,
 				'is_custom'      => true,
 				'author'         => 0,
-				'modified'       => self::$post->post_modified,
+				'modified'       => mysql_to_rfc3339( self::$post->post_modified ),
 			),
 			$data
 		);
@@ -180,7 +180,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'has_theme_file' => false,
 				'is_custom'      => true,
 				'author'         => 0,
-				'modified'       => self::$post->post_modified,
+				'modified'       => mysql_to_rfc3339( self::$post->post_modified ),
 			),
 			$this->find_and_normalize_template_by_id( $data, 'emptytheme//my_template' )
 		);
