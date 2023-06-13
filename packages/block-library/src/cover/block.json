@@ -125,7 +125,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowJustification": false
 		}
 	},

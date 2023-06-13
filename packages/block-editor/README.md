@@ -608,6 +608,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
+### LayoutStyle
+
+Undocumented declaration.
+
 ### LineHeightControl
 
 _Related_
@@ -836,6 +840,33 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
+
+### useLayoutClasses
+
+Generates the utility classnames for the given block's layout attributes.
+
+_Parameters_
+
+-   _blockAttributes_ `Object`: Block attributes.
+-   _blockName_ `string`: Block name.
+
+_Returns_
+
+-   `Array`: Array of CSS classname strings.
+
+### useLayoutStyles
+
+Generates a CSS rule with the given block's layout styles.
+
+_Parameters_
+
+-   _blockAttributes_ `Object`: Block attributes.
+-   _blockName_ `string`: Block name.
+-   _selector_ `string`: A selector to use in generating the CSS rule.
+
+_Returns_
+
+-   `string`: CSS rule.
 
 ### useSetting
 

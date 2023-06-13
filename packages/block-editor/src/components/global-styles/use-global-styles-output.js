@@ -1030,7 +1030,9 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
 		}
 
-		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
+		const hasLayoutSupport =
+			!! blockType?.supports?.layout ||
+			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
