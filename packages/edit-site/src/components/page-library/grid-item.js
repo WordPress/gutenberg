@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { BlockPreview } from '@wordpress/block-editor';
@@ -75,6 +80,10 @@ const GridItem = ( { categoryId, composite, icon, item } ) => {
 		canvas: 'edit',
 	} );
 
+	const previewClassNames = classnames( 'edit-site-library__preview', {
+		'is-inactive': item.type === PATTERNS,
+	} );
+
 	return (
 		<div
 			className="edit-site-library__pattern"
@@ -82,7 +91,7 @@ const GridItem = ( { categoryId, composite, icon, item } ) => {
 			aria-describedby={ item.description ? descriptionId : undefined }
 		>
 			<CompositeItem
-				className="edit-site-library__preview"
+				className={ previewClassNames }
 				role="option"
 				as="div"
 				{ ...composite }

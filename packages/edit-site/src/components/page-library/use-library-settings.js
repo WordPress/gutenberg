@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 export default function useLibrarySettings() {

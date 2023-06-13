@@ -1,17 +1,8 @@
 $library-color: #e0e0e0;
 
-.edit-site-layout {
-	.edit-site-library {
-		width: 100%;
-
-		.interface-interface-skeleton__editor {
-			.interface-interface-skeleton__body {
-				.interface-interface-skeleton__content {
-					border-radius: 0;
-				}
-			}
-		}
-	}
+.edit-site-library {
+	background: $gray-900;
+	margin: 0;
 }
 
 .edit-site-library__section-header {
@@ -43,6 +34,10 @@ $library-color: #e0e0e0;
 			border-radius: $radius-block-ui * 4;
 			cursor: pointer;
 			overflow: hidden;
+
+			&.is-inactive {
+				cursor: default;
+			}
 		}
 
 		.edit-site-library__footer,

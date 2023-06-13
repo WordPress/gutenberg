@@ -36,7 +36,6 @@ import Sidebar from '../sidebar';
 import Editor from '../editor';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import getIsLibraryPage from '../../utils/get-is-library-page';
 import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -66,9 +65,8 @@ export default function Layout() {
 
 	const hubRef = useRef();
 	const { params } = useLocation();
-	const isLibraryPage = getIsLibraryPage( params );
 	const isListPage = getIsListPage( params );
-	const isEditorPage = ! isListPage && ! isLibraryPage;
+	const isEditorPage = ! isListPage;
 	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
 		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
@@ -95,14 +93,14 @@ export default function Layout() {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const showSidebar =
-		( isMobileViewport && isEditorPage ) ||
+		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
 		! isMobileViewport ||
 		! isEditorPage;
 	const isFullCanvas =
-		( isMobileViewport && ! isEditorPage ) || ( isEditorPage && isEditing );
+		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
