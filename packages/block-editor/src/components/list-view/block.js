@@ -345,7 +345,7 @@ function ListViewBlock( {
 						<BlockSettingsMenu
 							clientIds={ dropdownClientIds }
 							block={ block }
-							icon={ moreVertical }
+							icon={ moreVertical } // can be probably removed?
 							label={ settingsAriaLabel }
 							toggleProps={ {
 								ref,

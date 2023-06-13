@@ -166,7 +166,15 @@ export function BlockSettingsDropdown( {
 	children,
 	__unstableDisplayLocation,
 	toggleProps,
-	// Investigate which props are usually forwarded to this component
+	label,
+	icon,
+	disableOpenOnArrowDown,
+	// Unused (avoid forwarding with rest props)
+	block,
+	expand,
+	expandedState,
+	setInsertedBlock,
+	// Rest props
 	...props
 } ) {
 	const blockClientIds = Array.isArray( clientIds )
@@ -323,9 +331,18 @@ export function BlockSettingsDropdown( {
 					trigger={
 						<Button
 							{ ...toggleProps }
+							onKeyDown={ ( event ) => {
+								if (
+									disableOpenOnArrowDown &&
+									event.key === 'ArrowDown'
+								) {
+									event.preventDefault();
+								}
+								toggleProps?.onKeyDown?.( event );
+							} }
 							__next40pxDefaultSize
-							label={ __( 'Options' ) }
-							icon={ moreVertical }
+							label={ label ?? __( 'Options' ) }
+							icon={ icon ?? moreVertical }
 						/>
 					}
 					align="start"
