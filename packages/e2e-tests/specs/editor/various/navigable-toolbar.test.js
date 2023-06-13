@@ -49,22 +49,4 @@ describe( 'Block Toolbar', () => {
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 	} );
-
-	describe( 'Unified Toolbar', () => {
-		beforeEach( async () => {
-			// Enable unified toolbar
-			await page.evaluate( () => {
-				const { select, dispatch } = wp.data;
-				const isCurrentlyUnified =
-					select( 'core/edit-post' ).isFeatureActive(
-						'fixedToolbar'
-					);
-				if ( ! isCurrentlyUnified ) {
-					dispatch( 'core/edit-post' ).toggleFeature(
-						'fixedToolbar'
-					);
-				}
-			} );
-		} );
-	} );
 } );
