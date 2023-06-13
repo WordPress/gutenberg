@@ -19,12 +19,16 @@ function render_block_core_categories( $attributes ) {
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
-		'taxonomy'     => isset( $attributes['taxonomy'] ) ? $attributes['taxonomy'] : 'category',
 		'orderby'      => 'name',
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
+	
+	if( isset( $attributes['taxonomy'] ) ){
+		$args['taxonomy'] = $attributes['taxonomy'];
+	}
+	
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;
 	}
