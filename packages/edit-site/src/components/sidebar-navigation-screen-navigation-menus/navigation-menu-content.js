@@ -10,7 +10,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { VisuallyHidden } from '@wordpress/components';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -38,8 +38,7 @@ const PAGES_QUERY = [
 ];
 
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
-	const [ isLoading, setIsLoading ] = useState( true );
-	const { shouldKeepLoading, isSinglePageList, pageListClientId } = useSelect(
+	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const { areInnerBlocksControlled, getBlockName, getBlockOrder } =
 				select( blockEditorStore );
@@ -55,40 +54,20 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 				PAGES_QUERY
 			);
 			return {
-				pageListClientId: hasOnlyPageListBlock
+				listViewRootClientId: hasOnlyPageListBlock
 					? blockClientIds[ 0 ]
-					: undefined,
+					: rootClientId,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
-				shouldKeepLoading:
+				isLoading:
 					! areInnerBlocksControlled( rootClientId ) ||
 					isLoadingPages,
-				isSinglePageList: hasOnlyPageListBlock && ! isLoadingPages,
 			};
 		},
 		[ rootClientId ]
 	);
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	// Delay loading stop by 50ms to avoid flickering.
-	useEffect( () => {
-		let timeoutId;
-		if ( shouldKeepLoading && ! isLoading ) {
-			setIsLoading( true );
-		}
-		if ( ! shouldKeepLoading && isLoading ) {
-			timeoutId = setTimeout( () => {
-				setIsLoading( false );
-				timeoutId = undefined;
-			}, 50 );
-		}
-		return () => {
-			if ( timeoutId ) {
-				clearTimeout( timeoutId );
-			}
-		};
-	}, [ shouldKeepLoading, isLoading ] );
 
 	const offCanvasOnselect = useCallback(
 		( block ) => {
@@ -114,9 +93,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		<>
 			{ ! isLoading && (
 				<PrivateListView
-					rootClientId={
-						isSinglePageList ? pageListClientId : rootClientId
-					}
+					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
