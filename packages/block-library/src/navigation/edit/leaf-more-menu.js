@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -14,12 +19,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 
 const POPOVER_PROPS = {
-	// This was using the same class of the block settings dropdown:
-	// - check if there are no common components that were supposed to be rendered
-	//   in both menus
-	// - should this dropdown be refactored too?
-	// - should we restore the deleted styles, otherwise?
-	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
 
@@ -97,6 +96,7 @@ function AddSubmenuItem( {
 }
 
 export default function LeafMoreMenu( props ) {
+	// TODO: consider if this menu can be refactored later
 	const { block } = props;
 	const { clientId } = block;
 
@@ -122,11 +122,16 @@ export default function LeafMoreMenu( props ) {
 		<DropdownMenu
 			icon={ moreVertical }
 			label={ __( 'Options' ) }
-			// Same for this class
-			className="block-editor-block-settings-menu"
 			popoverProps={ POPOVER_PROPS }
 			noIcons
 			{ ...props }
+			toggleProps={ {
+				...props.toggleProps,
+				className: classnames(
+					'block-library-navigation-leaf-more-menu__trigger',
+					props.toggleProps?.className
+				),
+			} }
 		>
 			{ ( { onClose } ) => (
 				<>

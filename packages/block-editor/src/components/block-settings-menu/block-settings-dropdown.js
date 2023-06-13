@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -331,6 +336,10 @@ export function BlockSettingsDropdown( {
 					trigger={
 						<Button
 							{ ...toggleProps }
+							className={ classnames(
+								'block-editor-block-settings-menu__trigger',
+								toggleProps?.className
+							) }
 							onKeyDown={ ( event ) => {
 								if (
 									disableOpenOnArrowDown &&
