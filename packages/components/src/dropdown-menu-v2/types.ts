@@ -61,7 +61,7 @@ export type DropdownMenuProps = {
 	 * The contents of the dropdown
 	 */
 	children: React.ReactNode;
-};
+} & Pick< DropdownMenuPrimitive.DropdownMenuContentProps, 'onKeyDown' >;
 
 export type DropdownSubMenuTriggerProps = {
 	/**

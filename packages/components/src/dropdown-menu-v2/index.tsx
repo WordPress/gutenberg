@@ -62,6 +62,8 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 		sideOffset = 0,
 		align = 'center',
 		alignOffset = 0,
+		// Other content props
+		onKeyDown,
 		// Render props
 		children,
 		trigger,
@@ -104,6 +106,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 					alignOffset={ alignOffset }
 					loop={ true }
 					variant={ variant }
+					onKeyDown={ onKeyDown }
 				>
 					<DropdownMenuPrivateContext.Provider
 						value={ privateContextValue }
