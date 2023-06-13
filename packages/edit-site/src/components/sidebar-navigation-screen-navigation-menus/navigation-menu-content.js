@@ -40,21 +40,30 @@ const PAGES_QUERY = [
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
-			const { areInnerBlocksControlled, getBlockName, getBlockOrder } =
-				select( blockEditorStore );
+			const {
+				areInnerBlocksControlled,
+				getBlockName,
+				getBlockCount,
+				getBlockOrder,
+			} = select( blockEditorStore );
 			const { isResolving } = select( coreStore );
 
 			const blockClientIds = getBlockOrder( rootClientId );
+
 			const hasOnlyPageListBlock =
 				blockClientIds.length === 1 &&
 				getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
+			const pageListHasBlocks =
+				hasOnlyPageListBlock &&
+				getBlockCount( blockClientIds[ 0 ] ) > 0;
 
 			const isLoadingPages = isResolving(
 				'getEntityRecords',
 				PAGES_QUERY
 			);
+
 			return {
-				listViewRootClientId: hasOnlyPageListBlock
+				listViewRootClientId: pageListHasBlocks
 					? blockClientIds[ 0 ]
 					: rootClientId,
 				// This is a small hack to wait for the navigation block
