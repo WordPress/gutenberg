@@ -34,6 +34,7 @@ import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
+import ChangeStatus from '../change-status';
 
 export default function SidebarNavigationScreenPage() {
 	const navigator = useNavigator();
@@ -95,12 +96,15 @@ export default function SidebarNavigationScreenPage() {
 				</>
 			}
 			meta={
-				<ExternalLink
-					className="edit-site-sidebar-navigation-screen__page-link"
-					href={ record.link }
-				>
-					{ record.link.replace( /^(https?:\/\/)?/, '' ) }
-				</ExternalLink>
+				<VStack>
+					<ExternalLink
+						className="edit-site-sidebar-navigation-screen__page-link"
+						href={ record.link }
+					>
+						{ record.link.replace( /^(https?:\/\/)?/, '' ) }
+					</ExternalLink>
+					<ChangeStatus post={ record } />
+				</VStack>
 			}
 			content={
 				<>
