@@ -18,7 +18,9 @@ test.describe( 'Iframed block', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		await expect(
-			page.locator( 'role=document[name="Block: Iframed Block"i]' )
+			editor.canvas.locator(
+				'role=document[name="Block: Iframed Block"i]'
+			)
 		).toContainText( 'Iframed Block (set with jQuery)' );
 
 		// open page from sidebar settings

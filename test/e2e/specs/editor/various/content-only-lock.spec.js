@@ -23,8 +23,8 @@ test.describe( 'Content-only lock', () => {
         <!-- /wp:paragraph --></div>
         <!-- /wp:group -->` );
 		await pageUtils.pressKeys( 'secondary+M' );
-
-		await page.click( 'role=document[name="Paragraph block"i]' );
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await editor.canvas.click( 'role=document[name="Paragraph block"i]' );
 		await page.keyboard.type( ' World' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

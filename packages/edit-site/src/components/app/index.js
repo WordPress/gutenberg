@@ -15,7 +15,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 

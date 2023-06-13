@@ -230,7 +230,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
  */
 add_filter(
 	'mime_types',
-	function( $mime_types ) {
+	static function( $mime_types ) {
 		// Webfonts formats.
 		$mime_types['woff2'] = 'font/woff2';
 		$mime_types['woff']  = 'font/woff';

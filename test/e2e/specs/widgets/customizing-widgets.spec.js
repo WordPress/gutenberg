@@ -36,7 +36,11 @@ test.describe( 'Widgets Customizer', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
+	test( 'should add blocks', async ( {
+		page,
+		widgetsCustomizerPage,
+		editor,
+	} ) => {
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 
 		await widgetsCustomizerPage.visitCustomizerPage();
@@ -82,7 +86,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.click( 'role=option[name="Search"i]' );
 
-		await page.focus(
+		await editor.canvas.focus(
 			'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
 		);
 
@@ -229,6 +233,7 @@ test.describe( 'Widgets Customizer', () => {
 		page,
 		requestUtils,
 		widgetsCustomizerPage,
+		editor,
 	} ) => {
 		await requestUtils.addWidgetBlock(
 			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
@@ -277,7 +282,7 @@ test.describe( 'Widgets Customizer', () => {
 		await headingWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editHeadingWidget.click();
 
-		const headingBlock = page.locator(
+		const headingBlock = editor.canvas.locator(
 			'role=document[name="Block: Heading"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
@@ -583,12 +588,13 @@ test.describe( 'Widgets Customizer', () => {
 	test( 'preserves content in the Custom HTML block', async ( {
 		page,
 		widgetsCustomizerPage,
+		editor,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = page.locator(
+		const HTMLBlockTextarea = editor.canvas.locator(
 			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
 		);
 		await HTMLBlockTextarea.type( 'hello' );

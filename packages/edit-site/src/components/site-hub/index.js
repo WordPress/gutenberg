@@ -20,16 +20,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { store as commandsStore } from '@wordpress/commands';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
-import { unlock } from '../../private-apis';
-
-const { store: commandsStore } = unlock( commandsPrivateApis );
+import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
@@ -158,14 +156,18 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							{ decodeEntities( siteTitle ) }
 						</motion.div>
 					</AnimatePresence>
-					<Button
-						href={ homeUrl }
-						target="_blank"
-						label={ __( 'View site' ) }
-						aria-label={ __( 'View site (opens in a new tab)' ) }
-						icon={ external }
-						className="edit-site-site-hub__site-view-link"
-					/>
+					{ canvasMode === 'view' && (
+						<Button
+							href={ homeUrl }
+							target="_blank"
+							label={ __( 'View site' ) }
+							aria-label={ __(
+								'View site (opens in a new tab)'
+							) }
+							icon={ external }
+							className="edit-site-site-hub__site-view-link"
+						/>
+					) }
 				</HStack>
 				{ canvasMode === 'view' && (
 					<Button
