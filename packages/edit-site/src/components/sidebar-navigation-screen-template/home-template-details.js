@@ -23,7 +23,7 @@ import {
 	SidebarNavigationScreenDetailsPanel,
 	SidebarNavigationScreenDetailsPanelRow,
 } from '../sidebar-navigation-screen-details-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
