@@ -147,7 +147,10 @@ export type DropdownMenuItemProps = {
 	 * The contents of the item's suffix
 	 */
 	suffix?: React.ReactNode;
-};
+} & Pick<
+	DropdownMenuPrimitive.DropdownMenuItemProps,
+	'onClick' | 'onMouseEnter' | 'onMouseMove' | 'onMouseLeave'
+>;
 
 export type DropdownMenuCheckboxItemProps = {
 	/**
