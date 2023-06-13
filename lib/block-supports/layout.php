@@ -266,11 +266,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
 				);
-			} else {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'align-items' => 'flex-start' ),
-				);
 			}
 			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
