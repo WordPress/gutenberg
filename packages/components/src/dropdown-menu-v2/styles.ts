@@ -75,6 +75,8 @@ const baseContent = (
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 	will-change: transform, opacity;
+	/* Following z-index('.components-popover'), as per base styles */
+	z-index: 1000000;
 
 	&[data-side='top'] {
 		animation-name: ${ slideDownAndFade };
