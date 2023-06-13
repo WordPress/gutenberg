@@ -121,7 +121,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['home'] = array(
 			'title'       => _x( 'Blog page', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays the latest posts as either the site homepage or a custom page defined under reading settings. If it exists, the Front Page template overrides this template when posts are shown on the front page.',
+				'Displays the latest posts as either the site homepage or a custom page defined under reading settings. If it exists, the Homepage template overrides this template when posts are shown on the homepage.',
 				'gutenberg'
 			),
 		);
@@ -130,7 +130,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['front-page'] = array(
 			'title'       => _x( 'Homepage', 'Template name', 'gutenberg' ),
 			'description' => __(
-				"Displays your site's front page, whether it is set to display latest posts or a static page. The Front Page template takes precedence over all templates.",
+				"Displays your site's homepage, whether it is set to display latest posts or a static page. The Homepage template takes precedence over all templates.",
 				'gutenberg'
 			),
 		);
