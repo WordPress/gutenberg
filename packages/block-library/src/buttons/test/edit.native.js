@@ -8,6 +8,7 @@ import {
 	within,
 	getBlock,
 	initializeEditor,
+	render,
 	triggerBlockListLayout,
 	typeInRichText,
 	waitFor,
@@ -18,6 +19,12 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { Button } from '@wordpress/components';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -34,6 +41,10 @@ afterAll( () => {
 		unregisterBlockType( block.name );
 	} );
 } );
+
+const getTestComponentWithContent = () => {
+	return render( <Button /> );
+};
 
 describe( 'Buttons block', () => {
 	describe( 'when a button is shown', () => {
@@ -231,6 +242,45 @@ describe( 'Buttons block', () => {
 				fireEvent.press( deleteButton );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
+			} );
+
+			it( 'removes the button and buttons block when deleting the block using the delete (backspace) key', async () => {
+				const screen = await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
+
+				// Get block
+				const buttonsBlock = await getBlock( screen, 'Buttons' );
+
+				// Trigger inner blocks layout
+				const innerBlockListWrapper = await within(
+					buttonsBlock
+				).findByTestId( 'block-list-wrapper' );
+				fireEvent( innerBlockListWrapper, 'layout', {
+					nativeEvent: {
+						layout: {
+							width: 300,
+						},
+					},
+				} );
+
+				// Get inner button block
+				const buttonBlock = await getBlock( screen, 'Button' );
+				fireEvent.press( buttonBlock );
+
+				// Delete block
+				fireEvent( buttonBlock, 'onKeyDown', {
+					nativeEvent: {},
+					preventDefault() {},
+					keyCode: BACKSPACE,
+				} );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+
+				const component = getTestComponentWithContent();
+
+				const rendered = component.toJSON();
+				expect( rendered ).toMatchSnapshot();
 			} );
 		} );
 	} );

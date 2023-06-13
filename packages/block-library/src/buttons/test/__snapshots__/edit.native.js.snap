@@ -71,3 +71,60 @@ exports[`Buttons block when a button is shown removing button along with buttons
 <p></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the delete (backspace) key 1`] = `
+"<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the delete (backspace) key 2`] = `
+<View
+  accessibilityRole="button"
+  accessible={true}
+  collapsable={false}
+  focusable={false}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "alignItems": "center",
+      "flex": 1,
+      "justifyContent": "center",
+      "opacity": 1,
+      "padding": 3,
+    }
+  }
+>
+  <View
+    collapsable={false}
+    handlerTag={161}
+    handlerType="LongPressGestureHandler"
+    onGestureHandlerEvent={[Function]}
+    onGestureHandlerStateChange={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "aspectRatio": 1,
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "row",
+        }
+      }
+    />
+  </View>
+</View>
+`;

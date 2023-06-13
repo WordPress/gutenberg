@@ -327,7 +327,7 @@ function ButtonEdit( props ) {
 	function onRemove() {
 		const { onDeleteBlock, onReplace } = props;
 
-		if ( numOfButtons === 1 ) {
+		if ( numOfButtons === 1 && onDeleteBlock ) {
 			onDeleteBlock();
 		} else {
 			onReplace( [] );
