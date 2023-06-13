@@ -9,7 +9,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { default as GlobalStylesUIComponent } from '../ui';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 
 const { GlobalStylesContext, ExperimentalBlockEditorProvider } = unlock(
 	blockEditorPrivateApis

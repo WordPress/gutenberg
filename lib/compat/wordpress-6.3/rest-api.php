@@ -6,15 +6,6 @@
  */
 
 /**
- * Registers the block pattern directory.
- */
-function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_3();
-	$pattern_directory_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
-
-/**
  * Updates `wp_template` and `wp_template_part` post types to use
  * Gutenberg's REST controllers
  *

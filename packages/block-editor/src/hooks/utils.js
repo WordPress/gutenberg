@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,12 +30,13 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( object )
-			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
-			.filter( ( [ , value ] ) => value !== undefined )
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
+
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: Object.fromEntries( cleanedNestedObjects );
 };
 
 export function transformStyles(

@@ -1,1 +1,1 @@
-export const directivePrefix = 'data-wp-';
+export const directivePrefix = 'wp';
