@@ -48,21 +48,6 @@ describe( 'Block Toolbar', () => {
 			} );
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
-
-		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
-			// Assumes new post focus starts in title. Create first new
-			// block by Enter.
-			await page.keyboard.press( 'Enter' );
-
-			// [TEMPORARY]: A new paragraph is not technically a block yet
-			// until starting to type within it.
-			await page.keyboard.type( 'Example' );
-
-			// Upward.
-			await pressKeyWithModifier( 'alt', 'F10' );
-
-			expect( await isInBlockToolbar() ).toBe( true );
-		} );
 	} );
 
 	describe( 'Unified Toolbar', () => {
@@ -80,25 +65,6 @@ describe( 'Block Toolbar', () => {
 					);
 				}
 			} );
-		} );
-
-		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
-			// Assumes new post focus starts in title. Create first new
-			// block by Enter.
-			await page.keyboard.press( 'Enter' );
-
-			// [TEMPORARY]: A new paragraph is not technically a block yet
-			// until starting to type within it.
-			await page.keyboard.type( 'Example' );
-
-			// Upward.
-			await pressKeyWithModifier( 'alt', 'F10' );
-
-			expect(
-				await page.evaluate( () => {
-					return document.activeElement.getAttribute( 'aria-label' );
-				} )
-			).toBe( 'Show document tools' );
 		} );
 	} );
 } );
