@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import path from 'path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
 
@@ -11,8 +10,6 @@ import type { FullConfig } from '@playwright/test';
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 async function globalSetup( config: FullConfig ) {
-	process.env.WP_ARTIFACTS_PATH ??= path.join( process.cwd(), 'artifacts' );
-
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
 		typeof storageState === 'string' ? storageState : undefined;

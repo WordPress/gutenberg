@@ -6,12 +6,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
 
-process.env.WP_ARTIFACTS_PATH ??= path.join( process.cwd(), 'artifacts' );
-process.env.STORAGE_STATE_PATH ??= path.join(
-	process.env.WP_ARTIFACTS_PATH,
-	'storage-states/admin.json'
-);
-process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
+const STORAGE_STATE_PATH =
+	process.env.STORAGE_STATE_PATH ||
+	path.join( process.cwd(), 'artifacts/storage-states/admin.json' );
 
 const config = defineConfig( {
 	reporter: process.env.CI
@@ -24,8 +21,7 @@ const config = defineConfig( {
 	// Don't report slow test "files", as we will be running our tests in serial.
 	reportSlowTests: null,
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
-	testIgnore: '**/performance/**',
-	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
+	outputDir: path.join( process.cwd(), 'artifacts/test-results' ),
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
 	globalSetup: fileURLToPath(
@@ -44,7 +40,7 @@ const config = defineConfig( {
 			reducedMotion: 'reduce',
 			strictSelectors: true,
 		},
-		storageState: process.env.STORAGE_STATE_PATH,
+		storageState: STORAGE_STATE_PATH,
 		actionTimeout: 10_000, // 10 seconds.
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
