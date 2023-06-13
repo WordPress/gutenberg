@@ -78,7 +78,7 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726
+/test/e2e                                       @kevin940726 @Mamaduka
 
 # UI Components
 /packages/components                            @ajitbohra
