@@ -28,7 +28,7 @@ import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import CreateNewPostLink from './create-new-post-link';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
