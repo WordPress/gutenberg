@@ -2,7 +2,7 @@
  * External dependencies
  */
 import {
-	changeTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	measurePerformance,
 	screen,
@@ -24,7 +24,7 @@ describe( 'RichText Performance', () => {
 
 			fireEvent( richTextInput, 'focus' );
 
-			changeTextOfRichText(
+			typeInRichText(
 				richTextInput,
 				'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> text'
 			);

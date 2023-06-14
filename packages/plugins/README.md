@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPPlugin`: Plugin setting.
+-   `WPPlugin | undefined`: Plugin setting.
 
 #### getPlugins
 
@@ -34,7 +34,7 @@ Returns all registered plugins without a scope or for a given scope.
 
 _Parameters_
 
--   _scope_ `[string]`: The scope to be used when rendering inside a plugin area. No scope by default.
+-   _scope_ `string`: The scope to be used when rendering inside a plugin area. No scope by default.
 
 _Returns_
 
@@ -70,9 +70,9 @@ const Layout = () => (
 
 _Parameters_
 
--   _props_ `Object`:
--   _props.scope_ `string|undefined`:
--   _props.onError_ `Function|undefined`:
+-   _props_ `{ scope?: string; onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void; }`:
+-   _props.scope_ `string`:
+-   _props.onError_ `( name: WPPlugin[ 'name' ], error: Error ) => void`:
 
 _Returns_
 
@@ -147,12 +147,12 @@ registerPlugin( 'plugin-name', {
 
 _Parameters_
 
--   _name_ `string`: A string identifying the plugin.Must be unique across all registered plugins.
--   _settings_ `Omit<WPPlugin, 'name'>`: The settings for this plugin.
+-   _name_ `string`: A string identifying the plugin. Must be unique across all registered plugins.
+-   _settings_ `PluginSettings`: The settings for this plugin.
 
 _Returns_
 
--   `WPPlugin`: The final plugin settings object.
+-   `PluginSettings | null`: The final plugin settings object.
 
 #### unregisterPlugin
 
@@ -188,7 +188,7 @@ A Higher Order Component used to inject Plugin context to the wrapped component.
 
 _Parameters_
 
--   _mapContextToProps_ `Function`: Function called on every context change, expected to return object of props to merge with the component's own props.
+-   _mapContextToProps_ `( context: PluginContext, props: T ) => T & PluginContext`: Function called on every context change, expected to return object of props to merge with the component's own props.
 
 _Returns_
 

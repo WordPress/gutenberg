@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
@@ -84,6 +84,9 @@
 	},
 	"supports": {
 		"anchor": true,
+		"behaviors": {
+			"lightbox": true
+		},
 		"color": {
 			"text": false,
 			"background": false
@@ -104,7 +107,7 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area",
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
 		"filter": {
 			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}

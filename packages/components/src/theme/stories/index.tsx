@@ -103,7 +103,7 @@ export const ColorScheme: ComponentStory< typeof Theme > = ( {
 	);
 };
 ColorScheme.args = {
-	accent: '#007cba',
+	accent: '#3858e9',
 	background: '#fff',
 };
 ColorScheme.argTypes = {

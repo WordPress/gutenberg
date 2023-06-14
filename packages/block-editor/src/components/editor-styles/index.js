@@ -68,29 +68,33 @@ function useDarkThemeBodyClassName( styles ) {
 }
 
 export default function EditorStyles( { styles } ) {
+	const stylesArray = useMemo(
+		() => Object.values( styles ?? [] ),
+		[ styles ]
+	);
 	const transformedStyles = useMemo(
 		() =>
 			transformStyles(
-				styles.filter( ( style ) => style?.css ),
+				stylesArray.filter( ( style ) => style?.css ),
 				EDITOR_STYLES_SELECTOR
 			),
-		[ styles ]
+		[ stylesArray ]
 	);
 
 	const transformedSvgs = useMemo(
 		() =>
-			styles
+			stylesArray
 				.filter( ( style ) => style.__unstableType === 'svgs' )
 				.map( ( style ) => style.assets )
 				.join( '' ),
-		[ styles ]
+		[ stylesArray ]
 	);
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( styles ) } />
+			<style ref={ useDarkThemeBodyClassName( stylesArray ) } />
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }

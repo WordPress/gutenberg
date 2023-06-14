@@ -16,13 +16,13 @@ import {
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import {
 	BlockControls,
+	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
@@ -34,7 +34,9 @@ import {
 } from '../components/duotone';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { store as blockEditorStore } from '../store';
+import { useBlockSettings } from './utils';
+import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const EMPTY_ARRAY = [];
 
@@ -106,9 +108,10 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanel( { attributes, setAttributes } ) {
+function DuotonePanel( { attributes, setAttributes, name } ) {
 	const style = attributes?.style;
 	const duotoneStyle = style?.color?.duotone;
+	const settings = useBlockSettings( name );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -132,30 +135,48 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		: duotoneStyle;
 
 	return (
-		<BlockControls group="block" __experimentalShareWithChildBlocks>
-			<DuotoneControl
-				duotonePalette={ duotonePalette }
-				colorPalette={ colorPalette }
-				disableCustomDuotone={ disableCustomDuotone }
-				disableCustomColors={ disableCustomColors }
-				value={ duotonePresetOrColors }
-				onChange={ ( newDuotone ) => {
-					const maybePreset = getDuotonePresetFromColors(
-						newDuotone,
-						duotonePalette
-					);
+		<>
+			<InspectorControls group="filter">
+				<StylesFiltersPanel
+					value={ { filter: { duotone: duotonePresetOrColors } } }
+					onChange={ ( newDuotone ) => {
+						const newStyle = {
+							...style,
+							color: {
+								...newDuotone?.filter,
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+					settings={ settings }
+				/>
+			</InspectorControls>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DuotoneControl
+					duotonePalette={ duotonePalette }
+					colorPalette={ colorPalette }
+					disableCustomDuotone={ disableCustomDuotone }
+					disableCustomColors={ disableCustomColors }
+					value={ duotonePresetOrColors }
+					onChange={ ( newDuotone ) => {
+						const maybePreset = getDuotonePresetFromColors(
+							newDuotone,
+							duotonePalette
+						);
 
-					const newStyle = {
-						...style,
-						color: {
-							...style?.color,
-							duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
-						},
-					};
-					setAttributes( { style: newStyle } );
-				} }
-			/>
-		</BlockControls>
+						const newStyle = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+					settings={ settings }
+				/>
+			</BlockControls>
+		</>
 	);
 }
 
@@ -204,14 +225,7 @@ const withDuotoneControls = createHigherOrderComponent(
 			'filter.duotone'
 		);
 
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
+		const blockEditingMode = useBlockEditingMode();
 
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
@@ -219,7 +233,7 @@ const withDuotoneControls = createHigherOrderComponent(
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && ! isContentLocked && (
+				{ hasDuotoneSupport && blockEditingMode === 'default' && (
 					<DuotonePanel { ...props } />
 				) }
 				<BlockEdit { ...props } />

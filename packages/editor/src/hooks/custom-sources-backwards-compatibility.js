@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -87,7 +82,7 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 									] )
 							);
 
-							if ( ! isEmpty( nextMeta ) ) {
+							if ( Object.entries( nextMeta ).length ) {
 								setMeta( nextMeta );
 							}
 
@@ -115,7 +110,7 @@ function shimAttributeSource( settings ) {
 			.filter( ( [ , { source } ] ) => source === 'meta' )
 			.map( ( [ attributeKey, { meta } ] ) => [ attributeKey, meta ] )
 	);
-	if ( ! isEmpty( metaAttributes ) ) {
+	if ( Object.entries( metaAttributes ).length ) {
 		settings.edit = createWithMetaAttributeSource( metaAttributes )(
 			settings.edit
 		);

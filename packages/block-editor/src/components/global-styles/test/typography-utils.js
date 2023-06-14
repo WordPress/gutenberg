@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from '../typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../typography-utils';
 
 describe( 'typography utils', () => {
 	describe( 'getTypographyFontSizeValue', () => {
@@ -89,11 +92,11 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(1.313rem, 1.313rem + ((1vw - 0.48rem) * 0.84), 1.75rem)',
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 0.789), 1.75rem)',
 			},
 
 			{
-				message: 'should return clamp value with eem min and max units',
+				message: 'should return clamp value with em min and max units',
 				preset: {
 					size: '1.75em',
 				},
@@ -101,19 +104,19 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(1.313em, 1.313rem + ((1vw - 0.48em) * 0.84), 1.75em)',
+					'clamp(1.119em, 1.119rem + ((1vw - 0.2em) * 0.789), 1.75em)',
 			},
 
 			{
 				message: 'should return clamp value for floats',
 				preset: {
-					size: '100.175px',
+					size: '70.175px',
 				},
 				typographySettings: {
 					fluid: true,
 				},
 				expected:
-					'clamp(75.131px, 4.696rem + ((1vw - 7.68px) * 3.01), 100.175px)',
+					'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			},
 
 			{
@@ -127,20 +130,20 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(24.75px, 1.547rem + ((1vw - 7.68px) * 0.992), 33px)',
+					'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
 			},
 
 			{
 				message: 'should coerce float to `px` and returns clamp value',
 				preset: {
-					size: 100.23,
+					size: 70.175,
 					fluid: true,
 				},
 				typographySettings: {
 					fluid: true,
 				},
 				expected:
-					'clamp(75.173px, 4.698rem + ((1vw - 7.68px) * 3.012), 100.23px)',
+					'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			},
 
 			{
@@ -154,7 +157,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(21px, 1.313rem + ((1vw - 7.68px) * 0.841), 28px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			},
 
 			{
@@ -167,7 +170,59 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(21px, 1.313rem + ((1vw - 7.68px) * 0.841), 28px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+			},
+
+			{
+				message:
+					'returns clamp value where min and max fluid values defined',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+			},
+
+			{
+				message:
+					'should apply maxViewPortWidth as maximum viewport width',
+				preset: {
+					size: '80px',
+					fluid: {
+						min: '70px',
+						max: '125px',
+					},
+				},
+				typographySettings: {
+					fluid: {
+						maxViewPortWidth: '1100px',
+					},
+				},
+				expected:
+					'clamp(70px, 4.375rem + ((1vw - 3.2px) * 7.051), 125px)',
+			},
+
+			{
+				message: 'returns clamp value where max is equal to size',
+				preset: {
+					size: '7.8125rem',
+					fluid: {
+						min: '4.375rem',
+						max: '7.8125rem',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
 			},
 
 			{
@@ -183,8 +238,7 @@ describe( 'typography utils', () => {
 				typographySettings: {
 					fluid: true,
 				},
-				expected:
-					'clamp(5rem, 5rem + ((1vw - 0.48rem) * -5.769), 32px)',
+				expected: 'clamp(5rem, 5rem + ((1vw - 0.2rem) * -3.75), 32px)',
 			},
 
 			{
@@ -240,14 +294,14 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(20px, 1.25rem + ((1vw - 7.68px) * 93.75), 50rem)',
+					'clamp(20px, 1.25rem + ((1vw - 3.2px) * 60.938), 50rem)',
 			},
 
 			{
 				message:
 					'should return clamp value where no fluid max size is set',
 				preset: {
-					size: '28px',
+					size: '50px',
 					fluid: {
 						min: '2.6rem',
 					},
@@ -256,7 +310,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(2.6rem, 2.6rem + ((1vw - 0.48rem) * -1.635), 28px)',
+					'clamp(2.6rem, 2.6rem + ((1vw - 0.2rem) * 0.656), 50px)',
 			},
 
 			{
@@ -272,7 +326,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(21px, 1.313rem + ((1vw - 7.68px) * 7.091), 80px)',
+					'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 4.851), 80px)',
 			},
 
 			{
@@ -289,7 +343,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(0.5rem, 0.5rem + ((1vw - 0.48rem) * 8.654), 5rem)',
+					'clamp(0.5rem, 0.5rem + ((1vw - 0.2rem) * 5.625), 5rem)',
 			},
 
 			{
@@ -305,7 +359,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(12px, 0.75rem + ((1vw - 7.68px) * 0.962), 20px)',
+					'clamp(12px, 0.75rem + ((1vw - 3.2px) * 0.625), 20px)',
 			},
 
 			{
@@ -321,7 +375,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 36.779), 20rem)',
+					'clamp(0.875rem, 0.875rem + ((1vw - 0.2rem) * 23.906), 20rem)',
 			},
 
 			{
@@ -337,7 +391,7 @@ describe( 'typography utils', () => {
 				typographySettings: {
 					fluid: true,
 				},
-				expected: 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
+				expected: 'clamp(30px, 1.875rem + ((1vw - 3.2px) * 1), 30px)',
 			},
 
 			{
@@ -352,7 +406,7 @@ describe( 'typography utils', () => {
 					},
 				},
 				expected:
-					'clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px)',
+					'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.078), 15px)',
 			},
 
 			// Equivalent custom config PHP unit tests in `test_should_covert_font_sizes_to_fluid_values()`.
@@ -366,7 +420,7 @@ describe( 'typography utils', () => {
 						minFontSize: '16px',
 					},
 				},
-				expected: 'clamp(16px, 1rem + ((1vw - 7.68px) * 0.12), 17px)',
+				expected: 'clamp(16px, 1rem + ((1vw - 3.2px) * 0.078), 17px)',
 			},
 
 			{
@@ -382,11 +436,136 @@ describe( 'typography utils', () => {
 				},
 				expected: '15px',
 			},
+
+			{
+				message:
+					'should apply scaled min font size for em values when custom min font size is not set',
+				preset: {
+					size: '12rem',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(5.174rem, 5.174rem + ((1vw - 0.2rem) * 8.533), 12rem)',
+			},
+
+			{
+				message:
+					'should apply scaled min font size for px values when custom min font size is not set',
+				preset: {
+					size: '200px',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(85.342px, 5.334rem + ((1vw - 3.2px) * 8.958), 200px)',
+			},
+
+			{
+				message:
+					'should not apply scaled min font size for minimum font size when custom min font size is set',
+				preset: {
+					size: '200px',
+					fluid: {
+						min: '100px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `${ message }`, () => {
 				expect(
 					getTypographyFontSizeValue( preset, typographySettings )
 				).toBe( expected );
+			} );
+		} );
+	} );
+
+	describe( 'typography utils', () => {
+		[
+			{
+				message:
+					'should return `undefined` when settings is `undefined`',
+				settings: undefined,
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `undefined` when typography is `undefined`',
+				settings: {},
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `undefined` when typography.fluid is `undefined`',
+				settings: { typography: {} },
+				expected: { fluid: undefined },
+			},
+
+			{
+				message:
+					'should return `false` when typography.fluid is disabled by `false`',
+				settings: { typography: { fluid: false } },
+				expected: { fluid: false },
+			},
+
+			{
+				message: 'should return `{}` when typography.fluid is empty',
+				settings: { typography: { fluid: {} } },
+				expected: { fluid: {} },
+			},
+
+			{
+				message:
+					'should return false when typography.fluid is disabled and layout.wideSize is defined',
+				settings: {
+					typography: { fluid: false },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: { fluid: false },
+			},
+
+			{
+				message:
+					'should return true when fluid is enabled by a boolean',
+				settings: { typography: { fluid: true } },
+				expected: { fluid: true },
+			},
+
+			{
+				message:
+					'should return fluid settings with merged `layout.wideSize`d',
+				settings: {
+					typography: { fluid: { minFontSize: '16px' } },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: {
+					fluid: { maxViewPortWidth: '1000rem', minFontSize: '16px' },
+				},
+			},
+
+			{
+				message:
+					'should prioritize fluid `maxViewPortWidth` over `layout.wideSize`',
+				settings: {
+					typography: { fluid: { maxViewPortWidth: '10px' } },
+					layout: { wideSize: '1000rem' },
+				},
+				expected: { fluid: { maxViewPortWidth: '10px' } },
+			},
+		].forEach( ( { message, settings, expected } ) => {
+			it( `${ message }`, () => {
+				expect(
+					getFluidTypographyOptionsFromSettings( settings )
+				).toEqual( expected );
 			} );
 		} );
 	} );

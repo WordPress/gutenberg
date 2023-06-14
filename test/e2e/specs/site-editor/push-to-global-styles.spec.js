@@ -35,7 +35,6 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Typography styles' } ).click();
 
 		// Headings should not have uppercase
 		await expect(
@@ -82,12 +81,13 @@ test.describe( 'Push to Global Styles button', () => {
 		).toBeDisabled();
 
 		// Navigate again to Styles -> Blocks -> Heading -> Typography
-		await page.getByRole( 'button', { name: 'Styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Styles', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Typography styles' } ).click();
 
 		// Headings should now have uppercase
 		await expect(

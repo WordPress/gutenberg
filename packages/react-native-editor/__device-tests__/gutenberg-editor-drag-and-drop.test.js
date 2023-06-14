@@ -4,7 +4,6 @@
 import { blockNames } from './pages/editor-page';
 import {
 	clearClipboard,
-	clickElementOutsideOfTextInput,
 	dragAndDropAfterElement,
 	isAndroid,
 	setClipboard,
@@ -33,8 +32,10 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		const spacerBlock = await editorPage.getBlockAtPosition(
 			blockNames.spacer
 		);
-		const paragraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
+		const paragraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
 
 		// Drag & drop the Spacer block after the Paragraph block
 		await dragAndDropAfterElement(
@@ -122,7 +123,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		}
 	);
 
-	it( 'should be able to drag & drop a text-based block when the textinput is not focused', async () => {
+	it( 'should be able to drag & drop a text-based block when another textinput is focused', async () => {
 		// Initialize the editor with two Paragraph blocks
 		await editorPage.setHtmlContent(
 			[
@@ -131,16 +132,15 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			].join( '\n\n' )
 		);
 
-		// Get elements for both blocks
-		const firstParagraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 1 );
-		const secondParagraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
+		// Tap on the second block
+		const secondParagraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+		await secondParagraphBlock.click();
 
-		// Tap on the first Paragraph block outside of the textinput
-		await clickElementOutsideOfTextInput(
-			editorPage.driver,
-			firstParagraphBlock
+		const firstParagraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph
 		);
 
 		// Drag & drop the first Paragraph block after the second Paragraph block
@@ -156,8 +156,5 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 		// Expect the second Paragraph block to have the expected content
 		expect( secondBlockText ).toMatch( testData.shortText );
-
-		// Remove the block
-		await editorPage.removeBlock();
 	} );
 } );

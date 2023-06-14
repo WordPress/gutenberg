@@ -1,6 +1,6 @@
 # Edit and Save
 
-When registering a block, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
+When registering a block with JavaScript on the client, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
 
 ## Edit
 
@@ -14,7 +14,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -30,7 +30,7 @@ const blockSettings = {
 
 ```js
 var blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -58,7 +58,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -76,7 +76,7 @@ const blockSettings = {
 
 ```js
 var blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 

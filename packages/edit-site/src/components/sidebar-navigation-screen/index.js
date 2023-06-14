@@ -7,22 +7,29 @@ import {
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
+	meta,
 	content,
+	footer,
 	description,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
@@ -31,46 +38,84 @@ export default function SidebarNavigationScreen( {
 			dashboardLink: getSettings().__experimentalDashboardLink,
 		};
 	}, [] );
+	const { getTheme } = useSelect( coreStore );
+	const theme = getTheme( currentlyPreviewingTheme() );
 
 	return (
-		<VStack spacing={ 2 }>
-			<HStack
-				spacing={ 4 }
-				alignment="flex-start"
-				className="edit-site-sidebar-navigation-screen__title-icon"
+		<>
+			<VStack
+				className="edit-site-sidebar-navigation-screen__main"
+				spacing={ 0 }
+				justify="flex-start"
 			>
-				{ ! isRoot ? (
-					<NavigatorToParentButton
-						as={ SidebarButton }
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Back' ) }
-					/>
-				) : (
-					<SidebarButton
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						label={ __( 'Go back to the Dashboard' ) }
-						href={ dashboardLink || 'index.php' }
-					/>
-				) }
-				<Heading
-					className="edit-site-sidebar-navigation-screen__title"
-					color={ 'white' }
-					level={ 2 }
-					size={ 20 }
+				<HStack
+					spacing={ 4 }
+					alignment="flex-start"
+					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ title }
-				</Heading>
-				{ actions }
-			</HStack>
-
-			<nav className="edit-site-sidebar-navigation-screen__content">
-				{ description && (
-					<p className="edit-site-sidebar-navigation-screen__description">
-						{ description }
-					</p>
+					{ ! isRoot ? (
+						<NavigatorToParentButton
+							as={ SidebarButton }
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							label={ __( 'Back' ) }
+						/>
+					) : (
+						<SidebarButton
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							label={
+								! isPreviewingTheme()
+									? __( 'Go back to the Dashboard' )
+									: __( 'Go back to the theme showcase' )
+							}
+							href={
+								! isPreviewingTheme()
+									? dashboardLink || 'index.php'
+									: 'themes.php'
+							}
+						/>
+					) }
+					<Heading
+						className="edit-site-sidebar-navigation-screen__title"
+						color={ 'white' }
+						level={ 2 }
+						size={ 20 }
+					>
+						{ ! isPreviewingTheme()
+							? title
+							: sprintf(
+									'Previewing %1$s: %2$s',
+									theme?.name?.rendered,
+									title
+							  ) }
+					</Heading>
+					{ actions && (
+						<div className="edit-site-sidebar-navigation-screen__actions">
+							{ actions }
+						</div>
+					) }
+				</HStack>
+				{ meta && (
+					<>
+						<div className="edit-site-sidebar-navigation-screen__meta">
+							{ meta }
+						</div>
+					</>
 				) }
-				{ content }
-			</nav>
-		</VStack>
+
+				<div className="edit-site-sidebar-navigation-screen__content">
+					{ description && (
+						<p className="edit-site-sidebar-navigation-screen__description">
+							{ description }
+						</p>
+					) }
+					{ content }
+				</div>
+			</VStack>
+			{ footer && (
+				<footer className="edit-site-sidebar-navigation-screen__footer">
+					{ footer }
+				</footer>
+			) }
+		</>
 	);
 }

@@ -20,7 +20,6 @@ import { displayShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { store as editorStore } from '../../store';
 
 /**
@@ -107,7 +106,7 @@ export default function PostSavedState( {
 	}
 
 	if ( isPublished || isScheduled ) {
-		return <PostSwitchToDraftButton />;
+		return null;
 	}
 
 	/* translators: button label text should, if possible, be under 16 characters. */

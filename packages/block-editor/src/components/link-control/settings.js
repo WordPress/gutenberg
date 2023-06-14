@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl, VisuallyHidden } from '@wordpress/components';
+import { CheckboxControl, VisuallyHidden } from '@wordpress/components';
 
 const noop = () => {};
 
@@ -19,7 +19,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 	};
 
 	const theSettings = settings.map( ( setting ) => (
-		<ToggleControl
+		<CheckboxControl
 			__nextHasNoMarginBottom
 			className="block-editor-link-control__setting"
 			key={ setting.id }

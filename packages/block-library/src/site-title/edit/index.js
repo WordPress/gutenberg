@@ -109,7 +109,7 @@ export default function SiteTitleEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Make title link to home' ) }

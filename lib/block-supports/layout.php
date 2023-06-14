@@ -83,9 +83,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
 
 		// Make sure there is a single CSS rule, and all tags are stripped for security.
-		// TODO: Use `safecss_filter_attr` instead when the minimum required WP version is >= 6.1.
-		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
-		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
+		$all_max_width_value  = safecss_filter_attr( explode( ';', $all_max_width_value )[0] );
+		$wide_max_width_value = safecss_filter_attr( explode( ';', $wide_max_width_value )[0] );
 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
@@ -281,12 +280,19 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+		if ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
-		$layout_styles[] = array(
-			'selector'     => $selector,
-			'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
-		);
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+			);
+		}
 
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
@@ -591,7 +597,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	);
 	$updated_content = preg_replace_callback(
 		$replace_regex,
-		function( $matches ) {
+		static function( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
 		$block_content

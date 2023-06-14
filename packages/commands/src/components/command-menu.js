@@ -9,11 +9,16 @@ import { Command } from 'cmdk';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal, TextHighlight } from '@wordpress/components';
+import {
+	Modal,
+	TextHighlight,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
+import { Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,25 +31,31 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
 
+	if ( ! commands.length ) {
+		return null;
+	}
+
 	return (
 		<>
 			<Command.List>
-				{ isLoading && (
-					<Command.Loading>{ __( 'Searching…' ) }</Command.Loading>
-				) }
-
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
-						value={ command.name }
+						value={ command.searchLabel ?? command.label }
 						onSelect={ () => command.callback( { close } ) }
 					>
-						<span className="commands-command-menu__item">
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
+						<HStack
+							alignment="left"
+							className="commands-command-menu__item"
+						>
+							<Icon icon={ command.icon } />
+							<span>
+								<TextHighlight
+									text={ command.label }
+									highlight={ search }
+								/>
+							</span>
+						</HStack>
 					</Command.Item>
 				) ) }
 			</Command.List>
@@ -78,32 +89,42 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	);
 }
 
-export function CommandMenuGroup( { group, search, setLoader, close } ) {
+export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
 			return {
-				commands: getCommands( group ),
-				loaders: getCommandLoaders( group ),
+				commands: getCommands( isContextual ),
+				loaders: getCommandLoaders( isContextual ),
 			};
 		},
-		[ group ]
+		[ isContextual ]
 	);
 
+	if ( ! commands.length && ! loaders.length ) {
+		return null;
+	}
+
 	return (
-		<Command.Group heading={ group }>
+		<Command.Group>
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
-					value={ command.name }
+					value={ command.searchLabel ?? command.label }
 					onSelect={ () => command.callback( { close } ) }
 				>
-					<span className="commands-command-menu__item">
-						<TextHighlight
-							text={ command.label }
-							highlight={ search }
-						/>
-					</span>
+					<HStack
+						alignment="left"
+						className="commands-command-menu__item"
+					>
+						<Icon icon={ command.icon } />
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
 				</Command.Item>
 			) ) }
 			{ loaders.map( ( loader ) => (
@@ -122,14 +143,13 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const [ open, setOpen ] = useState( false );
-	const { groups } = useSelect( ( select ) => {
-		const { getGroups } = select( commandsStore );
-		return {
-			groups: getGroups(),
-		};
-	}, [] );
+	const isOpen = useSelect(
+		( select ) => select( commandsStore ).isOpen(),
+		[]
+	);
+	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
+	const commandMenuInput = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -147,7 +167,11 @@ export function CommandMenu() {
 		'core/commands',
 		( event ) => {
 			event.preventDefault();
-			setOpen( ( prevOpen ) => ! prevOpen );
+			if ( isOpen ) {
+				close();
+			} else {
+				open();
+			}
 		},
 		{
 			bindGlobal: true,
@@ -162,12 +186,19 @@ export function CommandMenu() {
 			} ) ),
 		[]
 	);
-	const close = () => {
+	const closeAndReset = () => {
 		setSearch( '' );
-		setOpen( false );
+		close();
 	};
 
-	if ( ! open ) {
+	useEffect( () => {
+		// Focus the command menu input when mounting the modal.
+		if ( isOpen ) {
+			commandMenuInput.current.focus();
+		}
+	}, [ isOpen ] );
+
+	if ( ! isOpen ) {
 		return false;
 	}
 	const isLoading = Object.values( loaders ).some( Boolean );
@@ -176,38 +207,38 @@ export function CommandMenu() {
 		<Modal
 			className="commands-command-menu"
 			overlayClassName="commands-command-menu__overlay"
-			onRequestClose={ close }
+			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
 				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
 						<Command.Input
-							// The input should be focused when the modal is opened.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus
+							ref={ commandMenuInput }
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ __(
-								'Search for content and templates, or try commands like "Add…"'
-							) }
+							placeholder={ __( 'Type a command or search' ) }
 						/>
 					</div>
 					<Command.List>
-						{ ! isLoading && (
+						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
-						{ groups.map( ( group ) => (
+						<CommandMenuGroup
+							search={ search }
+							setLoader={ setLoader }
+							close={ closeAndReset }
+							isContextual
+						/>
+						{ search && (
 							<CommandMenuGroup
-								key={ group }
-								group={ group }
 								search={ search }
 								setLoader={ setLoader }
-								close={ close }
+								close={ closeAndReset }
 							/>
-						) ) }
+						) }
 					</Command.List>
 				</Command>
 			</div>

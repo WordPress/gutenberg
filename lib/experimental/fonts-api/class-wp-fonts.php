@@ -16,7 +16,16 @@ if ( class_exists( 'WP_Fonts' ) ) {
  *
  * @since X.X.X
  */
-class WP_Fonts extends WP_Webfonts {
+class WP_Fonts extends WP_Dependencies {
+
+	/**
+	 * Registered "origin", indicating the font is registered in the API.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var string
+	 */
+	const REGISTERED_ORIGIN = 'gutenberg_wp_fonts_api';
 
 	/**
 	 * An array of registered providers.
@@ -731,7 +740,7 @@ class WP_Fonts extends WP_Webfonts {
 			}
 
 			$variation_obj        = $this->registered[ $variation_handle ];
-			$variation_properties = array( 'origin' => 'gutenberg_wp_fonts_api' );
+			$variation_properties = array( 'origin' => static::REGISTERED_ORIGIN );
 			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
 				$property_in_camelcase                          = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
 				$variation_properties[ $property_in_camelcase ] = $property_value;

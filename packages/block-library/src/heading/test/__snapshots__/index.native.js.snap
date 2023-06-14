@@ -5,3 +5,15 @@ exports[`Heading block inserts block 1`] = `
 <h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->"
 `;
+
+exports[`Heading block should set a background color 1`] = `
+"<!-- wp:heading {"backgroundColor":"luminous-vivid-orange"} -->
+<h2 class="wp-block-heading has-luminous-vivid-orange-background-color has-background">A quick brown fox jumps over the lazy dog.</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading block should set a text color 1`] = `
+"<!-- wp:heading {"textColor":"pale-pink"} -->
+<h2 class="wp-block-heading has-pale-pink-color has-text-color">A quick brown fox jumps over the lazy dog.</h2>
+<!-- /wp:heading -->"
+`;

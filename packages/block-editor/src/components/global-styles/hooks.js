@@ -181,11 +181,7 @@ export function useGlobalStyle(
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult =
-				// The styles.css path is allowed to be empty, so don't revert to base if undefined.
-				finalPath === 'styles.css'
-					? get( userConfig, finalPath )
-					: get( mergedConfig, finalPath );
+			rawResult = get( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;

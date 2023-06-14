@@ -1,0 +1,10 @@
+{
+	"version": 2,
+	"behaviors": {
+		"blocks": {
+			"core/image": {
+				"lightbox": true
+			}
+		}
+	}
+}

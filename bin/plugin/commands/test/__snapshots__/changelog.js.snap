@@ -5,12 +5,8 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 ### Enhancements
 
-- Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
-- Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
-
 #### Components
 - Add new ColorPicker. ([33714](https://github.com/WordPress/gutenberg/pull/33714))
-- Promote \`ItemGroup\`. ([33701](https://github.com/WordPress/gutenberg/pull/33701))
 - Update snackbar to use framer motion instead of react spring. ([33717](https://github.com/WordPress/gutenberg/pull/33717))
 - Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 
@@ -39,7 +35,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Bug Fixes
 
 - Correct \`function_exists()\` check typo introduced in #33331. ([33513](https://github.com/WordPress/gutenberg/pull/33513))
-- ESLint Plugin: Include .jsx extenstion when linting import statements. ([33746](https://github.com/WordPress/gutenberg/pull/33746))
 - Fix block appender position in classic themes. ([33895](https://github.com/WordPress/gutenberg/pull/33895))
 - Fix misspelling of "queries" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
 - Fix positioning discrepancy with draggable chip. ([33893](https://github.com/WordPress/gutenberg/pull/33893))
@@ -81,12 +76,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### Meta Boxes
 - Fix Safari 13 metaboxes from overlapping the content. ([33817](https://github.com/WordPress/gutenberg/pull/33817))
 
-#### Build Tooling
-- Readable JS assets Plugin: Fix webpack 5 support. ([33785](https://github.com/WordPress/gutenberg/pull/33785))
-
-#### Navigation Screen
-- Fix regressed menu selection dropdown placeholder value for Nav Editor menu locations UI. ([33748](https://github.com/WordPress/gutenberg/pull/33748))
-
 #### Accessibility
 - Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
 
@@ -116,6 +105,15 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Refactor the HierarchicalTermSelector so that it does not cause unnecessary loading of terms. ([33418](https://github.com/WordPress/gutenberg/pull/33418))
 
 
+### Experiments
+
+#### Navigation Screen
+- Fix regressed menu selection dropdown placeholder value for Nav Editor menu locations UI. ([33748](https://github.com/WordPress/gutenberg/pull/33748))
+
+#### Components
+- Promote \`ItemGroup\`. ([33701](https://github.com/WordPress/gutenberg/pull/33701))
+
+
 ### Documentation
 
 - Add documentation to disable remote calls for block patterns. ([33930](https://github.com/WordPress/gutenberg/pull/33930))
@@ -132,8 +130,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 
 ### Code Quality
-
-- Scripts: Fix typo in format change message. ([33945](https://github.com/WordPress/gutenberg/pull/33945))
 
 #### Components
 - Components utils: \`rtl()\` return type, \`rtl.watch()\` utility. ([33882](https://github.com/WordPress/gutenberg/pull/33882))
@@ -157,16 +153,21 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 ### Tools
 
+- ESLint Plugin: Include .jsx extenstion when linting import statements. ([33746](https://github.com/WordPress/gutenberg/pull/33746))
 - GitHub Templates: Fix spacing in bug report template. ([33761](https://github.com/WordPress/gutenberg/pull/33761))
 - GitHub Templates: Format bug report template. ([33786](https://github.com/WordPress/gutenberg/pull/33786))
+- Scripts: Fix typo in format change message. ([33945](https://github.com/WordPress/gutenberg/pull/33945))
+- Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
+- Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
 - Update bug issue template to use forms. ([33713](https://github.com/WordPress/gutenberg/pull/33713))
+
+#### Build Tooling
+- Readable JS assets Plugin: Fix webpack 5 support. ([33785](https://github.com/WordPress/gutenberg/pull/33785))
+- Scripts: Update webpack to v5 (try 2). ([33818](https://github.com/WordPress/gutenberg/pull/33818))
 
 #### Testing
 - Add search performance measure and make other measures more stable. ([33848](https://github.com/WordPress/gutenberg/pull/33848))
 - E2E: Block Hierarchy Navigation wait for the column to be highlighted. ([33721](https://github.com/WordPress/gutenberg/pull/33721))
-
-#### Build Tooling
-- Scripts: Update webpack to v5 (try 2). ([33818](https://github.com/WordPress/gutenberg/pull/33818))
 
 
 ### Various

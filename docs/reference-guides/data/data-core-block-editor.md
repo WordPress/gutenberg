@@ -168,6 +168,29 @@ _Returns_
 
 -   `Array?`: The list of allowed block types.
 
+### getBehaviors
+
+Returns the behaviors registered with the editor.
+
+Behaviors are named, reusable pieces of functionality that can be attached to blocks. They are registered with the editor using the `theme.json` file.
+
+_Usage_
+
+```js
+const behaviors = select( blockEditorStore ).getBehaviors();
+if ( behaviors?.lightbox ) {
+	// Do something with the lightbox.
+}
+```
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: The editor behaviors object.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block, containing its `blockName`, `clientId`, and current `attributes` state. This is not the block's registration settings, which must be retrieved from the blocks module registration store.
@@ -1190,6 +1213,8 @@ _Parameters_
 
 Action that inserts a single block, optionally at a specific index respective a root block list.
 
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
+
 _Parameters_
 
 -   _block_ `Object`: Block object to insert.
@@ -1205,6 +1230,8 @@ _Returns_
 ### insertBlocks
 
 Action that inserts an array of blocks, optionally at a specific index respective a root block list.
+
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
 
 _Parameters_
 

@@ -3,13 +3,14 @@
  */
 import {
 	addBlock,
+	dismissModal,
 	getBlock,
-	changeTextOfRichText,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
 	setupCoreBlocks,
+	selectRangeInRichText,
 	within,
 } from 'test/helpers';
 
@@ -79,7 +80,7 @@ describe( 'Editor History', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.'
 		);
@@ -124,10 +125,10 @@ describe( 'Editor History', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		changeAndSelectTextOfRichText(
+		typeInRichText(
 			paragraphTextInput,
 			'A quick brown fox jumps over the lazy dog.',
-			{ selectionStart: 2, selectionEnd: 7 }
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
 		// Artifical delay to create two history entries for typing and bolding.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
@@ -171,6 +172,64 @@ describe( 'Editor History', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
 		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should preserve editor history when a link has been added and configured to open in a new tab', async () => {
+		// Arrange
+		const initialHtml = `
+			<!-- wp:paragraph --><p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p><!-- /wp:paragraph -->
+		`;
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		selectRangeInRichText( paragraphTextInput, 2, 7 );
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
+
+		const newTabButton = screen.getByText( 'Open in new tab' );
+		fireEvent.press( newTabButton );
+
+		dismissModal( screen.getByTestId( 'link-settings-modal' ) );
+
+		typeInRichText(
+			paragraphTextInput,
+			' A quick brown fox jumps over the lazy dog.'
+		);
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
