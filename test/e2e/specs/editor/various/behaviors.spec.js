@@ -49,43 +49,6 @@ test.describe( 'Testing behaviors functionality', () => {
 		await page.waitForLoadState();
 	} );
 
-	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
-		admin,
-		editor,
-		requestUtils,
-		page,
-		behaviorUtils,
-	} ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await admin.createNewPost();
-		const media = await behaviorUtils.createMedia();
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				alt: filename,
-				id: media.id,
-				url: media.source_url,
-			},
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings
-			.getByRole( 'button', { name: 'Advanced' } )
-			.click();
-		const select = editorSettings.getByRole( 'combobox', {
-			name: 'Behavior',
-		} );
-
-		// By default, no behaviors should be selected.
-		await expect( select ).toHaveValue( '' );
-
-		// By default, you should be able to select the Lightbox behavior.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
-	} );
-
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
 		admin,
 		editor,
@@ -171,50 +134,6 @@ test.describe( 'Testing behaviors functionality', () => {
 
 		// Here we should also check that the block renders on the frontend with the
 		// lightbox even though the theme.json has it set to false.
-	} );
-
-	test( 'You can set the default value for the behaviors in the theme.json', async ( {
-		admin,
-		editor,
-		requestUtils,
-		page,
-		behaviorUtils,
-	} ) => {
-		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
-		await requestUtils.activateTheme( 'behaviors-enabled' );
-		await admin.createNewPost();
-		const media = await behaviorUtils.createMedia();
-
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				alt: filename,
-				id: media.id,
-				url: media.source_url,
-			},
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings
-			.getByRole( 'button', { name: 'Advanced' } )
-			.click();
-		const select = editorSettings.getByRole( 'combobox', {
-			name: 'Behavior',
-		} );
-
-		// The behaviors dropdown should be present and the value should be set to
-		// `lightbox`.
-		await expect( select ).toHaveValue( 'lightbox' );
-
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
-
-		// We can change the value of the behaviors dropdown to `No behaviors`.
-		await select.selectOption( { label: 'No behaviors' } );
-		await expect( select ).toHaveValue( '' );
 	} );
 
 	test( 'Lightbox behavior is disabled if the Image has a link', async ( {

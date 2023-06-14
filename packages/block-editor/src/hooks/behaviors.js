@@ -65,7 +65,7 @@ function BehaviorsControl( {
 	];
 
 	// If every behavior is disabled, do not show the behaviors inspector control.
-	if ( options.length === 0 ) {
+	if ( behaviorsOptions.length === 0 ) {
 		return null;
 	}
 	// Block behaviors take precedence over theme behaviors.
@@ -89,7 +89,6 @@ function BehaviorsControl( {
 		<InspectorControls group="advanced">
 			<SelectControl
 				label={ __( 'Behaviors' ) }
-				// At the moment we are only supporting one behavior (Lightbox)
 				value={ value() }
 				options={ options }
 				onChange={ onChange }
