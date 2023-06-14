@@ -78,11 +78,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$lightbox_animation = $lightbox_settings['animation'];
 
 	$z = new WP_HTML_Tag_Processor( $content );
-	$z->next_tag('img');
+	$z->next_tag( 'img' );
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
 	} else {
-		$img_src = $m->get_attribute( 'src' );
+		$img_src = $z->get_attribute( 'src' );
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
