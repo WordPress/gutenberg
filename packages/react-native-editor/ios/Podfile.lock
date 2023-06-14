@@ -1,6 +1,6 @@
 PODS:
   - boost (1.76.0)
-  - BVLinearGradient (2.5.6-wp-3):
+  - BVLinearGradient (2.5.6-wp-4):
     - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.69.4)
@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.69.4)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.96.0):
+  - Gutenberg (1.97.0):
     - React-Core (= 0.69.4)
     - React-CoreModules (= 0.69.4)
     - React-RCTImage (= 0.69.4)
@@ -244,14 +244,14 @@ PODS:
     - React-Core
   - react-native-safe-area-context (3.2.0):
     - React-Core
-  - react-native-slider (3.0.2-wp-3):
+  - react-native-slider (3.0.2-wp-4):
     - React-Core
-  - react-native-video (5.2.0-wp-5):
+  - react-native-video (5.2.0-wp-6):
     - React-Core
-    - react-native-video/Video (= 5.2.0-wp-5)
-  - react-native-video/Video (5.2.0-wp-5):
+    - react-native-video/Video (= 5.2.0-wp-6)
+  - react-native-video/Video (5.2.0-wp-6):
     - React-Core
-  - react-native-webview (11.6.2):
+  - react-native-webview (11.26.1):
     - React-Core
   - React-perflogger (0.69.4)
   - React-RCTActionSheet (0.69.4):
@@ -327,9 +327,9 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGestureHandler (2.3.2-wp-2):
+  - RNGestureHandler (2.3.2-wp-3):
     - React-Core
-  - RNReanimated (2.9.1-wp-3):
+  - RNReanimated (2.9.1-wp-4):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -360,7 +360,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6):
     - React-Core
-  - RNTAztecView (1.96.0):
+  - RNTAztecView (1.97.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.8)
   - SDWebImage (5.11.1):
@@ -534,13 +534,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
-  BVLinearGradient: ace34fab72158c068ae989a0ebdbf86cb4ef0e49
+  BVLinearGradient: f9b5ebce56b36e3e20a433aa271d6dce2c10b06a
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: c71b8c429a8af2aff1013934a7152e9d9d0c937d
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
-  Gutenberg: baeb5202bdcc71526ae04505a54e72255a7260ce
+  Gutenberg: 75e04d6a42ecfb201115f1ccbb066680915a35aa
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
@@ -560,9 +560,9 @@ SPEC CHECKSUMS:
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
-  react-native-slider: a433f1c13c5da3c17a587351bff7371f65cc9a07
-  react-native-video: cc1982bfac4d256fb56302642d968b6e72ffbeb7
-  react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
+  react-native-slider: dff0d8a46f368a8d1bacd8638570d75b9b0be400
+  react-native-video: 6dee623307ed9d04d1be2de87494f9a0fa2041d1
+  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: cb386fd44c97ec7f8199c04c12b22066b0f2e1e0
   React-RCTActionSheet: f803a85e46cf5b4066c2ac5e122447f918e9c6e5
   React-RCTAnimation: 19c80fa950ccce7f4db76a2a7f2cf79baae07fc7
@@ -578,11 +578,11 @@ SPEC CHECKSUMS:
   RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
-  RNGestureHandler: 3e0ea0c115175e66680032904339696bab928ca3
-  RNReanimated: bea6acb5fdcbd8ca27641180579d09e3434f803c
+  RNGestureHandler: f5c389f7c9947057ee47d16ca1d7d170289b2c2a
+  RNReanimated: 5740ec9926f80bccd404bacd3e71108e87c94afa
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
-  RNTAztecView: 61e0a2f69770f30e01f21991c79861be70a8d8bc
+  RNTAztecView: 221ecdc2998b979bd0994b9100101ba755cbb1d8
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504

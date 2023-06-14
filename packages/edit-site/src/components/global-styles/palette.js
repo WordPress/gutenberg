@@ -22,7 +22,7 @@ import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 

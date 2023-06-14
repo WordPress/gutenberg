@@ -2,23 +2,33 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
+import { InspectorControls } from '../components';
 
 /**
  * External dependencies
  */
 import merge from 'deepmerge';
 
-function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
+function BehaviorsControl( {
+	blockName,
+	blockBehaviors,
+	onChange,
+	disabled = false,
+} ) {
 	const { settings, themeBehaviors } = useSelect(
 		( select ) => {
 			const { getBehaviors, getSettings } = select( blockEditorStore );
@@ -33,24 +43,17 @@ function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
 		[ blockName ]
 	);
 
-	if (
-		! settings ||
-		// If every behavior is disabled, do not show the behaviors inspector control.
-		Object.entries( settings ).every( ( [ , value ] ) => ! value )
-	) {
-		return null;
-	}
-
-	// Block behaviors take precedence over theme behaviors.
-	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
-
 	const noBehaviorsOption = {
 		value: '',
 		label: __( 'No behaviors' ),
 	};
 
 	const behaviorsOptions = Object.entries( settings )
-		.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out behaviors that are disabled.
+		.filter(
+			( [ behaviorName, behaviorValue ] ) =>
+				hasBlockSupport( blockName, 'behaviors.' + behaviorName ) &&
+				behaviorValue
+		) // Filter out behaviors that are disabled.
 		.map( ( [ behaviorName ] ) => ( {
 			value: behaviorName,
 			label:
@@ -59,21 +62,43 @@ function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
 				behaviorName.slice( 1 ).toLowerCase(),
 		} ) );
 
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	if ( behaviorsOptions.length === 0 ) return null;
+
 	const options = [ noBehaviorsOption, ...behaviorsOptions ];
+
+	// Block behaviors take precedence over theme behaviors.
+	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
+
+	const helpText = disabled
+		? __( 'The lightbox behavior is disabled for linked images.' )
+		: __( 'Add behaviors.' );
 
 	return (
 		<InspectorControls group="advanced">
-			<SelectControl
-				__nextHasNoMarginBottom
-				label={ __( 'Behaviors' ) }
-				// At the moment we are only supporting one behavior (Lightbox)
-				value={ behaviors?.lightbox ? 'lightbox' : '' }
-				options={ options }
-				onChange={ onChange }
-				hideCancelButton={ true }
-				help={ __( 'Add behaviors.' ) }
-				size="__unstable-large"
-			/>
+			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
+			<div>
+				<SelectControl
+					label={ __( 'Behaviors' ) }
+					// At the moment we are only supporting one behavior (Lightbox)
+					value={ behaviors?.lightbox ? 'lightbox' : '' }
+					options={ options }
+					onChange={ onChange }
+					hideCancelButton={ true }
+					help={ helpText }
+					size="__unstable-large"
+					disabled={ disabled }
+				/>
+			</div>
+			<HStack justify="flex-end">
+				<Button
+					isSmall
+					disabled={ disabled }
+					onClick={ () => onChange( undefined ) }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</HStack>
 		</InspectorControls>
 	);
 }
@@ -91,11 +116,13 @@ function BehaviorsControl( { blockName, blockBehaviors, onChange } ) {
 export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		// Only add behaviors to the core/image block.
-		if ( props.name !== 'core/image' ) {
+		// Only add behaviors to blocks with support.
+		if ( ! hasBlockSupport( props.name, 'behaviors' ) ) {
 			return blockEdit;
 		}
-
+		const blockHasLink =
+			typeof props.attributes?.linkDestination !== 'undefined' &&
+			props.attributes?.linkDestination !== 'none';
 		return (
 			<>
 				{ blockEdit }
@@ -103,14 +130,21 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
 					onChange={ ( nextValue ) => {
-						// If the user selects something, it means that they want to
-						// change the default value (true) so we save it in the attributes.
-						props.setAttributes( {
-							behaviors: {
-								lightbox: nextValue === 'lightbox',
-							},
-						} );
+						if ( nextValue === undefined ) {
+							props.setAttributes( {
+								behaviors: undefined,
+							} );
+						} else {
+							// If the user selects something, it means that they want to
+							// change the default value (true) so we save it in the attributes.
+							props.setAttributes( {
+								behaviors: {
+									lightbox: nextValue === 'lightbox',
+								},
+							} );
+						}
 					} }
+					disabled={ blockHasLink }
 				/>
 			</>
 		);

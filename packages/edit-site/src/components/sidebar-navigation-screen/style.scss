@@ -5,8 +5,13 @@
 	position: relative;
 }
 
+.edit-site-sidebar-navigation-screen__main {
+	// Ensure the sidebar is always at least as tall as the viewport.
+	// This allows the footer section to be sticky at the bottom of the viewport.
+	flex-grow: 1;
+}
+
 .edit-site-sidebar-navigation-screen__content {
-	margin: 0 0 $grid-unit-20 0;
 	color: $gray-400;
 	padding: 0 $grid-unit-20;
 	.components-item-group {
@@ -57,6 +62,10 @@
 	padding: $grid-unit-15 * 0.5 0 0 0;
 }
 
+.edit-site-sidebar-navigation-screen__actions {
+	flex-shrink: 0;
+}
+
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
 	.edit-site-global-styles-variations_item-preview {
 		border: $gray-900 $border-width solid;
@@ -73,12 +82,20 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__sticky-section {
+.edit-site-sidebar-navigation-screen__sticky-section.edit-site-sidebar-navigation-screen__sticky-section {
 	position: sticky;
 	bottom: 0;
 	background-color: $gray-900;
 	gap: 0;
 	padding: $grid-unit-20 0;
-	margin: $grid-unit-20 0 #{- $grid-unit-20} 0;
+	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
+	box-shadow: 0 #{-$grid-unit-10} $grid-unit-20 $gray-900;
+}
+
+.edit-site-sidebar-navigation-screen__footer {
+	position: sticky;
+	bottom: 0;
+	background-color: $gray-900;
+	padding: $grid-unit-20 0;
 }
