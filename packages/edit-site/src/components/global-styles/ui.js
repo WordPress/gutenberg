@@ -23,7 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { backup, code, lifesaver, moreVertical } from '@wordpress/icons';
+import { code, lifesaver, moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -52,57 +52,6 @@ const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
-function GlobalStylesActionMenu() {
-	const { toggle } = useDispatch( preferencesStore );
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
-		};
-	}, [] );
-	const { goTo } = useNavigator();
-	const loadCustomCSS = () => goTo( '/css' );
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
-		goTo( '/revisions' );
-		setEditorCanvasContainerView( 'global-styles-revisions' );
-	};
-	const hasRevisions = revisionsCount >= 2;
-
-	return (
-		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
-				{ () => (
-					<MenuGroup>
-						{ canEditCSS && (
-							<MenuItem onClick={ loadCustomCSS } icon={ code }>
-								{ __( 'Additional CSS' ) }
-							</MenuItem>
-						) }
-						<MenuItem
-							icon={ lifesaver }
-							onClick={ () =>
-								toggle( 'core/edit-site', 'welcomeGuideStyles' )
-							}
-						>
-							{ __( 'Welcome Guide' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
-		</GlobalStylesMenuFill>
-	);
-}
-
 function RevisionsCountBadge( { className, children } ) {
 	return (
 		<span
@@ -115,8 +64,11 @@ function RevisionsCountBadge( { className, children } ) {
 		</span>
 	);
 }
-function GlobalStylesRevisionsMenu() {
-	const { revisionsCount } = useSelect( ( select ) => {
+
+function GlobalStylesActionMenu() {
+	const { toggle } = useDispatch( preferencesStore );
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { canEditCSS, revisionsCount } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 
@@ -126,6 +78,8 @@ function GlobalStylesRevisionsMenu() {
 			: undefined;
 
 		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 			revisionsCount:
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
 		};
@@ -137,32 +91,63 @@ function GlobalStylesRevisionsMenu() {
 		useDispatch( editSiteStore )
 	);
 	const loadRevisions = () => {
+		setIsListViewOpened( false );
 		goTo( '/revisions' );
 		setEditorCanvasContainerView( 'global-styles-revisions' );
 	};
 	const hasRevisions = revisionsCount >= 2;
+	const loadCustomCSS = () => goTo( '/css' );
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Styles actions' ) }
+			>
 				{ () => (
-					<MenuGroup>
-						{ hasRevisions && (
+					<>
+						<MenuGroup label={ __( 'Tools' ) }>
+							{ canEditCSS && (
+								<MenuItem
+									onClick={ loadCustomCSS }
+									icon={ code }
+								>
+									{ __( 'Additional CSS' ) }
+								</MenuItem>
+							) }
 							<MenuItem
-								onClick={ loadRevisions }
-								icon={
-									<RevisionsCountBadge>
-										{ revisionsCount }
-									</RevisionsCountBadge>
+								icon={ lifesaver }
+								onClick={ () =>
+									toggle(
+										'core/edit-site',
+										'welcomeGuideStyles'
+									)
 								}
 							>
-								{ __( 'Revision history' ) }
+								{ __( 'Welcome Guide' ) }
 							</MenuItem>
-						) }
-						<MenuItem onClick={ onReset } disabled={ ! canReset }>
-							{ __( 'Reset to defaults' ) }
-						</MenuItem>
-					</MenuGroup>
+						</MenuGroup>
+						<MenuGroup label={ __( 'Revisions' ) }>
+							{ hasRevisions && (
+								<MenuItem
+									onClick={ loadRevisions }
+									icon={
+										<RevisionsCountBadge>
+											{ revisionsCount }
+										</RevisionsCountBadge>
+									}
+								>
+									{ __( 'Revision history' ) }
+								</MenuItem>
+							) }
+							<MenuItem
+								onClick={ onReset }
+								disabled={ ! canReset }
+							>
+								{ __( 'Reset to defaults' ) }
+							</MenuItem>
+						</MenuGroup>
+					</>
 				) }
 			</DropdownMenu>
 		</GlobalStylesMenuFill>
@@ -402,7 +387,6 @@ function GlobalStylesUI() {
 				<GlobalStylesStyleBook />
 			) }
 
-			<GlobalStylesRevisionsMenu />
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />
