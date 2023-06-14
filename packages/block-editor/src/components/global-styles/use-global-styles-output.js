@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, set } from 'lodash';
+import { get, kebabCase, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,10 @@ import { getCSSRules } from '@wordpress/style-engine';
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
@@ -398,7 +401,7 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				getFluidTypographyOptionsFromSettings( tree?.settings )
 			);
 		}
 
@@ -448,7 +451,11 @@ export function getLayoutStyles( {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== name &&
+					'grid' !== name
+				) {
 					return;
 				}
 
@@ -685,7 +692,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || custom ) {
+	if ( Object.keys( presets ).length > 0 || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -698,7 +705,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || blockCustom ) {
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -964,7 +971,7 @@ export const toStyles = (
 		}
 
 		const classes = getPresetsClasses( selector, presets );
-		if ( ! isEmpty( classes ) ) {
+		if ( classes.length > 0 ) {
 			ruleset += classes;
 		}
 	} );
@@ -980,7 +987,10 @@ export function toSvgFilters( tree, blockSelectors ) {
 }
 
 const getSelectorsConfig = ( blockType, rootSelector ) => {
-	if ( ! isEmpty( blockType?.selectors ) ) {
+	if (
+		blockType?.selectors &&
+		Object.keys( blockType.selectors ).length > 0
+	) {
 		return blockType.selectors;
 	}
 

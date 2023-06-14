@@ -15,6 +15,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
+import LockIcon from './lock-icon';
 import styles from './range-cell.scss';
 import RangeTextInput from './range-text-input';
 import { toFixed } from '../utils';
@@ -219,6 +220,7 @@ class BottomSheetRangeCell extends Component {
 						accessible={ false }
 						valueStyle={ styles.valueStyle }
 						disabled={ disabled }
+						showLockIcon={ false }
 					>
 						<View style={ containerStyle }>
 							{ preview }
@@ -260,6 +262,7 @@ class BottomSheetRangeCell extends Component {
 									{ children }
 								</RangeTextInput>
 							) }
+							{ disabled && <LockIcon /> }
 						</View>
 					</Cell>
 				</View>

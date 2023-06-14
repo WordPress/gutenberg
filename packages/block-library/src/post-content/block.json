@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-content",
 	"title": "Post Content",
 	"category": "theme",
@@ -8,7 +8,6 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
-		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"__experimentalLayout": true,

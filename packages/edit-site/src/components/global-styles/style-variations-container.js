@@ -19,7 +19,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis

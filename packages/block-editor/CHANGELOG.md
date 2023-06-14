@@ -6,6 +6,9 @@
 
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
+## 12.3.0 (2023-06-07)
+
+## 12.2.0 (2023-05-24)
 
 ## 12.1.0 (2023-05-10)
 

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,14 +42,14 @@ export const PanelColorGradientSettingsInner = ( {
 	const panelId = useInstanceId( PanelColorGradientSettingsInner );
 	const { batch } = useRegistry();
 	if (
-		isEmpty( colors ) &&
-		isEmpty( gradients ) &&
+		( ! colors || colors.length === 0 ) &&
+		( ! gradients || gradients.length === 0 ) &&
 		disableCustomColors &&
 		disableCustomGradients &&
 		settings?.every(
 			( setting ) =>
-				isEmpty( setting.colors ) &&
-				isEmpty( setting.gradients ) &&
+				( ! setting.colors || setting.colors.length === 0 ) &&
+				( ! setting.gradients || setting.gradients.length === 0 ) &&
 				( setting.disableCustomColors === undefined ||
 					setting.disableCustomColors ) &&
 				( setting.disableCustomGradients === undefined ||
