@@ -26,6 +26,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 import TouchableRipple from './ripple';
+import LockIcon from './lock-icon';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
@@ -92,6 +93,8 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			disabledStyle = styles.cellDisabled,
+			showLockIcon = true,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -223,10 +226,21 @@ class BottomSheetCell extends Component {
 				styles.cellValue,
 				styles.cellTextDark
 			);
-			const finalStyle = {
+			const textInputStyle = {
 				...cellValueStyle,
 				...valueStyle,
 				...styleRTL,
+			};
+			const placeholderTextColor = disabled
+				? this.props.getStylesFromColorScheme(
+						styles.placeholderColorDisabled,
+						styles.placeholderColorDisabledDark
+				  ).color
+				: styles.placeholderColor.color;
+			const textStyle = {
+				...( disabled && styles.cellDisabled ),
+				...cellValueStyle,
+				...valueStyle,
 			};
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
@@ -238,10 +252,10 @@ class BottomSheetCell extends Component {
 				<TextInput
 					ref={ ( c ) => ( this._valueTextInput = c ) }
 					numberOfLines={ 1 }
-					style={ finalStyle }
+					style={ textInputStyle }
 					value={ value }
 					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
+					placeholderTextColor={ placeholderTextColor }
 					onChangeText={ onChangeValue }
 					editable={ isValueEditable }
 					pointerEvents={
@@ -251,11 +265,12 @@ class BottomSheetCell extends Component {
 					onBlur={ finishEditing }
 					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
+					disabled={ disabled }
 					{ ...valueProps }
 				/>
 			) : (
 				<Text
-					style={ { ...cellValueStyle, ...valueStyle } }
+					style={ textStyle }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
 				>
@@ -361,6 +376,7 @@ class BottomSheetCell extends Component {
 									] }
 								>
 									<Icon
+										lock
 										icon={ icon }
 										size={ 24 }
 										fill={
@@ -418,7 +434,20 @@ class BottomSheetCell extends Component {
 						/>
 					) }
 					{ showValue && getValueComponent() }
-					{ children }
+					<View
+						style={ [
+							disabled && disabledStyle,
+							styles.cellRowContainer,
+						] }
+						pointerEvents={ disabled ? 'none' : 'auto' }
+					>
+						{ children }
+					</View>
+					{ disabled && showLockIcon && (
+						<View style={ styles.cellDisabled }>
+							<LockIcon />
+						</View>
+					) }
 				</View>
 				{ help && (
 					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>

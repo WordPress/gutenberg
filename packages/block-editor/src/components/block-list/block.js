@@ -6,19 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useMemo,
-	useCallback,
-	RawHTML,
-} from '@wordpress/element';
+import { useMemo, useCallback, RawHTML } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
 	switchToBlockType,
-	store as blocksStore,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
 } from '@wordpress/blocks';
@@ -43,7 +37,8 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-export const BlockListBlockContext = createContext();
+import { unlock } from '../../lock-unlock';
+import { BlockListBlockContext } from './block-list-block-context';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -99,35 +94,23 @@ function BlockListBlock( {
 } ) {
 	const {
 		themeSupportsLayout,
-		hasContentLockedParent,
-		isContentBlock,
-		isContentLocking,
 		isTemporarilyEditingAsBlocks,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
-				__unstableGetContentLockingParent,
-				getTemplateLock,
 				__unstableGetTemporarilyEditingAsBlocks,
-			} = select( blockEditorStore );
-			const _hasContentLockedParent =
-				!! __unstableGetContentLockingParent( clientId );
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock:
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					),
-				hasContentLockedParent: _hasContentLockedParent,
-				isContentLocking:
-					getTemplateLock( clientId ) === 'contentOnly' &&
-					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
-		[ name, clientId ]
+		[ clientId ]
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
@@ -160,7 +143,7 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( hasContentLockedParent && ! isContentBlock ) {
+	if ( blockEditingMode === 'disabled' ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -234,10 +217,9 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-content-locked': isContentLocking,
+				'is-editing-disabled': blockEditingMode === 'disabled',
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
-				'is-content-block': hasContentLockedParent && isContentBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className

@@ -9,6 +9,7 @@ import {
 	clickBlockToolbarButton,
 	clickMenuItem,
 	clickOnCloseModalButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const createTestParagraphBlocks = async () => {
@@ -51,7 +52,7 @@ describe( 'block editor keyboard shortcuts', () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await pressKeyWithModifier( 'shift', 'ArrowUp' );
-				await page.waitForSelector(
+				await canvas().waitForSelector(
 					'[aria-label="Multiple selected blocks"]'
 				);
 				await moveUp();
@@ -63,7 +64,7 @@ describe( 'block editor keyboard shortcuts', () => {
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await page.keyboard.press( 'ArrowUp' );
 				await pressKeyWithModifier( 'shift', 'ArrowUp' );
-				await page.waitForSelector(
+				await canvas().waitForSelector(
 					'[aria-label="Multiple selected blocks"]'
 				);
 				await moveDown();

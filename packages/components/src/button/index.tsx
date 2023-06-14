@@ -76,6 +76,7 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
+		__next32pxSmallSize,
 		isSmall,
 		isPressed,
 		isBusy,
@@ -117,6 +118,7 @@ export function UnforwardedButton(
 
 	const classes = classnames( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
+		'is-next-32px-small-size': __next32pxSmallSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
 		'is-small': isSmall,
