@@ -43,7 +43,7 @@ export default function PatternsList( { categoryId, label, type } ) {
 						<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
 						<Text variant="muted" as="p">
 							{ __(
-								'Make a change to one of these patterns and have it reflected across your entire site.'
+								'Patterns that are kept in sync across your site'
 							) }
 						</Text>
 					</VStack>
@@ -61,7 +61,7 @@ export default function PatternsList( { categoryId, label, type } ) {
 						<Heading level={ 4 }>{ __( 'Standard' ) }</Heading>
 						<Text variant="muted" as="p">
 							{ __(
-								'Insert and customize without stating in sync'
+								'Patterns that can be changed freely without affecting your site'
 							) }
 						</Text>
 					</VStack>
