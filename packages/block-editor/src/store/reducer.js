@@ -1759,38 +1759,29 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning map of block client IDs to whether or not they are
- * highlighted.
+ * Reducer returning current highlighted block.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current highlighted block.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function highlightedBlocks( state = {}, action ) {
+export function highlightedBlock( state, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HIGHLIGHT': {
-			if ( action.isHighlighted ) {
-				if ( ! state[ action.clientId ] ) {
-					return {
-						...state,
-						[ action.clientId ]: true,
-					};
-				}
-			} else if ( state[ action.clientId ] ) {
-				const nextState = { ...state };
-				delete nextState[ action.clientId ];
-				return nextState;
+		case 'TOGGLE_BLOCK_HIGHLIGHT':
+			const { clientId, isHighlighted } = action;
+
+			if ( isHighlighted ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
 			}
-			break;
-		}
-		case 'SELECT_BLOCK': {
-			if ( state[ action.clientId ] ) {
-				const nextState = { ...state };
-				delete nextState[ action.clientId ];
-				return nextState;
+
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
 			}
-		}
 	}
 
 	return state;
@@ -1885,7 +1876,7 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	editorMode,
 	hasBlockMovingClientId,
-	highlightedBlocks,
+	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
