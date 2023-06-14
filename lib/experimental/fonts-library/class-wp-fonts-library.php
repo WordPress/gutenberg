@@ -11,7 +11,7 @@ include(ABSPATH . "wp-admin/includes/admin.php");
 class WP_Fonts_Library {
     public function __construct() {
         $this->wp_fonts_dir = path_join( WP_CONTENT_DIR, 'fonts' );
-        $this->relative_fonts_path = site_url('/wp-content/fonts/', 'relative');
+        $this->relative_fonts_path = content_url('/fonts/');
 
 		$this->rest_base        = 'fonts_library';
 		$this->namespace        = 'wp/v2';
