@@ -34,6 +34,18 @@ export const TabsList = ( { className, children }: TabsListProps ) => (
 	</RadixTabs.TabsList>
 );
 
+const disabledTabProps = {
+	'aria-disabled': true,
+	onClick: ( event: React.MouseEvent ) => {
+		event.preventDefault();
+		event.stopPropagation();
+	},
+	onMouseDown: ( event: React.MouseEvent ) => {
+		event.preventDefault();
+		event.stopPropagation();
+	},
+};
+
 export const Tab = ( {
 	value,
 	title,
@@ -44,17 +56,11 @@ export const Tab = ( {
 }: TabProps ) => (
 	<RadixTabs.Trigger
 		value={ value }
-		disabled={ disabled }
 		className={ cx( 'components-tabs__tab', className ) }
 		asChild
+		{ ...( disabled ? disabledTabProps : null ) }
 	>
-		<Button
-			icon={ icon }
-			label={ icon && title }
-			showTooltip={ !! icon }
-			disabled={ disabled }
-			__experimentalIsFocusable
-		>
+		<Button icon={ icon } label={ icon && title } showTooltip={ !! icon }>
 			{ ! icon && children }
 		</Button>
 	</RadixTabs.Trigger>
@@ -99,17 +105,22 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 		activeClass = 'is-active',
 	} = props;
 
-	const [ selected, setSelected ] = useState< string >();
+	const [ selectedTabName, setSelectedTabName ] = useState< string >();
 
-	const handleTabSelection = useCallback(
+	const selectTab = useCallback(
 		( tabValue: string ) => {
-			setSelected( tabValue );
+			const newTab = tabs.find( ( t ) => t.name === tabValue );
+			if ( newTab?.disabled ) {
+				return;
+			}
+
+			setSelectedTabName( tabValue );
 			onSelect?.( tabValue );
 		},
-		[ onSelect ]
+		[ onSelect, tabs ]
 	);
 
-	const selectedTab = tabs.find( ( { name } ) => name === selected );
+	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
@@ -126,15 +137,16 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 		}
 		if ( initialTab && ! initialTab.disabled ) {
 			// Select the initial tab if it's not disabled.
-			handleTabSelection( initialTab.name );
+			selectTab( initialTab.name );
 		} else {
-			// Fallback to the first enabled tab when the initial is disabled.
+			// Fallback to the first enabled tab when the initial tab is
+			// disabled or it can't be found.
 			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
-			if ( firstEnabledTab ) handleTabSelection( firstEnabledTab.name );
+			if ( firstEnabledTab ) selectTab( firstEnabledTab.name );
 		}
-	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
+	}, [ tabs, selectedTab, initialTabName, selectTab ] );
 
-	// // Handle the currently selected tab becoming disabled.
+	// Handle the currently selected tab becoming disabled.
 	useEffect( () => {
 		// This effect only runs when the selected tab is defined and becomes disabled.
 		if ( ! selectedTab?.disabled ) {
@@ -144,18 +156,15 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 		// If the currently selected tab becomes disabled, select the first enabled tab.
 		// (if there is one).
 		if ( firstEnabledTab ) {
-			handleTabSelection( firstEnabledTab.name );
+			selectTab( firstEnabledTab.name );
 		}
-	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
+	}, [ tabs, selectedTab?.disabled, selectTab ] );
 
 	return (
 		<RadixTabs.Root
 			className={ className }
 			value={ selectedTab?.name }
-			onValueChange={ ( value ) => {
-				setSelected( value );
-				return onSelect?.( value );
-			} }
+			onValueChange={ selectTab }
 			orientation={ orientation }
 			activationMode={ selectOnMove ? 'automatic' : 'manual' }
 		>
@@ -169,7 +178,7 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 						className={ cx(
 							'components-tab-panel__tabs-item',
 							tab.className,
-							{ [ activeClass ]: tab.name === selected }
+							{ [ activeClass ]: tab.name === selectedTabName }
 						) }
 						disabled={ tab.disabled }
 					>
@@ -177,16 +186,11 @@ const TabPanelV2 = ( props: LegacyTabPanelProps ) => {
 					</Tab>
 				) ) }
 			</TabsList>
-			{ selectedTab && (
-				<RadixTabs.Content value={ selectedTab.name }>
-					{ children( selectedTab ) }
-				</RadixTabs.Content>
-			) }
-			{ /* { tabs.map( ( tab ) => (
+			{ tabs.map( ( tab ) => (
 				<TabPanel key={ tab.name } value={ tab.name }>
 					{ children( tab ) }
 				</TabPanel>
-			) ) } */ }
+			) ) }
 		</RadixTabs.Root>
 	);
 };
