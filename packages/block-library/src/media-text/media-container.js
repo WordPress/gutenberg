@@ -70,7 +70,12 @@ function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	);
 }
 
-function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
+function PlaceholderContainer( {
+	className,
+	mediaUrl,
+	onSelectMedia,
+	toggleUseFeaturedImage,
+} ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onUploadError = ( message ) => {
@@ -86,6 +91,7 @@ function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
 			className={ className }
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
+			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			onError={ onUploadError }
 			disableMediaButtons={ mediaUrl }

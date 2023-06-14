@@ -31,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -127,7 +127,12 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
+function MediaTextEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	context: { postId, postType },
+} ) {
 	const {
 		focalPoint,
 		href,
@@ -145,8 +150,34 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		rel,
 		verticalAlignment,
 		allowedBlocks,
+		useFeaturedImage,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const featuredImageMedia = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			imageFill: false,
+			mediaType: 'image',
+			mediaId: featuredImage,
+			mediaUrl: featuredImageMedia.source_url,
+			mediaAlt: featuredImageMedia?.alt_text,
+			useFeaturedImage: ! useFeaturedImage,
+		} );
+	};
 
 	const { imageSizes, image } = useSelect(
 		( select ) => {
@@ -370,6 +401,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					commitWidthChange={ commitWidthChange }
 					ref={ refMediaContainer }
 					enableResize={ blockEditingMode === 'default' }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					{ ...{
 						focalPoint,
 						imageFill,
