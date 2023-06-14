@@ -94,9 +94,6 @@ function gutenberg_wp_block_register_post_meta() {
 						'sync_status' => array(
 							'type' => 'string',
 						),
-						'slug'        => array(
-							'type' => 'string',
-						),
 					),
 				),
 			),
@@ -116,7 +113,6 @@ function gutenberg_wp_block_register_post_meta() {
  */
 function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
 	$meta_value['sync_status'] = sanitize_text_field( $meta_value['sync_status'] );
-	$meta_value['slug']        = sanitize_text_field( $meta_value['slug'] );
 	return $meta_value;
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
