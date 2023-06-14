@@ -46,6 +46,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-revisions-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
@@ -57,7 +58,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 
-	require_once __DIR__ . '/experimental/class-gutenberg-rest-global-styles-revisions-controller.php';
 	require_once __DIR__ . '/experimental/class-wp-rest-navigation-fallback-controller.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
