@@ -258,8 +258,11 @@ describe( 'Buttons block', () => {
 				const buttonBlock = await getBlock( screen, 'Button' );
 				fireEvent.press( buttonBlock );
 
+				const buttonInput =
+					within( buttonBlock ).getByLabelText( 'Text input. Empty' );
+
 				// Delete block
-				fireEvent( buttonBlock, 'onKeyDown', {
+				fireEvent( buttonInput, 'onKeyDown', {
 					nativeEvent: {},
 					preventDefault() {},
 					keyCode: BACKSPACE,
