@@ -25,7 +25,8 @@ add_action(
 					$name . '-view',
 					$view_file,
 					array( 'wp-interactivity' ),
-					filemtime( $view_file, )
+					filemtime( $view_file, ),
+					true
 				);
 
 				register_block_type_from_metadata( $block_folder );

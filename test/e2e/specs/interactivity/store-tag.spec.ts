@@ -4,8 +4,30 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'store tag', () => {
-	test( 'hydrates when it is well defined', async ( { goToFile, page } ) => {
-		await goToFile( 'store-tag-ok.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/store-tag { "condition":"ok"}' );
+		await utils.addPostWithBlock(
+			'test/store-tag {"condition":"missing"}'
+		);
+		await utils.addPostWithBlock(
+			'test/store-tag {"condition":"corrupted-json"}'
+		);
+		await utils.addPostWithBlock(
+			'test/store-tag {"condition":"invalid-state"}'
+		);
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+	} );
+
+	test( 'hydrates when it is well defined', async ( {
+		interactivityUtils: utils,
+		page,
+	} ) => {
+		const block = 'test/store-tag { "condition":"ok"}';
+		await page.goto( `/?p=${ utils.posts.get( block ) }` );
 
 		const value = page.getByTestId( 'counter value' );
 		const double = page.getByTestId( 'counter double' );
@@ -23,10 +45,11 @@ test.describe( 'store tag', () => {
 	} );
 
 	test( 'does not break the page when missing', async ( {
-		goToFile,
+		interactivityUtils: utils,
 		page,
 	} ) => {
-		await goToFile( 'store-tag-missing.html' );
+		const block = 'test/store-tag {"condition":"missing"}';
+		await page.goto( `/?p=${ utils.posts.get( block ) }` );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );
@@ -35,10 +58,11 @@ test.describe( 'store tag', () => {
 	} );
 
 	test( 'does not break the page when corrupted', async ( {
-		goToFile,
+		interactivityUtils: utils,
 		page,
 	} ) => {
-		await goToFile( 'store-tag-corrupted-json.html' );
+		const block = 'test/store-tag {"condition":"corrupted-json"}';
+		await page.goto( `/?p=${ utils.posts.get( block ) }` );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );
@@ -47,10 +71,11 @@ test.describe( 'store tag', () => {
 	} );
 
 	test( 'does not break the page when it contains an invalid state', async ( {
-		goToFile,
+		interactivityUtils: utils,
 		page,
 	} ) => {
-		await goToFile( 'store-tag-invalid-state.html' );
+		const block = 'test/store-tag {"condition":"invalid-state"}';
+		await page.goto( `/?p=${ utils.posts.get( block ) }` );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );
