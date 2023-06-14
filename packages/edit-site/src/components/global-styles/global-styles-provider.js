@@ -24,6 +24,9 @@ const { GlobalStylesContext, cleanEmptyObject } = unlock(
 
 export function mergeBaseAndUserConfigs( base, user ) {
 	return deepmerge( base, user, {
+		// We only pass as arrays the presets,
+		// in which case we want the new array of values
+		// to override the old array (no merging).
 		isMergeableObject: isPlainObject,
 	} );
 }
