@@ -52,7 +52,7 @@ function render_block_core_categories( $attributes ) {
 		$list_style_type = $attributes['listStyleType'];
 	}
 	$attribute_array = array( 'class' => "wp-block-categories-{$type}" );
-	if ( ! empty( $list_style_type ) && $list_style_type !== 'inherit' ) {
+	if ( ! empty( $list_style_type ) && 'inherit' !== $list_style_type ) {
 		$attribute_array['style'] = "list-style-type: {$list_style_type}";
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( $attribute_array );
