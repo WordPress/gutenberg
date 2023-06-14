@@ -108,11 +108,6 @@
 			.is-dark-theme & {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
 			}
-
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
 		}
 	}
 
