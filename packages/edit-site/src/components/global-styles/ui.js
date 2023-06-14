@@ -80,10 +80,7 @@ function GlobalStylesActionMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Styles actions' ) }
-			>
+			<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
 				{ () => (
 					<MenuGroup>
 						{ canEditCSS && (
@@ -147,10 +144,7 @@ function GlobalStylesRevisionsMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu
-				icon={ backup }
-				label={ __( 'Styles revisions actions' ) }
-			>
+			<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
 				{ () => (
 					<MenuGroup>
 						{ hasRevisions && (
