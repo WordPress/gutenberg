@@ -30,8 +30,12 @@
 	align-items: center;
 	width: 100%;
 	flex-wrap: nowrap;
-	background: $gray-800;
 	border-radius: 4px;
+	&:hover,
+	&:focus {
+		background: $gray-800;
+		color: $white;
+	}
 }
 
 .edit-site-sidebar-navigation-screen-template__template-area-label-text {
