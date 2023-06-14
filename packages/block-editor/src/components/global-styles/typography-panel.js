@@ -153,10 +153,10 @@ export default function TypographyPanel( {
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies =
-		fontFamiliesPerOrigin?.custom ??
-		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin?.default;
+	const fontFamilies = []
+		.concat( fontFamiliesPerOrigin?.custom ?? [] )
+		.concat( fontFamiliesPerOrigin?.theme ?? [] )
+		.concat( fontFamiliesPerOrigin?.default ?? [] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
