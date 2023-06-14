@@ -14,11 +14,6 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 
-/**
- * External dependencies
- */
-import merge from 'deepmerge';
-
 function BehaviorsControl( {
 	blockName,
 	blockBehaviors,
@@ -39,53 +34,63 @@ function BehaviorsControl( {
 		[ blockName ]
 	);
 
-	const noBehaviorsOption = {
-		value: '',
-		label: __( 'No behaviors' ),
-	};
-
-	const defaultBehaviorsOption = {
-		value: 'default',
-		label: __( 'Default' ),
+	const defaultBehaviors = {
+		default: {
+			value: 'default',
+			label: __( 'Default' ),
+		},
+		noBehaviors: {
+			value: '',
+			label: __( 'No behaviors' ),
+		},
 	};
 
 	const behaviorsOptions = Object.entries( settings )
 		.filter(
 			( [ behaviorName, behaviorValue ] ) =>
-				hasBlockSupport( blockName, 'behaviors.' + behaviorName ) &&
+				hasBlockSupport( blockName, `behaviors.${ behaviorName }` ) &&
 				behaviorValue
 		) // Filter out behaviors that are disabled.
 		.map( ( [ behaviorName ] ) => ( {
 			value: behaviorName,
-			label:
-				// Capitalize the first letter of the behavior name.
-				behaviorName[ 0 ].toUpperCase() +
-				behaviorName.slice( 1 ).toLowerCase(),
+			// Capitalize the first letter of the behavior name.
+			label: `${ behaviorName.charAt( 0 ).toUpperCase() }${ behaviorName
+				.slice( 1 )
+				.toLowerCase() }`,
 		} ) );
 
-	// If every behavior is disabled, do not show the behaviors inspector control.
-	if ( behaviorsOptions.length === 0 ) return null;
-
 	const options = [
-		defaultBehaviorsOption,
-		noBehaviorsOption,
+		...Object.values( defaultBehaviors ),
 		...behaviorsOptions,
 	];
 
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	if ( options.length === 0 ) {
+		return null;
+	}
 	// Block behaviors take precedence over theme behaviors.
-	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
+	const behaviors = { ...themeBehaviors, ...( blockBehaviors || {} ) };
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: __( 'Add behaviors.' );
 
+	const value = () => {
+		if ( blockBehaviors === undefined ) {
+			return 'default';
+		}
+		if ( behaviors?.lightbox ) {
+			return 'lightbox';
+		}
+		return '';
+	};
+
 	return (
 		<InspectorControls group="advanced">
-			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
 			<SelectControl
 				label={ __( 'Behaviors' ) }
 				// At the moment we are only supporting one behavior (Lightbox)
-				value={ behaviors?.lightbox ? 'lightbox' : '' }
+				value={ value() }
 				options={ options }
 				onChange={ onChange }
 				hideCancelButton={ true }
