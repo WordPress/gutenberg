@@ -312,6 +312,12 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
+	const [ isDropdownOpen, setIsDropdownOpen ] = useState( false );
+
+	const closeDropdown = useCallback( () => {
+		setIsDropdownOpen( false );
+	}, [] );
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -333,6 +339,10 @@ export function BlockSettingsDropdown( {
 				blocks,
 			} ) => (
 				<DropdownMenuV2
+					open={ isDropdownOpen }
+					onOpenChange={ ( open ) => {
+						setIsDropdownOpen( open );
+					} }
 					trigger={
 						<Button
 							{ ...toggleProps }
@@ -359,6 +369,11 @@ export function BlockSettingsDropdown( {
 					sideOffset={ 12 }
 					onKeyDown={ ( event ) => {
 						if ( event.defaultPrevented ) return;
+
+						if ( event.key === 'Escape' ) {
+							setIsDropdownOpen( false );
+							event.preventDefault();
+						}
 
 						if (
 							isMatch( 'core/block-editor/remove', event ) &&
@@ -396,7 +411,9 @@ export function BlockSettingsDropdown( {
 					{ ...props }
 				>
 					<DropdownMenuGroupV2>
-						<__unstableBlockSettingsMenuFirstItem.Slot />
+						<__unstableBlockSettingsMenuFirstItem.Slot
+							fillProps={ { onClose: closeDropdown } }
+						/>
 						{ ! parentBlockIsSelected && !! firstParentClientId && (
 							<DropdownMenuItemV2
 								{ ...showParentOutlineGestures }
@@ -474,6 +491,7 @@ export function BlockSettingsDropdown( {
 					) }
 					<BlockSettingsMenuControls.Slot
 						fillProps={ {
+							onClose: closeDropdown,
 							canMove,
 							onMoveTo,
 							onlyBlock,
