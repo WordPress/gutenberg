@@ -11,6 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	isCurrentURL,
 	openTypographyToolsPanelMenu,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -78,7 +79,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should autosave post', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -94,7 +95,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
@@ -117,7 +118,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		await publishPost();
 
@@ -130,7 +131,7 @@ describe( 'Change detection', () => {
 		] );
 
 		// Should be dirty after autosave change of published post.
-		await page.type( '.editor-post-title__input', '!' );
+		await canvas().type( '.editor-post-title__input', '!' );
 
 		await Promise.all( [
 			page.waitForSelector(
@@ -162,7 +163,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if property changed without save', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		await assertIsDirty( true );
 	} );
@@ -175,7 +176,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should not prompt if changes saved', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		await saveDraft();
 
@@ -192,7 +193,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should not save if all changes saved', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		await saveDraft();
 
@@ -205,7 +206,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if save failed', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		await page.setOfflineMode( true );
 
@@ -231,7 +232,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early. Other requests should be allowed to continue,
@@ -247,7 +248,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if changes made while save is in-flight', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early. Other requests should be allowed to continue,
@@ -257,7 +258,7 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
-		await page.type( '.editor-post-title__input', '!' );
+		await canvas().type( '.editor-post-title__input', '!' );
 		await page.waitForSelector( '.editor-post-save-draft' );
 
 		await releaseSaveIntercept();
@@ -266,7 +267,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if property changes made while save is in-flight, and save completes', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early.
@@ -282,7 +283,7 @@ describe( 'Change detection', () => {
 		);
 
 		// Dirty post while save is in-flight.
-		await page.type( '.editor-post-title__input', '!' );
+		await canvas().type( '.editor-post-title__input', '!' );
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
@@ -291,7 +292,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if block revision is made while save is in-flight, and save completes', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early.
@@ -324,7 +325,7 @@ describe( 'Change detection', () => {
 		await saveDraft();
 
 		// Verify that the title is empty.
-		const title = await page.$eval(
+		const title = await canvas().$eval(
 			'.editor-post-title__input',
 			// Trim padding non-breaking space.
 			( element ) => element.textContent.trim()
@@ -337,7 +338,7 @@ describe( 'Change detection', () => {
 
 	it( 'should not prompt to confirm unsaved changes when trashing an existing post', async () => {
 		// Enter title.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Save.
 		await saveDraft();
@@ -381,7 +382,7 @@ describe( 'Change detection', () => {
 		] );
 
 		// Change the paragraph's `drop cap`.
-		await page.click( '[data-type="core/paragraph"]' );
+		await canvas().click( '[data-type="core/paragraph"]' );
 
 		await openTypographyToolsPanelMenu();
 		await page.click( 'button[aria-label="Show Drop cap"]' );
@@ -390,7 +391,7 @@ describe( 'Change detection', () => {
 			"//label[contains(text(), 'Drop cap')]"
 		);
 		await dropCapToggle.click();
-		await page.click( '[data-type="core/paragraph"]' );
+		await canvas().click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
 		await page.waitForSelector( '.editor-post-save-draft' );
@@ -402,7 +403,7 @@ describe( 'Change detection', () => {
 		] );
 
 		// Change the paragraph's `drop cap` again.
-		await page.click( '[data-type="core/paragraph"]' );
+		await canvas().click( '[data-type="core/paragraph"]' );
 		await dropCapToggle.click();
 
 		// Check that the post is dirty.

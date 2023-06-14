@@ -44,7 +44,7 @@ Most of the properties are set in the `src/block.json` file.
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "create-block/gutenpride",
 	"version": "0.1.0",
 	"title": "Gutenpride",

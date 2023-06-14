@@ -24,7 +24,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 

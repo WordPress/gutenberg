@@ -68,7 +68,6 @@ describe( 'adding inline tokens', () => {
 			'.block-editor-format-toolbar__image-popover'
 		);
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '20' );
 		await page.keyboard.press( 'Enter' );
 

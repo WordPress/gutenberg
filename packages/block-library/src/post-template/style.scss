@@ -9,7 +9,7 @@
 	&.wp-block-post-template {
 		background: none;
 	}
-
+	// These rules no longer apply but should be kept for backwards compatibility.
 	&.is-flex-container {
 		flex-direction: row;
 		display: flex;
@@ -28,5 +28,12 @@
 				}
 			}
 		}
+	}
+}
+
+@media ( max-width: $break-small ) {
+	// Temporary specificity bump until "wp-container" layout specificity is revisited.
+	.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid {
+		grid-template-columns: 1fr;
 	}
 }

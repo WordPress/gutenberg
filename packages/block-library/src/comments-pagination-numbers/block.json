@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comments-pagination-numbers",
 	"title": "Comments Page Numbers",
 	"category": "theme",
@@ -9,7 +9,6 @@
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"supports": {
-		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {

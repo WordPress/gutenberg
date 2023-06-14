@@ -37,10 +37,9 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
@@ -74,6 +73,7 @@ export default function Editor( { isLoading } ) {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -81,6 +81,7 @@ export default function Editor( { isLoading } ) {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
+			hasPageContentFocus: _hasPageContentFocus,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -105,6 +106,7 @@ export default function Editor( { isLoading } ) {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
+			hasPageContentFocus: _hasPageContentFocus(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -122,9 +124,10 @@ export default function Editor( { isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const blockContext = useMemo(
-		() => ( {
-			...context,
+	const blockContext = useMemo( () => {
+		const { postType, postId, ...nonPostFields } = context ?? {};
+		return {
+			...( hasPageContentFocus ? context : nonPostFields ),
 			queryContext: [
 				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -136,9 +139,8 @@ export default function Editor( { isLoading } ) {
 						},
 					} ),
 			],
-		} ),
-		[ context, setEditedPostContext ]
-	);
+		};
+	}, [ hasPageContentFocus, context, setEditedPostContext ] );
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -180,12 +182,7 @@ export default function Editor( { isLoading } ) {
 									'is-loading': isLoading,
 								}
 							) }
-							notices={
-								( isEditMode ||
-									window?.__experimentalEnableThemePreviews ) && (
-									<EditorSnackbars />
-								)
-							}
+							notices={ <EditorSnackbars /> }
 							content={
 								<>
 									<GlobalStylesRenderer />
@@ -232,7 +229,11 @@ export default function Editor( { isLoading } ) {
 							footer={
 								shouldShowBlockBreakcrumbs && (
 									<BlockBreadcrumb
-										rootLabelText={ __( 'Template' ) }
+										rootLabelText={
+											hasPageContentFocus
+												? __( 'Page' )
+												: __( 'Template' )
+										}
 									/>
 								)
 							}
