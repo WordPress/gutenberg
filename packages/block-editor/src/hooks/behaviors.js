@@ -166,6 +166,10 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 								behaviors: {
 									lightbox: {
 										enabled: nextValue === 'lightbox',
+										animation:
+											nextValue === 'lightbox'
+												? 'zoom'
+												: '',
 									},
 								},
 							} );
