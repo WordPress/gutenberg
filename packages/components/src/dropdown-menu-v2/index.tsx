@@ -210,19 +210,22 @@ export const DropdownMenuItem = forwardRef(
 		{ children, prefix, suffix, ...props }: DropdownMenuItemProps,
 		forwardedRef: React.ForwardedRef< any >
 	) => {
+		const Component = props.href ? 'a' : 'div';
 		return (
-			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
-				{ prefix && (
-					<DropdownMenuStyled.ItemPrefixWrapper>
-						{ prefix }
-					</DropdownMenuStyled.ItemPrefixWrapper>
-				) }
-				{ children }
-				{ suffix && (
-					<DropdownMenuStyled.ItemSuffixWrapper>
-						{ suffix }
-					</DropdownMenuStyled.ItemSuffixWrapper>
-				) }
+			<DropdownMenuStyled.Item { ...props } asChild ref={ forwardedRef }>
+				<Component>
+					{ prefix && (
+						<DropdownMenuStyled.ItemPrefixWrapper>
+							{ prefix }
+						</DropdownMenuStyled.ItemPrefixWrapper>
+					) }
+					{ children }
+					{ suffix && (
+						<DropdownMenuStyled.ItemSuffixWrapper>
+							{ suffix }
+						</DropdownMenuStyled.ItemSuffixWrapper>
+					) }
+				</Component>
 			</DropdownMenuStyled.Item>
 		);
 	}

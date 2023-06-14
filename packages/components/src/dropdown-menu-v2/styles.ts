@@ -176,6 +176,14 @@ const baseItem = css`
 	outline: none;
 	cursor: pointer;
 
+	/* Undo existing base focus/hover/active styles */
+	&:focus,
+	&:hover,
+	&:active {
+		color: ${ COLORS.gray[ 900 ] };
+		box-shadow: none;
+	}
+
 	&[data-disabled] {
 		/*
 		TODO:

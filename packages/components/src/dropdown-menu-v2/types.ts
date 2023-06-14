@@ -147,6 +147,21 @@ export type DropdownMenuItemProps = {
 	 * The contents of the item's suffix
 	 */
 	suffix?: React.ReactNode;
+	/**
+	 * If specified, the menu item will render as an anchor tag and allow
+	 * navigation to the provided URL.
+	 */
+	href?: HTMLAnchorElement[ 'href' ];
+	/**
+	 * Equivalent to the `rel` attribute for an HTML Anchor Tag. It should
+	 * be only specified when passing a non-empty `href` prop.
+	 */
+	rel?: HTMLAnchorElement[ 'rel' ];
+	/**
+	 * Equivalent to the `target` attribute for an HTML Anchor Tag. It should
+	 * be only specified when passing a non-empty `href` prop.
+	 */
+	target?: HTMLAnchorElement[ 'target' ];
 } & Pick<
 	DropdownMenuPrimitive.DropdownMenuItemProps,
 	'onClick' | 'onMouseEnter' | 'onMouseMove' | 'onMouseLeave'
