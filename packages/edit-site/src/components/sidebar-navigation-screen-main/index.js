@@ -4,10 +4,11 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 import { useEffect } from '@wordpress/element';
 
@@ -17,25 +18,22 @@ import { useEffect } from '@wordpress/element';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarNavigationScreenNavigationMenuButton from '../sidebar-navigation-screen-navigation-menus/navigator-button';
 
 export default function SidebarNavigationScreenMain() {
-	const editorCanvasContainerView = useSelect( ( select ) => {
-		return unlock( select( editSiteStore ) ).getEditorCanvasContainerView();
-	}, [] );
-
+	const { location } = useNavigator();
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
 
 	// Clear the editor canvas container view when accessing the main navigation screen.
 	useEffect( () => {
-		if ( editorCanvasContainerView ) {
+		if ( location?.path === '/' ) {
 			setEditorCanvasContainerView( undefined );
 		}
-	}, [ editorCanvasContainerView, setEditorCanvasContainerView ] );
+	}, [ setEditorCanvasContainerView, location?.path ] );
 
 	return (
 		<SidebarNavigationScreen

@@ -1,15 +1,21 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { SPACE } from '@wordpress/keycodes';
+import { insert } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useFirefoxCompat() {
+export function useFirefoxCompat( props ) {
+	const propsRef = useRef( props );
+	propsRef.current = props;
+
 	const { isMultiSelecting } = useSelect( blockEditorStore );
 	return useRefEffect( ( element ) => {
 		function onFocus() {
@@ -31,9 +37,29 @@ export function useFirefoxCompat() {
 			}
 		}
 
+		// If a contenteditable element is inside a button/summary element,
+		// it is not possible to type a space in Firefox. Therefore, cancel
+		// the default event and insert a space explicitly.
+		// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1822860
+		function onKeyDown( event ) {
+			if ( event.keyCode !== SPACE ) {
+				return;
+			}
+
+			if ( element.closest( 'button, summary' ) === null ) {
+				return;
+			}
+
+			const { value, onChange } = propsRef.current;
+			onChange( insert( value, ' ' ) );
+			event.preventDefault();
+		}
+
 		element.addEventListener( 'focus', onFocus );
+		element.addEventListener( 'keydown', onKeyDown );
 		return () => {
 			element.removeEventListener( 'focus', onFocus );
+			element.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [] );
 }

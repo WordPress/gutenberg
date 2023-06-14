@@ -14,10 +14,10 @@
 function gutenberg_get_theme_preview_path( $current_stylesheet = null ) {
 	// Don't allow non-admins to preview themes.
 	if ( ! current_user_can( 'switch_themes' ) ) {
-		return;
+		return $current_stylesheet;
 	}
 
-	$preview_stylesheet = ! empty( $_GET['theme_preview'] ) ? $_GET['theme_preview'] : null;
+	$preview_stylesheet = ! empty( $_GET['gutenberg_theme_preview'] ) ? $_GET['gutenberg_theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
 	if ( ! is_wp_error( $wp_theme->errors() ) ) {
 		if ( current_filter() === 'template' ) {
@@ -45,7 +45,7 @@ function gutenberg_attach_theme_preview_middleware() {
 		'wp-api-fetch',
 		sprintf(
 			'wp.apiFetch.use( wp.apiFetch.createThemePreviewMiddleware( %s ) );',
-			wp_json_encode( sanitize_text_field( $_GET['theme_preview'] ) )
+			wp_json_encode( sanitize_text_field( $_GET['gutenberg_theme_preview'] ) )
 		),
 		'after'
 	);
@@ -88,7 +88,7 @@ function add_live_preview_button() {
 			livePreviewButton.setAttribute('class', 'button button-primary');
 			livePreviewButton.setAttribute(
 				'href',
-				`/wp-admin/site-editor.php?theme_preview=${themePath}&return=themes.php`
+				`/wp-admin/site-editor.php?gutenberg_theme_preview=${themePath}&return=themes.php`
 			);
 			livePreviewButton.innerHTML = '<?php echo esc_html_e( 'Live Preview' ); ?>';
 			themeInfo.querySelector('.theme-actions').appendChild(livePreviewButton);
@@ -112,18 +112,15 @@ function block_theme_activate_nonce() {
 	<?php
 }
 
-// Hide this feature behind an experiment.
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gutenberg_experiments ) ) {
-	/**
-	 * Attaches filters to enable theme previews in the Site Editor.
-	 */
-	if ( ! empty( $_GET['theme_preview'] ) ) {
-		add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'template', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
-	}
-
-	add_action( 'admin_head', 'block_theme_activate_nonce' );
-	add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
+/**
+ * Attaches filters to enable theme previews in the Site Editor.
+ */
+if ( ! empty( $_GET['gutenberg_theme_preview'] ) ) {
+	add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'template', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
 }
+
+add_action( 'admin_head', 'block_theme_activate_nonce' );
+add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
+
