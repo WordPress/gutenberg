@@ -343,7 +343,7 @@ addFilter(
 	'blockEditor.useSetting.before',
 	'example/useSetting.before',
 	( settingValue, settingName, clientId, blockName ) => {
-		if ( blockName === Media & Text block'core/column' && settingName === 'spacing.units' ) {
+		if ( blockName === 'core/column' && settingName === 'spacing.units' ) {
 			return [ 'px' ];
 		}
 		return settingValue;

@@ -607,15 +607,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: 2px;
 }
 
-.emotion-13:hover {
-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+.emotion-13 svg,
+.emotion-13 path {
+  fill: currentColor;
 }
 
-.emotion-13:focus {
-  background-color: transparent;
+.emotion-13:hover {
   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  outline: 3px solid transparent;
 }
 
 .emotion-15 {

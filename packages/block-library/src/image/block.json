@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
@@ -80,13 +80,13 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
-		},
-		"behaviors": {
-			"type": "object"
 		}
 	},
 	"supports": {
 		"anchor": true,
+		"behaviors": {
+			"lightbox": true
+		},
 		"color": {
 			"text": false,
 			"background": false

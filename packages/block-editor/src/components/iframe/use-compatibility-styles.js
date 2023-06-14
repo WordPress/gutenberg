@@ -38,12 +38,6 @@ export function useCompatibilityStyles() {
 					return accumulator;
 				}
 
-				// Generally, ignore inline styles. We add inline styles belonging to a
-				// stylesheet later, which may or may not match the selectors.
-				if ( ownerNode.tagName !== 'LINK' ) {
-					return accumulator;
-				}
-
 				// Don't try to add the reset styles, which were removed as a dependency
 				// from `edit-blocks` for the iframe since we don't need to reset admin
 				// styles.
@@ -76,20 +70,42 @@ export function useCompatibilityStyles() {
 				}
 
 				if ( matchFromRules( cssRules ) ) {
-					// Display warning once we have a way to add style dependencies to the editor.
-					// See: https://github.com/WordPress/gutenberg/pull/37466.
+					const isInline = ownerNode.tagName === 'STYLE';
+
+					if ( isInline ) {
+						// If the current target is inline,
+						// it could be a dependency of an existing stylesheet.
+						// Look for that dependency and add it BEFORE the current target.
+						const mainStylesCssId = ownerNode.id.replace(
+							'-inline-css',
+							'-css'
+						);
+						const mainStylesElement =
+							document.getElementById( mainStylesCssId );
+						if ( mainStylesElement ) {
+							accumulator.push(
+								mainStylesElement.cloneNode( true )
+							);
+						}
+					}
+
 					accumulator.push( ownerNode.cloneNode( true ) );
 
-					// Add inline styles belonging to the stylesheet.
-					const inlineCssId = ownerNode.id.replace(
-						'-css',
-						'-inline-css'
-					);
-					const inlineCssElement =
-						document.getElementById( inlineCssId );
-
-					if ( inlineCssElement ) {
-						accumulator.push( inlineCssElement.cloneNode( true ) );
+					if ( ! isInline ) {
+						// If the current target is not inline,
+						// we still look for inline styles that could be relevant for the current target.
+						// If they exist, add them AFTER the current target.
+						const inlineStylesCssId = ownerNode.id.replace(
+							'-css',
+							'-inline-css'
+						);
+						const inlineStylesElement =
+							document.getElementById( inlineStylesCssId );
+						if ( inlineStylesElement ) {
+							accumulator.push(
+								inlineStylesElement.cloneNode( true )
+							);
+						}
 					}
 				}
 

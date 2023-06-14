@@ -280,12 +280,19 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+		if ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
-		$layout_styles[] = array(
-			'selector'     => $selector,
-			'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
-		);
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+			);
+		}
 
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
@@ -590,7 +597,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	);
 	$updated_content = preg_replace_callback(
 		$replace_regex,
-		function( $matches ) {
+		static function( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
 		$block_content

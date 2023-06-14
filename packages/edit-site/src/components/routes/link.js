@@ -7,7 +7,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
@@ -37,7 +37,7 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 	if ( isPreviewingTheme() ) {
 		params = {
 			...params,
-			theme_preview: currentlyPreviewingTheme(),
+			gutenberg_theme_preview: currentlyPreviewingTheme(),
 		};
 	}
 

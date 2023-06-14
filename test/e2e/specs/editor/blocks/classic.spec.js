@@ -18,8 +18,15 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -125,6 +132,14 @@ test.describe( 'Classic', () => {
 
 		await page.reload();
 		await page.unroute( '**' );
+
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {
