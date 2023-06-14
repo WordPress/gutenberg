@@ -215,7 +215,7 @@ describe( 'when an image is attached', () => {
 		);
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
-			screen.getByTestId( 'Slider Y-Axis Position' ),
+			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
 			'valueChange',
 			'52'
 		);
@@ -240,10 +240,12 @@ describe( 'when an image is attached', () => {
 		);
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
-			screen.getByText( ( attributes.focalPoint.x * 100 ).toString() )
+			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
+				hidden: true,
+			} )
 		);
 		fireEvent.changeText(
-			screen.getByLabelText( 'X-Axis Position' ),
+			screen.getByLabelText( 'X-Axis Position', { hidden: true } ),
 			'99'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
@@ -267,10 +269,12 @@ describe( 'when an image is attached', () => {
 		);
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
-			screen.getByText( ( attributes.focalPoint.x * 100 ).toString() )
+			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
+				hidden: true,
+			} )
 		);
 		fireEvent.changeText(
-			screen.getByLabelText( 'X-Axis Position' ),
+			screen.getByLabelText( 'X-Axis Position', { hidden: true } ),
 			'80'
 		);
 		fireEvent.press( screen.getByLabelText( 'Go back' ) );
@@ -317,9 +321,13 @@ describe( 'when an image is attached', () => {
 
 		// Update Opacity attribute
 		const opacityControl = getByLabelText( /Opacity/ );
-		fireEvent.press( within( opacityControl ).getByText( '50' ) );
-		const heightTextInput =
-			within( opacityControl ).getByDisplayValue( '50' );
+		fireEvent.press(
+			within( opacityControl ).getByText( '50', { hidden: true } )
+		);
+		const heightTextInput = within( opacityControl ).getByDisplayValue(
+			'50',
+			{ hidden: true }
+		);
 		fireEvent.changeText( heightTextInput, '20' );
 
 		// The decreasing button should be disabled
@@ -539,12 +547,12 @@ describe( 'minimum height settings', () => {
 		await openBlockSettings( screen );
 
 		// Set vw unit
-		fireEvent.press( getByText( 'px' ) );
-		fireEvent.press( getByText( 'Viewport width (vw)' ) );
+		fireEvent.press( getByText( 'px', { hidden: true } ) );
+		fireEvent.press( getByText( 'Viewport width (vw)', { hidden: true } ) );
 
 		// Update height attribute
-		fireEvent.press( getByText( '300' ) );
-		const heightTextInput = getByDisplayValue( '300' );
+		fireEvent.press( getByText( '300', { hidden: true } ) );
+		const heightTextInput = getByDisplayValue( '300', { hidden: true } );
 		fireEvent.changeText( heightTextInput, '20' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -564,8 +572,8 @@ describe( 'minimum height settings', () => {
 		await openBlockSettings( screen );
 
 		// Set the pixel unit
-		fireEvent.press( getByText( 'vw' ) );
-		fireEvent.press( getByText( 'Pixels (px)' ) );
+		fireEvent.press( getByText( 'vw', { hidden: true } ) );
+		fireEvent.press( getByText( 'Pixels (px)', { hidden: true } ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -595,14 +603,17 @@ describe( 'minimum height settings', () => {
 				await openBlockSettings( screen );
 
 				// Set the unit name
-				fireEvent.press( getByText( 'vw' ) );
-				fireEvent.press( getByText( unitName ) );
+				fireEvent.press( getByText( 'vw', { hidden: true } ) );
+				fireEvent.press( getByText( unitName, { hidden: true } ) );
 
 				// Update height attribute
 				const heightControl = getByLabelText( /Minimum height/ );
-				fireEvent.press( within( heightControl ).getByText( value ) );
-				const heightTextInput =
-					within( heightControl ).getByDisplayValue( value );
+				fireEvent.press(
+					within( heightControl ).getByText( value, { hidden: true } )
+				);
+				const heightTextInput = within(
+					heightControl
+				).getByDisplayValue( value, { hidden: true } );
 				fireEvent.changeText( heightTextInput, minValue );
 
 				// The decreasing button should be disabled

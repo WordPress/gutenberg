@@ -359,9 +359,13 @@ describe( 'Columns block', () => {
 
 			// Get width control
 			const widthControl = screen.getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '33.3' ) );
-			const widthTextInput =
-				within( widthControl ).getByDisplayValue( '33.3' );
+			fireEvent.press(
+				within( widthControl ).getByText( '33.3', { hidden: true } )
+			);
+			const widthTextInput = within( widthControl ).getByDisplayValue(
+				'33.3',
+				{ hidden: true }
+			);
 			fireEvent.changeText( widthTextInput, '55.55555' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -386,9 +390,13 @@ describe( 'Columns block', () => {
 
 			// Set custom width value for the first column
 			let widthControl = getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '50' ) );
-			let widthTextInput =
-				within( widthControl ).getByDisplayValue( '50' );
+			fireEvent.press(
+				within( widthControl ).getByText( '50', { hidden: true } )
+			);
+			let widthTextInput = within( widthControl ).getByDisplayValue(
+				'50',
+				{ hidden: true }
+			);
 			fireEvent.changeText( widthTextInput, '90' );
 
 			// Dismiss settings
@@ -405,8 +413,12 @@ describe( 'Columns block', () => {
 
 			// Set custom width value for the second column
 			widthControl = getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '50' ) );
-			widthTextInput = within( widthControl ).getByDisplayValue( '50' );
+			fireEvent.press(
+				within( widthControl ).getByText( '50', { hidden: true } )
+			);
+			widthTextInput = within( widthControl ).getByDisplayValue( '50', {
+				hidden: true,
+			} );
 			fireEvent.changeText( widthTextInput, '55.5' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();

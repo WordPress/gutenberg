@@ -69,8 +69,10 @@ describe( 'Spacer block', () => {
 		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
-		fireEvent.press( screen.getByText( '100' ) );
-		const heightTextInput = screen.getByDisplayValue( '100' );
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '50' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -95,12 +97,16 @@ describe( 'Spacer block', () => {
 		await waitForModalVisible( blockSettingsModal );
 
 		// Set vh unit
-		fireEvent.press( screen.getByText( 'px' ) );
-		fireEvent.press( screen.getByText( 'Viewport height (vh)' ) );
+		fireEvent.press( screen.getByText( 'px', { hidden: true } ) );
+		fireEvent.press(
+			screen.getByText( 'Viewport height (vh)', { hidden: true } )
+		);
 
 		// Update height attribute
-		fireEvent.press( screen.getByText( '100' ) );
-		const heightTextInput = screen.getByDisplayValue( '100' );
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '25' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -212,8 +218,10 @@ describe( 'Spacer block', () => {
 		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
-		fireEvent.press( screen.getByText( '60' ) );
-		const heightTextInput = screen.getByDisplayValue( '60' );
+		fireEvent.press( screen.getByText( '60', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '60', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '70' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -238,8 +246,10 @@ describe( 'Spacer block', () => {
 		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
-		fireEvent.press( screen.getByText( '100' ) );
-		const heightTextInput = screen.getByDisplayValue( '100' );
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '120' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();

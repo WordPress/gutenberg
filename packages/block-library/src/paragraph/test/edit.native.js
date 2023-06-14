@@ -251,7 +251,7 @@ describe( 'Paragraph block', () => {
 			'wordpress.org'
 		);
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text' ),
+			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
 			'WordPress'
 		);
 		jest.useFakeTimers();
