@@ -6,12 +6,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * External dependencies
  */
-import path from 'path';
+const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
-import {
+const {
 	readFile,
 	deleteFile,
 	saveResultsFile,
@@ -19,7 +19,7 @@ import {
 	getTypingEventDurations,
 	getLoadingDurations,
 	loadBlocksFromHtml,
-} from '../utils';
+} = require( '../utils' );
 
 const results = {
 	serverResponse: [],
