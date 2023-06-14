@@ -113,8 +113,8 @@ export default function ChangeStatus( {
 	};
 
 	const handleStatus = ( value ) => {
-		if ( value === 'published' ) {
-			setDate( undefined );
+		if ( value === 'publish' ) {
+			setDate( null );
 		}
 		setStatus( value );
 	};
