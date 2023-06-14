@@ -25,122 +25,24 @@ store( {
 					context.core.image.initialized = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
-					context.core.image.scrollPosition = window.scrollY;
+					context.core.image.scrollDelta = 0;
 
+					// Since the img is hidden and its src not loaded until
+					// the lightbox is opened, let's create an img element on the fly
+					// so we can get the dimensions we need to calculate the styles
 					const imgDom = document.createElement( 'img' );
+
 					imgDom.onload = function () {
+						// Enable the lightbox only after the image
+						// is loaded to prevent flashing of unstyled content
 						context.core.image.lightboxEnabled = true;
 						if ( context.core.image.lightboxAnimation === 'zoom' ) {
-							let targetWidth = imgDom.naturalWidth;
-							let targetHeight = imgDom.naturalHeight;
-
-							const figureStyle = window.getComputedStyle(
-								context.core.image.figureRef
-							);
-
-							const topPadding = parseInt(
-								figureStyle.getPropertyValue( 'padding-top' )
-							);
-							const bottomPadding = parseInt(
-								figureStyle.getPropertyValue( 'padding-bottom' )
-							);
-							const figureWidth =
-								context.core.image.figureRef.clientWidth;
-							let horizontalPadding = 0;
-							if ( figureWidth > 480 ) {
-								horizontalPadding = 40;
-							} else if ( figureWidth > 1920 ) {
-								horizontalPadding = 80;
-							}
-
-							const figureHeight =
-								context.core.image.figureRef.clientHeight -
-								topPadding -
-								bottomPadding;
-
-							// Check difference between the image and figure dimensions
-							const widthOverflow = Math.abs(
-								Math.min( figureWidth - targetWidth, 0 )
-							);
-							const heightOverflow = Math.abs(
-								Math.min( figureHeight - targetHeight, 0 )
-							);
-
-							// If image is larger than the figure, resize along its largest axis
-							if ( widthOverflow > 0 || heightOverflow > 0 ) {
-								if ( widthOverflow > heightOverflow ) {
-									targetWidth =
-										figureWidth - horizontalPadding * 2;
-									targetHeight =
-										imgDom.naturalHeight *
-										( targetWidth / imgDom.naturalWidth );
-								} else {
-									targetHeight = figureHeight;
-									targetWidth =
-										imgDom.naturalWidth *
-										( targetHeight / imgDom.naturalHeight );
-								}
-							}
-
-							const { x: leftPosition, y: topPosition } =
-								event.target.nextElementSibling.getBoundingClientRect();
-							const scaleWidth =
-								event.target.nextElementSibling.offsetWidth /
-								targetWidth;
-
-							const scaleHeight =
-								event.target.nextElementSibling.offsetHeight /
-								targetHeight;
-							let targetLeft = 0;
-							if ( targetWidth >= figureWidth ) {
-								targetLeft = horizontalPadding;
-							} else {
-								targetLeft = ( figureWidth - targetWidth ) / 2;
-							}
-
-							let targetTop = 0;
-							if ( targetHeight >= figureHeight ) {
-								targetTop = topPadding;
-							} else {
-								targetTop =
-									( figureHeight - targetHeight ) / 2 +
-									topPadding;
-							}
-							const root = document.documentElement;
-
-							root.style.setProperty(
-								'--lightbox-image-max-width',
-								targetWidth + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-image-max-height',
-								targetHeight + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-initial-left-position',
-								leftPosition + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-initial-top-position',
-								topPosition + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-target-left-position',
-								targetLeft + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-target-top-position',
-								targetTop + 'px'
-							);
-							root.style.setProperty(
-								'--lightbox-scale-width',
-								scaleWidth
-							);
-							root.style.setProperty(
-								'--lightbox-scale-height',
-								scaleHeight
-							);
+							setZoomStyles( imgDom, context, event );
 						}
+
+						// Hide overflow only when the animation is in progress,
+						// otherwise the removal of the scrollbars will draw attention
+						// to itself and look like an error
 						document.documentElement.classList.add(
 							'has-lightbox-open'
 						);
@@ -148,16 +50,17 @@ store( {
 					imgDom.setAttribute( 'src', context.core.image.imageSrc );
 				},
 				hideLightbox: async ( { context, event } ) => {
-					context.core.image.animateOutEnabled = true;
+					context.core.image.hideAnimationEnabled = true;
 					if ( context.core.image.lightboxEnabled ) {
 						// If scrolling, wait a moment before closing the lightbox.
 						if ( context.core.image.lightboxAnimation === 'fade' ) {
+							context.core.image.scrollDelta += event.deltaY;
 							if (
 								event.type === 'mousewheel' &&
 								Math.abs(
 									window.scrollY -
-										context.core.image.scrollPosition
-								) < 5
+										context.core.image.scrollDelta
+								) < 10
 							) {
 								return;
 							}
@@ -258,3 +161,101 @@ store( {
 		},
 	},
 } );
+
+function setZoomStyles( imgDom, context, event ) {
+	let targetWidth = imgDom.naturalWidth;
+	let targetHeight = imgDom.naturalHeight;
+
+	const figureStyle = window.getComputedStyle( context.core.image.figureRef );
+	const topPadding = parseInt(
+		figureStyle.getPropertyValue( 'padding-top' )
+	);
+	const bottomPadding = parseInt(
+		figureStyle.getPropertyValue( 'padding-bottom' )
+	);
+
+	// As per the design, let's allow the image to stretch
+	// to the full width of its containing figure, but for the height,
+	// constrain it to the padding settings
+	const containerWidth = context.core.image.figureRef.clientWidth;
+	const containerHeight =
+		context.core.image.figureRef.clientHeight - topPadding - bottomPadding;
+
+	// Check difference between the image and figure dimensions
+	const widthOverflow = Math.abs(
+		Math.min( containerWidth - targetWidth, 0 )
+	);
+	const heightOverflow = Math.abs(
+		Math.min( containerHeight - targetHeight, 0 )
+	);
+
+	// The lightbox image has `positione:absolute` and
+	// ignores its parent's padding, so let's set the padding here,
+	// to be used when calculating the image width and positioning
+	let horizontalPadding = 0;
+	if ( containerWidth > 480 ) {
+		horizontalPadding = 40;
+	} else if ( containerWidth > 1920 ) {
+		horizontalPadding = 80;
+	}
+
+	// If image is larger than its container, resize along its largest axis
+	if ( widthOverflow > 0 || heightOverflow > 0 ) {
+		if ( widthOverflow > heightOverflow ) {
+			targetWidth = containerWidth - horizontalPadding * 2;
+			targetHeight =
+				imgDom.naturalHeight * ( targetWidth / imgDom.naturalWidth );
+		} else {
+			targetHeight = containerHeight;
+			targetWidth =
+				imgDom.naturalWidth * ( targetHeight / imgDom.naturalHeight );
+		}
+	}
+
+	// The reference img element lies adjacent to the event target button in the DOM
+	const { x: originLeft, y: originTop } =
+		event.target.nextElementSibling.getBoundingClientRect();
+	const scaleWidth =
+		event.target.nextElementSibling.offsetWidth / targetWidth;
+	const scaleHeight =
+		event.target.nextElementSibling.offsetHeight / targetHeight;
+
+	// Get values used to center the image
+	let targetLeft = 0;
+	if ( targetWidth >= containerWidth ) {
+		targetLeft = horizontalPadding;
+	} else {
+		targetLeft = ( containerWidth - targetWidth ) / 2;
+	}
+	let targetTop = 0;
+	if ( targetHeight >= containerHeight ) {
+		targetTop = topPadding;
+	} else {
+		targetTop = ( containerHeight - targetHeight ) / 2 + topPadding;
+	}
+
+	const root = document.documentElement;
+	root.style.setProperty( '--lightbox-scale-width', scaleWidth );
+	root.style.setProperty( '--lightbox-scale-height', scaleHeight );
+	root.style.setProperty( '--lightbox-image-max-width', targetWidth + 'px' );
+	root.style.setProperty(
+		'--lightbox-image-max-height',
+		targetHeight + 'px'
+	);
+	root.style.setProperty(
+		'--lightbox-initial-left-position',
+		originLeft + 'px'
+	);
+	root.style.setProperty(
+		'--lightbox-initial-top-position',
+		originTop + 'px'
+	);
+	root.style.setProperty(
+		'--lightbox-target-left-position',
+		targetLeft + 'px'
+	);
+	root.style.setProperty(
+		'--lightbox-target-top-position',
+		targetTop + 'px'
+	);
+}
