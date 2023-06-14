@@ -264,6 +264,10 @@
 			visibility: visible;
 			.wp-block-image img {
 				animation: lightbox-zoom-in 0.4s forwards;
+
+				@media (prefers-reduced-motion) {
+					animation: both turn-on-visibility 0.3s;
+				}
 			}
 			.scrim {
 				animation: turn-on-visibility 0.4s forwards;
@@ -273,6 +277,10 @@
 			&:not(.active) {
 				.wp-block-image img {
 					animation: lightbox-zoom-out 0.4s forwards;
+
+					@media (prefers-reduced-motion) {
+						animation: both turn-on-visibility 0.3s;
+					}
 				}
 				.scrim {
 					animation: turn-off-visibility 0.4s forwards;
