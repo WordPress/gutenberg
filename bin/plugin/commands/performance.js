@@ -285,7 +285,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && node ./bin/packages/build.js',
+		'npm ci && npm run build:packages',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
