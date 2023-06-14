@@ -17,8 +17,20 @@ import { create } from './create';
  * @return {Object} `a`, mutated.
  */
 export function mergePair( a, b ) {
-	a.formats = a.formats.concat( b.formats );
-	a.replacements = a.replacements.concat( b.replacements );
+	const splitPoint = a.text.length;
+
+	a.formats.length += b.text.length;
+	for ( const i in b.formats ) {
+		// eslint-disable-next-line no-bitwise
+		a.formats[ ( i | 0 ) + splitPoint ] = b.formats[ i ];
+	}
+
+	a.replacements.length += b.text.length;
+	for ( const i in b.replacements ) {
+		// eslint-disable-next-line no-bitwise
+		a.replacements[ ( i | 0 ) + splitPoint ] = b.replacements[ i ];
+	}
+
 	a.text += b.text;
 
 	return a;
