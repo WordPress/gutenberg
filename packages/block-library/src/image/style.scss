@@ -263,19 +263,19 @@
 			opacity: 1;
 			visibility: visible;
 			.wp-block-image img {
-				animation: lightbox-zoom-in .4s forwards;
+				animation: lightbox-zoom-in 0.4s forwards;
 			}
 			.scrim {
-				animation: turn-on-visibility .4s forwards;
+				animation: turn-on-visibility 0.4s forwards;
 			}
 		}
-		&.initialized {
+		&.animateoutenabled {
 			&:not(.active) {
 				.wp-block-image img {
-					animation: lightbox-zoom-out .4s forwards;
+					animation: lightbox-zoom-out 0.4s forwards;
 				}
 				.scrim {
-					animation: turn-off-visibility .4s forwards;
+					animation: turn-off-visibility 0.4s forwards;
 				}
 			}
 		}
@@ -314,31 +314,31 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
-		left: var(--lightbox-left-position);
-		top: var(--lightbox-top-position);
+		left: var(--lightbox-initial-left-position);
+		top: var(--lightbox-initial-top-position);
 		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 	100% {
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) scale(1, 1);
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) scale(1, 1);
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
 
-		left: var(--lightbox-left-position);
-		top: var(--lightbox-top-position);
+		left: var(--lightbox-initial-left-position);
+		top: var(--lightbox-initial-top-position);
 		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 }

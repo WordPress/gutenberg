@@ -23,7 +23,6 @@ store( {
 			image: {
 				showLightbox: ( { context, event } ) => {
 					context.core.image.initialized = true;
-					context.core.image.lightboxEnabled = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
@@ -32,8 +31,8 @@ store( {
 					);
 
 					const imgDom = document.createElement( 'img' );
-					imgDom.setAttribute( 'src', context.core.image.imageSrc );
 					imgDom.onload = function () {
+						context.core.image.lightboxEnabled = true;
 						if ( context.core.image.lightboxAnimation === 'zoom' ) {
 							let targetWidth = imgDom.naturalWidth;
 							let targetHeight = imgDom.naturalHeight;
@@ -48,17 +47,15 @@ store( {
 							const bottomPadding = parseInt(
 								figureStyle.getPropertyValue( 'padding-bottom' )
 							);
-							const leftPadding = parseInt(
-								figureStyle.getPropertyValue( 'padding-left' )
-							);
-							const rightPadding = parseInt(
-								figureStyle.getPropertyValue( 'padding-right' )
-							);
-
 							const figureWidth =
-								context.core.image.figureRef.clientWidth -
-								leftPadding -
-								rightPadding;
+								context.core.image.figureRef.clientWidth;
+							let horizontalPadding = 0;
+							if ( figureWidth > 480 ) {
+								horizontalPadding = 40;
+							} else if ( figureWidth > 1920 ) {
+								horizontalPadding = 80;
+							}
+
 							const figureHeight =
 								context.core.image.figureRef.clientHeight -
 								topPadding -
@@ -75,21 +72,16 @@ store( {
 							// If image is larger than the figure, resize along its largest axis
 							if ( widthOverflow > 0 || heightOverflow > 0 ) {
 								if ( widthOverflow > heightOverflow ) {
-									targetWidth = figureWidth;
+									targetWidth =
+										figureWidth - horizontalPadding * 2;
 									targetHeight =
-										context.core.image.imageRef
-											.naturalHeight *
-										( targetWidth /
-											context.core.image.imageRef
-												.naturalWidth );
+										imgDom.naturalHeight *
+										( targetWidth / imgDom.naturalWidth );
 								} else {
 									targetHeight = figureHeight;
 									targetWidth =
-										context.core.image.imageRef
-											.naturalWidth *
-										( targetHeight /
-											context.core.image.imageRef
-												.naturalHeight );
+										imgDom.naturalWidth *
+										( targetHeight / imgDom.naturalHeight );
 								}
 							}
 
@@ -98,9 +90,25 @@ store( {
 							const scaleWidth =
 								event.target.nextElementSibling.offsetWidth /
 								targetWidth;
+
 							const scaleHeight =
 								event.target.nextElementSibling.offsetHeight /
 								targetHeight;
+							let targetLeft = 0;
+							if ( targetWidth >= figureWidth ) {
+								targetLeft = horizontalPadding;
+							} else {
+								targetLeft = ( figureWidth - targetWidth ) / 2;
+							}
+
+							let targetTop = 0;
+							if ( targetHeight >= figureHeight ) {
+								targetTop = topPadding;
+							} else {
+								targetTop =
+									( figureHeight - targetHeight ) / 2 +
+									topPadding;
+							}
 							const root = document.documentElement;
 
 							root.style.setProperty(
@@ -112,12 +120,20 @@ store( {
 								targetHeight + 'px'
 							);
 							root.style.setProperty(
-								'--lightbox-left-position',
+								'--lightbox-initial-left-position',
 								leftPosition + 'px'
 							);
 							root.style.setProperty(
-								'--lightbox-top-position',
+								'--lightbox-initial-top-position',
 								topPosition + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-target-left-position',
+								targetLeft + 'px'
+							);
+							root.style.setProperty(
+								'--lightbox-target-top-position',
+								targetTop + 'px'
 							);
 							root.style.setProperty(
 								'--lightbox-scale-width',
@@ -129,8 +145,10 @@ store( {
 							);
 						}
 					};
+					imgDom.setAttribute( 'src', context.core.image.imageSrc );
 				},
 				hideLightbox: async ( { context, event } ) => {
+					context.core.image.animateOutEnabled = true;
 					if ( context.core.image.lightboxEnabled ) {
 						// If scrolling, wait a moment before closing the lightbox.
 						if ( context.core.image.lightboxAnimation === 'fade' ) {

@@ -89,7 +89,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
-	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "imageSrc": "' . $img_src . '", "lightboxEnabled": false, "lightboxAnimation": "' . $lightbox_animation . '" } } }' );
+	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "imageSrc": "' . $img_src . '", "lightboxEnabled": false, "lightboxAnimation": "' . $lightbox_animation . '", "animateOutEnabled": false } } }' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -120,6 +120,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
             aria-label="$dialog_label"
             data-wp-class--initialized="context.core.image.initialized"
             data-wp-class--active="context.core.image.lightboxEnabled"
+			data-wp-class--animateOutEnabled="context.core.image.animateOutEnabled"
             data-wp-bind--aria-hidden="!context.core.image.lightboxEnabled"
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
             data-wp-effect="effects.core.image.initLightbox"
