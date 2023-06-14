@@ -1,44 +1,26 @@
 .edit-site-document-actions {
-	display: grid;
-	grid-template-columns: 1fr 2fr 1fr;
-	height: $button-size;
-	// Flex items will, by default, refuse to shrink below a minimum
-	// intrinsic width. In order to shrink this flexbox item, and
-	// subsequently truncate child text, we set an explicit min-width.
-	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
-	min-width: 0;
-	background: $gray-100;
-	border-radius: 4px;
-	width: min(100%, 450px);
-	overflow: hidden;
-
-	&:hover {
-		color: currentColor;
-		background: $gray-200;
-	}
+	align-items: center;
+	display: flex;
+	justify-items: center;
 }
 
 .edit-site-document-actions__command {
-	grid-column: 1 / -1;
-	display: grid;
-	grid-template-columns: 1fr 2fr 1fr;
-	grid-row: 1;
+	align-items: center;
+	background-color: $gray-100;
+	border-radius: 4px;
+	display: flex;
+	height: auto;
+	justify-content: space-between;
+	margin-left: 1rem;
+	width: min(100%, 450px);
+
+	> span + span {
+		padding-left: clamp(0.25rem, 0.5rem, 1rem);
+	}
 }
 
 
 .edit-site-document-actions__title {
-	flex-grow: 1;
-	color: var(--wp-block-synced-color);
-	overflow: hidden;
-	grid-column: 2 / 3;
-
-	h1 {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		color: var(--wp-block-synced-color);
-	}
-
 	.edit-site-document-actions.is-page & {
 		color: $gray-800;
 
