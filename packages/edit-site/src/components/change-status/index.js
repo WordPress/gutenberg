@@ -53,7 +53,7 @@ const STATUS_OPTIONS = [
 export default function ChangeStatus( {
 	postType,
 	postId,
-	postStatus: initialStatus,
+	status: initialStatus,
 	password: initialPassword,
 	date: initialDate,
 } ) {
