@@ -14,7 +14,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import CreatePatternModal from '../create-pattern-modal';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
