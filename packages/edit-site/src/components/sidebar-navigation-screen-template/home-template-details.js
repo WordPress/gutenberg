@@ -29,15 +29,10 @@ import { useLink } from '../routes/link';
 
 const EMPTY_OBJECT = {};
 
-function TemplateAreaButton( { area, postId, icon, title } ) {
+function TemplateAreaButton( { postId, icon, title } ) {
 	const icons = {
 		header,
 		footer,
-	};
-	// Generic area labels - not the same as the template part title defined in "templateParts" in theme.json.
-	const areaLabels = {
-		header: __( 'Header' ),
-		footer: __( 'Footer' ),
 	};
 	const linkInfo = useLink( {
 		postType: 'wp_template_part',
@@ -49,20 +44,17 @@ function TemplateAreaButton( { area, postId, icon, title } ) {
 			as="a"
 			className="edit-site-sidebar-navigation-screen-template__template-area-button"
 			{ ...linkInfo }
+			icon={ icons[ icon ] ?? layout }
 		>
-			<span className="edit-site-sidebar-navigation-screen-template__template-area-name">
-				{ areaLabels[ area ] ?? __( 'Template part' ) }
-			</span>
-			<span className="edit-site-sidebar-navigation-screen-template__template-area-label">
-				<Icon icon={ icons[ icon ] ?? layout } />
-				<Truncate
-					limit={ 20 }
-					ellipsizeMode="tail"
-					numberOfLines={ 1 }
-					className="edit-site-sidebar-navigation-screen-template__template-area-label-text"
-				>
-					{ title }
-				</Truncate>
+			<Truncate
+				limit={ 20 }
+				ellipsizeMode="tail"
+				numberOfLines={ 1 }
+				className="edit-site-sidebar-navigation-screen-template__template-area-label-text"
+			>
+				{ title }
+			</Truncate>
+			<span className="edit-site-sidebar-navigation-screen-template__template-icon">
 				<Icon icon={ chevronRightSmall } />
 			</span>
 		</Button>
@@ -79,9 +71,9 @@ export default function HomeTemplateDetails() {
 	const {
 		allowCommentsOnNewPosts,
 		templatePartAreas,
-		isHomePageBlog,
 		postsPerPage,
-		siteTitle,
+		postsPageTitle,
+		postsPageId,
 		templateRecord,
 	} = useSelect(
 		( select ) => {
@@ -95,15 +87,20 @@ export default function HomeTemplateDetails() {
 					postType,
 					postId
 				) || EMPTY_OBJECT;
+			const _postsPageRecord = siteSettings?.page_for_posts
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'page',
+						siteSettings?.page_for_posts
+				  )
+				: EMPTY_OBJECT;
 
 			return {
 				templateRecord: _templateRecord,
-				isHomePageBlog:
-					siteSettings?.page_for_posts ===
-					siteSettings?.page_on_front,
 				allowCommentsOnNewPosts:
 					siteSettings?.default_comment_status === 'open',
-				siteTitle: siteSettings?.title,
+				postsPageTitle: _postsPageRecord?.title?.rendered,
+				postsPageId: _postsPageRecord?.id,
 				postsPerPage: siteSettings?.posts_per_page,
 				templatePartAreas: siteEditorSettings?.defaultTemplatePartAreas,
 			};
@@ -111,15 +108,16 @@ export default function HomeTemplateDetails() {
 		[ postType, postId ]
 	);
 
-	const [ commentsOnNewPosts, setCommentsOnNewPosts ] = useState( '' );
-	const [ postsCount, setPostsCount ] = useState( 1 );
-	const [ siteTitleValue, setSiteTitleValue ] = useState( '' );
+	const [ commentsOnNewPostsValue, setCommentsOnNewPostsValue ] =
+		useState( '' );
+	const [ postsCountValue, setPostsCountValue ] = useState( 1 );
+	const [ postsPageTitleValue, setPostsPageTitleValue ] = useState( '' );
 
 	useEffect( () => {
-		setCommentsOnNewPosts( allowCommentsOnNewPosts );
-		setSiteTitleValue( siteTitle );
-		setPostsCount( postsPerPage );
-	}, [ siteTitle, allowCommentsOnNewPosts, postsPerPage ] );
+		setCommentsOnNewPostsValue( allowCommentsOnNewPosts );
+		setPostsPageTitleValue( postsPageTitle );
+		setPostsCountValue( postsPerPage );
+	}, [ postsPageTitle, allowCommentsOnNewPosts, postsPerPage ] );
 
 	const templateAreas = useMemo( () => {
 		return templateRecord?.blocks && templatePartAreas
@@ -140,21 +138,21 @@ export default function HomeTemplateDetails() {
 	}, [ templateRecord?.blocks, templatePartAreas ] );
 
 	const setAllowCommentsOnNewPosts = ( newValue ) => {
-		setCommentsOnNewPosts( newValue );
+		setCommentsOnNewPostsValue( newValue );
 		editEntityRecord( 'root', 'site', undefined, {
 			default_comment_status: newValue ? 'open' : null,
 		} );
 	};
 
-	const setSiteTitle = ( newValue ) => {
-		setSiteTitleValue( newValue );
-		editEntityRecord( 'root', 'site', undefined, {
+	const setPostsPageTitle = ( newValue ) => {
+		setPostsPageTitleValue( newValue );
+		editEntityRecord( 'postType', 'page', postsPageId, {
 			title: newValue,
 		} );
 	};
 
 	const setPostsPerPage = ( newValue ) => {
-		setPostsCount( newValue );
+		setPostsCountValue( newValue );
 		editEntityRecord( 'root', 'site', undefined, {
 			posts_per_page: newValue,
 		} );
@@ -163,53 +161,53 @@ export default function HomeTemplateDetails() {
 	return (
 		<>
 			<SidebarNavigationScreenDetailsPanel>
-				<SidebarNavigationScreenDetailsPanelRow>
-					<InputControl
-						className="edit-site-sidebar-navigation-screen__input-control"
-						placeholder={ __( 'No Title' ) }
-						value={ siteTitleValue }
-						onChange={ debounce( setSiteTitle, 300 ) }
-						label={ __( 'Site title' ) }
-						help={ __( 'Update the title of your site' ) }
-					/>
-				</SidebarNavigationScreenDetailsPanelRow>
-				{ isHomePageBlog && (
+				{ postsPageId && (
 					<SidebarNavigationScreenDetailsPanelRow>
 						<InputControl
 							className="edit-site-sidebar-navigation-screen__input-control"
-							placeholder={ 0 }
-							value={ postsCount }
-							step="1"
-							min="1"
-							type="number"
-							onChange={ debounce( setPostsPerPage, 300 ) }
-							label={ __( 'Posts per page' ) }
-							help={ __(
-								'The maximum amount of posts to display on a page. This setting applies to all blog pages including category and tag archives.'
-							) }
+							placeholder={ __( 'No Title' ) }
+							value={ postsPageTitleValue }
+							onChange={ debounce( setPostsPageTitle, 300 ) }
+							label={ __( 'Blog title' ) }
+							help={ __( 'Update the title of your posts page' ) }
 						/>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) }
+				<SidebarNavigationScreenDetailsPanelRow>
+					<InputControl
+						className="edit-site-sidebar-navigation-screen__input-control"
+						placeholder={ 0 }
+						value={ postsCountValue }
+						step="1"
+						min="1"
+						type="number"
+						onChange={ debounce( setPostsPerPage, 300 ) }
+						label={ __( 'Posts per page' ) }
+						help={ __(
+							'The maximum amount of posts to display on a page. This setting applies to all blog pages including category and tag archives.'
+						) }
+					/>
+				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Discussion' ) }>
 				<SidebarNavigationScreenDetailsPanelRow>
 					<CheckboxControl
+						className="edit-site-sidebar-navigation-screen__input-control"
 						label="Allow comments on new posts"
 						help="Individual posts may override these settings. Changes here will only be applied to new posts."
-						checked={ commentsOnNewPosts }
+						checked={ commentsOnNewPostsValue }
 						onChange={ debounce( setAllowCommentsOnNewPosts, 300 ) }
 					/>
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Areas' ) }>
-				{ templateAreas.map( ( { label, icon, area, theme, slug } ) => (
+				{ templateAreas.map( ( { label, icon, theme, slug } ) => (
 					<SidebarNavigationScreenDetailsPanelRow key={ slug }>
 						<TemplateAreaButton
 							postId={ `${ theme }//${ slug }` }
 							title={ label }
 							icon={ icon }
-							area={ area }
 						/>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) ) }

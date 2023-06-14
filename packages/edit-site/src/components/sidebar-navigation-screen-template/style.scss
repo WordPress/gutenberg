@@ -34,16 +34,11 @@
 	border-radius: 4px;
 }
 
-.edit-site-sidebar-navigation-screen-template__template-area-name {
+.edit-site-sidebar-navigation-screen-template__template-area-label-text {
+	margin: 0 $grid-unit-20 0 $grid-unit-05;
 	flex-grow: 1;
 }
 
-.edit-site-sidebar-navigation-screen-template__template-area-label {
+.edit-site-sidebar-navigation-screen-template__template-icon {
 	display: flex;
-	align-items: center;
-	flex-wrap: nowrap;
-}
-
-.edit-site-sidebar-navigation-screen-template__template-area-label-text {
-	margin: 0 $grid-unit-20 0 $grid-unit-05;
 }
