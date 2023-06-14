@@ -52,7 +52,7 @@ function gutenberg_test_register_context_blocks() {
 				'postId',
 				'postType',
 			),
-			'render_callback' => function( $attributes, $content, $block ) {
+			'render_callback' => static function( $attributes, $content, $block ) {
 				$ordered_context = array(
 					$block->context['gutenberg/recordId'],
 					$block->context['postId'],

@@ -31,12 +31,10 @@ import {
 	__experimentaluseLayoutStyles as useLayoutStyles,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
-import { arrowLeft } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
+import { parse, store as blocksStore } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -114,6 +112,7 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
+		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -123,6 +122,7 @@ export default function VisualEditor( { styles } ) {
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
 			select( editorStore );
+		const { getBlockTypes } = select( blocksStore );
 		const _isTemplateMode = isEditingTemplate();
 		let _wrapperBlockName;
 
@@ -153,6 +153,9 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
+			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
+				return type.apiVersion >= 3;
+			} ),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -175,8 +178,6 @@ export default function VisualEditor( { styles } ) {
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
 		};
 	}, [] );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
@@ -349,18 +350,6 @@ export default function VisualEditor( { styles } ) {
 				} }
 				ref={ blockSelectionClearerRef }
 			>
-				{ isTemplateMode && (
-					<Button
-						className="edit-post-visual-editor__exit-template-mode"
-						icon={ arrowLeft }
-						onClick={ () => {
-							clearSelectedBlock();
-							setIsEditingTemplate( false );
-						} }
-					>
-						{ __( 'Back' ) }
-					</Button>
-				) }
 				<motion.div
 					animate={ animatedStyles }
 					initial={ desktopCanvasStyles }
@@ -368,8 +357,8 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isGutenbergPlugin &&
-								isBlockBasedTheme &&
+							( ( hasV3BlocksOnly ||
+								( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
@@ -383,8 +372,15 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<>
 									<LayoutStyle
-										selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+										selector=".edit-post-visual-editor__post-title-wrapper"
 										layout={ fallbackLayout }
+										layoutDefinitions={
+											globalLayoutSettings?.definitions
+										}
+									/>
+									<LayoutStyle
+										selector=".block-editor-block-list__layout.is-root-container"
+										layout={ blockListLayout }
 										layoutDefinitions={
 											globalLayoutSettings?.definitions
 										}
