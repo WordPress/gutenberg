@@ -94,7 +94,7 @@ describe.each( [
 			);
 		} );
 
-		test.skip( 'should display a tooltip when hovering tabs provided with an icon', async () => {
+		test( 'should display a tooltip when hovering tabs provided with an icon', async () => {
 			const user = userEvent.setup();
 
 			const panelRenderFunction = jest.fn();
@@ -138,7 +138,7 @@ describe.each( [
 			}
 		} );
 
-		test.skip( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
+		test( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
 			const user = userEvent.setup();
 
 			const mockOnSelect = jest.fn();
