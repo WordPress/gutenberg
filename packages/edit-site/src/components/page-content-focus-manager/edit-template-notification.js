@@ -38,20 +38,24 @@ function useEditTemplateNotification( contentRef ) {
 		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
-
-	const alreadySeen = useRef( false );
+	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice } = useDispatch( noticesStore );
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
+	const lastNoticeId = useRef( 0 );
+
 	useEffect( () => {
-		const handleClick = ( event ) => {
+		const handleClick = async ( event ) => {
+			const isNoticeAlreadyShowing = getNotices().some(
+				( notice ) => notice.id === lastNoticeId.current
+			);
 			if (
-				! alreadySeen.current &&
+				! isNoticeAlreadyShowing &&
 				hasPageContentFocus &&
 				event.target.classList.contains( 'is-root-container' )
 			) {
-				createInfoNotice(
+				const { notice } = await createInfoNotice(
 					__( 'Edit your template to edit this block' ),
 					{
 						isDismissible: true,
@@ -64,11 +68,11 @@ function useEditTemplateNotification( contentRef ) {
 						],
 					}
 				);
-				alreadySeen.current = true;
+				lastNoticeId.current = notice.id;
 			}
 		};
 		const canvas = contentRef.current;
 		canvas?.addEventListener( 'click', handleClick );
 		return () => canvas?.removeEventListener( 'click', handleClick );
-	}, [ alreadySeen, hasPageContentFocus, contentRef.current ] );
+	}, [ lastNoticeId, hasPageContentFocus, contentRef.current ] );
 }
