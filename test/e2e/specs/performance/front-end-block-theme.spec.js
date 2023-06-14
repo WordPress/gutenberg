@@ -24,19 +24,14 @@ test.describe( 'Front End Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Measure TTFB, LCP, and LCP-TTFB', async ( { browser } ) => {
-		const sampleCount = 16;
-		for ( let i = 1; i <= sampleCount; i++ ) {
-			// Create a new, logged-out page for each iteration.
-			const guestPage = await browser.newPage( {
-				storageState: undefined,
-			} );
-
+	test( 'Report TTFB, LCP, and LCP-TTFB', async ( { page } ) => {
+		let i = 16;
+		while ( i-- ) {
 			// Go to the base URL.
-			await guestPage.goto( '/' );
+			await page.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.
-			const [ lcp, ttfb ] = await guestPage.evaluate( () => {
+			const [ lcp, ttfb ] = await page.evaluate( () => {
 				return Promise.all( [
 					// Measure the Largest Contentful Paint time.
 					// Based on https://www.checklyhq.com/learn/headless/basics-performance#largest-contentful-paint-api-largest-contentful-paint
@@ -76,9 +71,6 @@ test.describe( 'Front End Performance', () => {
 			results.largestContentfulPaint.push( lcp );
 			results.timeToFirstByte.push( ttfb );
 			results.lcpMinusTtfb.push( lcp - ttfb );
-
-			// Close the current page.
-			await guestPage.close();
 		}
 	} );
 } );

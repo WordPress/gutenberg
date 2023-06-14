@@ -54,7 +54,7 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Loading', async ( { browser, page, admin, editor } ) => {
+	test( 'Loading', async ( { page, admin } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
@@ -77,58 +77,49 @@ test.describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		// Open the test page in Site Editor.
-		await admin.visitSiteEditor( {
-			postId: testPageId,
-			postType: 'page',
-		} );
+		// Number of sample measurements to take.
+		const samples = 5;
+		// Number of throwaway measurements to perform before recording samples.
+		// Having at least one helps ensure that caching quirks don't manifest in
+		// the results.
+		const throwaway = 1;
 
-		// Get the URL that we will be testing against.
-		const targetUrl = await page.evaluate( 'document.location.href' );
-
-		// Wait for the content to finish loading.
-		await editor.canvas
-			.getByText( 'Lorem ipsum dolor sit amet' )
-			.first()
-			.waitFor( { timeout: 60_000 } );
-
-		// Start the measurements.
-		const sampleCount = 3;
-		for ( let i = 1; i <= sampleCount; i++ ) {
-			// Open a fresh page in a new context to prevent caching.
-			const freshPage = await browser.newPage();
-
-			// Go to the target URL.
-			await freshPage.goto( targetUrl );
+		let i = throwaway + samples;
+		while ( i-- ) {
+			// Open the test page in Site Editor.
+			await admin.visitSiteEditor( {
+				postId: testPageId,
+				postType: 'page',
+			} );
 
 			// Wait for the first block.
-			await freshPage
+			await page
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
 				.waitFor( { timeout: 60_000 } );
 
-			// Save results.
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations( freshPage );
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
-
-			await freshPage.close();
+			if ( i < samples ) {
+				// Save results.
+				const {
+					serverResponse,
+					firstPaint,
+					domContentLoaded,
+					loaded,
+					firstContentfulPaint,
+					firstBlock,
+				} = await getLoadingDurations( page );
+				results.serverResponse.push( serverResponse );
+				results.firstPaint.push( firstPaint );
+				results.domContentLoaded.push( domContentLoaded );
+				results.loaded.push( loaded );
+				results.firstContentfulPaint.push( firstContentfulPaint );
+				results.firstBlock.push( firstBlock );
+			}
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, pageUtils, admin, editor } ) => {
+	test( 'Typing', async ( { browser, page, pageUtils, admin } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
@@ -160,16 +151,17 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Wait for the first paragraph to be ready.
-		const firstParagraph = editor.canvas
+		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
+		const firstParagraph = canvas
 			.getByText( 'Lorem ipsum dolor sit amet' )
 			.first();
 		await firstParagraph.waitFor( { timeout: 60_000 } );
 
 		// Enter edit mode.
-		await editor.canvas.click( 'body' );
+		await canvas.locator( 'body' ).click();
 
 		// Insert a new paragraph right under the first one.
-		await editor.canvas
+		await canvas
 			.getByRole( 'document', { name: 'Block: Post Content' } )
 			.click();
 		await firstParagraph.click();
