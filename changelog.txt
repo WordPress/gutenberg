@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 16.0.0-rc.5 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Layout
+- Make sure post content always has correct layout. ([51431](https://github.com/WordPress/gutenberg/pull/51431))
+
+#### Accessibility
+- Block Toolbar: Fix text only label for locked blocks. ([50944](https://github.com/WordPress/gutenberg/pull/50944))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka @tellthemachines
+
+
 = 16.0.0-rc.4 =
 
 
