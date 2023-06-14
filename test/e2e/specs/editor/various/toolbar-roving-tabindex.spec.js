@@ -104,7 +104,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
-		await page.click( `role=button[name="Create Table"i]` );
+		await editor.canvas.click( `role=button[name="Create Table"i]` );
 		await pageUtils.pressKeys( 'Tab' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Body cell text',
@@ -188,15 +188,19 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		let ariaLabel = await this.page.evaluate( () =>
-			document.activeElement.getAttribute( 'aria-label' )
-		);
+		let ariaLabel = await this.page.evaluate( () => {
+			const { activeElement } =
+				document.activeElement.contentDocument ?? document;
+			return activeElement.getAttribute( 'aria-label' );
+		} );
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			);
+			ariaLabel = await this.page.evaluate( () => {
+				const { activeElement } =
+					document.activeElement.contentDocument ?? document;
+				return activeElement.getAttribute( 'aria-label' );
+			} );
 		}
 		expect( ariaLabel ).toBe( label );
 	}

@@ -6,7 +6,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
@@ -31,7 +31,8 @@ export function useActivateTheme() {
 				'&_wpnonce=' +
 				window.BLOCK_THEME_ACTIVATE_NONCE;
 			await window.fetch( activationURL );
-			const { theme_preview: themePreview, ...params } = location.params;
+			const { gutenberg_theme_preview: themePreview, ...params } =
+				location.params;
 			history.replace( params );
 		}
 	};

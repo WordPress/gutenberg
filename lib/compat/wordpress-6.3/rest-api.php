@@ -6,15 +6,6 @@
  */
 
 /**
- * Registers the block pattern directory.
- */
-function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_3();
-	$pattern_directory_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
-
-/**
  * Updates `wp_template` and `wp_template_part` post types to use
  * Gutenberg's REST controllers
  *
@@ -48,7 +39,7 @@ add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_part
  * Registers the Global Styles Revisions REST API routes.
  */
 function gutenberg_register_global_styles_revisions_endpoints() {
-	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller();
+	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_3();
 	$global_styles_revisions_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
@@ -62,17 +53,3 @@ function gutenberg_register_global_styles_endpoints() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 
-/**
- * Update `wp_global_styles` post type to use Gutenberg's REST controller.
- *
- * @param array  $args Array of arguments for registering a post type.
- * @param string $post_type Post type key.
- */
-function gutenberg_update_global_styles_rest_controller( $args, $post_type ) {
-	if ( in_array( $post_type, array( 'wp_global_styles' ), true ) ) {
-		$args['rest_controller_class'] = 'Gutenberg_REST_Templates_Controller_6_3';
-		$args['rest_base']             = 'global-styles';
-	}
-	return $args;
-}
-add_filter( 'register_post_type_args', 'gutenberg_update_global_styles_rest_controller', 10, 2 );

@@ -36,6 +36,7 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 import useBlockOverlayActive from '../../block-content-overlay';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -75,6 +76,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		isSubtreeDisabled,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -88,7 +90,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
-			} = select( blockEditorStore );
+				isBlockSubtreeDisabled,
+			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation } = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
@@ -111,6 +114,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 			};
 		},
 		[ clientId ]
@@ -158,6 +162,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: classnames(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {

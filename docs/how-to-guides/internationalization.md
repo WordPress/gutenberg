@@ -28,7 +28,7 @@ function myguten_block_init() {
     );
 
     register_block_type( 'myguten/simple', array(
-		'api_version' => 2,
+		'api_version' => 3,
         'editor_script' => 'myguten-script',
     ) );
 }
@@ -46,7 +46,7 @@ import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'myguten/simple', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
