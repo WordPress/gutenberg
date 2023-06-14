@@ -487,7 +487,7 @@
 										"type": "string"
 									},
 									"fluid": {
-										"description": "Specifics the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
+										"description": "Specifies the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
 										"oneOf": [
 											{
 												"type": "object",

@@ -43,7 +43,7 @@ export async function visitSiteEditor(
 
 			window.wp.data
 				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
+				.set( 'core/edit-site', 'welcomeGuideStyles', false );
 		} );
 	}
 
