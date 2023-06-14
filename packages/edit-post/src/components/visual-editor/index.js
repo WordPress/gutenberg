@@ -374,16 +374,10 @@ export default function VisualEditor( { styles } ) {
 									<LayoutStyle
 										selector=".edit-post-visual-editor__post-title-wrapper"
 										layout={ fallbackLayout }
-										layoutDefinitions={
-											globalLayoutSettings?.definitions
-										}
 									/>
 									<LayoutStyle
 										selector=".block-editor-block-list__layout.is-root-container"
 										layout={ blockListLayout }
-										layoutDefinitions={
-											globalLayoutSettings?.definitions
-										}
 									/>
 									{ align && (
 										<LayoutStyle css={ alignCSS } />
@@ -392,9 +386,6 @@ export default function VisualEditor( { styles } ) {
 										<LayoutStyle
 											layout={ postContentLayout }
 											css={ postContentLayoutStyles }
-											layoutDefinitions={
-												globalLayoutSettings?.definitions
-											}
 										/>
 									) }
 								</>
