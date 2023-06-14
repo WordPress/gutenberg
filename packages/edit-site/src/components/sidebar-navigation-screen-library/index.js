@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
+import { file } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -63,6 +64,19 @@ export default function SidebarNavigationScreenLibrary() {
 					} }
 				/>
 			}
+			footer={
+				<ItemGroup>
+					{ ! isMobileViewport && (
+						<SidebarNavigationItem
+							as="a"
+							href="edit.php?post_type=wp_block"
+							withChevron
+						>
+							{ __( 'Manage all reusable blocks' ) }
+						</SidebarNavigationItem>
+					) }
+				</ItemGroup>
+			}
 			content={
 				<>
 					{ isLoading && __( 'Loading library' ) }
@@ -111,6 +125,7 @@ export default function SidebarNavigationScreenLibrary() {
 											key={ category.name }
 											count={ category.count }
 											label={ category.name }
+											icon={ file }
 											id={ category.id }
 											type="pattern"
 											isActive={
@@ -122,17 +137,6 @@ export default function SidebarNavigationScreenLibrary() {
 									) ) }
 								</ItemGroup>
 							) }
-							<ItemGroup>
-								{ ! isMobileViewport && (
-									<SidebarNavigationItem
-										as="a"
-										href="edit.php?post_type=wp_block"
-										withChevron
-									>
-										{ __( 'Manage all reusable blocks' ) }
-									</SidebarNavigationItem>
-								) }
-							</ItemGroup>
 						</>
 					) }
 				</>

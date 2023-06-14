@@ -40,8 +40,8 @@ export default function PatternsList( { categoryId, label, type } ) {
 			{ ! isResolving && !! syncedPatterns.length && (
 				<>
 					<VStack className="edit-site-library__section-header">
-						<Heading level={ 5 }>{ __( 'Synced' ) }</Heading>
-						<Text as="p">
+						<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
+						<Text variant="muted" as="p">
 							{ __(
 								'Make a change to one of these patterns and have it reflected across your entire site.'
 							) }
@@ -58,8 +58,8 @@ export default function PatternsList( { categoryId, label, type } ) {
 			{ ! isResolving && !! unsyncedPatterns.length && (
 				<>
 					<VStack className="edit-site-library__section-header">
-						<Heading level={ 5 }>{ __( 'Standard' ) }</Heading>
-						<Text as="p">
+						<Heading level={ 4 }>{ __( 'Standard' ) }</Heading>
+						<Text variant="muted" as="p">
 							{ __(
 								'Insert and customize without stating in sync'
 							) }
