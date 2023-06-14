@@ -1,99 +1,91 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
+import { plus, header, file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import CreatePatternModal from '../create-pattern-modal';
+import CreateTemplatePartModal from '../create-template-part-modal';
 import { unlock } from '../../lock-unlock';
+import SidebarButton from '../sidebar-button';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function AddNewPattern( { toggleProps } ) {
+export default function AddNewPattern() {
 	const history = useHistory();
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const [ showPatternModal, setShowPatternModal ] = useState( false );
+	const [ showTemplatePartModal, setShowTemplatePartModal ] =
+		useState( false );
 
-	async function createPattern( { name, categoryId, syncType } ) {
-		if ( ! name ) {
-			createErrorNotice( __( 'Name is not defined.' ), {
-				type: 'snackbar',
-			} );
-			return;
-		}
+	function handleCreatePattern( { pattern, categoryId } ) {
+		setShowPatternModal( false );
 
-		const categories = categoryId ? [ categoryId ] : undefined;
-
-		try {
-			// TODO: Enforce unique pattern names?
-
-			const pattern = await saveEntityRecord(
-				'postType',
-				'wp_block',
-				{
-					title: name || __( 'Untitled Pattern' ),
-					content: '',
-					status: 'publish',
-					meta: { wp_block: { sync_status: syncType } },
-					wp_pattern: categories,
-				},
-				{ throwOnError: true }
-			);
-
-			// Invalidate pattern category taxonomy so nav screen can reflect
-			// up-to-date counts.
-			invalidateResolution( 'getEntityRecords', [
-				'taxonomy',
-				'wp_pattern',
-				{ per_page: -1, hide_empty: false, context: 'view' },
-			] );
-
-			setIsModalOpen( false );
-
-			history.push( {
-				postId: pattern.id,
-				postType: 'wp_block',
-				categoryType: 'wp_block',
-				categoryId,
-				canvas: 'edit',
-			} );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the pattern.' );
-
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
-			setIsModalOpen( false );
-		}
+		history.push( {
+			postId: pattern.id,
+			postType: 'wp_block',
+			categoryType: 'wp_block',
+			categoryId,
+			canvas: 'edit',
+		} );
 	}
 
-	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
+	function handleCreateTemplatePart( templatePart ) {
+		setShowTemplatePartModal( false );
+
+		// Navigate to the created template part editor.
+		history.push( {
+			postId: templatePart.id,
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+	}
+
+	function handleError() {
+		setShowPatternModal( false );
+		setShowTemplatePartModal( false );
+	}
 
 	return (
 		<>
-			<Toggle
-				{ ...restToggleProps }
-				onClick={ () => {
-					setIsModalOpen( true );
-				} }
-				icon={ plus }
-				label={ __( 'Create pattern' ) }
+			<DropdownMenu
+				controls={ [
+					{
+						icon: header,
+						onClick: () => setShowTemplatePartModal( true ),
+						title: 'Create a template part',
+					},
+					{
+						icon: file,
+						onClick: () => setShowPatternModal( true ),
+						title: 'Create a pattern',
+					},
+				] }
+				icon={
+					<SidebarButton
+						icon={ plus }
+						label={ __( 'Create a pattern' ) }
+					/>
+				}
+				label="Create a pattern."
 			/>
-			{ isModalOpen && (
+			{ showPatternModal && (
 				<CreatePatternModal
-					closeModal={ () => setIsModalOpen( false ) }
-					onCreate={ createPattern }
+					closeModal={ () => setShowPatternModal( false ) }
+					onCreate={ handleCreatePattern }
+					onError={ handleError }
+				/>
+			) }
+			{ showTemplatePartModal && (
+				<CreateTemplatePartModal
+					closeModal={ () => setShowPatternModal( false ) }
+					onCreate={ handleCreateTemplatePart }
+					onError={ handleError }
 				/>
 			) }
 		</>

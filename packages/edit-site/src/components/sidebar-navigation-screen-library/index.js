@@ -19,7 +19,6 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import SidebarButton from '../sidebar-button';
 import { store as editSiteStore } from '../../store';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
@@ -56,14 +55,7 @@ export default function SidebarNavigationScreenLibrary() {
 			description={ __(
 				'Manage what patterns are available when editing your site.'
 			) }
-			actions={
-				<AddNewPattern
-					patternType={ categoryType }
-					toggleProps={ {
-						as: SidebarButton,
-					} }
-				/>
-			}
+			actions={ <AddNewPattern /> }
 			footer={
 				<ItemGroup>
 					{ ! isMobileViewport && (

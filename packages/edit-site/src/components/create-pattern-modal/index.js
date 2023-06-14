@@ -10,16 +10,22 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
 
 const SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
 };
 
-export default function CreatePatternModal( { closeModal, onCreate } ) {
+export default function CreatePatternModal( {
+	closeModal,
+	onCreate,
+	onError,
+} ) {
 	const [ name, setName ] = useState( '' );
 	const [ categoryId, setCategoryId ] = useState( '' );
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
@@ -46,6 +52,55 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 		);
 	};
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+
+	async function createPattern() {
+		if ( ! name ) {
+			createErrorNotice( __( 'Name is not defined.' ), {
+				type: 'snackbar',
+			} );
+			return;
+		}
+
+		const selectedCategories = categoryId ? [ categoryId ] : undefined;
+
+		try {
+			// TODO: Enforce unique pattern names?
+
+			const pattern = await saveEntityRecord(
+				'postType',
+				'wp_block',
+				{
+					title: name || __( 'Untitled Pattern' ),
+					content: '',
+					status: 'publish',
+					meta: { wp_block: { sync_status: syncType } },
+					wp_pattern: selectedCategories,
+				},
+				{ throwOnError: true }
+			);
+
+			// Invalidate pattern category taxonomy so nav screen can reflect
+			// up-to-date counts.
+			invalidateResolution( 'getEntityRecords', [
+				'taxonomy',
+				'wp_pattern',
+				{ per_page: -1, hide_empty: false, context: 'view' },
+			] );
+
+			onCreate( { pattern, categoryId } );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the pattern.' );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			onError();
+		}
+	}
+
 	return (
 		<Modal
 			title={ __( 'Create a pattern' ) }
@@ -65,7 +120,7 @@ export default function CreatePatternModal( { closeModal, onCreate } ) {
 						return;
 					}
 					setIsSubmitting( true );
-					await onCreate( { name, categoryId, syncType } );
+					await createPattern();
 				} }
 			>
 				<VStack spacing="4">
