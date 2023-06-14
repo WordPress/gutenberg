@@ -94,11 +94,13 @@ function block_core_home_link_build_css_font_sizes( $context ) {
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
 	$colors          = block_core_home_link_build_css_colors( $context );
 	$font_sizes      = block_core_home_link_build_css_font_sizes( $context );
+	$is_active       = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
 	$classes[]       = 'wp-block-navigation-item';
+	$classes[]       = $is_active ? 'current-menu-item' : '';
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
