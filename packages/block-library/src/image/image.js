@@ -18,6 +18,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -25,7 +26,6 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -53,7 +53,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../private-apis';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
@@ -62,8 +61,6 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
-
-const { ImageSizeControl } = unlock( blockEditorPrivateApis );
 
 export default function Image( {
 	temporaryURL,
@@ -438,8 +435,8 @@ export default function Image( {
 						height={ height }
 						imageSizeOptions={ imageSizeOptions }
 						isResizable={ isResizable }
-						naturalWidth={ naturalWidth }
-						naturalHeight={ naturalHeight }
+						imageWidth={ naturalWidth }
+						imageHeight={ naturalHeight }
 						imageSizeHelp={ __(
 							'Select the size of the source image.'
 						) }
