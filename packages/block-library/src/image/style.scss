@@ -240,7 +240,7 @@
 				animation: both turn-on-visibility 300ms;
 			}
 		}
-		&.initialized {
+		&.animateoutenabled {
 			&:not(.active) {
 				animation: both turn-off-visibility 300ms;
 
