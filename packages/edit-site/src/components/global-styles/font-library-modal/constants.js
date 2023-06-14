@@ -45,6 +45,6 @@ export const DEFAULT_DEMO_CONFIG = {
 export const ALLOWED_FILE_EXTENSIONS = [
     'otf',
     'ttf',
-    // 'woff',
-    // 'woff2',
+    'woff',
+    'woff2',
 ];

@@ -1,4 +1,4 @@
-import { Font } from "lib-font";
+import { Font } from "../../../../lib/lib-font.browser";
 
 /**
  * WordPress dependencies
