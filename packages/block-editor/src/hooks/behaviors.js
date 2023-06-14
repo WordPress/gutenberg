@@ -17,7 +17,8 @@ import { InspectorControls } from '../components';
 function BehaviorsControl( {
 	blockName,
 	blockBehaviors,
-	onChange,
+	onChangeBehavior,
+	onChangeAnimation,
 	disabled = false,
 } ) {
 	const { settings, themeBehaviors } = useSelect(
@@ -79,7 +80,7 @@ function BehaviorsControl( {
 		if ( blockBehaviors === undefined ) {
 			return 'default';
 		}
-		if ( behaviors?.lightbox ) {
+		if ( behaviors?.lightbox.enabled ) {
 			return 'lightbox';
 		}
 		return '';
@@ -94,7 +95,7 @@ function BehaviorsControl( {
 					// At the moment we are only supporting one behavior (Lightbox)
 					value={ value() }
 					options={ options }
-					onChange={ onChange }
+					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
 					help={ helpText }
 					size="__unstable-large"
@@ -116,7 +117,7 @@ function BehaviorsControl( {
 							},
 							{ value: 'fade', label: 'Fade' },
 						] }
-						onChange={ onChange }
+						onChange={ onChangeAnimation }
 						hideCancelButton={ false }
 						size="__unstable-large"
 						disabled={ disabled }
@@ -153,7 +154,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 				<BehaviorsControl
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
-					onChange={ ( nextValue ) => {
+					onChangeBehavior={ ( nextValue ) => {
 						if ( nextValue === 'default' ) {
 							props.setAttributes( {
 								behaviors: undefined,
@@ -161,25 +162,26 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 						} else {
 							// If the user selects something, it means that they want to
 							// change the default value (true) so we save it in the attributes.
-							const enabled =
-								nextValue === 'lightbox' ||
-								nextValue === 'zoom' ||
-								nextValue === 'fade'
-									? true
-									: false;
-							const animation =
-								nextValue === 'zoom' || nextValue === 'fade'
-									? nextValue
-									: 'zoom';
 							props.setAttributes( {
 								behaviors: {
 									lightbox: {
-										enabled,
-										animation,
+										enabled: nextValue === 'lightbox',
 									},
 								},
 							} );
 						}
+					} }
+					onChangeAnimation={ ( nextValue ) => {
+						props.setAttributes( {
+							behaviors: {
+								lightbox: {
+									enabled:
+										props.attributes.behaviors.lightbox
+											.enabled,
+									animation: nextValue,
+								},
+							},
+						} );
 					} }
 					disabled={ blockHasLink }
 				/>
