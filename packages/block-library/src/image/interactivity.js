@@ -166,28 +166,12 @@ function setZoomStyles( imgDom, context, event ) {
 	let targetWidth = imgDom.naturalWidth;
 	let targetHeight = imgDom.naturalHeight;
 
-	const figureStyle = window.getComputedStyle( context.core.image.figureRef );
-	const topPadding = parseInt(
-		figureStyle.getPropertyValue( 'padding-top' )
-	);
-	const bottomPadding = parseInt(
-		figureStyle.getPropertyValue( 'padding-bottom' )
-	);
+	const verticalPadding = 40;
 
 	// As per the design, let's allow the image to stretch
 	// to the full width of its containing figure, but for the height,
-	// constrain it to the padding settings
+	// constrain it with a fixed padding
 	const containerWidth = context.core.image.figureRef.clientWidth;
-	const containerHeight =
-		context.core.image.figureRef.clientHeight - topPadding - bottomPadding;
-
-	// Check difference between the image and figure dimensions
-	const widthOverflow = Math.abs(
-		Math.min( containerWidth - targetWidth, 0 )
-	);
-	const heightOverflow = Math.abs(
-		Math.min( containerHeight - targetHeight, 0 )
-	);
 
 	// The lightbox image has `positione:absolute` and
 	// ignores its parent's padding, so let's set the padding here,
@@ -199,9 +183,24 @@ function setZoomStyles( imgDom, context, event ) {
 		horizontalPadding = 80;
 	}
 
-	// If image is larger than its container, resize along its largest axis
+	const containerHeight =
+		context.core.image.figureRef.clientHeight - verticalPadding * 2;
+
+	// Check difference between the image and figure dimensions
+	const widthOverflow = Math.abs(
+		Math.min( containerWidth - targetWidth, 0 )
+	);
+	const heightOverflow = Math.abs(
+		Math.min( containerHeight - targetHeight, 0 )
+	);
+
+	// If image is larger than its container any dimension, resize along its largest axis.
+	// For vertically oriented devices, always maximize the width.
 	if ( widthOverflow > 0 || heightOverflow > 0 ) {
-		if ( widthOverflow > heightOverflow ) {
+		if (
+			widthOverflow >= heightOverflow ||
+			containerHeight >= containerWidth
+		) {
 			targetWidth = containerWidth - horizontalPadding * 2;
 			targetHeight =
 				imgDom.naturalHeight * ( targetWidth / imgDom.naturalWidth );
@@ -229,9 +228,9 @@ function setZoomStyles( imgDom, context, event ) {
 	}
 	let targetTop = 0;
 	if ( targetHeight >= containerHeight ) {
-		targetTop = topPadding;
+		targetTop = verticalPadding;
 	} else {
-		targetTop = ( containerHeight - targetHeight ) / 2 + topPadding;
+		targetTop = ( containerHeight - targetHeight ) / 2 + verticalPadding;
 	}
 
 	const root = document.documentElement;
