@@ -18,20 +18,13 @@ function gutenberg_register_taxonomy_patterns() {
 	$labels = array(
 		'name'          => _x( 'Pattern Categories', 'taxonomy general name' ),
 		'singular_name' => _x( 'Pattern Category', 'taxonomy singular name' ),
-		'search_items'  => __( 'Search Pattern Categoriess' ),
-		'all_items'     => __( 'All Pattern Categories' ),
-		'edit_item'     => __( 'Edit Pattern Category' ),
-		'update_item'   => __( 'Update Pattern Category' ),
-		'add_new_item'  => __( 'Add New Pattern Category' ),
-		'new_item_name' => __( 'New Pattern Category Name' ),
-		'menu_name'     => __( 'Pattern Categories' ),
 	);
 	$args   = array(
 		'hierarchical'      => false,
 		'labels'            => $labels,
 		'show_ui'           => true,
-		'show_in_menu'      => true,
-		'show_in_nav_menus' => true,
+		'show_in_menu'      => false,
+		'show_in_nav_menus' => false,
 		'show_admin_column' => true,
 		'query_var'         => true,
 		'show_in_rest'      => true,
