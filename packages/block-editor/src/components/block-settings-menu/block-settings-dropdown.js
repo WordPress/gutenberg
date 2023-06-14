@@ -407,7 +407,6 @@ export function BlockSettingsDropdown( {
 							onInsertBefore();
 						}
 					} }
-					// Missing: pressing esc is not just closing the menu, but also the toolbar?
 					{ ...props }
 				>
 					<DropdownMenuGroupV2>
