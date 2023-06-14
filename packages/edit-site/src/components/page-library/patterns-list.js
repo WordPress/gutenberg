@@ -8,7 +8,6 @@ import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { symbol } from '@wordpress/icons';
 
@@ -18,10 +17,18 @@ import { symbol } from '@wordpress/icons';
 import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
+import useDebouncedInput from '../../utils/use-debounced-input';
 
 export default function PatternsList( { categoryId, label, type } ) {
-	const [ query, setQuery ] = useState( '' );
-	const [ patterns, isResolving ] = usePatterns( type, categoryId );
+	const [ filterValue, setFilterValue, delayedFilterValue ] =
+		useDebouncedInput( '' );
+
+	const [ patterns, isResolving ] = usePatterns(
+		type,
+		categoryId,
+		delayedFilterValue
+	);
+
 	const { syncedPatterns, unsyncedPatterns } = patterns;
 	const hasPatterns = !! syncedPatterns.length || !! unsyncedPatterns.length;
 
@@ -29,11 +36,9 @@ export default function PatternsList( { categoryId, label, type } ) {
 		<VStack spacing={ 6 }>
 			<SearchControl
 				className="edit-site-library__search"
-				onChange={ ( value ) => {
-					setQuery( value );
-				} }
+				onChange={ ( value ) => setFilterValue( value ) }
 				placeholder={ __( 'Search patterns' ) }
-				value={ query }
+				value={ filterValue }
 				__nextHasNoMarginBottom
 			/>
 			{ isResolving && __( 'Loading' ) }
