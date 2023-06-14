@@ -12,6 +12,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	VisuallyHidden,
+	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
@@ -111,10 +112,11 @@ const GridItem = ( { categoryId, composite, icon, item } ) => {
 				<HStack
 					alignment="center"
 					justify="left"
+					spacing={ 3 }
 					className="edit-site-library__pattern-title"
 				>
 					{ icon && <Icon icon={ icon } /> }
-					<span>{ item.title }</span>
+					<Heading level={ 5 }>{ item.title }</Heading>
 				</HStack>
 				{ item.type === USER_PATTERNS && (
 					<DropdownMenu

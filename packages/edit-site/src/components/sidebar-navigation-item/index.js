@@ -26,6 +26,7 @@ export default function SidebarNavigationItem( {
 		<Item
 			className={ classnames(
 				'edit-site-sidebar-navigation-item',
+				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
 			{ ...props }
