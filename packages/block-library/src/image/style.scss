@@ -308,9 +308,9 @@
 
 // This line causes the zoom animation to jump
 //
-// html.has-lightbox-open {
-// 	overflow: hidden;
-// }
+html.has-lightbox-open {
+	overflow: hidden;
+}
 
 @keyframes lightbox-zoom-in {
 	0% {

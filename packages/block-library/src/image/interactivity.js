@@ -26,9 +26,6 @@ store( {
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollPosition = window.scrollY;
-					document.documentElement.classList.add(
-						'has-lightbox-open'
-					);
 
 					const imgDom = document.createElement( 'img' );
 					imgDom.onload = function () {
@@ -144,6 +141,9 @@ store( {
 								scaleHeight
 							);
 						}
+						document.documentElement.classList.add(
+							'has-lightbox-open'
+						);
 					};
 					imgDom.setAttribute( 'src', context.core.image.imageSrc );
 				},
