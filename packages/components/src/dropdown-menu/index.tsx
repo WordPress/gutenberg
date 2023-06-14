@@ -11,10 +11,15 @@ import { menu } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
-import type { DropdownMenuProps, DropdownOption } from './types';
+import type {
+	DropdownMenuProps,
+	DropdownOption,
+	DropdownMenuInternalContext,
+} from './types';
 
 function mergeProps<
 	T extends { className?: string; [ key: string ]: unknown }
@@ -38,88 +43,7 @@ function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
 	return typeof maybeFunc === 'function';
 }
 
-/**
- *
- * The DropdownMenu displays a list of actions (each contained in a MenuItem,
- * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
- * after the user has interacted with an element (a button or icon) or when
- * they perform a specific action.
- *
- * Render a Dropdown Menu with a set of controls:
- *
- * ```jsx
- * import { DropdownMenu } from '@wordpress/components';
- * import {
- * 	more,
- * 	arrowLeft,
- * 	arrowRight,
- * 	arrowUp,
- * 	arrowDown,
- * } from '@wordpress/icons';
- *
- * const MyDropdownMenu = () => (
- * 	<DropdownMenu
- * 		icon={ more }
- * 		label="Select a direction"
- * 		controls={ [
- * 			{
- * 				title: 'Up',
- * 				icon: arrowUp,
- * 				onClick: () => console.log( 'up' ),
- * 			},
- * 			{
- * 				title: 'Right',
- * 				icon: arrowRight,
- * 				onClick: () => console.log( 'right' ),
- * 			},
- * 			{
- * 				title: 'Down',
- * 				icon: arrowDown,
- * 				onClick: () => console.log( 'down' ),
- * 			},
- * 			{
- * 				title: 'Left',
- * 				icon: arrowLeft,
- * 				onClick: () => console.log( 'left' ),
- * 			},
- * 		] }
- * 	/>
- * );
- * ```
- *
- * Alternatively, specify a `children` function which returns elements valid for
- * use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
- *
- * ```jsx
- * import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
- * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
- *
- * const MyDropdownMenu = () => (
- * 	<DropdownMenu icon={ more } label="Select a direction">
- * 		{ ( { onClose } ) => (
- * 			<>
- * 				<MenuGroup>
- * 					<MenuItem icon={ arrowUp } onClick={ onClose }>
- * 						Move Up
- * 					</MenuItem>
- * 					<MenuItem icon={ arrowDown } onClick={ onClose }>
- * 						Move Down
- * 					</MenuItem>
- * 				</MenuGroup>
- * 				<MenuGroup>
- * 					<MenuItem icon={ trash } onClick={ onClose }>
- * 						Remove
- * 					</MenuItem>
- * 				</MenuGroup>
- * 			</>
- * 		) }
- * 	</DropdownMenu>
- * );
- * ```
- *
- */
-
-function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const {
 		children,
 		className,
@@ -132,7 +56,13 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		disableOpenOnArrowDown = false,
 		text,
 		noIcons,
-	} = dropdownMenuProps;
+
+		// Context
+		variant,
+	} = useContextSystem< DropdownMenuProps & DropdownMenuInternalContext >(
+		dropdownMenuProps,
+		'DropdownMenu'
+	);
 
 	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
@@ -154,13 +84,14 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
+			variant,
 		},
 		popoverProps
 	);
 
 	return (
 		<Dropdown
-			className={ classnames( 'components-dropdown-menu', className ) }
+			className={ className }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
@@ -283,5 +214,90 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		/>
 	);
 }
+
+/**
+ *
+ * The DropdownMenu displays a list of actions (each contained in a MenuItem,
+ * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
+ * after the user has interacted with an element (a button or icon) or when
+ * they perform a specific action.
+ *
+ * Render a Dropdown Menu with a set of controls:
+ *
+ * ```jsx
+ * import { DropdownMenu } from '@wordpress/components';
+ * import {
+ * 	more,
+ * 	arrowLeft,
+ * 	arrowRight,
+ * 	arrowUp,
+ * 	arrowDown,
+ * } from '@wordpress/icons';
+ *
+ * const MyDropdownMenu = () => (
+ * 	<DropdownMenu
+ * 		icon={ more }
+ * 		label="Select a direction"
+ * 		controls={ [
+ * 			{
+ * 				title: 'Up',
+ * 				icon: arrowUp,
+ * 				onClick: () => console.log( 'up' ),
+ * 			},
+ * 			{
+ * 				title: 'Right',
+ * 				icon: arrowRight,
+ * 				onClick: () => console.log( 'right' ),
+ * 			},
+ * 			{
+ * 				title: 'Down',
+ * 				icon: arrowDown,
+ * 				onClick: () => console.log( 'down' ),
+ * 			},
+ * 			{
+ * 				title: 'Left',
+ * 				icon: arrowLeft,
+ * 				onClick: () => console.log( 'left' ),
+ * 			},
+ * 		] }
+ * 	/>
+ * );
+ * ```
+ *
+ * Alternatively, specify a `children` function which returns elements valid for
+ * use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
+ *
+ * ```jsx
+ * import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+ * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
+ *
+ * const MyDropdownMenu = () => (
+ * 	<DropdownMenu icon={ more } label="Select a direction">
+ * 		{ ( { onClose } ) => (
+ * 			<>
+ * 				<MenuGroup>
+ * 					<MenuItem icon={ arrowUp } onClick={ onClose }>
+ * 						Move Up
+ * 					</MenuItem>
+ * 					<MenuItem icon={ arrowDown } onClick={ onClose }>
+ * 						Move Down
+ * 					</MenuItem>
+ * 				</MenuGroup>
+ * 				<MenuGroup>
+ * 					<MenuItem icon={ trash } onClick={ onClose }>
+ * 						Remove
+ * 					</MenuItem>
+ * 				</MenuGroup>
+ * 			</>
+ * 		) }
+ * 	</DropdownMenu>
+ * );
+ * ```
+ *
+ */
+export const DropdownMenu = contextConnectWithoutRef(
+	UnconnectedDropdownMenu,
+	'DropdownMenu'
+);
 
 export default DropdownMenu;

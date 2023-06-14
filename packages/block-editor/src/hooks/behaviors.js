@@ -2,21 +2,106 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
+import { InspectorControls } from '../components';
 
 /**
  * External dependencies
  */
 import merge from 'deepmerge';
+
+function BehaviorsControl( {
+	blockName,
+	blockBehaviors,
+	onChange,
+	disabled = false,
+} ) {
+	const { settings, themeBehaviors } = useSelect(
+		( select ) => {
+			const { getBehaviors, getSettings } = select( blockEditorStore );
+
+			return {
+				settings:
+					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
+						?.behaviors,
+				themeBehaviors: getBehaviors()?.blocks?.[ blockName ],
+			};
+		},
+		[ blockName ]
+	);
+
+	const noBehaviorsOption = {
+		value: '',
+		label: __( 'No behaviors' ),
+	};
+
+	const behaviorsOptions = Object.entries( settings )
+		.filter(
+			( [ behaviorName, behaviorValue ] ) =>
+				hasBlockSupport( blockName, 'behaviors.' + behaviorName ) &&
+				behaviorValue
+		) // Filter out behaviors that are disabled.
+		.map( ( [ behaviorName ] ) => ( {
+			value: behaviorName,
+			label:
+				// Capitalize the first letter of the behavior name.
+				behaviorName[ 0 ].toUpperCase() +
+				behaviorName.slice( 1 ).toLowerCase(),
+		} ) );
+
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	if ( behaviorsOptions.length === 0 ) return null;
+
+	const options = [ noBehaviorsOption, ...behaviorsOptions ];
+
+	// Block behaviors take precedence over theme behaviors.
+	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
+
+	const helpText = disabled
+		? __( 'The lightbox behavior is disabled for linked images.' )
+		: __( 'Add behaviors.' );
+
+	return (
+		<InspectorControls group="advanced">
+			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
+			<div>
+				<SelectControl
+					label={ __( 'Behaviors' ) }
+					// At the moment we are only supporting one behavior (Lightbox)
+					value={ behaviors?.lightbox ? 'lightbox' : '' }
+					options={ options }
+					onChange={ onChange }
+					hideCancelButton={ true }
+					help={ helpText }
+					size="__unstable-large"
+					disabled={ disabled }
+				/>
+			</div>
+			<HStack justify="flex-end">
+				<Button
+					isSmall
+					disabled={ disabled }
+					onClick={ () => onChange( undefined ) }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</HStack>
+		</InspectorControls>
+	);
+}
 
 /**
  * Override the default edit UI to include a new block inspector control for
@@ -30,55 +115,26 @@ import merge from 'deepmerge';
  */
 export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		// Only add behaviors to the core/image block.
-		if ( props.name !== 'core/image' ) {
-			return <BlockEdit { ...props } />;
+		const blockEdit = <BlockEdit key="edit" { ...props } />;
+		// Only add behaviors to blocks with support.
+		if ( ! hasBlockSupport( props.name, 'behaviors' ) ) {
+			return blockEdit;
 		}
-
-		const settings =
-			select( blockEditorStore ).getSettings()?.__experimentalFeatures
-				?.blocks?.[ props.name ]?.behaviors;
-
-		if (
-			! settings ||
-			// If every behavior is disabled, do not show the behaviors inspector control.
-			Object.entries( settings ).every( ( [ , value ] ) => ! value )
-		) {
-			return <BlockEdit { ...props } />;
-		}
-
-		const { behaviors: blockBehaviors } = props.attributes;
-
-		// Get the theme behaviors for the block from the theme.json.
-		const themeBehaviors =
-			select( blockEditorStore ).getBehaviors()?.blocks?.[ props.name ];
-
-		// Block behaviors take precedence over theme behaviors.
-		const behaviors = merge( themeBehaviors, blockBehaviors || {} );
-
+		const blockHasLink =
+			typeof props.attributes?.linkDestination !== 'undefined' &&
+			props.attributes?.linkDestination !== 'none';
 		return (
 			<>
-				<BlockEdit { ...props } />
-				<InspectorControls group="advanced">
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ __( 'Behaviors' ) }
-						// At the moment we are only supporting one behavior (Lightbox)
-						value={ behaviors?.lightbox ? 'lightbox' : '' }
-						options={ Object.entries( settings )
-							.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out behaviors that are disabled.
-							.map( ( [ behaviorName ] ) => ( {
-								value: behaviorName,
-								label:
-									// Capitalize the first letter of the behavior name.
-									behaviorName[ 0 ].toUpperCase() +
-									behaviorName.slice( 1 ).toLowerCase(),
-							} ) )
-							.concat( {
-								value: '',
-								label: __( 'No behaviors' ),
-							} ) }
-						onChange={ ( nextValue ) => {
+				{ blockEdit }
+				<BehaviorsControl
+					blockName={ props.name }
+					blockBehaviors={ props.attributes.behaviors }
+					onChange={ ( nextValue ) => {
+						if ( nextValue === undefined ) {
+							props.setAttributes( {
+								behaviors: undefined,
+							} );
+						} else {
 							// If the user selects something, it means that they want to
 							// change the default value (true) so we save it in the attributes.
 							props.setAttributes( {
@@ -86,19 +142,19 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 									lightbox: nextValue === 'lightbox',
 								},
 							} );
-						} }
-						hideCancelButton={ true }
-						help={ __( 'Add behaviors.' ) }
-						size="__unstable-large"
-					/>
-				</InspectorControls>
+						}
+					} }
+					disabled={ blockHasLink }
+				/>
 			</>
 		);
 	};
 }, 'withBehaviors' );
 
-addFilter(
-	'editor.BlockEdit',
-	'core/behaviors/with-inspector-control',
-	withBehaviors
-);
+if ( window?.__experimentalInteractivityAPI ) {
+	addFilter(
+		'editor.BlockEdit',
+		'core/behaviors/with-inspector-control',
+		withBehaviors
+	);
+}

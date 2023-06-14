@@ -42,7 +42,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=2' );
+		await editor.canvas.focus(
+			'role=document[name="Paragraph block"i] >> text=2'
+		);
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -54,7 +56,7 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
-		const firstParagraph = page.locator(
+		const firstParagraph = editor.canvas.locator(
 			'role=document[name="Paragraph block"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
@@ -112,7 +114,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=1' );
+		await editor.canvas.focus(
+			'role=document[name="Paragraph block"i] >> text=1'
+		);
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -124,7 +128,7 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
-		const secondParagraph = page.locator(
+		const secondParagraph = editor.canvas.locator(
 			'role=document[name="Paragraph block"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
@@ -193,7 +197,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=2' );
+		await editor.canvas.focus(
+			'role=document[name="Paragraph block"i] >> text=2'
+		);
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -205,7 +211,7 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the left half of the paragraph block to trigger the indicator.
-		const firstParagraph = page.locator(
+		const firstParagraph = editor.canvas.locator(
 			'role=document[name="Paragraph block"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
@@ -272,7 +278,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=1' );
+		await editor.canvas.focus(
+			'role=document[name="Paragraph block"i] >> text=1'
+		);
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -284,7 +292,7 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the right half of the paragraph block to trigger the indicator.
-		const secondParagraph = page.locator(
+		const secondParagraph = editor.canvas.locator(
 			'role=document[name="Paragraph block"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
@@ -334,6 +342,13 @@ test.describe( 'Draggable block', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',

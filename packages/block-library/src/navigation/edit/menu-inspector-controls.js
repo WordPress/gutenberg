@@ -19,7 +19,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
@@ -32,6 +32,49 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
+const { PrivateListView } = unlock( blockEditorPrivateApis );
+
+function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+		insertedBlock?.name
+	);
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	if ( ! showLinkControls ) {
+		return null;
+	}
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) return;
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	return (
+		<LinkUI
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
+			onClose={ () => {
+				setInsertedBlock( null );
+			} }
+			hasCreateSuggestion={ false }
+			onChange={ ( updatedValue ) => {
+				updateAttributes(
+					updatedValue,
+					setInsertedBlockAttributes( insertedBlock?.clientId ),
+					insertedBlock?.attributes
+				);
+				setInsertedBlock( null );
+			} }
+			onCancel={ () => {
+				setInsertedBlock( null );
+			} }
+		/>
+	);
+}
 
 const MainContent = ( {
 	clientId,
@@ -40,25 +83,12 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
-
-	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree.
-	const clientIdsTree = useSelect(
+	const hasChildren = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
-			return __unstableGetClientIdsTree( clientId );
+			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
 	);
-
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const setInsertedBlockAttributes =
-		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _insertedBlockClientId ) return;
-			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
-		};
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
@@ -80,62 +110,20 @@ const MainContent = ( {
 				'You have not yet created any menus. Displaying a list of your Pages'
 		  );
 
-	const renderLinkUI = (
-		currentBlock,
-		lastInsertedBlock,
-		setLastInsertedBlock
-	) => {
-		const blockSupportsLinkUI = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-			lastInsertedBlock?.name
-		);
-		const currentBlockWasJustInserted =
-			lastInsertedBlock?.clientId === currentBlock.clientId;
-
-		const shouldShowLinkUIForBlock =
-			blockSupportsLinkUI && currentBlockWasJustInserted;
-
-		return (
-			shouldShowLinkUIForBlock && (
-				<LinkUI
-					clientId={ lastInsertedBlock?.clientId }
-					link={ lastInsertedBlock?.attributes }
-					onClose={ () => {
-						setLastInsertedBlock( null );
-					} }
-					hasCreateSuggestion={ false }
-					onChange={ ( updatedValue ) => {
-						updateAttributes(
-							updatedValue,
-							setInsertedBlockAttributes(
-								lastInsertedBlock?.clientId
-							),
-							lastInsertedBlock?.attributes
-						);
-						setLastInsertedBlock( null );
-					} }
-					onCancel={ () => {
-						setLastInsertedBlock( null );
-					} }
-				/>
-			)
-		);
-	};
-
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">
-			{ clientIdsTree.length === 0 && (
+			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
 					{ __( 'This navigation menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView
-				blocks={ clientIdsTree }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
-				renderAdditionalBlockUI={ renderLinkUI }
+				additionalBlockContent={ AdditionalBlockContent }
 			/>
 		</div>
 	);

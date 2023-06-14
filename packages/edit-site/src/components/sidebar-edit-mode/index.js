@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody, PanelRow } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useEffect } from '@wordpress/element';
@@ -16,8 +16,8 @@ import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
-import LastRevision from './template-revisions';
-import TemplateCard from './template-card';
+import PagePanels from './page-panels';
+import TemplatePanel from './template-panel';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
@@ -33,6 +33,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
+		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
@@ -47,18 +48,23 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
+		// Don't automatically switch tab when the sidebar is closed or when we
+		// are focused on page content.
+		if ( ! isEditorSidebarOpened || hasPageContentFocus ) {
+			return;
+		}
 		if ( hasBlockSelection ) {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	}, [ hasBlockSelection, isEditorSidebarOpened, hasPageContentFocus ] );
 
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
@@ -77,15 +83,11 @@ export function SidebarComplementaryAreaFills() {
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<>
-						<PanelBody>
-							<TemplateCard />
-							<PanelRow
-								header={ __( 'Editing history' ) }
-								className="edit-site-template-revisions"
-							>
-								<LastRevision />
-							</PanelRow>
-						</PanelBody>
+						{ hasPageContentFocus ? (
+							<PagePanels />
+						) : (
+							<TemplatePanel />
+						) }
 						<PluginTemplateSettingPanel.Slot />
 					</>
 				) }
