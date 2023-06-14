@@ -2049,6 +2049,10 @@
 			"type": "string",
 			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
+		"description": {
+			"type": "string",
+			"description": "Description of the global styles variation."
+		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
