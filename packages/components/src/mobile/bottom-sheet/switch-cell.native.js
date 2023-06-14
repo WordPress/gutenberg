@@ -12,6 +12,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  */
 import Cell from './cell';
 
+const EMPTY_STYLE = {};
+
 export default function BottomSheetSwitchCell( props ) {
 	const { value, onValueChange, disabled, ...cellProps } = props;
 
@@ -61,6 +63,7 @@ export default function BottomSheetSwitchCell( props ) {
 			editable={ false }
 			value={ '' }
 			disabled={ disabled }
+			disabledStyle={ EMPTY_STYLE }
 		>
 			<Switch
 				value={ value }

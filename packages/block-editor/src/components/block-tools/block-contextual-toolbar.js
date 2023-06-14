@@ -25,6 +25,7 @@ import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import { unlock } from '../../lock-unlock';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
@@ -38,8 +39,8 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				getBlockName,
 				getBlockParents,
 				getSelectedBlockClientIds,
-				__unstableGetContentLockingParent,
-			} = select( blockEditorStore );
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 			const { getBlockType } = select( blocksStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -62,9 +63,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						true
 					) &&
 					selectedBlockClientIds.length <= 1 &&
-					! __unstableGetContentLockingParent(
-						_selectedBlockClientId
-					),
+					getBlockEditingMode( _selectedBlockClientId ) === 'default',
 			};
 		}, [] );
 

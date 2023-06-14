@@ -67,8 +67,9 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 .emotion-8:focus-within {
   border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  outline: none;
   z-index: 1;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
 }
 
 .emotion-10 {
@@ -81,6 +82,8 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   -webkit-transition: -webkit-transform 160ms ease;
   transition: transform 160ms ease;
   z-index: 1;
+  outline: 2px solid transparent;
+  outline-offset: -3px;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
@@ -402,8 +405,9 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
 .emotion-8:focus-within {
   border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  outline: none;
   z-index: 1;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
 }
 
 .emotion-10 {

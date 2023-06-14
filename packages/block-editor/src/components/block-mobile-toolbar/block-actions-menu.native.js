@@ -39,6 +39,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { getMoversSetup } from '../block-mover/mover-description';
 import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from '../block-switcher/block-transformations-menu';
+import {
+	useConvertToGroupButtons,
+	useConvertToGroupButtonProps,
+} from '../convert-to-group-buttons';
 
 const BlockActionsMenu = ( {
 	// Select.
@@ -55,6 +59,7 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
+	canRemove,
 	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
@@ -92,6 +97,17 @@ const BlockActionsMenu = ( {
 			forward: forwardButtonTitle,
 		},
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
+
+	// Check if selected block is Groupable and/or Ungroupable.
+	const convertToGroupButtonProps = useConvertToGroupButtonProps( [
+		selectedBlockClientId,
+	] );
+	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
+	const showConvertToGroupButton =
+		( isGroupable || isUngroupable ) && canRemove;
+	const convertToGroupButtons = useConvertToGroupButtons( {
+		...convertToGroupButtonProps,
+	} );
 
 	const allOptions = {
 		settings: {
@@ -229,6 +245,10 @@ const BlockActionsMenu = ( {
 		canDuplicate && allOptions.cutButton,
 		canDuplicate && isPasteEnabled && allOptions.pasteButton,
 		canDuplicate && allOptions.duplicateButton,
+		showConvertToGroupButton && isGroupable && convertToGroupButtons.group,
+		showConvertToGroupButton &&
+			isUngroupable &&
+			convertToGroupButtons.ungroup,
 		isReusableBlockType &&
 			innerBlockCount > 0 &&
 			allOptions.convertToRegularBlocks,
@@ -327,6 +347,7 @@ export default compose(
 			getSelectedBlockClientIds,
 			canInsertBlockType,
 			getTemplateLock,
+			canRemoveBlock,
 		} = select( blockEditorStore );
 		const block = getBlock( clientId );
 		const blockName = getBlockName( clientId );
@@ -363,6 +384,7 @@ export default compose(
 		const selectedBlockPossibleTransformations = selectedBlock
 			? getBlockTransformItems( selectedBlock, rootClientId )
 			: EMPTY_BLOCK_LIST;
+		const canRemove = canRemoveBlock( selectedBlockClientId );
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType
@@ -388,6 +410,7 @@ export default compose(
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
+			canRemove,
 		};
 	} ),
 	withDispatch(

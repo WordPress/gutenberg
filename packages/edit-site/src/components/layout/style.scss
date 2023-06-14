@@ -81,6 +81,13 @@
 	}
 }
 
+.edit-site-layout__main {
+	flex-grow: 1;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
@@ -105,7 +112,13 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&:has(.edit-site-layout__resizable-frame-oversized) {
+		justify-content: flex-end;
+	}
 
 	& > div {
 		color: $gray-900;
@@ -243,5 +256,5 @@
 			z-index: 3;
 		}
 	}
-
 }
+

@@ -38,6 +38,13 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 							search: !! search ? search : undefined,
 							per_page: 10,
 							orderby: search ? 'relevance' : 'date',
+							status: [
+								'publish',
+								'future',
+								'draft',
+								'pending',
+								'private',
+							],
 					  }
 					: {
 							per_page: -1,

@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+
+## 25.1.0 (2023-06-07)
+
+### Enhancements
+
+-   `BorderControl`: Improve color code readability in aria-label ([#51197](https://github.com/WordPress/gutenberg/pull/51197)).
+-   `Dropdown` and `DropdownMenu`: use internal context system to automatically pick the toolbar popover variant when rendered inside the `Toolbar` component ([#51154](https://github.com/WordPress/gutenberg/pull/51154)).
+
+### Bug Fix
+
+-   `FocalPointUnitControl`: Add aria-labels ([#50993](https://github.com/WordPress/gutenberg/pull/50993)).
+
+### Enhancements
+
+-   Wrapped `TabPanel` in a `forwardRef` call ([#50199](https://github.com/WordPress/gutenberg/pull/50199)).
+-   `ColorPalette`: Improve readability of color name and value, and improve rendering of partially transparent colors ([#50450](https://github.com/WordPress/gutenberg/pull/50450)).
+-   `Button`: Add `__next32pxSmallSize` prop to opt into the new 32px size when the `isSmall` prop is enabled ([#51012](https://github.com/WordPress/gutenberg/pull/51012)).
+-   `ItemGroup`: Update styles so all SVGs inherit color from their parent element ([#50819](https://github.com/WordPress/gutenberg/pull/50819)).
+
+### Experimental
+
+-   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
+-   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component  ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
+-   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
+
+## 25.0.0 (2023-05-24)
+
 ### Breaking Changes
 
 -   `DateTime`: Remove previously deprecated props, `__nextRemoveHelpButton` and `__nextRemoveResetButton` ([#50724](https://github.com/WordPress/gutenberg/pull/50724)).
@@ -10,7 +40,20 @@
 
 -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
 -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
+-   Added experimental v2 of `DropdownMenu` ([#49473](https://github.com/WordPress/gutenberg/pull/49473)).
+-   `ColorPicker`: its private `SelectControl` component no longer hides BackdropUI, thus making its focus state visible for keyboard users ([#50703](https://github.com/WordPress/gutenberg/pull/50703)).
 
+### Bug Fix
+
+-   `ColorPicker`: Add an outline when the color picker select box is focused([#50609](https://github.com/WordPress/gutenberg/pull/50609)).
+-   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
+-   `ToggleGroupControl`: Fix focus and selected style to support Windows High Contrast mode ([#50785](https://github.com/WordPress/gutenberg/pull/50785)).
+-   `SearchControl`: Adjust icon styles to fix alignment issues in the block inserter ([#50439](https://github.com/WordPress/gutenberg/pull/50439)).
+
+### Enhancements
+
+-   `Tooltip`: Update background color so tooltip boundaries are more visible in the site editor ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
+-   `FontSizePicker`: Tweak the header spacing to be more consistent with other design tools ([#50855](https://github.com/WordPress/gutenberg/pull/50855)).
 
 ## 24.0.0 (2023-05-10)
 
@@ -21,7 +64,7 @@
 ### Bug Fix
 
 -   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
--   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state.  ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
+-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state. ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
 
 ### Internal
 
@@ -90,6 +133,7 @@
 -   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
 -   `Navigator`: Add `skipFocus` property in `NavigateOptions`. ([#49350](https://github.com/WordPress/gutenberg/pull/49350)).
 -   `Spinner`: add explicit opacity and background styles ([#49695](https://github.com/WordPress/gutenberg/pull/49695)).
+-   Make TypeScript types available for consumers ([#49229](https://github.com/WordPress/gutenberg/pull/49229)).
 
 ### Bug Fix
 
