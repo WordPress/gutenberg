@@ -22,9 +22,7 @@ const config = defineConfig( {
 	workers: 1,
 	retries: process.env.CI ? 2 : 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
-	testDir: fileURLToPath(
-		new URL( './specs/performance', 'file:' + __filename ).href
-	),
+	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',

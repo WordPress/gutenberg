@@ -24,7 +24,7 @@ import {
 	saveResultsFile,
 	sum,
 	getTraceFilePath,
-} from './utils';
+} from '../utils';
 
 const results = {
 	serverResponse: [],

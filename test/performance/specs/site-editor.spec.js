@@ -19,7 +19,7 @@ import {
 	getTypingEventDurations,
 	getLoadingDurations,
 	loadBlocksFromHtml,
-} from './utils';
+} from '../utils';
 
 const results = {
 	serverResponse: [],

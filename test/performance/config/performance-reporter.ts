@@ -9,7 +9,7 @@ import type { Reporter, TestCase } from '@playwright/test/reporter';
 /**
  * Internal dependencies
  */
-import { average, round } from '../specs/performance/utils';
+import { average, round } from '../utils';
 
 const title = chalk.bold;
 const success = chalk.bold.green;

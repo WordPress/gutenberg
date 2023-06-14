@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Internal dependencies
  */
-import { saveResultsFile } from './utils';
+import { saveResultsFile } from '../utils';
 
 const results = {
 	timeToFirstByte: [],
