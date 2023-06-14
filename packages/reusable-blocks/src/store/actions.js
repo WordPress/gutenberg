@@ -50,11 +50,14 @@ export const __experimentalConvertBlockToStatic =
 export const __experimentalConvertBlocksToReusable =
 	( clientIds, title, syncType, categoryId ) =>
 	async ( { registry, dispatch } ) => {
-		const meta = {
-			wp_block: {
-				sync_status: syncType,
-			},
-		};
+		const meta =
+			syncType === 'unsynced'
+				? {
+						wp_block: {
+							sync_status: syncType,
+						},
+				  }
+				: undefined;
 		const categories = categoryId ? [ categoryId ] : undefined;
 
 		const reusableBlock = {
