@@ -50,12 +50,18 @@ const STATUS_OPTIONS = [
 	},
 ];
 
-export default function ChangeStatus( { post } ) {
+export default function ChangeStatus( {
+	postType,
+	postId,
+	postStatus: initialStatus,
+	password: initialPassword,
+	date: initialDate,
+} ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-	const [ status, setStatus ] = useState( post.status );
-	const [ date, setDate ] = useState( post.date );
-	const [ showPassword, setShowPassword ] = useState( !! post.password );
-	const [ password, setPassword ] = useState( post.password );
+	const [ status, setStatus ] = useState( initialStatus );
+	const [ date, setDate ] = useState( initialDate );
+	const [ showPassword, setShowPassword ] = useState( !! initialPassword );
+	const [ password, setPassword ] = useState( initialPassword );
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
@@ -72,7 +78,7 @@ export default function ChangeStatus( { post } ) {
 		}
 		setIsCreatingPage( true );
 		try {
-			await editEntityRecord( 'postType', post.type, post.id, {
+			await editEntityRecord( 'postType', postType, postId, {
 				status,
 				date,
 				password,
@@ -121,8 +127,8 @@ export default function ChangeStatus( { post } ) {
 				onClick={ openModal }
 			>
 				<StatusLabel
-					status={ post?.password ? 'protected' : post.status }
-					date={ post?.date }
+					status={ initialPassword ? 'protected' : initialStatus }
+					date={ initialDate }
 				/>
 			</Button>
 			{ isOpen && (
