@@ -23,10 +23,6 @@ import Subtitle from './subtitle';
 function FontFamilies() {
 	const { modalTabOepn, toggleModal, themeFonts, customFonts  } = useContext( FontLibraryContext );
 
-	const fonts = Array.isArray( customFonts )
-		? customFonts
-		: themeFonts || [];
-
 	return (
 		<>
 			{ !! modalTabOepn && (
@@ -59,7 +55,13 @@ function FontFamilies() {
 					</HStack>
 				</HStack>
 				<ItemGroup isBordered isSeparated>
-					{ fonts.map( font => (
+					{ customFonts.map( font => (
+						<FontFamilyItem
+							key={ font.slug }
+							font={font}
+						/>
+					) ) }
+					{ themeFonts.map( font => (
 						<FontFamilyItem
 							key={ font.slug }
 							font={font}

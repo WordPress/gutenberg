@@ -36,12 +36,12 @@ function FontLibraryProvider( { children } ) {
 		? fontFamilies.theme
 			.map( setFallbackValues )
 			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
-		: null;
+		: [];
 	const customFonts = fontFamilies.custom
 		? fontFamilies.custom
 			.map( setFallbackValues )
 			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
-		: null;
+		: [];
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
