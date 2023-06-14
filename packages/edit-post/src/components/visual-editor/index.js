@@ -15,7 +15,6 @@ import {
 	WritingFlow,
 	BlockList,
 	BlockTools,
-	LayoutStyle,
 	store as blockEditorStore,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
@@ -27,8 +26,7 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 	__experimentalRecursionProvider as RecursionProvider,
-	useLayoutClasses,
-	useLayoutStyles,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -41,6 +39,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
+	blockEditorPrivateApis
+);
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 
