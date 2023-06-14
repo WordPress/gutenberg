@@ -31,7 +31,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 			/>
 			<SelectControl
 				__nextHasNoMarginBottom
-				label={ __( 'Numbering type' ) }
+				label={ __( 'Numbering style' ) }
 				options={ [
 					{ value: '1', label: __( 'Numbers' ) },
 					{ value: 'A', label: __( 'Uppercase letters' ) },
