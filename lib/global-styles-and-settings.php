@@ -290,3 +290,13 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
+
+function add_variation_class_to_body( $classes ) {
+	$custom = wp_get_global_settings( array( 'custom' ) );
+	if ( isset($custom['variation']) && 'Default' !== $custom['variation'] ) {
+		$classes[] = 'uses-style-variation';
+		$classes[] = _wp_to_kebab_case('is style variation ' . $custom['variation']);
+	}
+	return $classes;
+}
+add_filter( 'body_class','add_variation_class_to_body' );

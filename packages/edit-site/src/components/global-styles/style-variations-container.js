@@ -43,7 +43,14 @@ function Variation( { variation } ) {
 	const selectVariation = () => {
 		setUserConfig( () => {
 			return {
-				settings: variation.settings,
+				settings: {
+					...( 'Default' !== variation.title && {
+						custom: {
+							variation: variation.title,
+						},
+					} ),
+					...variation.settings,
+				},
 				styles: variation.styles,
 			};
 		} );
