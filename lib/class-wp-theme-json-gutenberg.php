@@ -3659,9 +3659,20 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $styles as $key => $style ) {
 			if ( is_array( $style ) ) {
 				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
+				continue;
 			}
-			if ( is_string( $style ) && 0 === strpos( $style, 'var(' ) ) {
+
+			if ( 0 === strpos( $style, 'var(' ) ) {
 				$styles[ $key ] = isset( $values[ $style ] ) ? $values[ $style ] : $style;
+			} elseif ( 0 < strpos( $style, 'var(' ) ) { // if the variable is not the first value in the string.
+				$has_matches = preg_match_all( '/var\(([^)]+)\)/', $style, $var_parts );
+				if ( $has_matches ) {
+					$resolved_style = $styles[ $key ];
+					foreach ( $var_parts[0] as $var_part ) {
+						$resolved_style = str_replace( $var_part, isset( $values[ $var_part ] ) ? $values[ $var_part ] : $var_part, $resolved_style );
+					}
+					$styles[ $key ] = $resolved_style;
+				}
 			}
 		}
 

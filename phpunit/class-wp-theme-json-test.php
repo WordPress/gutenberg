@@ -2085,11 +2085,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
-						'core/post-terms' => array(
+						'core/post-terms'      => array(
 							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
 							'color'      => array( 'background' => $raw_color_value ),
 						),
-						'core/navigation' => array(
+						'core/more'            => array(
+							'typography' => array( 'fontSize' => 'var(--undefined--font-size--small)' ),
+							'color'      => array( 'background' => 'linear-gradient(90deg, var(--wp--preset--color--primary) 0%, var(--wp--preset--color--secondary) 35%, var(--wp--undefined--color--secondary) 100%)' ),
+						),
+						'core/comment-content' => array(
+							'typography' => array( 'fontSize' => 'calc(var(--wp--preset--font-size--small) + 20px)' ),
+						),
+						'core/navigation'      => array(
 							'elements' => array(
 								'link' => array(
 									'color'      => array(
@@ -2102,7 +2109,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'core/quote'      => array(
+						'core/quote'           => array(
 							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--large)' ),
 							'color'      => array( 'background' => 'var(--wp--preset--color--primary)' ),
 							'variations' => array(
@@ -2129,6 +2136,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
 		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
 		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
+		$this->assertEquals(
+			"linear-gradient(90deg, $primary_color 0%, $secondary_color 35%, var(--wp--undefined--color--secondary) 100%)",
+			$styles['blocks']['core/more']['color']['background'],
+			'Blocks: multiple colors and undefined color'
+		);
+		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
+		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
 
 		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
 		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
