@@ -165,6 +165,9 @@ Fastest time to move mouse between two block item in the inserter: ${ success(
 				round( Math.min( ...inserterHover ) ) + 'ms'
 			) }` );
 		}
+
+		// eslint-disable-next-line no-console
+		console.log( '' );
 	}
 }
 
