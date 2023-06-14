@@ -279,6 +279,37 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	const isDraggingBelow = candidateEdge === 'bottom';
 
 	// If the user is dragging towards the bottom of the block check whether
+	// they might be trying to nest the block as a child.
+	// If the block already has inner blocks, and is expanded, this should be treated
+	// as nesting since the next block in the tree will be the first child.
+	// However, if the block is collapsed, dragging beneath the block should
+	// still be allowed, as the next visible block in the tree will be a sibling.
+	if (
+		isDraggingBelow &&
+		candidateBlockData.canInsertDraggedBlocksAsChild &&
+		( ( candidateBlockData.innerBlockCount > 0 &&
+			candidateBlockData.isExpanded ) ||
+			isNestingGesture(
+				position,
+				candidateRect,
+				candidateBlockParents.length,
+				rtl
+			) )
+	) {
+		// If the block is expanded, insert the block as the first child.
+		// Otherwise, for collapsed blocks, insert the block as the last child.
+		const newBlockIndex = candidateBlockData.isExpanded
+			? 0
+			: candidateBlockData.innerBlockCount || 0;
+
+		return {
+			rootClientId: candidateBlockData.clientId,
+			blockIndex: newBlockIndex,
+			dropPosition: 'inside',
+		};
+	}
+
+	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to move the block to be at a parent level.
 	if (
 		isDraggingBelow &&
@@ -348,37 +379,6 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 				};
 			}
 		}
-	}
-
-	// If the user is dragging towards the bottom of the block check whether
-	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, and is expanded, this should be treated
-	// as nesting since the next block in the tree will be the first child.
-	// However, if the block is collapsed, dragging beneath the block should
-	// still be allowed, as the next visible block in the tree will be a sibling.
-	if (
-		isDraggingBelow &&
-		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( ( candidateBlockData.innerBlockCount > 0 &&
-			candidateBlockData.isExpanded ) ||
-			isNestingGesture(
-				position,
-				candidateRect,
-				candidateBlockParents.length,
-				rtl
-			) )
-	) {
-		// If the block is expanded, insert the block as the first child.
-		// Otherwise, for collapsed blocks, insert the block as the last child.
-		const newBlockIndex = candidateBlockData.isExpanded
-			? 0
-			: candidateBlockData.innerBlockCount || 0;
-
-		return {
-			rootClientId: candidateBlockData.clientId,
-			blockIndex: newBlockIndex,
-			dropPosition: 'inside',
-		};
 	}
 
 	// If dropping as a sibling, but block cannot be inserted in
