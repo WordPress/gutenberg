@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
-	<InspectorControls group="styles">
+	<InspectorControls>
 		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
 				__nextHasNoMarginBottom
