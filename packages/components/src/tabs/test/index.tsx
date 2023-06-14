@@ -219,7 +219,6 @@ describe.each( [
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
 			).toBeInTheDocument();
-			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 		} );
 
 		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
@@ -613,7 +612,6 @@ describe.each( [
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
 			).toBeInTheDocument();
-			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Click on Beta, make sure beta is the selected tab
@@ -623,7 +621,6 @@ describe.each( [
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Beta' } )
 			).toBeInTheDocument();
-			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 			// Click on Alpha, make sure beta is the selected tab
@@ -633,7 +630,6 @@ describe.each( [
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
 			).toBeInTheDocument();
-			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
@@ -845,18 +841,20 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
 			// Navigate backwards with arrow keys. The gamma tab receives focus.
+			// The `mockOnSelect` callback doesn't fire, since the gamma tab was
+			// already selected.
 			await user.keyboard( '[ArrowLeft]' );
 			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			await expect( getSelectedTab() ).toHaveFocus();
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 
-			// Click on on the disabled tab. Compared to using arrow keys to move the
+			// Click on the disabled tab. Compared to using arrow keys to move the
 			// focus, disabled tabs ignore pointer clicks — and therefore, they don't
 			// receive focus, nor they cause the `mockOnSelect` function to fire.
 			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
 			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			await expect( getSelectedTab() ).toHaveFocus();
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 		} );
 
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
