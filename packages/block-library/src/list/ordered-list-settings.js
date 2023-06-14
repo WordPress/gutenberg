@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
-	<InspectorControls>
+	<InspectorControls group="styles">
 		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
 				__nextHasNoMarginBottom
@@ -35,7 +35,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 				options={ [
 					{ value: '1', label: __( 'Numbers' ) },
 					{ value: 'A', label: __( 'Uppercase letters' ) },
-					{ value: 'a', label: __( 'Lowercase letter' ) },
+					{ value: 'a', label: __( 'Lowercase letters' ) },
 					{ value: 'I', label: __( 'Uppercase roman numerals' ) },
 					{ value: 'i', label: __( 'Lowercase roman numerals' ) },
 				] }
