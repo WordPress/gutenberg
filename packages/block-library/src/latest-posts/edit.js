@@ -23,9 +23,9 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
+	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
@@ -37,7 +37,6 @@ import { createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../private-apis';
 import {
 	MIN_EXCERPT_LENGTH,
 	MAX_EXCERPT_LENGTH,
@@ -56,8 +55,6 @@ const USERS_LIST_QUERY = {
 	has_published_posts: [ 'post' ],
 	context: 'view',
 };
-
-const { ImageSizeControl } = unlock( blockEditorPrivateApis );
 
 function getFeaturedImageDetails( post, size ) {
 	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
@@ -276,16 +273,22 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					<>
 						<ImageSizeControl
 							onChange={ ( value ) => {
-								setAttributes( {
-									featuredImageSizeWidth: value.width,
-									featuredImageSizeHeight: value.height,
-								} );
+								const newAttrs = {};
+								if ( value.hasOwnProperty( 'width' ) ) {
+									newAttrs.featuredImageSizeWidth =
+										value.width;
+								}
+								if ( value.hasOwnProperty( 'height' ) ) {
+									newAttrs.featuredImageSizeHeight =
+										value.height;
+								}
+								setAttributes( newAttrs );
 							} }
 							slug={ featuredImageSizeSlug }
 							width={ featuredImageSizeWidth }
 							height={ featuredImageSizeHeight }
-							naturalWidth={ defaultImageWidth }
-							naturalHeight={ defaultImageHeight }
+							imageWidth={ defaultImageWidth }
+							imageHeight={ defaultImageHeight }
 							imageSizeOptions={ imageSizeOptions }
 							imageSizeHelp={ __(
 								'Select the size of the source image.'
