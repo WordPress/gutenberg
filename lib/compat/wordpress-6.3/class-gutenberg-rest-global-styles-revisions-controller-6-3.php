@@ -14,7 +14,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Controller {
 	/**
 	 * Parent post type.
 	 *
