@@ -14,7 +14,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Controller {
 	/**
 	 * Parent post type.
 	 *
@@ -108,18 +108,41 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 	}
 
 	/**
+	 * A direct copy of WP_REST_Revisions_Controller->prepare_date_response().
+	 * Checks the post_date_gmt or modified_gmt and prepare any post or
+	 * modified date for single post output.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string      $date_gmt GMT publication time.
+	 * @param string|null $date     Optional. Local publication time. Default null.
+	 * @return string|null ISO8601/RFC3339 formatted datetime, otherwise null.
+	 */
+	protected function prepare_date_response( $date_gmt, $date = null ) {
+		if ( '0000-00-00 00:00:00' === $date_gmt ) {
+			return null;
+		}
+
+		if ( isset( $date ) ) {
+			return mysql_to_rfc3339( $date );
+		}
+
+		return mysql_to_rfc3339( $date_gmt );
+	}
+
+	/**
 	 * Prepares the revision for the REST response.
 	 *
 	 * @since 6.3.0
 	 *
-	 * @param WP_Post         $item    Post revision object.
+	 * @param WP_Post         $post    Post revision object.
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
-	public function prepare_item_for_response( $item, $request ) {
+	public function prepare_item_for_response( $post, $request ) {
 		$parent = $this->get_parent( $request['parent'] );
 		// Retrieves global styles config as JSON.
-		$raw_revision_config = json_decode( $item->post_content, true );
+		$raw_revision_config = json_decode( $post->post_content, true );
 		$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
 
 		// Prepares item data.
@@ -127,27 +150,27 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller extends WP_REST_Controll
 		$fields = $this->get_fields_for_response( $request );
 
 		if ( rest_is_field_included( 'author', $fields ) ) {
-			$data['author'] = (int) $item->post_author;
+			$data['author'] = (int) $post->post_author;
 		}
 
 		if ( rest_is_field_included( 'date', $fields ) ) {
-			$data['date'] = $item->post_date;
+			$data['date'] = $this->prepare_date_response( $post->post_date_gmt, $post->post_date );
 		}
 
 		if ( rest_is_field_included( 'date_gmt', $fields ) ) {
-			$data['date_gmt'] = $item->post_date_gmt;
+			$data['date_gmt'] = $this->prepare_date_response( $post->post_date_gmt );
 		}
 
 		if ( rest_is_field_included( 'id', $fields ) ) {
-			$data['id'] = (int) $item->ID;
+			$data['id'] = (int) $post->ID;
 		}
 
 		if ( rest_is_field_included( 'modified', $fields ) ) {
-			$data['modified'] = $item->post_modified;
+			$data['modified'] = $this->prepare_date_response( $post->post_modified_gmt, $post->post_modified );
 		}
 
 		if ( rest_is_field_included( 'modified_gmt', $fields ) ) {
-			$data['modified_gmt'] = $item->post_modified_gmt;
+			$data['modified_gmt'] = $this->prepare_date_response( $post->post_modified_gmt );
 		}
 
 		if ( rest_is_field_included( 'parent', $fields ) ) {
