@@ -1,5 +1,5 @@
-( ( win ) => {
-	const { store } = win.wp.interactivity;
+( ( { wp } ) => {
+	const { store } = wp.interactivity;
 
 	store( {
 		state: {

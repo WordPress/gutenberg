@@ -7,18 +7,29 @@
  * @package gutenberg-test-interactive-blocks
  */
 
- // Register all blocks found in the `interactive-blocks` folder.
-function auto_register_block_types() {
-	if ( file_exists( __DIR__ . '/interactive-blocks/' ) ) {
-		$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
+add_action(
+	'init',
+	function() {
+		// Register all blocks found in the `interactive-blocks` folder.
+		if ( file_exists( __DIR__ . '/interactive-blocks/' ) ) {
+			$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
 
+			// auto register all blocks that were found.
+			foreach ( $block_json_files as $filename ) {
+				$block_folder = dirname( $filename );
+				$name = basename( $block_folder );
+				$view_file =
+					plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-		// auto register all blocks that were found.
-		foreach ( $block_json_files as $filename ) {
-			$block_folder = dirname( $filename );
-			register_block_type( $block_folder );
+				wp_register_script(
+					$name . '-view',
+					$view_file,
+					array( 'wp-interactivity' ),
+					filemtime( $view_file, )
+				);
+
+				register_block_type_from_metadata( $block_folder );
+			};
 		};
-	};
-}
-
-add_action( 'init', 'auto_register_block_types' );
+	}
+);
