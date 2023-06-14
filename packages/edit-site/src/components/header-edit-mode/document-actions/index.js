@@ -12,7 +12,6 @@ import {
 	Button,
 	VisuallyHidden,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { store as commandsStore } from '@wordpress/commands';
@@ -144,6 +143,13 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 		<div
 			className={ classnames( 'edit-site-document-actions', className ) }
 		>
+			<Text
+				size="body"
+				as="h1"
+				className="edit-site-document-actions__title"
+			>
+				{ children }
+			</Text>
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
@@ -160,16 +166,8 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 				className="edit-site-document-actions__command"
 				onClick={ () => openCommandCenter() }
 			>
-				<HStack
-					className="edit-site-document-actions__title"
-					spacing={ 1 }
-					justify="center"
-				>
-					<BlockIcon icon={ icon } />
-					<Text size="body" as="h1">
-						{ children }
-					</Text>
-				</HStack>
+				<BlockIcon icon={ icon } />
+				<Text as="span">{ __( 'Open command center' ) }</Text>
 				<span className="edit-site-document-actions__shortcut">
 					{ displayShortcut.primary( 'k' ) }
 				</span>
