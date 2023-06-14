@@ -1,17 +1,12 @@
-$library-color: #e0e0e0;
-
 .edit-site-library {
-	background: $gray-900;
+	background: rgba(0, 0, 0, 0.05);
 	margin: 0;
-}
-
-.edit-site-library__section-header {
-	p {
-		color: $library-color;
+	.components-text {
+		color: $gray-600;
 	}
 
-	h5 {
-		color: #fff;
+	.components-heading {
+		color: $white;
 	}
 }
 
@@ -22,6 +17,7 @@ $library-color: #e0e0e0;
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
+	margin-bottom: $grid-unit-40;
 
 	.edit-site-library__pattern {
 		break-inside: avoid-column;
@@ -31,7 +27,7 @@ $library-color: #e0e0e0;
 
 		// Temp styles for testing - delete asap
 		.edit-site-library__preview {
-			border-radius: $radius-block-ui * 4;
+			border-radius: $radius-block-ui;
 			cursor: pointer;
 			overflow: hidden;
 
@@ -42,14 +38,14 @@ $library-color: #e0e0e0;
 
 		.edit-site-library__footer,
 		.edit-site-library__button {
-			color: $library-color;
+			color: $gray-600;
 		}
 		// END: temp styles for testing.
 	}
 
 	.edit-site-library__preview {
 		flex: 1;
-		margin-bottom: $grid-unit-30;
+		margin-bottom: $grid-unit-20;
 	}
 }
 
@@ -58,30 +54,30 @@ $library-color: #e0e0e0;
 .edit-site-library__search {
 	&#{&} input[type="search"] {
 		background: $gray-800;
-		color: $library-color;
+		color: $gray-600;
 
 		&:focus {
-			background: $gray-800;
+			background: $gray-600;
 		}
 	}
 
 	svg {
-		fill: $library-color;
+		fill: $gray-600;
 	}
 }
 
 .edit-site-library__pattern-title {
-	color: $library-color;
+	color: $gray-600;
 
 	svg {
 		border-radius: $grid-unit-05;
 		background: var(--wp-block-synced-color);
-		fill: $library-color;
+		fill: $gray-600;
 	}
 }
 
 .edit-site-library__no-results {
-	color: $library-color;
+	color: $gray-600;
 	// height: 100%,
 	// display: flex,
 	// alignItems: center,
