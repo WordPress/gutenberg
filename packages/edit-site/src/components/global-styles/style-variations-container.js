@@ -19,7 +19,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -91,13 +91,10 @@ function Variation( { variation } ) {
 }
 
 export default function StyleVariationsContainer() {
-	const { variations } = useSelect( ( select ) => {
-		return {
-			variations:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations() || [],
-		};
+	const variations = useSelect( ( select ) => {
+		return select(
+			coreStore
+		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
 	const withEmptyVariation = useMemo( () => {
@@ -107,7 +104,7 @@ export default function StyleVariationsContainer() {
 				settings: {},
 				styles: {},
 			},
-			...variations.map( ( variation ) => ( {
+			...( variations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
@@ -116,15 +113,13 @@ export default function StyleVariationsContainer() {
 	}, [ variations ] );
 
 	return (
-		<>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ withEmptyVariation?.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } />
-				) ) }
-			</Grid>
-		</>
+		<Grid
+			columns={ 2 }
+			className="edit-site-global-styles-style-variations-container"
+		>
+			{ withEmptyVariation.map( ( variation, index ) => (
+				<Variation key={ index } variation={ variation } />
+			) ) }
+		</Grid>
 	);
 }

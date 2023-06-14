@@ -10,16 +10,10 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
 import { areBlocksDirty } from './are-blocks-dirty';
 import { DEFAULT_BLOCK, ALLOWED_BLOCKS } from '../constants';
 
 const EMPTY_OBJECT = {};
-const DRAFT_MENU_PARAMS = [
-	'postType',
-	'wp_navigation',
-	{ status: 'draft', per_page: -1 },
-];
 
 export default function UnsavedInnerBlocks( {
 	blocks,
@@ -75,34 +69,29 @@ export default function UnsavedInnerBlocks( {
 		}
 	);
 
-	const { isSaving, hasResolvedDraftNavigationMenus } = useSelect(
+	const { isSaving, hasResolvedAllNavigationMenus } = useSelect(
 		( select ) => {
 			if ( isDisabled ) {
 				return EMPTY_OBJECT;
 			}
 
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				isSavingEntityRecord,
-			} = select( coreStore );
+			const { hasFinishedResolution, isSavingEntityRecord } =
+				select( coreStore );
 
 			return {
 				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-				draftNavigationMenus: getEntityRecords(
-					// This is needed so that hasResolvedDraftNavigationMenus gives the correct status.
-					...DRAFT_MENU_PARAMS
-				),
-				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+				hasResolvedAllNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
-					DRAFT_MENU_PARAMS
+					[
+						'postType',
+						'wp_navigation',
+						{ per_page: -1, status: [ 'publish', 'draft' ] },
+					]
 				),
 			};
 		},
 		[ isDisabled ]
 	);
-
-	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
@@ -121,8 +110,7 @@ export default function UnsavedInnerBlocks( {
 		if (
 			isDisabled ||
 			isSaving ||
-			! hasResolvedDraftNavigationMenus ||
-			! hasResolvedNavigationMenus ||
+			! hasResolvedAllNavigationMenus ||
 			! hasSelection ||
 			! innerBlocksAreDirty
 		) {
@@ -135,8 +123,7 @@ export default function UnsavedInnerBlocks( {
 		createNavigationMenu,
 		isDisabled,
 		isSaving,
-		hasResolvedDraftNavigationMenus,
-		hasResolvedNavigationMenus,
+		hasResolvedAllNavigationMenus,
 		innerBlocksAreDirty,
 		hasSelection,
 	] );

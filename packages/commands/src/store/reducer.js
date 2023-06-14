@@ -16,24 +16,18 @@ function commands( state = {}, action ) {
 		case 'REGISTER_COMMAND':
 			return {
 				...state,
-				[ action.group ]: {
-					...state[ action.group ],
-					[ action.name ]: {
-						name: action.name,
-						label: action.label,
-						group: action.group,
-						callback: action.callback,
-						icon: action.icon,
-					},
+				[ action.name ]: {
+					name: action.name,
+					label: action.label,
+					searchLabel: action.searchLabel,
+					context: action.context,
+					callback: action.callback,
+					icon: action.icon,
 				},
 			};
 		case 'UNREGISTER_COMMAND': {
-			const { [ action.name ]: _, ...remainingState } =
-				state?.[ action.group ];
-			return {
-				...state,
-				[ action.group ]: remainingState,
-			};
+			const { [ action.name ]: _, ...remainingState } = state;
+			return remainingState;
 		}
 	}
 
@@ -53,21 +47,15 @@ function commandLoaders( state = {}, action ) {
 		case 'REGISTER_COMMAND_LOADER':
 			return {
 				...state,
-				[ action.group ]: {
-					...state[ action.group ],
-					[ action.name ]: {
-						name: action.name,
-						hook: action.hook,
-					},
+				[ action.name ]: {
+					name: action.name,
+					context: action.context,
+					hook: action.hook,
 				},
 			};
 		case 'UNREGISTER_COMMAND_LOADER': {
-			const { [ action.name ]: _, ...remainingState } =
-				state?.[ action.group ];
-			return {
-				...state,
-				[ action.group ]: remainingState,
-			};
+			const { [ action.name ]: _, ...remainingState } = state;
+			return remainingState;
 		}
 	}
 
@@ -93,10 +81,28 @@ function isOpen( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the command center's active context.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function context( state = 'root', action ) {
+	switch ( action.type ) {
+		case 'SET_CONTEXT':
+			return action.context;
+	}
+
+	return state;
+}
+
 const reducer = combineReducers( {
 	commands,
 	commandLoaders,
 	isOpen,
+	context,
 } );
 
 export default reducer;

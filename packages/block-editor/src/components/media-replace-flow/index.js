@@ -59,9 +59,7 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
-	popoverProps = {
-		variant: 'toolbar',
-	},
+	popoverProps,
 } ) => {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;

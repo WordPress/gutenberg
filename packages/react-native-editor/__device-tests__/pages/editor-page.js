@@ -499,6 +499,22 @@ class EditorPage {
 		await toolBarButton.click();
 	}
 
+	async moveBlockSelectionUp( options = { toRoot: false } ) {
+		let navigateUpElements = [];
+		do {
+			await this.driver.sleep( 2000 );
+			navigateUpElements = await this.driver.elementsByAccessibilityId(
+				'Navigate Up'
+			);
+			if ( navigateUpElements.length > 0 ) {
+				await navigateUpElements[ 0 ].click();
+			}
+			if ( ! options.toRoot ) {
+				break;
+			}
+		} while ( navigateUpElements.length > 0 );
+	}
+
 	// =========================
 	// Inline toolbar functions
 	// =========================
@@ -547,10 +563,6 @@ class EditorPage {
 			: '//XCUIElementTypeButton';
 		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
@@ -564,6 +576,10 @@ class EditorPage {
 			}
 		}
 
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
+			blockActionsMenuButtonLocator
+		);
 		await blockActionsMenuButton.click();
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
@@ -911,7 +927,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.view.ViewGroup[@content-desc="block-list"]/android.view.ViewGroup[${ position }]/android.widget.Button`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();

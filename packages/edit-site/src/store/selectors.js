@@ -321,3 +321,27 @@ export function isNavigationOpened() {
 		version: '6.4',
 	} );
 }
+
+/**
+ * Whether or not the editor has a page loaded into it.
+ *
+ * @see setPage
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor has a page loaded into it.
+ */
+export function isPage( state ) {
+	return !! state.editedPost.context?.postId;
+}
+
+/**
+ * Whether or not the editor allows only page content to be edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not focus is on editing page content.
+ */
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
+}
