@@ -16,7 +16,7 @@ import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import ResizableEditor from '../block-editor/resizable-editor';
 

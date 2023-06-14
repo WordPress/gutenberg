@@ -15,7 +15,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis

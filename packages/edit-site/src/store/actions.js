@@ -12,6 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -144,7 +145,7 @@ export const removeTemplate =
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					decodeEntities( template.title.rendered )
 				),
 				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
@@ -528,4 +529,23 @@ export const switchEditorMode =
 		} else if ( mode === 'text' ) {
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
+	};
+
+/**
+ * Sets whether or not the editor allows only page content to be edited.
+ *
+ * @param {boolean} hasPageContentFocus True to allow only page content to be
+ *                                      edited, false to allow template to be
+ *                                      edited.
+ */
+export const setHasPageContentFocus =
+	( hasPageContentFocus ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentFocus ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
+		} );
 	};
