@@ -139,6 +139,12 @@ _Required._ Called when the value changes. The second parameter is `null` unless
 }
 ```
 
+### `onKeydown`: `( event: KeyboardEvent ) => void`
+
+A callback invoked on the keydown event.
+
+-   Required: No
+
 ### `label: String`
 
 _Optional._ If this property is added, a label will be generated using label property as the content.

@@ -14,7 +14,6 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
-	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -34,9 +33,13 @@ const mergeConfigs = require( './merge-configs' );
  * The root configuration options.
  *
  * @typedef WPRootConfigOptions
- * @property {number}      port       The port to use in the development environment.
- * @property {number}      testsPort  The port to use in the tests environment.
- * @property {string|null} afterSetup The command(s) to run after configuring WordPress on start and clean.
+ * @property {number}                               port                          The port to use in the development environment.
+ * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterDestroy The script to run after the "destroy" command has completed.
+ * @property {Object.<string, WPEnvironmentConfig>} env                           The environment-specific configuration options.
  */
 
 /**
@@ -68,6 +71,34 @@ const mergeConfigs = require( './merge-configs' );
  * @property {?string}             ref      The git ref for the source if the source type is 'git'.
  * @property {string}              basename Name that identifies the WordPress installation, plugin or theme.
  */
+
+/**
+ * An object containing all of the default configuration options for environment-specific configurations.
+ * Unless otherwise set at the root-level or the environment-level, these are the values that will be
+ * parsed into the environment. This is useful for tracking known configuration options since these
+ * are the only configuration options that can be set in each environment.
+ */
+const DEFAULT_ENVIRONMENT_CONFIG = {
+	core: null,
+	phpVersion: null,
+	plugins: [],
+	themes: [],
+	port: 8888,
+	testsPort: 8889,
+	mappings: {},
+	config: {
+		FS_METHOD: 'direct',
+		WP_DEBUG: true,
+		SCRIPT_DEBUG: true,
+		WP_ENVIRONMENT_TYPE: 'local',
+		WP_PHP_BINARY: 'php',
+		WP_TESTS_EMAIL: 'admin@example.org',
+		WP_TESTS_TITLE: 'Test Blog',
+		WP_TESTS_DOMAIN: 'localhost',
+		WP_SITEURL: 'http://localhost',
+		WP_HOME: 'http://localhost',
+	},
+};
 
 /**
  * Given a directory, this parses any relevant config files and
@@ -164,9 +195,7 @@ async function getDefaultConfig(
 	configDirectoryPath,
 	{ shouldInferType, cacheDirectoryPath }
 ) {
-	// Our default config should try to infer what type of project
-	// this is in order to automatically map the current directory.
-	const detectedType = shouldInferType
+	const detectedDirectoryType = shouldInferType
 		? await detectDirectoryType( configDirectoryPath )
 		: null;
 
@@ -175,29 +204,40 @@ async function getDefaultConfig(
 	// config objects easier because once merged we don't need to
 	// verify that a given option exists before using it.
 	const rawConfig = {
-		core: detectedType === 'core' ? '.' : null,
-		phpVersion: null,
-		plugins: detectedType === 'plugin' ? [ '.' ] : [],
-		themes: detectedType === 'theme' ? [ '.' ] : [],
-		port: 8888,
-		testsPort: 8889,
-		mappings: {},
-		config: {
-			WP_DEBUG: true,
-			SCRIPT_DEBUG: true,
-			WP_ENVIRONMENT_TYPE: 'local',
-			WP_PHP_BINARY: 'php',
-			WP_TESTS_EMAIL: 'admin@example.org',
-			WP_TESTS_TITLE: 'Test Blog',
-			WP_TESTS_DOMAIN: 'localhost',
-			WP_SITEURL: 'http://localhost',
-			WP_HOME: 'http://localhost',
+		// Since the root config is the base "environment" config for
+		// all environments, we will start with those defaults.
+		...DEFAULT_ENVIRONMENT_CONFIG,
+
+		// When the current directory has no configuration file we support a zero-config mode of operation.
+		// This works by using the default options and inferring how to map the current directory based
+		// on the contents of the directory.
+		core:
+			detectedDirectoryType === 'core'
+				? '.'
+				: DEFAULT_ENVIRONMENT_CONFIG.core,
+		plugins:
+			detectedDirectoryType === 'plugin'
+				? [ '.' ]
+				: DEFAULT_ENVIRONMENT_CONFIG.plugins,
+		themes:
+			detectedDirectoryType === 'theme'
+				? [ '.' ]
+				: DEFAULT_ENVIRONMENT_CONFIG.themes,
+
+		// These configuration options are root-only and should not be present
+		// on environment-specific configuration objects.
+		lifecycleScripts: {
+			afterStart: null,
+			afterClean: null,
+			afterDestroy: null,
 		},
-		afterSetup: null,
 		env: {
 			development: {},
 			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				config: {
+					WP_DEBUG: false,
+					SCRIPT_DEBUG: false,
+				},
 			},
 		},
 	};
@@ -220,6 +260,7 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	// Create a service config object so we can merge it with the others
 	// and override anything that the configuration options need to.
 	const overrideConfig = {
+		lifecycleScripts: overrides.lifecycleScripts,
 		env: {
 			development: {},
 			tests: {},
@@ -250,10 +291,6 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.phpVersion = overrides.phpVersion;
 		overrideConfig.env.development.phpVersion = overrides.phpVersion;
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
-	}
-
-	if ( overrides.afterSetup ) {
-		overrideConfig.afterSetup = overrides.afterSetup;
 	}
 
 	return overrideConfig;
@@ -292,7 +329,10 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		configFile,
 		null,
 		rawConfig,
-		options
+		{
+			...options,
+			rootConfig: true,
+		}
 	);
 
 	// Parse any root-only options.
@@ -300,18 +340,28 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
-	if ( rawConfig.afterSetup !== undefined ) {
-		// Support null as a valid input.
-		if ( rawConfig.afterSetup !== null ) {
-			checkString( configFile, 'afterSetup', rawConfig.afterSetup );
-		}
-		parsedConfig.afterSetup = rawConfig.afterSetup;
+	parsedConfig.lifecycleScripts = {};
+	if ( rawConfig.lifecycleScripts ) {
+		checkObjectWithValues(
+			configFile,
+			'lifecycleScripts',
+			rawConfig.lifecycleScripts,
+			[ 'null', 'string' ],
+			true
+		);
+		parsedConfig.lifecycleScripts = rawConfig.lifecycleScripts;
 	}
 
 	// Parse the environment-specific configs so they're accessible to the root.
 	parsedConfig.env = {};
 	if ( rawConfig.env ) {
-		checkObjectWithValues( configFile, 'env', rawConfig.env, [ 'object' ] );
+		checkObjectWithValues(
+			configFile,
+			'env',
+			rawConfig.env,
+			[ 'object' ],
+			false
+		);
 		for ( const env in rawConfig.env ) {
 			parsedConfig.env[ env ] = await parseEnvironmentConfig(
 				configFile,
@@ -333,6 +383,7 @@ async function parseRootConfig( configFile, rawConfig, options ) {
  * @param {Object}      config                     A config object to parse.
  * @param {Object}      options
  * @param {string}      options.cacheDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {boolean}     options.rootConfig         Indicates whether or not this is the root config object.
  *
  * @return {Promise<WPEnvironmentConfig>} The environment config object.
  */
@@ -348,6 +399,36 @@ async function parseEnvironmentConfig(
 
 	const environmentPrefix = environment ? environment + '.' : '';
 
+	// Before we move forward with parsing we should make sure that there aren't any
+	// configuration options that do not exist. This helps prevent silent failures
+	// when a user sets up their configuration incorrectly.
+	for ( const key in config ) {
+		if ( DEFAULT_ENVIRONMENT_CONFIG[ key ] !== undefined ) {
+			continue;
+		}
+
+		// We should also check root-only options for the root config
+		// because these aren't part of the above defaults but are
+		// configuration options that we will parse.
+		switch ( key ) {
+			case 'testsPort':
+			case 'lifecycleScripts':
+			case 'env': {
+				if ( options.rootConfig ) {
+					continue;
+				}
+
+				break;
+			}
+		}
+
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ environmentPrefix }${ key }" is not a configuration option.`
+		);
+	}
+
+	// Parse each option individually so that we can handle the validation
+	// and any conversion that is required to use the option.
 	const parsedConfig = {};
 
 	if ( config.port !== undefined ) {
@@ -401,7 +482,8 @@ async function parseEnvironmentConfig(
 			configFile,
 			`${ environmentPrefix }config`,
 			config.config,
-			[ 'string', 'number', 'boolean', 'empty' ]
+			[ 'string', 'number', 'boolean' ],
+			true
 		);
 		parsedConfig.config = config.config;
 
@@ -426,7 +508,8 @@ async function parseEnvironmentConfig(
 			configFile,
 			`${ environmentPrefix }mappings`,
 			config.mappings,
-			[ 'string' ]
+			[ 'string' ],
+			false
 		);
 		parsedConfig.mappings = Object.entries( config.mappings ).reduce(
 			( result, [ wpDir, localDir ] ) => {

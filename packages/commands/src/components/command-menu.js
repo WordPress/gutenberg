@@ -31,17 +31,17 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
 
+	if ( ! commands.length ) {
+		return null;
+	}
+
 	return (
 		<>
 			<Command.List>
-				{ isLoading && (
-					<Command.Loading>{ __( 'Searching…' ) }</Command.Loading>
-				) }
-
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
-						value={ command.name }
+						value={ command.searchLabel ?? command.label }
 						onSelect={ () => command.callback( { close } ) }
 					>
 						<HStack
@@ -89,24 +89,28 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	);
 }
 
-export function CommandMenuGroup( { group, search, setLoader, close } ) {
+export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
 			return {
-				commands: getCommands( group ),
-				loaders: getCommandLoaders( group ),
+				commands: getCommands( isContextual ),
+				loaders: getCommandLoaders( isContextual ),
 			};
 		},
-		[ group ]
+		[ isContextual ]
 	);
+
+	if ( ! commands.length && ! loaders.length ) {
+		return null;
+	}
 
 	return (
 		<Command.Group>
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
-					value={ command.name }
+					value={ command.searchLabel ?? command.label }
 					onSelect={ () => command.callback( { close } ) }
 				>
 					<HStack
@@ -139,13 +143,11 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const [ open, setOpen ] = useState( false );
-	const { groups } = useSelect( ( select ) => {
-		const { getGroups } = select( commandsStore );
-		return {
-			groups: getGroups(),
-		};
-	}, [] );
+	const isOpen = useSelect(
+		( select ) => select( commandsStore ).isOpen(),
+		[]
+	);
+	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
 	const commandMenuInput = useRef();
 
@@ -165,7 +167,11 @@ export function CommandMenu() {
 		'core/commands',
 		( event ) => {
 			event.preventDefault();
-			setOpen( ( prevOpen ) => ! prevOpen );
+			if ( isOpen ) {
+				close();
+			} else {
+				open();
+			}
 		},
 		{
 			bindGlobal: true,
@@ -180,19 +186,19 @@ export function CommandMenu() {
 			} ) ),
 		[]
 	);
-	const close = () => {
+	const closeAndReset = () => {
 		setSearch( '' );
-		setOpen( false );
+		close();
 	};
 
 	useEffect( () => {
 		// Focus the command menu input when mounting the modal.
-		if ( open ) {
+		if ( isOpen ) {
 			commandMenuInput.current.focus();
 		}
-	}, [ open ] );
+	}, [ isOpen ] );
 
-	if ( ! open ) {
+	if ( ! isOpen ) {
 		return false;
 	}
 	const isLoading = Object.values( loaders ).some( Boolean );
@@ -201,7 +207,7 @@ export function CommandMenu() {
 		<Modal
 			className="commands-command-menu"
 			overlayClassName="commands-command-menu__overlay"
-			onRequestClose={ close }
+			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
@@ -214,24 +220,26 @@ export function CommandMenu() {
 							placeholder={ __( 'Type a command or search' ) }
 						/>
 					</div>
-					{ search && (
-						<Command.List>
-							{ ! isLoading && (
-								<Command.Empty>
-									{ __( 'No results found.' ) }
-								</Command.Empty>
-							) }
-							{ groups.map( ( group ) => (
-								<CommandMenuGroup
-									key={ group }
-									group={ group }
-									search={ search }
-									setLoader={ setLoader }
-									close={ close }
-								/>
-							) ) }
-						</Command.List>
-					) }
+					<Command.List>
+						{ search && ! isLoading && (
+							<Command.Empty>
+								{ __( 'No results found.' ) }
+							</Command.Empty>
+						) }
+						<CommandMenuGroup
+							search={ search }
+							setLoader={ setLoader }
+							close={ closeAndReset }
+							isContextual
+						/>
+						{ search && (
+							<CommandMenuGroup
+								search={ search }
+								setLoader={ setLoader }
+								close={ closeAndReset }
+							/>
+						) }
+					</Command.List>
 				</Command>
 			</div>
 		</Modal>

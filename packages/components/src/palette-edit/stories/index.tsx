@@ -59,6 +59,10 @@ Default.args = {
 	],
 	paletteLabel: 'Colors',
 	emptyMessage: 'Colors are empty',
+	popoverProps: {
+		placement: 'bottom-start',
+		offset: 8,
+	},
 };
 
 export const Gradients = Template.bind( {} );

@@ -32,19 +32,32 @@ import { store as blockEditorStore } from '../../store';
  */
 export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	const isVertical = keyCode === UP || keyCode === DOWN;
+	const { tagName } = element;
+	const elementType = element.getAttribute( 'type' );
 
-	// Currently, all elements support unmodified vertical navigation.
+	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
+		if ( tagName === 'INPUT' ) {
+			const verticalInputTypes = [
+				'date',
+				'datetime-local',
+				'month',
+				'number',
+				'range',
+				'time',
+				'week',
+			];
+			return ! verticalInputTypes.includes( elementType );
+		}
 		return true;
 	}
-
-	const { tagName } = element;
 
 	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
 	if ( tagName === 'INPUT' ) {
 		const simpleInputTypes = [
 			'button',
 			'checkbox',
+			'number',
 			'color',
 			'file',
 			'image',
@@ -52,7 +65,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 			'reset',
 			'submit',
 		];
-		return simpleInputTypes.includes( element.getAttribute( 'type' ) );
+		return simpleInputTypes.includes( elementType );
 	}
 
 	// Native textareas should not navigate horizontally.

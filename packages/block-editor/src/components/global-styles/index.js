@@ -5,7 +5,10 @@ export {
 	useSettingsForBlockElement,
 } from './hooks';
 export { getBlockCSSSelector } from './get-block-css-selector';
-export { useGlobalStylesOutput } from './use-global-styles-output';
+export {
+	useGlobalStylesOutput,
+	useGlobalStylesOutputWithConfig,
+} from './use-global-styles-output';
 export { GlobalStylesContext } from './context';
 export {
 	default as TypographyPanel,
@@ -20,3 +23,4 @@ export { default as ColorPanel, useHasColorPanel } from './color-panel';
 export { default as EffectsPanel, useHasEffectsPanel } from './effects-panel';
 export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';
 export { default as AdvancedPanel } from './advanced-panel';
+export { areGlobalStyleConfigsEqual } from './utils';

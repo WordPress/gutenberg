@@ -17,6 +17,7 @@ export default function SaveButton( {
 	className = 'edit-site-save-button__button',
 	variant = 'primary',
 	showTooltip = true,
+	defaultLabel,
 	icon,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
@@ -37,14 +38,28 @@ export default function SaveButton( {
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
-	let label;
-	if ( isPreviewingTheme() && isDirty ) {
-		label = __( 'Activate & Save' );
-	} else if ( isPreviewingTheme() ) {
-		label = __( 'Activate' );
-	} else {
-		label = __( 'Save' );
-	}
+	const getLabel = () => {
+		if ( isPreviewingTheme() ) {
+			if ( isSaving ) {
+				return __( 'Activating' );
+			} else if ( disabled ) {
+				return __( 'Saved' );
+			} else if ( isDirty ) {
+				return __( 'Activate & Save' );
+			}
+			return __( 'Activate' );
+		}
+
+		if ( isSaving ) {
+			return __( 'Saving' );
+		} else if ( disabled ) {
+			return __( 'Saved' );
+		} else if ( defaultLabel ) {
+			return defaultLabel;
+		}
+		return __( 'Save' );
+	};
+	const label = getLabel();
 
 	return (
 		<Button

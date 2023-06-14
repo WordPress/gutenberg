@@ -97,7 +97,7 @@ export default function PostFeaturedImageEdit( {
 		} ) );
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio, maxWidth: '100%' },
+		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
 

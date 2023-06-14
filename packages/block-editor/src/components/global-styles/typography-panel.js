@@ -238,7 +238,7 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	const hasLineHeight = () => !! value?.typography?.lineHeight;
+	const hasLineHeight = () => value?.typography?.lineHeight !== undefined;
 	const resetLineHeight = () => setLineHeight( undefined );
 
 	// Letter Spacing

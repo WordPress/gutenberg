@@ -82,34 +82,31 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{
-						// @ts-expect-error TODO: Remove when DropdownMenu is typed
-						( toggleProps ) => {
-							return (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ alignLeft }
-									label="Align"
-									controls={ [
-										{
-											icon: alignLeft,
-											title: 'Align left',
-											isActive: true,
-										},
-										{
-											icon: alignCenter,
-											title: 'Align center',
-										},
-										{
-											icon: alignRight,
-											title: 'Align right',
-										},
-									] }
-									toggleProps={ toggleProps }
-								/>
-							);
-						}
-					}
+					{ /* There is an issue here with TS not recognizing the
+					 * `RenderProp` being passed.
+					 * @ts-expect-error */ }
+					{ ( toggleProps ) => (
+						<DropdownMenu
+							icon={ alignLeft }
+							label="Align"
+							controls={ [
+								{
+									icon: alignLeft,
+									title: 'Align left',
+									isActive: true,
+								},
+								{
+									icon: alignCenter,
+									title: 'Align center',
+								},
+								{
+									icon: alignRight,
+									title: 'Align right',
+								},
+							] }
+							toggleProps={ toggleProps }
+						/>
+					) }
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>

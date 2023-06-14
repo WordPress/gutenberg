@@ -39,10 +39,10 @@
  *
  * Example:
  * ```php
- *     $tags = new WP_HTML_Tag_Processor( $html );
- *     if ( $tags->next_tag( 'option' ) ) {
- *         $tags->set_attribute( 'selected', true );
- *     }
+ * $tags = new WP_HTML_Tag_Processor( $html );
+ * if ( $tags->next_tag( 'option' ) ) {
+ *     $tags->set_attribute( 'selected', true );
+ * }
  * ```
  *
  * ### Finding tags
@@ -55,7 +55,7 @@
  *
  * If you want to _find whatever the next tag is_:
  * ```php
- *     $tags->next_tag();
+ * $tags->next_tag();
  * ```
  *
  * | Goal                                                      | Query                                                                           |
@@ -88,17 +88,17 @@
  *
  * Example:
  * ```php
- *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
- *     $remaining_count = 5;
- *     while ( $remaining_count > 0 && $tags->next_tag() ) {
- *         if (
- *              ( 'DIV' === $tags->get_tag() || 'SPAN' === $tags->get_tag() ) &&
- *              'jazzy' === $tags->get_attribute( 'data-style' )
- *         ) {
- *             $tags->add_class( 'theme-style-everest-jazz' );
- *             $remaining_count--;
- *         }
+ * // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
+ * $remaining_count = 5;
+ * while ( $remaining_count > 0 && $tags->next_tag() ) {
+ *     if (
+ *          ( 'DIV' === $tags->get_tag() || 'SPAN' === $tags->get_tag() ) &&
+ *          'jazzy' === $tags->get_attribute( 'data-style' )
+ *     ) {
+ *         $tags->add_class( 'theme-style-everest-jazz' );
+ *         $remaining_count--;
  *     }
+ * }
  * ```
  *
  * `get_attribute()` will return `null` if the attribute wasn't present
@@ -117,10 +117,10 @@
  *
  * Example:
  * ```php
- *     if ( $tags->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
- *         $tags->set_attribute( 'title', 'This groups the contained content.' );
- *         $tags->remove_attribute( 'data-test-id' );
- *     }
+ * if ( $tags->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
+ *     $tags->set_attribute( 'title', 'This groups the contained content.' );
+ *     $tags->remove_attribute( 'data-test-id' );
+ * }
  * ```
  *
  * If `set_attribute()` is called for an existing attribute it will
@@ -142,29 +142,29 @@
  *
  * Example:
  * ```php
- *     // from `<span>Yippee!</span>`
- *     //   to `<span class="is-active">Yippee!</span>`
- *     $tags->add_class( 'is-active' );
+ * // from `<span>Yippee!</span>`
+ * //   to `<span class="is-active">Yippee!</span>`
+ * $tags->add_class( 'is-active' );
  *
- *     // from `<span class="excited">Yippee!</span>`
- *     //   to `<span class="excited is-active">Yippee!</span>`
- *     $tags->add_class( 'is-active' );
+ * // from `<span class="excited">Yippee!</span>`
+ * //   to `<span class="excited is-active">Yippee!</span>`
+ * $tags->add_class( 'is-active' );
  *
- *     // from `<span class="is-active heavy-accent">Yippee!</span>`
- *     //   to `<span class="is-active heavy-accent">Yippee!</span>`
- *     $tags->add_class( 'is-active' );
+ * // from `<span class="is-active heavy-accent">Yippee!</span>`
+ * //   to `<span class="is-active heavy-accent">Yippee!</span>`
+ * $tags->add_class( 'is-active' );
  *
- *     // from `<input type="text" class="is-active rugby not-disabled" length="24">`
- *     //   to `<input type="text" class="is-active not-disabled" length="24">
- *     $tags->remove_class( 'rugby' );
+ * // from `<input type="text" class="is-active rugby not-disabled" length="24">`
+ * //   to `<input type="text" class="is-active not-disabled" length="24">
+ * $tags->remove_class( 'rugby' );
  *
- *     // from `<input type="text" class="rugby" length="24">`
- *     //   to `<input type="text" length="24">
- *     $tags->remove_class( 'rugby' );
+ * // from `<input type="text" class="rugby" length="24">`
+ * //   to `<input type="text" length="24">
+ * $tags->remove_class( 'rugby' );
  *
- *     // from `<input type="text" length="24">`
- *     //   to `<input type="text" length="24">
- *     $tags->remove_class( 'rugby' );
+ * // from `<input type="text" length="24">`
+ * //   to `<input type="text" length="24">
+ * $tags->remove_class( 'rugby' );
  * ```
  *
  * When class changes are enqueued but a direct change to `class` is made via
@@ -185,24 +185,24 @@
  * bookmark and update it frequently, such as within a loop.
  *
  * ```php
- *     $total_todos = 0;
- *     while ( $p->next_tag( array( 'tag_name' => 'UL', 'class_name' => 'todo' ) ) ) {
- *         $p->set_bookmark( 'list-start' );
- *         while ( $p->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
- *             if ( 'UL' === $p->get_tag() && $p->is_tag_closer() ) {
- *                 $p->set_bookmark( 'list-end' );
- *                 $p->seek( 'list-start' );
- *                 $p->set_attribute( 'data-contained-todos', (string) $total_todos );
- *                 $total_todos = 0;
- *                 $p->seek( 'list-end' );
- *                 break;
- *             }
+ * $total_todos = 0;
+ * while ( $p->next_tag( array( 'tag_name' => 'UL', 'class_name' => 'todo' ) ) ) {
+ *     $p->set_bookmark( 'list-start' );
+ *     while ( $p->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+ *         if ( 'UL' === $p->get_tag() && $p->is_tag_closer() ) {
+ *             $p->set_bookmark( 'list-end' );
+ *             $p->seek( 'list-start' );
+ *             $p->set_attribute( 'data-contained-todos', (string) $total_todos );
+ *             $total_todos = 0;
+ *             $p->seek( 'list-end' );
+ *             break;
+ *         }
  *
- *             if ( 'LI' === $p->get_tag() && ! $p->is_tag_closer() ) {
- *                 $total_todos++;
- *             }
+ *         if ( 'LI' === $p->get_tag() && ! $p->is_tag_closer() ) {
+ *             $total_todos++;
  *         }
  *     }
+ * }
  * ```
  *
  * ## Design and limitations
@@ -229,11 +229,11 @@
  * The Tag Processor's design incorporates a "garbage-in-garbage-out" philosophy.
  * HTML5 specifies that certain invalid content be transformed into different forms
  * for display, such as removing null bytes from an input document and replacing
- * invalid characters with the Unicode replacement character U+FFFD �. Where errors
- * or transformations exist within the HTML5 specification, the Tag Processor leaves
- * those invalid inputs untouched, passing them through to the final browser to handle.
- * While this implies that certain operations will be non-spec-compliant, such as
- * reading the value of an attribute with invalid content, it also preserves a
+ * invalid characters with the Unicode replacement character `U+FFFD` (visually "�").
+ * Where errors or transformations exist within the HTML5 specification, the Tag Processor
+ * leaves those invalid inputs untouched, passing them through to the final browser
+ * to handle. While this implies that certain operations will be non-spec-compliant,
+ * such as reading the value of an attribute with invalid content, it also preserves a
  * simplicity and efficiency for handling those error cases.
  *
  * Most operations within the Tag Processor are designed to minimize the difference
@@ -253,9 +253,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * The maximum number of bookmarks allowed to exist at
 	 * any given time.
 	 *
-	 * @see set_bookmark()
 	 * @since 6.2.0
 	 * @var int
+	 *
+	 * @see WP_HTML_Tag_Processor::set_bookmark()
 	 */
 	const MAX_BOOKMARKS = 10;
 
@@ -263,9 +264,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Maximum number of times seek() can be called.
 	 * Prevents accidental infinite loops.
 	 *
-	 * @see seek()
 	 * @since 6.2.0
 	 * @var int
+	 *
+	 * @see WP_HTML_Tag_Processor::seek()
 	 */
 	const MAX_SEEK_OPS = 1000;
 
@@ -318,23 +320,6 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	private $stop_on_tag_closers;
 
 	/**
-	 * Holds updated HTML as updates are applied.
-	 *
-	 * Updates and unmodified portions of the input document are
-	 * appended to this value as they are applied. It will hold
-	 * a copy of the updated document up until the point of the
-	 * latest applied update. The fully-updated HTML document
-	 * will comprise this value plus the part of the input document
-	 * which follows that latest update.
-	 *
-	 * @see $bytes_already_copied
-	 *
-	 * @since 6.2.0
-	 * @var string
-	 */
-	private $output_buffer = '';
-
-	/**
 	 * How many bytes from the original HTML document have been read and parsed.
 	 *
 	 * This value points to the latest byte offset in the input document which
@@ -345,23 +330,6 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * @var int
 	 */
 	private $bytes_already_parsed = 0;
-
-	/**
-	 * How many bytes from the input HTML document have already been
-	 * copied into the output buffer.
-	 *
-	 * Lexical updates are enqueued and processed in batches. Prior
-	 * to any given update in the input document, there might exist
-	 * a span of HTML unaffected by any changes. This span ought to
-	 * be copied verbatim into the output buffer before applying the
-	 * following update. This value will point to the starting byte
-	 * offset in the input document where that unaffected span of
-	 * HTML starts.
-	 *
-	 * @since 6.2.0
-	 * @var int
-	 */
-	private $bytes_already_copied = 0;
 
 	/**
 	 * Byte offset in input document where current tag name starts.
@@ -421,23 +389,23 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     // supposing the parser is working through this content
-	 *     // and stops after recognizing the `id` attribute
-	 *     // <div id="test-4" class=outline title="data:text/plain;base64=asdk3nk1j3fo8">
-	 *     //                 ^ parsing will continue from this point
-	 *     $this->attributes = array(
-	 *         'id' => new WP_HTML_Attribute_Match( 'id', null, 6, 17 )
-	 *     );
+	 * // supposing the parser is working through this content
+	 * // and stops after recognizing the `id` attribute
+	 * // <div id="test-4" class=outline title="data:text/plain;base64=asdk3nk1j3fo8">
+	 * //                 ^ parsing will continue from this point
+	 * $this->attributes = array(
+	 *     'id' => new WP_HTML_Attribute_Match( 'id', null, 6, 17 )
+	 * );
 	 *
-	 *     // when picking up parsing again, or when asking to find the
-	 *     // `class` attribute we will continue and add to this array
-	 *     $this->attributes = array(
-	 *         'id'    => new WP_HTML_Attribute_Match( 'id', null, 6, 17 ),
-	 *         'class' => new WP_HTML_Attribute_Match( 'class', 'outline', 18, 32 )
-	 *     );
+	 * // when picking up parsing again, or when asking to find the
+	 * // `class` attribute we will continue and add to this array
+	 * $this->attributes = array(
+	 *     'id'    => new WP_HTML_Attribute_Match( 'id', null, 6, 17 ),
+	 *     'class' => new WP_HTML_Attribute_Match( 'class', 'outline', 18, 32 )
+	 * );
 	 *
-	 *     // Note that only the `class` attribute value is stored in the index.
-	 *     // That's because it is the only value used by this class at the moment.
+	 * // Note that only the `class` attribute value is stored in the index.
+	 * // That's because it is the only value used by this class at the moment.
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -458,12 +426,12 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     // Add the `wp-block-group` class, remove the `wp-group` class.
-	 *     $classname_updates = array(
-	 *         // Indexed by a comparable class name
-	 *         'wp-block-group' => WP_HTML_Tag_Processor::ADD_CLASS,
-	 *         'wp-group'       => WP_HTML_Tag_Processor::REMOVE_CLASS
-	 *     );
+	 * // Add the `wp-block-group` class, remove the `wp-group` class.
+	 * $classname_updates = array(
+	 *     // Indexed by a comparable class name
+	 *     'wp-block-group' => WP_HTML_Tag_Processor::ADD_CLASS,
+	 *     'wp-group'       => WP_HTML_Tag_Processor::REMOVE_CLASS
+	 * );
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -512,16 +480,16 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     // Replace an attribute stored with a new value, indices
-	 *     // sourced from the lazily-parsed HTML recognizer.
-	 *     $start = $attributes['src']->start;
-	 *     $end   = $attributes['src']->end;
-	 *     $modifications[] = new WP_HTML_Text_Replacement( $start, $end, $new_value );
+	 * // Replace an attribute stored with a new value, indices
+	 * // sourced from the lazily-parsed HTML recognizer.
+	 * $start = $attributes['src']->start;
+	 * $end   = $attributes['src']->end;
+	 * $modifications[] = new WP_HTML_Text_Replacement( $start, $end, $new_value );
 	 *
-	 *     // Correspondingly, something like this will appear in this array.
-	 *     $lexical_updates = array(
-	 *         WP_HTML_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
-	 *     );
+	 * // Correspondingly, something like this will appear in this array.
+	 * $lexical_updates = array(
+	 *     WP_HTML_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
+	 * );
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -532,9 +500,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	/**
 	 * Tracks and limits `seek()` calls to prevent accidental infinite loops.
 	 *
-	 * @see seek
 	 * @since 6.2.0
 	 * @var int
+	 *
+	 * @see WP_HTML_Tag_Processor::seek()
 	 */
 	protected $seek_count = 0;
 
@@ -754,8 +723,9 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	/**
 	 * Skips contents of title and textarea tags.
 	 *
-	 * @see https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
 	 * @since 6.2.0
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
 	 *
 	 * @param string $tag_name – the lowercase tag name which will close the RCDATA region.
 	 * @return bool Whether an end to the RCDATA region was found before the end of the document.
@@ -1303,8 +1273,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * @return void
 	 */
 	private function after_tag() {
-		$this->class_name_updates_to_attributes_updates();
-		$this->apply_attributes_updates();
+		$this->get_updated_html();
 		$this->tag_name_starts_at = null;
 		$this->tag_name_length    = null;
 		$this->tag_ends_at        = null;
@@ -1316,10 +1285,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Converts class name updates into tag attributes updates
 	 * (they are accumulated in different data formats for performance).
 	 *
-	 * @see $lexical_updates
-	 * @see $classname_updates
-	 *
 	 * @since 6.2.0
+	 *
+	 * @see WP_HTML_Tag_Processor::$lexical_updates
+	 * @see WP_HTML_Tag_Processor::$classname_updates
 	 *
 	 * @return void
 	 */
@@ -1460,14 +1429,18 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Applies attribute updates to HTML document.
 	 *
 	 * @since 6.2.0
+	 * @since 6.2.1 Accumulates shift for internal cursor and passed pointer.
 	 * @since 6.3.0 Invalidate any bookmarks whose targets are overwritten.
 	 *
-	 * @return void
+	 * @param int $shift_this_point Accumulate and return shift for this position.
+	 * @return int How many bytes the given pointer moved in response to the updates.
 	 */
-	private function apply_attributes_updates() {
+	private function apply_attributes_updates( $shift_this_point = 0 ) {
 		if ( ! count( $this->lexical_updates ) ) {
-			return;
+			return 0;
 		}
+
+		$accumulated_shift_for_given_point = 0;
 
 		/*
 		 * Attribute updates can be enqueued in any order but updates
@@ -1481,11 +1454,27 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		 */
 		usort( $this->lexical_updates, array( self::class, 'sort_start_ascending' ) );
 
+		$bytes_already_copied = 0;
+		$output_buffer        = '';
 		foreach ( $this->lexical_updates as $diff ) {
-			$this->output_buffer       .= substr( $this->html, $this->bytes_already_copied, $diff->start - $this->bytes_already_copied );
-			$this->output_buffer       .= $diff->text;
-			$this->bytes_already_copied = $diff->end;
+			$shift = strlen( $diff->text ) - ( $diff->end - $diff->start );
+
+			// Adjust the cursor position by however much an update affects it.
+			if ( $diff->start <= $this->bytes_already_parsed ) {
+				$this->bytes_already_parsed += $shift;
+			}
+
+			// Accumulate shift of the given pointer within this function call.
+			if ( $diff->start <= $shift_this_point ) {
+				$accumulated_shift_for_given_point += $shift;
+			}
+
+			$output_buffer       .= substr( $this->html, $bytes_already_copied, $diff->start - $bytes_already_copied );
+			$output_buffer       .= $diff->text;
+			$bytes_already_copied = $diff->end;
 		}
+
+		$this->html = $output_buffer . substr( $this->html, $bytes_already_copied );
 
 		/*
 		 * Adjust bookmark locations to account for how the text
@@ -1527,6 +1516,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		}
 
 		$this->lexical_updates = array();
+
+		return $accumulated_shift_for_given_point;
 	}
 
 	/**
@@ -1576,8 +1567,6 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 
 		// Point this tag processor before the sought tag opener and consume it.
 		$this->bytes_already_parsed = $this->bookmarks[ $bookmark_name ]->start;
-		$this->bytes_already_copied = $this->bytes_already_parsed;
-		$this->output_buffer        = substr( $this->html, 0, $this->bytes_already_copied );
 		return $this->next_tag( array( 'tag_closers' => 'visit' ) );
 	}
 
@@ -1676,14 +1665,14 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
-	 *     $p->next_tag( array( 'class_name' => 'test' ) ) === true;
-	 *     $p->get_attribute( 'data-test-id' ) === '14';
-	 *     $p->get_attribute( 'enabled' ) === true;
-	 *     $p->get_attribute( 'aria-label' ) === null;
+	 * $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 * $p->next_tag( array( 'class_name' => 'test' ) ) === true;
+	 * $p->get_attribute( 'data-test-id' ) === '14';
+	 * $p->get_attribute( 'enabled' ) === true;
+	 * $p->get_attribute( 'aria-label' ) === null;
 	 *
-	 *     $p->next_tag() === false;
-	 *     $p->get_attribute( 'class' ) === null;
+	 * $p->next_tag() === false;
+	 * $p->get_attribute( 'class' ) === null;
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -1755,19 +1744,19 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * > case-insensitive match for each other.
 	 *     - HTML 5 spec
 	 *
-	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
-	 *
 	 * Example:
 	 * ```php
-	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
-	 *     $p->next_tag( array( 'class_name' => 'test' ) ) === true;
-	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
+	 * $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
+	 * $p->next_tag( array( 'class_name' => 'test' ) ) === true;
+	 * $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
 	 *
-	 *     $p->next_tag() === false;
-	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
+	 * $p->next_tag() === false;
+	 * $p->get_attribute_names_with_prefix( 'data-' ) === null;
 	 * ```
 	 *
 	 * @since 6.2.0
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 	 *
 	 * @param string $prefix Prefix of requested attribute names.
 	 * @return array|null List of attribute names, or `null` when no tag opener is matched.
@@ -1793,12 +1782,12 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     $p = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
-	 *     $p->next_tag() === true;
-	 *     $p->get_tag() === 'DIV';
+	 * $p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+	 * $p->next_tag() === true;
+	 * $p->get_tag() === 'DIV';
 	 *
-	 *     $p->next_tag() === false;
-	 *     $p->get_tag() === null;
+	 * $p->next_tag() === false;
+	 * $p->get_tag() === null;
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -1845,12 +1834,12 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * Example:
 	 * ```php
-	 *     $p = new WP_HTML_Tag_Processor( '<div></div>' );
-	 *     $p->next_tag( array( 'tag_name' => 'div', 'tag_closers' => 'visit' ) );
-	 *     $p->is_tag_closer() === false;
+	 * $p = new WP_HTML_Tag_Processor( '<div></div>' );
+	 * $p->next_tag( array( 'tag_name' => 'div', 'tag_closers' => 'visit' ) );
+	 * $p->is_tag_closer() === false;
 	 *
-	 *     $p->next_tag( array( 'tag_name' => 'div', 'tag_closers' => 'visit' ) );
-	 *     $p->is_tag_closer() === true;
+	 * $p->next_tag( array( 'tag_name' => 'div', 'tag_closers' => 'visit' ) );
+	 * $p->is_tag_closer() === true;
 	 * ```
 	 *
 	 * @since 6.2.0
@@ -2110,7 +2099,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
-	 * @see get_updated_html
+	 *
+	 * @see WP_HTML_Tag_Processor::get_updated_html()
 	 *
 	 * @return string The processed HTML.
 	 */
@@ -2122,6 +2112,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
+	 * @since 6.2.1 Shifts the internal cursor corresponding to the applied updates.
 	 *
 	 * @return string The processed HTML.
 	 */
@@ -2132,46 +2123,24 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		 * When there is nothing more to update and nothing has already been
 		 * updated, return the original document and avoid a string copy.
 		 */
-		if ( $requires_no_updating && 0 === $this->bytes_already_copied ) {
+		if ( $requires_no_updating ) {
 			return $this->html;
 		}
 
 		/*
-		 * If there are no updates left to apply, but some have already
-		 * been applied, then finish by copying the rest of the input
-		 * to the end of the updated document and return.
+		 * Keep track of the position right before the current tag. This will
+		 * be necessary for reparsing the current tag after updating the HTML.
 		 */
-		if ( $requires_no_updating && $this->bytes_already_copied > 0 ) {
-			$this->html                 = $this->output_buffer . substr( $this->html, $this->bytes_already_copied );
-			$this->bytes_already_copied = strlen( $this->output_buffer );
-			return $this->output_buffer . substr( $this->html, $this->bytes_already_copied );
-		}
-
-		// Apply the updates, rewind to before the current tag, and reparse the attributes.
-		$content_up_to_opened_tag_name = $this->output_buffer . substr(
-			$this->html,
-			$this->bytes_already_copied,
-			$this->tag_name_starts_at + $this->tag_name_length - $this->bytes_already_copied
-		);
+		$before_current_tag = $this->tag_name_starts_at - 1;
 
 		/*
-		 * 1. Apply the edits by flushing them to the output buffer and updating the copied byte count.
-		 *
-		 * Note: `apply_attributes_updates()` modifies `$this->output_buffer`.
+		 * 1. Apply the enqueued edits and update all the pointers to reflect those changes.
 		 */
 		$this->class_name_updates_to_attributes_updates();
-		$this->apply_attributes_updates();
+		$before_current_tag += $this->apply_attributes_updates( $before_current_tag );
 
 		/*
-		 * 2. Replace the original HTML with the now-updated HTML so that it's possible to
-		 *    seek to a previous location and have a consistent view of the updated document.
-		 */
-		$this->html                 = $this->output_buffer . substr( $this->html, $this->bytes_already_copied );
-		$this->output_buffer        = $content_up_to_opened_tag_name;
-		$this->bytes_already_copied = strlen( $this->output_buffer );
-
-		/*
-		 * 3. Point this tag processor at the original tag opener and consume it
+		 * 2. Rewind to before the current tag and reparse to get updated attributes.
 		 *
 		 * At this point the internal cursor points to the end of the tag name.
 		 * Rewind before the tag name starts so that it's as if the cursor didn't
@@ -2183,8 +2152,18 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		 *                 ^  | back up by the length of the tag name plus the opening <
 		 *                 \<-/ back up by strlen("em") + 1 ==> 3
 		 */
-		$this->bytes_already_parsed = strlen( $content_up_to_opened_tag_name ) - $this->tag_name_length - 1;
+
+		// Store existing state so it can be restored after reparsing.
+		$previous_parsed_byte_count = $this->bytes_already_parsed;
+		$previous_query             = $this->last_query;
+
+		// Reparse attributes.
+		$this->bytes_already_parsed = $before_current_tag;
 		$this->next_tag();
+
+		// Restore previous state.
+		$this->bytes_already_parsed = $previous_parsed_byte_count;
+		$this->parse_query( $previous_query );
 
 		return $this->html;
 	}

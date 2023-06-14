@@ -103,9 +103,13 @@ async function buildCSS( file ) {
 		'animations',
 		'z-index',
 	]
-		// Editor styles should be excluded from the default CSS vars output.
+		// Editor and component styles should be excluded from the default CSS vars output.
 		.concat(
-			file.includes( 'common.scss' ) || ! file.includes( 'block-library' )
+			file.includes( 'common.scss' ) ||
+				! (
+					file.includes( 'block-library' ) ||
+					file.includes( 'components' )
+				)
 				? [ 'default-custom-properties' ]
 				: []
 		)

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
@@ -11,15 +12,21 @@ import { useSelect } from '@wordpress/data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const TEMPLATE = [ [ 'core/details-summary' ], [ 'core/details-content' ] ];
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			placeholder: __( 'Type / to add a hidden block' ),
+		},
+	],
+];
 
 function DetailsEdit( { attributes, setAttributes, clientId } ) {
-	const { showContent } = attributes;
+	const { showContent, summary } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: TEMPLATE,
 		template: TEMPLATE,
-		templateLock: 'all',
+		__experimentalCaptureToolbars: true,
 	} );
 
 	// Check if either the block or the inner blocks are selected.
@@ -51,7 +58,22 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			<details
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
-			></details>
+			>
+				<summary onClick={ ( event ) => event.preventDefault() }>
+					<RichText
+						aria-label={ __( 'Write summary' ) }
+						placeholder={ __( 'Write summary…' ) }
+						allowedFormats={ [] }
+						withoutInteractiveFormatting
+						value={ summary }
+						onChange={ ( newSummary ) =>
+							setAttributes( { summary: newSummary } )
+						}
+						multiline={ false }
+					/>
+				</summary>
+				{ innerBlocksProps.children }
+			</details>
 		</>
 	);
 }

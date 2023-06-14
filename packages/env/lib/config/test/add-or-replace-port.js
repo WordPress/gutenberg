@@ -40,6 +40,33 @@ describe( 'addOrReplacePort', () => {
 		}
 	} );
 
+	it( 'should support number ports', () => {
+		const testMap = [ { in: 'test', expect: 'test:104' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 104, false );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
+	it( 'should not add default HTTP port', () => {
+		const testMap = [ { in: 'test', expect: 'test' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 80, false );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
+	it( 'should not add default HTTPS port', () => {
+		const testMap = [ { in: 'test', expect: 'test' } ];
+
+		for ( const test of testMap ) {
+			const result = addOrReplacePort( test.in, 443, false );
+			expect( result ).toEqual( test.expect );
+		}
+	} );
+
 	it( 'should do nothing if port is present but replacement is not requested', () => {
 		const testMap = [
 			{ in: 'test', expect: 'test:103' },

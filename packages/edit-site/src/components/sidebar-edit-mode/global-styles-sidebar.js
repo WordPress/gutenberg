@@ -15,7 +15,7 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 export default function GlobalStylesSidebar() {
 	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
@@ -56,7 +56,7 @@ export default function GlobalStylesSidebar() {
 			identifier="edit-site/global-styles"
 			title={ __( 'Styles' ) }
 			icon={ styles }
-			closeLabel={ __( 'Close Styles sidebar' ) }
+			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
 				<Flex className="edit-site-global-styles-sidebar__header">

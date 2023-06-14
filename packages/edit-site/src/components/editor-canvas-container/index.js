@@ -16,8 +16,9 @@ import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import ResizableEditor from '../block-editor/resizable-editor';
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -30,6 +31,8 @@ function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
+		case 'global-styles-revisions':
+			return __( 'Global styles revisions' );
 		default:
 			return '';
 	}
@@ -47,7 +50,8 @@ const {
 function EditorCanvasContainer( {
 	children,
 	closeButtonLabel,
-	onClose = () => {},
+	onClose,
+	enableResizing = false,
 } ) {
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
@@ -64,8 +68,11 @@ function EditorCanvasContainer( {
 		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
 		[ editorCanvasContainerView ]
 	);
+
 	function onCloseContainer() {
-		onClose();
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
@@ -93,24 +100,30 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const shouldShowCloseButton = onClose || closeButtonLabel;
+
 	return (
 		<EditorCanvasContainerFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className="edit-site-editor-canvas-container"
-				ref={ focusOnMountRef }
-				onKeyDown={ closeOnEscape }
-				aria-label={ title }
-			>
-				<Button
-					className="edit-site-editor-canvas-container__close-button"
-					icon={ closeSmall }
-					label={ closeButtonLabel || __( 'Close' ) }
-					onClick={ onCloseContainer }
-					showTooltip={ false }
-				/>
-				{ childrenWithProps }
-			</section>
+			<ResizableEditor enableResizing={ enableResizing }>
+				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+				<section
+					className="edit-site-editor-canvas-container"
+					ref={ shouldShowCloseButton ? focusOnMountRef : null }
+					onKeyDown={ closeOnEscape }
+					aria-label={ title }
+				>
+					{ shouldShowCloseButton && (
+						<Button
+							className="edit-site-editor-canvas-container__close-button"
+							icon={ closeSmall }
+							label={ closeButtonLabel || __( 'Close' ) }
+							onClick={ onCloseContainer }
+							showTooltip={ false }
+						/>
+					) }
+					{ childrenWithProps }
+				</section>
+			</ResizableEditor>
 		</EditorCanvasContainerFill>
 	);
 }
