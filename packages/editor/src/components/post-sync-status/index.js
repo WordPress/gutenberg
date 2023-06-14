@@ -24,10 +24,17 @@ export default function PostSyncStatus() {
 	}
 	const onUpdateSync = ( syncStatus ) =>
 		editPost( {
-			meta: { ...meta, wp_block: { sync_status: syncStatus } },
+			meta: {
+				...meta,
+				wp_block:
+					syncStatus === 'unsynced'
+						? { sync_status: syncStatus }
+						: null,
+			},
 		} );
 	const syncStatus = meta?.wp_block?.sync_status;
-	const isFullySynced = syncStatus === 'fully' || ! syncStatus;
+	const isFullySynced = ! syncStatus;
+
 	return (
 		<PanelRow className="edit-post-sync-status">
 			<span>{ __( 'Syncing' ) }</span>
@@ -39,7 +46,7 @@ export default function PostSyncStatus() {
 				checked={ isFullySynced }
 				onChange={ () => {
 					onUpdateSync(
-						syncStatus === 'fully' ? 'unsynced' : 'fully'
+						syncStatus === 'unsynced' ? 'fully' : 'unsynced'
 					);
 				} }
 			/>
