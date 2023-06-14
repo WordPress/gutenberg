@@ -340,9 +340,7 @@ export function BlockSettingsDropdown( {
 			} ) => (
 				<DropdownMenuV2
 					open={ isDropdownOpen }
-					onOpenChange={ ( open ) => {
-						setIsDropdownOpen( open );
-					} }
+					onOpenChange={ setIsDropdownOpen }
 					trigger={
 						<Button
 							{ ...toggleProps }
