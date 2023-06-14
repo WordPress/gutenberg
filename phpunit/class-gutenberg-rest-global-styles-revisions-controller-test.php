@@ -54,12 +54,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-emptytheme',
+				'post_name'    => 'wp-global-styles-emptytheme-revisions',
 				'tax_input'    => array(
 					'wp_theme' => 'emptytheme',
 				),
-			),
-			true
+			)
 		);
 	}
 
