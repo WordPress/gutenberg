@@ -82,7 +82,7 @@ function createBabelPlugin( shouldProcessImport, isGutenbergPlugin ) {
  * For details, check the implementation.
  *
  * @param {Object} path Babel.js AST path representing the import declaration,
- * @return {boolean} Whether the import represents an experimental block.
+ * @return {boolean | undefined} Whether the import represents an experimental block.
  */
 function isImportDeclarationAnExperimentalBlock( path ) {
 	// Only look for wildcard imports like import * as a from "source":

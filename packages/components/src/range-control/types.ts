@@ -74,7 +74,7 @@ export type RangeMarkProps = {
 
 export type ControlledRangeValue = number | '' | null;
 
-export type RangeControlProps< IconProps = unknown > = Pick<
+export type RangeControlProps = Pick<
 	BaseControlProps,
 	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &
@@ -86,7 +86,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 * For more information on `IconType` see the Icon component:
 		 * /packages/components/src/icon/index.tsx
 		 */
-		afterIcon?: IconType< IconProps >;
+		afterIcon?: IconType;
 		/**
 		 * If this property is true, a button to reset the slider is
 		 * rendered.
@@ -101,7 +101,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 * For more information on `IconType` see the Icon component:
 		 * /packages/components/src/icon/index.tsx
 		 */
-		beforeIcon?: IconType< IconProps >;
+		beforeIcon?: IconType;
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
@@ -236,10 +236,8 @@ export type RailProps = MarksProps & {
 export type InputRangeProps = {
 	describedBy?: string;
 	label?: string;
-	onHideTooltip?: () => void;
 	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
 	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	onShowTooltip?: () => void;
 	value?: number | '';
 };
 
@@ -290,39 +288,6 @@ export type UseControlledRangeValueArgs = {
 	 * The current value.
 	 */
 	value: number | null;
-};
-
-export type UseDebouncedHoverInteractionArgs = {
-	/**
-	 *  A callback function invoked when the element is hidden.
-	 *
-	 * @default () => {}
-	 */
-	onHide?: () => void;
-	/**
-	 * A callback function invoked when the mouse is moved out of the element.
-	 *
-	 * @default () => {}
-	 */
-	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
-	/**
-	 * A callback function invoked when the mouse is moved.
-	 *
-	 * @default () => {}
-	 */
-	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	/**
-	 * A callback function invoked when the element is shown.
-	 *
-	 * @default () => {}
-	 */
-	onShow?: () => void;
-	/**
-	 * Timeout before the element is shown or hidden.
-	 *
-	 * @default 300
-	 */
-	timeout?: number;
 };
 
 export type UseMarksArgs = NumericProps & {

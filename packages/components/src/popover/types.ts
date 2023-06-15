@@ -12,8 +12,10 @@ type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
+type PopoverPlacement = Placement | 'overlay';
+
 export type AnimatedWrapperProps = {
-	placement: Placement;
+	placement: PopoverPlacement;
 	shouldAnimate?: boolean;
 };
 
@@ -21,6 +23,10 @@ export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
 >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
+
+export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
+	ownerDocument?: Document;
+};
 
 export type PopoverProps = {
 	/**
@@ -31,20 +37,14 @@ export type PopoverProps = {
 	 */
 	__unstableSlotName?: string;
 	/**
-	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
-	 * property, used to specify a fixed popover position.
+	 * The element that should be used by the popover as its anchor. It can either
+	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
+	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+	 *
+	 * **The anchor element should be stored in local state** rather than a
+	 * plain React ref to ensure reactive updating when it changes.
 	 */
-	anchorRect?: DomRectWithOwnerDocument;
-	/**
-	 * Used to specify a fixed popover position. It can be an `Element`, a React
-	 * reference to an `element`, an object with a `top` and a `bottom` properties
-	 * (both pointing to elements), or a `range`.
-	 */
-	anchorRef?:
-		| Element
-		| PopoverAnchorRefReference
-		| PopoverAnchorRefTopBottom
-		| Range;
+	anchor?: Element | VirtualElement | null;
 	/**
 	 * Whether the popover should animate when opening.
 	 *
@@ -90,21 +90,10 @@ export type PopoverProps = {
 	 */
 	onFocusOutside?: ( event: SyntheticEvent ) => void;
 	/**
-	 * A function returning the same value as the one expected by the `anchorRect`
-	 * prop, used to specify a dynamic popover position.
-	 */
-	getAnchorRect?: (
-		fallbackReferenceElement: Element | null
-	) => DomRectWithOwnerDocument;
-	/**
 	 * Used to customize the header text shown when the popover is toggled to
 	 * fullscreen on mobile viewports (see the `expandOnMobile` prop).
 	 */
 	headerTitle?: string;
-	/**
-	 * Used to enable a different visual style for the popover.
-	 */
-	isAlternate?: boolean;
 	/**
 	 * Used to show/hide the arrow that points at the popover's anchor.
 	 *
@@ -124,12 +113,13 @@ export type PopoverProps = {
 	 *
 	 * @default 'bottom-start'
 	 */
-	placement?: Placement;
+	placement?: PopoverPlacement;
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
 	 */
 	position?:
+		| `${ PositionYAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
 	/**
@@ -146,7 +136,20 @@ export type PopoverProps = {
 	 * @default false
 	 */
 	shift?: boolean;
-
+	/**
+	 * Specifies the popover's style.
+	 *
+	 * Leave undefined for the default style. Other values are:
+	 * - 'unstyled':  The popover is essentially without any visible style, it
+	 *                has no background, border, outline or drop shadow, but
+	 *                the popover contents are still displayed.
+	 * - 'toolbar':   A style that has no elevation, but a high contrast with
+	 *                other elements. This is matches the style of the
+	 *                `Toolbar` component.
+	 *
+	 * @default undefined
+	 */
+	variant?: 'unstyled' | 'toolbar';
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
@@ -157,17 +160,39 @@ export type PopoverProps = {
 	 */
 	__unstableForcePosition?: boolean;
 	/**
-	 * Enables the `Popover` to shift in order to stay in view when meeting the
-	 * viewport edges.
-	 * _Note: this prop is deprecated. Use the `shift` prop instead._
+	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
+	 * property, used to specify a fixed popover position.
 	 *
 	 * @deprecated
 	 */
-	__unstableShift?: boolean;
+	anchorRect?: DomRectWithOwnerDocument;
 	/**
-	 * _Note: this prop is deprecated and has no effect on the component._
+	 * Used to specify a fixed popover position. It can be an `Element`, a React
+	 * reference to an `element`, an object with a `top` and a `bottom` properties
+	 * (both pointing to elements), or a `range`.
 	 *
 	 * @deprecated
 	 */
-	range?: unknown;
+	anchorRef?:
+		| Element
+		| PopoverAnchorRefReference
+		| PopoverAnchorRefTopBottom
+		| Range;
+	/**
+	 * A function returning the same value as the one expected by the `anchorRect`
+	 * prop, used to specify a dynamic popover position.
+	 *
+	 * @deprecated
+	 */
+	getAnchorRect?: (
+		fallbackReferenceElement: Element | null
+	) => DomRectWithOwnerDocument;
+	/**
+	 * Used to enable a different visual style for the popover.
+	 * _Note: this prop is deprecated. Use the `variant` prop with the
+	 * 'toolbar' value instead._
+	 *
+	 * @deprecated
+	 */
+	isAlternate?: boolean;
 };

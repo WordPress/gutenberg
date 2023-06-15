@@ -33,8 +33,8 @@ describe( 'DownloadableBlockListItem', () => {
 		);
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
-		expect( author ).not.toBeNull();
-		expect( description ).not.toBeNull();
+		expect( author ).toBeInTheDocument();
+		expect( description ).toBeInTheDocument();
 	} );
 
 	it( 'should show installing status when installing the block', () => {
@@ -47,7 +47,7 @@ describe( 'DownloadableBlockListItem', () => {
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
 		);
 		const statusLabel = screen.queryByText( 'Installing…' );
-		expect( statusLabel ).not.toBeNull();
+		expect( statusLabel ).toBeInTheDocument();
 	} );
 
 	it( "should be disabled when a plugin can't be installed", () => {
@@ -62,13 +62,11 @@ describe( 'DownloadableBlockListItem', () => {
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
 		expect( button.disabled ).toBe( false );
-		expect( button.getAttribute( 'aria-disabled' ) ).toBe( 'true' );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'should try to install the block plugin', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,

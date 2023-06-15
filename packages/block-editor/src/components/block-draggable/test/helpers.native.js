@@ -53,14 +53,14 @@ export const initializeWithBlocksLayouts = async ( blocks ) => {
 	const initialHtml = blocks.map( ( block ) => block.html ).join( '\n' );
 
 	const screen = await initializeEditor( { initialHtml } );
-	const { getByA11yLabel } = screen;
+	const { getAllByLabelText } = screen;
 
 	const waitPromises = [];
 	blocks.forEach( ( block, index ) => {
 		const a11yLabel = new RegExp(
 			`${ block.name } Block\\. Row ${ index + 1 }`
 		);
-		const element = getByA11yLabel( a11yLabel );
+		const [ element ] = getAllByLabelText( a11yLabel );
 		// "onLayout" event will populate the blocks layouts data.
 		fireEvent( element, 'layout', {
 			nativeEvent: { layout: block.layout },
@@ -91,13 +91,11 @@ export const initializeWithBlocksLayouts = async ( blocks ) => {
 				const nestedA11yLabel = new RegExp(
 					`${ nestedBlock.name } Block\\. Row ${ nestedIndex + 1 }`
 				);
-				fireEvent(
-					within( element ).getByA11yLabel( nestedA11yLabel ),
-					'layout',
-					{
-						nativeEvent: { layout: nestedBlock.layout },
-					}
-				);
+				const [ nestedElement ] =
+					within( element ).getAllByLabelText( nestedA11yLabel );
+				fireEvent( nestedElement, 'layout', {
+					nativeEvent: { layout: nestedBlock.layout },
+				} );
 			} );
 		}
 	} );

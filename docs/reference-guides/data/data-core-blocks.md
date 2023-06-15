@@ -8,16 +8,11 @@ Namespace: `core/blocks`.
 
 ### getActiveBlockVariation
 
-Returns the active block variation for a given block based on its attributes.
-Variations are determined by their `isActive` property.
-Which is either an array of block attribute keys or a function.
+Returns the active block variation for a given block based on its attributes. Variations are determined by their `isActive` property. Which is either an array of block attribute keys or a function.
 
-In case of an array of block attribute keys, the `attributes` are compared
-to the variation's attributes using strict equality check.
+In case of an array of block attribute keys, the `attributes` are compared to the variation's attributes using strict equality check.
 
-In case of function type, the function should accept a block's attributes
-and the variation's attributes and determines if a variation is active.
-A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
+In case of function type, the function should accept a block's attributes and the variation's attributes and determines if a variation is active. A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
 
 _Usage_
 
@@ -394,10 +389,7 @@ _Returns_
 
 ### getDefaultBlockVariation
 
-Returns the default block variation for the given block type.
-When there are multiple variations annotated as the default one,
-the last added item is picked. This simplifies registering overrides.
-When there is no default variation set, it returns the first item.
+Returns the default block variation for the given block type. When there are multiple variations annotated as the default one, the last added item is picked. This simplifies registering overrides. When there is no default variation set, it returns the first item.
 
 _Usage_
 
@@ -670,8 +662,7 @@ _Returns_
 
 ### isMatchingSearchTerm
 
-Returns true if the block type by the given name or object value matches a
-search term, or false otherwise.
+Returns true if the block type by the given name or object value matches a search term, or false otherwise.
 
 _Usage_
 

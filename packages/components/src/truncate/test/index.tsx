@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,34 +10,34 @@ import { Truncate } from '..';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
-		const { container } = render( <Truncate>Lorem ipsum.</Truncate> );
-		expect( container.firstChild?.textContent ).toEqual( 'Lorem ipsum.' );
+		render( <Truncate>Lorem ipsum.</Truncate> );
+		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeVisible();
 	} );
 
 	test( 'should render limit', () => {
-		const { container } = render(
+		render(
 			<Truncate limit={ 1 } ellipsizeMode="tail">
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'L…' );
+		expect( screen.getByText( 'L…' ) ).toBeVisible();
 	} );
 
 	test( 'should render custom ellipsis', () => {
-		const { container } = render(
+		render(
 			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'Lorem!!!' );
+		expect( screen.getByText( 'Lorem!!!' ) ).toBeVisible();
 	} );
 
 	test( 'should render custom ellipsizeMode', () => {
-		const { container } = render(
+		render(
 			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'Lo!!!m.' );
+		expect( screen.getByText( 'Lo!!!m.' ) ).toBeVisible();
 	} );
 } );

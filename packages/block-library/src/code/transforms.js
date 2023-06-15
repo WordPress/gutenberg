@@ -38,6 +38,17 @@ const transforms = {
 			},
 		},
 	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/paragraph', {
+					content: content.replace( /\n/g, '<br>' ),
+				} );
+			},
+		},
+	],
 };
 
 export default transforms;

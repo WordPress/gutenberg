@@ -85,11 +85,7 @@ export default function ResponsiveWrapper( {
 					onClick={ () => onToggle( true ) }
 				>
 					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
-					{ ! hasIcon && (
-						<span className="wp-block-navigation__toggle_button_label">
-							{ __( 'Menu' ) }
-						</span>
-					) }
+					{ ! hasIcon && __( 'Menu' ) }
 				</Button>
 			) }
 
@@ -109,11 +105,7 @@ export default function ResponsiveWrapper( {
 							onClick={ () => onToggle( false ) }
 						>
 							{ hasIcon && <Icon icon={ close } /> }
-							{ ! hasIcon && (
-								<span className="wp-block-navigation__toggle_button_label">
-									{ __( 'Close' ) }
-								</span>
-							) }
+							{ ! hasIcon && __( 'Close' ) }
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"

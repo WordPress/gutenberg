@@ -1,16 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
-import {
-	__experimentalBlockPatternsList as BlockPatternsList,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -25,7 +22,7 @@ import {
 	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 import { createTemplatePartId } from './utils/create-template-part-id';
-import { searchPatterns } from './utils/search';
+import { searchPatterns } from '../../utils/search-patterns';
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,
@@ -36,9 +33,6 @@ export default function TemplatePartSelectionModal( {
 } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 
-	// When the templatePartId is undefined,
-	// it means the user is creating a new one from the placeholder.
-	const isReplacingTemplatePartContent = !! templatePartId;
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -62,9 +56,8 @@ export default function TemplatePartSelectionModal( {
 	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
-	const onTemplatePartSelect = useCallback( ( templatePart ) => {
+	const onTemplatePartSelect = ( templatePart ) => {
 		setAttributes( {
 			slug: templatePart.slug,
 			theme: templatePart.theme,
@@ -81,7 +74,7 @@ export default function TemplatePartSelectionModal( {
 			}
 		);
 		onClose();
-	}, [] );
+	};
 
 	const createFromBlocks = useCreateTemplatePartFromBlocks(
 		area,
@@ -95,6 +88,7 @@ export default function TemplatePartSelectionModal( {
 		<div className="block-library-template-part__selection-content">
 			<div className="block-library-template-part__selection-search">
 				<SearchControl
+					__nextHasNoMarginBottom
 					onChange={ setSearchValue }
 					value={ searchValue }
 					label={ __( 'Search for replacements' ) }
@@ -121,12 +115,7 @@ export default function TemplatePartSelectionModal( {
 						blockPatterns={ filteredBlockPatterns }
 						shownPatterns={ shownBlockPatterns }
 						onClickPattern={ ( pattern, blocks ) => {
-							if ( isReplacingTemplatePartContent ) {
-								replaceInnerBlocks( clientId, blocks );
-							} else {
-								createFromBlocks( blocks, pattern.title );
-							}
-
+							createFromBlocks( blocks, pattern.title );
 							onClose();
 						} }
 					/>

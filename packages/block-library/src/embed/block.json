@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/embed",
 	"title": "Embed",
 	"category": "embed",
@@ -8,18 +8,22 @@
 	"textdomain": "default",
 	"attributes": {
 		"url": {
-			"type": "string"
+			"type": "string",
+			"__experimentalRole": "content"
 		},
 		"caption": {
 			"type": "string",
 			"source": "html",
-			"selector": "figcaption"
+			"selector": "figcaption",
+			"__experimentalRole": "content"
 		},
 		"type": {
-			"type": "string"
+			"type": "string",
+			"__experimentalRole": "content"
 		},
 		"providerNameSlug": {
-			"type": "string"
+			"type": "string",
+			"__experimentalRole": "content"
 		},
 		"allowResponsive": {
 			"type": "boolean",
@@ -27,15 +31,20 @@
 		},
 		"responsive": {
 			"type": "boolean",
-			"default": false
+			"default": false,
+			"__experimentalRole": "content"
 		},
 		"previewable": {
 			"type": "boolean",
-			"default": true
+			"default": true,
+			"__experimentalRole": "content"
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"spacing": {
+			"margin": true
+		}
 	},
 	"editorStyle": "wp-block-embed-editor",
 	"style": "wp-block-embed"

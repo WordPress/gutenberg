@@ -77,6 +77,7 @@ export default function EntityRecordItem( {
 	return (
 		<PanelRow>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={
 					<strong>
 						{ decodeEntities( entityRecordTitle ) ||

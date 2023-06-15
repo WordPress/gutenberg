@@ -18,6 +18,13 @@ This component is generated automatically by its parent
 
 ## Props
 
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+
+The heading level of the panel's header.
+
+-   Required: No
+-   Default: `2`
+
 ### `label`: `string`
 
 Text to be displayed within the panel header. It is also passed along as the

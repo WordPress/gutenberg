@@ -13,7 +13,10 @@ import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 
 interface SelectProps
-	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+	extends Pick<
+		SelectControlProps,
+		'__next36pxDefaultSize' | 'disabled' | 'multiple'
+	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -50,8 +53,15 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 
 const sizeStyles = ( {
 	__next36pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
+	if ( multiple ) {
+		// When `multiple`, just use the native browser styles
+		// without setting explicit height.
+		return;
+	}
+
 	const sizes = {
 		default: {
 			height: 36,
@@ -91,33 +101,37 @@ export const chevronIconSize = 18;
 
 const sizePaddings = ( {
 	__next36pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
-	const iconWidth = chevronIconSize;
-
-	const sizes = {
-		default: {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
-		small: {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		},
-		'__unstable-large': {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
+	const padding = {
+		default: 16,
+		small: 8,
+		'__unstable-large': 16,
 	};
 
 	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		};
+		padding.default = 8;
 	}
 
-	return rtl( sizes[ selectSize ] || sizes.default );
+	const selectedPadding = padding[ selectSize ] || padding.default;
+
+	return rtl( {
+		paddingLeft: selectedPadding,
+		paddingRight: selectedPadding + chevronIconSize,
+		...( multiple
+			? {
+					paddingTop: selectedPadding,
+					paddingBottom: selectedPadding,
+			  }
+			: {} ),
+	} );
+};
+
+const overflowStyles = ( { multiple }: SelectProps ) => {
+	return {
+		overflow: multiple ? 'auto' : 'hidden',
+	};
 };
 
 // TODO: Resolve need to use &&& to increase specificity
@@ -137,7 +151,6 @@ export const Select = styled.select< SelectProps >`
 		width: 100%;
 		max-width: none;
 		cursor: pointer;
-		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 
@@ -145,6 +158,7 @@ export const Select = styled.select< SelectProps >`
 		${ fontSizeStyles };
 		${ sizeStyles };
 		${ sizePaddings };
+		${ overflowStyles }
 	}
 `;
 

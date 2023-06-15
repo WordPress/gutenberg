@@ -13,17 +13,15 @@ export const unstyledButton = css`
 	border: 1px solid transparent;
 	cursor: pointer;
 	background: none;
-	text-align: left;
+	text-align: start;
+
+	svg,
+	path {
+		fill: currentColor;
+	}
 
 	&:hover {
 		color: ${ COLORS.ui.theme };
-	}
-
-	&:focus {
-		background-color: transparent;
-		color: ${ COLORS.ui.theme };
-		border-color: ${ COLORS.ui.theme };
-		outline: 3px solid transparent;
 	}
 `;
 
@@ -33,6 +31,7 @@ export const itemWrapper = css`
 `;
 
 export const item = css`
+	box-sizing: border-box;
 	width: 100%;
 	display: block;
 	margin: 0;

@@ -1,41 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Disabled from '../';
-
-jest.mock( '@wordpress/dom', () => {
-	const focus = jest.requireActual( '../../../../dom/src' ).focus;
-	return {
-		focus: {
-			...focus,
-			focusable: {
-				...focus.focusable,
-				find( context: Element, options = { sequential: false } ) {
-					// In JSDOM, all elements have zero'd widths and height.
-					// This is a metric for focusable's `isVisible`, so find
-					// and apply an arbitrary non-zero width.
-					Array.from( context.querySelectorAll( '*' ) ).forEach(
-						( element ) => {
-							Object.defineProperties( element, {
-								offsetWidth: {
-									get: () => 1,
-									configurable: true,
-								},
-							} );
-						}
-					);
-
-					return focus.focusable.find( context, options );
-				},
-			},
-		},
-	};
-} );
+import userEvent from '@testing-library/user-event';
 
 describe( 'Disabled', () => {
 	const Form = () => (
@@ -47,23 +19,20 @@ describe( 'Disabled', () => {
 
 	it( 'will disable all fields', () => {
 		render(
-			<Disabled>
+			<Disabled data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
 		);
 
-		const input = screen.getByRole( 'textbox' );
-		const contentEditable = screen.getByTitle( 'edit my content' );
-		expect( input ).toBeDisabled();
-		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
-		expect( contentEditable ).not.toHaveAttribute( 'tabindex' );
-		expect( contentEditable ).not.toHaveAttribute( 'disabled' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
 		const MaybeDisable = ( { isDisabled = true } ) =>
 			isDisabled ? (
-				<Disabled>
+				<Disabled data-testid="disabled-wrapper">
 					<Form />
 				</Disabled>
 			) : (
@@ -72,65 +41,69 @@ describe( 'Disabled', () => {
 
 		const { rerender } = render( <MaybeDisable /> );
 
-		const input = screen.getByRole( 'textbox' );
-		const contentEditable = screen.getByTitle( 'edit my content' );
-
-		expect( input ).toBeDisabled();
-		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		expect( input ).not.toBeDisabled();
-		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
-		expect( contentEditable ).toHaveAttribute( 'tabindex' );
+		expect(
+			screen.queryByTestId( 'disabled-wrapper' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
 		const MaybeDisable = ( { isDisabled = true } ) => (
-			<Disabled isDisabled={ isDisabled }>
+			<Disabled isDisabled={ isDisabled } data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
 		);
 
 		const { rerender } = render( <MaybeDisable /> );
 
-		const input = screen.getByRole( 'textbox' );
-		const contentEditable = screen.getByTitle( 'edit my content' );
-
-		expect( input ).toBeDisabled();
-		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		expect( input ).not.toBeDisabled();
-		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).not.toHaveAttribute(
+			'inert'
+		);
 	} );
 
-	it( 'will disable all fields on sneaky DOM manipulation', async () => {
-		render(
-			<Disabled>
+	it( 'should preserve input values when toggling the isDisabled prop', async () => {
+		const user = userEvent.setup();
+
+		const MaybeDisable = ( { isDisabled = true } ) => (
+			<Disabled isDisabled={ isDisabled }>
 				<Form />
 			</Disabled>
 		);
 
-		const form = screen.getByTitle( 'form' );
-		form.insertAdjacentHTML(
-			'beforeend',
-			'<input title="sneaky input" />'
-		);
-		form.insertAdjacentHTML(
-			'beforeend',
-			'<div title="sneaky editable content" contentEditable tabIndex={ 0 } />'
-		);
-		const sneakyInput = screen.getByTitle( 'sneaky input' );
-		const sneakyEditable = screen.getByTitle( 'sneaky editable content' );
+		const getInput = () => screen.getByRole( 'textbox' );
+		const getContentEditable = () => screen.getByTitle( 'edit my content' );
 
-		await waitFor( () => expect( sneakyInput ).toBeDisabled() );
-		await waitFor( () =>
-			expect( sneakyEditable ).toHaveAttribute(
-				'contenteditable',
-				'false'
-			)
+		const { rerender } = render( <MaybeDisable isDisabled={ false } /> );
+
+		await user.type( getInput(), 'This is input.' );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+
+		await user.type( getContentEditable(), 'This is contentEditable.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
+
+		rerender( <MaybeDisable isDisabled={ true } /> );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
+
+		rerender( <MaybeDisable isDisabled={ false } /> );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
 		);
 	} );
 

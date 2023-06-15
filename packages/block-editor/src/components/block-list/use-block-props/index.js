@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -20,7 +21,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { BlockListBlockContext } from '../block';
+import { BlockListBlockContext } from '../block-list-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockEditContext } from '../../block-edit/context';
@@ -35,6 +36,7 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 import useBlockOverlayActive from '../../block-content-overlay';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -74,9 +76,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		isSubtreeDisabled,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockAttributes,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
@@ -86,26 +90,31 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
-			} = select( blockEditorStore );
+				isBlockSubtreeDisabled,
+			} = unlock( select( blockEditorStore ) );
+			const { getActiveBlockVariation } = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
+			const attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, attributes );
 
 			return {
 				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle: blockType?.title,
+				blockTitle: match?.title || blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 			};
 		},
 		[ clientId ]
@@ -153,6 +162,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: classnames(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {

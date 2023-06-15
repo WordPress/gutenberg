@@ -39,7 +39,3 @@ export const BLOCK_ALIGNMENTS_CONTROLS = {
 };
 
 export const DEFAULT_CONTROL = 'none';
-
-export const POPOVER_PROPS = {
-	isAlternate: true,
-};

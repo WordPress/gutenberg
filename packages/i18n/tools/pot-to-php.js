@@ -44,7 +44,7 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 
 	// The format of gettext-js matches the terminology in gettext itself.
 	let original = translation.msgid;
-	const comments = translation.comments;
+	const comments = translation.comments ?? {};
 
 	if ( Object.values( comments ).length ) {
 		if ( comments.reference ) {

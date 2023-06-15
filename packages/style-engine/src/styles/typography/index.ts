@@ -65,13 +65,25 @@ const letterSpacing = {
 };
 
 const lineHeight = {
-	name: 'letterSpacing',
+	name: 'lineHeight',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
 			options,
 			[ 'typography', 'lineHeight' ],
 			'lineHeight'
+		);
+	},
+};
+
+const textColumns = {
+	name: 'textColumns',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textColumns' ],
+			'columnCount'
 		);
 	},
 };
@@ -107,6 +119,7 @@ export default [
 	fontWeight,
 	letterSpacing,
 	lineHeight,
+	textColumns,
 	textDecoration,
 	textTransform,
 ];

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -140,7 +139,7 @@ const v4 = {
 			className,
 		} = attributes;
 
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClasses, figureStyles;
 
@@ -206,7 +205,7 @@ const v4 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style;
 
 		if ( customMainColor ) {
@@ -270,7 +269,7 @@ const v3 = {
 			figureStyle,
 		} = attributes;
 
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClasses, figureStyles;
 
@@ -345,7 +344,7 @@ const v3 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style;
 
 		if ( customMainColor ) {
@@ -416,7 +415,7 @@ const v2 = {
 			citation,
 			className,
 		} = attributes;
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClass, figureStyles;
 		// Is solid color style
@@ -435,11 +434,8 @@ const v2 = {
 			// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 			// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get(
-				select( blockEditorStore ).getSettings(),
-				[ 'colors' ],
-				[]
-			);
+			const colors =
+				select( blockEditorStore ).getSettings().colors ?? [];
 			const colorObject = getColorObjectByAttributeValues(
 				colors,
 				mainColor
@@ -484,7 +480,7 @@ const v2 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style = {};
 
 		if ( customMainColor ) {

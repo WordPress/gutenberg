@@ -1,5 +1,5 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "test/iframed-multiple-stylesheets",
 	"title": "Iframed Multiple Stylesheets",
 	"category": "text",

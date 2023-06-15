@@ -21,6 +21,7 @@ import type {
 	ToolsPanelMenuItems,
 	ToolsPanelMenuItemsConfig,
 	ToolsPanelProps,
+	ResetAllFilter,
 } from '../types';
 
 const DEFAULT_COLUMNS = 2;
@@ -29,20 +30,45 @@ const generateMenuItems = ( {
 	panelItems,
 	shouldReset,
 	currentMenuItems,
+	menuItemOrder,
 }: ToolsPanelMenuItemsConfig ) => {
+	const newMenuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
 		const group = isShownByDefault ? 'default' : 'optional';
 
-		// If a menu item for this label already exists, do not overwrite its value.
-		// This can cause default controls that have been flagged as customized to
-		// lose their value.
+		// If a menu item for this label has already been flagged as customized
+		// (for default controls), or toggled on (for optional controls), do not
+		// overwrite its value as those controls would lose that state.
 		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
-		const value =
-			existingItemValue !== undefined ? existingItemValue : hasValue();
+		const value = existingItemValue ? existingItemValue : hasValue();
 
-		menuItems[ group ][ label ] = shouldReset ? false : value;
+		newMenuItems[ group ][ label ] = shouldReset ? false : value;
+	} );
+
+	// Loop the known, previously registered items first to maintain menu order.
+	menuItemOrder.forEach( ( key ) => {
+		if ( newMenuItems.default.hasOwnProperty( key ) ) {
+			menuItems.default[ key ] = newMenuItems.default[ key ];
+		}
+
+		if ( newMenuItems.optional.hasOwnProperty( key ) ) {
+			menuItems.optional[ key ] = newMenuItems.optional[ key ];
+		}
+	} );
+
+	// Loop newMenuItems object adding any that aren't in the known items order.
+	Object.keys( newMenuItems.default ).forEach( ( key ) => {
+		if ( ! menuItems.default.hasOwnProperty( key ) ) {
+			menuItems.default[ key ] = newMenuItems.default[ key ];
+		}
+	} );
+
+	Object.keys( newMenuItems.optional ).forEach( ( key ) => {
+		if ( ! menuItems.optional.hasOwnProperty( key ) ) {
+			menuItems.optional[ key ] = newMenuItems.optional[ key ];
+		}
 	} );
 
 	return menuItems;
@@ -57,10 +83,11 @@ export function useToolsPanel(
 ) {
 	const {
 		className,
+		headingLevel = 2,
 		resetAll,
 		panelId,
-		hasInnerWrapper,
-		shouldRenderPlaceholderItems,
+		hasInnerWrapper = false,
+		shouldRenderPlaceholderItems = false,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
 		...otherProps
@@ -81,9 +108,14 @@ export function useToolsPanel(
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
+	const [ menuItemOrder, setMenuItemOrder ] = useState< string[] >( [] );
+	const [ resetAllFilters, setResetAllFilters ] = useState<
+		ResetAllFilter[]
+	>( [] );
 
 	const registerPanelItem = useCallback(
 		( item: ToolsPanelItem ) => {
+			// Add item to panel items.
 			setPanelItems( ( items ) => {
 				const newItems = [ ...items ];
 				// If an item with this label has already been registered, remove it
@@ -97,8 +129,18 @@ export function useToolsPanel(
 				}
 				return [ ...newItems, item ];
 			} );
+
+			// Track the initial order of item registration. This is used for
+			// maintaining menu item order later.
+			setMenuItemOrder( ( items ) => {
+				if ( items.includes( item.label ) ) {
+					return items;
+				}
+
+				return [ ...items, item.label ];
+			} );
 		},
-		[ setPanelItems ]
+		[ setPanelItems, setMenuItemOrder ]
 	);
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
@@ -123,6 +165,26 @@ export function useToolsPanel(
 		[ setPanelItems ]
 	);
 
+	const registerResetAllFilter = useCallback(
+		( newFilter: ResetAllFilter ) => {
+			setResetAllFilters( ( filters ) => {
+				return [ ...filters, newFilter ];
+			} );
+		},
+		[ setResetAllFilters ]
+	);
+
+	const deregisterResetAllFilter = useCallback(
+		( filterToRemove: ResetAllFilter ) => {
+			setResetAllFilters( ( filters ) => {
+				return filters.filter(
+					( filter ) => filter !== filterToRemove
+				);
+			} );
+		},
+		[ setResetAllFilters ]
+	);
+
 	// Manage and share display state of menu items representing child controls.
 	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
 		default: {},
@@ -136,10 +198,11 @@ export function useToolsPanel(
 				panelItems,
 				shouldReset: false,
 				currentMenuItems: prevState,
+				menuItemOrder,
 			} );
 			return items;
 		} );
-	}, [ generateMenuItems, panelItems, setMenuItems ] );
+	}, [ panelItems, setMenuItems, menuItemOrder ] );
 
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
@@ -237,31 +300,17 @@ export function useToolsPanel(
 	const resetAllItems = useCallback( () => {
 		if ( typeof resetAll === 'function' ) {
 			isResetting.current = true;
-
-			// Collect available reset filters from panel items.
-			const filters: Array< () => void > = [];
-			panelItems.forEach( ( item ) => {
-				if ( item.resetAllFilter ) {
-					filters.push( item.resetAllFilter );
-				}
-			} );
-
-			resetAll( filters );
+			resetAll( resetAllFilters );
 		}
 
 		// Turn off display of all non-default items.
 		const resetMenuItems = generateMenuItems( {
 			panelItems,
+			menuItemOrder,
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [
-		generateMenuItems,
-		isResetting.current,
-		panelItems,
-		resetAll,
-		setMenuItems,
-	] );
+	}, [ panelItems, resetAllFilters, resetAll, setMenuItems, menuItemOrder ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
@@ -283,6 +332,7 @@ export function useToolsPanel(
 		() => ( {
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems: !! panelItems.length,
@@ -291,6 +341,7 @@ export function useToolsPanel(
 			menuItems,
 			panelId,
 			registerPanelItem,
+			registerResetAllFilter,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,
@@ -298,13 +349,14 @@ export function useToolsPanel(
 		[
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
-			isResetting.current,
 			lastDisplayedItem,
 			menuItems,
 			panelId,
 			panelItems,
+			registerResetAllFilter,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
@@ -314,6 +366,7 @@ export function useToolsPanel(
 
 	return {
 		...otherProps,
+		headingLevel,
 		panelContext,
 		resetAllItems,
 		toggleItem,

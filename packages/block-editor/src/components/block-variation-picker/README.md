@@ -68,7 +68,7 @@ The different variations of the block.
 
 -   Type: `Function`
 
-Callback called when a block variation is selected. It recieves the selected variation as a parameter.
+Callback called when a block variation is selected. It receives the selected variation as a parameter.
 
 #### `icon`
 

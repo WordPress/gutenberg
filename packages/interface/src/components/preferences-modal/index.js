@@ -9,7 +9,6 @@ export default function PreferencesModal( { closeModal, children } ) {
 		<Modal
 			className="interface-preferences-modal"
 			title={ __( 'Preferences' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
 			{ children }

@@ -8,6 +8,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
+import { SVG } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -67,19 +68,50 @@ function useDarkThemeBodyClassName( styles ) {
 }
 
 export default function EditorStyles( { styles } ) {
-	const transformedStyles = useMemo(
-		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
+	const stylesArray = useMemo(
+		() => Object.values( styles ?? [] ),
 		[ styles ]
+	);
+	const transformedStyles = useMemo(
+		() =>
+			transformStyles(
+				stylesArray.filter( ( style ) => style?.css ),
+				EDITOR_STYLES_SELECTOR
+			),
+		[ stylesArray ]
+	);
+
+	const transformedSvgs = useMemo(
+		() =>
+			stylesArray
+				.filter( ( style ) => style.__unstableType === 'svgs' )
+				.map( ( style ) => style.assets )
+				.join( '' ),
+		[ stylesArray ]
 	);
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( styles ) } />
+			<style ref={ useDarkThemeBodyClassName( stylesArray ) } />
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
+			<SVG
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 0 0"
+				width="0"
+				height="0"
+				role="none"
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					left: '-9999px',
+					overflow: 'hidden',
+				} }
+				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
+			/>
 		</>
 	);
 }

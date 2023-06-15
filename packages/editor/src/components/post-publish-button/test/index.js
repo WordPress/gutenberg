@@ -1,12 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
-/**
- * WordPress dependencies
- */
-import { Button } from '@wordpress/components';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -16,27 +12,25 @@ import { PostPublishButton } from '../';
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {
-			const wrapper = shallow(
-				<PostPublishButton isPublishable isSaveable isSaving />
-			);
+			render( <PostPublishButton isPublishable isSaveable isSaving /> );
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				true
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if forceIsSaving is true', () => {
-			const wrapper = shallow(
+			render(
 				<PostPublishButton isPublishable isSaveable forceIsSaving />
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				true
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
 					isSaveable
 					isPublishable={ false }
@@ -44,23 +38,21 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				true
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post is not saveable', () => {
-			const wrapper = shallow(
-				<PostPublishButton isPublishable isSaveable={ false } />
-			);
+			render( <PostPublishButton isPublishable isSaveable={ false } /> );
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				true
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post saving is locked', () => {
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
 					isPublishable
 					isSaveable
@@ -68,13 +60,13 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				true
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
 					isSaveable
 					isPublishable={ false }
@@ -82,113 +74,126 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				false
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
-			const wrapper = shallow(
-				<PostPublishButton isPublishable isSaveable />
-			);
+			render( <PostPublishButton isPublishable isSaveable /> );
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
-				false
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
 		} );
 	} );
 
 	describe( 'publish status', () => {
-		it( 'should be pending for contributor', () => {
+		it( 'should be pending for contributor', async () => {
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
 					hasPublishAction={ false }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					isSaveable={ true }
-					isPublishable={ true }
+					isSaveable
+					isPublishable
 				/>
 			);
 
-			wrapper.find( Button ).simulate( 'click' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'pending' );
 		} );
 
-		it( 'should be future for scheduled post', () => {
+		it( 'should be future for scheduled post', async () => {
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
-					hasPublishAction={ true }
+					hasPublishAction
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
 					isBeingScheduled
-					isSaveable={ true }
-					isPublishable={ true }
+					isSaveable
+					isPublishable
 				/>
 			);
 
-			wrapper.find( Button ).simulate( 'click' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'future' );
 		} );
 
-		it( 'should be private for private visibility', () => {
+		it( 'should be private for private visibility', async () => {
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
-					hasPublishAction={ true }
+					hasPublishAction
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
 					visibility="private"
-					isSaveable={ true }
-					isPublishable={ true }
+					isSaveable
+					isPublishable
 				/>
 			);
 
-			wrapper.find( Button ).simulate( 'click' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'private' );
 		} );
 
-		it( 'should be publish otherwise', () => {
+		it( 'should be publish otherwise', async () => {
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
-					hasPublishAction={ true }
+					hasPublishAction
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					isSaveable={ true }
-					isPublishable={ true }
+					isSaveable
+					isPublishable
 				/>
 			);
 
-			wrapper.find( Button ).simulate( 'click' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 		} );
 	} );
 
 	describe( 'click', () => {
-		it( 'should save with status', () => {
+		it( 'should save with status', async () => {
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
-			const wrapper = shallow(
+			render(
 				<PostPublishButton
-					hasPublishAction={ true }
+					hasPublishAction
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					isSaveable={ true }
-					isPublishable={ true }
+					isSaveable
+					isPublishable
 				/>
 			);
 
-			wrapper.find( Button ).simulate( 'click' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 			expect( onSave ).toHaveBeenCalled();
@@ -196,8 +201,10 @@ describe( 'PostPublishButton', () => {
 	} );
 
 	it( 'should have save modifier class', () => {
-		const wrapper = shallow( <PostPublishButton isSaving isPublished /> );
+		render( <PostPublishButton isSaving isPublished /> );
 
-		expect( wrapper.find( Button ).prop( 'isBusy' ) ).toBe( true );
+		expect(
+			screen.getByRole( 'button', { name: 'Submit for Review' } )
+		).toHaveClass( 'is-busy' );
 	} );
 } );

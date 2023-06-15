@@ -13,6 +13,7 @@ export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as EditorSnackbars } from './editor-snackbars';
 export { default as EntitiesSavedStates } from './entities-saved-states';
+export { useIsDirty as useEntitiesSavedStatesIsDirty } from './entities-saved-states/hooks/use-is-dirty';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -72,6 +73,8 @@ export { default as TableOfContents } from './table-of-contents';
 export { default as ThemeSupportCheck } from './theme-support-check';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
+export { default as TimeToRead } from './time-to-read';
+export { default as CharacterCount } from './character-count';
 
 // State Related Components.
 export { default as EditorProvider } from './provider';

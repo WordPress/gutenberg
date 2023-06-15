@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -125,6 +120,7 @@ export class PostPublishPanel extends Component {
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={ __( 'Always show pre-publish checks.' ) }
 						checked={ isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
@@ -152,12 +148,9 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+			isPostTypeViewable: postType?.viewable,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),

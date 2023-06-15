@@ -6,7 +6,7 @@
  */
 
 class Override_Script_Test extends WP_UnitTestCase {
-	function set_up() {
+	public function set_up() {
 		parent::set_up();
 
 		wp_register_script(
@@ -18,7 +18,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function tear_down() {
+	public function tear_down() {
 		parent::tear_down();
 
 		wp_deregister_script( 'gutenberg-dummy-script' );
@@ -27,7 +27,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that script is localized.
 	 */
-	function test_localizes_script() {
+	public function test_localizes_script() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -40,13 +40,13 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
-		$this->assertEquals( array( 'dependency', 'wp-i18n' ), $script->deps );
+		$this->assertEquals( array( 'dependency' ), $script->deps );
 	}
 
 	/**
 	 * Tests that script properties are overridden.
 	 */
-	function test_replaces_registered_properties() {
+	public function test_replaces_registered_properties() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -60,7 +60,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
 		$this->assertEquals( 'https://example.com/updated', $script->src );
-		$this->assertEquals( array( 'updated-dependency', 'wp-i18n' ), $script->deps );
+		$this->assertEquals( array( 'updated-dependency' ), $script->deps );
 		$this->assertEquals( 'updated-version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}
@@ -68,7 +68,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that new script registers normally if no handle by the name.
 	 */
-	function test_registers_new_script() {
+	public function test_registers_new_script() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -82,7 +82,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 
 		$script = $wp_scripts->query( 'gutenberg-second-dummy-script', 'registered' );
 		$this->assertEquals( 'https://example.com/', $script->src );
-		$this->assertEquals( array( 'dependency', 'wp-i18n' ), $script->deps );
+		$this->assertEquals( array( 'dependency' ), $script->deps );
 		$this->assertEquals( 'version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}

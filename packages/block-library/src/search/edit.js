@@ -13,11 +13,13 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -57,6 +59,8 @@ import {
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
 
+const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
+
 export default function SearchEdit( {
 	className,
 	attributes,
@@ -75,6 +79,8 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		buttonBehavior,
+		isSearchFieldHidden,
 		style,
 	} = attributes;
 
@@ -112,17 +118,48 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
+	const layout = useSetting( 'layout' );
+	const typographyProps = useTypographyProps( attributes, {
+		typography: {
+			fluid: fluidTypographySettings,
+		},
+		layout: {
+			wideSize: layout?.wideSize,
+		},
+	} );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
 	const hasOnlyButton = 'button-only' === buttonPosition;
+	const searchFieldRef = useRef();
+	const buttonRef = useRef();
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
+
+	useEffect( () => {
+		if ( hasOnlyButton && ! isSelected ) {
+			setAttributes( {
+				isSearchFieldHidden: true,
+			} );
+		}
+	}, [ hasOnlyButton, isSelected, setAttributes ] );
+
+	// Show the search field when width changes.
+	useEffect( () => {
+		if ( ! hasOnlyButton || ! isSelected ) {
+			return;
+		}
+
+		setAttributes( {
+			isSearchFieldHidden: false,
+		} );
+	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -140,6 +177,12 @@ export default function SearchEdit( {
 				: undefined,
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
+				: undefined,
+			hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+				? 'wp-block-search__button-behavior-expand'
+				: undefined,
+			hasOnlyButton && isSearchFieldHidden
+				? 'wp-block-search__searchfield-hidden'
 				: undefined
 		);
 	};
@@ -153,6 +196,7 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'button-outside',
+					isSearchFieldHidden: false,
 				} );
 			},
 		},
@@ -164,6 +208,7 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'button-inside',
+					isSearchFieldHidden: false,
 				} );
 			},
 		},
@@ -175,6 +220,19 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'no-button',
+					isSearchFieldHidden: false,
+				} );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'Button Only' ),
+			isActive: buttonPosition === 'button-only',
+			icon: buttonOnly,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'button-only',
+					isSearchFieldHidden: true,
 				} );
 			},
 		},
@@ -208,11 +266,16 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+			...typographyProps.style,
+			textDecoration: undefined,
+		};
 
 		return (
 			<input
@@ -230,6 +293,7 @@ export default function SearchEdit( {
 				onChange={ ( event ) =>
 					setAttributes( { placeholder: event.target.value } )
 				}
+				ref={ searchFieldRef }
 			/>
 		);
 	};
@@ -239,15 +303,24 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
 			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
+		};
+		const handleButtonClick = () => {
+			if ( hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) {
+				setAttributes( {
+					isSearchFieldHidden: ! isSearchFieldHidden,
+				} );
+			}
 		};
 
 		return (
@@ -262,6 +335,8 @@ export default function SearchEdit( {
 								? stripHTML( buttonText )
 								: __( 'Search' )
 						}
+						onClick={ handleButtonClick }
+						ref={ buttonRef }
 					>
 						<Icon icon={ search } />
 					</button>
@@ -278,6 +353,7 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
+						onClick={ handleButtonClick }
 					/>
 				) }
 			</>
@@ -349,7 +425,7 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							style={ { maxWidth: 80 } }
+							__unstableInputWidth={ '80px' }
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
@@ -443,7 +519,17 @@ export default function SearchEdit( {
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: {
+			...typographyProps.style,
+			// Input opts out of text decoration.
+			textDecoration: undefined,
+		},
 	} );
+
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
 
 	return (
 		<div { ...blockProps }>
@@ -451,12 +537,13 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					style={ typographyProps.style }
 				/>
 			) }
 
@@ -486,14 +573,15 @@ export default function SearchEdit( {
 				} }
 				showHandle={ isSelected }
 			>
-				{ ( isButtonPositionInside || isButtonPositionOutside ) && (
+				{ ( isButtonPositionInside ||
+					isButtonPositionOutside ||
+					hasOnlyButton ) && (
 					<>
 						{ renderTextField() }
 						{ renderButton() }
 					</>
 				) }
 
-				{ hasOnlyButton && renderButton() }
 				{ hasNoButton && renderTextField() }
 			</ResizableBox>
 		</div>

@@ -17,7 +17,7 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render alignment', () => {
@@ -27,7 +27,7 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render spacing', () => {
@@ -37,6 +37,6 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

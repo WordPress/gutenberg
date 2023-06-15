@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -74,6 +74,9 @@ export default function LinkPickerResults( {
 		return {
 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
+		// Disable eslint rule for now, to avoid introducing a regression
+		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	// Prevent setting state when unmounted.
@@ -86,6 +89,9 @@ export default function LinkPickerResults( {
 		setHasAllSuggestions( false );
 		setLinks( [ directEntry ] );
 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ query ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );

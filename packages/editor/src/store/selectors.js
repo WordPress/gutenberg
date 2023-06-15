@@ -95,16 +95,7 @@ export function isEditedPostNew( state ) {
  */
 export function hasChangedContent( state ) {
 	const edits = getPostEdits( state );
-
-	return (
-		'blocks' in edits ||
-		// `edits` is intended to contain only values which are different from
-		// the saved post, so the mere presence of a property is an indicator
-		// that the value is different than what is known to be saved. While
-		// content in Visual mode is represented by the blocks state, in Text
-		// mode it is tracked by `edits.content`.
-		'content' in edits
-	);
+	return 'content' in edits;
 }
 
 /**
@@ -673,6 +664,17 @@ export function isEditedPostDateFloating( state ) {
 }
 
 /**
+ * Returns true if the post is currently being deleted, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether post is being deleted.
+ */
+export function isDeletingPost( state ) {
+	return !! state.deleting.pending;
+}
+
+/**
  * Returns true if the post is currently being saved, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -783,7 +785,7 @@ export function isPreviewingPost( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Preview Link.
+ * @return {string | undefined} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
 	if ( state.saving.pending || isSavingPost( state ) ) {

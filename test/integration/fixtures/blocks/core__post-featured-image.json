@@ -6,7 +6,8 @@
 			"isLink": false,
 			"scale": "cover",
 			"rel": "",
-			"linkTarget": "_self"
+			"linkTarget": "_self",
+			"dimRatio": 0
 		},
 		"innerBlocks": []
 	}

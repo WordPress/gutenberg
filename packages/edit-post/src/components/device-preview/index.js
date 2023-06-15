@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Icon, MenuGroup } from '@wordpress/components';
@@ -35,7 +30,7 @@ export default function DevicePreview() {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
-			isViewable: get( postType, [ 'viewable' ], false ),
+			isViewable: postType?.viewable ?? false,
 			deviceType:
 				select( editPostStore ).__experimentalGetPreviewDeviceType(),
 		};
@@ -49,6 +44,8 @@ export default function DevicePreview() {
 			className="edit-post-post-preview-dropdown"
 			deviceType={ deviceType }
 			setDeviceType={ setPreviewDeviceType }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			viewLabel={ __( 'Preview' ) }
 		>
 			{ isViewable && (
 				<MenuGroup>

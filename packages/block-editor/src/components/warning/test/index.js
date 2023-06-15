@@ -31,9 +31,7 @@ describe( 'Warning', () => {
 	} );
 
 	it( 'should show hidden secondary actions', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>

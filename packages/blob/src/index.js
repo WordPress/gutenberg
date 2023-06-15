@@ -1,9 +1,4 @@
 /**
- * Browser dependencies
- */
-const { createObjectURL, revokeObjectURL } = window.URL;
-
-/**
  * @type {Record<string, File|undefined>}
  */
 const cache = {};
@@ -16,7 +11,7 @@ const cache = {};
  * @return {string} The blob URL.
  */
 export function createBlobURL( file ) {
-	const url = createObjectURL( file );
+	const url = window.URL.createObjectURL( file );
 
 	cache[ url ] = file;
 
@@ -56,7 +51,7 @@ export function getBlobTypeByURL( url ) {
  */
 export function revokeBlobURL( url ) {
 	if ( cache[ url ] ) {
-		revokeObjectURL( url );
+		window.URL.revokeObjectURL( url );
 	}
 
 	delete cache[ url ];

@@ -10,7 +10,7 @@ You can visually browse the components and what their implementation looks like 
 
 ## Additional Tutorials
 
-The **RichText component** allows for creating a richer input besides plain text, allowing for bold, italic, links, and other inline formating. See the [RichText Reference](/docs/reference-guides/richtext.md) for documentation using this component.
+The **RichText component** allows for creating a richer input besides plain text, allowing for bold, italic, links, and other inline formatting. See the [RichText Reference](/docs/reference-guides/richtext.md) for documentation using this component.
 
 The InspectorPanel (the settings on the right for a block) and Block Controls (toolbar controls) have a standard way to be implemented. See the [Block controls tutorial](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) for additional information.
 

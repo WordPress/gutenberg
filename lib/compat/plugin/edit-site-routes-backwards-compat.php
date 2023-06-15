@@ -28,7 +28,7 @@
  */
 function gutenberg_site_editor_menu() {
 	if ( wp_is_block_theme() ) {
-		add_submenu_page( null, null, null, 'edit_theme_options', 'gutenberg-edit-site', '__return_empty_string' );
+		add_submenu_page( '', '', '', 'edit_theme_options', 'gutenberg-edit-site', '__return_empty_string' );
 	}
 }
 add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );

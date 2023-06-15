@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
-export const StyledWrapper = styled.div`
+export const disabledStyles = css`
 	position: relative;
 	pointer-events: none;
 

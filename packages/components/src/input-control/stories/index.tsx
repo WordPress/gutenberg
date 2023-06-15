@@ -40,6 +40,12 @@ Default.args = {
 	placeholder: 'Placeholder',
 };
 
+export const WithHelpText = Template.bind( {} );
+WithHelpText.args = {
+	...Default.args,
+	help: 'Help text to describe the control.',
+};
+
 /**
  * A `prefix` can be inserted before the input. By default, the prefix is aligned with the edge of the input border,
  * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided

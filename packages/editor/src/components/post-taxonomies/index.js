@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -25,11 +20,10 @@ export function PostTaxonomies( {
 	taxonomies,
 	taxonomyWrapper = identity,
 } ) {
-	const availableTaxonomies = filter( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+	const availableTaxonomies = ( taxonomies ?? [] ).filter( ( taxonomy ) =>
+		taxonomy.types.includes( postType )
 	);
-	const visibleTaxonomies = filter(
-		availableTaxonomies,
+	const visibleTaxonomies = availableTaxonomies.filter(
 		// In some circumstances .visibility can end up as undefined so optional chaining operator required.
 		// https://github.com/WordPress/gutenberg/issues/40326
 		( taxonomy ) => taxonomy.visibility?.show_ui

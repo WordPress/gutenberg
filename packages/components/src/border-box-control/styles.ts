@@ -7,28 +7,33 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG, rtl } from '../utils';
-import { space } from '../ui/utils/space';
 
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
 
-export const BorderBoxControl = css``;
+export const borderBoxControl = css``;
 
-export const LinkedBorderControl = css`
+export const linkedBorderControl = () => css`
 	flex: 1;
+	${ rtl( { marginRight: '24px' } )() }
 `;
 
-export const BorderBoxControlLinkedButton = (
-	__next36pxDefaultSize?: boolean
+export const wrapper = css`
+	position: relative;
+`;
+
+export const borderBoxControlLinkedButton = (
+	size?: 'default' | '__unstable-large'
 ) => {
 	return css`
-		flex: 0;
-		flex-basis: 36px;
-		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
+		position: absolute;
+		top: ${ size === '__unstable-large' ? '8px' : '3px' };
+		${ rtl( { right: 0 } )() }
+		line-height: 0;
 	`;
 };
 
-const BorderBoxStyleWithFallback = ( border?: Border ) => {
+const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
 		color = COLORS.gray[ 200 ],
 		style = 'solid',
@@ -45,36 +50,38 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
 
 export const borderBoxControlVisualizer = (
 	borders?: Borders,
-	__next36pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => {
 	return css`
 		position: absolute;
-		top: ${ __next36pxDefaultSize ? '18px' : '15px' };
-		right: 30px;
-		bottom: ${ __next36pxDefaultSize ? '18px' : '15px' };
-		left: 30px;
-		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
-		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
+		top: ${ size === '__unstable-large' ? '20px' : '15px' };
+		right: ${ size === '__unstable-large' ? '39px' : '29px' };
+		bottom: ${ size === '__unstable-large' ? '20px' : '15px' };
+		left: ${ size === '__unstable-large' ? '39px' : '29px' };
+		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
+		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
 		${ rtl( {
-			borderLeft: BorderBoxStyleWithFallback( borders?.left ),
+			borderLeft: borderBoxStyleWithFallback( borders?.left ),
 		} )() }
 		${ rtl( {
-			borderRight: BorderBoxStyleWithFallback( borders?.right ),
+			borderRight: borderBoxStyleWithFallback( borders?.right ),
 		} )() }
 	`;
 };
 
-export const borderBoxControlSplitControls = () => css`
+export const borderBoxControlSplitControls = (
+	size?: 'default' | '__unstable-large'
+) => css`
 	position: relative;
 	flex: 1;
-	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
+	width: ${ size === '__unstable-large' ? undefined : '80%' };
 `;
 
-export const CenteredBorderControl = css`
+export const centeredBorderControl = css`
 	grid-column: span 2;
 	margin: 0 auto;
 `;
 
 export const rightBorderControl = () => css`
-	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
+	${ rtl( { marginLeft: 'auto' } )() }
 `;

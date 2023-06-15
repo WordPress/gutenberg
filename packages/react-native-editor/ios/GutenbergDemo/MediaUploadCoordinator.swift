@@ -70,7 +70,7 @@ class MediaUploadCoordinator: NSObject {
     if !successfullUpload {
       timer.invalidate()
       progress.setUserInfoObject("Network upload failed", forKey: .mediaError)
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil, metadata: ["demoApp" : true, "failReason" : "Network upload failed"])
       successfullUpload = true
       return
     }
@@ -80,7 +80,7 @@ class MediaUploadCoordinator: NSObject {
       gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: mediaID)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: mediaID, metadata: ["demoApp" : true])
       activeUploads[mediaID] = nil
     }
   }

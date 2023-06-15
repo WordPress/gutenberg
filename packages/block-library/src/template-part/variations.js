@@ -40,6 +40,10 @@ export function enhanceTemplatePartVariations( settings, name ) {
 				'wp_template_part',
 				`${ theme }//${ slug }`
 			);
+
+			if ( entity?.slug ) {
+				return entity.slug === variationAttributes.slug;
+			}
 			return entity?.area === variationAttributes.area;
 		};
 

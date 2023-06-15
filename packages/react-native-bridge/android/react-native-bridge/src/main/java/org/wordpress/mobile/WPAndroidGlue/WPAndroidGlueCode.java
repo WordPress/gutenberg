@@ -27,13 +27,13 @@ import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -45,9 +45,7 @@ import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import com.swmansion.gesturehandler.RNGestureHandlerPackage;
-import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
@@ -102,6 +100,7 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private OnGutenbergDidRequestEmbedFullscreenPreviewListener mOnGutenbergDidRequestEmbedFullscreenPreviewListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
@@ -210,6 +209,10 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+
+    public interface OnGutenbergDidRequestEmbedFullscreenPreviewListener {
+        void gutenbergDidRequestEmbedFullscreenPreview(String html, String title);
     }
 
     public interface OnGutenbergDidSendButtonPressedActionListener {
@@ -432,8 +435,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
+            public void performGetRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performGetRequest(pathFromJS, enableCaching, onSuccess, onError);
+            }
+
+            @Override
+            public void performPostRequest(String pathFromJS, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performPostRequest(pathFromJS, data, onSuccess, onError);
             }
 
             @Override
@@ -457,6 +465,11 @@ public class WPAndroidGlueCode {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
                 mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
                         gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
+            }
+
+            public void requestEmbedFullscreenPreview(String html, String title) {
+                mOnGutenbergDidRequestEmbedFullscreenPreviewListener.
+                        gutenbergDidRequestEmbedFullscreenPreview(html, title);
             }
 
             @Override
@@ -590,12 +603,6 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    protected JSIModulePackage getJSIModulePackage() {
-        // In the future, once we support more JSI modules, we would need to provide our own JSIModulePackage and
-        // include Reanimated.
-        return new ReanimatedJSIModulePackage();
-    }
-
     private MainPackageConfig getMainPackageConfig(ImagePipelineConfig imagePipelineConfig) {
         return new MainPackageConfig.Builder().setFrescoConfig(imagePipelineConfig).build();
     }
@@ -615,7 +622,7 @@ public class WPAndroidGlueCode {
         mIsDarkMode = gutenbergProps.isDarkMode();
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
-        mReactRootView = new RNGestureHandlerEnabledRootView(new MutableContextWrapper(initContext));
+        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
@@ -625,7 +632,6 @@ public class WPAndroidGlueCode {
                                     .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
-                                    .setJSIModulesPackage(getJSIModulePackage())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
             builder.setBundleAssetName("index.android.bundle");
@@ -651,6 +657,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
+                                  OnGutenbergDidRequestEmbedFullscreenPreviewListener onGutenbergDidRequestEmbedFullscreenPreviewListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
@@ -673,6 +680,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
+        mOnGutenbergDidRequestEmbedFullscreenPreviewListener = onGutenbergDidRequestEmbedFullscreenPreviewListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mShowSuggestionsUtil = showSuggestionsUtil;
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
@@ -996,6 +1004,10 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
+    public void sendToJSPostSaveEvent() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().sendToJSPostSaveEvent();
+    }
+
     public void appendMediaFiles(ArrayList<Media> mediaList) {
         if (isMediaSelectedCallbackRegistered() && mMediaPickedByUserOnBlock) {
             mMediaPickedByUserOnBlock = false;
@@ -1068,8 +1080,9 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
     }
 
-    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
-        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
+    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId, final
+                                         WritableNativeMap metadata) {
+        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId, metadata);
     }
 
     public void clearMediaFileURL(final int mediaId) {

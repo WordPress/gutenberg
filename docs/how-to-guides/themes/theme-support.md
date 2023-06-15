@@ -136,16 +136,16 @@ The colors will be shown in order on the palette, and there's no limit to how ma
 Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the classes itself. The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ```css
-.has-strong-magenta-background-color {
-	background-color: #a156b4;
-}
-
 .has-strong-magenta-color {
 	color: #a156b4;
 }
 
+.has-strong-magenta-background-color {
+	background-color: #a156b4;
+}
+
 .has-strong-magenta-border-color {
-	color: #a156b4;
+	border-color: #a156b4;
 }
 ```
 
@@ -476,3 +476,17 @@ Use this setting to enable the following Global Styles settings:
 ```php
 add_theme_support( 'appearance-tools' );
 ```
+
+## Block Based Template Parts
+
+Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support( 'block-template-parts' );
+```
+
+This feature is only relevant for non block based themes, as block based themes already support block based template parts as part of the site editor.
+
+The standalone template part editor does not allow editors to create new, or delete existing template parts. This is because the theme manually needs to include the template part in the PHP template.
+
+You can find out more about block based template parts in the [themes handbook block template and template parts section](https://developer.wordpress.org/themes/block-themes/templates-and-template-parts/#block-c5fa39a2-a27d-4bd2-98d0-dc6249a0801a).

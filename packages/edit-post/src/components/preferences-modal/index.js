@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 
@@ -24,6 +19,7 @@ import {
 	PreferencesModalTabs,
 	PreferencesModalSection,
 } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -44,26 +40,40 @@ const MODAL_NAME = 'edit-post/preferences';
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const isModalActive = useSelect(
-		( select ) => select( editPostStore ).isModalActive( MODAL_NAME ),
-		[]
-	);
-	const showBlockBreadcrumbsOption = useSelect(
+	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const modalActive =
+				select( editPostStore ).isModalActive( MODAL_NAME );
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const hasReducedUI = isFeatureActive( 'reducedUI' );
-			return (
-				! hasReducedUI &&
-				isLargeViewport &&
-				isRichEditingEnabled &&
-				mode === 'visual'
-			);
+			const isDistractionFreeEnabled =
+				isFeatureActive( 'distractionFree' );
+			return [
+				modalActive,
+				! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual',
+				isDistractionFreeEnabled,
+			];
 		},
 		[ isLargeViewport ]
 	);
+
+	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editPostStore );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const toggleDistractionFree = () => {
+		setPreference( 'core/edit-post', 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
+
 	const sections = useMemo(
 		() => [
 			{
@@ -96,6 +106,14 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								featureName="distractionFree"
+								onToggle={ toggleDistractionFree }
+								help={ __(
+									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+								) }
+								label={ __( 'Distraction free' ) }
+							/>
+							<EnableFeature
 								featureName="focusMode"
 								help={ __(
 									'Highlights the current block and fades other content.'
@@ -115,13 +133,6 @@ export default function EditPostPreferencesModal() {
 									'Opens the block list view sidebar by default.'
 								) }
 								label={ __( 'Always open list view' ) }
-							/>
-							<EnableFeature
-								featureName="reducedUI"
-								help={ __(
-									'Compacts options and outlines in the toolbar.'
-								) }
-								label={ __( 'Reduce the interface' ) }
 							/>
 							<EnableFeature
 								featureName="themeStyles"
@@ -197,10 +208,7 @@ export default function EditPostPreferencesModal() {
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
-										label={ get( taxonomy, [
-											'labels',
-											'menu_name',
-										] ) }
+										label={ taxonomy.labels.menu_name }
 										panelName={ `taxonomy-panel-${ taxonomy.slug }` }
 									/>
 								) }

@@ -3,12 +3,12 @@
  */
 import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
-import { get, set } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import getQueryParts from './get-query-parts';
+import { setNestedValue } from '../utils';
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries
@@ -66,8 +66,12 @@ function getQueriedItemsUncached( state, query ) {
 
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
-				const value = get( item, field );
-				set( filteredItem, field, value );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value[ fieldName ];
+				} );
+
+				setNestedValue( filteredItem, field, value );
 			}
 		} else {
 			// If expecting a complete item, validate that completeness, or

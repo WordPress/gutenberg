@@ -41,7 +41,7 @@ The component accepts the following props:
 
 Elements to render, upon whom key events are to be monitored.
 
--   Type: `Element` | `Element[]`
+-   Type: `ReactNode`
 -   Required: No
 
 ### shortcuts

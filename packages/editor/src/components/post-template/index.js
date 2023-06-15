@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -38,12 +33,17 @@ export function PostTemplate() {
 
 	const { editPost } = useDispatch( editorStore );
 
-	if ( ! isViewable || isEmpty( availableTemplates ) ) {
+	if (
+		! isViewable ||
+		! availableTemplates ||
+		! Object.keys( availableTemplates ).length
+	) {
 		return null;
 	}
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
 			onChange={ ( templateSlug ) => {
@@ -51,9 +51,8 @@ export function PostTemplate() {
 					template: templateSlug || '',
 				} );
 			} }
-			options={ map(
-				availableTemplates,
-				( templateName, templateSlug ) => ( {
+			options={ Object.entries( availableTemplates ?? {} ).map(
+				( [ templateSlug, templateName ] ) => ( {
 					value: templateSlug,
 					label: templateName,
 				} )

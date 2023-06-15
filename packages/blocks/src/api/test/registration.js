@@ -4,6 +4,7 @@
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+import { logged } from '@wordpress/deprecated';
 import { select } from '@wordpress/data';
 
 /**
@@ -61,6 +62,11 @@ describe( 'blocks', () => {
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
 		unstable__bootstrapServerSideBlockDefinitions( {} );
+
+		// Reset deprecation logging to ensure we properly track warnings.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
 	} );
 
 	describe( 'registerBlockType()', () => {
@@ -128,6 +134,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -274,6 +281,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -310,6 +318,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -342,6 +351,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -352,7 +362,7 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-incompatible-keys';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					api_version: 2,
+					api_version: 3,
 					provides_context: {
 						fontSize: 'fontSize',
 					},
@@ -365,7 +375,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -376,6 +386,7 @@ describe( 'blocks', () => {
 				},
 				usesContext: [ 'textColor' ],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -392,7 +403,7 @@ describe( 'blocks', () => {
 			} );
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					apiVersion: 2,
+					apiVersion: 3,
 					category: 'ignored',
 				},
 			} );
@@ -402,7 +413,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -412,6 +423,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -448,6 +460,43 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [],
+			} );
+		} );
+
+		// This can be removed once polyfill adding selectors has been removed.
+		it( 'should apply selectors on the client when not set on the server', () => {
+			const blockName = 'core/test-block-with-selectors';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					selectors: { root: '.wp-block-custom-selector' },
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: { root: '.wp-block-custom-selector' },
 				supports: {},
 				styles: [],
 				variations: [],
@@ -516,6 +565,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -547,6 +597,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -592,6 +643,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -651,6 +703,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -677,6 +730,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -763,6 +817,7 @@ describe( 'blocks', () => {
 										providesContext: {},
 										usesContext: [],
 										keywords: [],
+										selectors: {},
 										supports: {},
 										styles: [],
 										variations: [],
@@ -832,6 +887,41 @@ describe( 'blocks', () => {
 				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
 				expect( block1.attributes ).not.toEqual( block2.attributes );
 			} );
+
+			it( 'should allow non-string descriptions at registration but warn for undesired usage.', () => {
+				const newDescription = <p>foo bar</p>;
+
+				const block = registerBlockType( 'my-plugin/test-block-1', {
+					...defaultBlockSettings,
+					description: newDescription,
+				} );
+
+				expect( block.description ).toBe( newDescription );
+				expect( console ).toHaveWarnedWith(
+					'Declaring non-string block descriptions is deprecated since version 6.2.'
+				);
+			} );
+
+			it( 'should allow non-string descriptions through `blocks.registerBlockType` filter but warn for undesired usage.', () => {
+				const newDescription = <p>foo bar</p>;
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/non-string-description',
+					( settings ) => {
+						settings.description = newDescription;
+						return settings;
+					}
+				);
+				const block = registerBlockType(
+					'my-plugin/test-block-2',
+					defaultBlockSettings
+				);
+
+				expect( block.description ).toBe( newDescription );
+				expect( console ).toHaveWarnedWith(
+					'Declaring non-string block descriptions is deprecated since version 6.2.'
+				);
+			} );
 		} );
 
 		test( 'registers block from metadata', () => {
@@ -867,6 +957,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [
@@ -933,6 +1024,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [
 					{
@@ -998,6 +1090,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -1015,6 +1108,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1094,6 +1188,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1119,6 +1214,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1151,6 +1247,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -1166,6 +1263,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],

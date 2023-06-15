@@ -7,7 +7,7 @@ import type { AnyAction, Reducer } from 'redux';
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
- * @param  actionProperty Action property by which to key object.
+ * @param actionProperty Action property by which to key object.
  * @return Higher-order reducer.
  */
 export const onSubKey =
@@ -42,7 +42,7 @@ export const onSubKey =
  * Normalize selector argument array by defaulting `undefined` value to an empty array
  * and removing trailing `undefined` values.
  *
- * @param  args Selector argument array
+ * @param args Selector argument array
  * @return Normalized state key array
  */
 export function selectorArgsToStateKey( args: unknown[] | null | undefined ) {

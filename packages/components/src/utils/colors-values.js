@@ -22,14 +22,6 @@ const GRAY = {
 	100: '#f0f0f0',
 };
 
-// TODO: Replace usages of these with the equivalents in `GRAY`
-const LIGHT_GRAY = {
-	800: '#b5bcc2',
-	600: '#d7dade',
-	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
-	300: '#edeff0',
-};
-
 // Matches @wordpress/base-styles
 const ALERT = {
 	yellow: '#f0b849',
@@ -37,17 +29,19 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches @wordpress/base-styles
+// Matches the Modern admin scheme in @wordpress/base-styles
 const ADMIN = {
-	theme: 'var( --wp-admin-theme-color, #007cba)',
-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+	themeDark10:
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
 };
 
 const UI = {
 	theme: ADMIN.theme,
+	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
-	border: GRAY[ 700 ],
+	border: GRAY[ 600 ],
 	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: GRAY[ 400 ],
@@ -64,10 +58,6 @@ export const COLORS = Object.freeze( {
 	 * The main gray color object.
 	 */
 	gray: GRAY,
-	/**
-	 * @deprecated Try to use `gray` instead.
-	 */
-	lightGray: LIGHT_GRAY,
 	white,
 	alert: ALERT,
 	ui: UI,

@@ -31,12 +31,14 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'left',
 	'left-start',
 	'left-end',
+	'overlay',
 ];
 
 const meta: ComponentMeta< typeof Popover > = {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {
+		anchor: { control: { type: null } },
 		anchorRef: { control: { type: null } },
 		anchorRect: { control: { type: null } },
 		children: { control: { type: null } },
@@ -79,7 +81,7 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Popover > = ( args ) => {
+const Template: ComponentStory< typeof Popover > = ( args ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
@@ -113,6 +115,8 @@ export const Default: ComponentStory< typeof Popover > = ( args ) => {
 		</div>
 	);
 };
+
+export const Default: ComponentStory< typeof Popover > = Template.bind( {} );
 Default.args = {
 	children: (
 		<div style={ { width: '280px', whiteSpace: 'normal' } }>
@@ -122,6 +126,19 @@ Default.args = {
 			aliquip ex ea commodo consequat.
 		</div>
 	),
+};
+
+export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
+Unstyled.args = {
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+			aliquip ex ea commodo consequat.
+		</div>
+	),
+	variant: 'unstyled',
 };
 
 export const AllPlacements: ComponentStory< typeof Popover > = ( {
@@ -141,7 +158,12 @@ export const AllPlacements: ComponentStory< typeof Popover > = ( {
 		</h2>
 		<div>
 			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
-				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
+				<PopoverWithAnchor
+					key={ p }
+					placement={ p }
+					{ ...args }
+					resize={ p === 'overlay' ? true : args.resize }
+				>
 					{ children }
 					<div>
 						<small>(placement: { p })</small>

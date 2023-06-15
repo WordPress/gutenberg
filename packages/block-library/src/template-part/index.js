@@ -62,13 +62,13 @@ export const init = () => {
 		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromPostTemplates',
 		(
-			can,
+			canInsert,
 			blockType,
 			rootClientId,
 			{ getBlock, getBlockParentsByBlockName }
 		) => {
 			if ( blockType.name !== 'core/template-part' ) {
-				return can;
+				return canInsert;
 			}
 
 			for ( const disallowedParentType of DISALLOWED_PARENTS ) {

@@ -12,7 +12,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
  *
  * @access private
  */
@@ -42,7 +42,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	protected $rules = array();
 
 	/**
-	 * Get an instance of the store.
+	 * Gets an instance of the store.
 	 *
 	 * @param string $store_name The name of the store.
 	 *
@@ -61,7 +61,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Get an array of all available stores.
+	 * Gets an array of all available stores.
 	 *
 	 * @return WP_Style_Engine_CSS_Rules_Store[]
 	 */
@@ -79,7 +79,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Set the store name.
+	 * Sets the store name.
 	 *
 	 * @param string $name The store name.
 	 *
@@ -90,7 +90,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Get the store name.
+	 * Gets the store name.
 	 *
 	 * @return string
 	 */
@@ -99,7 +99,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Get an array of all rules.
+	 * Gets an array of all rules.
 	 *
 	 * @return WP_Style_Engine_CSS_Rule[]
 	 */
@@ -108,7 +108,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Get a WP_Style_Engine_CSS_Rule object by its selector.
+	 * Gets a WP_Style_Engine_CSS_Rule object by its selector.
 	 * If the rule does not exist, it will be created.
 	 *
 	 * @param string $selector The CSS selector.
@@ -132,7 +132,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
-	 * Remove a selector from the store.
+	 * Removes a selector from the store.
 	 *
 	 * @param string $selector The CSS selector.
 	 *

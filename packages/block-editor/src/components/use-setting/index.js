@@ -11,6 +11,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -18,13 +19,17 @@ import {
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
-const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+const blockedPaths = [
+	'color',
+	'border',
+	'dimensions',
+	'typography',
+	'spacing',
+];
 
 const deprecatedFlags = {
-	'color.palette': ( settings ) =>
-		settings.colors === undefined ? undefined : settings.colors,
-	'color.gradients': ( settings ) =>
-		settings.gradients === undefined ? undefined : settings.gradients,
+	'color.palette': ( settings ) => settings.colors,
+	'color.gradients': ( settings ) => settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
@@ -33,8 +38,7 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'typography.fontSizes': ( settings ) =>
-		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+	'typography.fontSizes': ( settings ) => settings.fontSizes,
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
@@ -109,7 +113,7 @@ const removeCustomPrefixes = ( path ) => {
 export default function useSetting( path ) {
 	const { name: blockName, clientId } = useBlockEditContext();
 
-	const setting = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( blockedPaths.includes( path ) ) {
 				// eslint-disable-next-line no-console
@@ -119,15 +123,32 @@ export default function useSetting( path ) {
 				return undefined;
 			}
 
-			let result;
+			// 0. Allow third parties to filter the block's settings at runtime.
+			let result = applyFilters(
+				'blockEditor.useSetting.before',
+				undefined,
+				path,
+				clientId,
+				blockName
+			);
+
+			if ( undefined !== result ) {
+				return result;
+			}
+
 			const normalizedPath = removeCustomPrefixes( path );
 
 			// 1. Take settings from the block instance or its ancestors.
+			// Start from the current block and work our way up the ancestors.
 			const candidates = [
-				...select( blockEditorStore ).getBlockParents( clientId ),
-				clientId, // The current block is added last, so it overwrites any ancestor.
+				clientId,
+				...select( blockEditorStore ).getBlockParents(
+					clientId,
+					/* ascending */ true
+				),
 			];
-			candidates.forEach( ( candidateClientId ) => {
+
+			for ( const candidateClientId of candidates ) {
 				const candidateBlockName =
 					select( blockEditorStore ).getBlockName(
 						candidateClientId
@@ -143,17 +164,18 @@ export default function useSetting( path ) {
 						select( blockEditorStore ).getBlockAttributes(
 							candidateClientId
 						);
-					const candidateResult =
+					result =
 						get(
 							candidateAtts,
 							`settings.blocks.${ blockName }.${ normalizedPath }`
 						) ??
 						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( candidateResult !== undefined ) {
-						result = candidateResult;
+					if ( result !== undefined ) {
+						// Stop the search for more distant ancestors and move on.
+						break;
 					}
 				}
-			} );
+			}
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
@@ -188,6 +210,4 @@ export default function useSetting( path ) {
 		},
 		[ blockName, clientId, path ]
 	);
-
-	return setting;
 }

@@ -71,6 +71,9 @@
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md": []
 					}
 				]
 			},
@@ -176,6 +179,9 @@
 					{
 						"docs/reference-guides/block-api/block-registration.md": []
 					},
+					{
+						"docs/reference-guides/block-api/block-selectors.md": []
+					},
 					{ "docs/reference-guides/block-api/block-styles.md": [] },
 					{ "docs/reference-guides/block-api/block-supports.md": [] },
 					{
@@ -198,6 +204,9 @@
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
+					},
+					{
+						"docs/reference-guides/filters/global-styles-filters.md": []
 					}
 				]
 			},
@@ -241,6 +250,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/styles-versions.md": []
 					}
 				]
 			},
@@ -272,7 +284,6 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},
@@ -291,6 +302,7 @@
 				"docs/explanations/architecture/README.md": [
 					{ "docs/explanations/architecture/key-concepts.md": [] },
 					{ "docs/explanations/architecture/data-flow.md": [] },
+					{ "docs/explanations/architecture/entities.md": [] },
 					{ "docs/explanations/architecture/modularity.md": [] },
 					{ "docs/explanations/architecture/performance.md": [] },
 					{
@@ -325,8 +337,20 @@
 					},
 					{ "docs/contributors/code/git-workflow.md": [] },
 					{ "docs/contributors/code/coding-guidelines.md": [] },
-					{ "docs/contributors/code/testing-overview.md": [] },
-					{ "docs/contributors/code/grammar.md": [] },
+					{
+						"docs/contributors/code/testing-overview.md": [
+							{
+								"docs/contributors/code/e2e/README.md": [
+									{
+										"docs/contributors/code/e2e/migration.md": []
+									},
+									{
+										"docs/contributors/code/e2e/overusing-snapshots.md": []
+									}
+								]
+							}
+						]
+					},
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{
@@ -375,8 +399,7 @@
 			{ "docs/contributors/accessibility-testing.md": [] },
 			{ "docs/contributors/repository-management.md": [] },
 			{ "docs/contributors/folder-structure.md": [] },
-			{ "docs/contributors/versions-in-wordpress.md": [] },
-			{ "docs/contributors/roadmap.md": [] }
+			{ "docs/contributors/versions-in-wordpress.md": [] }
 		]
 	}
 ]

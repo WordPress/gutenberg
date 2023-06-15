@@ -9,7 +9,7 @@ jest.mock( '@wordpress/api-fetch' );
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -21,15 +21,8 @@ describe( 'useEntityRecords', () => {
 	let registry;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
-
 		registry = createRegistry();
 		registry.register( coreDataStore );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	const TEST_RECORDS = [
@@ -60,14 +53,12 @@ describe( 'useEntityRecords', () => {
 			status: 'IDLE',
 		} );
 
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-
 		// Fetch request should have been issued
-		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/widgets?context=edit&status=draft',
-		} );
+		await waitFor( () =>
+			expect( triggerFetch ).toHaveBeenCalledWith( {
+				path: '/wp/v2/widgets?context=edit&status=draft',
+			} )
+		);
 
 		expect( data ).toEqual( {
 			records: TEST_RECORDS,

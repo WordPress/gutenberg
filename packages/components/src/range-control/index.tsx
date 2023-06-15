@@ -40,12 +40,8 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const noop = () => {};
 
-function UnforwardedRangeControl< IconProps = unknown >(
-	props: WordPressComponentProps<
-		RangeControlProps< IconProps >,
-		'input',
-		false
-	>,
+function UnforwardedRangeControl(
+	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
@@ -138,7 +134,9 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( next: string ) => {
+	const handleOnChange = ( next?: string ) => {
+		// @ts-expect-error TODO: Investigate if it's problematic for setValue() to
+		// potentially receive a NaN when next is undefined.
 		let nextValue = parseFloat( next );
 		setValue( nextValue );
 
@@ -267,7 +265,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
+					<ThumbWrapper
+						className="components-range-control__thumb-wrapper"
+						style={ offsetStyle }
+						disabled={ disabled }
+					>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
@@ -304,6 +306,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
+						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
 					/>
 				) }

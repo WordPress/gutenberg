@@ -11,21 +11,43 @@ import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
+import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
-function BlockEditorProvider( props ) {
-	const { children, settings } = props;
+export const ExperimentalBlockEditorProvider = withRegistryProvider(
+	( props ) => {
+		const { children, settings, stripExperimentalSettings = false } = props;
 
-	const { updateSettings } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		updateSettings( settings );
-	}, [ settings ] );
+		const { __experimentalUpdateSettings } = unlock(
+			useDispatch( blockEditorStore )
+		);
+		useEffect( () => {
+			__experimentalUpdateSettings(
+				{
+					...settings,
+					__internalIsInitialized: true,
+				},
+				stripExperimentalSettings
+			);
+		}, [ settings ] );
 
-	// Syncs the entity provider with changes in the block-editor store.
-	useBlockSync( props );
+		// Syncs the entity provider with changes in the block-editor store.
+		useBlockSync( props );
 
-	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
-}
+		return <BlockRefsProvider>{ children }</BlockRefsProvider>;
+	}
+);
 
-export default withRegistryProvider( BlockEditorProvider );
+export const BlockEditorProvider = ( props ) => {
+	return (
+		<ExperimentalBlockEditorProvider
+			{ ...props }
+			stripExperimentalSettings={ true }
+		>
+			{ props.children }
+		</ExperimentalBlockEditorProvider>
+	);
+};
+
+export default BlockEditorProvider;
