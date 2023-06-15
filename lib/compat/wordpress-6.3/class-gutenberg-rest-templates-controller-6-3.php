@@ -69,6 +69,8 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	/**
 	 * Add revisions to the response.
 	 *
+	 * @since 6.3.0 Added prepare_revision_links() method to get revision links.
+	 *
 	 * @param WP_Block_Template $item    Template instance.
 	 * @param WP_REST_Request   $request Request object.
 	 * @return WP_REST_Response Response object.
@@ -98,7 +100,7 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	/**
 	 * Adds revisions to links.
 	 *
-	 * @since 6.2.0
+	 * @since 6.3.0
 	 *
 	 * @param WP_Block_Template $template  Template instance.
 	 * @return array Links for the given post.

@@ -53,3 +53,33 @@ function gutenberg_register_global_styles_endpoints() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 
+/**
+ * Add the `modified` value to the `wp_template` schema.
+ *
+ * @since 6.3.0 Added 'modified' property and response value.
+ */
+function add_modified_wp_template_schema() {
+		register_rest_field(
+			array( 'wp_template', 'wp_template_part' ),
+			'modified',
+			array(
+				'schema'       => array(
+					'description' => __( "The date the template was last modified, in the site's timezone.", 'gutenberg' ),
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'get_callback' => function( $object ) {
+					if ( ! empty( $object['wp_id'] ) ) {
+						$post = get_post( $object['wp_id'] );
+						if ( $post && isset( $post->post_modified ) ) {
+							return mysql_to_rfc3339( $post->post_modified );
+						}
+					}
+					return null;
+				},
+			)
+		);
+}
+add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
