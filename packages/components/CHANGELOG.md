@@ -13,6 +13,9 @@
 -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
 -   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
 
+### Experimental
+-   `Tabs`: Create a new version of `TabPanel` with updated internals, while maintaining the same functionality and API surface  ([#51551](https://github.com/WordPress/gutenberg/pull/51551)).
+
 ### Internal
 
 -   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
