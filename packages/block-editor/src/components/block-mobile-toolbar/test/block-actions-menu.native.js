@@ -246,7 +246,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
 
 			// Tap on the Copy button
-			fireEvent.press( getByLabelText( /Copy block/ ) );
+			fireEvent.press( getByLabelText( /Copy/ ) );
 
 			// Get Paragraph block
 			paragraphBlock = await getBlock( screen, 'Paragraph' );
@@ -293,7 +293,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
 
 			// Tap on the Copy button
-			fireEvent.press( getByLabelText( /Copy block/ ) );
+			fireEvent.press( getByLabelText( /Copy/ ) );
 
 			// Get Paragraph block
 			paragraphBlock = await getBlock( screen, 'Paragraph' );

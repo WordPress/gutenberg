@@ -156,7 +156,7 @@ const BlockActionsMenu = ( {
 		},
 		copyButton: {
 			id: 'copyButtonOption',
-			label: __( 'Copy block' ),
+			label: __( 'Copy' ),
 			value: 'copyButtonOption',
 			onSelect: () => {
 				const serializedBlock = serialize(
