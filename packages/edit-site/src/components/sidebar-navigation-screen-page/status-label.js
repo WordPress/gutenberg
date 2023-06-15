@@ -47,14 +47,16 @@ export default function StatusLabel( { status, date, short } ) {
 	let statusIcon = pendingIcon;
 	switch ( status ) {
 		case 'publish':
-			statusLabel = createInterpolateElement(
-				sprintf(
-					/* translators: %s: is the relative time when the post was published. */
-					__( 'Published <time>%s</time>' ),
-					relateToNow
-				),
-				{ time: <time dateTime={ date } /> }
-			);
+			statusLabel = date
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the relative time when the post was published. */
+							__( 'Published <time>%s</time>' ),
+							relateToNow
+						),
+						{ time: <time dateTime={ date } /> }
+				  )
+				: __( 'Published' );
 			statusIcon = publishedIcon;
 			break;
 		case 'future':
