@@ -93,9 +93,10 @@ function DimensionsControls( {
 				onChange={ ( nextAspectRatio ) => {
 					const { aspectRatio, ...nextValue } = value;
 
-					// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
-					// dropdown to indicate that setting both the width and height is the same
-					// as a custom aspect ratio.
+					// 'auto' is CSS default and our default, so setting the
+					// new aspect ratio isn't needed. And 'custom' doesn't
+					// require an aspect ratio either because with and height
+					// are both set overriding any CSS aspect-ratio.
 					if (
 						nextAspectRatio !== 'custom' &&
 						nextAspectRatio !== 'auto' &&
