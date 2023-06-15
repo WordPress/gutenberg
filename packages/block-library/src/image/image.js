@@ -459,12 +459,12 @@ export default function Image( {
 						label={ __( 'Aspect ratio' ) }
 						options={ [
 							{ label: __( 'Original' ), value: 'auto' },
-							{ label: __( 'Square - 1:1' ), value: '1:1' },
-							{ label: __( 'Classic - 3:2' ), value: '3:2' },
-							{ label: __( 'Standard - 4:3' ), value: '4:3' },
-							{ label: __( 'Portrait - 3:4' ), value: '3:4' },
-							{ label: __( 'Wide - 16:9' ), value: '16:9' },
-							{ label: __( 'Tall - 9:16' ), value: '9:16' },
+							{ label: __( 'Square - 1:1' ), value: '1/1' },
+							{ label: __( 'Classic - 3:2' ), value: '3/2' },
+							{ label: __( 'Standard - 4:3' ), value: '4/3' },
+							{ label: __( 'Portrait - 3:4' ), value: '3/4' },
+							{ label: __( 'Wide - 16:9' ), value: '16/9' },
+							{ label: __( 'Tall - 9:16' ), value: '9/16' },
 							{ label: __( 'Custom' ), value: 'custom' },
 						] }
 						value={ aspectRatio }
