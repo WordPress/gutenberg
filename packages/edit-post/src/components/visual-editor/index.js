@@ -23,12 +23,10 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
-	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 	__experimentalRecursionProvider as RecursionProvider,
-	__experimentaluseLayoutClasses as useLayoutClasses,
-	__experimentaluseLayoutStyles as useLayoutStyles,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -41,6 +39,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
+	blockEditorPrivateApis
+);
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 
@@ -415,7 +418,7 @@ export default function VisualEditor( { styles } ) {
 										? 'wp-site-blocks'
 										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
-								__experimentalLayout={ blockListLayout }
+								layout={ blockListLayout }
 							/>
 						</RecursionProvider>
 					</MaybeIframe>
