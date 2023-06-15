@@ -31,6 +31,7 @@ import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
+import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -416,7 +417,7 @@ export function getStylesDeclarations(
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
  * @param {Object}  props
- * @param {Object}  props.tree                  A theme.json tree containing layout definitions.
+ * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
@@ -425,7 +426,7 @@ export function getStylesDeclarations(
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
-	tree,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	style,
 	selector,
 	hasBlockGapSupport,
@@ -447,8 +448,8 @@ export function getLayoutStyles( {
 		}
 	}
 
-	if ( gapValue && tree?.settings?.layout?.definitions ) {
-		Object.values( tree.settings.layout.definitions ).forEach(
+	if ( gapValue && layoutDefinitions ) {
+		Object.values( layoutDefinitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
 				if (
@@ -513,12 +514,9 @@ export function getLayoutStyles( {
 	}
 
 	// Output base styles
-	if (
-		selector === ROOT_BLOCK_SELECTOR &&
-		tree?.settings?.layout?.definitions
-	) {
+	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
 		const validDisplayModes = [ 'block', 'flex', 'grid' ];
-		Object.values( tree.settings.layout.definitions ).forEach(
+		Object.values( layoutDefinitions ).forEach(
 			( { className, displayMode, baseStyles } ) => {
 				if (
 					displayMode &&
@@ -880,7 +878,6 @@ export const toStyles = (
 				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
 			) {
 				ruleset += getLayoutStyles( {
-					tree,
 					style: styles,
 					selector,
 					hasBlockGapSupport,

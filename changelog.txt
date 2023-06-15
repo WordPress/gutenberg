@@ -1,49 +1,8 @@
 == Changelog ==
 
-= 16.0.0-rc.2 =
-
-
+= 16.0.0 =
 
 ## Changelog
-
-### Bug Fixes
-
-#### Global Styles
-- Global styles revisions: Ensure redirect runs once for back button. ([51316](https://github.com/WordPress/gutenberg/pull/51316))
-
-#### Block Library
-- Query: Fix deprecation error when migrating layout. ([51311](https://github.com/WordPress/gutenberg/pull/51311))
-
-
-### Code Quality
-
-#### Site Editor
-- Rename 'page content lock' to 'page content focus'. ([51280](https://github.com/WordPress/gutenberg/pull/51280))
-
-
-### Various
-
-- Post title: Fix autofocus when iframed. ([51331](https://github.com/WordPress/gutenberg/pull/51331))
-
-
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@andrewserong @ellatrix @noisysocks @ramonjd
-
-
-= 16.0.0-rc.1 =
-
-## Changelog
-
-### Features
-
-- Add the ability to create a new page in the Site Editor. ([50565](https://github.com/WordPress/gutenberg/pull/50565))
-- Add the ability to focus on editing a page's content vs the page's template. ([50857](https://github.com/WordPress/gutenberg/pull/50857))
-- Add page details to the Site Editor sidebar. ([50767](https://github.com/WordPress/gutenberg/pull/50767))
 
 ### Enhancements
 
@@ -56,15 +15,18 @@ The following contributors merged PRs in this release:
 - List View: Allow dragging outside the immediate area by passing down a dropZoneElement. ([50726](https://github.com/WordPress/gutenberg/pull/50726))
 - List View: Append when dragging into collapsed blocks. ([50936](https://github.com/WordPress/gutenberg/pull/50936))
 - Reinstate Text control outside of settings in Link Control. ([50957](https://github.com/WordPress/gutenberg/pull/50957))
+- Update the document title in the template mode of the post editor. ([50864](https://github.com/WordPress/gutenberg/pull/50864))
 - Use "Save" instead of "Apply" in Link Control. ([50964](https://github.com/WordPress/gutenberg/pull/50964))
 - Use checkbox for `Open in new tab` within Link Control. ([50961](https://github.com/WordPress/gutenberg/pull/50961))
 - Visually hide the LinkControl initial/results heading. ([50977](https://github.com/WordPress/gutenberg/pull/50977))
-- Update the document title in the template mode of the post editor. ([50864](https://github.com/WordPress/gutenberg/pull/50864))
 
 #### Site Editor
 - Add `delete` action for pages in navigation sidebar. ([51101](https://github.com/WordPress/gutenberg/pull/51101))
+- Add page details to the Site Editor sidebar. ([50767](https://github.com/WordPress/gutenberg/pull/50767))
 - Add Paragraph prompt to Post Content when empty. ([50623](https://github.com/WordPress/gutenberg/pull/50623))
 - Add template actions in site editor navigation sidebar. ([51054](https://github.com/WordPress/gutenberg/pull/51054))
+- Add the ability to create a new page in the Site Editor. ([50565](https://github.com/WordPress/gutenberg/pull/50565))
+- Add the ability to focus on editing a page's content vs the page's template. ([50857](https://github.com/WordPress/gutenberg/pull/50857))
 - Directly save if only changing current context. ([50567](https://github.com/WordPress/gutenberg/pull/50567))
 - Disable block supports derived design tools when Blocking Editing Mode is not `default`. ([50912](https://github.com/WordPress/gutenberg/pull/50912))
 - DocumentActions: Animate between page and template mode. ([51224](https://github.com/WordPress/gutenberg/pull/51224))
@@ -112,11 +74,12 @@ The following contributors merged PRs in this release:
 #### Block Editor
 - Add inert attribute to disabled blocks that have only disabled descendants. ([51079](https://github.com/WordPress/gutenberg/pull/51079))
 - Fix multi-entity multi-property undo redo. ([50911](https://github.com/WordPress/gutenberg/pull/50911))
+- Hide the save draft button for published posts. ([51193](https://github.com/WordPress/gutenberg/pull/51193))
 - Iframe enqueuing: Add editorStyle and warning. ([50091](https://github.com/WordPress/gutenberg/pull/50091))
 - Improvements to how blocks with a 'disabled' editing mode behave. ([51148](https://github.com/WordPress/gutenberg/pull/51148))
 - Link Control: Add missing translation. ([51081](https://github.com/WordPress/gutenberg/pull/51081))
+- Make sure post content always has correct layout. ([51431](https://github.com/WordPress/gutenberg/pull/51431))
 - Navigation: Memoize link value passed to the LinkControl. ([51155](https://github.com/WordPress/gutenberg/pull/51155))
-- Hide the save draft button for published posts. ([51193](https://github.com/WordPress/gutenberg/pull/51193))
 
 #### Site Editor
 - Browse Mode: Remove horizontal scrollbar during screen transitions. ([51189](https://github.com/WordPress/gutenberg/pull/51189))
@@ -131,11 +94,15 @@ The following contributors merged PRs in this release:
 - Freeform/Shortcode: Prevent blocks from converting HTML entities. ([51123](https://github.com/WordPress/gutenberg/pull/51123))
 - Navigation: Apply color classes to the navigation container element. ([50968](https://github.com/WordPress/gutenberg/pull/50968))
 - Post Template: Set block context via filter. ([50313](https://github.com/WordPress/gutenberg/pull/50313))
+- Post Template: Output number of columns as classname for backwards compatibility. ([51358](https://github.com/WordPress/gutenberg/pull/51358))
+- Post Title: Fix autofocus when iframed. ([51331](https://github.com/WordPress/gutenberg/pull/51331), [51367](https://github.com/WordPress/gutenberg/pull/51367))
+- Query: Fix deprecation error when migrating layout. ([51311](https://github.com/WordPress/gutenberg/pull/51311))
 - Term Description: Handle default margin styles. ([51137](https://github.com/WordPress/gutenberg/pull/51137))
 
 #### Global Styles
 - DimensionsPanel: Fix site editor error on Columns block level screen. ([51252](https://github.com/WordPress/gutenberg/pull/51252))
 - Fluid typography: Ensure max viewport width is used in the editor. ([51146](https://github.com/WordPress/gutenberg/pull/51146))
+- Global styles revisions: Ensure redirect runs once for back button. ([51316](https://github.com/WordPress/gutenberg/pull/51316))
 - SpacingSizesControl: Fix problem with the slider position being reset when saving global styles. ([50956](https://github.com/WordPress/gutenberg/pull/50956))
 - Styles Screen: Ensure variations previews will render in mobile viewports. ([51080](https://github.com/WordPress/gutenberg/pull/51080))
 
@@ -151,6 +118,7 @@ The following contributors merged PRs in this release:
 
 #### Accessibility
 - Add aria labels to the focal point picker component. ([50993](https://github.com/WordPress/gutenberg/pull/50993))
+- Block Toolbar: Fix text only label for locked blocks. ([50944](https://github.com/WordPress/gutenberg/pull/50944))
 - Fix Navigable Toolbar initialIndex. ([51181](https://github.com/WordPress/gutenberg/pull/51181))
 - Fix screen readers not announcing updated `aria-describedby` in Firefox. ([51035](https://github.com/WordPress/gutenberg/pull/51035))
 - Link Control: Fix the 'Save' button's disabled state. ([51117](https://github.com/WordPress/gutenberg/pull/51117))
@@ -213,6 +181,7 @@ The following contributors merged PRs in this release:
 - Remove legacy logic for `__unstableResolvedAssets`. ([51100](https://github.com/WordPress/gutenberg/pull/51100))
 - Remove outdated Babel spread optimization from selectors. ([50987](https://github.com/WordPress/gutenberg/pull/50987))
 - Remove the insert.ref field from insertUsage data. ([51130](https://github.com/WordPress/gutenberg/pull/51130))
+- Rename 'page content lock' to 'page content focus'. ([51280](https://github.com/WordPress/gutenberg/pull/51280))
 - Separate template screens in the Site Editor. ([51040](https://github.com/WordPress/gutenberg/pull/51040))
 - Writing flow: Fix tab into iframe. ([50955](https://github.com/WordPress/gutenberg/pull/50955))
 

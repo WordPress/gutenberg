@@ -181,12 +181,6 @@ function LinkControl( {
 			isMounting.current = false;
 			return;
 		}
-		// Unless we are mounting, we always want to focus either:
-		// - the URL input
-		// - the first focusable element in the Link UI.
-		// But in editing mode if there is a text input present then
-		// the URL input is at index 1. If not then it is at index 0.
-		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
 		// Scenario - when:
 		// - switching between editable and non editable LinkControl
@@ -194,9 +188,8 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[
-				whichFocusTargetIndex
-			] || wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			wrapperNode.current;
 
 		nextFocusTarget.focus();
 
