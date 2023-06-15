@@ -54,7 +54,7 @@ const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.3;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -161,7 +161,7 @@ export default function Layout() {
 								duration: disableMotion
 									? 0
 									: ANIMATION_DURATION,
-								ease: 'easeOut',
+								ease: 'easeInOut',
 							} }
 						>
 							{ isEditing && <Header /> }
@@ -185,7 +185,7 @@ export default function Layout() {
 								transition={ {
 									type: 'tween',
 									duration: ANIMATION_DURATION,
-									ease: 'easeOut',
+									ease: 'easeInOut',
 								} }
 								className="edit-site-layout__sidebar"
 							>
@@ -226,7 +226,7 @@ export default function Layout() {
 																	isResizing
 																		? 0
 																		: 0.5,
-																ease: 'easeOut',
+																ease: 'easeInOut',
 															},
 													  }
 													: {}
@@ -240,7 +240,7 @@ export default function Layout() {
 													disableMotion || isResizing
 														? 0
 														: ANIMATION_DURATION,
-												ease: 'easeOut',
+												ease: 'easeInOut',
 											} }
 										>
 											<ErrorBoundary>

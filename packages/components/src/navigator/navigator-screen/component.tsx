@@ -35,8 +35,8 @@ import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
 
 const animationEnterDelay = 0;
-const animationEnterDuration = 0.14;
-const animationExitDuration = 0.14;
+const animationEnterDuration = 0.3;
+const animationExitDuration = 0.3;
 const animationExitDelay = 0;
 
 // Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
