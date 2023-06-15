@@ -513,7 +513,7 @@ In addition to styles at the individual block level and in global styles, there 
 
 The layout block support is an experimental approach for outputting common layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
 
-While the feature is part of WordPress core, it is still flagged as experimental in the sense that the features and output are still undergoing active development. It is therefore not yet a stable feature from the perspective of 3rd party blocks, as the API is likely to change. The feature is enabled in core blocks via the `__experimentalLayout` setting under `supports` in a block's `block.json` file.
+While the feature is part of WordPress core, it is still flagged as experimental in the sense that the features and output are still undergoing active development. It is therefore not yet a stable feature from the perspective of 3rd party blocks, as the API is likely to change. The feature is enabled in core blocks via the `layout` setting under `supports` in a block's `block.json` file.
 
 There are two primary places where Layout styles are output:
 

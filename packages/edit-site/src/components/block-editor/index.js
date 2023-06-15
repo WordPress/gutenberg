@@ -213,7 +213,7 @@ export default function BlockEditor() {
 									{ resizeObserver }
 									<BlockList
 										className="edit-site-block-editor__block-list wp-site-blocks"
-										__experimentalLayout={ LAYOUT }
+										layout={ LAYOUT }
 										renderAppender={ showBlockAppender }
 									/>
 								</EditorCanvas>

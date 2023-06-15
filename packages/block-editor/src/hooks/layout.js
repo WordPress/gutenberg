@@ -32,7 +32,14 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 
-const layoutBlockSupportKey = '__experimentalLayout';
+const layoutBlockSupportKey = 'layout';
+
+function hasLayoutBlockSupport( blockName ) {
+	return (
+		hasBlockSupport( blockName, 'layout' ) ||
+		hasBlockSupport( blockName, '__experimentalLayout' )
+	);
+}
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -295,7 +302,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+	if ( hasLayoutBlockSupport( settings ) ) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -317,10 +324,7 @@ export function addAttribute( settings ) {
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+		const supportLayout = hasLayoutBlockSupport( blockName );
 
 		const blockEditingMode = useBlockEditingMode();
 		return [
@@ -343,16 +347,13 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const hasLayoutBlockSupport = hasBlockSupport(
-			name,
-			layoutBlockSupportKey
-		);
+		const blockSupportsLayout = hasLayoutBlockSupport( name );
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return !! getSettings().disableLayoutStyles;
 		} );
 		const shouldRenderLayoutStyles =
-			hasLayoutBlockSupport && ! disableLayoutStyles;
+			blockSupportsLayout && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
@@ -362,7 +363,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layout?.inherit || layout?.contentSize || layout?.wideSize
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
-		const layoutClasses = hasLayoutBlockSupport
+		const layoutClasses = blockSupportsLayout
 			? useLayoutClasses( attributes, name )
 			: null;
 		// Higher specificity to override defaults from theme.json.

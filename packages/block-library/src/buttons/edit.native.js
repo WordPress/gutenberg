@@ -45,7 +45,7 @@ export default function ButtonsEdit( {
 	const { marginLeft: spacing } = styles.spacing;
 
 	// Extract attributes from block layout
-	const layoutBlockSupport = getBlockSupport( name, '__experimentalLayout' );
+	const layoutBlockSupport = getBlockSupport( name, 'layout' );
 	const defaultBlockLayout = layoutBlockSupport?.default;
 	const usedLayout = layout || defaultBlockLayout || {};
 	const { justifyContent } = usedLayout;
@@ -168,7 +168,7 @@ export default function ButtonsEdit( {
 				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
-				__experimentalLayout={ layoutProp }
+				layout={ layoutProp }
 				templateInsertUpdatesSelection
 				blockWidth={ blockWidth }
 			/>
