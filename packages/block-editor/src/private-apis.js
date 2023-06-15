@@ -16,7 +16,8 @@ import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import { useLayoutClasses, useLayoutStyles } from './hooks';
-import { ImageSizeControl } from './components/image-size-control';
+import DimensionsTool from './components/dimensions-tool';
+import ResolutionTool from './components/resolution-tool';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -38,5 +39,6 @@ lock( privateApis, {
 	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
-	ImageSizeControl,
+	DimensionsTool,
+	ResolutionTool,
 } );

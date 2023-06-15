@@ -10,33 +10,39 @@ import {
 /**
  * Internal dependencies
  */
-import ScaleItem from '../scale';
+import DimensionsTool from '..';
 
 export default {
-	title: 'BlockEditor (Experimental)/ImageDimensionsControls/ScaleItem',
-	component: ScaleItem,
+	title: 'BlockEditor (Private APIs)/DimensionsControls',
+	component: DimensionsTool,
 	argTypes: {
 		panelId: { control: { type: null } },
 		onChange: { action: 'changed' },
 	},
 };
 
+const EMPTY_OBJECT = {};
+
 export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
-	const [ scale, setScale ] = useState( undefined );
+	const [ value, setValue ] = useState( EMPTY_OBJECT );
 	const resetAll = () => {
-		setScale( undefined );
-		onChangeProp( undefined );
+		setValue( EMPTY_OBJECT );
+		onChangeProp( EMPTY_OBJECT );
 	};
 	return (
 		<Panel>
-			<ToolsPanel panelId={ panelId } resetAll={ resetAll }>
-				<ScaleItem
+			<ToolsPanel
+				label="Dimensions"
+				panelId={ panelId }
+				resetAll={ resetAll }
+			>
+				<DimensionsTool
 					panelId={ panelId }
-					onChange={ ( newValue ) => {
-						setScale( newValue );
-						onChangeProp( newValue );
+					onChange={ ( nextValue ) => {
+						setValue( nextValue );
+						onChangeProp( nextValue );
 					} }
-					value={ scale }
+					value={ value }
 					{ ...props }
 				/>
 			</ToolsPanel>

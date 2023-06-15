@@ -77,74 +77,76 @@ export default function AspectRatioItem( {
 	const [ selectValue, setSelectValue ] = useState(
 		options.every( ( option ) => value !== option.value ) ? 'custom' : value
 	);
-	const [ widthValue, setWidthValue ] = useState( width ?? '' );
-	const [ heightValue, setHeightValue ] = useState( height ?? '' );
+	const [ widthValue, setWidthValue ] = useState( width );
+	const [ heightValue, setHeightValue ] = useState( height );
 
 	return (
-		<ToolsPanelItem
-			hasValue={ () => value != null && value !== defaultValue }
-			label={ __( 'Aspect ratio' ) }
-			onDeselect={ () => onChange( defaultValue ) }
-			isShownByDefault={ true }
-			panelId={ panelId }
-		>
-			<SelectControl
-				__nextHasNoMarginBottom
+		<>
+			<ToolsPanelItem
+				hasValue={ () => value != null && value !== defaultValue }
 				label={ __( 'Aspect ratio' ) }
-				value={ selectValue }
-				options={ options }
-				onChange={ ( nextValue ) => {
-					setSelectValue( nextValue );
-					if ( nextValue === 'custom' ) {
-						return;
-					}
-					const parsedNextValue =
-						parseAspectRatioCSSValue( nextValue );
-					setWidthValue( parsedNextValue.width );
-					setHeightValue( parsedNextValue.height );
-					onChange( nextValue );
-				} }
-			/>
-			<NumberControl
+				onDeselect={ () => onChange( defaultValue ) }
+				isShownByDefault={ true }
+				panelId={ panelId }
+			>
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Aspect ratio' ) }
+					value={ selectValue }
+					options={ options }
+					onChange={ ( nextValue ) => {
+						setSelectValue( nextValue );
+						if ( nextValue === 'custom' ) {
+							return;
+						}
+						onChange( nextValue );
+					} }
+				/>
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				hasValue={ () => !! width }
 				label={ __( 'Width' ) }
-				placeholder={ __( 'Auto' ) }
-				value={ widthValue }
-				min={ Number.MIN_VALUE }
-				step="any"
-				spinControls="none"
-				onChange={ ( nextWidth ) => {
-					setWidthValue( nextWidth );
-					if ( nextWidth === '' && heightValue === '' ) {
-						setSelectValue( 'auto' );
-						onChange( 'auto' );
-					} else if ( nextWidth !== '' ) {
-						setSelectValue( 'custom' );
-						onChange(
-							formatAspectRatioCSSValue( nextWidth, heightValue )
-						);
+				onDeselect={ () => onChange( { width: undefined } ) }
+				resetAllFilter={ () => ( {
+					width: undefined,
+				} ) }
+				isShownByDefault={ true }
+				panelId={ panelId }
+			>
+				<UnitControl
+					label={ __( 'Width' ) }
+					placeholder={ __( 'Auto' ) }
+					labelPosition="top"
+					value={ width }
+					min={ 0 }
+					onChange={ ( nextWidth ) =>
+						onChange( { width: nextWidth } )
 					}
-				} }
-			/>
-			<NumberControl
+					units={ units }
+				/>
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				hasValue={ () => height != null }
 				label={ __( 'Height' ) }
-				placeholder={ __( 'Auto' ) }
-				value={ heightValue }
-				min={ Number.MIN_VALUE }
-				step="any"
-				spinControls="none"
-				onChange={ ( nextHeight ) => {
-					setHeightValue( nextHeight );
-					if ( nextHeight === '' && widthValue === '' ) {
-						setSelectValue( 'auto' );
-						onChange( 'auto' );
-					} else if ( nextHeight !== '' ) {
-						setSelectValue( 'custom' );
-						onChange(
-							formatAspectRatioCSSValue( widthValue, nextHeight )
-						);
+				onDeselect={ () => onChange( { height: undefined } ) }
+				resetAllFilter={ () => ( {
+					height: undefined,
+				} ) }
+				isShownByDefault={ true }
+				panelId={ panelId }
+			>
+				<UnitControl
+					label={ __( 'Height' ) }
+					placeholder={ __( 'Auto' ) }
+					labelPosition="top"
+					value={ height }
+					min={ 0 }
+					onChange={ ( nextHeight ) =>
+						onChange( { height: nextHeight } )
 					}
-				} }
-			/>
-		</ToolsPanelItem>
+					units={ units }
+				/>
+			</ToolsPanelItem>
+		</>
 	);
 }
