@@ -124,6 +124,7 @@ function wordpressDockerFileContents( env, config ) {
 # Update apt sources for archived versions of Debian.
 
 # stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
+RUN touch /etc/apt/sources.list
 RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
@@ -167,7 +168,7 @@ RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 )
 
 # Install any dependencies we need in the container.
 ${ installDependencies( 'cli', env, config ) }
-	
+
 # Switch back to the original user now that we're done.
 USER www-data
 
