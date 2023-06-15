@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -20,7 +22,7 @@ export default function TemplatePartNavigationMenuListItem( { id } ) {
 
 	return (
 		<SidebarNavigationItem withChevron { ...linkInfo }>
-			{ title }
+			{ title || __( '(no title)' ) }
 		</SidebarNavigationItem>
 	);
 }
