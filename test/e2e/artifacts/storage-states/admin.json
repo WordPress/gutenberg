@@ -1,0 +1,66 @@
+{
+	"cookies": [
+		{
+			"name": "wordpress_test_cookie",
+			"value": "WP%20Cookie%20check",
+			"domain": "localhost",
+			"path": "/",
+			"expires": -1,
+			"httpOnly": false,
+			"secure": false,
+			"sameSite": "Lax"
+		},
+		{
+			"name": "wordpress_23778236db82f19306f247e20a353a99",
+			"value": "admin%7C1686989474%7CmDwG41XiZA5ltMFqumFL8Cw8snC3ZgXHJVcG5allIun%7Cc559eec3a86365e1afff86e94cc6eee554c8cd4d14e07eb4302c8c51b6c5ffbf",
+			"domain": "localhost",
+			"path": "/wp-content/plugins",
+			"expires": -1,
+			"httpOnly": true,
+			"secure": false,
+			"sameSite": "Lax"
+		},
+		{
+			"name": "wordpress_23778236db82f19306f247e20a353a99",
+			"value": "admin%7C1686989474%7CmDwG41XiZA5ltMFqumFL8Cw8snC3ZgXHJVcG5allIun%7Cc559eec3a86365e1afff86e94cc6eee554c8cd4d14e07eb4302c8c51b6c5ffbf",
+			"domain": "localhost",
+			"path": "/wp-admin",
+			"expires": -1,
+			"httpOnly": true,
+			"secure": false,
+			"sameSite": "Lax"
+		},
+		{
+			"name": "wordpress_logged_in_23778236db82f19306f247e20a353a99",
+			"value": "admin%7C1686989474%7CmDwG41XiZA5ltMFqumFL8Cw8snC3ZgXHJVcG5allIun%7C3653900b249bf390642f17d5c8a8678992e899a4a0c9b286b0aacef422be65a3",
+			"domain": "localhost",
+			"path": "/",
+			"expires": -1,
+			"httpOnly": true,
+			"secure": false,
+			"sameSite": "Lax"
+		},
+		{
+			"name": "wp-settings-1",
+			"value": "libraryContent%3Dupload",
+			"domain": "localhost",
+			"path": "/",
+			"expires": 1718352675.047,
+			"httpOnly": false,
+			"secure": false,
+			"sameSite": "Lax"
+		},
+		{
+			"name": "wp-settings-time-1",
+			"value": "1686816674",
+			"domain": "localhost",
+			"path": "/",
+			"expires": 1718352675.047,
+			"httpOnly": false,
+			"secure": false,
+			"sameSite": "Lax"
+		}
+	],
+	"nonce": "124f04d125",
+	"rootURL": "http://localhost:8889/index.php?rest_route=/"
+}
