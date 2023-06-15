@@ -13,11 +13,7 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	positionSticky as positionStickyIcon,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pin } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -157,28 +153,11 @@ function ListViewBlockSelectButton(
 				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				{ positionLabel ? (
-					<Tooltip text={ positionLabel }>
-						<div className="block-editor-list-view-block-select-button__icon-wrapper">
-							<BlockIcon
-								icon={ blockInformation?.icon }
-								showColors
-								context="list-view"
-							/>
-							{ isSticky && (
-								<div className="block-editor-list-view-block-select-button__sticky-indicator">
-									<Icon icon={ positionStickyIcon } />
-								</div>
-							) }
-						</div>
-					</Tooltip>
-				) : (
-					<BlockIcon
-						icon={ blockInformation?.icon }
-						showColors
-						context="list-view"
-					/>
-				) }
+				<BlockIcon
+					icon={ blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
 				<HStack
 					alignment="center"
 					className="block-editor-list-view-block-select-button__label-wrapper"
@@ -197,6 +176,13 @@ function ListViewBlockSelectButton(
 								{ blockInformation.anchor }
 							</Truncate>
 						</span>
+					) }
+					{ positionLabel && isSticky && (
+						<Tooltip text={ positionLabel }>
+							<span className="block-editor-list-view-block-select-button__sticky">
+								<Icon icon={ pin } />
+							</span>
+						</Tooltip>
 					) }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">

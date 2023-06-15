@@ -299,23 +299,6 @@
 		}
 	}
 
-	.block-editor-list-view-block-select-button__icon-wrapper {
-		position: relative;
-	}
-
-	.block-editor-list-view-block-select-button__sticky-indicator {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 24px;
-		height: 24px;
-		color: $gray-400;
-	}
-
-	&.is-selected .block-editor-list-view-block-select-button__sticky-indicator {
-		color: $white;
-	}
-
 	.block-editor-list-view-block-select-button__label-wrapper {
 		min-width: 120px;
 	}
@@ -352,7 +335,8 @@
 		background: rgba($black, 0.3);
 	}
 
-	.block-editor-list-view-block-select-button__lock {
+	.block-editor-list-view-block-select-button__lock,
+	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
 }
