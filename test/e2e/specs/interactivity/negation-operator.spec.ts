@@ -16,6 +16,7 @@ test.describe( 'negation-operator', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'add hidden attribute when !state.active', async ( { page } ) => {

@@ -16,6 +16,7 @@ test.describe( 'data-wp-effect', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'check that effect runs when it is added', async ( { page } ) => {

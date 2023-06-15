@@ -16,6 +16,7 @@ test.describe( 'data-wp-class', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'remove class if callback returns falsy value', async ( {

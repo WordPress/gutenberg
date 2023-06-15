@@ -16,6 +16,7 @@ test.describe( 'Directives (w/ priority)', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'should run in priority order', async ( { page } ) => {
