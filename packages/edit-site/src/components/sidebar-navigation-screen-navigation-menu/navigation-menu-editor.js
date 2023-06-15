@@ -6,16 +6,17 @@ import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
-import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
 
 const { useHistory } = unlock( routerPrivateApis );
 

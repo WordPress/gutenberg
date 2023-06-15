@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
