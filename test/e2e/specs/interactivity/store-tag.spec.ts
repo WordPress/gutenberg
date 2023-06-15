@@ -28,7 +28,7 @@ test.describe( 'store tag', () => {
 		page,
 	} ) => {
 		const block = 'test/store-tag {"condition":"ok"}';
-		await page.goto( `/?p=${ utils.posts.get( block ) }` );
+		await page.goto( utils.getLink( block ) );
 
 		const value = page.getByTestId( 'counter value' );
 		const double = page.getByTestId( 'counter double' );
@@ -50,7 +50,7 @@ test.describe( 'store tag', () => {
 		page,
 	} ) => {
 		const block = 'test/store-tag {"condition":"missing"}';
-		await page.goto( `/?p=${ utils.posts.get( block ) }` );
+		await page.goto( utils.getLink( block ) );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );
@@ -63,7 +63,7 @@ test.describe( 'store tag', () => {
 		page,
 	} ) => {
 		const block = 'test/store-tag {"condition":"corrupted-json"}';
-		await page.goto( `/?p=${ utils.posts.get( block ) }` );
+		await page.goto( utils.getLink( block ) );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );
@@ -76,7 +76,7 @@ test.describe( 'store tag', () => {
 		page,
 	} ) => {
 		const block = 'test/store-tag {"condition":"invalid-state"}';
-		await page.goto( `/?p=${ utils.posts.get( block ) }` );
+		await page.goto( utils.getLink( block ) );
 
 		const clicks = page.getByTestId( 'counter clicks' );
 		await expect( clicks ).toHaveText( '0' );

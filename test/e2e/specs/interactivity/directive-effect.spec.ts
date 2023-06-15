@@ -10,8 +10,7 @@ test.describe( 'data-wp-effect', () => {
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/directive-effect' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/directive-effect' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

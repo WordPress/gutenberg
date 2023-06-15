@@ -9,8 +9,7 @@ test.describe( 'toVdom - islands', () => {
 		await utils.addPostWithBlock( 'test/tovdom-islands' );
 	} );
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/tovdom-islands' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/tovdom-islands' ) );
 	} );
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();

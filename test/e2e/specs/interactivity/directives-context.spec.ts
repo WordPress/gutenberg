@@ -17,8 +17,7 @@ test.describe( 'data-wp-context', () => {
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/directive-context' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/directive-context' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

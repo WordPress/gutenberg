@@ -10,8 +10,7 @@ test.describe( 'Directives (w/ priority)', () => {
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/directive-priorities' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/directive-priorities' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

@@ -10,8 +10,7 @@ test.describe( 'data-wp-bind', () => {
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/directive-bind' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/directive-bind' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

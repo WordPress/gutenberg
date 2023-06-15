@@ -10,8 +10,7 @@ test.describe( 'negation-operator', () => {
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		const postId = utils.posts.get( 'test/negation-operator' );
-		await page.goto( `/?p=${ postId }` );
+		await page.goto( utils.getLink( 'test/negation-operator' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

@@ -4,12 +4,20 @@
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 export default class InteractivityUtils {
-	posts: Map< string, number >;
+	links: Map< string, string >;
 	requestUtils: RequestUtils;
 
 	constructor( { requestUtils }: { requestUtils: RequestUtils } ) {
-		this.posts = new Map();
+		this.links = new Map();
 		this.requestUtils = requestUtils;
+	}
+
+	getLink( blockName: string ) {
+		const link = this.links.get( blockName );
+		if ( ! link ) {
+			throw Error( `No link found for post with block ${ blockName }` );
+		}
+		return link;
 	}
 
 	async addPostWithBlock( blockName: string ) {
@@ -19,13 +27,13 @@ export default class InteractivityUtils {
 			date_gmt: '2023-01-01T00:00:00',
 		};
 
-		const { id } = await this.requestUtils.createPost( payload );
-		this.posts.set( blockName, id );
+		const { link } = await this.requestUtils.createPost( payload );
+		this.links.set( blockName, link );
 	}
 
 	async deleteAllPosts() {
 		await this.requestUtils.deleteAllPosts();
-		this.posts.clear();
+		this.links.clear();
 	}
 
 	async activatePlugins() {
