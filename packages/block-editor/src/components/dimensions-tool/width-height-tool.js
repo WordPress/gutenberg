@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,62 +13,64 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
-const DEFAULT_UNITS = [ 'px', '%', 'vw', 'em', 'rem' ];
+const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
+	grid-column: span 1;
+`;
 
-export default function DimensionsItem( {
+export default function WidthHeightTool( {
 	panelId,
-	value: { width, height },
+	value,
 	onChange,
-	availableUnits = DEFAULT_UNITS,
+	units,
+	isShownByDefault = true,
 } ) {
-	const units = useCustomUnits( { availableUnits } );
+	const onDimensionChange = ( dimension ) => ( nextDimension ) => {
+		const nextValue = Object.assign( {}, value );
+		// Empty strings or undefined may be passed and both represent removing the value.
+		if ( ! nextDimension ) {
+			delete nextValue[ dimension ];
+		} else {
+			nextValue[ dimension ] = nextDimension;
+		}
+		onChange( nextValue );
+	};
 
 	return (
 		<>
-			<ToolsPanelItem
-				hasValue={ () => height != null }
-				label={ __( 'Height' ) }
-				onDeselect={ () => onChange( { height: undefined } ) }
-				resetAllFilter={ () => ( {
-					height: undefined,
-				} ) }
-				isShownByDefault={ true }
-				panelId={ panelId }
-			>
-				<UnitControl
-					label={ __( 'Height' ) }
-					placeholder={ __( 'Auto' ) }
-					labelPosition="top"
-					value={ height }
-					min={ 0 }
-					onChange={ ( nextHeight ) =>
-						onChange( { height: nextHeight } )
-					}
-					units={ units }
-				/>
-			</ToolsPanelItem>
-			<ToolsPanelItem
-				hasValue={ () => !! width }
+			<SingleColumnToolsPanelItem
 				label={ __( 'Width' ) }
-				onDeselect={ () => onChange( { width: undefined } ) }
-				resetAllFilter={ () => ( {
-					width: undefined,
-				} ) }
-				isShownByDefault={ true }
+				isShownByDefault={ isShownByDefault }
+				hasValue={ () => value.width != null }
+				onDeselect={ onDimensionChange( 'width' ) }
 				panelId={ panelId }
 			>
 				<UnitControl
 					label={ __( 'Width' ) }
 					placeholder={ __( 'Auto' ) }
 					labelPosition="top"
-					value={ width }
-					min={ 0 }
-					onChange={ ( nextWidth ) =>
-						onChange( { width: nextWidth } )
-					}
 					units={ units }
+					min={ 0 }
+					value={ value.width }
+					onChange={ onDimensionChange( 'width' ) }
 				/>
-			</ToolsPanelItem>
+			</SingleColumnToolsPanelItem>
+			<SingleColumnToolsPanelItem
+				label={ __( 'Height' ) }
+				isShownByDefault={ isShownByDefault }
+				hasValue={ () => value.height != null }
+				onDeselect={ onDimensionChange( 'height' ) }
+				panelId={ panelId }
+			>
+				<UnitControl
+					label={ __( 'Height' ) }
+					placeholder={ __( 'Auto' ) }
+					labelPosition="top"
+					units={ units }
+					min={ 0 }
+					value={ value.height }
+					onChange={ onDimensionChange( 'height' ) }
+				/>
+			</SingleColumnToolsPanelItem>
 		</>
 	);
 }
