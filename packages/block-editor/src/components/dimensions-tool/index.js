@@ -126,9 +126,7 @@ function DimensionsControls( {
 				defaultValue="cover"
 				value={ value.scale }
 				onChange={ ( nextScale ) => {
-					const nextValue = Object.assign( {}, value );
-					nextValue.scale = nextScale;
-					onChange( nextValue );
+					onChange( { ...value, scale: nextScale } );
 				} }
 				showControl={ showScaleControl }
 			/>
