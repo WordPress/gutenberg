@@ -15,9 +15,17 @@ export default class InteractivityUtils {
 	getLink( blockName: string ) {
 		const link = this.links.get( blockName );
 		if ( ! link ) {
-			throw Error( `No link found for post with block ${ blockName }` );
+			throw new Error(
+				`No link found for post with block '${ blockName }'`
+			);
 		}
-		return link;
+
+		// Add an extra param to disable directives SSR. This is required at
+		// this moment, as SSR for directives is not stabilized yet and we need
+		// to ensure hydration works, even when the SSR'ed HTML is not correct.
+		const url = new URL( link );
+		url.searchParams.append( 'disable_directives_ssr', 'true' );
+		return url.href;
 	}
 
 	async addPostWithBlock( blockName: string ) {
