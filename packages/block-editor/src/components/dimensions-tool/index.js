@@ -79,21 +79,21 @@ const DEFAULT_SCALE_OPTIONS = [
 		value: 'cover',
 		label: _x( 'Cover', 'Scale option for dimensions control' ),
 		help: __(
-			'Image is scaled and cropped to fill the entire space without being distorted.'
+			'Content is scaled and cropped to fill the entire space without being distorted.'
 		),
 	},
 	{
 		value: 'contain',
 		label: _x( 'Contain', 'Scale option for dimensions control' ),
 		help: __(
-			'Image is scaled to fill the space without clipping nor distorting.'
+			'Content is scaled to fill the space without clipping nor distorting.'
 		),
 	},
 	{
 		value: 'fill',
 		label: _x( 'Fill', 'Scale option for dimensions control' ),
 		help: __(
-			'Image will be stretched and distorted to completely fill the space.'
+			'Content will be stretched and distorted to completely fill the space.'
 		),
 	},
 ];
