@@ -49,8 +49,8 @@ const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
  */
 export default function WidthHeightTool( {
 	panelId,
-	value,
-	onChange,
+	value = {},
+	onChange = () => {},
 	units,
 	isShownByDefault = true,
 } ) {
