@@ -51,8 +51,8 @@ import WidthHeightTool from './width-height-tool';
  */
 function DimensionsControls( {
 	panelId,
-	value,
-	onChange,
+	value = {},
+	onChange = () => {},
 	aspectRatioOptions,
 	scaleOptions,
 	unitsOptions,
