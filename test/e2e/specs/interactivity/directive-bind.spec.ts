@@ -16,6 +16,7 @@ test.describe( 'data-wp-bind', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'add missing href at hydration', async ( { page } ) => {

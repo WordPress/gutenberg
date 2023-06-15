@@ -20,6 +20,7 @@ test.describe( 'store tag', () => {
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'hydrates when it is well defined', async ( {

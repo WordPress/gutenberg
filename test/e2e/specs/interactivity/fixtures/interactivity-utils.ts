@@ -23,6 +23,11 @@ export default class InteractivityUtils {
 		this.posts.set( blockName, id );
 	}
 
+	async deleteAllPosts() {
+		await this.requestUtils.deleteAllPosts();
+		this.posts.clear();
+	}
+
 	async activatePlugins() {
 		await this.requestUtils.activateTheme( 'emptytheme' );
 		await this.requestUtils.activatePlugin(
