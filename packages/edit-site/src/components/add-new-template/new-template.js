@@ -12,12 +12,30 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Icon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { plus } from '@wordpress/icons';
+import {
+	archive,
+	blockMeta,
+	category,
+	home,
+	layout,
+	list,
+	media,
+	notFound,
+	page,
+	plus,
+	post,
+	postAuthor,
+	postDate,
+	postList,
+	search,
+	tag,
+} from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -56,7 +74,24 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'404',
 ];
 
-function TemplateListItem( { title, description, onClick } ) {
+const TEMPLATE_ICONS = {
+	'front-page': home,
+	home: postList,
+	single: post,
+	page,
+	archive,
+	search,
+	404: notFound,
+	index: list,
+	category,
+	author: postAuthor,
+	taxonomy: blockMeta,
+	date: postDate,
+	tag,
+	attachment: media,
+};
+
+function TemplateListItem( { title, description, icon, onClick } ) {
 	return (
 		<Button onClick={ onClick }>
 			<VStack
@@ -65,6 +100,7 @@ function TemplateListItem( { title, description, onClick } ) {
 				justify="flex-start"
 				style={ { width: '100%' } }
 			>
+				<Icon icon={ icon } />
 				<Text
 					weight={ 500 }
 					lineHeight={ 1.53846153846 } // 20px
@@ -228,6 +264,7 @@ export default function NewTemplate( {
 										key={ slug }
 										title={ title }
 										description={ description }
+										icon={ TEMPLATE_ICONS[ slug ] || post }
 										onClick={ () =>
 											onClick
 												? onClick( template )
@@ -241,6 +278,7 @@ export default function NewTemplate( {
 								description={ __(
 									'A custom template can be manually applied to any post or page.'
 								) }
+								icon={ layout }
 								onClick={ () =>
 									setModalContent(
 										modalContentMap.customGenericTemplate
