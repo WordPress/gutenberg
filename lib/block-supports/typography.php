@@ -381,12 +381,18 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 			'coerce_to' => $font_size_unit,
 		)
 	);
+
 	$minimum_viewport_width = gutenberg_get_typography_value_and_unit(
 		$minimum_viewport_width_raw,
 		array(
 			'coerce_to' => $font_size_unit,
 		)
 	);
+
+	// Protects against unsupported units in min and max viewport widths.
+	if ( ! $minimum_viewport_width || ! $maximum_viewport_width ) {
+		return null;
+	}
 
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
