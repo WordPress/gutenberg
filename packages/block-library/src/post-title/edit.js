@@ -120,7 +120,7 @@ export default function PostTitleEdit( {
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<HeadingLevelDropdown
-						selectedLevel={ level }
+						value={ level }
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}

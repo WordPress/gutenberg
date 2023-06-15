@@ -94,8 +94,8 @@ export default function SiteTitleEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					levels={ HEADING_LEVELS }
-					selectedLevel={ level }
+					options={ HEADING_LEVELS }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

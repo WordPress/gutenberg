@@ -22,9 +22,9 @@ const POPOVER_PROPS = {
  *
  * @typedef WPHeadingLevelDropdownProps
  *
- * @property {number}                 selectedLevel The chosen heading level.
- * @property {(newValue:number)=>any} onChange      Callback to run when
- *                                                  toolbar value is changed.
+ * @property {number}                 value    The chosen heading level.
+ * @property {(newValue:number)=>any} onChange Callback to run when
+ *                                             toolbar value is changed.
  */
 
 /**
@@ -35,21 +35,18 @@ const POPOVER_PROPS = {
  * @return {WPComponent} The toolbar.
  */
 export default function HeadingLevelDropdown( {
-	levels,
-	selectedLevel,
+	options = HEADING_LEVELS,
+	value,
 	onChange,
 } ) {
-	if ( levels === undefined ) {
-		levels = HEADING_LEVELS;
-	}
 	return (
 		<ToolbarDropdownMenu
 			popoverProps={ POPOVER_PROPS }
-			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+			icon={ <HeadingLevelIcon level={ value } /> }
 			label={ __( 'Change level' ) }
-			controls={ levels.map( ( targetLevel ) => {
+			controls={ options.map( ( targetLevel ) => {
 				{
-					const isActive = targetLevel === selectedLevel;
+					const isActive = targetLevel === value;
 
 					return {
 						icon: (

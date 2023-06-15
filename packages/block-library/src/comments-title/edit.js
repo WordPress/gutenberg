@@ -94,7 +94,7 @@ export default function Edit( {
 				}
 			/>
 			<HeadingLevelDropdown
-				selectedLevel={ level }
+				value={ level }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}

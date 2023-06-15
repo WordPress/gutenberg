@@ -14,8 +14,8 @@ const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
 const MyHeadingLevelToolbar = () => (
 	<BlockControls group="block">
 		<HeadingLevelDropdown
-			tags={ HEADING_LEVELS }
-			selectedTag={ tag }
+			options={ HEADING_LEVELS }
+			value={ tag }
 			onChange={ ( newTag ) =>
 				setAttributes( { tag: newTag } )
 			}
@@ -26,14 +26,14 @@ const MyHeadingLevelToolbar = () => (
 
 ### Props
 
-#### tags
+#### options
 
 The list of available HTML tags, passed from the block.
 
 -   Type: `Object`
 -   Required: no
 
-#### selectedTag
+#### value
 
 The chosen HTML tag.
 

@@ -21,6 +21,16 @@ import {
  * @property {number} level The heading level to show an icon for.
  */
 
+const LEVEL_TO_PATH = {
+	0: paragraph,
+	1: headingLevel1,
+	2: headingLevel2,
+	3: headingLevel3,
+	4: headingLevel4,
+	5: headingLevel5,
+	6: headingLevel6,
+};
+
 /**
  * Heading level icon.
  *
@@ -29,17 +39,5 @@ import {
  * @return {?WPComponent} The icon.
  */
 export default function HeadingLevelIcon( { level } ) {
-	if ( level === 0 ) return paragraph;
-	const levelToPath = {
-		1: headingLevel1,
-		2: headingLevel2,
-		3: headingLevel3,
-		4: headingLevel4,
-		5: headingLevel5,
-		6: headingLevel6,
-	};
-	if ( ! levelToPath.hasOwnProperty( level ) ) {
-		return null;
-	}
-	return levelToPath[ level ];
+	return LEVEL_TO_PATH[ level ] ?? null;
 }
