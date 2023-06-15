@@ -10,6 +10,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
@@ -25,14 +26,21 @@ const createTemplatePartId = ( theme, slug ) =>
 	theme && slug ? theme + '//' + slug : null;
 
 const templatePartToPattern = ( templatePart ) => ( {
+	blocks: parse( templatePart.content.raw ),
+	categories: [ templatePart.area ],
+	description: templatePart.description || '',
+	keywords: templatePart.keywords || [],
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: templatePart.title.rendered,
-	blocks: parse( templatePart.content.raw ),
 	type: templatePart.type,
 	templatePart,
 } );
 
-const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
+const useTemplatePartsAsPatterns = (
+	categoryId,
+	postType = TEMPLATE_PARTS,
+	filterValue = ''
+) => {
 	const { templateParts, isResolving } = useSelect(
 		( select ) => {
 			if ( postType !== TEMPLATE_PARTS ) {
@@ -45,9 +53,17 @@ const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
 			const { getEntityRecords, isResolving: _isResolving } =
 				select( coreStore );
 			const query = { per_page: -1 };
+			const rawTemplateParts = getEntityRecords(
+				'postType',
+				postType,
+				query
+			);
+			const partsAsPatterns = rawTemplateParts?.map( ( templatePart ) =>
+				templatePartToPattern( templatePart )
+			);
 
 			return {
-				templateParts: getEntityRecords( 'postType', postType, query ),
+				templateParts: partsAsPatterns,
 				isResolving: _isResolving( 'getEntityRecords', [
 					'postType',
 					'wp_template_part',
@@ -63,21 +79,20 @@ const useTemplatePartsAsPatterns = ( area, postType = TEMPLATE_PARTS ) => {
 			return EMPTY_PATTERN_LIST;
 		}
 
-		const partsAsPatterns = [];
-
-		templateParts?.forEach( ( templatePart ) => {
-			if ( ! area || templatePart.area === area ) {
-				partsAsPatterns.push( templatePartToPattern( templatePart ) );
-			}
+		return searchItems( templateParts, filterValue, {
+			categoryId,
+			hasCategory: ( item, area ) => item.templatePart.area === area,
 		} );
-
-		return partsAsPatterns;
-	}, [ templateParts, area ] );
+	}, [ templateParts, filterValue, categoryId ] );
 
 	return { templateParts: filteredTemplateParts, isResolving };
 };
 
-const useBlockPatternsByCategory = ( categoryId, postType = PATTERNS ) => {
+const useBlockPatternsByCategory = (
+	categoryId,
+	postType = PATTERNS,
+	filterValue = ''
+) => {
 	const blockPatterns = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		const settings = getSettings();
@@ -101,6 +116,7 @@ const useBlockPatternsByCategory = ( categoryId, postType = PATTERNS ) => {
 				)
 				.map( ( pattern ) => ( {
 					...pattern,
+					keywords: pattern.keywords || [],
 					type: 'pattern',
 					blocks: parse( pattern.content ),
 				} ) ),
@@ -116,13 +132,18 @@ const useBlockPatternsByCategory = ( categoryId, postType = PATTERNS ) => {
 		categoryId
 	);
 
-	if ( postType !== PATTERNS || ! category ) {
-		return EMPTY_PATTERN_LIST;
-	}
+	const filteredPatterns = useMemo( () => {
+		if ( postType !== PATTERNS || ! category ) {
+			return EMPTY_PATTERN_LIST;
+		}
 
-	return patterns.filter( ( pattern ) =>
-		pattern.categories?.includes( category.slug )
-	);
+		return searchItems( patterns, filterValue, {
+			// Rely on closure to check the category slug, rather than id, is in item categories.
+			hasCategory: ( item ) => item.categories?.includes( category.slug ),
+		} );
+	}, [ patterns, filterValue, category, postType ] );
+
+	return filteredPatterns;
 };
 
 const reusableBlockToPattern = ( reusableBlock ) => ( {
@@ -130,17 +151,22 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 	categories: reusableBlock.wp_pattern,
 	id: reusableBlock.id,
 	name: reusableBlock.slug,
+	syncStatus: reusableBlock.meta?.wp_block?.sync_status,
 	title: reusableBlock.title.raw,
 	type: reusableBlock.type,
 	reusableBlock,
 } );
 
-const useUserPatterns = ( categoryId, categoryType = PATTERNS ) => {
+const useUserPatterns = (
+	categoryId,
+	categoryType = PATTERNS,
+	filterValue = ''
+) => {
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
 	const unfilteredPatterns = useSelect(
 		( select ) => {
 			if ( postType !== USER_PATTERNS ) {
-				return {};
+				return EMPTY_PATTERN_LIST;
 			}
 
 			const { getEntityRecords } = select( coreStore );
@@ -149,61 +175,55 @@ const useUserPatterns = ( categoryId, categoryType = PATTERNS ) => {
 			} );
 
 			if ( ! records ) {
-				return {};
+				return EMPTY_PATTERN_LIST;
 			}
 
-			const patterns = { synced: [], unsynced: [] };
-
-			records.forEach( ( record ) => {
-				const pattern = reusableBlockToPattern( record );
-
-				if ( record.meta?.wp_block?.sync_status === SYNC_TYPES.full ) {
-					patterns.synced.push( pattern );
-				} else {
-					patterns.unsynced.push( pattern );
-				}
-			} );
-
-			return patterns;
+			return records.map( ( record ) =>
+				reusableBlockToPattern( record )
+			);
 		},
 		[ postType ]
 	);
 
-	if ( categoryId === 'uncategorized' ) {
-		return {
-			syncedPatterns: unfilteredPatterns.synced?.filter(
-				( pattern ) => ! pattern.categories?.length
-			),
-			unsyncedPatterns: unfilteredPatterns.unsynced?.filter(
-				( pattern ) => ! pattern.categories?.length
-			),
-		};
-	}
+	const filteredPatterns = useMemo( () => {
+		return searchItems( unfilteredPatterns, filterValue, {
+			categoryId,
+			hasCategory: ( item, currentCategory ) => {
+				return currentCategory === 'uncategorized'
+					? ! item.categories?.length
+					: item.categories?.includes( parseInt( currentCategory ) );
+			},
+		} );
+	}, [ unfilteredPatterns, categoryId, filterValue ] );
 
-	const currentId = parseInt( categoryId );
+	const patterns = { syncedPatterns: [], unsyncedPatterns: [] };
 
-	return {
-		syncedPatterns: unfilteredPatterns.synced?.filter( ( pattern ) =>
-			pattern.categories?.includes( currentId )
-		),
-		unsyncedPatterns: unfilteredPatterns.unsynced?.filter( ( pattern ) =>
-			pattern.categories?.includes( currentId )
-		),
-	};
+	filteredPatterns.forEach( ( pattern ) => {
+		if ( pattern.syncStatus === SYNC_TYPES.full ) {
+			patterns.syncedPatterns.push( pattern );
+		} else {
+			patterns.unsyncedPatterns.push( pattern );
+		}
+	} );
+
+	return patterns;
 };
 
-export const usePatterns = ( categoryType, categoryId ) => {
+export const usePatterns = ( categoryType, categoryId, filterValue ) => {
 	const blockPatterns = useBlockPatternsByCategory(
 		categoryId,
-		categoryType
+		categoryType,
+		filterValue
 	);
 	const { syncedPatterns = [], unsyncedPatterns = [] } = useUserPatterns(
 		categoryId,
-		categoryType
+		categoryType,
+		filterValue
 	);
 	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
 		categoryId,
-		categoryType
+		categoryType,
+		filterValue
 	);
 
 	const patterns = {
