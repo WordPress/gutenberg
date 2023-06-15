@@ -100,7 +100,10 @@ export default function ListViewDropIndicator( {
 
 				const scrollContainerWidth = scrollContainer.clientWidth;
 
-				if ( scrollContainerWidth < width ) {
+				if (
+					scrollContainerWidth <
+					width + distanceBetweenContainerAndTarget
+				) {
 					width =
 						scrollContainerWidth -
 						distanceBetweenContainerAndTarget;
