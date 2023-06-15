@@ -61,7 +61,7 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test( 'Loading', async ( { page } ) => {
+	test( 'Loading', async ( { browser, page } ) => {
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -74,6 +74,8 @@ test.describe( 'Post Editor Performance', () => {
 			page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
+		const draftURL = page.url();
+
 		// Number of sample measurements to take.
 		const samples = 5;
 		// Number of throwaway measurements to perform before recording samples.
@@ -83,8 +85,10 @@ test.describe( 'Post Editor Performance', () => {
 
 		let i = throwaway + samples;
 		while ( i-- ) {
-			await page.reload();
-			await page
+			const testPage = await browser.newPage();
+
+			await testPage.goto( draftURL );
+			await testPage
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
@@ -100,7 +104,7 @@ test.describe( 'Post Editor Performance', () => {
 					loaded,
 					firstContentfulPaint,
 					firstBlock,
-				} = await getLoadingDurations( page );
+				} = await getLoadingDurations( testPage );
 
 				results.serverResponse.push( serverResponse );
 				results.firstPaint.push( firstPaint );
@@ -109,6 +113,8 @@ test.describe( 'Post Editor Performance', () => {
 				results.firstContentfulPaint.push( firstContentfulPaint );
 				results.firstBlock.push( firstBlock );
 			}
+
+			await testPage.close();
 		}
 	} );
 
