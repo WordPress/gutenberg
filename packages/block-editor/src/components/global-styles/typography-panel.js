@@ -62,7 +62,10 @@ function useHasFontFamilyControl( settings ) {
 	const fontFamilies = []
 		.concat( fontFamiliesPerOrigin?.custom ?? [] )
 		.concat( fontFamiliesPerOrigin?.theme ?? [] )
-		.concat( fontFamiliesPerOrigin?.default ?? [] );
+		.concat( fontFamiliesPerOrigin?.default ?? [] )
+		.sort( ( a, b ) =>
+			( a?.name || a?.slug ).localeCompare( b?.name || a?.slug )
+		);
 	return !! fontFamilies?.length;
 }
 
