@@ -37,7 +37,8 @@ function runShellScript( script, cwd, env = {} ) {
 					...env,
 				},
 			},
-			function ( error, _, stderr ) {
+			function ( error, stdout, stderr ) {
+				console.log( stdout );
 				if ( error ) {
 					console.log( stderr );
 					reject( error );
