@@ -192,7 +192,9 @@ const DimensionControls = ( {
 											<div
 												className="aspect-ratio-wrapper-item"
 												style={ {
-													// height: !! aspectRatio && '100%',
+													height:
+														!! aspectRatio &&
+														'100%',
 													transform: `scale(${ options[ aspectRatio ]?.scale })`,
 													aspectRatio,
 													backgroundImage: `url(${ mediaUrl })`,
