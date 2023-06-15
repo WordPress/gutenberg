@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,

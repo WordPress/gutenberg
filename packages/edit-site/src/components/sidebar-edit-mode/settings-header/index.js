@@ -19,8 +19,8 @@ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { store as editSiteStore } from '../../../store';
 
 const SettingsHeader = ( { sidebarName } ) => {
-	const hasPageContentLock = useSelect( ( select ) =>
-		select( editSiteStore ).hasPageContentLock()
+	const hasPageContentFocus = useSelect( ( select ) =>
+		select( editSiteStore ).hasPageContentFocus()
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -30,7 +30,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 
 	let templateAriaLabel;
-	if ( hasPageContentLock ) {
+	if ( hasPageContentFocus ) {
 		templateAriaLabel =
 			sidebarName === SIDEBAR_TEMPLATE
 				? // translators: ARIA label for the Template sidebar tab, selected.
@@ -60,10 +60,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 					) }
 					aria-label={ templateAriaLabel }
 					data-label={
-						hasPageContentLock ? __( 'Page' ) : __( 'Template' )
+						hasPageContentFocus ? __( 'Page' ) : __( 'Template' )
 					}
 				>
-					{ hasPageContentLock ? __( 'Page' ) : __( 'Template' ) }
+					{ hasPageContentFocus ? __( 'Page' ) : __( 'Template' ) }
 				</Button>
 			</li>
 			<li>

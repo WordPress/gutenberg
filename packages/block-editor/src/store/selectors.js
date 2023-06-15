@@ -303,10 +303,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		if ( ! blockName ) {
 			return EMPTY_ARRAY;
 		}
+		const blockNames = Array.isArray( blockName )
+			? blockName
+			: [ blockName ];
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
 			const block = state.blocks.byClientId.get( clientId );
-			return block.name === blockName;
+			return blockNames.includes( block.name );
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
 	},
@@ -536,18 +539,10 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return parents
-			.map( ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) )
-			.filter( ( { name } ) => {
-				if ( Array.isArray( blockName ) ) {
-					return blockName.includes( name );
-				}
-				return name === blockName;
-			} )
-			.map( ( { id } ) => id );
+		const hasName = Array.isArray( blockName )
+			? ( name ) => blockName.includes( name )
+			: ( name ) => blockName === name;
+		return parents.filter( ( id ) => hasName( getBlockName( state, id ) ) );
 	},
 	( state ) => [ state.blocks.parents ]
 );

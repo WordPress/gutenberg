@@ -33,7 +33,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
-		hasPageContentLock,
+		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
@@ -48,7 +48,7 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
-			hasPageContentLock: select( editSiteStore ).hasPageContentLock(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -56,7 +56,7 @@ export function SidebarComplementaryAreaFills() {
 	useEffect( () => {
 		// Don't automatically switch tab when the sidebar is closed or when we
 		// are focused on page content.
-		if ( ! isEditorSidebarOpened || hasPageContentLock ) {
+		if ( ! isEditorSidebarOpened || hasPageContentFocus ) {
 			return;
 		}
 		if ( hasBlockSelection ) {
@@ -64,7 +64,7 @@ export function SidebarComplementaryAreaFills() {
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened, hasPageContentLock ] );
+	}, [ hasBlockSelection, isEditorSidebarOpened, hasPageContentFocus ] );
 
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
@@ -83,7 +83,7 @@ export function SidebarComplementaryAreaFills() {
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<>
-						{ hasPageContentLock ? (
+						{ hasPageContentFocus ? (
 							<PagePanels />
 						) : (
 							<TemplatePanel />

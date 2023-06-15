@@ -208,7 +208,7 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 } ) {
 	const decodeValue = ( rawValue ) => {
-		if ( typeof rawValue === 'object' ) {
+		if ( rawValue && typeof rawValue === 'object' ) {
 			return Object.keys( rawValue ).reduce( ( acc, key ) => {
 				acc[ key ] = getValueFromVariable(
 					{ settings },
