@@ -4,8 +4,18 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-class', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directives-class.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-class' );
+	} );
+
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-class' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
 	} );
 
 	test( 'remove class if callback returns falsy value', async ( {
