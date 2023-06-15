@@ -20,7 +20,7 @@ const config = defineConfig( {
 	forbidOnly: !! process.env.CI,
 	fullyParallel: false,
 	workers: 1,
-	retries: process.env.CI ? 2 : 0,
+	retries: 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
