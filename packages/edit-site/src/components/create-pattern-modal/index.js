@@ -5,12 +5,11 @@ import {
 	TextControl,
 	Button,
 	Modal,
-	SelectControl,
 	ToggleControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -21,30 +20,16 @@ const SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
+const USER_PATTERN_CATEGORY = 'your-patterns';
+
 export default function CreatePatternModal( {
 	closeModal,
 	onCreate,
 	onError,
 } ) {
 	const [ name, setName ] = useState( '' );
-	const [ categoryId, setCategoryId ] = useState( '' );
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
-
-	const { records: categories } = useEntityRecords(
-		'taxonomy',
-		'wp_pattern',
-		{ per_page: -1, hide_empty: false, context: 'view' }
-	);
-
-	const options = ( categories || [] )
-		.map( ( category ) => ( {
-			label: category.name,
-			value: category.id,
-		} ) )
-		.concat( [
-			{ value: '', label: __( 'Select a category' ), disabled: true },
-		] );
 
 	const onSyncChange = () => {
 		setSyncType(
@@ -53,7 +38,7 @@ export default function CreatePatternModal( {
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function createPattern() {
 		if ( ! name ) {
@@ -62,8 +47,6 @@ export default function CreatePatternModal( {
 			} );
 			return;
 		}
-
-		const selectedCategories = categoryId ? [ categoryId ] : undefined;
 
 		try {
 			// TODO: Enforce unique pattern names?
@@ -76,20 +59,11 @@ export default function CreatePatternModal( {
 					content: '',
 					status: 'publish',
 					meta: { wp_block: { sync_status: syncType } },
-					wp_pattern: selectedCategories,
 				},
 				{ throwOnError: true }
 			);
 
-			// Invalidate pattern category taxonomy so nav screen can reflect
-			// up-to-date counts.
-			invalidateResolution( 'getEntityRecords', [
-				'taxonomy',
-				'wp_pattern',
-				{ per_page: -1, hide_empty: false, context: 'view' },
-			] );
-
-			onCreate( { pattern, categoryId } );
+			onCreate( { pattern, categoryId: USER_PATTERN_CATEGORY } );
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
@@ -132,13 +106,6 @@ export default function CreatePatternModal( {
 						required
 						value={ name }
 						__nextHasNoMarginBottom
-					/>
-					<SelectControl
-						label={ __( 'Category' ) }
-						onChange={ setCategoryId }
-						options={ options }
-						size="__unstable-large"
-						value={ categoryId }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
