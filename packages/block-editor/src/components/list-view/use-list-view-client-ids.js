@@ -10,37 +10,26 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const NON_DISABLED_EDITING_MODES = [ 'default', 'contentOnly' ];
+
 export default function useListViewClientIds( { blocks, rootClientId } ) {
 	return useSelect(
 		( select ) => {
 			const {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
-				__unstableGetClientIdsTree,
-				getBlockEditingMode,
+				getClientIdsTreeWithBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
-
-			const removeDisabledBlocks = ( tree ) => {
-				return tree.flatMap( ( { clientId, innerBlocks, ...rest } ) => {
-					if ( getBlockEditingMode( clientId ) === 'disabled' ) {
-						return removeDisabledBlocks( innerBlocks );
-					}
-					return [
-						{
-							clientId,
-							innerBlocks: removeDisabledBlocks( innerBlocks ),
-							...rest,
-						},
-					];
-				} );
-			};
 
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
-				clientIdsTree: removeDisabledBlocks(
-					blocks ?? __unstableGetClientIdsTree( rootClientId )
-				),
+				clientIdsTree:
+					blocks ??
+					getClientIdsTreeWithBlockEditingMode(
+						NON_DISABLED_EDITING_MODES,
+						rootClientId
+					),
 			};
 		},
 		[ blocks, rootClientId ]

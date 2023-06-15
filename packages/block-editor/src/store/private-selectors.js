@@ -135,3 +135,47 @@ export const isBlockSubtreeDisabled = createSelector(
 	},
 	( state ) => [ state.blockEditingModes, state.blocks.parents ]
 );
+
+/**
+ * Returns a tree of block objects with only clientID and innerBlocks set. Only
+ * blocks with the given editing mode are included in the tree.
+ *
+ * @param {Object}                              state        Global application state.
+ * @param {BlockEditingMode|BlockEditingMode[]} mode         The editing mode(s)
+ *                                                           to filter by.
+ * @param {?string}                             rootClientId Optional root
+ *                                                           client ID of block
+ *                                                           list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+export const getClientIdsTreeWithBlockEditingMode = createSelector(
+	( state, mode, rootClientId = '' ) => {
+		const modes = Array.isArray( mode ) ? mode : [ mode ];
+		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
+			if ( modes.includes( getBlockEditingMode( state, clientId ) ) ) {
+				return [
+					{
+						clientId,
+						innerBlocks: getClientIdsTreeWithBlockEditingMode(
+							state,
+							mode,
+							clientId
+						),
+					},
+				];
+			}
+			return getClientIdsTreeWithBlockEditingMode(
+				state,
+				mode,
+				clientId
+			);
+		} );
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blockEditingModes,
+		state.settings.templateLock,
+		state.blockListSettings,
+	]
+);
