@@ -189,6 +189,7 @@ export function BlockSettingsDropdown( {
 			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
 		>
 			{ ( {
+				canCopyStyles,
 				canDuplicate,
 				canInsertDefaultBlock,
 				canMove,
@@ -330,16 +331,18 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 							</MenuGroup>
-							<MenuGroup>
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-									label={ __( 'Copy styles' ) }
-								/>
-								<MenuItem onClick={ onPasteStyles }>
-									{ __( 'Paste styles' ) }
-								</MenuItem>
-							</MenuGroup>
+							{ canCopyStyles && (
+								<MenuGroup>
+									<CopyMenuItem
+										blocks={ blocks }
+										onCopy={ onCopy }
+										label={ __( 'Copy styles' ) }
+									/>
+									<MenuItem onClick={ onPasteStyles }>
+										{ __( 'Paste styles' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
 							<BlockSettingsMenuControls.Slot
 								fillProps={ {
 									onClose,
