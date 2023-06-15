@@ -42,7 +42,6 @@ export default function ResolutionTool( {
 			panelId={ panelId }
 		>
 			<SelectControl
-				__nextHasNoMarginBottom
 				label={ __( 'Resolution' ) }
 				value={ value ?? defaultValue }
 				options={ options }
