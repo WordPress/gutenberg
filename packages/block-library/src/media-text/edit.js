@@ -413,6 +413,7 @@ function MediaTextEdit( {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						useFeaturedImage,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

@@ -56,7 +56,13 @@ const ResizableBoxContainer = forwardRef(
 	}
 );
 
-function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
+function ToolbarEditButton( {
+	mediaId,
+	mediaUrl,
+	onSelectMedia,
+	toggleUseFeaturedImage,
+	useFeaturedImage,
+} ) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
@@ -65,6 +71,8 @@ function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
+				onToggleFeaturedImage={ toggleUseFeaturedImage }
+				useFeaturedImage={ useFeaturedImage }
 			/>
 		</BlockControls>
 	);
@@ -116,6 +124,8 @@ function MediaContainer( props, ref ) {
 		onSelectMedia,
 		onWidthChange,
 		enableResize,
+		toggleUseFeaturedImage,
+		useFeaturedImage,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -173,6 +183,8 @@ function MediaContainer( props, ref ) {
 					onSelectMedia={ onSelectMedia }
 					mediaUrl={ mediaUrl }
 					mediaId={ mediaId }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
