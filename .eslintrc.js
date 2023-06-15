@@ -110,6 +110,7 @@ const restrictedImports = [
 			'maxBy',
 			'memoize',
 			'merge',
+			'mergeWith',
 			'negate',
 			'noop',
 			'nth',
