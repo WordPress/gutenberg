@@ -1,11 +1,34 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { test, expect } from './fixtures';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'data-wp-effect', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directives-effect.html' );
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-interactive-blocks'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-interactive-blocks'
+		);
+	} );
+
+	let postId: number | null;
+
+	test.beforeEach( async ( { admin, editor, page } ) => {
+		// We only need to publish a new post the first time. Subsequent tests
+		// will access to the same post.
+		if ( ! postId ) {
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'test/directive-effect' } );
+			postId = await editor.publishPost();
+		}
+		await page.goto( `/?p=${ postId }` );
 	} );
 
 	test( 'check that effect runs when it is added', async ( { page } ) => {
