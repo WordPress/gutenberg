@@ -93,7 +93,7 @@ export default function SidebarNavigationScreenTemplatePart() {
 		postId
 	);
 
-	const navigationBlocks = getBlocksFromBlocks(
+	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
 		record?.blocks
 	);
@@ -123,13 +123,13 @@ export default function SidebarNavigationScreenTemplatePart() {
 }
 
 /**
- * Retrieves a list of specific blocks from a given set of blocks.
+ * Retrieves a list of specific blocks from a given tree of blocks.
  *
  * @param {string} targetBlock the name of the block to find.
  * @param {Array}  blocks      a list of blocks from the template part entity.
  * @return {Array} a list of any navigation blocks found in the blocks.
  */
-function getBlocksFromBlocks( targetBlock, blocks ) {
+function getBlocksOfTypeFromBlocks( targetBlock, blocks ) {
 	if ( ! targetBlock || ! blocks?.length ) return [];
 
 	const findInBlocks = ( _blocks ) => {
