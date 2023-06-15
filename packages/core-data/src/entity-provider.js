@@ -9,15 +9,12 @@ import {
 } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __unstableGetRichTextValues as getRichTextValues } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { unlock } from './private-apis';
-
-const { getRichTextValues } = unlock( blockEditorPrivateApis );
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
