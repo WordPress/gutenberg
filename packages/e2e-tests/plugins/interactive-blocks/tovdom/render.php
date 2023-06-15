@@ -4,7 +4,7 @@
 	$src_cdata    = $plugin_url . 'tovdom/cdata.js';
 
 ?>
-<div data-wp-island>
+<div data-wp-interactive>
 	<div data-testid="it should delete comments">
 		<!-- ##1## -->
 		<div data-testid="it should keep this node between comments">

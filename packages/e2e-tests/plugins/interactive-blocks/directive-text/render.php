@@ -1,11 +1,11 @@
-<div data-wp-island>
+<div data-wp-interactive>
 	<div>
 		<span
 			data-wp-text="state.text"
 			data-testid="show state text"
 		></span>
 		<button
-			data-wp-on.click="actions.toggleStateText"
+			data-wp-on--click="actions.toggleStateText"
 			data-testid="toggle state text"
 		>
 			Toggle State Text
@@ -18,7 +18,7 @@
 			data-testid="show context text"
 		></span>
 		<button
-			data-wp-on.click="actions.toggleContextText"
+			data-wp-on--click="actions.toggleContextText"
 			data-testid="toggle context text"
 		>
 			Toggle Context Text

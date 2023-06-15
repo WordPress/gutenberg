@@ -5,7 +5,7 @@
 		</span>
 	</div>
 
-	<div data-wp-island>
+	<div data-wp-interactive>
 		<div data-wp-show="state.falseValue">
 			<span data-testid="inside an island">
 				This should not be shown because it is inside an island.
@@ -13,7 +13,7 @@
 		</div>
 	</div>
 
-	<div data-wp-island>
+	<div data-wp-interactive>
 		<div data-wp-ignore>
 			<div data-wp-show="state.falseValue">
 				<span
@@ -26,8 +26,8 @@
 		</div>
 	</div>
 
-	<div data-wp-island>
-		<div data-wp-island>
+	<div data-wp-interactive>
+		<div data-wp-interactive>
 			<div
 				data-wp-show="state.falseValue"
 				data-testid="island inside another island"
@@ -40,9 +40,9 @@
 		</div>
 	</div>
 
-	<div data-wp-island>
+	<div data-wp-interactive>
 		<div>
-			<div data-wp-island data-wp-ignore>
+			<div data-wp-interactive data-wp-ignore>
 				<div data-wp-show="state.falseValue">
 					<span
 						data-testid="island inside inner block of isolated island"

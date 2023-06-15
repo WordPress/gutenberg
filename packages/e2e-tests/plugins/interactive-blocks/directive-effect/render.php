@@ -1,4 +1,4 @@
-<div data-wp-island>
+<div data-wp-interactive>
 	<div data-wp-fakeshow="state.isOpen">
 		<input
 			data-testid="input"
@@ -13,7 +13,7 @@
 
 	<div data-wp-effect="effects.changeFocus"></div>
 
-	<button data-testid="toggle" data-wp-on.click="actions.toggle">
+	<button data-testid="toggle" data-wp-on--click="actions.toggle">
 		Update
 	</button>
 </div>

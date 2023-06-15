@@ -1,13 +1,13 @@
-<div data-wp-island>
+<div data-wp-interactive>
 	<button
-		data-wp-on.click="actions.toggleTrueValue"
+		data-wp-on--click="actions.toggleTrueValue"
 		data-testid="toggle trueValue"
 	>
 		Toggle trueValue
 	</button>
 
 	<button
-		data-wp-on.click="actions.toggleFalseValue"
+		data-wp-on--click="actions.toggleFalseValue"
 		data-testid="toggle falseValue"
 	>
 		Toggle falseValue
@@ -36,7 +36,7 @@
 			falseValue
 		</div>
 		<button
-			data-wp-on.click="actions.toggleContextFalseValue"
+			data-wp-on--click="actions.toggleContextFalseValue"
 			data-testid="toggle context false value"
 		>
 			Toggle context falseValue

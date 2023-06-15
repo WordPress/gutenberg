@@ -1,4 +1,4 @@
-<div data-wp-island>
+<div data-wp-interactive>
 	<pre data-testid="execution order"></pre>
 
 	<!-- Element with test directives -->
