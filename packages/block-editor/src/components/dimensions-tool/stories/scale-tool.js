@@ -13,7 +13,7 @@ import {
 import ScaleTool from '../scale-tool';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsControls/ScaleTool',
+	title: 'BlockEditor (Private APIs)/DimensionsTool/ScaleTool',
 	component: ScaleTool,
 	argTypes: {
 		panelId: { control: { type: null } },
