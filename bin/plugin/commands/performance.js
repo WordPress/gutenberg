@@ -285,7 +285,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm ci && npx playwright install chromium --with-deps && npm run build:packages',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
