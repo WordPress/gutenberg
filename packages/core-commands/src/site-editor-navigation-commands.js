@@ -119,8 +119,44 @@ function useSiteEditorBasicNavigationCommands() {
 	const commands = useMemo( () => {
 		const result = [];
 		result.push( {
+			name: 'core/edit-site/open-navigation',
+			label: __( 'Open navigation' ),
+			icon: styles,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/navigation',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
+			name: 'core/edit-site/open-pages',
+			label: __( 'Open pages' ),
+			icon: styles,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/page',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
 			name: 'core/edit-site/open-styles',
-			label: __( 'Open Styles' ),
+			label: __( 'Open style variations' ),
 			icon: styles,
 			callback: ( { close } ) => {
 				const args = {
@@ -138,7 +174,7 @@ function useSiteEditorBasicNavigationCommands() {
 
 		result.push( {
 			name: 'core/edit-site/open-templates',
-			label: __( 'View all templates' ),
+			label: __( 'Open templates' ),
 			icon: layout,
 			callback: ( { close } ) => {
 				const args = {
@@ -156,7 +192,7 @@ function useSiteEditorBasicNavigationCommands() {
 
 		result.push( {
 			name: 'core/edit-site/open-template-parts',
-			label: __( 'View all template parts' ),
+			label: __( 'Open library' ),
 			icon: symbolFilled,
 			callback: ( { close } ) => {
 				const args = {
@@ -200,5 +236,6 @@ export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/basic-navigation',
 		hook: useSiteEditorBasicNavigationCommands,
+		context: 'site-editor',
 	} );
 }
