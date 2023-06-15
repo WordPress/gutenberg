@@ -11,8 +11,10 @@
 }
 
 .edit-site-library__grid {
-	column-count: 2;
 	column-gap: $grid-unit-30;
+	@include break-large() {
+		column-count: 2;
+	}
 
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
