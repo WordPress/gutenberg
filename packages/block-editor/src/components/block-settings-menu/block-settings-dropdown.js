@@ -375,6 +375,7 @@ export function BlockSettingsDropdown( {
 					onKeyDown={ ( event ) => {
 						if ( event.defaultPrevented ) return;
 
+						// TODO: can use `onEscapeKeyDown` prop instead?
 						if ( event.key === 'Escape' ) {
 							setIsDropdownOpen( false );
 							event.preventDefault();

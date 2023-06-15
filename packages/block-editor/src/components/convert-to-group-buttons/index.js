@@ -70,7 +70,6 @@ function ConvertToGroupButton( {
 				<DropdownMenuItemV2
 					onClick={ () => {
 						onConvertFromGroup();
-						// onClose();
 					} }
 				>
 					{ _x(

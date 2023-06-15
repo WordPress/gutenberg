@@ -163,7 +163,6 @@ export default function TemplatePartEdit( {
 				) }
 				{ canReplace && (
 					<BlockSettingsMenuControls>
-						{ /* TODO: check if this used in other legacy dropdown menus */ }
 						<DropdownMenuItemV2
 							onSelect={ ( event ) => {
 								setIsTemplatePartSelectionOpen( true );

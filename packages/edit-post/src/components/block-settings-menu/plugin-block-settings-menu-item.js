@@ -101,7 +101,6 @@ const PluginBlockSettingsMenuItem = ( {
 				return null;
 			}
 			return (
-				/* TODO: check if this used in other legacy dropdown menus */
 				<DropdownMenuItemV2
 					onSelect={ onClick }
 					prefix={ <Icon icon={ icon } size={ 24 } /> }
