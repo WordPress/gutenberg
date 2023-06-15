@@ -26,7 +26,7 @@ const DEFAULT_SIZE_OPTIONS = [
 	},
 ];
 
-export default function ResolutionItem( {
+export default function ResolutionTool( {
 	panelId,
 	value,
 	onChange,

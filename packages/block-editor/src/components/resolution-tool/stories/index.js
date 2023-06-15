@@ -10,11 +10,11 @@ import {
 /**
  * Internal dependencies
  */
-import AspectRatioItem from '../aspect-ratio';
+import ResolutionTool from '..';
 
 export default {
-	title: 'BlockEditor (Experimental)/ImageDimensionsControls/AspectRatioItem',
-	component: AspectRatioItem,
+	title: 'BlockEditor (Private APIs)/ResolutionControl',
+	component: ResolutionTool,
 	argTypes: {
 		panelId: { control: { type: null } },
 		onChange: { action: 'changed' },
@@ -22,21 +22,21 @@ export default {
 };
 
 export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
-	const [ aspectRatio, setAspectRatio ] = useState( 'auto' );
+	const [ resolution, setResolution ] = useState( undefined );
 	const resetAll = () => {
-		setAspectRatio( undefined );
+		setResolution( undefined );
 		onChangeProp( undefined );
 	};
 	return (
 		<Panel>
 			<ToolsPanel panelId={ panelId } resetAll={ resetAll }>
-				<AspectRatioItem
+				<ResolutionTool
 					panelId={ panelId }
 					onChange={ ( newValue ) => {
-						setAspectRatio( newValue );
+						setResolution( newValue );
 						onChangeProp( newValue );
 					} }
-					value={ aspectRatio }
+					value={ resolution }
 					{ ...props }
 				/>
 			</ToolsPanel>
