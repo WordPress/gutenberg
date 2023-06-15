@@ -13,7 +13,7 @@ import {
 import WidthHeightTool from '../width-height-tool';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsControls/WidthHeightTool',
+	title: 'BlockEditor (Private APIs)/DimensionsTool/WidthHeightTool',
 	component: WidthHeightTool,
 	argTypes: {
 		panelId: { control: { type: null } },

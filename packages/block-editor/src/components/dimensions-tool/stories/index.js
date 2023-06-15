@@ -13,7 +13,7 @@ import {
 import DimensionsTool from '..';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsControls',
+	title: 'BlockEditor (Private APIs)/DimensionsTool',
 	component: DimensionsTool,
 	argTypes: {
 		panelId: { control: { type: null } },
