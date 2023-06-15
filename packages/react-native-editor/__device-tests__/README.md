@@ -59,7 +59,7 @@ Appium uses a config object that contains `capabilities` to define how it will c
 -   `platformVersion` which is the platform version of a connected adb device. e.g `9.0` for Android or `12.2` for iOS. The version used here is upper bounded by the max allowed on CI but feel free to change this value locally as needed.
 -   `app` which is the absolute path to the `.app` or `.apk` file or the path relative to the **Appium root**. It's important to note that when using the relative paths it's not to the project folder but to the appium server, since by default we start up appium in the project root when running the paths appear relative to the root but if you were using another instance of the Appium server the relative path would need to come from there.
 
-A full spec on the capabilities can be found [here](http://appium.io/docs/en/writing-running-appium/caps/). If you'd like to change configurations like
+A full spec on the capabilities can be found [here](https://github.com/appium/appium/blob/1.x/docs/en/writing-running-appium/caps.md). If you'd like to change configurations like
 what port appium runs on or what device or emulator the tests should be executed on that file would be where you'd like to make that update.
 
 ## The run process
@@ -75,4 +75,4 @@ After the build is complete, an appium server is fired up on port 4723 and the d
 
 ---
 
-To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md)
+To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).

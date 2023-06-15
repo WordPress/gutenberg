@@ -19,12 +19,22 @@ import { useEntityProp } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
-function buildMenuLabel( title, id ) {
-	const label =
-		decodeEntities( title?.rendered ) ||
+function buildMenuLabel( title, id, status ) {
+	if ( ! title?.rendered ) {
 		/* translators: %s is the index of the menu in the list of menus. */
-		sprintf( __( '(no title %s)' ), id );
-	return label;
+		return sprintf( __( '(no title %s)' ), id );
+	}
+
+	if ( status === 'publish' ) {
+		return decodeEntities( title?.rendered );
+	}
+
+	return sprintf(
+		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
+		__( '%1$s (%2$s)' ),
+		decodeEntities( title?.rendered ),
+		status
+	);
 }
 
 function NavigationMenuSelector( {
@@ -61,8 +71,8 @@ function NavigationMenuSelector( {
 
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title }, index ) => {
-				const label = buildMenuLabel( title, index + 1 );
+			navigationMenus?.map( ( { id, title, status }, index ) => {
+				const label = buildMenuLabel( title, index + 1, status );
 
 				return {
 					value: id,

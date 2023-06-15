@@ -147,33 +147,27 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
-								<>
-									<SidebarNavigationItem
-										className="edit-site-sidebar-navigation-screen-templates__see-all"
-										withChevron
-										{ ...browseAllLink }
-									>
-										{ config[ postType ].labels.manage }
-									</SidebarNavigationItem>
-									{ !! config[ postType ].labels
-										.reusableBlocks && (
-										<SidebarNavigationItem
-											as="a"
-											href="edit.php?post_type=wp_block"
-											withChevron
-										>
-											{
-												config[ postType ].labels
-													.reusableBlocks
-											}
-										</SidebarNavigationItem>
-									) }
-								</>
-							) }
 						</ItemGroup>
 					) }
 				</>
+			}
+			footer={
+				! isMobileViewport && (
+					<>
+						<SidebarNavigationItem withChevron { ...browseAllLink }>
+							{ config[ postType ].labels.manage }
+						</SidebarNavigationItem>
+						{ !! config[ postType ].labels.reusableBlocks && (
+							<SidebarNavigationItem
+								as="a"
+								href="edit.php?post_type=wp_block"
+								withChevron
+							>
+								{ config[ postType ].labels.reusableBlocks }
+							</SidebarNavigationItem>
+						) }
+					</>
+				)
 			}
 		/>
 	);
