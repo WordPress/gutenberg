@@ -74,7 +74,7 @@ function GlobalStylesActionMenu() {
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
-				{ () => (
+				{ ( { onClose } ) => (
 					<MenuGroup>
 						{ canEditCSS && (
 							<MenuItem onClick={ loadCustomCSS }>
@@ -82,9 +82,13 @@ function GlobalStylesActionMenu() {
 							</MenuItem>
 						) }
 						<MenuItem
-							onClick={ () =>
-								toggle( 'core/edit-site', 'welcomeGuideStyles' )
-							}
+							onClick={ () => {
+								toggle(
+									'core/edit-site',
+									'welcomeGuideStyles'
+								);
+								onClose();
+							} }
 						>
 							{ __( 'Welcome Guide' ) }
 						</MenuItem>
@@ -139,7 +143,7 @@ function GlobalStylesRevisionsMenu() {
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-				{ () => (
+				{ ( { onClose } ) => (
 					<MenuGroup>
 						{ hasRevisions && (
 							<MenuItem
@@ -153,7 +157,13 @@ function GlobalStylesRevisionsMenu() {
 								{ __( 'Revision history' ) }
 							</MenuItem>
 						) }
-						<MenuItem onClick={ onReset } disabled={ ! canReset }>
+						<MenuItem
+							onClick={ () => {
+								onReset();
+								onClose();
+							} }
+							disabled={ ! canReset }
+						>
 							{ __( 'Reset to defaults' ) }
 						</MenuItem>
 					</MenuGroup>
