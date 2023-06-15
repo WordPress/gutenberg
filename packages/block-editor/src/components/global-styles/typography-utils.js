@@ -31,7 +31,6 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
  * @property {?number} minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
  * @property {?string} minFontSize       The smallest a calculated font size may be. Optional.
  */
-
 /**
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
