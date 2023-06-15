@@ -25,7 +25,7 @@ export default function TemplatePartNavigationMenus( { menus } ) {
 				size="12"
 				upperCase={ true }
 			>
-				{ __( 'Navigation Menus' ) }
+				{ __( 'Navigation' ) }
 			</Heading>
 			<TemplatePartNavigationMenuList menus={ menus } />
 		</>
