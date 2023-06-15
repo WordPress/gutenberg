@@ -3,8 +3,8 @@
  * HTML for testing the hydration of the serialized store.
  *
  * @package gutenberg-test-interactive-blocks
+ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
-
 
 // These variables simulates SSR.
 $test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
