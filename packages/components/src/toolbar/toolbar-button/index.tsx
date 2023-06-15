@@ -82,19 +82,16 @@ function UnforwardedToolbarButton(
 			{ ...props }
 			ref={ ref }
 		>
-			{
-				// @ts-expect-error
-				( toolbarItemProps ) => (
-					<Button
-						label={ title }
-						isPressed={ isActive }
-						disabled={ isDisabled }
-						{ ...toolbarItemProps }
-					>
-						{ children }
-					</Button>
-				)
-			}
+			{ ( toolbarItemProps ) => (
+				<Button
+					label={ title }
+					isPressed={ isActive }
+					disabled={ isDisabled }
+					{ ...toolbarItemProps }
+				>
+					{ children }
+				</Button>
+			) }
 		</ToolbarItem>
 	);
 }

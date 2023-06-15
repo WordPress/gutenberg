@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/file",
 	"title": "File",
 	"category": "media",
@@ -67,7 +67,7 @@
 			}
 		}
 	},
-	"viewScript": "file:./view.min.js",
+	"viewScript": "file:./interactivity.min.js",
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
 }

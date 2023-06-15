@@ -13,7 +13,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_Patterns_Controller_6_1 {
+class Gutenberg_REST_Block_Patterns_Controller_6_2 extends WP_REST_Block_Patterns_Controller {
 	/**
 	 * Defines whether remote patterns should be loaded.
 	 *

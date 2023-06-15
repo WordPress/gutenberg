@@ -14,11 +14,11 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,17 +31,15 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
-import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import { ScreenVariation } from './screen-variations';
-import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
-import { unlock } from '../../private-apis';
-import ScreenEffects from './screen-effects';
+import ScreenRevisions from './screen-revisions';
+import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -49,7 +47,7 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
-	const { canEditCSS } = useSelect( ( select ) => {
+	const { canEditCSS, revisionsCount } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 
@@ -61,12 +59,23 @@ function GlobalStylesActionMenu() {
 		return {
 			canEditCSS:
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			revisionsCount:
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
 		};
 	}, [] );
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
 	const loadCustomCSS = () => goTo( '/css' );
+	const loadRevisions = () => {
+		goTo( '/revisions' );
+		setEditorCanvasContainerView( 'global-styles-revisions' );
+	};
+	const hasRevisions = revisionsCount >= 2;
+
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu
@@ -91,6 +100,22 @@ function GlobalStylesActionMenu() {
 								},
 						  ]
 						: [] ),
+					...( hasRevisions
+						? [
+								{
+									title: sprintf(
+										/* translators: %d: number of revisions */
+										_n(
+											'%d Revision',
+											'%d Revisions',
+											revisionsCount
+										),
+										revisionsCount
+									),
+									onClick: loadRevisions,
+								},
+						  ]
+						: [] ),
 				] }
 			/>
 		</GlobalStylesMenuFill>
@@ -111,33 +136,6 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 	);
 }
 
-function BlockStyleVariationsScreens( { name } ) {
-	const blockStyleVariations = useSelect(
-		( select ) => {
-			const { getBlockStyles } = select( blocksStore );
-			return getBlockStyles( name );
-		},
-		[ name ]
-	);
-	if ( ! blockStyleVariations?.length ) {
-		return null;
-	}
-
-	return blockStyleVariations.map( ( variation ) => (
-		<ContextScreens
-			key={ variation.name + name }
-			name={ name }
-			parentMenu={
-				'/blocks/' +
-				encodeURIComponent( name ) +
-				'/variations/' +
-				encodeURIComponent( variation.name )
-			}
-			variation={ variation.name }
-		/>
-	) );
-}
-
 function BlockStylesNavigationScreens( {
 	parentMenu,
 	blockStyles,
@@ -148,12 +146,12 @@ function BlockStylesNavigationScreens( {
 			key={ index }
 			path={ parentMenu + '/variations/' + style.name }
 		>
-			<ScreenVariation blockName={ blockName } style={ style } />
+			<ScreenBlock name={ blockName } variation={ style.name } />
 		</GlobalStylesNavigationScreen>
 	) );
 }
 
-function ContextScreens( { name, parentMenu = '', variation = '' } ) {
+function ContextScreens( { name, parentMenu = '' } ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -164,68 +162,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 
 	return (
 		<>
-			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
-				<ScreenTypography name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/text' }
-			>
-				<ScreenTypographyElement name={ name } element="text" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/link' }
-			>
-				<ScreenTypographyElement name={ name } element="link" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/heading' }
-			>
-				<ScreenTypographyElement name={ name } element="heading" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/caption' }
-			>
-				<ScreenTypographyElement name={ name } element="caption" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/typography/button' }
-			>
-				<ScreenTypographyElement name={ name } element="button" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
-				<ScreenColors name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/palette' }
 			>
 				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
-				<ScreenFilters name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
-				<ScreenBorder name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
-				<ScreenEffects name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
-				<ScreenLayout name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
-				<ScreenCSS name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (
@@ -239,7 +179,7 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 	);
 }
 
-function GlobalStylesStyleBook( { onClose } ) {
+function GlobalStylesStyleBook() {
 	const navigator = useNavigator();
 	const { path } = navigator.location;
 	return (
@@ -257,14 +197,12 @@ function GlobalStylesStyleBook( { onClose } ) {
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
-			onClose={ onClose }
 		/>
 	);
 }
 
 function GlobalStylesBlockLink() {
 	const navigator = useNavigator();
-	const isMounted = useRef();
 	const { selectedBlockName, selectedBlockClientId } = useSelect(
 		( select ) => {
 			const { getSelectedBlockClientId, getBlockName } =
@@ -278,27 +216,65 @@ function GlobalStylesBlockLink() {
 		[]
 	);
 	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
+	// When we're in the `Blocks` screen enable deep linking to the selected block.
 	useEffect( () => {
-		// Avoid navigating to the block screen on mount.
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
-			return;
-		}
 		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
 			return;
 		}
-		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
+		const currentPath = navigator.location.path;
+		if (
+			currentPath !== '/blocks' &&
+			! currentPath.startsWith( '/blocks/' )
+		) {
+			return;
+		}
+		const newPath = '/blocks/' + encodeURIComponent( selectedBlockName );
 		// Avoid navigating to the same path. This can happen when selecting
 		// a new block of the same type.
-		if ( path !== navigator.location.path ) {
-			navigator.goTo( path, { skipFocus: true } );
+		if ( newPath !== currentPath ) {
+			navigator.goTo( newPath, { skipFocus: true } );
 		}
 	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
-function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
-	const blocks = getBlockTypes();
+function GlobalStylesEditorCanvasContainerLink() {
+	const { goTo, location } = useNavigator();
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 
+	// If the user switches the editor canvas container view, redirect
+	// to the appropriate screen. This effectively allows deep linking to the
+	// desired screens from outside the global styles navigation provider.
+	useEffect( () => {
+		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
+			// Switching to the revisions container view should
+			// redirect to the revisions screen.
+			goTo( '/revisions' );
+		} else if (
+			!! editorCanvasContainerView &&
+			location?.path === '/revisions'
+		) {
+			// Switching to any container other than revisions should
+			// redirect from the revisions screen to the root global styles screen.
+			goTo( '/' );
+		}
+		// location?.path is not a dependency because we don't want to track it.
+		// Doing so will cause an infinite loop. We could abstract logic to avoid
+		// having to disable the check later.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ editorCanvasContainerView, goTo ] );
+}
+
+function GlobalStylesUI() {
+	const blocks = getBlockTypes();
+	const editorCanvasContainerView = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -314,6 +290,46 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 
 			<GlobalStylesNavigationScreen path="/blocks">
 				<ScreenBlockList />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography">
+				<ScreenTypography />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/text">
+				<ScreenTypographyElement element="text" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/link">
+				<ScreenTypographyElement element="link" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/heading">
+				<ScreenTypographyElement element="heading" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/caption">
+				<ScreenTypographyElement element="caption" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/button">
+				<ScreenTypographyElement element="button" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/colors">
+				<ScreenColors />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/layout">
+				<ScreenLayout />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/css">
+				<ScreenCSS />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ '/revisions' }>
+				<ScreenRevisions />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (
@@ -335,20 +351,13 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 				/>
 			) ) }
 
-			{ blocks.map( ( block, index ) => {
-				return (
-					<BlockStyleVariationsScreens
-						key={ 'screens-block-styles-' + block.name + index }
-						name={ block.name }
-					/>
-				);
-			} ) }
-			{ isStyleBookOpened && (
-				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
+			{ 'style-book' === editorCanvasContainerView && (
+				<GlobalStylesStyleBook />
 			) }
 
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
+			<GlobalStylesEditorCanvasContainerLink />
 		</NavigatorProvider>
 	);
 }

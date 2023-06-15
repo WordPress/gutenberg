@@ -207,11 +207,6 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 		$src = '';
 
 		foreach ( $value as $item ) {
-
-			if ( str_starts_with( $item['url'], get_site_url() ) ) {
-				$item['url'] = wp_make_link_relative( $item['url'] );
-			}
-
 			$src .= ( 'data' === $item['format'] )
 				? ", url({$item['url']})"
 				: ", url('{$item['url']}') format('{$item['format']}')";

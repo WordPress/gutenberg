@@ -4,6 +4,7 @@
 import { Popover } from '@wordpress/components';
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 export default function ListViewDropIndicator( {
 	listViewRef,
@@ -41,6 +42,8 @@ export default function ListViewDropIndicator( {
 	// is undefined, so the indicator will appear after the rootBlockElement.
 	const targetElement = blockElement || rootBlockElement;
 
+	const rtl = isRTL();
+
 	const getDropIndicatorIndent = useCallback(
 		( targetElementRect ) => {
 			if ( ! rootBlockElement ) {
@@ -55,9 +58,11 @@ export default function ListViewDropIndicator( {
 			);
 			const rootBlockIconRect =
 				rootBlockIconElement.getBoundingClientRect();
-			return rootBlockIconRect.right - targetElementRect.left;
+			return rtl
+				? targetElementRect.right - rootBlockIconRect.left
+				: rootBlockIconRect.right - targetElementRect.left;
 		},
-		[ rootBlockElement ]
+		[ rootBlockElement, rtl ]
 	);
 
 	const getDropIndicatorWidth = useCallback(
@@ -80,21 +85,56 @@ export default function ListViewDropIndicator( {
 				'horizontal'
 			);
 
-			if ( scrollContainer ) {
+			const ownerDocument = targetElement.ownerDocument;
+			const windowScroll =
+				scrollContainer === ownerDocument.body ||
+				scrollContainer === ownerDocument.documentElement;
+
+			if ( scrollContainer && ! windowScroll ) {
 				const scrollContainerRect =
 					scrollContainer.getBoundingClientRect();
 
-				if ( scrollContainer.clientWidth < width ) {
+				const distanceBetweenContainerAndTarget = isRTL()
+					? scrollContainerRect.right - targetElementRect.right
+					: targetElementRect.left - scrollContainerRect.left;
+
+				const scrollContainerWidth = scrollContainer.clientWidth;
+
+				if (
+					scrollContainerWidth <
+					width + distanceBetweenContainerAndTarget
+				) {
 					width =
-						scrollContainer.clientWidth -
-						( targetElementRect.left - scrollContainerRect.left );
+						scrollContainerWidth -
+						distanceBetweenContainerAndTarget;
+				}
+
+				// LTR logic for ensuring the drop indicator does not extend
+				// beyond the right edge of the scroll container.
+				if (
+					! rtl &&
+					targetElementRect.left + indent < scrollContainerRect.left
+				) {
+					width -= scrollContainerRect.left - targetElementRect.left;
+					return width;
+				}
+
+				// RTL logic for ensuring the drop indicator does not extend
+				// beyond the right edge of the scroll container.
+				if (
+					rtl &&
+					targetElementRect.right - indent > scrollContainerRect.right
+				) {
+					width -=
+						targetElementRect.right - scrollContainerRect.right;
+					return width;
 				}
 			}
 
 			// Subtract the indent from the final width of the indicator.
 			return width - indent;
 		},
-		[ targetElement ]
+		[ rtl, targetElement ]
 	);
 
 	const style = useMemo( () => {
@@ -119,14 +159,58 @@ export default function ListViewDropIndicator( {
 			return undefined;
 		}
 
+		const ownerDocument = targetElement.ownerDocument;
+
 		return {
-			ownerDocument: targetElement.ownerDocument,
+			ownerDocument,
 			getBoundingClientRect() {
 				const rect = targetElement.getBoundingClientRect();
 				const indent = getDropIndicatorIndent( rect );
-				const left = rect.left + indent;
+				// In RTL languages, the drop indicator should be positioned
+				// to the left of the target element, with the width of the
+				// indicator determining the indent at the right edge of the
+				// target element. In LTR languages, the drop indicator should
+				// end at the right edge of the target element, with the indent
+				// added to the position of the left edge of the target element.
+				let left = rtl ? rect.left : rect.left + indent;
 				let top = 0;
 				let bottom = 0;
+
+				// In deeply nested lists, where a scrollbar is present,
+				// the width of the drop indicator should be the width of
+				// the visible area of the scroll container. Additionally,
+				// the left edge of the drop indicator line needs to be
+				// offset by the distance the left edge of the target element
+				// and the left edge of the scroll container. The ensures
+				// that the drop indicator position never breaks out of the
+				// visible area of the scroll container.
+				const scrollContainer = getScrollContainer(
+					targetElement,
+					'horizontal'
+				);
+
+				const windowScroll =
+					scrollContainer === ownerDocument.body ||
+					scrollContainer === ownerDocument.documentElement;
+
+				// If the scroll container is not the window, offset the left position, if need be.
+				if ( scrollContainer && ! windowScroll ) {
+					const scrollContainerRect =
+						scrollContainer.getBoundingClientRect();
+
+					// In RTL languages, a vertical scrollbar is present on the
+					// left edge of the scroll container. The width of the
+					// scrollbar needs to be accounted for when positioning the
+					// drop indicator.
+					const scrollbarWidth = rtl
+						? scrollContainer.offsetWidth -
+						  scrollContainer.clientWidth
+						: 0;
+
+					if ( left < scrollContainerRect.left + scrollbarWidth ) {
+						left = scrollContainerRect.left + scrollbarWidth;
+					}
+				}
 
 				if ( dropPosition === 'top' ) {
 					top = rect.top;
@@ -148,6 +232,7 @@ export default function ListViewDropIndicator( {
 		dropPosition,
 		getDropIndicatorIndent,
 		getDropIndicatorWidth,
+		rtl,
 	] );
 
 	if ( ! targetElement ) {

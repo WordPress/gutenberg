@@ -50,6 +50,7 @@ export const setupMediaUpload = () => {
 					mediaId: mediaItem.localId,
 					mediaUrl: mediaItem.serverUrl,
 					mediaServerId: mediaItem.serverId,
+					metadata: mediaItem.metadata,
 				} );
 			} ),
 		notifyFailedState: async ( mediaItem ) =>

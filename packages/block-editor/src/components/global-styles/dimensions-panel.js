@@ -28,7 +28,7 @@ import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -103,8 +103,9 @@ function useHasSpacingPresets( settings ) {
 }
 
 function filterValuesBySides( values, sides ) {
-	if ( ! sides ) {
-		// If no custom side configuration all sides are opted into by default.
+	// If no custom side configuration, all sides are opted into by default.
+	// Without any values, we have nothing to filter either.
+	if ( ! sides || ! values ) {
 		return values;
 	}
 
@@ -184,12 +185,12 @@ function DimensionsToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	contentSize: false,
-	wideSize: false,
-	padding: false,
-	margin: false,
-	blockGap: false,
-	minHeight: false,
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
 	childLayout: true,
 };
 
@@ -206,8 +207,19 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const decodeValue = ( rawValue ) => {
+		if ( rawValue && typeof rawValue === 'object' ) {
+			return Object.keys( rawValue ).reduce( ( acc, key ) => {
+				acc[ key ] = getValueFromVariable(
+					{ settings },
+					'',
+					rawValue[ key ]
+				);
+				return acc;
+			}, {} );
+		}
+		return getValueFromVariable( { settings }, '', rawValue );
+	};
 
 	const showSpacingPresetsControl = useHasSpacingPresets( settings );
 	const units = useCustomUnits( {
@@ -226,7 +238,7 @@ export default function DimensionsPanel( {
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'layout', 'contentSize' ],
 				newValue || undefined
@@ -242,7 +254,7 @@ export default function DimensionsPanel( {
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'layout', 'wideSize' ],
 				newValue || undefined
@@ -264,7 +276,7 @@ export default function DimensionsPanel( {
 		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		onChange( immutableSet( value, [ 'spacing', 'padding' ], padding ) );
+		onChange( setImmutably( value, [ 'spacing', 'padding' ], padding ) );
 	};
 	const hasPaddingValue = () =>
 		!! value?.spacing?.padding &&
@@ -284,7 +296,7 @@ export default function DimensionsPanel( {
 		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setMarginValues = ( newMarginValues ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
-		onChange( immutableSet( value, [ 'spacing', 'margin' ], margin ) );
+		onChange( setImmutably( value, [ 'spacing', 'margin' ], margin ) );
 	};
 	const hasMarginValue = () =>
 		!! value?.spacing?.margin &&
@@ -303,7 +315,7 @@ export default function DimensionsPanel( {
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setGapValue = ( newGapValue ) => {
 		onChange(
-			immutableSet( value, [ 'spacing', 'blockGap' ], newGapValue )
+			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
 		);
 	};
 	const setGapValues = ( nextBoxGapValue ) => {
@@ -328,7 +340,7 @@ export default function DimensionsPanel( {
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'dimensions', 'minHeight' ], newValue )
+			setImmutably( value, [ 'dimensions', 'minHeight' ], newValue )
 		);
 	};
 	const resetMinHeightValue = () => {
@@ -487,7 +499,6 @@ export default function DimensionsPanel( {
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialPadding }
 							onMouseOver={ onMouseOverPadding }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -528,7 +539,6 @@ export default function DimensionsPanel( {
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialMargin }
 							onMouseOver={ onMouseOverMargin }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -575,10 +585,10 @@ export default function DimensionsPanel( {
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
+							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
-							splitOnAxis={ isAxialGap }
 						/>
 					) }
 				</ToolsPanelItem>

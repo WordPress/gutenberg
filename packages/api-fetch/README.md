@@ -30,7 +30,7 @@ import { addQueryArgs } from '@wordpress/url';
 
 const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
 
-apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams } ).then( ( posts ) => {
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
 	console.log( posts );
 } );
 ```

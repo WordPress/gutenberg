@@ -2,11 +2,15 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -72,8 +76,11 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
-		valueFunc: ( preset, { typography: typographySettings } ) =>
-			getTypographyFontSizeValue( preset, typographySettings ),
+		valueFunc: ( preset, settings ) =>
+			getTypographyFontSizeValue(
+				preset,
+				getFluidTypographyOptionsFromSettings( settings )
+			),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -375,4 +382,30 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Compares global style variations according to their styles and settings properties.
+ *
+ * @example
+ * ```js
+ * const globalStyles = { styles: { typography: { fontSize: '10px' } }, settings: {} };
+ * const variation = { styles: { typography: { fontSize: '10000px' } }, settings: {} };
+ * const isEqual = areGlobalStyleConfigsEqual( globalStyles, variation );
+ * // false
+ * ```
+ *
+ * @param {Object} original  A global styles object.
+ * @param {Object} variation A global styles object.
+ *
+ * @return {boolean} Whether `original` and `variation` match.
+ */
+export function areGlobalStyleConfigsEqual( original, variation ) {
+	if ( typeof original !== 'object' || typeof variation !== 'object' ) {
+		return original === variation;
+	}
+	return (
+		fastDeepEqual( original?.styles, variation?.styles ) &&
+		fastDeepEqual( original?.settings, variation?.settings )
+	);
 }

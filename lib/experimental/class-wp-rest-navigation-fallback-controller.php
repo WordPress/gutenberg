@@ -33,7 +33,7 @@ class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = 'wp-block-editor/v1';
-		$this->rest_base = 'navigation-fallbacks';
+		$this->rest_base = 'navigation-fallback';
 		$this->post_type = 'wp_navigation';
 	}
 
@@ -121,7 +121,7 @@ class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'navigation-fallbacks',
+			'title'      => 'navigation-fallback',
 			'type'       => 'object',
 			'properties' => array(
 				'id' => array(

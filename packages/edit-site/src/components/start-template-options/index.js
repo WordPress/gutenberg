@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Modal } from '@wordpress/components';
+import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
@@ -35,8 +35,6 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 	}, [ isCustom, slug ] );
 	return templateContent;
 }
-
-const START_BLANK_TITLE = __( 'Start blank' );
 
 function useStartPatterns( fallbackContent ) {
 	const { slug, patterns } = useSelect( ( select ) => {
@@ -72,13 +70,6 @@ function useStartPatterns( fallbackContent ) {
 				.map( ( pattern ) => {
 					return { ...pattern, blocks: parse( pattern.content ) };
 				} ),
-			{
-				name: 'start-blank',
-				blocks: parse(
-					'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->'
-				),
-				title: START_BLANK_TITLE,
-			},
 		];
 	}, [ fallbackContent, slug, patterns ] );
 }
@@ -87,25 +78,15 @@ function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
 	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
 	const blockPatterns = useStartPatterns( fallbackContent );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
-
 	return (
-		<div
-			className="edit-site-start-template-options__pattern-container"
-			style={ {
-				'--wp-edit-site-start-template-options-start-blank': `"${ START_BLANK_TITLE }"`,
+		<BlockPatternsList
+			blockPatterns={ blockPatterns }
+			shownPatterns={ shownBlockPatterns }
+			onClickPattern={ ( pattern, blocks ) => {
+				onChange( blocks, { selection: undefined } );
+				onChoosePattern();
 			} }
-		>
-			<BlockPatternsList
-				blockPatterns={ blockPatterns }
-				shownPatterns={ shownBlockPatterns }
-				onClickPattern={ ( pattern, blocks ) => {
-					onChange( 'start-blank' === pattern.name ? [] : blocks, {
-						selection: undefined,
-					} );
-					onChoosePattern();
-				} }
-			/>
-		</div>
+		/>
 	);
 }
 
@@ -134,6 +115,17 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 					} }
 				/>
 			</div>
+			<Flex
+				className="edit-site-start-template-options__modal__actions"
+				justify="flex-end"
+				expanded={ false }
+			>
+				<FlexItem>
+					<Button variant="tertiary" onClick={ onClose }>
+						{ __( 'Skip' ) }
+					</Button>
+				</FlexItem>
+			</Flex>
 		</Modal>
 	);
 }

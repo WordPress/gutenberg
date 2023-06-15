@@ -388,7 +388,8 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 		};
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withBorderColorPaletteStyles'
 );
 
 addFilter(
