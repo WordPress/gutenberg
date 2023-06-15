@@ -173,7 +173,7 @@ function MediaTextEdit( {
 			imageFill: false,
 			mediaType: 'image',
 			mediaId: featuredImage,
-			mediaUrl: featuredImageMedia.source_url,
+			mediaUrl: featuredImageMedia?.source_url,
 			mediaAlt: featuredImageMedia?.alt_text,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
