@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import escapeHtml from 'escape-html';
+
+/**
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
@@ -22,12 +27,57 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { store } from '../../store';
 
+const unescapeString = ( arg ) => {
+	return decodeEntities( arg );
+};
+
+/**
+ * Returns a term object with name unescaped.
+ *
+ * @param {Object} term The term object to unescape.
+ *
+ * @return {Object} Term object with name property unescaped.
+ */
+const unescapeTerm = ( term ) => {
+	return {
+		...term,
+		name: unescapeString( term.name ),
+	};
+};
+// Tries to create a term or fetch it if it already exists.
+function findOrCreateTerm( category ) {
+	const escapedTermName = escapeHtml( category.label );
+	const escapedTermSlug = escapeHtml( category.value );
+	const escapedTermDescription = escapeHtml( category.description );
+	return apiFetch( {
+		path: '/wp/v2/wp_pattern',
+		method: 'POST',
+		data: {
+			name: escapedTermName,
+			slug: escapedTermSlug,
+			description: escapedTermDescription,
+		},
+	} )
+		.catch( ( error ) => {
+			if ( error.code !== 'term_exists' ) {
+				return Promise.reject( error );
+			}
+
+			return Promise.resolve( {
+				id: error.data.term_id,
+				name: category.label,
+			} );
+		} )
+		.then( unescapeTerm );
+}
 /**
  * Menu control to convert block(s) to reusable block.
  *
@@ -49,13 +99,13 @@ export default function ReusableBlockConvertButton( {
 	);
 
 	const [ syncType, setSyncType ] = useState( 'unsynced' );
-	const [ categoryId, setCategoryId ] = useState( '' );
+	const [ categorySlug, setCategorySlug ] = useState( '' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
-	const canConvert = useSelect(
+	const { canConvert, corePatternCategories } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } =
+			const { getBlocksByClientId, canInsertBlockType, getSettings } =
 				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
@@ -87,7 +137,11 @@ export default function ReusableBlockConvertButton( {
 				// Hide when current doesn't have permission to do that.
 				!! canUser( 'create', 'blocks' );
 
-			return _canConvert;
+			return {
+				canConvert: _canConvert,
+				corePatternCategories:
+					getSettings().__experimentalBlockPatternCategories,
+			};
 		},
 		[ clientIds ]
 	);
@@ -97,8 +151,51 @@ export default function ReusableBlockConvertButton( {
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const patternCategories = categories === null ? [] : categories;
+	const categoryOptions = patternCategories.map( ( cat ) => ( {
+		label: cat.name,
+		value: cat.slug,
+		taxonomyId: cat.id,
+	} ) );
+
+	corePatternCategories
+		.filter( ( cat ) => cat.name !== 'query' )
+		.forEach( ( coreCategory ) => {
+			if (
+				! categoryOptions.find(
+					( cat ) => cat.value === coreCategory.name
+				)
+			) {
+				categoryOptions.push( {
+					label: coreCategory.label,
+					value: coreCategory.name,
+					taxonomyId: undefined,
+					description: coreCategory.description,
+				} );
+			}
+		} );
+
+	categoryOptions
+		.sort( ( a, b ) => a.label.localeCompare( b.label ) )
+		.push( {
+			value: '',
+			label: __( 'Select a category' ),
+			disabled: true,
+		} );
+
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
+			let categoryId;
+			const selectedCategory = categoryOptions.find(
+				( cat ) => cat.value === categorySlug
+			);
+			if ( selectedCategory.taxonomyId ) {
+				categoryId = selectedCategory.taxonomyId;
+			} else {
+				const newTerm = await findOrCreateTerm( selectedCategory );
+				categoryId = newTerm.id;
+			}
+
 			try {
 				await convertBlocksToReusable(
 					clientIds,
@@ -125,10 +222,11 @@ export default function ReusableBlockConvertButton( {
 			}
 		},
 		[
+			categoryOptions,
+			categorySlug,
 			convertBlocksToReusable,
 			clientIds,
 			syncType,
-			categoryId,
 			createSuccessNotice,
 			createErrorNotice,
 		]
@@ -137,16 +235,6 @@ export default function ReusableBlockConvertButton( {
 	if ( ! canConvert ) {
 		return null;
 	}
-	const patternCategories = categories === null ? [] : categories;
-	const categoryOptions = patternCategories
-		.filter( ( category ) => category.slug !== 'query' )
-		.map( ( category ) => ( {
-			label: category.name,
-			value: category.id,
-		} ) )
-		.concat( [
-			{ value: '', label: __( 'Select a category' ), disabled: true },
-		] );
 
 	return (
 		<BlockSettingsMenuControls>
@@ -155,7 +243,7 @@ export default function ReusableBlockConvertButton( {
 					<MenuItem
 						icon={ symbol }
 						onClick={ () => {
-							setCategoryId( '' );
+							setCategorySlug( '' );
 							setIsModalOpen( true );
 						} }
 					>
@@ -188,10 +276,10 @@ export default function ReusableBlockConvertButton( {
 									/>
 									<SelectControl
 										label={ __( 'Category' ) }
-										onChange={ setCategoryId }
+										onChange={ setCategorySlug }
 										options={ categoryOptions }
 										size="__unstable-large"
-										value={ categoryId }
+										value={ categorySlug }
 									/>
 
 									<ToggleControl
