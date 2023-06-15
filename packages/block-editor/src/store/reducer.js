@@ -1648,7 +1648,7 @@ export const blockListSettings = ( state = {}, action ) => {
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
 			const withoutRemovedBlocks = Object.assign( {}, state );
-			for ( const id in action.clientIds ) {
+			for ( const id of action.clientIds ) {
 				delete withoutRemovedBlocks[ id ];
 			}
 			return withoutRemovedBlocks;
