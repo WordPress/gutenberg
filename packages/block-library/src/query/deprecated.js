@@ -296,7 +296,7 @@ const v2 = {
 			gradients: true,
 			link: true,
 		},
-		__experimentalLayout: true,
+		layout: true,
 	},
 	isEligible: ( { query: { categoryIds, tagIds } = {} } ) =>
 		categoryIds || tagIds,
@@ -369,7 +369,7 @@ const v3 = {
 				text: true,
 			},
 		},
-		__experimentalLayout: true,
+		layout: true,
 	},
 	isEligible( attributes ) {
 		const { style, backgroundColor, gradient, textColor } = attributes;
@@ -448,7 +448,7 @@ const v4 = {
 				text: true,
 			},
 		},
-		__experimentalLayout: true,
+		layout: true,
 	},
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
@@ -509,7 +509,7 @@ const v5 = {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
-		__experimentalLayout: true,
+		layout: true,
 	},
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
