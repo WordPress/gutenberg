@@ -70,9 +70,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.click();
 
 		// Tweak the columns count.
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).click();
-		await pageUtils.pressKeys( 'primary+a' );
-		await page.keyboard.type( '3' );
+		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '3' );
 
 		// Wait for the new column block to appear in the list view
 		const column = listView.getByRole( 'gridcell', {
