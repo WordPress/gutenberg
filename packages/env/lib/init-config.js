@@ -201,6 +201,9 @@ RUN apt-get -qy update
 # Install some basic PHP dependencies.
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
+# Install git
+RUN apt-get -qy install git
+
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
