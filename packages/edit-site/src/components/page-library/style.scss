@@ -54,10 +54,10 @@
 .edit-site-library__search {
 	&#{&} input[type="search"] {
 		background: $gray-800;
-		color: $gray-600;
+		color: $gray-100;
 
 		&:focus {
-			background: $gray-600;
+			background: $gray-800;
 		}
 	}
 
