@@ -102,6 +102,7 @@ describe( 'selectors', () => {
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
