@@ -29,12 +29,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Local Patterns' ) }>
+		<InserterPanel title={ __( 'Synced Patterns' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Local Patterns' ) }
+				label={ __( 'Synced Patterns' ) }
 			/>
 		</InserterPanel>
 	);
@@ -67,7 +67,7 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 						post_type: 'wp_block',
 					} ) }
 				>
-					{ __( 'Manage Local Patterns' ) }
+					{ __( 'Manage Synced Patterns' ) }
 				</Button>
 			</div>
 		</>
