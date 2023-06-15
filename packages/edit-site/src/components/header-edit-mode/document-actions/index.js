@@ -143,13 +143,12 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 		<div
 			className={ classnames( 'edit-site-document-actions', className ) }
 		>
-			<Text
-				size="body"
+			<VisuallyHidden
 				as="h1"
 				className="edit-site-document-actions__title"
 			>
 				{ children }
-			</Text>
+			</VisuallyHidden>
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
@@ -167,7 +166,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 				onClick={ () => openCommandCenter() }
 			>
 				<BlockIcon icon={ icon } />
-				<Text as="span">{ __( 'Open command center' ) }</Text>
+				<Text as="span">{ __( 'Command center' ) }</Text>
 				<span className="edit-site-document-actions__shortcut">
 					{ displayShortcut.primary( 'k' ) }
 				</span>
