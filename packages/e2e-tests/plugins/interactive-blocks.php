@@ -17,15 +17,15 @@ add_action(
 			// auto register all blocks that were found.
 			foreach ( $block_json_files as $filename ) {
 				$block_folder = dirname( $filename );
-				$name = basename( $block_folder );
-				$view_file =
-					plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
+				$name         = basename( $block_folder );
+
+				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
 				wp_register_script(
 					$name . '-view',
 					$view_file,
 					array( 'wp-interactivity' ),
-					filemtime( $view_file, ),
+					filemtime( $view_file ),
 					true
 				);
 
