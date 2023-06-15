@@ -56,7 +56,7 @@ const DimensionControls = ( {
 	clientId,
 	attributes: { width, height, sizeSlug },
 	setAttributes,
-	// mediaUrl,
+	mediaUrl,
 	imageSizeOptions = [],
 } ) => {
 	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
@@ -188,7 +188,17 @@ const DimensionControls = ( {
 											{ __( 'Aspect ratio' ) }
 										</BaseControl.VisualLabel>
 
-										<div className="aspect-ratio-wrapper"></div>
+										<div className="aspect-ratio-wrapper">
+											<div
+												className="aspect-ratio-wrapper-item"
+												style={ {
+													// height: !! aspectRatio && '100%',
+													transform: `scale(${ options[ aspectRatio ]?.scale })`,
+													aspectRatio,
+													backgroundImage: `url(${ mediaUrl })`,
+												} }
+											/>
+										</div>
 
 										<RangeControl
 											// __nextHasNoMarginBottomx
