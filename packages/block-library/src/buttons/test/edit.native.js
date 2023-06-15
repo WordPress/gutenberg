@@ -241,18 +241,7 @@ describe( 'Buttons block', () => {
 
 				// Get block
 				const buttonsBlock = await getBlock( screen, 'Buttons' );
-
-				// Trigger inner blocks layout
-				const innerBlockListWrapper = await within(
-					buttonsBlock
-				).findByTestId( 'block-list-wrapper' );
-				fireEvent( innerBlockListWrapper, 'layout', {
-					nativeEvent: {
-						layout: {
-							width: 300,
-						},
-					},
-				} );
+				triggerBlockListLayout( buttonsBlock );
 
 				// Get inner button block
 				const buttonBlock = await getBlock( screen, 'Button' );
