@@ -4,8 +4,18 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'negation-operator', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'negation-operator.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/negation-operator' );
+	} );
+
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/negation-operator' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
 	} );
 
 	test( 'add hidden attribute when !state.active', async ( { page } ) => {
