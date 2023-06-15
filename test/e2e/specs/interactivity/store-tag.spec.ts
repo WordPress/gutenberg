@@ -6,7 +6,7 @@ import { test, expect } from './fixtures';
 test.describe( 'store tag', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
-		await utils.addPostWithBlock( 'test/store-tag { "condition":"ok"}' );
+		await utils.addPostWithBlock( 'test/store-tag {"condition":"ok"}' );
 		await utils.addPostWithBlock(
 			'test/store-tag {"condition":"missing"}'
 		);
@@ -26,7 +26,7 @@ test.describe( 'store tag', () => {
 		interactivityUtils: utils,
 		page,
 	} ) => {
-		const block = 'test/store-tag { "condition":"ok"}';
+		const block = 'test/store-tag {"condition":"ok"}';
 		await page.goto( `/?p=${ utils.posts.get( block ) }` );
 
 		const value = page.getByTestId( 'counter value' );
