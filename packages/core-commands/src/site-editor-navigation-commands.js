@@ -6,7 +6,14 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { post, page, layout, symbolFilled, styles } from '@wordpress/icons';
+import {
+	post,
+	page,
+	layout,
+	symbolFilled,
+	styles,
+	navigation,
+} from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 
@@ -121,7 +128,7 @@ function useSiteEditorBasicNavigationCommands() {
 		result.push( {
 			name: 'core/edit-site/open-navigation',
 			label: __( 'Open navigation' ),
-			icon: styles,
+			icon: navigation,
 			callback: ( { close } ) => {
 				const args = {
 					path: '/navigation',
@@ -139,7 +146,7 @@ function useSiteEditorBasicNavigationCommands() {
 		result.push( {
 			name: 'core/edit-site/open-pages',
 			label: __( 'Open pages' ),
-			icon: styles,
+			icon: page,
 			callback: ( { close } ) => {
 				const args = {
 					path: '/page',
