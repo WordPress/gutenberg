@@ -4,8 +4,18 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'Directives (w/ priority)', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directive-priorities.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-priorities' );
+	} );
+
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-priorities' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
 	} );
 
 	test( 'should run in priority order', async ( { page } ) => {
