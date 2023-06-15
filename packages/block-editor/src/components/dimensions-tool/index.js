@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
-import { useSetting } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import useSetting from '../use-setting';
 import AspectRatioTool from './aspect-ratio-tool';
 import ScaleTool from './scale-tool';
 import WidthHeightTool from './width-height-tool';
