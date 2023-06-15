@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-bind`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<a
 		data-wp-bind--href="state.url"

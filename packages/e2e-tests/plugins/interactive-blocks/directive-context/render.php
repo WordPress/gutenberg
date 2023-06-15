@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-context`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<div
 		data-wp-context='{ "prop1":"parent","prop2":"parent","obj":{"prop4":"parent","prop5":"parent"},"array":[1,2,3] }'

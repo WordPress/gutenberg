@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the negation operator in directives.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<button
 		data-wp-on--click="actions.toggle"

@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-text`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<div>
 		<span

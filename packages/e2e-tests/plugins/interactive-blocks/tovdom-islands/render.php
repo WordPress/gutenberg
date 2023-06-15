@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-interactive`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div>
 	<div data-wp-show="state.falseValue">
 		<span data-testid="not inside an island">

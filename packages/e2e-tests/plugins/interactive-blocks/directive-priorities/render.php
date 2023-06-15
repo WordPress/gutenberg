@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing priorities between directives.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<pre data-testid="execution order"></pre>
 

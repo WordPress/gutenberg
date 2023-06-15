@@ -1,9 +1,15 @@
 <?php
-	$plugin_url   = plugin_dir_url( __DIR__ );
-	$src_proc_ins = $plugin_url . 'tovdom/processing-instructions.js';
-	$src_cdata    = $plugin_url . 'tovdom/cdata.js';
+/**
+ * HTML for testing the vDOM generation.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
 
+$plugin_url   = plugin_dir_url( __DIR__ );
+$src_proc_ins = $plugin_url . 'tovdom/processing-instructions.js';
+$src_cdata    = $plugin_url . 'tovdom/cdata.js';
 ?>
+
 <div data-wp-interactive>
 	<div data-testid="it should delete comments">
 		<!-- ##1## -->
@@ -17,11 +23,11 @@
 		<div id="replace-with-processing-instructions"></div>
 	</div>
 
-	<script src="<?= $src_proc_ins ?>"></script>
+	<script src="<?php echo $src_proc_ins; ?>"></script>
 
 	<div data-testid="it should replace CDATA with text nodes">
 		<div id="replace-with-cdata"></div>
 	</div>
 
-	<script src="<?= $src_cdata ?>"></script>
+	<script src="<?php echo $src_cdata; ?>"></script>
 </div>

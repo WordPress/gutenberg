@@ -1,3 +1,11 @@
+<?php
+/**
+ * HTML for testing the directive `data-wp-class`.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+?>
 <div data-wp-interactive>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"

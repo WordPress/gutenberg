@@ -1,6 +1,14 @@
 <?php
-	$counter = 'ok' === $attributes['condition'] ? 3 : 0;
-	$double  = $counter * 2;
+/**
+ * HTML for testing the hydration of the serialized store.
+ *
+ * @package gutenberg-test-interactive-blocks
+ */
+
+
+// These variables simulates SSR.
+$test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
+$test_store_tag_double  = $test_store_tag_counter * 2;
 ?>
 <div data-wp-interactive>
 	<div>
@@ -8,14 +16,14 @@
 		<span
 			data-wp-bind--children="state.counter.value"
 			data-testid="counter value"
-			><?= $counter ?></span
+			><?php echo $test_store_tag_counter; ?></span
 		>
 		<br />
 		Double:
 		<span
 			data-wp-bind--children="state.counter.double"
 			data-testid="counter double"
-			><?= $double ?></span
+			><?php echo $test_store_tag_double; ?></span
 		>
 		<br />
 		<button
@@ -32,20 +40,25 @@
 		clicks
 	</div>
 </div>
-<?php switch ( $attributes[ 'condition' ] ) : ?>
-<?php case 'ok': ?>
+<?php
+
+if ( 'missing' !== $attributes['condition'] ) {
+
+	if ( 'ok' === $attributes['condition'] ) {
+		$test_store_tag_json = '{ "state": { "counter": { "value": 3 } } }';
+	}
+
+	if ( 'corrupted-json' === $attributes['condition'] ) {
+		$test_store_tag_json = 'this is not a JSON';
+	}
+
+	if ( 'invalid-state' === $attributes['condition'] ) {
+		$test_store_tag_json = '{ "state": null }';
+	}
+
+	echo <<<HTML
 	<script type="application/json" id="wp-interactivity-store-data">
-		{ "state": { "counter": { "value": 3 } } }
+		$test_store_tag_json
 	</script>
-<?php break; ?>
-<?php case 'corrupted-json': ?>
-	<script type="application/json" id="wp-interactivity-store-data">
-		this is not a JSON
-	</script>
-<?php break; ?>
-<?php case 'invalid-state': ?>
-	<script type="application/json" id="wp-interactivity-store-data">
-		{ "state": null }
-	</script>
-<?php break; ?>
-<?php endswitch ?>
+HTML;
+}
