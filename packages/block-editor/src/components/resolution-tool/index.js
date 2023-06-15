@@ -32,13 +32,14 @@ export default function ResolutionTool( {
 	onChange,
 	options = DEFAULT_SIZE_OPTIONS,
 	defaultValue = DEFAULT_SIZE_OPTIONS[ 0 ].value,
+	isShownByDefault = true,
 } ) {
 	return (
 		<ToolsPanelItem
 			hasValue={ () => value != null && value !== defaultValue }
 			label={ __( 'Resolution' ) }
 			onDeselect={ () => onChange( defaultValue ) }
-			isShownByDefault={ true }
+			isShownByDefault={ isShownByDefault }
 			panelId={ panelId }
 		>
 			<SelectControl
