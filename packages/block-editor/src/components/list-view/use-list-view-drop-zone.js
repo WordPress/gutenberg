@@ -7,6 +7,7 @@ import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
 } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -71,14 +72,16 @@ export const NESTING_LEVEL_INDENTATION = 28;
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
  * @param {number}  nestingLevel The nesting level of the block.
+ * @param {boolean} rtl          Whether the editor is in RTL mode.
  * @return {boolean} Whether the gesture is an upward gesture.
  */
-function isUpGesture( point, rect, nestingLevel = 1 ) {
+function isUpGesture( point, rect, nestingLevel = 1, rtl = false ) {
 	// If the block is nested, and the user is dragging to the bottom
-	// left of the block, then it is an upward gesture.
-	const blockIndentPosition =
-		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
-	return point.x < blockIndentPosition;
+	// left of the block (or bottom right in RTL languages), then it is an upward gesture.
+	const blockIndentPosition = rtl
+		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
+		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+	return rtl ? point.x > blockIndentPosition : point.x < blockIndentPosition;
 }
 
 /**
@@ -96,14 +99,29 @@ function isUpGesture( point, rect, nestingLevel = 1 ) {
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
  * @param {number}  nestingLevel The nesting level of the block.
+ * @param {boolean} rtl          Whether the editor is in RTL mode.
  * @return {number} The desired relative parent level.
  */
-function getDesiredRelativeParentLevel( point, rect, nestingLevel = 1 ) {
-	const blockIndentPosition =
-		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+function getDesiredRelativeParentLevel(
+	point,
+	rect,
+	nestingLevel = 1,
+	rtl = false
+) {
+	// In RTL languages, the block indent position is from the right edge of the block.
+	// In LTR languages, the block indent position is from the left edge of the block.
+	const blockIndentPosition = rtl
+		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
+		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+
+	const distanceBetweenPointAndBlockIndentPosition = rtl
+		? blockIndentPosition - point.x
+		: point.x - blockIndentPosition;
+
 	const desiredParentLevel = Math.round(
-		( point.x - blockIndentPosition ) / NESTING_LEVEL_INDENTATION
+		distanceBetweenPointAndBlockIndentPosition / NESTING_LEVEL_INDENTATION
 	);
+
 	return Math.abs( desiredParentLevel );
 }
 
@@ -158,14 +176,18 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
  * @param {number}  nestingLevel The nesting level of the block.
+ * @param {boolean} rtl          Whether the editor is in RTL mode.
  */
-function isNestingGesture( point, rect, nestingLevel = 1 ) {
-	const blockIndentPosition =
-		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
-	return (
-		point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION &&
-		point.y < rect.bottom
-	);
+function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
+	const blockIndentPosition = rtl
+		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
+		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+
+	const isNestingHorizontalGesture = rtl
+		? point.x < blockIndentPosition - NESTING_LEVEL_INDENTATION
+		: point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
+
+	return isNestingHorizontalGesture && point.y < rect.bottom;
 }
 
 // Block navigation is always a vertical list, so only allow dropping
@@ -177,10 +199,11 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  *
  * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
  * @param {WPPoint}                  position   The point representing the cursor position when dragging.
+ * @param {boolean}                  rtl        Whether the editor is in RTL mode.
  *
  * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
-export function getListViewDropTarget( blocksData, position ) {
+export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
@@ -256,11 +279,47 @@ export function getListViewDropTarget( blocksData, position ) {
 	const isDraggingBelow = candidateEdge === 'bottom';
 
 	// If the user is dragging towards the bottom of the block check whether
+	// they might be trying to nest the block as a child.
+	// If the block already has inner blocks, and is expanded, this should be treated
+	// as nesting since the next block in the tree will be the first child.
+	// However, if the block is collapsed, dragging beneath the block should
+	// still be allowed, as the next visible block in the tree will be a sibling.
+	if (
+		isDraggingBelow &&
+		candidateBlockData.canInsertDraggedBlocksAsChild &&
+		( ( candidateBlockData.innerBlockCount > 0 &&
+			candidateBlockData.isExpanded ) ||
+			isNestingGesture(
+				position,
+				candidateRect,
+				candidateBlockParents.length,
+				rtl
+			) )
+	) {
+		// If the block is expanded, insert the block as the first child.
+		// Otherwise, for collapsed blocks, insert the block as the last child.
+		const newBlockIndex = candidateBlockData.isExpanded
+			? 0
+			: candidateBlockData.innerBlockCount || 0;
+
+		return {
+			rootClientId: candidateBlockData.clientId,
+			blockIndex: newBlockIndex,
+			dropPosition: 'inside',
+		};
+	}
+
+	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to move the block to be at a parent level.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.rootClientId &&
-		isUpGesture( position, candidateRect, candidateBlockParents.length )
+		isUpGesture(
+			position,
+			candidateRect,
+			candidateBlockParents.length,
+			rtl
+		)
 	) {
 		const nextBlock = getNextNonDraggedBlock(
 			blocksData,
@@ -274,7 +333,8 @@ export function getListViewDropTarget( blocksData, position ) {
 			const desiredRelativeLevel = getDesiredRelativeParentLevel(
 				position,
 				candidateRect,
-				candidateBlockParents.length
+				candidateBlockParents.length,
+				rtl
 			);
 
 			const targetParentIndex = Math.max(
@@ -321,36 +381,6 @@ export function getListViewDropTarget( blocksData, position ) {
 		}
 	}
 
-	// If the user is dragging towards the bottom of the block check whether
-	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, and is expanded, this should be treated
-	// as nesting since the next block in the tree will be the first child.
-	// However, if the block is collapsed, dragging beneath the block should
-	// still be allowed, as the next visible block in the tree will be a sibling.
-	if (
-		isDraggingBelow &&
-		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( ( candidateBlockData.innerBlockCount > 0 &&
-			candidateBlockData.isExpanded ) ||
-			isNestingGesture(
-				position,
-				candidateRect,
-				candidateBlockParents.length
-			) )
-	) {
-		// If the block is expanded, insert the block as the first child.
-		// Otherwise, for collapsed blocks, insert the block as the last child.
-		const newBlockIndex = candidateBlockData.isExpanded
-			? 0
-			: candidateBlockData.innerBlockCount || 0;
-
-		return {
-			rootClientId: candidateBlockData.clientId,
-			blockIndex: newBlockIndex,
-			dropPosition: 'inside',
-		};
-	}
-
 	// If dropping as a sibling, but block cannot be inserted in
 	// this context, return early.
 	if ( ! candidateBlockData.canInsertDraggedBlocksAsSibling ) {
@@ -387,6 +417,8 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 		target || {};
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+
+	const rtl = isRTL();
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
@@ -433,13 +465,24 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 					};
 				} );
 
-				const newTarget = getListViewDropTarget( blocksData, position );
+				const newTarget = getListViewDropTarget(
+					blocksData,
+					position,
+					rtl
+				);
 
 				if ( newTarget ) {
 					setTarget( newTarget );
 				}
 			},
-			[ draggedBlockClientIds ]
+			[
+				canInsertBlocks,
+				draggedBlockClientIds,
+				getBlockCount,
+				getBlockIndex,
+				getBlockRootClientId,
+				rtl,
+			]
 		),
 		200
 	);
