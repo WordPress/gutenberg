@@ -64,6 +64,9 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 		alignOffset = 0,
 		// Other content props
 		onKeyDown,
+		id,
+		className,
+		'aria-labelledby': ariaLabelledBy,
 		// Render props
 		children,
 		trigger,
@@ -87,6 +90,15 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 		[ variant, portalContainer ]
 	);
 
+	// Only pass those props to `DropdownMenuStyled.Content` if they are defined,
+	// as it would otherwise override internal values
+	const extraContentProps = {
+		...( onKeyDown ? { onKeyDown } : null ),
+		...( id ? { id } : null ),
+		...( className ? { className } : null ),
+		...( ariaLabelledBy ? { 'aria-labelledby': ariaLabelledBy } : null ),
+	};
+
 	return (
 		<DropdownMenuPrimitive.Root
 			defaultOpen={ defaultOpen }
@@ -106,7 +118,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 					alignOffset={ alignOffset }
 					loop={ true }
 					variant={ variant }
-					onKeyDown={ onKeyDown }
+					{ ...extraContentProps }
 				>
 					<DropdownMenuPrivateContext.Provider
 						value={ privateContextValue }

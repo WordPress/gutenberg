@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import { find, QueryEmptyError } from 'puppeteer-testing-library';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -189,17 +195,28 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'does not show group option in the options toolbar if Grouping block is disabled', async () => {
+			// Click on dropdown menu trigger
 			await clickBlockToolbarButton( 'Options' );
 
-			// TODO: need to improve the selector / maybe even use puppeteer-testing-library
-			const blockOptionsDropdownHTML = await page.evaluate(
-				() =>
-					document.querySelector(
-						'[data-radix-menu-content][role="menu"]'
-					).innerHTML
-			);
+			// Wait for menu to be visible
+			const blockOptionsDropdownHTML = await find( {
+				role: 'menu',
+				name: 'Options',
+			} );
 
-			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
+			// Make sure that "Group" menu item is not rendered.
+			await expect(
+				find(
+					{
+						role: 'menuitem',
+						name: /^Group/,
+					},
+					{
+						root: blockOptionsDropdownHTML,
+						timeout: 0,
+					}
+				)
+			).rejects.toThrow( QueryEmptyError );
 		} );
 	} );
 

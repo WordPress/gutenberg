@@ -61,7 +61,10 @@ export type DropdownMenuProps = {
 	 * The contents of the dropdown
 	 */
 	children: React.ReactNode;
-} & Pick< DropdownMenuPrimitive.DropdownMenuContentProps, 'onKeyDown' >;
+} & Pick<
+	DropdownMenuPrimitive.DropdownMenuContentProps,
+	'onKeyDown' | 'id' | 'className' | 'aria-labelledby'
+>;
 
 export type DropdownSubMenuTriggerProps = {
 	/**

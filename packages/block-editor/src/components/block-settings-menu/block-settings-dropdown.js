@@ -318,6 +318,13 @@ export function BlockSettingsDropdown( {
 		setIsDropdownOpen( false );
 	}, [] );
 
+	// Save the dropdownTriggerId in case it is enforced via toggleProps, so that
+	// it can be passed as the value for the `aria-labelledby` prop for the
+	// dropdown content. This would normally work out of the box for the
+	// `DropdownMenu` component, but in this case the toggle may receive an
+	// external id from the parent `ToolbarItem` that can't be ignored.
+	const dropdownTriggerId = toggleProps?.id;
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -405,6 +412,7 @@ export function BlockSettingsDropdown( {
 							onInsertBefore();
 						}
 					} }
+					aria-labelledby={ dropdownTriggerId }
 					{ ...props }
 				>
 					<DropdownMenuGroupV2>
