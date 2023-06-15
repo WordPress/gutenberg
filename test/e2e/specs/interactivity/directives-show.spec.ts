@@ -4,8 +4,17 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-show', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directives-show.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-show' );
+	} );
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-show' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'show if callback returns truthy value', async ( { page } ) => {
