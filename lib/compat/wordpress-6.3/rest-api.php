@@ -88,7 +88,7 @@ function add_modified_wp_template_schema() {
 			'modified',
 			array(
 				'schema'       => array(
-					'description' => __( "The date the post was last modified, in the site's timezone.", 'gutenberg' ),
+					'description' => __( "The date the template was last modified, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
