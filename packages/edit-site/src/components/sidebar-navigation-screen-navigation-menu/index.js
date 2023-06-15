@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalUseNavigator as useNavigator,
