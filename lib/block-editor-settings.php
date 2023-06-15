@@ -146,6 +146,18 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 
+	$settings['navigationBlockOverlayIcons'] = array(
+		array(
+			'label' => __( 'Handle icon', 'gutenberg' ),
+			'icon'  => 'handle',
+		),
+		array(
+			'label' => __( 'Menu icon', 'gutenberg' ),
+			'icon'  => 'menu',
+		),
+
+	);
+
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
