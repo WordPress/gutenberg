@@ -116,13 +116,13 @@ export default function SidebarNavigationScreenLibrary() {
 										<CategoryItem
 											key={ category.name }
 											count={ category.count }
-											label={ category.name }
+											label={ category.label }
 											icon={ file }
-											id={ category.id }
+											id={ category.name }
 											type="pattern"
 											isActive={
 												currentCategory ===
-													`${ category.id }` &&
+													`${ category.name }` &&
 												currentType === 'pattern'
 											}
 										/>

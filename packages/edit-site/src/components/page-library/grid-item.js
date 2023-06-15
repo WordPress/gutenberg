@@ -17,7 +17,6 @@ import {
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Icon, moreHorizontal } from '@wordpress/icons';
@@ -31,7 +30,6 @@ import { useLink } from '../routes/link';
 import { PATTERNS, USER_PATTERNS } from './use-patterns';
 
 const DeleteMenuItem = ( { item, onClose } ) => {
-	const { invalidateResolution } = useDispatch( coreStore );
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -44,11 +42,6 @@ const DeleteMenuItem = ( { item, onClose } ) => {
 	const deleteReusableBlock = async () => {
 		try {
 			await __experimentalDeleteReusableBlock( item.id );
-			invalidateResolution( 'getEntityRecords', [
-				'taxonomy',
-				'wp_pattern',
-				{ per_page: -1, hide_empty: false, context: 'view' },
-			] );
 			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
 				type: 'snackbar',
 			} );

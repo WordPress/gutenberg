@@ -3,7 +3,7 @@
  */
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -17,6 +17,7 @@ const EMPTY_PATTERN_LIST = [];
 export const TEMPLATE_PARTS = 'wp_template_part';
 export const PATTERNS = 'pattern';
 export const USER_PATTERNS = 'wp_block';
+const USER_PATTERN_CATEGORY = 'your-patterns';
 const SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
@@ -88,7 +89,7 @@ const useTemplatePartsAsPatterns = (
 	return { templateParts: filteredTemplateParts, isResolving };
 };
 
-const useBlockPatternsByCategory = (
+const useThemePatterns = (
 	categoryId,
 	postType = PATTERNS,
 	filterValue = ''
@@ -123,25 +124,17 @@ const useBlockPatternsByCategory = (
 		[ blockPatterns, restBlockPatterns ]
 	);
 
-	// Non-user-created patterns (e.g. theme patterns ) will have string
-	// category names in their assigned categories array. We'll need to
-	// to retrieve the current category's name to match them.
-	const { record: category } = useEntityRecord(
-		'taxonomy',
-		'wp_pattern',
-		categoryId
-	);
-
 	const filteredPatterns = useMemo( () => {
-		if ( postType !== PATTERNS || ! category ) {
+		if ( postType !== PATTERNS ) {
 			return EMPTY_PATTERN_LIST;
 		}
 
 		return searchItems( patterns, filterValue, {
-			// Rely on closure to check the category slug, rather than id, is in item categories.
-			hasCategory: ( item ) => item.categories?.includes( category.slug ),
+			categoryId,
+			hasCategory: ( item, currentCategory ) =>
+				item.categories?.includes( currentCategory ),
 		} );
-	}, [ patterns, filterValue, category, postType ] );
+	}, [ patterns, filterValue, categoryId, postType ] );
 
 	return filteredPatterns;
 };
@@ -165,7 +158,10 @@ const useUserPatterns = (
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
 	const unfilteredPatterns = useSelect(
 		( select ) => {
-			if ( postType !== USER_PATTERNS ) {
+			if (
+				postType !== USER_PATTERNS ||
+				categoryId !== USER_PATTERN_CATEGORY
+			) {
 				return EMPTY_PATTERN_LIST;
 			}
 
@@ -182,19 +178,21 @@ const useUserPatterns = (
 				reusableBlockToPattern( record )
 			);
 		},
-		[ postType ]
+		[ postType, categoryId ]
 	);
 
 	const filteredPatterns = useMemo( () => {
+		if ( ! unfilteredPatterns.length ) {
+			return EMPTY_PATTERN_LIST;
+		}
+
 		return searchItems( unfilteredPatterns, filterValue, {
-			categoryId,
-			hasCategory: ( item, currentCategory ) => {
-				return currentCategory === 'uncategorized'
-					? ! item.categories?.length
-					: item.categories?.includes( parseInt( currentCategory ) );
-			},
+			// We exit user pattern retrieval early if we aren't in the
+			// catch-all category for user created patterns, so it has
+			// to be in the category.
+			hasCategory: () => true,
 		} );
-	}, [ unfilteredPatterns, categoryId, filterValue ] );
+	}, [ unfilteredPatterns, filterValue ] );
 
 	const patterns = { syncedPatterns: [], unsyncedPatterns: [] };
 
@@ -210,16 +208,18 @@ const useUserPatterns = (
 };
 
 export const usePatterns = ( categoryType, categoryId, filterValue ) => {
-	const blockPatterns = useBlockPatternsByCategory(
+	const blockPatterns = useThemePatterns(
 		categoryId,
 		categoryType,
 		filterValue
 	);
+
 	const { syncedPatterns = [], unsyncedPatterns = [] } = useUserPatterns(
 		categoryId,
 		categoryType,
 		filterValue
 	);
+
 	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
 		categoryId,
 		categoryType,
