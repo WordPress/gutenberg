@@ -6,6 +6,7 @@ export {
 } from './hooks';
 export { getBlockCSSSelector } from './get-block-css-selector';
 export {
+	getLayoutStyles,
 	useGlobalStylesOutput,
 	useGlobalStylesOutputWithConfig,
 } from './use-global-styles-output';
