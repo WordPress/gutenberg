@@ -28,7 +28,7 @@ function gutenberg_add_selectors_property_to_block_type_settings( $settings, $me
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to_block_type_settings', 10, 2 );
 
 /**
- * Adds custom fields support to the wp_block post type so an unsynced option can be added and renames 
+ * Adds custom fields support to the wp_block post type so an unsynced option can be added and renames
  * from Reusable block to Pattern.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
