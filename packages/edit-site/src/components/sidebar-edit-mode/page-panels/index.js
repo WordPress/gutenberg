@@ -19,7 +19,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../../store';
 import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
-import ChangeStatus from '../../change-status';
+import PageSummary from './page-summary';
 import EditTemplate from './edit-template';
 
 export default function PagePanels() {
@@ -65,15 +65,17 @@ export default function PagePanels() {
 									humanTimeDiff( modified )
 								) }
 							</Text>
-							<ChangeStatus
-								status={ status }
-								date={ date }
-								password={ password }
-								postId={ id }
-								postType={ type }
-							/>
 						</VStack>
 					}
+				/>
+			</PanelBody>
+			<PanelBody title={ __( 'Summary' ) }>
+				<PageSummary
+					status={ status }
+					date={ date }
+					password={ password }
+					postId={ id }
+					postType={ type }
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>

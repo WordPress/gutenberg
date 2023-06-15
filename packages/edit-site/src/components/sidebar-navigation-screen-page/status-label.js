@@ -64,14 +64,16 @@ export default function StatusLabel( { status, date, short } ) {
 				short ? 'M j' : 'F j',
 				getDate( date )
 			);
-			statusLabel = createInterpolateElement(
-				sprintf(
-					/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
-					__( 'Scheduled: <time>%s</time>' ),
-					formattedDate
-				),
-				{ time: <time dateTime={ date } /> }
-			);
+			statusLabel = date
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
+							__( 'Scheduled: <time>%s</time>' ),
+							formattedDate
+						),
+						{ time: <time dateTime={ date } /> }
+				  )
+				: __( 'Scheduled' );
 			break;
 		case 'draft':
 			statusLabel = __( 'Draft' );
