@@ -228,9 +228,22 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				</>
 			}
 			title={ decodeEntities( menuTitle ) }
-			description={ __(
-				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
-			) }
+			description={
+				<>
+					<p>
+						{ sprintf(
+							/* translators: %s: Navigation menu title */
+							'This is your "%s" navigation menu. ',
+							decodeEntities( menuTitle )
+						) }
+					</p>
+					<p>
+						{ __(
+							'You can edit this menu here, but be aware that visual styles might be applied separately in templates or template parts, so the preview shown here can be incomplete.'
+						) }
+					</p>
+				</>
+			}
 		>
 			<NavigationMenuEditor navigationMenu={ navigationMenu } />
 		</SidebarNavigationScreenWrapper>
