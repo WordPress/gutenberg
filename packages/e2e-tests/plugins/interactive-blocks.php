@@ -7,10 +7,10 @@
  * @package gutenberg-test-interactive-blocks
  */
 
- // Register all blocks found in the `build/blocks` folder.
+ // Register all blocks found in the `interactive-blocks` folder.
 function auto_register_block_types() {
-	if ( file_exists( __DIR__ . '/build/' ) ) {
-		$block_json_files = glob( __DIR__ . '/build/**/block.json' );
+	if ( file_exists( __DIR__ . '/interactive-blocks/' ) ) {
+		$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
 
 
 		// auto register all blocks that were found.
