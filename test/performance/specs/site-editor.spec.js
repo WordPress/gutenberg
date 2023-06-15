@@ -54,7 +54,7 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Loading', async ( { page, admin } ) => {
+	test( 'Loading', async ( { browser, page, admin } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
@@ -77,45 +77,53 @@ test.describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		// Number of sample measurements to take.
-		const samples = 5;
-		// Number of throwaway measurements to perform before recording samples.
-		// Having at least one helps ensure that caching quirks don't manifest in
-		// the results.
-		const throwaway = 1;
+		// Open the test page in Site Editor.
+		await admin.visitSiteEditor( {
+			postId: testPageId,
+			postType: 'page',
+		} );
 
-		let i = throwaway + samples;
+		// Get the URL that we will be testing against.
+		const targetUrl = await page.evaluate( 'document.location.href' );
+
+		// Start the measurements.
+		let i = 3;
 		while ( i-- ) {
-			// Open the test page in Site Editor.
-			await admin.visitSiteEditor( {
-				postId: testPageId,
-				postType: 'page',
-			} );
+			// Open a fresh page in a new context to prevent caching.
+			const freshPage = await browser.newPage();
+
+			// Go to the test page URL.
+			await freshPage.goto( targetUrl );
+
+			// Wait for the canvas to appear.
+			await freshPage
+				.locator( '.edit-site-canvas-spinner' )
+				.waitFor( { state: 'hidden' } );
 
 			// Wait for the first block.
-			await page
+			await freshPage
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
 				.waitFor( { timeout: 60_000 } );
 
-			if ( i < samples ) {
-				// Save results.
-				const {
-					serverResponse,
-					firstPaint,
-					domContentLoaded,
-					loaded,
-					firstContentfulPaint,
-					firstBlock,
-				} = await getLoadingDurations( page );
-				results.serverResponse.push( serverResponse );
-				results.firstPaint.push( firstPaint );
-				results.domContentLoaded.push( domContentLoaded );
-				results.loaded.push( loaded );
-				results.firstContentfulPaint.push( firstContentfulPaint );
-				results.firstBlock.push( firstBlock );
-			}
+			// Save results.
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations( freshPage );
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
+
+			await freshPage.close();
 		}
 	} );
 

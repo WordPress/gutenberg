@@ -131,7 +131,7 @@ export async function getLoadingDurations( page ) {
 				paintTimings.find(
 					( { name } ) => name === 'first-contentful-paint'
 				).startTime - responseEnd,
-			// This is evaluated right after Puppeteer found the block selector.
+			// This is evaluated right after Playwright found the block selector.
 			firstBlock: performance.now() - responseEnd,
 		};
 	} );
