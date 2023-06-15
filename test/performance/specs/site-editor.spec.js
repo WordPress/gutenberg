@@ -84,24 +84,24 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Get the URL that we will be testing against.
-		const targetUrl = await page.evaluate( 'document.location.href' );
+		const targetUrl = page.url();
 
 		// Start the measurements.
 		let i = 3;
 		while ( i-- ) {
 			// Open a fresh page in a new context to prevent caching.
-			const freshPage = await browser.newPage();
+			const testPage = await browser.newPage();
 
 			// Go to the test page URL.
-			await freshPage.goto( targetUrl );
+			await testPage.goto( targetUrl );
 
 			// Wait for the canvas to appear.
-			await freshPage
+			await testPage
 				.locator( '.edit-site-canvas-spinner' )
 				.waitFor( { state: 'hidden' } );
 
 			// Wait for the first block.
-			await freshPage
+			await testPage
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
@@ -115,7 +115,7 @@ test.describe( 'Site Editor Performance', () => {
 				loaded,
 				firstContentfulPaint,
 				firstBlock,
-			} = await getLoadingDurations( freshPage );
+			} = await getLoadingDurations( testPage );
 			results.serverResponse.push( serverResponse );
 			results.firstPaint.push( firstPaint );
 			results.domContentLoaded.push( domContentLoaded );
@@ -123,7 +123,7 @@ test.describe( 'Site Editor Performance', () => {
 			results.firstContentfulPaint.push( firstContentfulPaint );
 			results.firstBlock.push( firstBlock );
 
-			await freshPage.close();
+			await testPage.close();
 		}
 	} );
 
