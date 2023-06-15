@@ -30,22 +30,27 @@ const interactiveContentTags = new Set( [
 
 function prefixSelectKeys( selected, prefix ) {
 	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
-	return Object.fromEntries(
-		Object.entries( selected ).map( ( [ key, value ] ) => [
-			`${ prefix }.${ key }`,
-			value,
-		] )
-	);
+
+	const keys = {};
+	for ( const key in selected ) {
+		keys[ `${ prefix }.${ key }` ] = selected[ key ];
+	}
+	return keys;
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
 	if ( selected[ prefix ] ) return selected[ prefix ];
-	return Object.keys( selected )
-		.filter( ( key ) => key.startsWith( prefix + '.' ) )
-		.reduce( ( accumulator, key ) => {
-			accumulator[ key.slice( prefix.length + 1 ) ] = selected[ key ];
-			return accumulator;
-		}, {} );
+
+	const keys = {};
+	const fullPrefix = `${ prefix }.`;
+	for ( const key in selected ) {
+		if ( key[ 0 ] !== prefix[ 0 ] || ! key.startsWith( fullPrefix ) ) {
+			continue;
+		}
+
+		keys[ key.slice( fullPrefix.length ) ] = selected[ key ];
+	}
+	return keys;
 }
 
 /**

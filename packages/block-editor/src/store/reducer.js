@@ -303,20 +303,16 @@ const withBlockTree =
 					action.blocks
 				);
 				newState.tree = new Map( newState.tree );
-				action.replacedClientIds
-					.concat(
-						// Controlled inner blocks are only removed
-						// if the block doesn't move to another position
-						// otherwise their content will be lost.
-						action.replacedClientIds
-							.filter(
-								( clientId ) => ! inserterClientIds[ clientId ]
-							)
-							.map( ( clientId ) => 'controlled||' + clientId )
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+
+				for ( const id of action.replacedClientIds ) {
+					newState.tree.delete( id );
+					// Controlled inner blocks are only removed
+					// if the block doesn't move to another position
+					// otherwise their content will be lost.
+					if ( ! inserterClientIds[ id ] ) {
+						newState.tree.delete( `controlled||${ id }` );
+					}
+				}
 
 				updateBlockTreeForBlocks( newState, action.blocks );
 				updateParentInnerBlocksInTree(
@@ -1651,18 +1647,19 @@ export const blockListSettings = ( state = {}, action ) => {
 		// should correct the state.
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
-			return Object.fromEntries(
-				Object.entries( state ).filter(
-					( [ id ] ) => ! action.clientIds.includes( id )
-				)
-			);
+			const withoutRemovedBlocks = Object.assign( {}, state );
+			for ( const id in action.clientIds ) {
+				delete withoutRemovedBlocks[ id ];
+			}
+			return withoutRemovedBlocks;
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { clientId } = action;
 			if ( ! action.settings ) {
 				if ( state.hasOwnProperty( clientId ) ) {
-					const { [ clientId ]: removedBlock, ...restBlocks } = state;
-					return restBlocks;
+					const withoutBlock = Object.assign( {}, state );
+					delete withoutBlock[ clientId ];
+					return withoutBlock;
 				}
 
 				return state;
