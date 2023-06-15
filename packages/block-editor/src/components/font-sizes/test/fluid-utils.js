@@ -74,7 +74,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		);
 	} );
 
-	it( 'should return default font size when maximumViewPortWidth not a supported value or unit', () => {
+	it( 'should return null when maximumViewPortWidth is not a supported value or unit', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '30px',
 			maximumViewPortWidth: 'min(calc(100% - 60px), 1200px)',
@@ -82,7 +82,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		expect( fluidTypographyValues ).toBeNull();
 	} );
 
-	it( 'should return `null` font size when minimumViewPortWidth not a supported value or unit', () => {
+	it( 'should return `null` font size when minimumViewPortWidth is not a supported value or unit', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '33px',
 			minimumViewPortWidth: 'calc(100% - 60px)',
