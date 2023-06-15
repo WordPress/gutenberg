@@ -83,7 +83,7 @@ export default function AddNewPattern() {
 			) }
 			{ showTemplatePartModal && (
 				<CreateTemplatePartModal
-					closeModal={ () => setShowPatternModal( false ) }
+					closeModal={ () => setShowTemplatePartModal( false ) }
 					onCreate={ handleCreateTemplatePart }
 					onError={ handleError }
 				/>
