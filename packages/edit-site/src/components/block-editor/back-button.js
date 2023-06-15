@@ -19,7 +19,9 @@ function BackButton() {
 	const isTemplatePart = location.params.postType === 'wp_template_part';
 	const previousTemplateId = location.state?.fromTemplateId;
 
-	if ( ! isTemplatePart || ! previousTemplateId ) {
+	const isFocusMode = isTemplatePart;
+
+	if ( ! isFocusMode || ! previousTemplateId ) {
 		return null;
 	}
 
