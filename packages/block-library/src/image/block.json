@@ -69,6 +69,9 @@
 		"height": {
 			"type": "number"
 		},
+		"aspectRatio": {
+			"type": "string"
+		},
 		"sizeSlug": {
 			"type": "string"
 		},
