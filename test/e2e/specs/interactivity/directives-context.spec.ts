@@ -11,8 +11,19 @@ const parseContent = async ( loc: Locator ) =>
 	JSON.parse( ( await loc.textContent() ) || '' );
 
 test.describe( 'data-wp-context', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directives-context.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-context' );
+	} );
+
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-context' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'is correctly initialized', async ( { page } ) => {
