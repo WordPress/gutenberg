@@ -81,4 +81,62 @@ test.describe( 'Block Locking', () => {
 <p>Some paragraph</p>
 <!-- /wp:paragraph -->` );
 	} );
+
+	test( 'block locking supersedes template locking', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'constrained' },
+				templateLock: 'all',
+			},
+			innerBlocks: [
+				{
+					name: 'core/heading',
+					attributes: { content: 'Hello, hello' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'WordPress' },
+				},
+			],
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Paragraph block',
+		} );
+		await paragraph.click();
+
+		await editor.clickBlockToolbarButton( 'Unlock' );
+		await page.click( 'role=checkbox[name="Lock all"]' );
+		await page.click( 'role=button[name="Apply"]' );
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Move up' } )
+		).toBeVisible();
+
+		await paragraph.click();
+		await pageUtils.pressKeys( 'access+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					layout: { type: 'constrained' },
+					templateLock: 'all',
+				},
+				innerBlocks: [
+					{
+						name: 'core/heading',
+						attributes: { content: 'Hello, hello' },
+					},
+				],
+			},
+		] );
+	} );
 } );
