@@ -28,7 +28,8 @@ function gutenberg_add_selectors_property_to_block_type_settings( $settings, $me
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to_block_type_settings', 10, 2 );
 
 /**
- * Adds custom fields support to the wp_block post type so a partial and unsynced option can be added.
+ * Adds custom fields support to the wp_block post type so an unsynced option can be added and renames 
+ * from Reusable block to Pattern.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
@@ -67,7 +68,7 @@ function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
 
 /**
- * Adds wp_block_sync_status and wp_block_category_name meta fields to the wp_block post type so a partial and unsynced option can be added.
+ * Adds wp_block_sync_status meta fields to the wp_block post type so an unsynced option can be added.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *

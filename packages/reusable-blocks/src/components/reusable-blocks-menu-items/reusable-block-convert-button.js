@@ -14,14 +14,13 @@ import {
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -40,16 +39,7 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
-	const query = { per_page: -1, hide_empty: false, context: 'view' };
-
-	const { records: categories } = useEntityRecords(
-		'taxonomy',
-		'wp_pattern',
-		query
-	);
-
 	const [ syncType, setSyncType ] = useState( 'unsynced' );
-	const [ categoryId, setCategoryId ] = useState( '' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
@@ -89,7 +79,7 @@ export default function ReusableBlockConvertButton( {
 
 			return _canConvert;
 		},
-		[ clientIds ]
+		[ clientIds, rootClientId ]
 	);
 
 	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
@@ -103,8 +93,7 @@ export default function ReusableBlockConvertButton( {
 				await convertBlocksToReusable(
 					clientIds,
 					reusableBlockTitle,
-					syncType,
-					categoryId
+					syncType
 				);
 				createSuccessNotice(
 					sprintf(
@@ -128,7 +117,6 @@ export default function ReusableBlockConvertButton( {
 			convertBlocksToReusable,
 			clientIds,
 			syncType,
-			categoryId,
 			createSuccessNotice,
 			createErrorNotice,
 		]
@@ -137,16 +125,6 @@ export default function ReusableBlockConvertButton( {
 	if ( ! canConvert ) {
 		return null;
 	}
-	const patternCategories = categories === null ? [] : categories;
-	const categoryOptions = patternCategories
-		.filter( ( category ) => category.slug !== 'query' )
-		.map( ( category ) => ( {
-			label: category.name,
-			value: category.id,
-		} ) )
-		.concat( [
-			{ value: '', label: __( 'Select a category' ), disabled: true },
-		] );
 
 	return (
 		<BlockSettingsMenuControls>
@@ -154,10 +132,7 @@ export default function ReusableBlockConvertButton( {
 				<>
 					<MenuItem
 						icon={ symbol }
-						onClick={ () => {
-							setCategoryId( '' );
-							setIsModalOpen( true );
-						} }
+						onClick={ () => setIsModalOpen( true ) }
 					>
 						{ __( 'Create a Pattern' ) }
 					</MenuItem>
@@ -185,13 +160,6 @@ export default function ReusableBlockConvertButton( {
 										label={ __( 'Name' ) }
 										value={ title }
 										onChange={ setTitle }
-									/>
-									<SelectControl
-										label={ __( 'Category' ) }
-										onChange={ setCategoryId }
-										options={ categoryOptions }
-										size="__unstable-large"
-										value={ categoryId }
 									/>
 
 									<ToggleControl
