@@ -138,6 +138,7 @@ export default function PostFeaturedImageEdit( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				imageSizeOptions={ imageSizeOptions }
+				mediaUrl={ mediaUrl }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
