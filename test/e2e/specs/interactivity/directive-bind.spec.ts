@@ -1,34 +1,21 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-bind', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
-		await requestUtils.activatePlugin(
-			'gutenberg-test-interactive-blocks'
-		);
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-bind' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-interactive-blocks'
-		);
-	} );
-
-	let postId: number | null;
-
-	test.beforeEach( async ( { admin, editor, page } ) => {
-		// We only need to publish a new post the first time. Subsequent tests
-		// will access to the same post.
-		if ( ! postId ) {
-			await admin.createNewPost();
-			await editor.setContent( `<!-- wp:test/directive-bind /-->` );
-			postId = await editor.publishPost();
-		}
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-bind' );
 		await page.goto( `/?p=${ postId }` );
+	} );
+
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
 	} );
 
 	test( 'add missing href at hydration', async ( { page } ) => {
