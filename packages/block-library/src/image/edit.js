@@ -329,9 +329,7 @@ export function ImageEdit( {
 		ref,
 		className: classes,
 		style: {
-			height: aspectRatio ? '100%' : height,
-			width: !! aspectRatio && '100%',
-			objectFit: !! ( height || aspectRatio ) && scale,
+			objectFit: aspectRatio ? scale : 'auto',
 			aspectRatio,
 		},
 	} );
@@ -351,8 +349,6 @@ export function ImageEdit( {
 					'Upload an image file, pick one from your media library, or add one with a URL.'
 				) }
 				style={ {
-					height: !! aspectRatio && '100%',
-					width: !! aspectRatio && '100%',
 					...borderProps.style,
 				} }
 			>
