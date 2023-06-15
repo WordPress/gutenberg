@@ -811,7 +811,12 @@ test.describe( 'Image - interactivity', () => {
 
 		let blocks = await editor.getBlocks();
 		expect( blocks[ 0 ].attributes ).toMatchObject( {
-			behaviors: { lightbox: true },
+			behaviors: {
+				lightbox: {
+					animation: 'zoom',
+					enabled: true,
+				},
+			},
 			linkDestination: 'none',
 		} );
 		expect( blocks[ 0 ].attributes.url ).toContain( filename );
@@ -819,7 +824,12 @@ test.describe( 'Image - interactivity', () => {
 		await page.getByLabel( 'Behaviors' ).selectOption( '' );
 		blocks = await editor.getBlocks();
 		expect( blocks[ 0 ].attributes ).toMatchObject( {
-			behaviors: { lightbox: false },
+			behaviors: {
+				lightbox: {
+					animation: '',
+					enabled: false,
+				},
+			},
 			linkDestination: 'none',
 		} );
 		expect( blocks[ 0 ].attributes.url ).toContain( filename );
