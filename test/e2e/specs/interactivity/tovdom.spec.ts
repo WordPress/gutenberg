@@ -4,8 +4,17 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'toVdom', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'tovdom.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/tovdom' );
+	} );
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/tovdom' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'it should delete comments', async ( { page } ) => {

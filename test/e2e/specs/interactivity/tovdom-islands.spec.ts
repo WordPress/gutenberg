@@ -3,9 +3,18 @@
  */
 import { test, expect } from './fixtures';
 
-test.describe( 'toVdom - isands', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'tovdom-islands.html' );
+test.describe( 'toVdom - islands', () => {
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/tovdom-islands' );
+	} );
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/tovdom-islands' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'directives that are not inside islands should not be hydrated', async ( {
