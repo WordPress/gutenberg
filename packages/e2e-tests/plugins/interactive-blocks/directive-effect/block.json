@@ -9,5 +9,7 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "file:./view.js"
+	"editorScript": "directive-effect-editor",
+	"viewScript": ["directive-effect-view", "wp-interactivity"],
+	"render": "file:./render.php"
 }

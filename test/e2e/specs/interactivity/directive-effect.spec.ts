@@ -25,7 +25,7 @@ test.describe( 'data-wp-effect', () => {
 		// will access to the same post.
 		if ( ! postId ) {
 			await admin.createNewPost();
-			await editor.insertBlock( { name: 'test/directive-effect' } );
+			await editor.setContent( `<!-- wp:test/directive-effect /-->` );
 			postId = await editor.publishPost();
 		}
 		await page.goto( `/?p=${ postId }` );

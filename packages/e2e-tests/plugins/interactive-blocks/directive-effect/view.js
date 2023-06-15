@@ -1,5 +1,5 @@
-( ( win ) => {
-	const { store, directive, useContext, useMemo } = win.wp.interactivity;
+( ( { wp } ) => {
+	const { store, directive, useContext, useMemo } = wp.interactivity;
 
 	// Fake `data-wp-fakeshow` directive to test when things are removed from the DOM.
 	// Replace with `data-wp-show` when it's ready.

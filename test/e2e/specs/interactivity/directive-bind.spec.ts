@@ -25,7 +25,7 @@ test.describe( 'data-wp-bind', () => {
 		// will access to the same post.
 		if ( ! postId ) {
 			await admin.createNewPost();
-			await editor.insertBlock( { name: 'test/directive-bind' } );
+			await editor.setContent( `<!-- wp:test/directive-bind /-->` );
 			postId = await editor.publishPost();
 		}
 		await page.goto( `/?p=${ postId }` );
