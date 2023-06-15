@@ -10,6 +10,9 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	SelectControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,7 +36,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -91,6 +94,8 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		aspectRatio,
+		scale,
 	} = attributes;
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
@@ -260,6 +265,10 @@ export default function Image( {
 		setAttributes( { alt: newAlt } );
 	}
 
+	function updateAspectRatio( newAspectRatio ) {
+		setAttributes( { aspectRatio: newAspectRatio } );
+	}
+
 	function updateImage( newSizeSlug ) {
 		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
@@ -317,6 +326,33 @@ export default function Image( {
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
+	const showScaleControl =
+		height || ( aspectRatio && aspectRatio !== 'auto' );
+
+	const SCALE_OPTIONS = (
+		<>
+			<ToggleGroupControlOption
+				value="cover"
+				label={ _x( 'Cover', 'Scale option for aspect ratio control' ) }
+			/>
+			<ToggleGroupControlOption
+				value="contain"
+				label={ _x(
+					'Contain',
+					'Scale option for aspect ratio control'
+				) }
+			/>
+		</>
+	);
+
+	const scaleHelp = {
+		cover: __(
+			'Image is scaled and cropped to fill the entire space without being distorted.'
+		),
+		contain: __(
+			'Image is scaled to fill the space without clipping nor distorting.'
+		),
+	};
 
 	function switchToCover() {
 		replaceBlocks(
@@ -419,6 +455,39 @@ export default function Image( {
 							}
 						/>
 					) }
+					<SelectControl
+						label={ __( 'Aspect ratio' ) }
+						options={ [
+							{ label: __( 'Original' ), value: 'auto' },
+							{ label: __( 'Square - 1:1' ), value: '1:1' },
+							{ label: __( 'Classic - 3:2' ), value: '3:2' },
+							{ label: __( 'Standard - 4:3' ), value: '4:3' },
+							{ label: __( 'Portrait - 3:4' ), value: '3:4' },
+							{ label: __( 'Wide - 16:9' ), value: '16:9' },
+							{ label: __( 'Tall - 9:16' ), value: '9:16' },
+							{ label: __( 'Custom' ), value: 'custom' },
+						] }
+						value={ aspectRatio }
+						onChange={ updateAspectRatio }
+						size="__unstable-large"
+					/>
+					{ showScaleControl && (
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							label={ __( 'Scale' ) }
+							value={ scale }
+							help={ scaleHelp[ scale ] }
+							onChange={ ( value ) =>
+								setAttributes( {
+									scale: value,
+								} )
+							}
+							isBlock
+						>
+							{ SCALE_OPTIONS }
+						</ToggleGroupControl>
+					) }
+
 					<ImageSizeControl
 						onChangeImage={ updateImage }
 						onChange={ ( value ) => setAttributes( value ) }
