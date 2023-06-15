@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
  */
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
