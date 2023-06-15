@@ -4,8 +4,17 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-text', () => {
-	test.beforeEach( async ( { goToFile } ) => {
-		await goToFile( 'directives-text.html' );
+	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+		await utils.activatePlugins();
+		await utils.addPostWithBlock( 'test/directive-text' );
+	} );
+	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
+		const postId = utils.posts.get( 'test/directive-text' );
+		await page.goto( `/?p=${ postId }` );
+	} );
+	test.afterAll( async ( { interactivityUtils: utils } ) => {
+		await utils.deactivatePlugins();
+		await utils.deleteAllPosts();
 	} );
 
 	test( 'show proper text reading from state', async ( { page } ) => {
