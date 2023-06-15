@@ -11,8 +11,6 @@ import {
 	TextControl,
 	ToolbarButton,
 	SelectControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -36,7 +34,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -326,33 +324,6 @@ export default function Image( {
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
-	const showScaleControl =
-		height || ( aspectRatio && aspectRatio !== 'auto' );
-
-	const SCALE_OPTIONS = (
-		<>
-			<ToggleGroupControlOption
-				value="cover"
-				label={ _x( 'Cover', 'Scale option for aspect ratio control' ) }
-			/>
-			<ToggleGroupControlOption
-				value="contain"
-				label={ _x(
-					'Contain',
-					'Scale option for aspect ratio control'
-				) }
-			/>
-		</>
-	);
-
-	const scaleHelp = {
-		cover: __(
-			'Image is scaled and cropped to fill the entire space without being distorted.'
-		),
-		contain: __(
-			'Image is scaled to fill the space without clipping nor distorting.'
-		),
-	};
 
 	function switchToCover() {
 		replaceBlocks(
@@ -459,35 +430,18 @@ export default function Image( {
 						label={ __( 'Aspect ratio' ) }
 						options={ [
 							{ label: __( 'Original' ), value: 'auto' },
-							{ label: __( 'Square - 1:1' ), value: '1/1' },
-							{ label: __( 'Classic - 3:2' ), value: '3/2' },
-							{ label: __( 'Standard - 4:3' ), value: '4/3' },
-							{ label: __( 'Portrait - 3:4' ), value: '3/4' },
-							{ label: __( 'Wide - 16:9' ), value: '16/9' },
-							{ label: __( 'Tall - 9:16' ), value: '9/16' },
+							{ label: __( 'Square - 1:1' ), value: '1' },
+							{ label: __( 'Classic - 3:2' ), value: '1.5' },
+							{ label: __( 'Standard - 4:3' ), value: '1.33' },
+							{ label: __( 'Portrait - 3:4' ), value: '0.75' },
+							{ label: __( 'Wide - 16:9' ), value: '1.77' },
+							{ label: __( 'Tall - 9:16' ), value: '0.562' },
 							{ label: __( 'Custom' ), value: 'custom' },
 						] }
 						value={ aspectRatio }
 						onChange={ updateAspectRatio }
 						size="__unstable-large"
 					/>
-					{ showScaleControl && (
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							label={ __( 'Scale' ) }
-							value={ scale }
-							help={ scaleHelp[ scale ] }
-							onChange={ ( value ) =>
-								setAttributes( {
-									scale: value,
-								} )
-							}
-							isBlock
-						>
-							{ SCALE_OPTIONS }
-						</ToggleGroupControl>
-					) }
-
 					<ImageSizeControl
 						onChangeImage={ updateImage }
 						onChange={ ( value ) => setAttributes( value ) }
@@ -547,6 +501,11 @@ export default function Image( {
 	const hasCustomBorder =
 		!! borderProps.className ||
 		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
+	const imageStyles = {
+		...borderProps.style,
+		aspectRatio,
+		objectFit: !! ( height || aspectRatio ) && scale,
+	};
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -565,7 +524,7 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ borderProps.style }
+				style={ imageStyles }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -662,7 +621,7 @@ export default function Image( {
 		img = (
 			<ResizableBox
 				size={ {
-					width: width ?? 'auto',
+					width: 'auto',
 					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 				showHandle={ isSelected }
@@ -686,6 +645,7 @@ export default function Image( {
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
+				styles={ { aspectRatio } }
 			>
 				{ img }
 			</ResizableBox>
