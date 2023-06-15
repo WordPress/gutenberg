@@ -35,7 +35,7 @@ export default function ChangeStatus( { postType, postId, status, date } ) {
 		try {
 			let newStatus = status;
 			if ( status === 'future' && new Date( newDate ) < new Date() ) {
-				newStatus = 'draft';
+				newStatus = 'publish';
 			} else if (
 				status === 'publish' &&
 				new Date( newDate ) > new Date()
