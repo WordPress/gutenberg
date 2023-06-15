@@ -3,7 +3,7 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 import { createRegistrySelector } from '../factory';
 
 describe( 'Private data APIs', () => {

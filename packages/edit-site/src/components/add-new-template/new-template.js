@@ -37,7 +37,7 @@ import {
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
