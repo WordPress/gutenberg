@@ -163,7 +163,9 @@ export default function ReusableBlockConvertButton( {
 		.forEach( ( coreCategory ) => {
 			if (
 				! categoryOptions.find(
-					( cat ) => cat.value === coreCategory.name
+					( cat ) =>
+						cat.value === coreCategory.name ||
+						cat.label === coreCategory.label
 				)
 			) {
 				categoryOptions.push( {
