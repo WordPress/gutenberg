@@ -40,6 +40,28 @@ const DEFAULT_SCALE_OPTIONS = [
 	},
 ];
 
+/**
+ * @callback ScaleToolPropsOnChange
+ * @param {string} nextValue
+ * @return {void}
+ */
+
+/**
+ * @typedef {Object} ScaleToolProps
+ * @property {string}                 [panelId]               ID of the panel that contains the controls.
+ * @property {string}                 [value]                 Current scale value.
+ * @property {ScaleToolPropsOnChange} [onChange]              Callback to update the scale value.
+ * @property {SelectControlProps[]}   [options]               Scale options.
+ * @property {string}                 [defaultValue]          Default scale value.
+ * @property {boolean}                [showControl=true]      Whether to show the control.
+ * @property {boolean}                [isShownByDefault=true] Whether the tool panel is shown by default.
+ */
+
+/**
+ * A tool to select the CSS object-fit property for the image.
+ * @param {ScaleToolProps} props
+ * @return {import('@wordpress/element').WPElement}
+ */
 export default function ScaleTool( {
 	panelId,
 	value = 'fill', // Match the CSS default so if the value is used directly in CSS it will look correct in the control.
