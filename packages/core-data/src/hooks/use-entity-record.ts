@@ -160,7 +160,7 @@ export default function useEntityRecord< RecordType >(
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
 	const { editedRecord, hasEdits } = useSelect(
