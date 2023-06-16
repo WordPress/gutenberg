@@ -165,7 +165,9 @@ export default function HomeTemplateDetails() {
 							value={ postsPageTitleValue }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }
-							help={ __( 'Set the title of the Posts Page' ) }
+							help={ __(
+								'Set the Posts Page title. Appears in search results, and when the page is shared on social media.'
+							) }
 						/>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) }
@@ -180,7 +182,7 @@ export default function HomeTemplateDetails() {
 						onChange={ debounce( setPostsPerPage, 300 ) }
 						label={ __( 'Posts per page' ) }
 						help={ __(
-							'Applies to all blog pages including categories and tags, but some templates may override this setting.'
+							'Set the default number of posts to display on blog pages, including categories and tags. Some templates may override this setting.'
 						) }
 					/>
 				</SidebarNavigationScreenDetailsPanelRow>
