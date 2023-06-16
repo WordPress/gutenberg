@@ -174,11 +174,11 @@ function ResizableFrame( {
 	const resizeHandleVariants = {
 		default: {
 			opacity: 1,
-			left: -16,
+			left: -12,
 		},
 		resizing: {
 			opacity: 1,
-			left: -16,
+			left: -12,
 			scaleY: 1.3,
 		},
 	};
