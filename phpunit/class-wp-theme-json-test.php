@@ -2094,7 +2094,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'color'      => array( 'background' => 'linear-gradient(90deg, var(--wp--preset--color--primary) 0%, var(--wp--preset--color--secondary) 35%, var(--wp--undefined--color--secondary) 100%)' ),
 						),
 						'core/comment-content' => array(
-							'typography' => array( 'fontSize' => 'calc(var(--wp--preset--font-size--small) + 20px)' ),
+							'typography' => array( 'fontSize' => 'calc(var(--wp--preset--font-size--small, 12px) + 20px)' ),
+							'color'      => array(
+								'text'       => 'var(--wp--preset--color--primary, red)',
+								'background' => 'var(--wp--preset--color--primary, var(--wp--preset--font-size--secondary))',
+								'link'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+							),
+						),
+						'core/comments'        => array(
+							'color' => array(
+								'text' => 'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+							),
 						),
 						'core/navigation'      => array(
 							'elements' => array(
@@ -2143,10 +2153,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
 		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
-
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
 		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
 		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
 		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+
+		$this->assertEquals(
+			'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+			$styles['blocks']['core/comments']['color']['text'],
+			'Blocks: text color with undefined var and fallback'
+		);
 
 		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
 		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
