@@ -91,9 +91,9 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-function TemplateListItem( { title, description, icon, onClick } ) {
+function TemplateListItem( { title, className, description, icon, onClick } ) {
 	return (
-		<Button onClick={ onClick }>
+		<Button className={ className } onClick={ onClick }>
 			<VStack
 				as="span"
 				spacing={ 2 }
@@ -296,6 +296,7 @@ export default function NewTemplate( {
 							} ) }
 							<TemplateListItem
 								title={ __( 'Custom template' ) }
+								className="edit-site-add-new-template__custom-template-button"
 								description={ __(
 									'A custom template can be manually applied to any post or page.'
 								) }

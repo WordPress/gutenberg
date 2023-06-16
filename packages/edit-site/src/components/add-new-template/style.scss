@@ -184,6 +184,11 @@
 			}
 		}
 	}
+
+	.edit-site-add-new-template__custom-template-button {
+		grid-column-start: 1;
+		grid-column-end: 4;
+	}
 }
 
 .edit-site-add-new-template__template-list__contents {
