@@ -97,6 +97,16 @@ const baseContent = (
 	@media ( prefers-reduced-motion ) {
 		animation-duration: 0s;
 	}
+
+	/*
+	 * Styles to ensure a minimum level of back compat in case the legacy
+	 * MenuItem components were rendered inside the dropdown menu.
+	 **/
+	.components-menu-item__button,
+	.components-menu-item__button.components-button {
+		display: flex;
+		width: auto;
+	}
 `;
 
 const itemPrefix = css`
