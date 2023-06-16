@@ -228,6 +228,7 @@ _Parameters_
 
 -   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
 -   _onSuccess_ `Function`: Called when to text is copied.
+-   _container_ `Element=`: The container in which the copy action will be performed. Useful when there are active focus traps, like when using modal components.
 
 _Returns_
 

@@ -31,14 +31,16 @@ function useUpdatedRef( value ) {
  * @param {string | (() => string)} text      The text to copy. Use a function if not
  *                                            already available and expensive to compute.
  * @param {Function}                onSuccess Called when to text is copied.
+ * @param {Element=}                container The container in which the copy action will be performed. Useful when there are active focus traps, like when using modal components.
  *
  * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
  */
-export default function useCopyToClipboard( text, onSuccess ) {
+export default function useCopyToClipboard( text, onSuccess, container ) {
 	// Store the dependencies as refs and continuously update them so they're
 	// fresh when the callback is called.
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
+	const containerRef = useUpdatedRef( container );
 	return useRefEffect( ( node ) => {
 		// Clipboard listens to click events.
 		const clipboard = new Clipboard( node, {
@@ -47,6 +49,7 @@ export default function useCopyToClipboard( text, onSuccess ) {
 					? textRef.current()
 					: textRef.current || '';
 			},
+			container: containerRef.current ?? undefined,
 		} );
 
 		clipboard.on( 'success', ( { clearSelection } ) => {
