@@ -15,6 +15,8 @@ function render_block_core_back_to_top( $attributes ) {
 	$link_text          = isset( $attributes['text'] ) ? $attributes['text'] : __( 'Back to top' );
 	$wrapper_attributes = get_block_wrapper_attributes();
 
+	enqueue_block_core_back_to_top_classic_fallback();
+
 	return sprintf(
 		'<p %1$s><a href="#wp-back-to-top">%2$s</a></p>',
 		$wrapper_attributes,
@@ -84,4 +86,3 @@ function enqueue_block_core_back_to_top_classic_fallback() {
 		}
 	}
 }
-add_action( 'wp_enqueue_scripts', 'enqueue_block_core_back_to_top_classic_fallback' );
