@@ -94,8 +94,8 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
 				/*
 				 * Removes the part after the double hyphen before looking for
-			 	 * the directive processor inside `$directives`, e.g., "wp-bind"
-			 	 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
+				 * the directive processor inside `$directives`, e.g., "wp-bind"
+				 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
 				 */
 				list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
 				if ( array_key_exists( $type, $directives ) ) {
