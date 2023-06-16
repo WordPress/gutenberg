@@ -207,7 +207,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				newOrder.push( match[ 1 ] );
 			}
 
-			const footnotes = JSON.parse( meta.footnotes );
+			const footnotes = JSON.parse( meta.footnotes || '[]' );
 			const currentOrder = footnotes.map( ( fn ) => fn.id );
 
 			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;

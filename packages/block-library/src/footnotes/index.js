@@ -10,7 +10,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
-import { format } from './format';
+import { formatName, format } from './format';
 
 const { name } = metadata;
 
@@ -22,7 +22,7 @@ export const settings = {
 };
 
 // Would be good to remove the format and HoR if the block is unregistered.
-registerFormatType( 'core/footnote', format );
+registerFormatType( formatName, format );
 
 export const init = () => {
 	initBlock( { name, metadata, settings } );

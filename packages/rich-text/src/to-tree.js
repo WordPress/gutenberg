@@ -101,6 +101,8 @@ function fromFormat( {
 		}
 	}
 
+	// When a format is declared as non editable, make it non editable in the
+	// editor.
 	if ( isEditableTree && formatType.contentEditable === false ) {
 		elementAttributes.contenteditable = 'false';
 	}
@@ -314,6 +316,7 @@ export function toTree( {
 					),
 				} );
 			} else if ( formatType?.contentEditable === false ) {
+				// For non editable formats, render the stored inner HTML.
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {

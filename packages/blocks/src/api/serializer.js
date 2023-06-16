@@ -98,6 +98,9 @@ export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
 	const [ firstBlock ] = innerBlocks ?? [];
 	if ( ! firstBlock ) return props;
+	// If the innerBlocks passed to `getSaveElement` are not blocks but already
+	// components, return the props as is. This is the case for
+	// `getRichTextValues`.
 	if ( ! firstBlock.clientId ) return { ...props, children: innerBlocks };
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );

@@ -424,6 +424,8 @@ function createFromElement( {
 			attributes: getAttributes( { element: node } ),
 		} );
 
+		// When a format type is declared as not editable, replace it with an
+		// object replacement character and preserve the inner HTML.
 		if ( format?.formatType?.contentEditable === false ) {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );

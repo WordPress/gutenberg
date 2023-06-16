@@ -20,6 +20,8 @@ export function useSelectObject() {
 			const { defaultView } = ownerDocument;
 			const selection = defaultView.getSelection();
 
+			// If it's already selected, do nothing and let default behavior
+			// happen. This means it's "click-through".
 			if ( selection.containsNode( target ) ) return;
 
 			const range = ownerDocument.createRange();
@@ -32,6 +34,7 @@ export function useSelectObject() {
 		}
 
 		function onFocusIn( event ) {
+			// When there is incoming focus from a link, select the object.
 			if (
 				event.relatedTarget &&
 				! element.contains( event.relatedTarget ) &&

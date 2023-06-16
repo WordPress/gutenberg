@@ -16,6 +16,12 @@ import {
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { name } from './block.json';
+
+export const formatName = 'core/footnote';
 export const format = {
 	title: __( 'Footnote' ),
 	tagName: 'a',
@@ -35,7 +41,7 @@ export const format = {
 			registry.batch( () => {
 				const id = createId();
 				const newValue = insertObject( value, {
-					type: 'core/footnote',
+					type: formatName,
 					attributes: {
 						href: '#' + id,
 						id: `${ id }-link`,
@@ -57,10 +63,12 @@ export const format = {
 						[]
 					);
 				let fnBlock = flattenBlocks( getBlocks() ).find(
-					( block ) => block.name === 'core/footnotes'
+					( block ) => block.name === name
 				);
 
 				// Maybe this should all also be moved to the entity provider.
+				// When there is no footnotes block in the post, create one and
+				// insert it at the bottom.
 				if ( ! fnBlock ) {
 					const clientId = getSelectedBlockClientId();
 					let rootClientId = getBlockRootClientId( clientId );
@@ -72,7 +80,7 @@ export const format = {
 						rootClientId = getBlockRootClientId( rootClientId );
 					}
 
-					fnBlock = createBlock( 'core/footnotes' );
+					fnBlock = createBlock( name );
 
 					insertBlock( fnBlock, undefined, rootClientId );
 				}
