@@ -18,53 +18,73 @@ import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-nav
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 
-export default function SidebarNavigationScreenNavigationMenu() {
-	const {
-		deleteEntityRecord,
-		saveEntityRecord,
-		editEntityRecord,
-		saveEditedEntityRecord,
-	} = useDispatch( coreStore );
+const postType = `wp_navigation`;
 
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	const postType = `wp_navigation`;
+function useDeleteNavigationMenu() {
 	const {
 		goTo,
 		params: { postId },
 	} = useNavigator();
 
-	const { record: navigationMenu, isResolving } = useEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
+	const { deleteEntityRecord } = useDispatch( coreStore );
 
-	const { getEditedEntityRecord, isSaving, isDeleting } = useSelect(
-		( select ) => {
-			const {
-				isSavingEntityRecord,
-				isDeletingEntityRecord,
-				getEditedEntityRecord: getEditedEntityRecordSelector,
-			} = select( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
-			return {
-				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
-				isDeleting: isDeletingEntityRecord(
-					'postType',
-					postType,
-					postId
+	const handleDelete = async () => {
+		try {
+			await deleteEntityRecord(
+				'postType',
+				postType,
+				postId,
+				{
+					force: true,
+				},
+				{
+					throwOnError: true,
+				}
+			);
+			createSuccessNotice( __( 'Deleted Navigation menu' ), {
+				type: 'snackbar',
+			} );
+			goTo( '/navigation' );
+		} catch ( error ) {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: error message describing why the navigation menu could not be deleted. */
+					__( `Unable to delete Navigation menu (%s).` ),
+					error?.message
 				),
-				getEditedEntityRecord: getEditedEntityRecordSelector,
-			};
-		},
-		[ postId, postType ]
-	);
 
-	const isLoading = isResolving || isSaving || isDeleting;
+				{
+					type: 'snackbar',
+				}
+			);
+		}
+	};
 
-	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
+	return handleDelete;
+}
+
+function useSaveNavigationMenu() {
+	const {
+		params: { postId },
+	} = useNavigator();
+
+	const { getEditedEntityRecord } = useSelect( ( select ) => {
+		const { getEditedEntityRecord: getEditedEntityRecordSelector } =
+			select( coreStore );
+
+		return {
+			getEditedEntityRecord: getEditedEntityRecordSelector,
+		};
+	}, [] );
+
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const handleSave = async ( edits = {} ) => {
 		// Prepare for revert in case of error.
@@ -103,38 +123,21 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		}
 	};
 
-	const handleDelete = async () => {
-		try {
-			await deleteEntityRecord(
-				'postType',
-				postType,
-				postId,
-				{
-					force: true,
-				},
-				{
-					throwOnError: true,
-				}
-			);
-			createSuccessNotice( __( 'Deleted Navigation menu' ), {
-				type: 'snackbar',
-			} );
-			goTo( '/navigation' );
-		} catch ( error ) {
-			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to delete Navigation menu (%s).` ),
-					error?.message
-				),
+	return handleSave;
+}
 
-				{
-					type: 'snackbar',
-				}
-			);
-		}
-	};
+function useDuplicateNavigationMenu( navigationMenu ) {
+	const { goTo } = useNavigator();
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
 	const handleDuplicate = async () => {
+		const menuTitle =
+			navigationMenu?.title?.rendered || navigationMenu?.slug;
+
 		try {
 			const savedRecord = await saveEntityRecord(
 				'postType',
@@ -173,6 +176,51 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			);
 		}
 	};
+
+	return handleDuplicate;
+}
+
+export default function SidebarNavigationScreenNavigationMenu() {
+	const {
+		params: { postId },
+	} = useNavigator();
+
+	const { record: navigationMenu, isResolving } = useEntityRecord(
+		'postType',
+		postType,
+		postId
+	);
+
+	const { isSaving, isDeleting } = useSelect(
+		( select ) => {
+			const {
+				isSavingEntityRecord,
+				isDeletingEntityRecord,
+				getEditedEntityRecord: getEditedEntityRecordSelector,
+			} = select( coreStore );
+
+			return {
+				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
+				isDeleting: isDeletingEntityRecord(
+					'postType',
+					postType,
+					postId
+				),
+				getEditedEntityRecord: getEditedEntityRecordSelector,
+			};
+		},
+		[ postId ]
+	);
+
+	const isLoading = isResolving || isSaving || isDeleting;
+
+	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
+
+	const handleSave = useSaveNavigationMenu();
+
+	const handleDelete = useDeleteNavigationMenu();
+
+	const handleDuplicate = useDuplicateNavigationMenu( navigationMenu );
 
 	if ( isLoading ) {
 		return (
