@@ -51,7 +51,6 @@
 	top: 0;
 	background: $gray-900;
 	padding-top: $grid-unit-60 + $header-height;
-	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
@@ -90,5 +89,4 @@
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
-	box-shadow: 0 #{-$grid-unit-10} $grid-unit-20 $gray-900;
 }
