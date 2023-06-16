@@ -3,11 +3,6 @@
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
-	// Escapes the padding from the parent block, when showing the navigation items.
-	// Grid units aren't accurate enough to use here.
-	margin-left: -10px;
-	margin-right: -10px;
-
 	.offcanvas-editor-list-view-leaf {
 		max-width: calc(100% - #{ $grid-unit-05 });
 		border-radius: $radius-block-ui;
