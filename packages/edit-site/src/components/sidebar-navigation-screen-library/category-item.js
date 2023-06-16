@@ -12,11 +12,19 @@ export default function CategoryItem( {
 	label,
 	type,
 } ) {
-	const linkInfo = useLink( {
-		path: '/library',
-		categoryType: type,
-		categoryId: id,
-	} );
+	const linkInfo = useLink(
+		{
+			path: '/library',
+			categoryType: type,
+			categoryId: id,
+		},
+		{
+			// Keep record for where we came from in a state so we can
+			// use browser's back button to go back to the library.
+			// See the implementation of the back button in patterns-list.
+			backPath: '/library',
+		}
+	);
 
 	if ( ! count ) {
 		return;
