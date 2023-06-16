@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalUseNavigator as useNavigator,
@@ -12,8 +12,6 @@ import {
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
-import { humanTimeDiff } from '@wordpress/date';
-import { createInterpolateElement } from '@wordpress/element';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
 
@@ -26,11 +24,7 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
-import {
-	SidebarNavigationScreenDetailsPanelRow,
-	SidebarNavigationScreenDetailsPanelLabel,
-	SidebarNavigationScreenDetailsPanelValue,
-} from '../sidebar-navigation-screen-details-panel';
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 export default function SidebarNavigationScreenPage() {
 	const navigator = useNavigator();
@@ -128,23 +122,9 @@ export default function SidebarNavigationScreenPage() {
 			}
 			footer={
 				!! record?.modified && (
-					<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-page__footer">
-						<SidebarNavigationScreenDetailsPanelLabel>
-							{ __( 'Last modified' ) }
-						</SidebarNavigationScreenDetailsPanelLabel>
-						<SidebarNavigationScreenDetailsPanelValue>
-							{ createInterpolateElement(
-								sprintf(
-									/* translators: %s: is the relative time when the post was last modified. */
-									__( '<time>%s</time>' ),
-									humanTimeDiff( record.modified )
-								),
-								{
-									time: <time dateTime={ record.modified } />,
-								}
-							) }
-						</SidebarNavigationScreenDetailsPanelValue>
-					</SidebarNavigationScreenDetailsPanelRow>
+					<SidebarNavigationScreenDetailsFooter
+						lastModifiedDateTime={ record.modified }
+					/>
 				)
 			}
 		/>
