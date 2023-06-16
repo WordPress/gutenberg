@@ -65,7 +65,8 @@ export default function Layout() {
 
 	const hubRef = useRef();
 	const { params } = useLocation();
-	const isListPage = getIsListPage( params );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isListPage = getIsListPage( params, isMobileViewport );
 	const isEditorPage = ! isListPage;
 	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
 		useSelect( ( select ) => {
@@ -91,7 +92,6 @@ export default function Layout() {
 		next: nextShortcut,
 	} );
 	const disableMotion = useReducedMotion();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
@@ -171,20 +171,31 @@ export default function Layout() {
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
-						{ showSidebar && (
+						{
 							<motion.div
 								initial={ {
 									opacity: 0,
 								} }
-								animate={ {
-									opacity: 1,
-								} }
+								animate={
+									showSidebar
+										? { opacity: 1, display: 'block' }
+										: {
+												opacity: 0,
+												transitionEnd: {
+													display: 'none',
+												},
+										  }
+								}
 								exit={ {
 									opacity: 0,
 								} }
 								transition={ {
 									type: 'tween',
-									duration: ANIMATION_DURATION,
+									duration:
+										// Disable transition in mobile to emulate a full page transition.
+										disableMotion || isMobileViewport
+											? 0
+											: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
 								className="edit-site-layout__sidebar"
@@ -195,7 +206,7 @@ export default function Layout() {
 									<Sidebar />
 								</NavigableRegion>
 							</motion.div>
-						) }
+						}
 					</AnimatePresence>
 
 					<SavePanel />
