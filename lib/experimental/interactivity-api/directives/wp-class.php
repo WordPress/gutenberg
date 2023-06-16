@@ -20,7 +20,7 @@ function gutenberg_interactivity_process_wp_class( $tags, $context ) {
 	$prefixed_attributes = $tags->get_attribute_names_with_prefix( 'data-wp-class--' );
 
 	foreach ( $prefixed_attributes as $attr ) {
-		list( , $class_name ) = explode( '--', $attr );
+		list( , $class_name ) = WP_Directive_Processor::parse_attribute_name( $attr );
 		if ( empty( $class_name ) ) {
 			continue;
 		}
