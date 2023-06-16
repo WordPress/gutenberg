@@ -255,6 +255,7 @@ export class UnsupportedBlockEdit extends Component {
 			styles.unsupportedBlockSubtitle,
 			styles.unsupportedBlockSubtitleDark
 		);
+
 		const subtitle = (
 			<Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>
 		);

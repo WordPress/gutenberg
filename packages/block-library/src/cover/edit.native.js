@@ -365,9 +365,14 @@ const Cover = ( {
 		} );
 	}, [] );
 
+	const selectedColorText = getStylesFromColorScheme(
+		styles.selectedColorText,
+		styles.selectedColorTextDark
+	);
+
 	function getBottomLabelText() {
 		return customOverlayColor ? (
-			<Text style={ styles.selectedColorText }>
+			<Text style={ selectedColorText }>
 				{ customOverlayColor.toUpperCase() }
 			</Text>
 		) : (
