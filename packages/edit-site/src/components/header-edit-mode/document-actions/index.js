@@ -20,8 +20,9 @@ import {
 	chevronLeftSmall as chevronLeftSmallIcon,
 	page as pageIcon,
 } from '@wordpress/icons';
-import { useEntityRecord } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -35,27 +36,46 @@ export default function DocumentActions() {
 }
 
 function PageDocumentActions() {
-	const { hasPageContentLock, context } = useSelect(
-		( select ) => ( {
-			hasPageContentLock: select( editSiteStore ).hasPageContentLock(),
-			context: select( editSiteStore ).getEditedPostContext(),
-		} ),
+	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+		( select ) => {
+			const {
+				hasPageContentFocus: _hasPageContentFocus,
+				getEditedPostContext,
+			} = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const context = getEditedPostContext();
+			const queryArgs = [ 'postType', context.postType, context.postId ];
+			const page = getEditedEntityRecord( ...queryArgs );
+			return {
+				hasPageContentFocus: _hasPageContentFocus(),
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				isFound: !! page,
+				title: page?.title,
+			};
+		},
 		[]
 	);
 
-	const { hasResolved, editedRecord } = useEntityRecord(
-		'postType',
-		context.postType,
-		context.postId
-	);
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
+	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
+	const prevHasPageContentFocus = useRef( false );
+	useEffect( () => {
+		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
+			setHasEditedTemplate( true );
+		}
+		prevHasPageContentFocus.current = hasPageContentFocus;
+	}, [ hasPageContentFocus ] );
 
 	if ( ! hasResolved ) {
 		return null;
 	}
 
-	if ( ! editedRecord ) {
+	if ( ! isFound ) {
 		return (
 			<div className="edit-site-document-actions">
 				{ __( 'Document not found' ) }
@@ -63,18 +83,24 @@ function PageDocumentActions() {
 		);
 	}
 
-	return hasPageContentLock ? (
-		<BaseDocumentActions isPage icon={ pageIcon }>
-			{ editedRecord.title }
+	return hasPageContentFocus ? (
+		<BaseDocumentActions
+			className={ classnames( 'is-page', {
+				'is-animated': hasEditedTemplate,
+			} ) }
+			icon={ pageIcon }
+		>
+			{ title }
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
-			onBack={ () => setHasPageContentLock( true ) }
+			className="is-animated"
+			onBack={ () => setHasPageContentFocus( true ) }
 		/>
 	);
 }
 
-function TemplateDocumentActions( { onBack } ) {
+function TemplateDocumentActions( { className, onBack } ) {
 	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
 
 	if ( ! isLoaded ) {
@@ -95,7 +121,11 @@ function TemplateDocumentActions( { onBack } ) {
 			: __( 'template' );
 
 	return (
-		<BaseDocumentActions icon={ icon } onBack={ onBack }>
+		<BaseDocumentActions
+			className={ className }
+			icon={ icon }
+			onBack={ onBack }
+		>
 			<VisuallyHidden as="span">
 				{ sprintf(
 					/* translators: %s: the entity being edited, like "template"*/
@@ -108,10 +138,12 @@ function TemplateDocumentActions( { onBack } ) {
 	);
 }
 
-function BaseDocumentActions( { icon, children, onBack, isPage = false } ) {
+function BaseDocumentActions( { className, icon, children, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	return (
-		<div className="edit-site-document-actions">
+		<div
+			className={ classnames( 'edit-site-document-actions', className ) }
+		>
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
@@ -129,14 +161,9 @@ function BaseDocumentActions( { icon, children, onBack, isPage = false } ) {
 				onClick={ () => openCommandCenter() }
 			>
 				<HStack
+					className="edit-site-document-actions__title"
 					spacing={ 1 }
 					justify="center"
-					className={ classnames(
-						'edit-site-document-actions__title',
-						{
-							'is-page': isPage,
-						}
-					) }
 				>
 					<BlockIcon icon={ icon } />
 					<Text size="body" as="h1">

@@ -34,7 +34,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import Sidebar from '../sidebar';
 import Editor from '../editor';
-import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
@@ -43,11 +42,12 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
+import PageMain from '../page-main';
 import { useIsSiteEditorLoading } from './hooks';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -201,63 +201,68 @@ export default function Layout() {
 					<SavePanel />
 
 					{ showCanvas && (
-						<div
-							className={ classnames(
-								'edit-site-layout__canvas-container',
-								{
-									'is-resizing': isResizing,
-								}
-							) }
-						>
-							{ canvasResizer }
-							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										isEditorPage && canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration:
-															disableMotion ||
-															isResizing
-																? 0
-																: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
-									className="edit-site-layout__canvas"
-									transition={ {
-										type: 'tween',
-										duration:
-											disableMotion || isResizing
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
+						<>
+							{ isListPage && <PageMain /> }
+							{ isEditorPage && (
+								<div
+									className={ classnames(
+										'edit-site-layout__canvas-container',
+										{
+											'is-resizing': isResizing,
+										}
+									) }
 								>
-									<ErrorBoundary>
-										{ isEditorPage && (
-											<ResizableFrame
-												isReady={ ! isEditorLoading }
-												isFullWidth={ isEditing }
-												oversizedClassName="edit-site-layout__resizable-frame-oversized"
-											>
-												<Editor
-													isLoading={
-														isEditorLoading
+									{ canvasResizer }
+									{ !! canvasSize.width && (
+										<motion.div
+											whileHover={
+												isEditorPage &&
+												canvasMode === 'view'
+													? {
+															scale: 1.005,
+															transition: {
+																duration:
+																	disableMotion ||
+																	isResizing
+																		? 0
+																		: 0.5,
+																ease: 'easeOut',
+															},
+													  }
+													: {}
+											}
+											initial={ false }
+											layout="position"
+											className="edit-site-layout__canvas"
+											transition={ {
+												type: 'tween',
+												duration:
+													disableMotion || isResizing
+														? 0
+														: ANIMATION_DURATION,
+												ease: 'easeOut',
+											} }
+										>
+											<ErrorBoundary>
+												<ResizableFrame
+													isReady={
+														! isEditorLoading
 													}
-												/>
-											</ResizableFrame>
-										) }
-										{ isListPage && <ListPage /> }
-									</ErrorBoundary>
-								</motion.div>
+													isFullWidth={ isEditing }
+													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+												>
+													<Editor
+														isLoading={
+															isEditorLoading
+														}
+													/>
+												</ResizableFrame>
+											</ErrorBoundary>
+										</motion.div>
+									) }
+								</div>
 							) }
-						</div>
+						</>
 					) }
 				</div>
 			</div>

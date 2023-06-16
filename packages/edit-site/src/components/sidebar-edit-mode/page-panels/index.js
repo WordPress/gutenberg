@@ -1,50 +1,41 @@
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	__experimentalVStack as VStack,
-	Button,
-} from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { page as pageIcon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityRecord } from '@wordpress/core-data';
-import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import useEditedEntityRecord from '../../use-edited-entity-record';
 import SidebarCard from '../sidebar-card';
-import ContentBlocksList from './content-blocks-list';
+import PageContent from './page-content';
+import EditTemplate from './edit-template';
 
 export default function PagePanels() {
-	const context = useSelect(
-		( select ) => select( editSiteStore ).getEditedPostContext(),
-		[]
-	);
+	const { hasResolved, title, modified } = useSelect( ( select ) => {
+		const { getEditedPostContext } = select( editSiteStore );
+		const { getEditedEntityRecord, hasFinishedResolution } =
+			select( coreStore );
+		const context = getEditedPostContext();
+		const queryArgs = [ 'postType', context.postType, context.postId ];
+		const page = getEditedEntityRecord( ...queryArgs );
+		return {
+			hasResolved: hasFinishedResolution(
+				'getEditedEntityRecord',
+				queryArgs
+			),
+			title: page?.title,
+			modified: page?.modified,
+		};
+	}, [] );
 
-	const { hasResolved: hasPageResolved, editedRecord: page } =
-		useEntityRecord( 'postType', context.postType, context.postId );
-
-	const {
-		isLoaded: isTemplateLoaded,
-		getTitle: getTemplateTitle,
-		record: template,
-	} = useEditedEntityRecord();
-
-	const { setHasPageContentLock } = useDispatch( editSiteStore );
-
-	const blockContext = useMemo(
-		() => ( { ...context, postType: null, postId: null } ),
-		[ context ]
-	);
-
-	if ( ! hasPageResolved || ! isTemplateLoaded ) {
+	if ( ! hasResolved ) {
 		return null;
 	}
 
@@ -52,37 +43,20 @@ export default function PagePanels() {
 		<>
 			<PanelBody>
 				<SidebarCard
-					title={ page.title }
+					title={ decodeEntities( title ) }
 					icon={ pageIcon }
 					description={ sprintf(
 						// translators: %s: Human-readable time difference, e.g. "2 days ago".
 						__( 'Last edited %s' ),
-						humanTimeDiff( page.modified )
+						humanTimeDiff( modified )
 					) }
 				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>
-				<ContentBlocksList />
+				<PageContent />
 			</PanelBody>
 			<PanelBody title={ __( 'Template' ) }>
-				<VStack>
-					<div>{ getTemplateTitle() }</div>
-					<div className="edit-site-page-panels__edit-template-preview">
-						<BlockContextProvider value={ blockContext }>
-							<BlockPreview
-								viewportWidth={ 1024 }
-								blocks={ template.blocks }
-							/>
-						</BlockContextProvider>
-					</div>
-					<Button
-						className="edit-site-page-panels__edit-template-button"
-						variant="secondary"
-						onClick={ () => setHasPageContentLock( false ) }
-					>
-						{ __( 'Edit template' ) }
-					</Button>
-				</VStack>
+				<EditTemplate />
 			</PanelBody>
 		</>
 	);

@@ -13,7 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );

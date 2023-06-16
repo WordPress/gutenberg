@@ -4,24 +4,21 @@
 import { addFilter } from '@wordpress/hooks';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
-
-/**
- * External dependencies
- */
-import merge from 'deepmerge';
+import { InspectorControls } from '../components';
 
 function BehaviorsControl( {
 	blockName,
 	blockBehaviors,
-	onChange,
+	onChangeBehavior,
+	onChangeAnimation,
 	disabled = false,
 } ) {
 	const { settings, themeBehaviors } = useSelect(
@@ -38,52 +35,95 @@ function BehaviorsControl( {
 		[ blockName ]
 	);
 
-	if (
-		! settings ||
-		// If every behavior is disabled, do not show the behaviors inspector control.
-		Object.entries( settings ).every( ( [ , value ] ) => ! value )
-	) {
-		return null;
-	}
-
-	// Block behaviors take precedence over theme behaviors.
-	const behaviors = merge( themeBehaviors, blockBehaviors || {} );
-
-	const noBehaviorsOption = {
-		value: '',
-		label: __( 'No behaviors' ),
+	const defaultBehaviors = {
+		default: {
+			value: 'default',
+			label: __( 'Default' ),
+		},
+		noBehaviors: {
+			value: '',
+			label: __( 'No behaviors' ),
+		},
 	};
 
 	const behaviorsOptions = Object.entries( settings )
-		.filter( ( [ , behaviorValue ] ) => behaviorValue ) // Filter out behaviors that are disabled.
+		.filter(
+			( [ behaviorName, behaviorValue ] ) =>
+				hasBlockSupport( blockName, `behaviors.${ behaviorName }` ) &&
+				behaviorValue
+		) // Filter out behaviors that are disabled.
 		.map( ( [ behaviorName ] ) => ( {
 			value: behaviorName,
-			label:
-				// Capitalize the first letter of the behavior name.
-				behaviorName[ 0 ].toUpperCase() +
-				behaviorName.slice( 1 ).toLowerCase(),
+			// Capitalize the first letter of the behavior name.
+			label: `${ behaviorName.charAt( 0 ).toUpperCase() }${ behaviorName
+				.slice( 1 )
+				.toLowerCase() }`,
 		} ) );
 
-	const options = [ noBehaviorsOption, ...behaviorsOptions ];
+	const options = [
+		...Object.values( defaultBehaviors ),
+		...behaviorsOptions,
+	];
+
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	if ( behaviorsOptions.length === 0 ) {
+		return null;
+	}
+	// Block behaviors take precedence over theme behaviors.
+	const behaviors = { ...themeBehaviors, ...( blockBehaviors || {} ) };
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
-		: __( 'Add behaviors.' );
+		: '';
+
+	const value = () => {
+		if ( blockBehaviors === undefined ) {
+			return 'default';
+		}
+		if ( behaviors?.lightbox.enabled ) {
+			return 'lightbox';
+		}
+		return '';
+	};
 
 	return (
 		<InspectorControls group="advanced">
-			<SelectControl
-				__nextHasNoMarginBottom
-				label={ __( 'Behaviors' ) }
-				// At the moment we are only supporting one behavior (Lightbox)
-				value={ behaviors?.lightbox ? 'lightbox' : '' }
-				options={ options }
-				onChange={ onChange }
-				hideCancelButton={ true }
-				help={ helpText }
-				size="__unstable-large"
-				disabled={ disabled }
-			/>
+			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
+			<div>
+				<SelectControl
+					label={ __( 'Behaviors' ) }
+					// At the moment we are only supporting one behavior (Lightbox)
+					value={ value() }
+					options={ options }
+					onChange={ onChangeBehavior }
+					hideCancelButton={ true }
+					help={ helpText }
+					size="__unstable-large"
+					disabled={ disabled }
+				/>
+				{ behaviors?.lightbox.enabled && (
+					<SelectControl
+						label={ __( 'Animation' ) }
+						// At the moment we are only supporting one behavior (Lightbox)
+						value={
+							behaviors?.lightbox.animation
+								? behaviors?.lightbox.animation
+								: ''
+						}
+						options={ [
+							{
+								value: 'zoom',
+								label: __( 'Zoom' ),
+							},
+							{ value: 'fade', label: 'Fade' },
+						] }
+						onChange={ onChangeAnimation }
+						hideCancelButton={ false }
+						size="__unstable-large"
+						disabled={ disabled }
+					/>
+				) }
+			</div>
 		</InspectorControls>
 	);
 }
@@ -101,8 +141,8 @@ function BehaviorsControl( {
 export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		// Only add behaviors to the core/image block.
-		if ( props.name !== 'core/image' ) {
+		// Only add behaviors to blocks with support.
+		if ( ! hasBlockSupport( props.name, 'behaviors' ) ) {
 			return blockEdit;
 		}
 		const blockHasLink =
@@ -114,12 +154,36 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 				<BehaviorsControl
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
-					onChange={ ( nextValue ) => {
-						// If the user selects something, it means that they want to
-						// change the default value (true) so we save it in the attributes.
+					onChangeBehavior={ ( nextValue ) => {
+						if ( nextValue === 'default' ) {
+							props.setAttributes( {
+								behaviors: undefined,
+							} );
+						} else {
+							// If the user selects something, it means that they want to
+							// change the default value (true) so we save it in the attributes.
+							props.setAttributes( {
+								behaviors: {
+									lightbox: {
+										enabled: nextValue === 'lightbox',
+										animation:
+											nextValue === 'lightbox'
+												? 'zoom'
+												: '',
+									},
+								},
+							} );
+						}
+					} }
+					onChangeAnimation={ ( nextValue ) => {
 						props.setAttributes( {
 							behaviors: {
-								lightbox: nextValue === 'lightbox',
+								lightbox: {
+									enabled:
+										props.attributes.behaviors.lightbox
+											.enabled,
+									animation: nextValue,
+								},
 							},
 						} );
 					} }

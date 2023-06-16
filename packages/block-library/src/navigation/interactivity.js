@@ -111,7 +111,7 @@ store( {
 				},
 				handleMenuKeydown: ( args ) => {
 					const { context, event } = args;
-					if ( context.core.navigation.isMenuOpen ) {
+					if ( context.core.navigation.isMenuOpen.click ) {
 						// If Escape close the menu
 						if (
 							event?.key === 'Escape' ||

@@ -15,16 +15,19 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
+
+import TemplatePartNavigationMenus from './template-part-navigation-menus';
 
 function useTemplateTitleAndDescription( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
 	);
+
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme(),
 		[]
@@ -82,10 +85,24 @@ export default function SidebarNavigationScreenTemplatePart() {
 	const { params } = useNavigator();
 	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
+	const { record } = useEditedEntityRecord( postType, postId );
+
 	const { title, description } = useTemplateTitleAndDescription(
 		postType,
 		postId
 	);
+
+	const navigationBlocks = getBlocksOfTypeFromBlocks(
+		'core/navigation',
+		record?.blocks
+	);
+
+	// Get a list of the navigation menu ids from the navigation blocks'
+	// ref attribute.
+	const navigationMenuIds = navigationBlocks?.map( ( block ) => {
+		return block.attributes.ref;
+	} );
 
 	return (
 		<SidebarNavigationScreen
@@ -98,6 +115,46 @@ export default function SidebarNavigationScreenTemplatePart() {
 				/>
 			}
 			description={ description }
+			content={
+				<TemplatePartNavigationMenus menus={ navigationMenuIds } />
+			}
 		/>
 	);
+}
+
+/**
+ * Retrieves a list of specific blocks from a given tree of blocks.
+ *
+ * @param {string} targetBlock the name of the block to find.
+ * @param {Array}  blocks      a list of blocks from the template part entity.
+ * @return {Array} a list of any navigation blocks found in the blocks.
+ */
+function getBlocksOfTypeFromBlocks( targetBlock, blocks ) {
+	if ( ! targetBlock || ! blocks?.length ) return [];
+
+	const findInBlocks = ( _blocks ) => {
+		if ( ! _blocks ) {
+			return [];
+		}
+
+		const navigationBlocks = [];
+
+		for ( const block of _blocks ) {
+			if ( block.name === targetBlock ) {
+				navigationBlocks.push( block );
+			}
+
+			if ( block?.innerBlocks ) {
+				const innerNavigationBlocks = findInBlocks( block.innerBlocks );
+
+				if ( innerNavigationBlocks.length ) {
+					navigationBlocks.push( ...innerNavigationBlocks );
+				}
+			}
+		}
+
+		return navigationBlocks;
+	};
+
+	return findInBlocks( blocks );
 }

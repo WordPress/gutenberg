@@ -28,7 +28,7 @@ import { escapeAttribute } from '@wordpress/escape-html';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
@@ -147,7 +147,7 @@ export default function SidebarNavigationScreenPage() {
 					<HStack
 						spacing={ 5 }
 						alignment="left"
-						className="edit-site-sidebar-navigation-screen-page__details"
+						className="edit-site-sidebar-navigation-screen-page__details edit-site-sidebar-navigation-screen-page__footer"
 					>
 						<Text className="edit-site-sidebar-navigation-screen-page__details-label">
 							{ __( 'Last modified' ) }

@@ -50,7 +50,7 @@
 		"align": [ "left", "center", "right" ],
 		"anchor": true,
 		"__experimentalExposeControlsToChildren": true,
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
