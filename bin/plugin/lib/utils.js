@@ -37,13 +37,15 @@ function runShellScript( script, cwd, env = {} ) {
 					...env,
 				},
 			},
-			function ( error, _, stderr ) {
+			function ( error, stdout, stderr ) {
 				if ( error ) {
-					console.log( stderr );
+					// console.log( stderr );
 					reject( error );
 				} else {
 					resolve( true );
 				}
+				console.log( stdout );
+				console.error( stderr );
 			}
 		);
 	} );
