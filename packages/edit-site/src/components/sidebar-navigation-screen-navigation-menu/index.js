@@ -20,7 +20,7 @@ import SingleNavigationMenu from './single-navigation-menu';
 
 const postType = `wp_navigation`;
 
-function useDeleteNavigationMenu( navigationMenu ) {
+export function useDeleteNavigationMenu( navigationMenu ) {
 	const { goTo } = useNavigator();
 
 	const postId = navigationMenu?.id;
@@ -65,7 +65,7 @@ function useDeleteNavigationMenu( navigationMenu ) {
 	return handleDelete;
 }
 
-function useSaveNavigationMenu( navigationMenu ) {
+export function useSaveNavigationMenu( navigationMenu ) {
 	const postId = navigationMenu?.id;
 
 	const { getEditedEntityRecord } = useSelect( ( select ) => {
@@ -123,7 +123,7 @@ function useSaveNavigationMenu( navigationMenu ) {
 	return handleSave;
 }
 
-function useDuplicateNavigationMenu( navigationMenu ) {
+export function useDuplicateNavigationMenu( navigationMenu ) {
 	const { goTo } = useNavigator();
 
 	const { saveEntityRecord } = useDispatch( coreStore );

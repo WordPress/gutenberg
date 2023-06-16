@@ -18,7 +18,12 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
-import NavigationMenuEditor from '../sidebar-navigation-screen-navigation-menu/navigation-menu-editor';
+import {
+	useSaveNavigationMenu,
+	useDeleteNavigationMenu,
+	useDuplicateNavigationMenu,
+} from '../sidebar-navigation-screen-navigation-menu';
+import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
@@ -27,6 +32,14 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			`wp_navigation`,
 			PRELOADED_NAVIGATION_MENUS_QUERY
 		);
+
+	const firstNavigationMenu = navigationMenus?.[ 0 ];
+
+	const handleSave = useSaveNavigationMenu( firstNavigationMenu );
+
+	const handleDelete = useDeleteNavigationMenu( firstNavigationMenu );
+
+	const handleDuplicate = useDuplicateNavigationMenu( firstNavigationMenu );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
@@ -49,11 +62,12 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	// if single menu then render it
 	if ( navigationMenus?.length === 1 ) {
 		return (
-			<SidebarNavigationScreenWrapper>
-				<NavigationMenuEditor
-					navigationMenuId={ navigationMenus[ 0 ]?.id }
-				/>
-			</SidebarNavigationScreenWrapper>
+			<SingleNavigationMenu
+				navigationMenu={ firstNavigationMenu }
+				handleDelete={ handleDelete }
+				handleDuplicate={ handleDuplicate }
+				handleSave={ handleSave }
+			/>
 		);
 	}
 
