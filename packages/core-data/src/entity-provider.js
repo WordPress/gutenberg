@@ -194,17 +194,17 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( meta.footnotes === undefined ) return;
 
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
-
-			if ( _content.indexOf( 'data-fn' ) === -1 ) return;
+			const newOrder = [];
 
 			// This can be avoided when
 			// https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
 			// get the order directly from the rich text values.
-			const regex = /data-fn="([^"]+)"/g;
-			const newOrder = [];
-			let match;
-			while ( ( match = regex.exec( _content ) ) !== null ) {
-				newOrder.push( match[ 1 ] );
+			if ( _content.indexOf( 'data-fn' ) !== -1 ) {
+				const regex = /data-fn="([^"]+)"/g;
+				let match;
+				while ( ( match = regex.exec( _content ) ) !== null ) {
+					newOrder.push( match[ 1 ] );
+				}
 			}
 
 			const footnotes = JSON.parse( meta.footnotes || '[]' );

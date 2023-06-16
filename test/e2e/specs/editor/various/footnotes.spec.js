@@ -130,5 +130,56 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 		] );
+
+		await editor.canvas.click( `a[href="#${ id2 }-link"]` );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `second paragraph<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `first paragraph`,
+				},
+			},
+			{
+				name: 'core/footnotes',
+			},
+		] );
+
+		expect( await getFootnotes( page ) ).toMatchObject( [
+			{
+				content: 'first footnote',
+				id: id1,
+			},
+		] );
+
+		await editor.canvas.click( `a[href="#${ id1 }-link"]` );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `second paragraph`,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `first paragraph`,
+				},
+			},
+			{
+				name: 'core/footnotes',
+			},
+		] );
+
+		expect( await getFootnotes( page ) ).toMatchObject( [] );
 	} );
 } );
