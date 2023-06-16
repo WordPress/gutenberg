@@ -149,6 +149,7 @@
 		flex-direction: column;
 		border: $border-width solid $gray-300;
 		min-height: $grid-unit-80 * 3;
+		justify-content: center;
 
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
