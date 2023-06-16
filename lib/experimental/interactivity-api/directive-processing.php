@@ -99,7 +99,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 				 */
 				list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
 				if ( array_key_exists( $type, $directives ) ) {
-					$attributes[] = $name;
+					$attributes[] = $type;
 				}
 			}
 
