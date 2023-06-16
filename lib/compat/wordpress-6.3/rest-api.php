@@ -101,3 +101,12 @@ function add_modified_wp_template_schema() {
 		);
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
+
+/**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
