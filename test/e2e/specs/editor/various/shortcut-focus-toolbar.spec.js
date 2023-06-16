@@ -82,6 +82,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.setIsFixedToolbar( true );
 		} );
 
+		test.afterEach( async ( { editor } ) => {
+			// Ensure the fixed toolbar option is off
+			await editor.setIsFixedToolbar( false );
+		} );
+
 		test( 'Focuses the correct toolbar in edit mode', async ( {
 			editor,
 			page,
@@ -159,11 +164,6 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				width: 700,
 				height: 700,
 			},
-		} );
-
-		test.beforeEach( async ( { editor } ) => {
-			// Ensure the fixed toolbar option is off
-			await editor.setIsFixedToolbar( false );
 		} );
 
 		test( 'Focuses the correct toolbar in edit mode', async ( {
