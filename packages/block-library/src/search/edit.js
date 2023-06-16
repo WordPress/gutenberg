@@ -440,8 +440,8 @@ export default function SearchEdit( {
 										key={ widthValue }
 										isSmall
 										variant={
-											`${ widthValue }%` ===
-											`${ width }${ widthUnit }`
+											widthValue === width &&
+											widthUnit === '%'
 												? 'primary'
 												: undefined
 										}
