@@ -257,7 +257,7 @@ class BottomSheetCell extends Component {
 					placeholder={ valuePlaceholder }
 					placeholderTextColor={ placeholderTextColor }
 					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
+					editable={ isValueEditable && ! disabled }
 					pointerEvents={
 						this.state.isEditingValue ? 'auto' : 'none'
 					}
