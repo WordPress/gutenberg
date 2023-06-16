@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	archive,
@@ -140,6 +140,26 @@ export default function NewTemplate( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate } = unlock( useDispatch( editSiteStore ) );
+
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
+	const TEMPLATE_SHORT_DESCRIPTIONS = {
+		'front-page': homeUrl,
+		date: sprintf(
+			// translators: %s: The homepage url.
+			__( 'E.g. %s/2023/' ),
+			homeUrl
+		),
+	};
+
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
@@ -257,13 +277,14 @@ export default function NewTemplate( {
 							className="edit-site-add-new-template__template-list__contents"
 						>
 							{ missingTemplates.map( ( template ) => {
-								const { title, description, slug, onClick } =
-									template;
+								const { title, slug, onClick } = template;
 								return (
 									<TemplateListItem
 										key={ slug }
 										title={ title }
-										description={ description }
+										description={
+											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
+										}
 										icon={ TEMPLATE_ICONS[ slug ] || post }
 										onClick={ () =>
 											onClick
