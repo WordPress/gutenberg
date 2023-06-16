@@ -90,22 +90,18 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 				}
 			}
 		} else {
-			/*
-			 * Helper that removes the part after the double hyphen before looking for
-			 * the directive processor inside `$attribute_directives`.
-			 *
-			 * Example:
-			 *
-			 *     'wp-context' === $get_directive_type( 'wp-context' );
-			 *     'wp-bind'    === $get_directive_type( 'wp-bind--src' );
-			 */
-			$get_directive_type = function ( $attr ) {
-				return explode( '--', $attr )[0];
-			};
-
-			$attributes = $tags->get_attribute_names_with_prefix( $prefix );
-			$attributes = array_map( $get_directive_type, $attributes );
-			$attributes = array_intersect( $attributes, array_keys( $directives ) );
+			$attributes = array();
+			foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
+				/*
+				 * Removes the part after the double hyphen before looking for
+			 	 * the directive processor inside `$directives`, e.g., "wp-bind"
+			 	 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
+				 */
+				list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
+				if ( array_key_exists( $type, $directives ) ) {
+					$attributes[] = $name;
+				}
+			}
 
 			/*
 			 * If this is an open tag, and if it either has attribute directives, or
