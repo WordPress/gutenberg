@@ -165,7 +165,7 @@ export default function HomeTemplateDetails() {
 							value={ postsPageTitleValue }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }
-							help={ __( 'Update the title of your posts page' ) }
+							help={ __( 'Set the title of the Posts Page' ) }
 						/>
 					</SidebarNavigationScreenDetailsPanelRow>
 				) }
@@ -180,7 +180,7 @@ export default function HomeTemplateDetails() {
 						onChange={ debounce( setPostsPerPage, 300 ) }
 						label={ __( 'Posts per page' ) }
 						help={ __(
-							'The maximum amount of posts to display on a page. This setting applies to all blog pages including category and tag archives.'
+							'Applies to all blog pages including categories and tags, but some templates may override this setting.'
 						) }
 					/>
 				</SidebarNavigationScreenDetailsPanelRow>
@@ -191,7 +191,7 @@ export default function HomeTemplateDetails() {
 					<CheckboxControl
 						className="edit-site-sidebar-navigation-screen__input-control"
 						label="Allow comments on new posts"
-						help="Individual posts may override these settings. Changes here will only be applied to new posts."
+						help="Changes will apply to new posts only. Individual posts may override these settings."
 						checked={ commentsOnNewPostsValue }
 						onChange={ debounce( setAllowCommentsOnNewPosts, 300 ) }
 					/>
