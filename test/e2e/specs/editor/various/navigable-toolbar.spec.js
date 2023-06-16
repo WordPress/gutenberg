@@ -12,9 +12,10 @@ test.describe( 'Block Toolbar', () => {
 		test( 'should not scroll page', async ( { page, pageUtils } ) => {
 			while (
 				await page.evaluate( () => {
-					const scrollable = window.wp.dom.getScrollContainer(
-						document.activeElement
-					);
+					const { activeElement } =
+						document.activeElement?.contentDocument ?? document;
+					const scrollable =
+						window.wp.dom.getScrollContainer( activeElement );
 					return ! scrollable || scrollable.scrollTop === 0;
 				} )
 			) {
@@ -23,11 +24,14 @@ test.describe( 'Block Toolbar', () => {
 
 			await page.keyboard.type( 'a' );
 
-			const scrollTopBefore = await page.evaluate(
-				() =>
-					window.wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
-			);
+			const scrollTopBefore = await page.evaluate( () => {
+				const { activeElement } =
+					document.activeElement?.contentDocument ?? document;
+				window.scrollContainer =
+					window.wp.dom.getScrollContainer( activeElement );
+				return window.scrollContainer.scrollTop;
+			} );
+
 			await pageUtils.pressKeys( 'alt+F10' );
 			await expect(
 				page
@@ -35,12 +39,9 @@ test.describe( 'Block Toolbar', () => {
 					.getByRole( 'button', { name: 'Paragraph' } )
 			).toBeFocused();
 
-			const scrollTopAfter = await page.evaluate(
-				() =>
-					window.wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
-			);
-
+			const scrollTopAfter = await page.evaluate( () => {
+				return window.scrollContainer.scrollTop;
+			} );
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 	} );
