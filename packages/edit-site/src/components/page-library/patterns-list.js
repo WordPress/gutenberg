@@ -7,9 +7,13 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Flex,
+	FlexBlock,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { symbol } from '@wordpress/icons';
+import { __, isRTL } from '@wordpress/i18n';
+import { symbol, chevronLeft, chevronRight } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,9 +21,16 @@ import { symbol } from '@wordpress/icons';
 import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
+import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function PatternsList( { categoryId, label, type } ) {
+	const location = useLocation();
+	const history = useHistory();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( '' );
 
@@ -34,13 +45,32 @@ export default function PatternsList( { categoryId, label, type } ) {
 
 	return (
 		<VStack spacing={ 6 }>
-			<SearchControl
-				className="edit-site-library__search"
-				onChange={ ( value ) => setFilterValue( value ) }
-				placeholder={ __( 'Search patterns' ) }
-				value={ filterValue }
-				__nextHasNoMarginBottom
-			/>
+			<Flex>
+				{ isMobileViewport && (
+					<SidebarButton
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						label={ __( 'Back' ) }
+						onClick={ () => {
+							// Go back in history if we came from the library page.
+							// Otherwise push a stack onto the history.
+							if ( location.state?.backPath === '/library' ) {
+								history.back();
+							} else {
+								history.push( { path: '/library' } );
+							}
+						} }
+					/>
+				) }
+				<FlexBlock>
+					<SearchControl
+						className="edit-site-library__search"
+						onChange={ ( value ) => setFilterValue( value ) }
+						placeholder={ __( 'Search patterns' ) }
+						value={ filterValue }
+						__nextHasNoMarginBottom
+					/>
+				</FlexBlock>
+			</Flex>
 			{ isResolving && __( 'Loading' ) }
 			{ ! isResolving && !! syncedPatterns.length && (
 				<>

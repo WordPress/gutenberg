@@ -1,12 +1,16 @@
 .edit-site-library {
 	background: rgba(0, 0, 0, 0.05);
-	margin: 0;
+	margin: $header-height 0 0;
 	.components-text {
 		color: $gray-600;
 	}
 
 	.components-heading {
 		color: $white;
+	}
+
+	@include break-medium {
+		margin: 0;
 	}
 }
 
