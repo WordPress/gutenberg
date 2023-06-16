@@ -24,7 +24,7 @@ import { useEntityProp } from '@wordpress/core-data';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 

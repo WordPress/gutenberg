@@ -10,7 +10,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -31,7 +31,7 @@ export default function useInitEditedEntityFromURL() {
 		};
 	}, [] );
 
-	const { setTemplate, setTemplatePart, setPage } =
+	const { setTemplate, setTemplatePart, setPage, setNavigationMenu } =
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
@@ -42,6 +42,9 @@ export default function useInitEditedEntityFromURL() {
 					break;
 				case 'wp_template_part':
 					setTemplatePart( postId );
+					break;
+				case 'wp_navigation':
+					setNavigationMenu( postId );
 					break;
 				default:
 					setPage( {
@@ -71,5 +74,6 @@ export default function useInitEditedEntityFromURL() {
 		setPage,
 		setTemplate,
 		setTemplatePart,
+		setNavigationMenu,
 	] );
 }

@@ -36,7 +36,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(

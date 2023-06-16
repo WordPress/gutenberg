@@ -28,7 +28,33 @@ function gutenberg_update_get_edit_post_link( $link, $post_id ) {
 		$slug             = urlencode( get_stylesheet() . '//' . $post->post_name );
 		$link             = admin_url( sprintf( $post_type_object->_edit_link, $slug ) );
 	}
+
 	return $link;
 }
 
 add_filter( 'get_edit_post_link', 'gutenberg_update_get_edit_post_link', 10, 2 );
+
+
+
+/**
+ * Modifies the edit link for the `wp_navigation` custom post type.
+ *
+ * This has not been backported to Core.
+ *
+ * @param string $link    The edit link.
+ * @param int    $post_id Post ID.
+ * @return string|null The edit post link for the given post. Null if the post type does not exist
+ *                     or does not allow an editing UI.
+ */
+function gutenberg_update_navigation_get_edit_post_link( $link, $post_id ) {
+	$post = get_post( $post_id );
+
+	if ( 'wp_navigation' === $post->post_type ) {
+		$post_type_object = get_post_type_object( $post->post_type );
+		$id               = $post->ID;
+		$link             = admin_url( sprintf( $post_type_object->_edit_link, $id ) );
+	}
+
+	return $link;
+}
+add_filter( 'get_edit_post_link', 'gutenberg_update_navigation_get_edit_post_link', 10, 2 );

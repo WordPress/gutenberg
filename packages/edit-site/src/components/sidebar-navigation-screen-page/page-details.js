@@ -17,7 +17,7 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
  * Internal dependencies
  */
 import StatusLabel from './status-label';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
