@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
 
 ## 1.97.0
 -   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
