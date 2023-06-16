@@ -16,21 +16,16 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
 	useContext,
-	useEffect,
 	useMemo,
-	useRef,
-	useState,
 	createPortal,
 	Platform,
 } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
-import BlockPopover from '../components/block-popover';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
@@ -209,56 +204,6 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
 
-export function PositionVisualizer( { clientId, attributes, forceShow } ) {
-	const positionType = attributes?.style?.position?.type;
-
-	const [ isActive, setIsActive ] = useState( false );
-	const valueRef = useRef( positionType );
-	const timeoutRef = useRef();
-
-	const clearTimer = () => {
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-	};
-
-	useEffect( () => {
-		if (
-			! isShallowEqual( positionType, valueRef.current ) &&
-			! forceShow
-		) {
-			setIsActive( true );
-			valueRef.current = positionType;
-
-			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
-			}, 400 );
-		}
-
-		return () => {
-			setIsActive( false );
-			clearTimer();
-		};
-	}, [ positionType, forceShow ] );
-
-	if ( ! isActive && ! forceShow ) {
-		return null;
-	}
-
-	return (
-		<BlockPopover
-			className="block-editor__sticky-position-visualizer-popover"
-			clientId={ clientId }
-			__unstableCoverTarget
-			__unstableRefreshSize={ positionType }
-			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
-		>
-			<div className="block-editor__sticky-position-visualizer" />
-		</BlockPopover>
-	);
-}
-
 /*
  * Position controls rendered in an inspector control panel.
  *
@@ -270,7 +215,6 @@ export function PositionPanel( props ) {
 	const {
 		attributes: { style = {} },
 		clientId,
-		isSelected,
 		name: blockName,
 		setAttributes,
 	} = props;
@@ -278,8 +222,6 @@ export function PositionPanel( props ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
-	const [ isPositionVisualizerActive, setIsPositionVisualizerActive ] =
-		useState();
 
 	const { firstParentClientId } = useSelect(
 		( select ) => {
@@ -289,14 +231,6 @@ export function PositionPanel( props ) {
 		},
 		[ clientId ]
 	);
-
-	const onMouseOverPosition = () => {
-		setIsPositionVisualizerActive( true );
-	};
-
-	const onMouseLeavePosition = () => {
-		setIsPositionVisualizerActive( false );
-	};
 
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
@@ -355,15 +289,6 @@ export function PositionPanel( props ) {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					{ firstParentClientId && value === STICKY_OPTION.value ? (
-						<PositionVisualizer
-							forceShow={
-								isSelected && isPositionVisualizerActive
-							}
-							{ ...props }
-							clientId={ firstParentClientId }
-						/>
-					) : null }
 					<BaseControl
 						className="block-editor-hooks__position-selection"
 						__nextHasNoMarginBottom
@@ -386,8 +311,6 @@ export function PositionPanel( props ) {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
-							onMouseOver={ onMouseOverPosition }
-							onMouseOut={ onMouseLeavePosition }
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
