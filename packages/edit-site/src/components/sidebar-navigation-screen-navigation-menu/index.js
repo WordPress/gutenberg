@@ -20,11 +20,10 @@ import SingleNavigationMenu from './single-navigation-menu';
 
 const postType = `wp_navigation`;
 
-function useDeleteNavigationMenu() {
-	const {
-		goTo,
-		params: { postId },
-	} = useNavigator();
+function useDeleteNavigationMenu( navigationMenu ) {
+	const { goTo } = useNavigator();
+
+	const postId = navigationMenu?.id;
 
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
@@ -66,10 +65,8 @@ function useDeleteNavigationMenu() {
 	return handleDelete;
 }
 
-function useSaveNavigationMenu() {
-	const {
-		params: { postId },
-	} = useNavigator();
+function useSaveNavigationMenu( navigationMenu ) {
+	const postId = navigationMenu?.id;
 
 	const { getEditedEntityRecord } = useSelect( ( select ) => {
 		const { getEditedEntityRecord: getEditedEntityRecordSelector } =
@@ -216,9 +213,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
-	const handleSave = useSaveNavigationMenu();
+	const handleSave = useSaveNavigationMenu( navigationMenu );
 
-	const handleDelete = useDeleteNavigationMenu();
+	const handleDelete = useDeleteNavigationMenu( navigationMenu );
 
 	const handleDuplicate = useDuplicateNavigationMenu( navigationMenu );
 
