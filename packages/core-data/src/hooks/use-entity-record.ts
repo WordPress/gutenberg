@@ -182,7 +182,9 @@ export default function useEntityRecord< RecordType >(
 	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return null;
+				return {
+					data: null,
+				};
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
