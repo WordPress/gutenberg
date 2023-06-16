@@ -82,7 +82,7 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__sticky-section.edit-site-sidebar-navigation-screen__sticky-section {
+.edit-site-sidebar-navigation-screen__footer {
 	position: sticky;
 	bottom: 0;
 	background-color: $gray-900;
@@ -91,11 +91,4 @@
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
 	box-shadow: 0 #{-$grid-unit-10} $grid-unit-20 $gray-900;
-}
-
-.edit-site-sidebar-navigation-screen__footer {
-	position: sticky;
-	bottom: 0;
-	background-color: $gray-900;
-	padding: $grid-unit-20 0;
 }
