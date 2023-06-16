@@ -14,12 +14,18 @@
 .edit-site-sidebar-navigation-screen__content {
 	color: $gray-400;
 	padding: 0 $grid-unit-20;
+
 	.components-item-group {
 		margin-left: -$grid-unit-20;
 		margin-right: -$grid-unit-20;
 	}
+
 	.components-text {
 		color: $gray-400;
+	}
+
+	.components-heading {
+		margin-bottom: $grid-unit-10;
 	}
 }
 
@@ -90,3 +96,4 @@
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
 }
+
