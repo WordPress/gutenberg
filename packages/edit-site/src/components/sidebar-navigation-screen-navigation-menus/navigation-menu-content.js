@@ -37,7 +37,7 @@ const PAGES_QUERY = [
 	},
 ];
 
-export default function NavigationMenuContent( { rootClientId, onSelect } ) {
+export default function NavigationMenuContent( { rootClientId } ) {
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -89,11 +89,9 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					block.clientId,
 					createBlock( 'core/navigation-link', block.attributes )
 				);
-			} else {
-				onSelect( block );
 			}
 		},
-		[ onSelect, __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
