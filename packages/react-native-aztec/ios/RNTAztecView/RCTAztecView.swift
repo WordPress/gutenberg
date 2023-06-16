@@ -357,7 +357,7 @@ class RCTAztecView: Aztec.TextView {
         // Replace occurrences of the obj symbol ("\u{FFFC}")
         textView.text = textView.text?.replacingOccurrences(of: "\u{FFFC}", with: "")
         
-        // The cursor's position is reduced by one if the symbol was at or before the cursor position
+        // Detect if cursor is off-by-one and correct, if so
         let newPositionOffset = originalPosition > 0 ? originalPosition - 1 : originalPosition
         if let newPosition = textView.position(from: textView.beginningOfDocument, offset: newPositionOffset) {
             // Move the cursor to the correct, new position following dictation
