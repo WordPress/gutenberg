@@ -139,7 +139,7 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	);
 
 	/*
-	 * Check first if the directive is preceded by a negator operator (!),
+	 * Check first if the directive path is preceded by a negator operator (!),
 	 * indicating that the value obtained from the Interactivity Store using the
 	 * subsequent path should be negated.
 	 */
