@@ -173,4 +173,21 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 				return false;
 		}
 	}
+
+	/**
+	 * Extract and return the directive type and the the part after the double
+	 * hyphen from an attribute name (if present), in an array format.
+	 *
+	 * Examples:
+	 *
+	 *     'wp-island'            => array( 'wp-island', null )
+	 *     'wp-bind--src'         => array( 'wp-bind', 'src' )
+	 *     'wp-thing--and--thang' => array( 'wp-thing', 'and--thang' )
+	 *
+	 * @param string $name The attribute name.
+	 * @return array The resulting array
+	 */
+	public static function parse_attribute_name( $name ) {
+		return explode( '--', $name, 2 );
+	}
 }
