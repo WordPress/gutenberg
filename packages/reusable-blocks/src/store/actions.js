@@ -52,9 +52,7 @@ export const __experimentalConvertBlocksToReusable =
 		const meta =
 			syncType === 'unsynced'
 				? {
-						wp_block: {
-							sync_status: syncType,
-						},
+						sync_status: syncType,
 				  }
 				: undefined;
 
