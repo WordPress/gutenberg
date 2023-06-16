@@ -189,9 +189,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => {
-			const footnotes = meta?.footnotes
-				? JSON.parse( meta.footnotes )
-				: [];
+			if ( ! meta ) return;
+			// If meta.footnotes is empty, it means the meta is not registered.
+			if ( meta.footnotes === undefined ) return;
+
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
 
 			if ( _content.indexOf( 'data-fn' ) === -1 ) return;
@@ -206,6 +207,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				newOrder.push( match[ 1 ] );
 			}
 
+			const footnotes = JSON.parse( meta.footnotes );
 			const currentOrder = footnotes.map( ( fn ) => fn.id );
 
 			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
