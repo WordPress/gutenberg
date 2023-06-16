@@ -6,10 +6,9 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	Spinner,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -17,165 +16,13 @@ import { store as noticesStore } from '@wordpress/notices';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
+import {
+	useDeleteNavigationMenu,
+	useDuplicateNavigationMenu,
+	useSaveNavigationMenu,
+} from './use-navigation-menu-handlers';
 
-const postType = `wp_navigation`;
-
-export function useDeleteNavigationMenu( navigationMenu ) {
-	const { goTo } = useNavigator();
-
-	const postId = navigationMenu?.id;
-
-	const { deleteEntityRecord } = useDispatch( coreStore );
-
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	const handleDelete = async () => {
-		try {
-			await deleteEntityRecord(
-				'postType',
-				postType,
-				postId,
-				{
-					force: true,
-				},
-				{
-					throwOnError: true,
-				}
-			);
-			createSuccessNotice( __( 'Deleted Navigation menu' ), {
-				type: 'snackbar',
-			} );
-			goTo( '/navigation' );
-		} catch ( error ) {
-			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to delete Navigation menu (%s).` ),
-					error?.message
-				),
-
-				{
-					type: 'snackbar',
-				}
-			);
-		}
-	};
-
-	return handleDelete;
-}
-
-export function useSaveNavigationMenu( navigationMenu ) {
-	const postId = navigationMenu?.id;
-
-	const { getEditedEntityRecord } = useSelect( ( select ) => {
-		const { getEditedEntityRecord: getEditedEntityRecordSelector } =
-			select( coreStore );
-
-		return {
-			getEditedEntityRecord: getEditedEntityRecordSelector,
-		};
-	}, [] );
-
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	const handleSave = async ( edits = {} ) => {
-		// Prepare for revert in case of error.
-		const originalRecord = getEditedEntityRecord(
-			'postType',
-			'wp_navigation',
-			postId
-		);
-
-		// Apply the edits.
-		editEntityRecord( 'postType', postType, postId, edits );
-
-		// Attempt to persist.
-		try {
-			await saveEditedEntityRecord( 'postType', postType, postId, {
-				throwOnError: true,
-			} );
-			createSuccessNotice( __( 'Renamed Navigation menu' ), {
-				type: 'snackbar',
-			} );
-		} catch ( error ) {
-			// Revert to original in case of error.
-			editEntityRecord( 'postType', postType, postId, originalRecord );
-
-			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be renamed. */
-					__( `Unable to rename Navigation menu (%s).` ),
-					error?.message
-				),
-
-				{
-					type: 'snackbar',
-				}
-			);
-		}
-	};
-
-	return handleSave;
-}
-
-export function useDuplicateNavigationMenu( navigationMenu ) {
-	const { goTo } = useNavigator();
-
-	const { saveEntityRecord } = useDispatch( coreStore );
-
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	const handleDuplicate = async () => {
-		const menuTitle =
-			navigationMenu?.title?.rendered || navigationMenu?.slug;
-
-		try {
-			const savedRecord = await saveEntityRecord(
-				'postType',
-				postType,
-				{
-					title: sprintf(
-						/* translators: %s: Navigation menu title */
-						__( '%s (Copy)' ),
-						menuTitle
-					),
-					content: navigationMenu?.content?.raw,
-					status: 'publish',
-				},
-				{
-					throwOnError: true,
-				}
-			);
-
-			if ( savedRecord ) {
-				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
-					type: 'snackbar',
-				} );
-				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
-			}
-		} catch ( error ) {
-			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to duplicate Navigation menu (%s).` ),
-					error?.message
-				),
-
-				{
-					type: 'snackbar',
-				}
-			);
-		}
-	};
-
-	return handleDuplicate;
-}
+export const postType = `wp_navigation`;
 
 export default function SidebarNavigationScreenNavigationMenu() {
 	const {

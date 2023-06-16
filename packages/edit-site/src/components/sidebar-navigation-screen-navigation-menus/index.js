@@ -18,12 +18,12 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
+import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import {
-	useSaveNavigationMenu,
 	useDeleteNavigationMenu,
 	useDuplicateNavigationMenu,
-} from '../sidebar-navigation-screen-navigation-menu';
-import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
+	useSaveNavigationMenu,
+} from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
