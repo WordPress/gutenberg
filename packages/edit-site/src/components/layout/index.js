@@ -54,7 +54,7 @@ const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
-const ANIMATION_DURATION = 0.3;
+const ANIMATION_DURATION = 0.45;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
