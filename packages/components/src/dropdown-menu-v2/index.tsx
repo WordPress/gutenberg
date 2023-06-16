@@ -19,7 +19,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
+import { useContextSystem, contextConnect } from '../ui/context';
 import { useSlot } from '../slot-fill';
 import Icon from '../icon';
 import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
@@ -50,7 +50,10 @@ const DropdownMenuPrivateContext =
 		portalContainer: null,
 	} );
 
-const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
+const UnconnectedDropdownMenu = (
+	props: DropdownMenuProps,
+	forwardedRef: React.ForwardedRef< any >
+) => {
 	const {
 		// Root props
 		defaultOpen,
@@ -112,6 +115,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
 			</DropdownMenuPrimitive.Trigger>
 			<DropdownMenuPrimitive.Portal container={ portalContainer }>
 				<DropdownMenuStyled.Content
+					ref={ forwardedRef }
 					side={ side }
 					align={ align }
 					sideOffset={ sideOffset }
@@ -135,7 +139,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
  * `DropdownMenu` displays a menu to the user (such as a set of actions
  * or functions) triggered by a button.
  */
-export const DropdownMenu = contextConnectWithoutRef(
+export const DropdownMenu = contextConnect(
 	UnconnectedDropdownMenu,
 	'DropdownMenu'
 );
