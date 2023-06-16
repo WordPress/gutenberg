@@ -4,9 +4,6 @@
 import removeAccents from 'remove-accents';
 import { noCase } from 'change-case';
 
-// TODO: Replace or remove the removeAccents and noCase deps to avoid needing
-// to add them to side editor.
-
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;

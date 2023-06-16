@@ -49,8 +49,6 @@ export default function CreatePatternModal( {
 		}
 
 		try {
-			// TODO: Enforce unique pattern names?
-
 			const pattern = await saveEntityRecord(
 				'postType',
 				'wp_block',

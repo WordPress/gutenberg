@@ -30,7 +30,7 @@ const templatePartAreaLabels = {
 	header: __( 'Headers' ),
 	footer: __( 'Footers' ),
 	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ), // TODO: Find correct label for this.
+	uncategorized: __( 'Uncategorized' ),
 };
 
 export default function SidebarNavigationScreenLibrary() {
