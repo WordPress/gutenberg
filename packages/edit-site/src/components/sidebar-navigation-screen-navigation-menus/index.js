@@ -19,11 +19,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
-import {
-	useDeleteNavigationMenu,
-	useDuplicateNavigationMenu,
-	useSaveNavigationMenu,
-} from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
@@ -35,11 +31,8 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
-	const handleSave = useSaveNavigationMenu( firstNavigationMenu );
-
-	const handleDelete = useDeleteNavigationMenu( firstNavigationMenu );
-
-	const handleDuplicate = useDuplicateNavigationMenu( firstNavigationMenu );
+	const { handleSave, handleDelete, handleDuplicate } =
+		useNavigationMenuHandlers( firstNavigationMenu );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 

@@ -16,11 +16,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
-import {
-	useDeleteNavigationMenu,
-	useDuplicateNavigationMenu,
-	useSaveNavigationMenu,
-} from './use-navigation-menu-handlers';
+import useNavigationMenuHandlers from './use-navigation-menu-handlers';
 
 export const postType = `wp_navigation`;
 
@@ -60,11 +56,8 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
 
-	const handleSave = useSaveNavigationMenu( navigationMenu );
-
-	const handleDelete = useDeleteNavigationMenu( navigationMenu );
-
-	const handleDuplicate = useDuplicateNavigationMenu( navigationMenu );
+	const { handleSave, handleDelete, handleDuplicate } =
+		useNavigationMenuHandlers( navigationMenu );
 
 	if ( isLoading ) {
 		return (

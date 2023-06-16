@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { postType } from '.';
 
-export function useDeleteNavigationMenu( navigationMenu ) {
+function useDeleteNavigationMenu( navigationMenu ) {
 	const { goTo } = useNavigator();
 
 	const postId = navigationMenu?.id;
@@ -56,7 +56,7 @@ export function useDeleteNavigationMenu( navigationMenu ) {
 	return handleDelete;
 }
 
-export function useSaveNavigationMenu( navigationMenu ) {
+function useSaveNavigationMenu( navigationMenu ) {
 	const postId = navigationMenu?.id;
 
 	const { getEditedEntityRecord } = useSelect( ( select ) => {
@@ -114,7 +114,7 @@ export function useSaveNavigationMenu( navigationMenu ) {
 	return handleSave;
 }
 
-export function useDuplicateNavigationMenu( navigationMenu ) {
+function useDuplicateNavigationMenu( navigationMenu ) {
 	const { goTo } = useNavigator();
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -166,4 +166,12 @@ export function useDuplicateNavigationMenu( navigationMenu ) {
 	};
 
 	return handleDuplicate;
+}
+
+export default function useNavigationMenuHandlers( navigationMenu ) {
+	return {
+		handleDelete: useDeleteNavigationMenu( navigationMenu ),
+		handleSave: useSaveNavigationMenu( navigationMenu ),
+		handleDuplicate: useDuplicateNavigationMenu( navigationMenu ),
+	};
 }
