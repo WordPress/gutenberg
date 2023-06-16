@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -19,9 +19,18 @@ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { store as editSiteStore } from '../../../store';
 
 const SettingsHeader = ( { sidebarName } ) => {
-	const hasPageContentFocus = useSelect( ( select ) =>
-		select( editSiteStore ).hasPageContentFocus()
-	);
+	const { hasPageContentFocus, entityType } = useSelect( ( select ) => {
+		const { getEditedPostType, hasPageContentFocus: _hasPageContentFocus } =
+			select( editSiteStore );
+
+		return {
+			hasPageContentFocus: _hasPageContentFocus(),
+			entityType: getEditedPostType(),
+		};
+	} );
+
+	const entityLabel =
+		entityType === 'wp_navigation' ? __( 'Navigation' ) : __( 'Template' );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openTemplateSettings = () =>
@@ -41,9 +50,9 @@ const SettingsHeader = ( { sidebarName } ) => {
 		templateAriaLabel =
 			sidebarName === SIDEBAR_TEMPLATE
 				? // translators: ARIA label for the Template sidebar tab, selected.
-				  __( 'Template (selected)' )
+				  sprintf( __( '%s (selected)' ), entityLabel )
 				: // translators: ARIA label for the Template Settings Sidebar tab, not selected.
-				  __( 'Template' );
+				  entityLabel;
 	}
 
 	/* Use a list so screen readers will announce how many tabs there are. */
@@ -60,10 +69,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 					) }
 					aria-label={ templateAriaLabel }
 					data-label={
-						hasPageContentFocus ? __( 'Page' ) : __( 'Template' )
+						hasPageContentFocus ? __( 'Page' ) : entityLabel
 					}
 				>
-					{ hasPageContentFocus ? __( 'Page' ) : __( 'Template' ) }
+					{ hasPageContentFocus ? __( 'Page' ) : entityLabel }
 				</Button>
 			</li>
 			<li>

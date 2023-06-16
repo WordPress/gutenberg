@@ -19,6 +19,7 @@ import { store as commandsStore } from '@wordpress/commands';
 import {
 	chevronLeftSmall as chevronLeftSmallIcon,
 	page as pageIcon,
+	navigation as navigationIcon,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -115,15 +116,12 @@ function TemplateDocumentActions( { className, onBack } ) {
 		);
 	}
 
-	const entityLabel =
-		record.type === 'wp_template_part'
-			? __( 'template part' )
-			: __( 'template' );
+	const entityLabel = getEntityLabel( record.type );
 
 	return (
 		<BaseDocumentActions
 			className={ className }
-			icon={ icon }
+			icon={ record.type === 'wp_navigation' ? navigationIcon : icon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
@@ -176,4 +174,21 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
+}
+
+function getEntityLabel( entityType ) {
+	let label = '';
+	switch ( entityType ) {
+		case 'wp_navigation':
+			label = 'navigation menu';
+			break;
+		case 'wp_template_part':
+			label = 'template part';
+			break;
+		default:
+			label = 'template';
+			break;
+	}
+
+	return label;
 }

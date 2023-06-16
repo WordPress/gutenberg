@@ -9,8 +9,14 @@
  * Updates `wp_template` and `wp_template_part` post types to use
  * Gutenberg's REST controllers
  *
- * Adds `_edit_link` to the `wp_global_styles`, `wp_template`,
- * and `wp_template_part` post type schemata. See https://github.com/WordPress/gutenberg/issues/48065
+ * Adds `_edit_link` to the following post type schemata:
+ *
+ * - wp_global_styles
+ * - wp_template
+ * - wp_template_part
+ * - wp_navigation
+ *
+ * See https://github.com/WordPress/gutenberg/issues/48065
  *
  * @param array  $args Array of arguments for registering a post type.
  * @param string $post_type Post type key.
@@ -31,6 +37,18 @@ function gutenberg_update_templates_template_parts_rest_controller( $args, $post
 	if ( in_array( $post_type, array( 'wp_global_styles' ), true ) ) {
 		$args['_edit_link'] = '/site-editor.php?canvas=edit';
 	}
+
+	if ( 'wp_navigation' === $post_type ) {
+		$navigation_edit_link = 'site-editor.php?' . build_query(
+			array(
+				'postId'   => '%s',
+				'postType' => 'wp_navigation',
+				'canvas'   => 'edit',
+			)
+		);
+		$args['_edit_link']   = $navigation_edit_link;
+	}
+
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );

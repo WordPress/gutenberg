@@ -42,7 +42,7 @@ const LAYOUT = {
 export default function SiteEditorCanvas() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	const { isFocusMode, isViewMode } = useSelect( ( select ) => {
+	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
 		const { getEditedPostType, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
@@ -50,6 +50,7 @@ export default function SiteEditorCanvas() {
 		const _templateType = getEditedPostType();
 
 		return {
+			templateType: _templateType,
 			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
 			isViewMode: getCanvasMode() === 'view',
 		};
@@ -84,8 +85,17 @@ export default function SiteEditorCanvas() {
 		usePageContentFocusNotifications(),
 	] );
 
-	// Hide the appender when in view mode (i.e. not editing).
-	const showBlockAppender = hasBlocks || isViewMode ? false : undefined;
+	const isTemplateTypeNavigation = templateType === 'wp_navigation';
+
+	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+
+	// Hide the appender when:
+	// - In navigation focus mode (should only allow the root Nav block).
+	// - In view mode (i.e. not editing).
+	const showBlockAppender =
+		( isNavigationFocusMode && hasBlocks ) || isViewMode
+			? false
+			: undefined;
 
 	return (
 		<EditorCanvasContainer.Slot>
@@ -122,7 +132,13 @@ export default function SiteEditorCanvas() {
 							>
 								{ resizeObserver }
 								<BlockList
-									className="edit-site-block-editor__block-list wp-site-blocks"
+									className={ classnames(
+										'edit-site-block-editor__block-list wp-site-blocks',
+										{
+											'is-navigation-block':
+												isTemplateTypeNavigation,
+										}
+									) }
 									layout={ LAYOUT }
 									renderAppender={ showBlockAppender }
 								/>

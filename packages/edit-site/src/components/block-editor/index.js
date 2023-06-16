@@ -13,28 +13,31 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 /**
  * Internal dependencies
  */
-
 import TemplatePartConverter from '../template-part-converter';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { DisableNonPageContentBlocks } from '../page-content-focus';
 import SiteEditorCanvas from './site-editor-canvas';
-import DefaultBlockEditorProvider from './providers/default-block-editor-provider';
+import getBlockEditorProvider from './get-block-editor-provider';
 
 export default function BlockEditor() {
-	const { hasPageContentFocus } = useSelect( ( select ) => {
-		const { hasPageContentFocus: _hasPageContentFocus } = unlock(
-			select( editSiteStore )
-		);
+	const { entityType, hasPageContentFocus } = useSelect( ( select ) => {
+		const { getEditedPostType, hasPageContentFocus: _hasPageContentFocus } =
+			unlock( select( editSiteStore ) );
 
 		return {
+			entityType: getEditedPostType(),
 			hasPageContentFocus: _hasPageContentFocus(),
 		};
 	}, [] );
 
+	// Choose the provider based on the entity type currently
+	// being edited.
+	const BlockEditorProvider = getBlockEditorProvider( entityType );
+
 	return (
-		<DefaultBlockEditorProvider>
+		<BlockEditorProvider>
 			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
@@ -44,6 +47,6 @@ export default function BlockEditor() {
 			<SiteEditorCanvas />
 
 			<ReusableBlocksMenuItems />
-		</DefaultBlockEditorProvider>
+		</BlockEditorProvider>
 	);
 }
