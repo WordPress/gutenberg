@@ -40,9 +40,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 					{ value: 'i', label: __( 'Lowercase roman numerals' ) },
 				] }
 				value={ type }
-				onChange={ ( newValue ) => {
-					setAttributes( { type: newValue } );
-				} }
+				onChange={ ( newValue ) => setAttributes( { type: newValue } ) }
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
