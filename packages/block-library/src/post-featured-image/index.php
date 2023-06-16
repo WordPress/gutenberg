@@ -13,6 +13,20 @@
  * @param WP_Block $block      Block instance.
  * @return string Returns the featured image for the current post.
  */
+
+function gutenberg_featured_image_post_thumbnail_id( $thumbnail_id, $post ) {
+	if ( ! $thumbnail_id ) {
+		$blocks = parse_blocks( $post->post_content );
+		foreach( $blocks as $block ) {
+			if ( $block['blockName'] === 'core/image' ) {
+				$thumbnail_id = $block['attrs']['id'];
+				break;
+			}
+		}
+	}
+	return $thumbnail_id;
+}
+
 function render_block_core_post_featured_image( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
@@ -60,9 +74,17 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+	if ( ! $featured_image && $attributes['usePostFirstImage'] ) {
+		// Add filter to get the first image from the post content.
+		add_filter( 'post_thumbnail_id', 'gutenberg_featured_image_post_thumbnail_id', 10, 2 );
+		// Get the post thumbnail again.
+		$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+	}
+
 	if ( ! $featured_image ) {
 		return '';
 	}
+
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';

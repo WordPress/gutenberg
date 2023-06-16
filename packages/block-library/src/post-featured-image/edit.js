@@ -59,6 +59,7 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		usePostFirstImage,
 	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -177,6 +178,18 @@ export default function PostFeaturedImageEdit( {
 							/>
 						</>
 					) }
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Use first image from post if no featured image set'
+						) }
+						onChange={ () =>
+							setAttributes( {
+								usePostFirstImage: ! usePostFirstImage,
+							} )
+						}
+						checked={ usePostFirstImage }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
