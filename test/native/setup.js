@@ -2,7 +2,7 @@
  * External dependencies
  */
 import 'react-native-gesture-handler/jestSetup';
-import { Image } from 'react-native';
+import { Image, Linking } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
@@ -242,11 +242,7 @@ jest.mock(
 jest.mock( 'react-native/Libraries/ActionSheetIOS/ActionSheetIOS', () => ( {
 	showActionSheetWithOptions: jest.fn(),
 } ) );
-jest.mock( 'react-native/Libraries/Linking/Linking', () => {
-	return {
-		addEventListener: jest.fn( () => ( { remove: jest.fn() } ) ),
-	};
-} );
+Linking.addEventListener.mockReturnValue( { remove: jest.fn() } );
 
 // The mock provided by the package itself does not appear to work correctly.
 // Specifically, the mock provides a named export, where the module itself uses
