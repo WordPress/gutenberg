@@ -183,7 +183,6 @@ export default function useEntityRecord< RecordType >(
 		( query ) => {
 			if ( ! options.enabled ) {
 				return {
-					// Avoiding returning a new reference on every execution.
 					data: null,
 				};
 			}
