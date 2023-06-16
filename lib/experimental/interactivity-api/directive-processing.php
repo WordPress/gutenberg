@@ -81,15 +81,24 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			if ( $latest_opening_tag_name === $tag_name ) {
 				array_pop( $tag_stack );
 
-				// If the matching opening tag didn't have any attribute directives,
-				// we move on.
+				/*
+				 * If the matching opening tag didn't have any attribute directives,
+				 * we move on.
+				 */
 				if ( 0 === count( $attributes ) ) {
 					continue;
 				}
 			}
 		} else {
-			// Helper that removes the part after the double hyphen before looking for
-			// the directive processor inside `$attribute_directives`.
+			/*
+			 * Helper that removes the part after the double hyphen before looking for
+			 * the directive processor inside `$attribute_directives`.
+			 *
+			 * Example:
+			 *
+			 *     'wp-context' === $get_directive_type( 'wp-context' );
+			 *     'wp-bind'    === $get_directive_type( 'wp-bind--src' );
+			 */
 			$get_directive_type = function ( $attr ) {
 				return explode( '--', $attr )[0];
 			};
@@ -98,10 +107,12 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			$attributes = array_map( $get_directive_type, $attributes );
 			$attributes = array_intersect( $attributes, array_keys( $directives ) );
 
-			// If this is an open tag, and if it either has attribute directives, or
-			// if we're inside a tag that does, take note of this tag and its
-			// attribute directives so we can call its directive processor once we
-			// encounter the matching closing tag.
+			/*
+			 * If this is an open tag, and if it either has attribute directives, or
+			 * if we're inside a tag that does, take note of this tag and its
+			 * attribute directives so we can call its directive processor once we
+			 * encounter the matching closing tag.
+			 */
 			if (
 				! WP_Directive_Processor::is_html_void_element( $tags->get_tag() ) &&
 				( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
