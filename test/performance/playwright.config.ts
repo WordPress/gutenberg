@@ -46,7 +46,7 @@ const config = defineConfig( {
 		actionTimeout: 10_000, // 10 seconds.
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
-		video: 'on-first-retry',
+		video: 'off',
 	},
 	webServer: {
 		command: 'npm run wp-env start',
@@ -58,7 +58,6 @@ const config = defineConfig( {
 		{
 			name: 'chromium',
 			use: { ...devices[ 'Desktop Chrome' ] },
-			grepInvert: /-chromium/,
 		},
 	],
 } );
