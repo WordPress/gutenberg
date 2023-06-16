@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash, backup } from '@wordpress/icons';
+import { trash, backup, layout, page } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -19,16 +19,67 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 function useEditModeCommandLoader() {
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const history = useHistory();
 	const { isLoaded, record: template } = useEditedEntityRecord();
-	const isRemovable =
-		isLoaded && !! template && isTemplateRemovable( template );
-	const isRevertable =
-		isLoaded && !! template && isTemplateRevertable( template );
+	const { removeTemplate, revertTemplate, setHasPageContentFocus } =
+		useDispatch( editSiteStore );
+	const history = useHistory();
+	const { isPage, hasPageContentFocus } = useSelect(
+		( select ) => ( {
+			isPage: select( editSiteStore ).isPage(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+		} ),
+		[]
+	);
+
+	if ( ! isLoaded ) {
+		return { isLoading: true, commands: [] };
+	}
 
 	const commands = [];
-	if ( isRemovable ) {
+
+	if ( isPage ) {
+		if ( hasPageContentFocus ) {
+			commands.push( {
+				name: 'core/switch-to-template-focus',
+				label: __( 'Edit template' ),
+				icon: layout,
+				context: 'site-editor-edit',
+				callback: ( { close } ) => {
+					setHasPageContentFocus( false );
+					close();
+				},
+			} );
+		} else {
+			commands.push( {
+				name: 'core/switch-to-page-focus',
+				label: __( 'Back to page' ),
+				icon: page,
+				context: 'site-editor-edit',
+				callback: ( { close } ) => {
+					setHasPageContentFocus( true );
+					close();
+				},
+			} );
+		}
+	}
+
+	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Reset template' )
+				: __( 'Reset template part' );
+		commands.push( {
+			name: 'core/reset-template',
+			label,
+			icon: backup,
+			callback: ( { close } ) => {
+				revertTemplate( template );
+				close();
+			},
+		} );
+	}
+
+	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
 				? __( 'Delete template' )
@@ -44,21 +95,6 @@ function useEditModeCommandLoader() {
 				history.push( {
 					path: '/' + template.type,
 				} );
-				close();
-			},
-		} );
-	}
-	if ( isRevertable ) {
-		const label =
-			template.type === 'wp_template'
-				? __( 'Reset template' )
-				: __( 'Reset template part' );
-		commands.push( {
-			name: 'core/reset-template',
-			label,
-			icon: backup,
-			callback: ( { close } ) => {
-				revertTemplate( template );
 				close();
 			},
 		} );
