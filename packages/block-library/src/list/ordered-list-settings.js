@@ -36,7 +36,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 					{ value: '1', label: __( 'Numbers' ) },
 					{ value: 'A', label: __( 'Uppercase letters' ) },
 					{ value: 'a', label: __( 'Lowercase letters' ) },
-					{ value: 'I', label: __( 'Uppercase roman numerals' ) },
+					{ value: 'I', label: __( 'Uppercase Roman numerals' ) },
 					{ value: 'i', label: __( 'Lowercase roman numerals' ) },
 				] }
 				value={ type }
