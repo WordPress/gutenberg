@@ -1,0 +1,7 @@
+.block-editor-block-settings-menu__content {
+	// The "16px" are necessary to set the max-height correctly when meeting the viewport:
+	// - 12px are because of the offset (see the `sideOffset` prop)
+	// - 4px extra are necessary, probably to take into account borders etc?
+	max-height: calc(var(--radix-dropdown-menu-content-available-height) - 16px);
+	overflow-y: auto;
+}

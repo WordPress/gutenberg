@@ -372,6 +372,7 @@ export function BlockSettingsDropdown( {
 					align="start"
 					side="bottom"
 					sideOffset={ 12 }
+					className="block-editor-block-settings-menu__content"
 					onKeyDown={ ( event ) => {
 						if ( event.defaultPrevented ) return;
 
