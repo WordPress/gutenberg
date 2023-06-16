@@ -2026,6 +2026,7 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
+				syncStatus: reusableBlock.meta.sync_status,
 			};
 		};
 
