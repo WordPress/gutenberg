@@ -16,8 +16,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
-import NavigationMenuEditor from './navigation-menu-editor';
-import EditButton from './edit-button';
+import SingleNavigationMenu from './single-navigation-menu';
 
 export default function SidebarNavigationScreenNavigationMenu() {
 	const {
@@ -213,37 +212,11 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	}
 
 	return (
-		<SidebarNavigationScreenWrapper
-			actions={
-				<>
-					<EditButton />
-					<ScreenNavigationMoreMenu
-						menuTitle={ decodeEntities( menuTitle ) }
-						onDelete={ handleDelete }
-						onSave={ handleSave }
-						onDuplicate={ handleDuplicate }
-					/>
-				</>
-			}
-			title={ decodeEntities( menuTitle ) }
-			description={
-				<>
-					<p>
-						{ sprintf(
-							/* translators: %s: Navigation menu title */
-							'This is your "%s" navigation menu. ',
-							decodeEntities( menuTitle )
-						) }
-					</p>
-					<p>
-						{ __(
-							'You can edit this menu here, but be aware that visual styles might be applied separately in templates or template parts, so the preview shown here can be incomplete.'
-						) }
-					</p>
-				</>
-			}
-		>
-			<NavigationMenuEditor navigationMenuId={ navigationMenu?.id } />
-		</SidebarNavigationScreenWrapper>
+		<SingleNavigationMenu
+			navigationMenu={ navigationMenu }
+			handleSave={ handleSave }
+			handleDelete={ handleDelete }
+			handleDuplicate={ handleDuplicate }
+		/>
 	);
 }

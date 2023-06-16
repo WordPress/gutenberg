@@ -18,6 +18,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
+import NavigationMenuEditor from '../sidebar-navigation-screen-navigation-menu/navigation-menu-editor';
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const { records: navigationMenus, isResolving: isLoading } =
@@ -42,6 +43,17 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			<SidebarNavigationScreenWrapper
 				description={ __( 'No Navigation Menus found.' ) }
 			/>
+		);
+	}
+
+	// if single menu then render it
+	if ( navigationMenus?.length === 1 ) {
+		return (
+			<SidebarNavigationScreenWrapper>
+				<NavigationMenuEditor
+					navigationMenuId={ navigationMenus[ 0 ]?.id }
+				/>
+			</SidebarNavigationScreenWrapper>
 		);
 	}
 
