@@ -69,7 +69,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 	$tag_stack = array();
 
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
-		$tag_name = strtolower( $tags->get_tag() );
+		$tag_name = $tags->get_tag();
 
 		// Is this a tag that closes the latest opening tag?
 		if ( $tags->is_tag_closer() ) {
