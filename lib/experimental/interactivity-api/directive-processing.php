@@ -148,9 +148,9 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 		$has_negation_operator = true;
 	}
 
-	$array   = explode( '.', $path );
-	$current = $store;
-	foreach ( $array as $p ) {
+	$path_segments = explode( '.', $path );
+	$current       = $store;
+	foreach ( $path_segments as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
 		} else {
