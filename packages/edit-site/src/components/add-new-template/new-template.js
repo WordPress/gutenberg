@@ -97,7 +97,7 @@ function TemplateListItem( { title, description, icon, onClick } ) {
 			<VStack
 				as="span"
 				spacing={ 2 }
-				justify="flex-start"
+				alignment="center"
 				style={ { width: '100%' } }
 			>
 				<Icon icon={ icon } />
