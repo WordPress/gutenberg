@@ -56,3 +56,25 @@ export const Icon = VariantStates.bind( {} );
 Icon.args = {
 	icon: wordpress,
 };
+
+export const Dashicons: ComponentStory< typeof Button > = ( props ) => {
+	return (
+		<div style={ { display: 'flex', gap: 8 } }>
+			<Button { ...props } />
+			<Button { ...props }>Children</Button>
+			<Button { ...props } iconPosition="right">
+				Children (icon right)
+			</Button>
+			<Button { ...props } text="Text" />
+			<Button
+				{ ...props }
+				text="Text (icon right)"
+				iconPosition="right"
+			/>
+		</div>
+	);
+};
+Dashicons.args = {
+	icon: 'editor-help',
+	variant: 'primary',
+};
