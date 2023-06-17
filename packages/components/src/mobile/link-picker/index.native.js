@@ -88,9 +88,7 @@ export const LinkPicker = ( {
 
 	useEffect( () => {
 		getURLFromClipboard()
-			.then( ( url ) => {
-				setClipboardUrl( url );
-			} )
+			.then( setClipboardUrl )
 			.catch( () => setClipboardUrl( '' ) );
 	}, [] );
 
@@ -113,9 +111,7 @@ export const LinkPicker = ( {
 					autoCapitalize="none"
 					autoCorrect={ false }
 					keyboardType="url"
-					onChangeValue={ ( newValue ) => {
-						setValue( newValue );
-					} }
+					onChangeValue={ setValue }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus
