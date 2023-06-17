@@ -70,15 +70,18 @@ export default function PostNavigationLinkEdit( {
 		( select ) => select( 'core/editor' ).getCurrentPostType(),
 		[]
 	);
-	const taxonomies = useSelect( ( select ) => {
-		const { getTaxonomies } = select( coreStore );
-		const filteredTaxonomies = getTaxonomies( {
-			type: postType,
-			per_page: -1,
-			context: 'view',
-		} );
-		return filteredTaxonomies;
-	}, [] );
+	const taxonomies = useSelect(
+		( select ) => {
+			const { getTaxonomies } = select( coreStore );
+			const filteredTaxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+				context: 'view',
+			} );
+			return filteredTaxonomies;
+		},
+		[ postType ]
+	);
 	const getTaxonomyOptions = () => {
 		const selectOption = {
 			label: __( '- Select -' ),
@@ -165,9 +168,7 @@ export default function PostNavigationLinkEdit( {
 				</PanelBody>
 				<PanelBody title={ __( 'Filters' ) }>
 					<ToggleControl
-						label={ __(
-							'Only link to posts in the same taxonomy term'
-						) }
+						label={ __( 'Filter by taxonomy' ) }
 						checked={ !! inSameTerm }
 						onChange={ () =>
 							setAttributes( {
