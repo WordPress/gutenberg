@@ -461,7 +461,24 @@ const createOnMove =
 		dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
 	};
 
+/**
+ * Action that moves given blocks down by one position.
+ *
+ * @param {string[]} clientIds Client IDs of the blocks to move.
+ * @param {string}   clientId  Client ID of the block whose InnerBlocks will be moved.
+ *
+ * @return {Object} Action object.
+ */
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
+
+/**
+ * Action that moves given blocks up by one position.
+ *
+ * @param {string[]} clientIds Client IDs of the blocks to move.
+ * @param {string}   clientId  Client ID of the block whose InnerBlocks will be moved.
+ *
+ * @return {Object} Action object.
+ */
 export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 
 /**
