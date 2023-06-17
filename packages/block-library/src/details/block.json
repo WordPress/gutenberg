@@ -13,7 +13,9 @@
 			"default": false
 		},
 		"summary": {
-			"type": "string"
+			"type": "string",
+			"source": "html",
+			"selector": "summary"
 		}
 	},
 	"supports": {
