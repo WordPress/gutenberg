@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.1 (2023-06-17)
+
 ### Bug fix
 
 -   Address issue where a missing file in the underlying Docker image caused `wp-env` to crash. [#51513](https://github.com/WordPress/gutenberg/pull/51513)
