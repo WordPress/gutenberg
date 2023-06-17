@@ -329,6 +329,7 @@ const v11 = {
 			</div>
 		);
 	},
+	migrate: migrateTag,
 };
 
 // Deprecation for blocks that renders fixed background as backgroud from the main block container.
@@ -465,6 +466,7 @@ const v10 = {
 			</div>
 		);
 	},
+	migrate: migrateTag,
 };
 
 // Deprecation for blocks with `minHeightUnit` set but no `minHeight`.
