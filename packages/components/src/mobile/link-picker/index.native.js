@@ -57,10 +57,8 @@ export const LinkPicker = ( {
 	onLinkPicked,
 	onCancel: cancel,
 } ) => {
-	const [ { value, clipboardUrl }, setValue ] = useState( {
-		value: initialValue,
-		clipboardUrl: '',
-	} );
+	const [ value, setValue ] = useState( initialValue );
+	const [ clipboardUrl, setClipboardUrl ] = useState( '' );
 	const directEntry = createDirectEntry( value );
 
 	// The title of a direct entry is displayed as the raw input value, but if we
@@ -74,7 +72,8 @@ export const LinkPicker = ( {
 	};
 
 	const clear = () => {
-		setValue( { value: '', clipboardUrl } );
+		setValue( '' );
+		setClipboardUrl( '' );
 	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
@@ -89,11 +88,10 @@ export const LinkPicker = ( {
 
 	useEffect( () => {
 		getURLFromClipboard()
-			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
-			.catch( () => setValue( { value, clipboardUrl: '' } ) );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+			.then( ( url ) => {
+				setClipboardUrl( url );
+			} )
+			.catch( () => setClipboardUrl( '' ) );
 	}, [] );
 
 	// TODO: Localize the accessibility label.
@@ -116,7 +114,7 @@ export const LinkPicker = ( {
 					autoCorrect={ false }
 					keyboardType="url"
 					onChangeValue={ ( newValue ) => {
-						setValue( { value: newValue, clipboardUrl } );
+						setValue( newValue );
 					} }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
