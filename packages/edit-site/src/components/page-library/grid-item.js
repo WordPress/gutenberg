@@ -66,7 +66,6 @@ const GridItem = ( { categoryId, composite, icon, item } ) => {
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
 
 	const { onClick } = useLink( {
-		path: '/library',
 		postType: item.type,
 		postId: item.type === USER_PATTERNS ? item.id : item.name,
 		categoryId,
