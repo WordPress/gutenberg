@@ -193,7 +193,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create a Pattern' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -205,7 +205,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
 		);
 
 		await clearAllBlocks();
@@ -259,7 +259,7 @@ describe( 'Reusable blocks', () => {
 		// Save the reusable block.
 		await page.click( publishButtonSelector );
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block updated."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Site updated."]'
 		);
 
 		await createNewPost();
@@ -340,7 +340,7 @@ describe( 'Reusable blocks', () => {
 		await canvas().click( 'p[aria-label="Paragraph block"]' );
 		await page.keyboard.type( '2' );
 		const selector =
-			'//div[@aria-label="Block: Reusable block"]//p[@aria-label="Paragraph block"][.="12"]';
+			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Paragraph block"][.="12"]';
 		const reusableBlockWithParagraph = await page.$x( selector );
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
@@ -376,7 +376,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create a Pattern' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);
@@ -384,7 +384,7 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Block with styles' );
 		await page.keyboard.press( 'Enter' );
 		const reusableBlock = await canvas().waitForSelector(
-			'.block-editor-block-list__block[aria-label="Block: Reusable block"]'
+			'.block-editor-block-list__block[aria-label="Block: Pattern"]'
 		);
 		expect( reusableBlock ).toBeTruthy();
 	} );
