@@ -36,6 +36,7 @@ const {
 // removed by moving PushChangesToGlobalStylesControl to
 // @wordpress/block-editor.
 const STYLE_PATH_TO_CSS_VAR_INFIX = {
+	'border.color': 'color',
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
@@ -85,6 +86,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 // removed by moving PushChangesToGlobalStylesControl to
 // @wordpress/block-editor.
 const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
+	'border.color': 'borderColor',
 	'color.background': 'backgroundColor',
 	'color.text': 'textColor',
 	'color.gradient': 'gradient',
@@ -219,12 +221,22 @@ function PushChangesToGlobalStylesControl( {
 				);
 			}
 
+			const newBlockAttributes = {
+				borderColor: undefined,
+				backgroundColor: undefined,
+				textColor: undefined,
+				gradient: undefined,
+				fontSize: undefined,
+				fontFamily: undefined,
+				style: newBlockStyles,
+			};
+
 			// @wordpress/core-data doesn't support editing multiple entity types in
 			// a single undo level. So for now, we disable @wordpress/core-data undo
 			// tracking and implement our own Undo button in the snackbar
 			// notification.
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { style: newBlockStyles } );
+			setAttributes( newBlockAttributes );
 			setUserConfig( () => newUserConfig, { undoIgnore: true } );
 			createSuccessNotice(
 				sprintf(
@@ -239,7 +251,7 @@ function PushChangesToGlobalStylesControl( {
 							label: __( 'Undo' ),
 							onClick() {
 								__unstableMarkNextChangeAsNotPersistent();
-								setAttributes( { style: blockStyles } );
+								setAttributes( attributes );
 								setUserConfig( () => userConfig, {
 									undoIgnore: true,
 								} );
