@@ -63,7 +63,7 @@
 	}
 
 	[cmdk-item] {
-		border-radius: $grid-unit-05;
+		border-radius: 0 $grid-unit-05 $grid-unit-05 0;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -73,6 +73,7 @@
 		&[aria-selected="true"],
 		&:active {
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			box-shadow: inset 4px 0 0 0 currentColor;
 			color: var(--wp-admin-theme-color);
 
 			svg {
