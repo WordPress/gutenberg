@@ -77,6 +77,7 @@ describe( 'selectors', () => {
 				outlineMode: true,
 				focusMode: false,
 				hasFixedToolbar: false,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
