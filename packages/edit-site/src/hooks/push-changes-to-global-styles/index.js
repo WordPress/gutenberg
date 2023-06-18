@@ -105,27 +105,33 @@ const getValueFromObjectPath = ( object, path ) => {
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
-	return useMemo(
-		() =>
-			supports.flatMap( ( key ) => {
-				if ( ! STYLE_PROPERTY[ key ] ) {
-					return [];
-				}
-				const { value: path } = STYLE_PROPERTY[ key ];
-				const presetAttributeKey = path.join( '.' );
-				const presetAttributeValue =
-					attributes[
-						STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[
-							presetAttributeKey
-						]
-					];
-				const value = presetAttributeValue
-					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-					: getValueFromObjectPath( attributes.style, path );
-				return value ? [ { path, value } ] : [];
-			} ),
-		[ supports, attributes ]
-	);
+	return useMemo( () => {
+		const changes = supports.flatMap( ( key ) => {
+			if ( ! STYLE_PROPERTY[ key ] ) {
+				return [];
+			}
+			const { value: path } = STYLE_PROPERTY[ key ];
+			const presetAttributeKey = path.join( '.' );
+			const presetAttributeValue =
+				attributes[
+					STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
+				];
+			const value = presetAttributeValue
+				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+				: getValueFromObjectPath( attributes.style, path );
+			return value ? [ { path, value } ] : [];
+		} );
+
+		// To ensure display of a visible border, global styles require a
+		// default border style if a border color or width is present.
+		const { color, style, width } = attributes.style?.border || {};
+
+		if ( ( color || width ) && ! style ) {
+			changes.push( { path: [ 'border', 'style' ], value: 'solid' } );
+		}
+
+		return changes;
+	}, [ supports, attributes ] );
 }
 
 /**
@@ -269,7 +275,19 @@ function PushChangesToGlobalStylesControl( {
 				}
 			);
 		}
-	}, [ changes, attributes, userConfig, name ] );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		attributes,
+		changes,
+		createSuccessNotice,
+		inheritedBehaviors,
+		name,
+		setAttributes,
+		setBehavior,
+		setUserConfig,
+		userConfig,
+		userHasEditedBehaviors,
+	] );
 
 	return (
 		<BaseControl
