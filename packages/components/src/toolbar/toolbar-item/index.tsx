@@ -7,7 +7,12 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useContext } from '@wordpress/element';
+import {
+	forwardRef,
+	useContext,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import warning from '@wordpress/warning';
 
 /**
@@ -22,6 +27,11 @@ function ToolbarItem(
 ) {
 	const accessibleToolbarStore = useContext( ToolbarContext );
 	const isRenderProp = typeof children === 'function';
+	const [ rendered, setRendered ] = useState( false );
+
+	useEffect( () => {
+		setRendered( true );
+	}, [] );
 
 	if ( ! isRenderProp && ! Component ) {
 		warning(
@@ -43,13 +53,22 @@ function ToolbarItem(
 		return children( allProps );
 	}
 
-	const render = isRenderProp ? children : Component && <Component />;
-
 	return (
 		<BaseToolbarItem
-			store={ accessibleToolbarStore }
-			render={ render }
 			{ ...allProps }
+			store={ accessibleToolbarStore }
+			render={ ( itemProps ) => {
+				if ( ! rendered ) {
+					itemProps = { ...itemProps, tabIndex: 0 };
+				}
+				if ( isRenderProp ) {
+					return children( itemProps );
+				}
+				if ( Component ) {
+					return <Component { ...itemProps } />;
+				}
+				return <button { ...itemProps } />;
+			} }
 		/>
 	);
 }
