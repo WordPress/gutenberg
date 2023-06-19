@@ -169,6 +169,7 @@ export { default as positionRight } from './library/position-right';
 export { default as pencil } from './library/pencil';
 export { default as people } from './library/people';
 export { default as pin } from './library/pin';
+export { default as pinSmall } from './library/pin-small';
 export { default as plugins } from './library/plugins';
 export { default as plusCircleFilled } from './library/plus-circle-filled';
 export { default as plusCircle } from './library/plus-circle';
