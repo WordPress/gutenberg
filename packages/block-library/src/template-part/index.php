@@ -75,7 +75,7 @@ function render_block_core_template_part( $attributes ) {
 
 				foreach ( $themes as $theme ) {
 					$theme_folders           = get_block_theme_folders( $theme );
-					$template_part_file_path = get_theme_file_path( '/' . $theme_folders['wp_template_part'] . '/' . $theme_folders['slug'] . '.html' );
+					$template_part_file_path = get_theme_file_path( '/' . $theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
 					if ( file_exists( $template_part_file_path ) ) {
 						$content = (string) file_get_contents( $template_part_file_path );
 						$content = '' !== $content ? _inject_theme_attribute_in_block_template_content( $content ) : '';
