@@ -63,16 +63,19 @@ export const format = {
 
 				onChange( newValue );
 
-				function flattenBlocks( blocks ) {
-					return blocks.flatMap( ( block ) => [
-						block,
-						...flattenBlocks( block.innerBlocks ),
-					] );
+				// BFS search to find the first footnote block.
+				let fnBlock = null;
+				{
+					const queue = [ ...getBlocks() ];
+					while ( queue.length ) {
+						const block = queue.shift();
+						if ( block.name === name ) {
+							fnBlock = block;
+							break;
+						}
+						queue.push( ...block.innerBlocks );
+					}
 				}
-
-				let fnBlock = flattenBlocks( getBlocks() ).find(
-					( block ) => block.name === name
-				);
 
 				// Maybe this should all also be moved to the entity provider.
 				// When there is no footnotes block in the post, create one and
