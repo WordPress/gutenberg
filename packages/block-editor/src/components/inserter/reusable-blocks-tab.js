@@ -21,10 +21,7 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	);
 
 	const filteredItems = useMemo( () => {
-		return items.filter(
-			( { category, syncStatus } ) =>
-				category === 'reusable' && syncStatus !== 'unsynced'
-		);
+		return items.filter( ( { category } ) => category === 'reusable' );
 	}, [ items ] );
 
 	if ( filteredItems.length === 0 ) {
@@ -32,12 +29,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Synced Patterns' ) }>
+		<InserterPanel title={ __( 'Your Patterns' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Synced Patterns' ) }
+				label={ __( 'Your Patterns' ) }
 			/>
 		</InserterPanel>
 	);
@@ -70,7 +67,7 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 						post_type: 'wp_block',
 					} ) }
 				>
-					{ __( 'Manage Synced Patterns' ) }
+					{ __( 'Manage Your Patterns' ) }
 				</Button>
 			</div>
 		</>
