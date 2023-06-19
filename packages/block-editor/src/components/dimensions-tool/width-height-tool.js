@@ -44,7 +44,7 @@ const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
 /**
  * Component that renders controls to edit the dimensions of an image or container.
  * @param {WidthHeightToolProps} props The component props.
- * @return {import('@wordpress/element').WPElement} The dimensions controls.
+ * @return {import('@wordpress/element').WPElement} The width and height tool.
  */
 export default function WidthHeightTool( {
 	panelId,
