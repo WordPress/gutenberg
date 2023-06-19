@@ -859,7 +859,7 @@ Resolves the specified entity records.
 _Usage_
 
 ```js
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 function PageTitlesList() {
 	const { records, isResolving } = useEntityRecords( 'postType', 'page' );
