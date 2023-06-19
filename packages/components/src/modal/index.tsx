@@ -67,6 +67,7 @@ function UnforwardedModal(
 		onKeyDown,
 		isFullScreen = false,
 		__experimentalHideHeader = false,
+		onFocusReturn,
 	} = props;
 
 	const ref = useRef< HTMLDivElement >();
@@ -76,7 +77,7 @@ function UnforwardedModal(
 		: aria.labelledby;
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const constrainedTabbingRef = useConstrainedTabbing();
-	const focusReturnRef = useFocusReturn();
+	const focusReturnRef = useFocusReturn( onFocusReturn );
 	const focusOutsideProps = useFocusOutside( onRequestClose );
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );

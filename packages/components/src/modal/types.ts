@@ -143,4 +143,9 @@ export type ModalProps = {
 	 * @default false
 	 */
 	__experimentalHideHeader?: boolean;
+	/**
+	 * Callback called when the modal is dismissed. Used to implement custom
+	 * focus restoration behavior.
+	 */
+	onFocusReturn?: ( defaultFocusReturnElement: Element | null ) => void;
 };
