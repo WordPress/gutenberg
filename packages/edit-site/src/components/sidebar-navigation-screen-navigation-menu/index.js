@@ -59,6 +59,10 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const { handleSave, handleDelete, handleDuplicate } =
 		useNavigationMenuHandlers();
 
+	const _handleDelete = () => handleDelete( navigationMenu );
+	const _handleSave = () => handleSave( navigationMenu );
+	const _handleDuplicate = () => handleDuplicate( navigationMenu );
+
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper
@@ -85,9 +89,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				actions={
 					<ScreenNavigationMoreMenu
 						menuTitle={ decodeEntities( menuTitle ) }
-						onDelete={ () => handleDelete( navigationMenu ) }
-						onSave={ () => handleSave( navigationMenu ) }
-						onDuplicate={ () => handleDuplicate( navigationMenu ) }
+						onDelete={ _handleDelete }
+						onSave={ _handleSave }
+						onDuplicate={ _handleDuplicate }
 					/>
 				}
 				title={ decodeEntities( menuTitle ) }
@@ -99,9 +103,9 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SingleNavigationMenu
 			navigationMenu={ navigationMenu }
-			handleDelete={ () => handleDelete( navigationMenu ) }
-			handleSave={ () => handleSave( navigationMenu ) }
-			handleDuplicate={ () => handleDuplicate( navigationMenu ) }
+			handleDelete={ _handleDelete }
+			handleSave={ _handleSave }
+			handleDuplicate={ _handleDuplicate }
 		/>
 	);
 }
