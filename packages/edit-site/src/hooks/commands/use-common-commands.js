@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash, backup, help } from '@wordpress/icons';
+import { trash, backup, help, styles } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -63,6 +63,19 @@ export function useCommonCommands() {
 			openGeneralSidebar( 'edit-site/global-styles' );
 			setEditorCanvasContainerView( 'global-styles-revisions' );
 		},
+	} );
+
+	useCommand( {
+		name: 'core/edit-site/open-styles',
+		label: __( 'Open styles' ),
+		callback: () => {
+			history.push( {
+				path: '/wp_global_styles',
+				canvas: 'edit',
+			} );
+			openGeneralSidebar( 'edit-site/global-styles' );
+		},
+		icon: styles,
 	} );
 
 	useCommand( {
