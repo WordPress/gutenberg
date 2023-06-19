@@ -9,6 +9,7 @@ import {
 	CheckboxControl,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
+	__experimentalNumberControl as NumberControl,
 	__experimentalTruncate as Truncate,
 	__experimentalItemGroup as ItemGroup,
 } from '@wordpress/components';
@@ -170,14 +171,13 @@ export default function HomeTemplateDetails() {
 					</SidebarNavigationScreenDetailsPanelRow>
 				) }
 				<SidebarNavigationScreenDetailsPanelRow>
-					<InputControl
+					<NumberControl
 						className="edit-site-sidebar-navigation-screen__input-control"
 						placeholder={ 0 }
 						value={ postsCountValue }
 						size={ '__unstable-large' }
 						step="1"
 						min="1"
-						type="number"
 						onChange={ debounce( setPostsPerPage, 300 ) }
 						label={ __( 'Posts per page' ) }
 						help={ __(
