@@ -153,12 +153,10 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 		$this->assertSame(
 			'gutenberg_test_process_directives_helper_increment',
 			gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() )
-
 		);
 		$this->assertSame(
 			array( $helper, 'increment' ),
 			gutenberg_interactivity_evaluate_reference( 'selectors.class_method', $context->get_context() )
-
 		);
 		$this->assertSame(
 			'Helper_Class::static_increment',
