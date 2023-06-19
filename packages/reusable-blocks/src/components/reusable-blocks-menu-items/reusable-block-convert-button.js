@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -96,13 +96,9 @@ export default function ReusableBlockConvertButton( {
 					syncType
 				);
 				createSuccessNotice(
-					sprintf(
-						// translators: %s: The sync status of the block that is created.
-						__( '%s created.' ),
-						syncType === 'fully'
-							? __( 'Synced Pattern' )
-							: __( 'Unsynced Pattern' )
-					),
+					syncType === 'fully'
+						? __( 'Synced Pattern created' )
+						: __( 'Unsynced Pattern created' ),
 					{
 						type: 'snackbar',
 					}

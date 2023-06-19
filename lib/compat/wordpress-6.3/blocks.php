@@ -28,8 +28,7 @@ function gutenberg_add_selectors_property_to_block_type_settings( $settings, $me
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to_block_type_settings', 10, 2 );
 
 /**
- * Adds custom fields support to the wp_block post type so an unsynced option can be added and renames
- * from Reusable block to Pattern.
+ * Renames Reusable block CPT to Pattern.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
@@ -40,7 +39,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_add_selectors_property_to
  *
  * @return array Register post type args.
  */
-function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
+function gutenberg_rename_reusable_block_cpt_to_pattern( $args, $post_type ) {
 	if ( 'wp_block' === $post_type ) {
 		$args['labels']['name']                     = _x( 'Patterns', 'post type general name' );
 		$args['labels']['singular_name']            = _x( 'Pattern', 'post type singular name' );
@@ -60,6 +59,27 @@ function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 		$args['labels']['item_reverted_to_draft']   = __( 'Pattern reverted to draft.' );
 		$args['labels']['item_scheduled']           = __( 'Pattern scheduled.' );
 		$args['labels']['item_updated']             = __( 'Pattern updated.' );
+	}
+
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_rename_reusable_block_cpt_to_pattern', 10, 2 );
+
+/**
+ * Adds custom fields support to the wp_block post type so an unsynced option can be added.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.3.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/51144
+ *
+ * @param array  $args Register post type args.
+ * @param string $post_type The post type string.
+ *
+ * @return array Register post type args.
+ */
+function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
+	if ( 'wp_block' === $post_type ) {
 		array_push( $args['supports'], 'custom-fields' );
 	}
 
