@@ -16,7 +16,7 @@
 	Even though `:has` is not currently supported in Firefox, this is a small tweak
 	and does not affect the functionality of the block or the user's experience.
 	There will be a minor inconsistency between browsers. However, it's more important to provide
-	a better experience for 80+% of users, until Firefor catches up and supports `:has`.
+	a better experience for 80+% of users, until Firefox catches up and supports `:has`.
 	*/
 	&:has(input[type="checkbox"]) {
 		width: fit-content;
