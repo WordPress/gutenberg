@@ -4,11 +4,13 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,26 +18,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
+import SidebarNavigationScreenNavigationMenuButton from '../sidebar-navigation-screen-navigation-menus/navigator-button';
 
 export default function SidebarNavigationScreenMain() {
-	const hasNavigationMenus = useSelect( ( select ) => {
-		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
-		// to avoid double network calls.
-		const navigationMenus = select( coreStore ).getEntityRecords(
-			'postType',
-			'wp_navigation',
-			{
-				per_page: 1,
-				status: 'publish',
-				order: 'desc',
-				orderby: 'date',
-			}
-		);
-		return !! navigationMenus?.length;
-	}, [] );
-	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
-		? hasNavigationMenus
-		: false;
+	const { location } = useNavigator();
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
+	// Clear the editor canvas container view when accessing the main navigation screen.
+	useEffect( () => {
+		if ( location?.path === '/' ) {
+			setEditorCanvasContainerView( undefined );
+		}
+	}, [ setEditorCanvasContainerView, location?.path ] );
+
 	return (
 		<SidebarNavigationScreen
 			isRoot
@@ -45,16 +44,14 @@ export default function SidebarNavigationScreenMain() {
 			) }
 			content={
 				<ItemGroup>
-					{ showNavigationScreen && (
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/navigation"
-							withChevron
-							icon={ navigation }
-						>
-							{ __( 'Navigation' ) }
-						</NavigatorButton>
-					) }
+					<SidebarNavigationScreenNavigationMenuButton
+						withChevron
+						icon={ navigation }
+						as={ SidebarNavigationItem }
+					>
+						{ __( 'Navigation' ) }
+					</SidebarNavigationScreenNavigationMenuButton>
+
 					<SidebarNavigationItemGlobalStyles
 						withChevron
 						icon={ styles }
@@ -83,7 +80,7 @@ export default function SidebarNavigationScreenMain() {
 						withChevron
 						icon={ symbol }
 					>
-						{ __( 'Template Parts' ) }
+						{ __( 'Library' ) }
 					</NavigatorButton>
 				</ItemGroup>
 			}

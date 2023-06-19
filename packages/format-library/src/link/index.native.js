@@ -37,6 +37,7 @@ export const link = {
 	attributes: {
 		url: 'href',
 		target: 'target',
+		rel: 'rel',
 	},
 	edit: withSpokenMessages(
 		class LinkEdit extends Component {

@@ -267,6 +267,7 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
+		this.props.onKeyDown?.( event );
 		const { showSuggestions, selectedSuggestion, suggestions, loading } =
 			this.state;
 

@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -80,7 +77,7 @@ public class GutenbergEmbedWebViewActivity extends AppCompatActivity {
 
     protected void load() {
         String content = getIntent().getExtras().getString(ARG_CONTENT);
-        mWebView.loadData(content, "text/html", "UTF-8");
+        mWebView.loadDataWithBaseURL(null, content, "text/html", "UTF-8", null);
     }
 
     private void setupToolbar() {

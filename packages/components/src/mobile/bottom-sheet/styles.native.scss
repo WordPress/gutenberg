@@ -1,5 +1,7 @@
 //Bottom Sheet
 
+$cell-disable-opacity: 0.38;
+
 .bottomModal {
 	justify-content: flex-end;
 	margin: 0;
@@ -284,7 +286,15 @@
 
 // used in both light and dark modes
 .placeholderColor {
-	color: #87a6bc;
+	color: $gray;
+}
+
+.placeholderColorDisabled {
+	color: rgba($gray-dark, $cell-disable-opacity);
+}
+
+.placeholderColorDisabledDark {
+	color: rgba($white, $cell-disable-opacity);
 }
 
 .applyButton {
@@ -316,4 +326,8 @@
 
 .cellSubLabelTextDark {
 	color: $sub-heading-dark;
+}
+
+.cellDisabled {
+	opacity: $cell-disable-opacity;
 }

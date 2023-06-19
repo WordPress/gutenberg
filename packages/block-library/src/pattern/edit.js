@@ -65,7 +65,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		replaceBlocks,
 	] );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: slug?.replace( '/', '-' ),
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,

@@ -252,12 +252,7 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						<div
-							ref={ childrenContainerRef }
-							className="components-modal__children-container"
-						>
-							{ children }
-						</div>
+						<div ref={ childrenContainerRef }>{ children }</div>
 					</div>
 				</div>
 			</StyleProvider>

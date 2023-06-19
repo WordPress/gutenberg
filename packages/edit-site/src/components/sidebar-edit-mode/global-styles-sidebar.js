@@ -7,6 +7,7 @@ import { styles, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -15,31 +16,36 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 export default function GlobalStylesSidebar() {
-	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea } = select( interfaceStore );
-			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _isVisualEditorMode =
-				'visual' === select( editSiteStore ).getEditorMode();
-			const _isEditCanvasMode = 'edit' === getCanvasMode();
+	const {
+		shouldClearCanvasContainerView,
+		isStyleBookOpened,
+		showListViewByDefault,
+	} = useSelect( ( select ) => {
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _isVisualEditorMode =
+			'visual' === select( editSiteStore ).getEditorMode();
+		const _isEditCanvasMode = 'edit' === getCanvasMode();
+		const _showListViewByDefault = select( preferencesStore ).get(
+			'core/edit-site',
+			'showListViewByDefault'
+		);
 
-			return {
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				shouldClearCanvasContainerView:
-					'edit-site/global-styles' !==
-						getActiveComplementaryArea( 'core/edit-site' ) ||
-					! _isVisualEditorMode ||
-					! _isEditCanvasMode,
-			};
-		},
-		[]
-	);
+		return {
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			shouldClearCanvasContainerView:
+				'edit-site/global-styles' !==
+					getActiveComplementaryArea( 'core/edit-site' ) ||
+				! _isVisualEditorMode ||
+				! _isEditCanvasMode,
+			showListViewByDefault: _showListViewByDefault,
+		};
+	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -49,6 +55,8 @@ export default function GlobalStylesSidebar() {
 			setEditorCanvasContainerView( undefined );
 		}
 	}, [ shouldClearCanvasContainerView ] );
+
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	return (
 		<DefaultSidebar
@@ -69,11 +77,14 @@ export default function GlobalStylesSidebar() {
 							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
 							disabled={ shouldClearCanvasContainerView }
-							onClick={ () =>
+							onClick={ () => {
+								setIsListViewOpened(
+									isStyleBookOpened && showListViewByDefault
+								);
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
-								)
-							}
+								);
+							} }
 						/>
 					</FlexItem>
 					<FlexItem>

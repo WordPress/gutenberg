@@ -15,7 +15,6 @@ import {
 	getFontSizeClass,
 	getFontSizeObjectByValue,
 	FontSizePicker,
-	getComputedFluidTypographyValue,
 } from '../components/font-sizes';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import {
@@ -25,6 +24,10 @@ import {
 } from './utils';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -289,23 +292,15 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 		// BlockListContext.Provider. If we set fontSize using editor.
 		// BlockListBlock instead of using getEditWrapperProps then the value is
 		// clobbered when the core/style/addEditProps filter runs.
-		const fluidTypographyConfig =
+		const fluidTypographySettings = getFluidTypographyOptionsFromSettings(
 			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.typography?.fluid;
-
-		const fluidTypographySettings =
-			typeof fluidTypographyConfig === 'object'
-				? fluidTypographyConfig
-				: {};
-
-		const newFontSize =
-			fontSize && !! fluidTypographyConfig
-				? getComputedFluidTypographyValue( {
-						fontSize,
-						minimumFontSizeLimit:
-							fluidTypographySettings?.minFontSize,
-				  } )
-				: null;
+		);
+		const newFontSize = fontSize
+			? getTypographyFontSizeValue(
+					{ size: fontSize },
+					fluidTypographySettings
+			  )
+			: null;
 
 		if ( newFontSize === null ) {
 			return wrapperProps;
