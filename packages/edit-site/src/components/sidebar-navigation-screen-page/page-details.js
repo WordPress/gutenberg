@@ -11,7 +11,11 @@ import {
 import { count as wordCount } from '@wordpress/wordcount';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -95,13 +99,14 @@ function getPageDetails( page ) {
 
 export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
-
+	const { records: templates } = useEntityRecords(
+		'postType',
+		'wp_template',
+		{ per_page: -1 }
+	);
 	const { parentTitle, templateTitle } = useSelect(
 		( select ) => {
-			const { getEditedPostContext, getSettings } = unlock(
-				select( editSiteStore )
-			);
-			const defaultTemplateTypes = getSettings()?.defaultTemplateTypes;
+			const { getEditedPostContext } = unlock( select( editSiteStore ) );
 			const postContext = getEditedPostContext();
 
 			// Template title.
@@ -112,10 +117,10 @@ export default function PageDetails( { id } ) {
 					? postContext?.templateSlug
 					: null;
 			const _templateTitle =
-				defaultTemplateTypes && templateSlug
-					? defaultTemplateTypes.find(
+				templates && templateSlug
+					? templates?.find(
 							( template ) => template.slug === templateSlug
-					  )?.title
+					  )?.title?.rendered
 					: null;
 
 			// Parent page title.
@@ -135,7 +140,7 @@ export default function PageDetails( { id } ) {
 				templateTitle: _templateTitle,
 			};
 		},
-		[ record ]
+		[ record, templates ]
 	);
 	return (
 		<VStack spacing={ 5 }>
