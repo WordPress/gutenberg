@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
+import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,36 +13,30 @@ import { __ } from '@wordpress/i18n';
 import { store as editSiteStore } from '../../store';
 
 /**
- * Component that displays a 'Edit your template to edit this block'
- * notification when the user is focusing on editing page content and clicks on
- * a disabled template block.
+ * Component that:
+ *
+ * - Displays a 'Edit your template to edit this block' notification when the
+ *   user is focusing on editing page content and clicks on a disabled template
+ *   block.
+ * - Displays a 'Edit your template to edit this block' dialog when the user
+ *   is focusing on editing page conetnt and double clicks on a disabled
+ *   template block.
  *
  * @param {Object}                                 props
  * @param {import('react').RefObject<HTMLElement>} props.contentRef Ref to the block
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateNotification( { contentRef } ) {
-	useEditTemplateNotification( contentRef );
-	return null;
-}
-
-/**
- * Hook that displays a 'Edit your template to edit this block' notification
- * when the user is focusing on editing page content and clicks on a disabled
- * template block.
- *
- * @param {import('react').RefObject<HTMLElement>} contentRef Ref to the block
- *                                                            editor iframe canvas.
- */
-function useEditTemplateNotification( contentRef ) {
 	const hasPageContentFocus = useSelect(
 		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
 	const { getNotices } = useSelect( noticesStore );
 
-	const { createInfoNotice } = useDispatch( noticesStore );
+	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
 	const lastNoticeId = useRef( 0 );
 
@@ -74,8 +69,40 @@ function useEditTemplateNotification( contentRef ) {
 			);
 			lastNoticeId.current = notice.id;
 		};
+
+		const handleDblClick = ( event ) => {
+			if ( ! hasPageContentFocus ) {
+				return;
+			}
+			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+				return;
+			}
+			if ( lastNoticeId.current ) {
+				removeNotice( lastNoticeId.current );
+			}
+			setIsDialogOpen( true );
+		};
+
 		const canvas = contentRef.current;
 		canvas?.addEventListener( 'click', handleClick );
-		return () => canvas?.removeEventListener( 'click', handleClick );
+		canvas?.addEventListener( 'dblclick', handleDblClick );
+		return () => {
+			canvas?.removeEventListener( 'click', handleClick );
+			canvas?.removeEventListener( 'dblclick', handleDblClick );
+		};
 	}, [ lastNoticeId, hasPageContentFocus, contentRef.current ] );
+
+	return (
+		<ConfirmDialog
+			isOpen={ isDialogOpen }
+			confirmButtonText={ __( 'Edit template' ) }
+			onConfirm={ () => {
+				setIsDialogOpen( false );
+				setHasPageContentFocus( false );
+			} }
+			onCancel={ () => setIsDialogOpen( false ) }
+		>
+			{ __( 'Edit your template to edit this block.' ) }
+		</ConfirmDialog>
+	);
 }
