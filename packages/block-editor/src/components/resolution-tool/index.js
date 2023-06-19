@@ -9,19 +9,19 @@ import { __, _x } from '@wordpress/i18n';
 
 const DEFAULT_SIZE_OPTIONS = [
 	{
-		label: __( 'Thumbnail' ),
+		label: _x( 'Thumbnail', 'Image size option for resolution control' ),
 		value: 'thumbnail',
 	},
 	{
-		label: __( 'Medium' ),
+		label: _x( 'Medium', 'Image size option for resolution control' ),
 		value: 'medium',
 	},
 	{
-		label: __( 'Large' ),
+		label: _x( 'Large', 'Image size option for resolution control' ),
 		value: 'large',
 	},
 	{
-		label: __( 'Full Size' ),
+		label: _x( 'Full Size', 'Image size option for resolution control' ),
 		value: 'full',
 	},
 ];
@@ -34,9 +34,10 @@ export default function ResolutionTool( {
 	defaultValue = DEFAULT_SIZE_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
 } ) {
+	const displayValue = value ?? defaultValue;
 	return (
 		<ToolsPanelItem
-			hasValue={ () => value != null && value !== defaultValue }
+			hasValue={ () => displayValue !== defaultValue }
 			label={ __( 'Resolution' ) }
 			onDeselect={ () => onChange( defaultValue ) }
 			isShownByDefault={ isShownByDefault }
@@ -44,7 +45,7 @@ export default function ResolutionTool( {
 		>
 			<SelectControl
 				label={ __( 'Resolution' ) }
-				value={ value ?? defaultValue }
+				value={ displayValue }
 				options={ options }
 				onChange={ onChange }
 				help={ __( 'Select the size of the source image.' ) }
