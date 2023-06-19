@@ -138,7 +138,7 @@ export default function ReusableBlockConvertButton( {
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create a pattern' ) }
+							title={ __( 'Create a Pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
