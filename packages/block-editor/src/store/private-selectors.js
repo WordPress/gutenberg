@@ -17,6 +17,7 @@ import {
 	getTemplateLock,
 	getBlockName,
 	getBlockOrder,
+	getBlockParents,
 } from './selectors';
 
 /**
@@ -164,6 +165,31 @@ export const getListViewClientIdsTree = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+		state.blockEditingModes,
+		state.settings.templateLock,
+		state.blockListSettings,
+	]
+);
+
+/**
+ * Returns a list of a given block's ancestors, from top to bottom. Blocks with
+ * a 'disabled' editing mode are excluded.
+ *
+ * @see getBlockParents
+ *
+ * @param {Object}  state     Global application state.
+ * @param {string}  clientId  The block client ID.
+ * @param {boolean} ascending Order results from bottom to top (true) or top
+ *                            to bottom (false).
+ */
+export const getEnabledBlockParents = createSelector(
+	( state, clientId, ascending = false ) => {
+		return getBlockParents( state, clientId, ascending ).filter(
+			( parent ) => getBlockEditingMode( state, parent ) !== 'disabled'
+		);
+	},
+	( state ) => [
+		state.blocks.parents,
 		state.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
