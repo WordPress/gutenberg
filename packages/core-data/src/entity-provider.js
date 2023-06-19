@@ -263,7 +263,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 			registry.batch( () => {
 				updateFootnotes( edits.blocks );
-				editEntityRecord( kind, name, id, edits );
+				editEntityRecord( kind, name, id, edits, { isCached: false } );
 			} );
 		},
 		[ kind, name, id, blocks, updateFootnotes ]
@@ -275,7 +275,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			const edits = { blocks: newBlocks, selection };
 			registry.batch( () => {
 				updateFootnotes( edits.blocks );
-				editEntityRecord( kind, name, id, edits );
+				editEntityRecord( kind, name, id, edits, { isCached: false } );
 			} );
 		},
 		[ kind, name, id, updateFootnotes ]
