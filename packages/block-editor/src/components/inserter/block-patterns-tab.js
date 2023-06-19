@@ -27,6 +27,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import useBlockTypesState from './hooks/use-block-types-state';
 
 const noop = () => {};
 
@@ -49,6 +50,14 @@ function usePatternsCategories( rootClientId ) {
 		rootClientId
 	);
 
+	const [ unsyncedPatterns ] = useBlockTypesState( rootClientId );
+	const filteredUnsyncedPatterns = useMemo( () => {
+		return unsyncedPatterns.filter(
+			( { category: unsyncedPatternCategory, syncStatus } ) =>
+				unsyncedPatternCategory === 'reusable' &&
+				syncStatus === 'unsynced'
+		);
+	}, [ unsyncedPatterns ] );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -93,9 +102,20 @@ function usePatternsCategories( rootClientId ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
+		if ( filteredUnsyncedPatterns.length > 0 ) {
+			categories.push( {
+				name: 'reusable',
+				label: _x( 'Your patterns' ),
+			} );
+		}
 
 		return categories;
-	}, [ allPatterns, allCategories ] );
+	}, [
+		allCategories,
+		allPatterns,
+		filteredUnsyncedPatterns.length,
+		hasRegisteredCategory,
+	] );
 
 	return populatedCategories;
 }
@@ -144,6 +164,14 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
+	const [ unsyncedPatterns ] = useBlockTypesState( rootClientId, onInsert );
+	const filteredUnsyncedPatterns = useMemo( () => {
+		return unsyncedPatterns.filter(
+			( { category: unsyncedPatternCategory, syncStatus } ) =>
+				unsyncedPatternCategory === 'reusable' &&
+				syncStatus === 'unsynced'
+		);
+	}, [ unsyncedPatterns ] );
 
 	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
@@ -167,13 +195,19 @@ export function BlockPatternsCategoryPanel( {
 			} ),
 		[ allPatterns, category ]
 	);
-
-	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
+	const patterns =
+		category.name === 'reusable'
+			? filteredUnsyncedPatterns
+			: currentCategoryPatterns;
+	const currentShownPatterns = useAsyncList( patterns );
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
-	if ( ! currentCategoryPatterns.length ) {
+	if (
+		! currentCategoryPatterns.length &&
+		! filteredUnsyncedPatterns.length
+	) {
 		return null;
 	}
 
@@ -185,7 +219,7 @@ export function BlockPatternsCategoryPanel( {
 			<p>{ category.description }</p>
 			<BlockPatternList
 				shownPatterns={ currentShownPatterns }
-				blockPatterns={ currentCategoryPatterns }
+				blockPatterns={ patterns }
 				onClickPattern={ onClick }
 				onHover={ onHover }
 				label={ category.label }

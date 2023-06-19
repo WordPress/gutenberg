@@ -21,7 +21,10 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	);
 
 	const filteredItems = useMemo( () => {
-		return items.filter( ( { category } ) => category === 'reusable' );
+		return items.filter(
+			( { category, syncStatus } ) =>
+				category === 'reusable' && syncStatus !== 'unsynced'
+		);
 	}, [ items ] );
 
 	if ( filteredItems.length === 0 ) {
@@ -29,12 +32,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Your Patterns' ) }>
+		<InserterPanel title={ __( 'Synced Patterns' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Your Patterns' ) }
+				label={ __( 'Synced Patterns' ) }
 			/>
 		</InserterPanel>
 	);

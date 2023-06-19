@@ -106,8 +106,8 @@ export async function selectGlobalInserterTab( label ) {
 		case 'Media':
 			labelSelector = `. = "${ label }"`;
 			break;
-		case 'Your Patterns':
-			// Your Patterns tab label is an icon, hence the different selector.
+		case 'Synced Patterns':
+			// Synced Patterns tab label is an icon, hence the different selector.
 			labelSelector = `@aria-label = "${ label }"`;
 			break;
 	}
@@ -180,7 +180,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
 	switch ( category ) {
 		case 'Blocks':
 		case 'Patterns':
-		case 'Your Patterns': {
+		case 'Synced Patterns': {
 			waitForInsertElement = async () => {
 				return await page.waitForXPath(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
@@ -220,7 +220,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
  * If the entity is not instantly available in the open inserter, a search will
  * be performed. If the search returns no results, an error will be thrown.
  *
- * Available categories: Blocks, Patterns, Your Patterns and Block Directory.
+ * Available categories: Blocks, Patterns, Synced Patterns and Block Directory.
  *
  * @param {string} category   The category to insert from.
  * @param {string} searchTerm The term by which to find the entity to insert.
@@ -231,7 +231,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 
 	let insertButton;
 
-	if ( [ 'Blocks', 'Your Patterns' ].includes( category ) ) {
+	if ( [ 'Blocks', 'Synced Patterns' ].includes( category ) ) {
 		// If it's a block, see if it's insertable without searching...
 		try {
 			insertButton = (
@@ -260,7 +260,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 	await insertButton.click();
 
 	// Extra wait for the reusable block to be ready.
-	if ( category === 'Your Patterns' ) {
+	if ( category === 'Synced Patterns' ) {
 		await canvas().waitForSelector(
 			'.block-library-block__reusable-block-container'
 		);
@@ -347,7 +347,7 @@ export async function insertPattern( searchTerm ) {
  *                            insert.
  */
 export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Your Patterns', searchTerm );
+	await insertFromGlobalInserter( 'Synced Patterns', searchTerm );
 }
 
 /**
