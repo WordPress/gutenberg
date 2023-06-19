@@ -38,5 +38,12 @@ test.describe( 'Block list view', () => {
 		await expect(
 			page.locator( 'role=region[name="List View"i]' )
 		).toBeVisible();
+
+		// The preferences cleanup.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'showListViewByDefault', false );
+		} );
 	} );
 } );
