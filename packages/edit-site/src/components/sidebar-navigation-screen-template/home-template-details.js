@@ -8,12 +8,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	CheckboxControl,
 	__experimentalUseNavigator as useNavigator,
-	Button,
-	Icon,
 	__experimentalInputControl as InputControl,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { header, footer, layout, chevronRightSmall } from '@wordpress/icons';
+import { header, footer, layout } from '@wordpress/icons';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -27,6 +25,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const EMPTY_OBJECT = {};
 
@@ -41,11 +40,11 @@ function TemplateAreaButton( { postId, icon, title } ) {
 	} );
 
 	return (
-		<Button
-			as="a"
+		<SidebarNavigationItem
 			className="edit-site-sidebar-navigation-screen-template__template-area-button"
 			{ ...linkInfo }
 			icon={ icons[ icon ] ?? layout }
+			withChevron
 		>
 			<Truncate
 				limit={ 20 }
@@ -55,10 +54,7 @@ function TemplateAreaButton( { postId, icon, title } ) {
 			>
 				{ decodeEntities( title ) }
 			</Truncate>
-			<span className="edit-site-sidebar-navigation-screen-template__template-icon">
-				<Icon icon={ chevronRightSmall } />
-			</span>
-		</Button>
+		</SidebarNavigationItem>
 	);
 }
 
