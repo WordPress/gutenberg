@@ -11,6 +11,7 @@ import {
 	getLastInsertedBlocksClientIds,
 	getBlockEditingMode,
 	isBlockSubtreeDisabled,
+	getListViewClientIdsTree,
 } from '../private-selectors';
 
 jest.mock( '@wordpress/data/src/select', () => ( {
@@ -74,7 +75,13 @@ describe( 'private selectors', () => {
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
 				] ),
 				order: new Map( [
-					[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
+					[
+						'',
+						[
+							'6cf70164-9097-4460-bcbf-200560546988',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						],
+					],
 					[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
 					[
 						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
@@ -380,6 +387,171 @@ describe( 'private selectors', () => {
 					)
 				).toBe( false );
 			} );
+		} );
+	} );
+
+	describe( 'getListViewClientIdsTree', () => {
+		const baseState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', {} ], // Header
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ], // Group
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ], // |  Post Title
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ], // |  Post Content
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
+				] ),
+				order: new Map( [
+					[
+						'',
+						[
+							'6cf70164-9097-4460-bcbf-200560546988',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						],
+					],
+					[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+					[
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						],
+					],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
+					[
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						],
+					],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
+				] ),
+				parents: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
+					[
+						'b26fc763-417d-4f01-b81c-2ec61e14a972',
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					],
+					[
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					],
+					[
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					],
+					[
+						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					],
+				] ),
+			},
+			blockListSettings: {
+				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
+			},
+		};
+
+		it( 'should return tree containing only clientId and innerBlocks', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [] ),
+			};
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: '6cf70164-9097-4460-bcbf-200560546988',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					innerBlocks: [
+						{
+							clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							innerBlocks: [],
+						},
+						{
+							clientId: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							innerBlocks: [
+								{
+									clientId:
+										'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+									innerBlocks: [],
+								},
+								{
+									clientId:
+										'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'should return a subtree when rootBlockClientId is given', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [] ),
+			};
+			expect(
+				getListViewClientIdsTree(
+					state,
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337'
+				)
+			).toEqual( [
+				{
+					clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
+					innerBlocks: [],
+				},
+				{
+					clientId: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					innerBlocks: [
+						{
+							clientId: 'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'should filter out disabled blocks', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ '', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
+				] ),
+			};
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
+					innerBlocks: [],
+				},
+				{
+					clientId: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					innerBlocks: [
+						{
+							clientId: 'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							innerBlocks: [],
+						},
+						{
+							clientId: 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
 		} );
 	} );
 } );

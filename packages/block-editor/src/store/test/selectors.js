@@ -4734,6 +4734,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
+		expect( console ).toHaveWarned();
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
