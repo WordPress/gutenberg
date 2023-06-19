@@ -17,7 +17,10 @@ test.describe( 'Push to Global Styles button', () => {
 	} );
 
 	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+		} );
 		await editor.canvas.click( 'body' );
 	} );
 
@@ -29,8 +32,10 @@ test.describe( 'Push to Global Styles button', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'A heading' );
 
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+
 		// Navigate to Styles -> Blocks -> Heading -> Typography
-		await page.getByRole( 'button', { name: 'Styles' } ).click();
+		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
@@ -42,7 +47,7 @@ test.describe( 'Push to Global Styles button', () => {
 		).toHaveAttribute( 'aria-pressed', 'false' );
 
 		// Go to block settings and open the Advanced panel
-		await page.getByRole( 'button', { name: 'Settings' } ).click();
+		await topBar.getByRole( 'button', { name: 'Settings' } ).click();
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 
 		// Push button should be disabled
