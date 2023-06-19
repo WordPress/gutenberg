@@ -46,6 +46,7 @@ import { unlock } from '../../lock-unlock';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import PageMain from '../page-main';
 import { useIsSiteEditorLoading } from './hooks';
@@ -62,6 +63,7 @@ export default function Layout() {
 	useSyncCanvasModeWithURL();
 	useCommands();
 	useEditModeCommands();
+	useCommonCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
