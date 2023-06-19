@@ -40,15 +40,20 @@ export const format = {
 		function onClick() {
 			registry.batch( () => {
 				const id = createId();
-				const newValue = insertObject( value, {
-					type: formatName,
-					attributes: {
-						href: '#' + id,
-						id: `${ id }-link`,
-						'data-fn': id,
+				const newValue = insertObject(
+					value,
+					{
+						type: formatName,
+						attributes: {
+							href: '#' + id,
+							id: `${ id }-link`,
+							'data-fn': id,
+						},
+						innerHTML: '*',
 					},
-					innerHTML: '*',
-				} );
+					value.end,
+					value.end
+				);
 				newValue.start = newValue.end - 1;
 
 				onChange( newValue );
