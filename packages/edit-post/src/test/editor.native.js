@@ -79,7 +79,7 @@ describe( 'Editor', () => {
 
 		// Assert
 		const htmlEditor = await screen.findByLabelText( 'html-view-content' );
-		expect( htmlEditor ).toBeDefined();
+		expect( htmlEditor ).toBeVisible();
 	} );
 } );
 
