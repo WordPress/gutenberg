@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -46,7 +45,9 @@ import WidthHeightTool from './width-height-tool';
 
 /**
  * Component that renders controls to edit the dimensions of an image or container.
+ *
  * @param {DimensionsControlsProps} props The component props.
+ *
  * @return {WPElement} The dimensions controls.
  */
 function DimensionsControls( {
@@ -75,13 +76,19 @@ function DimensionsControls( {
 	// dropdown to indicate that setting both the width and height is the same
 	// as a custom aspect ratio.
 	const aspectRatioValue =
-		value.width != null && value.height != null
+		value.width !== null &&
+		value.width !== undefined &&
+		value.height !== null &&
+		value.height !== undefined
 			? 'custom'
 			: value.aspectRatio;
 
 	const showScaleControl =
-		value.aspectRatio != null ||
-		( value.width != null && value.height != null );
+		( value.aspectRatio !== null && value.aspectRatio !== undefined ) ||
+		( value.width !== null &&
+			value.width !== undefined &&
+			value.height !== null &&
+			value.height !== undefined );
 
 	return (
 		<>
@@ -100,7 +107,8 @@ function DimensionsControls( {
 					if (
 						nextAspectRatio !== 'custom' &&
 						nextAspectRatio !== 'auto' &&
-						nextAspectRatio != null
+						nextAspectRatio !== null &&
+						nextAspectRatio !== undefined
 					) {
 						nextValue.aspectRatio = nextAspectRatio;
 					}
@@ -109,12 +117,19 @@ function DimensionsControls( {
 						delete nextValue.scale;
 					}
 
-					if ( nextAspectRatio !== 'custom' && value.width != null ) {
+					if (
+						nextAspectRatio !== 'custom' &&
+						value.width !== null &&
+						value.width !== undefined
+					) {
 						delete nextValue.height;
 					}
 
 					// Set the value to 'cover' since CSS uses 'fill' by default.
-					if ( nextValue.scale == null ) {
+					if (
+						nextValue.scale === null ||
+						nextValue.scale === undefined
+					) {
 						nextValue.scale = 'cover';
 					}
 
@@ -140,11 +155,19 @@ function DimensionsControls( {
 					Object.assign( nextValue, nextDimension );
 
 					// Setting both width and height values overrides the aspect ratio.
-					if ( nextValue.width != null && nextValue.height != null ) {
+					if (
+						nextValue.width !== null &&
+						nextValue.width !== undefined &&
+						nextValue.height !== null &&
+						nextValue.height !== undefined
+					) {
 						delete nextValue.aspectRatio;
 
 						// Set the value to 'cover' since CSS uses 'fill' by default.
-						if ( nextValue.scale == null ) {
+						if (
+							nextValue.scale === null ||
+							nextValue.scale === undefined
+						) {
 							nextValue.scale = 'cover';
 						}
 					}
