@@ -3699,7 +3699,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0
 	 * @param WP_Theme_JSON_Gutenberg $theme_json The theme json resolver.
 	 *
-	 * @return array The styles with the variables replaced with their values.
+	 * @return WP_Theme_JSON_Gutenberg The $theme_json with resolved variables.
 	 */
 	public static function resolve_variables( $theme_json ) {
 		$settings    = $theme_json->get_settings();
@@ -3716,7 +3716,8 @@ class WP_Theme_JSON_Gutenberg {
 			array()
 		);
 
-		return self::convert_variables_to_value( $styles, $vars );
+		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
+		return $theme_json;
 	}
 
 }

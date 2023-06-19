@@ -2135,7 +2135,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$styles = $theme_json::resolve_variables( $theme_json );
+		$styles = $theme_json::resolve_variables( $theme_json )->get_raw_data()['styles'];
 
 		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
 		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
