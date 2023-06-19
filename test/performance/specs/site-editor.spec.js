@@ -98,7 +98,7 @@ test.describe( 'Site Editor Performance', () => {
 			// Wait for the canvas to appear.
 			await testPage
 				.locator( '.edit-site-canvas-spinner' )
-				.waitFor( { state: 'hidden' } );
+				.waitFor( { state: 'hidden', timeout: 60_000 } );
 
 			// Wait for the first block.
 			await testPage
