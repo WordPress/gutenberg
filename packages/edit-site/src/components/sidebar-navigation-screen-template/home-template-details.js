@@ -159,6 +159,7 @@ export default function HomeTemplateDetails() {
 						<InputControl
 							className="edit-site-sidebar-navigation-screen__input-control"
 							placeholder={ __( 'No Title' ) }
+							size={ '__unstable-large' }
 							value={ postsPageTitleValue }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }
@@ -173,6 +174,7 @@ export default function HomeTemplateDetails() {
 						className="edit-site-sidebar-navigation-screen__input-control"
 						placeholder={ 0 }
 						value={ postsCountValue }
+						size={ '__unstable-large' }
 						step="1"
 						min="1"
 						type="number"
