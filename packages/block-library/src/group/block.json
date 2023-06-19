@@ -75,7 +75,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSizingOnChildren": true
 		}
 	},

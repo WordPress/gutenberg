@@ -12,6 +12,8 @@ import { useShouldContextualToolbarShow } from './utils/use-should-contextual-to
 import { cleanEmptyObject } from './hooks/utils';
 import { useBlockEditingMode } from './components/block-editing-mode';
 import BlockQuickNavigation from './components/block-quick-navigation';
+import { LayoutStyle } from './components/block-list/layout';
+import { useLayoutClasses, useLayoutStyles } from './hooks';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -28,4 +30,7 @@ lock( privateApis, {
 	cleanEmptyObject,
 	useBlockEditingMode,
 	BlockQuickNavigation,
+	LayoutStyle,
+	useLayoutClasses,
+	useLayoutStyles,
 } );

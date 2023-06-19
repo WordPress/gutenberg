@@ -10,7 +10,16 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
+## 1.97.0
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 -   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
 
 ## 1.96.1
 -   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
@@ -21,7 +30,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
 
--   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+
 
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
