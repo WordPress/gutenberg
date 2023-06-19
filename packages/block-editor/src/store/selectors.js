@@ -2028,9 +2028,6 @@ export const getInserterItems = createSelector(
 				frecency,
 				syncStatus: reusableBlock.meta?.sync_status,
 				content: reusableBlock.content.raw,
-				blocks: parse( reusableBlock.content.raw, {
-					__unstableSkipMigrationLogs: true,
-				} ),
 			};
 		};
 

@@ -18,6 +18,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { parse } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -166,11 +167,18 @@ export function BlockPatternsCategoryPanel( {
 	);
 	const [ unsyncedPatterns ] = useBlockTypesState( rootClientId, onInsert );
 	const filteredUnsyncedPatterns = useMemo( () => {
-		return unsyncedPatterns.filter(
-			( { category: unsyncedPatternCategory, syncStatus } ) =>
-				unsyncedPatternCategory === 'reusable' &&
-				syncStatus === 'unsynced'
-		);
+		return unsyncedPatterns
+			.filter(
+				( { category: unsyncedPatternCategory, syncStatus } ) =>
+					unsyncedPatternCategory === 'reusable' &&
+					syncStatus === 'unsynced'
+			)
+			.map( ( syncedPattern ) => ( {
+				...syncedPattern,
+				blocks: parse( syncedPattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} ),
+			} ) );
 	}, [ unsyncedPatterns ] );
 
 	const availableCategories = usePatternsCategories( rootClientId );
