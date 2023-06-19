@@ -548,10 +548,10 @@ export default function Image( {
 
 	if ( clientWidth && naturalWidth && naturalHeight ) {
 		const exceedMaxWidth = naturalWidth > clientWidth;
-		const ratio = naturalHeight / naturalWidth;
+		const naturalRatio = naturalHeight / naturalWidth;
 		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
 		imageHeightWithinContainer = exceedMaxWidth
-			? clientWidth * ratio
+			? clientWidth * naturalRatio
 			: naturalHeight;
 	}
 
