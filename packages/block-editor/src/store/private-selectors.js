@@ -137,39 +137,29 @@ export const isBlockSubtreeDisabled = createSelector(
 );
 
 /**
- * Returns a tree of block objects with only clientID and innerBlocks set. Only
- * blocks with the given editing mode are included in the tree.
+ * Returns a tree of block objects with only clientID and innerBlocks set.
+ * Blocks with a 'disabled' editing mode are not included.
  *
- * @param {Object}                              state        Global application state.
- * @param {BlockEditingMode|BlockEditingMode[]} mode         The editing mode(s)
- *                                                           to filter by.
- * @param {?string}                             rootClientId Optional root
- *                                                           client ID of block
- *                                                           list.
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getClientIdsTreeWithBlockEditingMode = createSelector(
-	( state, mode, rootClientId = '' ) => {
-		const modes = Array.isArray( mode ) ? mode : [ mode ];
+export const getListViewClientIdsTree = createSelector(
+	( state, rootClientId = '' ) => {
 		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
-			if ( modes.includes( getBlockEditingMode( state, clientId ) ) ) {
+			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
 				return [
 					{
 						clientId,
-						innerBlocks: getClientIdsTreeWithBlockEditingMode(
+						innerBlocks: getListViewClientIdsTree(
 							state,
-							mode,
 							clientId
 						),
 					},
 				];
 			}
-			return getClientIdsTreeWithBlockEditingMode(
-				state,
-				mode,
-				clientId
-			);
+			return getListViewClientIdsTree( state, clientId );
 		} );
 	},
 	( state ) => [
