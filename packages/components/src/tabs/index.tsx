@@ -153,12 +153,14 @@ export const Tabs = ( props: TabPanelProps ) => {
 					<RadixTabs.Trigger
 						key={ tab.name }
 						value={ tab.name }
-						title={ tab.title }
 						className={ cx(
 							'components-tab-panel__tabs-item',
 							tab.className,
 							{ [ activeClass ]: tab.name === selectedTabName }
 						) }
+						tabIndex={
+							selectedTab?.name === tab.name ? undefined : -1
+						}
 						asChild
 						{ ...( tab.disabled ? disabledTabProps : null ) }
 					>
@@ -177,6 +179,7 @@ export const Tabs = ( props: TabPanelProps ) => {
 					key={ tab.name }
 					className={ 'components-tab-panel__tab-content' }
 					value={ tab.name }
+					tabIndex={ undefined }
 				>
 					{ children( tab ) }
 				</RadixTabs.Content>
