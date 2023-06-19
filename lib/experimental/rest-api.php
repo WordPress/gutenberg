@@ -28,6 +28,14 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+/**
+ * Registers the form-submit REST API controller.
+ */
+function gutenberg_register_rest_form_submit() {
+	$form_submit_controller = new Gutenberg_REST_Block_Form_Submit_Controller();
+	$form_submit_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_form_submit' );
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
