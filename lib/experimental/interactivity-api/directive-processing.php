@@ -155,7 +155,7 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 
 	/*
 	 * Check if $current is an anonymous function or an arrow function, and if
-	 * so, call it passing the store. Other types of callables are ignored in
+	 * so, call it passing the store. Other types of callables are ignored on
 	 * purpose, as arbitrary strings or arrays could be wrongly evaluated as
 	 * "callables".
 	 *
