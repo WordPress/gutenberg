@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
  * @return {string} The position type label.
  */
 function getPositionTypeLabel( attributes ) {
-	const positionType = attributes.style?.position?.type;
+	const positionType = attributes?.style?.position?.type;
 
 	if ( positionType === 'sticky' ) {
 		return __( 'Sticky' );
@@ -86,7 +86,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: blockType.description,
 				anchor: attributes?.anchor,
 				positionLabel,
-				positionType: attributes.style?.position?.type,
+				positionType: attributes?.style?.position?.type,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -97,7 +97,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
 				positionLabel,
-				positionType: attributes.style?.position?.type,
+				positionType: attributes?.style?.position?.type,
 			};
 		},
 		[ clientId ]
