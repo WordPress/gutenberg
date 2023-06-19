@@ -445,21 +445,15 @@ export default function Image( {
 							scale,
 							aspectRatio,
 						} }
-						onChange={ ( {
-							width,
-							height,
-							scale,
-							aspectRatio,
-						} ) => {
-							// Destructuring and rebuilding forces setting
-							// `undefined` for values that are removed since
-							// setAttributes doesn't do anything with keys
-							// that aren't set.
+						onChange={ ( newValue ) => {
+							// Rebuilding the object forces setting `undefined`
+							// for values that are removed since setAttributes
+							// doesn't do anything with keys that aren't set.
 							setAttributes( {
-								width,
-								height,
-								scale,
-								aspectRatio,
+								width: newValue.width,
+								height: newValue.height,
+								scale: newValue.scale,
+								aspectRatio: newValue.aspectRatio,
 							} );
 						} }
 					/>
@@ -510,9 +504,6 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
-	const hasCustomBorder =
-		!! borderProps.className ||
-		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -593,11 +584,19 @@ export default function Image( {
 			naturalWidth / naturalHeight;
 
 		const currentWidth =
-			height != null && height !== 'auto' && aspectRatio != null
+			height !== null &&
+			height !== undefined &&
+			height !== 'auto' &&
+			aspectRatio !== null &&
+			aspectRatio !== undefined
 				? _currentWidth * ratio
 				: _currentWidth;
 		const currentHeight =
-			width != null && width !== 'auto' && aspectRatio != null
+			width !== null &&
+			width !== undefined &&
+			width !== 'auto' &&
+			aspectRatio !== null &&
+			aspectRatio !== undefined
 				? _currentHeight / ratio
 				: _currentHeight;
 
