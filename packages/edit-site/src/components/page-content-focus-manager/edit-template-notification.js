@@ -47,29 +47,32 @@ function useEditTemplateNotification( contentRef ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
+			if ( ! hasPageContentFocus ) {
+				return;
+			}
+			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+				return;
+			}
 			const isNoticeAlreadyShowing = getNotices().some(
 				( notice ) => notice.id === lastNoticeId.current
 			);
-			if (
-				! isNoticeAlreadyShowing &&
-				hasPageContentFocus &&
-				event.target.classList.contains( 'is-root-container' )
-			) {
-				const { notice } = await createInfoNotice(
-					__( 'Edit your template to edit this block' ),
-					{
-						isDismissible: true,
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Edit template' ),
-								onClick: () => setHasPageContentFocus( false ),
-							},
-						],
-					}
-				);
-				lastNoticeId.current = notice.id;
+			if ( isNoticeAlreadyShowing ) {
+				return;
 			}
+			const { notice } = await createInfoNotice(
+				__( 'Edit your template to edit this block' ),
+				{
+					isDismissible: true,
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Edit template' ),
+							onClick: () => setHasPageContentFocus( false ),
+						},
+					],
+				}
+			);
+			lastNoticeId.current = notice.id;
 		};
 		const canvas = contentRef.current;
 		canvas?.addEventListener( 'click', handleClick );
