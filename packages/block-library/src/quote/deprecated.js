@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
 
 export const migrateToQuoteV2 = ( attributes ) => {
 	const { value, ...restAttributes } = attributes;
@@ -95,6 +94,7 @@ const v4 = {
 			},
 		},
 	},
+	isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
 	save( { attributes } ) {
 		const { align, citation } = attributes;
 		const className = classnames( {
@@ -109,7 +109,9 @@ const v4 = {
 			</blockquote>
 		);
 	},
-	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
+	migrate( attributes ) {
+		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+	},
 };
 
 const v3 = {
@@ -165,7 +167,9 @@ const v3 = {
 			</blockquote>
 		);
 	},
-	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
+	migrate( attributes ) {
+		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+	},
 };
 
 const v2 = {
@@ -187,7 +191,9 @@ const v2 = {
 			type: 'string',
 		},
 	},
-	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
+	migrate( attributes ) {
+		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+	},
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
 
