@@ -97,8 +97,8 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					syncType === 'fully'
-						? __( 'Synced Pattern created' )
-						: __( 'Unsynced Pattern created' ),
+						? __( 'Synced Pattern created.' )
+						: __( 'Unsynced Pattern created.' ),
 					{
 						type: 'snackbar',
 					}
