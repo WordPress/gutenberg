@@ -20,6 +20,8 @@ import { STORE_NAME } from './name';
 
 const EMPTY_ARRAY = [];
 
+let oldFootnotes = {};
+
 /**
  * Internal dependencies
  */
@@ -214,11 +216,22 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 			const newFootnotes = newOrder.map(
 				( fnId ) =>
-					footnotes.find( ( fn ) => fn.id === fnId ) || {
+					footnotes.find( ( fn ) => fn.id === fnId ) ||
+					oldFootnotes[ fnId ] || {
 						id: fnId,
 						content: '',
 					}
 			);
+
+			oldFootnotes = {
+				...oldFootnotes,
+				...footnotes.reduce( ( acc, fn ) => {
+					if ( ! newOrder.includes( fn.id ) ) {
+						acc[ fn.id ] = fn;
+					}
+					return acc;
+				}, {} ),
+			};
 
 			updateMeta( {
 				...meta,
