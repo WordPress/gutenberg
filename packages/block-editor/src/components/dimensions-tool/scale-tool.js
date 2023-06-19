@@ -42,7 +42,7 @@ const DEFAULT_SCALE_OPTIONS = [
 
 /**
  * @callback ScaleToolPropsOnChange
- * @param {string} nextValue
+ * @param {string} nextValue New scale value.
  * @return {void}
  */
 
@@ -59,18 +59,23 @@ const DEFAULT_SCALE_OPTIONS = [
 
 /**
  * A tool to select the CSS object-fit property for the image.
+ *
  * @param {ScaleToolProps} props
- * @return {import('@wordpress/element').WPElement}
+ *
+ * @return {import('@wordpress/element').WPElement} The scale tool.
  */
 export default function ScaleTool( {
 	panelId,
-	value = 'fill', // Match the CSS default so if the value is used directly in CSS it will look correct in the control.
+	value,
 	onChange,
 	options = DEFAULT_SCALE_OPTIONS,
 	defaultValue = DEFAULT_SCALE_OPTIONS[ 0 ].value,
 	showControl = true,
 	isShownByDefault = true,
 } ) {
+	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
+	const displayValue = value ?? 'fill';
+
 	// TODO: Since we're passing in options, would it make sense to hardcode the help text as a lookup for all CSS values inste?
 	const scaleHelp = useMemo( () => {
 		return options.reduce( ( acc, option ) => {
@@ -78,11 +83,12 @@ export default function ScaleTool( {
 			return acc;
 		}, {} );
 	}, [ options ] );
+
 	return (
 		<ToolsPanelItem
 			label={ __( 'Scale' ) }
 			isShownByDefault={ isShownByDefault }
-			hasValue={ () => value != null && value !== defaultValue }
+			hasValue={ () => displayValue !== defaultValue }
 			onDeselect={ () => onChange( defaultValue ) }
 			panelId={ panelId }
 		>
@@ -90,8 +96,8 @@ export default function ScaleTool( {
 				<ToggleGroupControl
 					label={ __( 'Scale' ) }
 					isBlock
-					help={ scaleHelp[ value ] }
-					value={ value }
+					help={ scaleHelp[ displayValue ] }
+					value={ displayValue }
 					onChange={ onChange }
 				>
 					{ options.map( ( option ) => (
