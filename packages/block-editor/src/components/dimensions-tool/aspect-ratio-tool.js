@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import {
 	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -10,43 +13,65 @@ import { __, _x } from '@wordpress/i18n';
 
 /**
  * These should use the same values as AspectRatioDropdown in @wordpress/block-editor.
+ *
  * @type {SelectControlProps[]}
  */
 export const DEFAULT_ASPECT_RATIO_OPTIONS = [
 	{
-		label: __( 'Original' ),
+		label: _x( 'Original', 'Aspect ratio option for dimensions control' ),
 		value: 'auto',
 	},
 	{
-		label: __( 'Square - 1:1' ),
+		label: _x(
+			'Square - 1:1',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '1',
 	},
 	{
-		label: __( 'Standard - 4:3' ),
+		label: _x(
+			'Standard - 4:3',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '4/3',
 	},
 	{
-		label: __( 'Portrait - 3:4' ),
+		label: _x(
+			'Portrait - 3:4',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '3/4',
 	},
 	{
-		label: __( 'Classic - 3:2' ),
+		label: _x(
+			'Classic - 3:2',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '3/2',
 	},
 	{
-		label: __( 'Classic Portrait - 2:3' ),
+		label: _x(
+			'Classic Portrait - 2:3',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '2/3',
 	},
 	{
-		label: __( 'Wide - 16:9' ),
+		label: _x(
+			'Wide - 16:9',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '16/9',
 	},
 	{
-		label: __( 'Tall - 9:16' ),
+		label: _x(
+			'Tall - 9:16',
+			'Aspect ratio option for dimensions control'
+		),
 		value: '9/16',
 	},
 	{
-		label: __( 'Custom' ),
+		label: _x( 'Custom', 'Aspect ratio option for dimensions control' ),
 		value: 'custom',
 		disabled: true,
 		hidden: true,
@@ -54,19 +79,19 @@ export const DEFAULT_ASPECT_RATIO_OPTIONS = [
 ];
 
 /**
- * @callback AspectRatioToolProps~onChange
- * @param {string} [value]
- * @returns {void}
+ * @callback AspectRatioToolPropsOnChange
+ * @param {string} [value] New aspect ratio value.
+ * @return {void} No return.
  */
 
 /**
  * @typedef {Object} AspectRatioToolProps
- * @property {string}                        [panelId]
- * @property {string}                        [value]
- * @property {AspectRatioToolProps~onChange} [onChange]
- * @property {SelectControlProps[]}          [options]
- * @property {string}                        [defaultValue]
- * @property {boolean}                       [isShownByDefault]
+ * @property {string}                       [panelId]          ID of the panel this tool is associated with.
+ * @property {string}                       [value]            Current aspect ratio value.
+ * @property {AspectRatioToolPropsOnChange} [onChange]         Callback to update the aspect ratio value.
+ * @property {SelectControlProps[]}         [options]          Aspect ratio options.
+ * @property {string}                       [defaultValue]     Default aspect ratio value.
+ * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
  */
 
 export default function AspectRatioTool( {
@@ -77,9 +102,10 @@ export default function AspectRatioTool( {
 	defaultValue = DEFAULT_ASPECT_RATIO_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
 } ) {
+	const displayValue = value ?? defaultValue;
 	return (
 		<ToolsPanelItem
-			hasValue={ () => value != null && value !== defaultValue }
+			hasValue={ () => displayValue !== defaultValue }
 			label={ __( 'Aspect ratio' ) }
 			onDeselect={ () => onChange( undefined ) }
 			isShownByDefault={ isShownByDefault }
@@ -87,7 +113,7 @@ export default function AspectRatioTool( {
 		>
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ value ?? defaultValue }
+				value={ displayValue }
 				options={ options }
 				onChange={ onChange }
 			/>
