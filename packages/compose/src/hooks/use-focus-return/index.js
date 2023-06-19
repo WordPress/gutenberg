@@ -9,7 +9,7 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * previously focused element when closed.
  * The current hook implements the returning behavior.
  *
- * @param {() => void} [onFocusReturn] Overrides the default return behavior.
+ * @param {( defaultElementToFocus: Element | null ) => void} [onFocusReturn] Overrides the default return behavior.
  * @return {import('react').RefCallback<HTMLElement>} Element Ref.
  *
  * @example
@@ -62,12 +62,14 @@ function useFocusReturn( onFocusReturn ) {
 			// decides to allow the default behavior to occur under some
 			// conditions.
 			if ( onFocusReturnRef.current ) {
-				onFocusReturnRef.current();
+				onFocusReturnRef.current( focusedBeforeMount.current );
 			} else {
 				/** @type {null | HTMLElement} */ (
 					focusedBeforeMount.current
 				)?.focus();
 			}
+		} else if ( onFocusReturnRef.current ) {
+			onFocusReturnRef.current( focusedBeforeMount.current );
 		}
 	}, [] );
 }
