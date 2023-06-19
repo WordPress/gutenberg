@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+} from '@wordpress/block-editor';
 
 const blockAttributes = {
 	align: {
@@ -17,6 +22,7 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'src',
+		__experimentalRole: 'content',
 	},
 	alt: {
 		type: 'string',
@@ -24,23 +30,27 @@ const blockAttributes = {
 		selector: 'img',
 		attribute: 'alt',
 		default: '',
+		__experimentalRole: 'content',
 	},
 	caption: {
 		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
+		__experimentalRole: 'content',
 	},
 	title: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'title',
+		__experimentalRole: 'content',
 	},
 	href: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'href',
+		__experimentalRole: 'content',
 	},
 	rel: {
 		type: 'string',
@@ -56,6 +66,7 @@ const blockAttributes = {
 	},
 	id: {
 		type: 'number',
+		__experimentalRole: 'content',
 	},
 	width: {
 		type: 'number',
@@ -79,20 +90,127 @@ const blockAttributes = {
 
 const blockSupports = {
 	anchor: true,
+	behaviors: {
+		lightbox: true,
+	},
 	color: {
-		__experimentalDuotone: 'img',
 		text: false,
 		background: false,
 	},
+	filter: {
+		duotone: true,
+	},
 	__experimentalBorder: {
+		color: true,
 		radius: true,
+		width: true,
+		__experimentalSkipSerialization: true,
 		__experimentalDefaultControls: {
+			color: true,
 			radius: true,
+			width: true,
 		},
 	},
 };
 
+const blockSelectors = {
+	border: '.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder',
+	filter: {
+		duotone: '.wp-block-image img, .wp-block-image .components-placeholder',
+	},
+};
+
 const deprecated = [
+	{
+		attributes: blockAttributes,
+		supports: blockSupports,
+		selectors: blockSelectors,
+		save( { attributes } ) {
+			const {
+				url,
+				alt,
+				caption,
+				align,
+				href,
+				rel,
+				linkClass,
+				width,
+				height,
+				id,
+				linkTarget,
+				sizeSlug,
+				title,
+			} = attributes;
+
+			const newRel = ! rel ? undefined : rel;
+			const borderProps = getBorderClassesAndStyles( attributes );
+
+			const classes = classnames( {
+				[ `align${ align }` ]: align,
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'is-resized': width || height,
+				'has-custom-border':
+					!! borderProps.className ||
+					( borderProps.style &&
+						Object.keys( borderProps.style ).length > 0 ),
+			} );
+
+			const imageClasses = classnames( borderProps.className, {
+				[ `wp-image-${ id }` ]: !! id,
+			} );
+
+			const image = (
+				<img
+					src={ url }
+					alt={ alt }
+					className={ imageClasses || undefined }
+					style={ borderProps.style }
+					width={ width }
+					height={ height }
+					title={ title }
+				/>
+			);
+
+			const figure = (
+				<>
+					{ href ? (
+						<a
+							className={ linkClass }
+							href={ href }
+							target={ linkTarget }
+							rel={ newRel }
+						>
+							{ image }
+						</a>
+					) : (
+						image
+					) }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							tagName="figcaption"
+							value={ caption }
+						/>
+					) }
+				</>
+			);
+
+			return (
+				<figure { ...useBlockProps.save( { className: classes } ) }>
+					{ figure }
+				</figure>
+			);
+		},
+		migrate( attributes ) {
+			return {
+				...attributes,
+				width: attributes.width && `${ attributes.width }px`,
+				height: attributes.height && `${ attributes.width }px`,
+			};
+		},
+	},
 	// The following deprecation moves existing border radius styles onto the
 	// inner img element where new border block support styles must be applied.
 	// It will also add a new `.has-custom-border` class for existing blocks
