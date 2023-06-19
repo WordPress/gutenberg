@@ -11,6 +11,7 @@ import {
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -18,7 +19,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -26,6 +26,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -53,6 +54,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
@@ -61,6 +63,9 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
+import { evalAspectRatio } from './utils';
+
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
 export default function Image( {
 	temporaryURL,
@@ -90,6 +95,8 @@ export default function Image( {
 		title,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		linkTarget,
 		sizeSlug,
 	} = attributes;
@@ -427,21 +434,49 @@ export default function Image( {
 							}
 						/>
 					) }
-					<ImageSizeControl
-						onChangeImage={ updateImage }
-						onChange={ ( value ) => setAttributes( value ) }
-						slug={ sizeSlug }
-						width={ width }
-						height={ height }
-						imageSizeOptions={ imageSizeOptions }
-						isResizable={ isResizable }
-						imageWidth={ naturalWidth }
-						imageHeight={ naturalHeight }
-						imageSizeHelp={ __(
-							'Select the size of the source image.'
-						) }
-					/>
 				</PanelBody>
+				<ToolsPanel
+					label={ __( 'Image size' ) }
+					resetAll={ () =>
+						setAttributes( {
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							aspectRatio: undefined,
+						} )
+					}
+				>
+					<DimensionsTool
+						value={ {
+							width,
+							height,
+							scale,
+							aspectRatio,
+						} }
+						onChange={ ( {
+							width,
+							height,
+							scale,
+							aspectRatio,
+						} ) => {
+							// Destructuring and rebuilding forces setting
+							// `undefined` for values that are removed since
+							// setAttributes doesn't do anything with keys
+							// that aren't set.
+							setAttributes( {
+								width,
+								height,
+								scale,
+								aspectRatio,
+							} );
+						} }
+					/>
+					<ResolutionTool
+						value={ sizeSlug }
+						onChange={ updateImage }
+						options={ imageSizeOptions }
+					/>
+				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
@@ -504,7 +539,12 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ borderProps.style }
+				style={ {
+					width: '100%',
+					height: '100%',
+					objectFit: scale,
+					...borderProps.style,
+				} }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -547,12 +587,28 @@ export default function Image( {
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
-		img = <div style={ { width, height } }>{ img }</div>;
+		img = (
+			<div style={ { width, height, aspectRatio, objectFit: scale } }>
+				{ img }
+			</div>
+		);
 	} else {
-		const currentWidth = width || imageWidthWithinContainer;
-		const currentHeight = height || imageHeightWithinContainer;
+		const _currentWidth = width ?? imageWidthWithinContainer;
+		const _currentHeight = height ?? imageHeightWithinContainer;
 
-		const ratio = naturalWidth / naturalHeight;
+		const ratio =
+			( aspectRatio && evalAspectRatio( aspectRatio ) ) ??
+			naturalWidth / naturalHeight;
+
+		const currentWidth =
+			height != null && height !== 'auto' && aspectRatio != null
+				? _currentWidth * ratio
+				: _currentWidth;
+		const currentHeight =
+			width != null && width !== 'auto' && aspectRatio != null
+				? _currentHeight / ratio
+				: _currentHeight;
+
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
 		const minHeight =
@@ -598,11 +654,13 @@ export default function Image( {
 		}
 		/* eslint-enable no-lonely-if */
 
+		// TODO: Figure out why height depended on having a custom border.
 		img = (
 			<ResizableBox
+				style={ { display: 'block', objectFit: scale } }
 				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
+					width: currentWidth ?? 'auto',
+					height: currentHeight ?? 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }

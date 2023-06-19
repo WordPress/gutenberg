@@ -3,6 +3,15 @@
  */
 import { NEW_TAB_REL } from './constants';
 
+export function evalAspectRatio( value ) {
+	if ( value.includes( 'auto' ) ) {
+		// TODO: Or this could return img.naturalWidth / img.naturalHeight somehow?
+		return null;
+	}
+	const [ width, height = 1 ] = value.split( '/' ).map( Number );
+	return width / height;
+}
+
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
 
