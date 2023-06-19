@@ -12,6 +12,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -279,8 +280,6 @@ export default function Image( {
 
 		setAttributes( {
 			url: newUrl,
-			width: undefined,
-			height: undefined,
 			sizeSlug: newSizeSlug,
 		} );
 	}
@@ -335,6 +334,12 @@ export default function Image( {
 			switchToBlockType( getBlock( clientId ), 'core/cover' )
 		);
 	}
+
+	// TODO: Can allow more units after figuring out how they interact with
+	// the ResizableBox and ImageEditor components.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
 
 	const controls = (
 		<>
@@ -464,6 +469,7 @@ export default function Image( {
 								aspectRatio: newValue.aspectRatio,
 							} );
 						} }
+						unitsOptions={ dimensionsUnitsOptions }
 					/>
 					<ResolutionTool
 						value={ sizeSlug }
@@ -542,21 +548,13 @@ export default function Image( {
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
-	let imageWidthWithinContainer;
-	let imageHeightWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		const naturalRatio = naturalHeight / naturalWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-		imageHeightWithinContainer = exceedMaxWidth
-			? clientWidth * naturalRatio
-			: naturalHeight;
-	}
-
 	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
 	// So we try using the imageRef width first and fallback to clientWidth.
 	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+
+	// TODO: Remove this once we have a better solution for the ImageEditor.
+	const pxWidth = width && parseInt( width, 10 );
+	const pxHeight = height && parseInt( height, 10 );
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
@@ -577,36 +575,26 @@ export default function Image( {
 				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
-	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
+	} else if ( ! isResizable ) {
 		img = (
 			<div style={ { width, height, aspectRatio, objectFit: scale } }>
 				{ img }
 			</div>
 		);
 	} else {
-		const _currentWidth = width ?? imageWidthWithinContainer;
-		const _currentHeight = height ?? imageHeightWithinContainer;
-
 		const ratio =
 			( aspectRatio && evalAspectRatio( aspectRatio ) ) ??
 			naturalWidth / naturalHeight;
 
+		const isAutoWidth =
+			width === null || width === undefined || width === 'auto';
+		const isAutoHeight =
+			height === null || height === undefined || height === 'auto';
+
 		const currentWidth =
-			height !== null &&
-			height !== undefined &&
-			height !== 'auto' &&
-			aspectRatio !== null &&
-			aspectRatio !== undefined
-				? _currentWidth * ratio
-				: _currentWidth;
+			isAutoWidth && ! isAutoHeight ? pxHeight * ratio : pxWidth;
 		const currentHeight =
-			width !== null &&
-			width !== undefined &&
-			width !== 'auto' &&
-			aspectRatio !== null &&
-			aspectRatio !== undefined
-				? _currentHeight / ratio
-				: _currentHeight;
+			isAutoHeight && ! isAutoWidth ? pxWidth / ratio : pxHeight;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -658,15 +646,15 @@ export default function Image( {
 			<ResizableBox
 				style={ { display: 'block', objectFit: scale } }
 				size={ {
-					width: currentWidth ?? 'auto',
-					height: currentHeight ?? 'auto',
+					width: currentWidth,
+					height: currentHeight,
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
 				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
+				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
 					right: showRightHandle,
@@ -677,8 +665,14 @@ export default function Image( {
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
 					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
+						width: `${ parseInt(
+							currentWidth + delta.width,
+							10
+						) }px`,
+						height: `${ parseInt(
+							currentHeight + delta.height,
+							10
+						) }px`,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
