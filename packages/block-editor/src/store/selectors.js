@@ -187,16 +187,27 @@ export function getBlocks( state, rootClientId ) {
  * Returns a stripped down block object containing only its client ID,
  * and its inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object} state    Editor state.
  * @param {string} clientId Client ID of the block to get.
  *
  * @return {Object} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdWithClientIdsTree = createSelector(
-	( state, clientId ) => ( {
-		clientId,
-		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
-	} ),
+	( state, clientId ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return {
+			clientId,
+			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+		};
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -205,16 +216,26 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  * given root, consisting of stripped down block objects containing only
  * their client IDs, and their inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) =>
-		getBlockOrder( state, rootClientId ).map( ( clientId ) =>
+	( state, rootClientId = '' ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 			__unstableGetClientIdWithClientIdsTree( state, clientId )
-		),
+		);
+	},
 	( state ) => [ state.blocks.order ]
 );
 
