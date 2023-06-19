@@ -27,6 +27,7 @@ import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
 
 const {
+	cleanEmptyObject,
 	GlobalStylesContext,
 	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
 	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
@@ -105,16 +106,19 @@ const getValueFromObjectPath = ( object, path ) => {
 	return value;
 };
 
-function getBorderStyleChanges( border, presetColor ) {
+const flatBorderProperties = [ 'borderColor', 'borderWidth', 'borderStyle' ];
+const sides = [ 'top', 'right', 'bottom', 'left' ];
+
+function getBorderStyleChanges( border, presetColor, userStyle ) {
 	if ( ! border && ! presetColor ) {
 		return [];
 	}
 
 	const changes = [
-		...getFallbackBorderStyleChange( border?.top, 'top' ),
-		...getFallbackBorderStyleChange( border?.right, 'right' ),
-		...getFallbackBorderStyleChange( border?.bottom, 'bottom' ),
-		...getFallbackBorderStyleChange( border?.left, 'left' ),
+		...getFallbackBorderStyleChange( 'top', border, userStyle ),
+		...getFallbackBorderStyleChange( 'right', border, userStyle ),
+		...getFallbackBorderStyleChange( 'bottom', border, userStyle ),
+		...getFallbackBorderStyleChange( 'left', border, userStyle ),
 	];
 
 	// Handle a flat border i.e. all sides the same, CSS shorthand.
@@ -122,18 +126,29 @@ function getBorderStyleChanges( border, presetColor ) {
 	const hasColorOrWidth = presetColor || customColor || width;
 
 	if ( hasColorOrWidth && ! style ) {
-		changes.push( { path: [ 'border', 'style' ], value: 'solid' } );
+		// Global Styles need individual side configurations to overcome
+		// theme.json configurations which are per side as well.
+		sides.forEach( ( side ) => {
+			// Only add fallback border-style if global styles don't already
+			// have something set.
+			if ( ! userStyle?.[ side ]?.style ) {
+				changes.push( {
+					path: [ 'border', side, 'style' ],
+					value: 'solid',
+				} );
+			}
+		} );
 	}
 
 	return changes;
 }
 
-function getFallbackBorderStyleChange( border, side ) {
-	if ( ! border ) {
+function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
+	if ( ! border?.[ side ] || globalBorderStyle?.[ side ]?.style ) {
 		return [];
 	}
 
-	const { color, style, width } = border;
+	const { color, style, width } = border[ side ];
 	const hasColorOrWidth = color || width;
 
 	if ( ! hasColorOrWidth || style ) {
@@ -143,8 +158,9 @@ function getFallbackBorderStyleChange( border, side ) {
 	return [ { path: [ 'border', side, 'style' ], value: 'solid' } ];
 }
 
-function useChangesToPush( name, attributes ) {
+function useChangesToPush( name, attributes, userConfig ) {
 	const supports = useSupportedStyles( name );
+	const blockUserConfig = userConfig?.styles?.blocks?.[ name ];
 
 	return useMemo( () => {
 		const changes = supports.flatMap( ( key ) => {
@@ -160,6 +176,20 @@ function useChangesToPush( name, attributes ) {
 			const value = presetAttributeValue
 				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
 				: getValueFromObjectPath( attributes.style, path );
+
+			// The shorthand border styles can't be mapped directly as global
+			// styles requires longhand config.
+			if ( flatBorderProperties.includes( key ) && value ) {
+				// The shorthand config path is included to clear the block attribute.
+				const borderChanges = [ { path, value } ];
+				sides.forEach( ( side ) => {
+					const currentPath = [ ...path ];
+					currentPath.splice( -1, 0, side );
+					borderChanges.push( { path: currentPath, value } );
+				} );
+				return borderChanges;
+			}
+
 			return value ? [ { path, value } ] : [];
 		} );
 
@@ -167,11 +197,12 @@ function useChangesToPush( name, attributes ) {
 		// default border style if a border color or width is present.
 		getBorderStyleChanges(
 			attributes.style?.border,
-			attributes.borderColor
+			attributes.borderColor,
+			blockUserConfig?.border
 		).forEach( ( change ) => changes.push( change ) );
 
 		return changes;
-	}, [ supports, attributes ] );
+	}, [ supports, attributes, blockUserConfig ] );
 }
 
 /**
@@ -223,13 +254,14 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const changes = useChangesToPush( name, attributes );
-
 	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
 		blockSupportOnly: true,
 	} );
+
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
+
+	const changes = useChangesToPush( name, attributes, userConfig );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -266,7 +298,7 @@ function PushChangesToGlobalStylesControl( {
 				gradient: undefined,
 				fontSize: undefined,
 				fontFamily: undefined,
-				style: newBlockStyles,
+				style: cleanEmptyObject( newBlockStyles ),
 			};
 
 			// @wordpress/core-data doesn't support editing multiple entity types in
