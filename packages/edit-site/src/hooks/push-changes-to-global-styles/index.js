@@ -105,6 +105,44 @@ const getValueFromObjectPath = ( object, path ) => {
 	return value;
 };
 
+function getBorderStyleChanges( border, presetColor ) {
+	if ( ! border && ! presetColor ) {
+		return [];
+	}
+
+	const changes = [
+		...getFallbackBorderStyleChange( border?.top, 'top' ),
+		...getFallbackBorderStyleChange( border?.right, 'right' ),
+		...getFallbackBorderStyleChange( border?.bottom, 'bottom' ),
+		...getFallbackBorderStyleChange( border?.left, 'left' ),
+	];
+
+	// Handle a flat border i.e. all sides the same, CSS shorthand.
+	const { color: customColor, style, width } = border || {};
+	const hasColorOrWidth = presetColor || customColor || width;
+
+	if ( hasColorOrWidth && ! style ) {
+		changes.push( { path: [ 'border', 'style' ], value: 'solid' } );
+	}
+
+	return changes;
+}
+
+function getFallbackBorderStyleChange( border, side ) {
+	if ( ! border ) {
+		return [];
+	}
+
+	const { color, style, width } = border;
+	const hasColorOrWidth = color || width;
+
+	if ( ! hasColorOrWidth || style ) {
+		return [];
+	}
+
+	return [ { path: [ 'border', side, 'style' ], value: 'solid' } ];
+}
+
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
@@ -127,11 +165,10 @@ function useChangesToPush( name, attributes ) {
 
 		// To ensure display of a visible border, global styles require a
 		// default border style if a border color or width is present.
-		const { color, style, width } = attributes.style?.border || {};
-
-		if ( ( attributes.borderColor || color || width ) && ! style ) {
-			changes.push( { path: [ 'border', 'style' ], value: 'solid' } );
-		}
+		getBorderStyleChanges(
+			attributes.style?.border,
+			attributes.borderColor
+		).forEach( ( change ) => changes.push( change ) );
 
 		return changes;
 	}, [ supports, attributes ] );
