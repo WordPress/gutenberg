@@ -54,8 +54,8 @@ function DimensionsControls( {
 	panelId,
 	value = {},
 	onChange = () => {},
-	aspectRatioOptions,
-	scaleOptions,
+	aspectRatioOptions, // Default value is in AspectRatioTool.
+	scaleOptions, // Default value is in ScaleTool.
 	unitsOptions,
 } ) {
 	// TODO: 'spacing.units` was used in the featured image code, but we're
