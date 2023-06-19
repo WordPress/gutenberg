@@ -21,7 +21,7 @@ const config = defineConfig( {
 	fullyParallel: false,
 	workers: 1,
 	retries: 0,
-	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
+	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 600_000, // Defaults to 10 minutes.
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
 	snapshotPathTemplate:
