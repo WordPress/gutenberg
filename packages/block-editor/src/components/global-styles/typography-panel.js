@@ -53,19 +53,22 @@ export function useHasTypographyPanel( settings ) {
 function useHasFontSizeControl( settings ) {
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes =
-		fontSizesPerOrigin?.custom ??
-		fontSizesPerOrigin?.theme ??
-		fontSizesPerOrigin.default;
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
 	return !! fontSizes?.length || ! disableCustomFontSizes;
 }
 
 function useHasFontFamilyControl( settings ) {
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies =
-		fontFamiliesPerOrigin?.custom ??
-		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin?.default;
+	const fontFamilies = []
+		.concat( fontFamiliesPerOrigin?.custom ?? [] )
+		.concat( fontFamiliesPerOrigin?.theme ?? [] )
+		.concat( fontFamiliesPerOrigin?.default ?? [] )
+		.sort( ( a, b ) =>
+			( a?.name || a?.slug ).localeCompare( b?.name || a?.slug )
+		);
 	return !! fontFamilies?.length;
 }
 
@@ -161,10 +164,10 @@ export default function TypographyPanel( {
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies =
-		fontFamiliesPerOrigin?.custom ??
-		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin?.default;
+	const fontFamilies = []
+		.concat( fontFamiliesPerOrigin?.custom ?? [] )
+		.concat( fontFamiliesPerOrigin?.theme ?? [] )
+		.concat( fontFamiliesPerOrigin?.default ?? [] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
@@ -187,10 +190,10 @@ export default function TypographyPanel( {
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes =
-		fontSizesPerOrigin?.custom ??
-		fontSizesPerOrigin?.theme ??
-		fontSizesPerOrigin.default;
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug

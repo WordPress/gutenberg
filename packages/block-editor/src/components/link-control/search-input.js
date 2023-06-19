@@ -126,6 +126,7 @@ const LinkControlSearchInput = forwardRef(
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
+					disableSuggestions={ currentLink?.url === value }
 					__nextHasNoMarginBottom
 					label={ useLabel ? 'URL' : undefined }
 					className={ inputClasses }
