@@ -2103,7 +2103,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 						'core/comments'        => array(
 							'color' => array(
-								'text' => 'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+								'text'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--small))',
+								'background' => 'var(--wp--preset--color--primary, var(--undefined--color--primary))',
 							),
 						),
 						'core/navigation'      => array(
@@ -2160,9 +2161,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
 
 		$this->assertEquals(
-			'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+			"var(--undefined--color--primary, $small_font)",
 			$styles['blocks']['core/comments']['color']['text'],
 			'Blocks: text color with undefined var and fallback'
+		);
+		$this->assertEquals(
+			$primary_color,
+			$styles['blocks']['core/comments']['color']['background'],
+			'Blocks: background color with variable and undefined fallback'
 		);
 
 		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );

@@ -3663,14 +3663,27 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( 0 <= strpos( $style, 'var(' ) ) {
-				// find all the variables in the string in the form of var(--variable-name, fallback)
-				$has_matches = preg_match_all( '/var\(([^),]+)?(,?\s\S+)?\)/', $style, $var_parts );
+				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
+
+				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
+
 				if ( $has_matches ) {
 					$resolved_style = $styles[ $key ];
 					foreach ( $var_parts[1] as $index => $var_part ) {
 						$key_in_values   = 'var(' . $var_part . ')';
-						$rule_to_replace = $var_parts[0][ $index ]; // the css rule to replace e.g. var(--wp--preset--color--vivid-green-cyan)
-						$resolved_style  = str_replace( $rule_to_replace, isset( $values[ $key_in_values ] ) ? $values[ $key_in_values ] : $rule_to_replace, $resolved_style );
+						$rule_to_replace = $var_parts[0][ $index ]; // the css rule to replace e.g. var(--wp--preset--color--vivid-green-cyan).
+						$fallback        = $var_parts[2][ $index ]; // the fallback value.
+						$resolved_style  = str_replace(
+							array(
+								$rule_to_replace,
+								$fallback,
+							),
+							array(
+								isset( $values[ $key_in_values ] ) ? $values[ $key_in_values ] : $rule_to_replace,
+								isset( $values[ $fallback ] ) ? $values[ $fallback ] : $fallback,
+							),
+							$resolved_style
+						);
 					}
 					$styles[ $key ] = $resolved_style;
 				}
