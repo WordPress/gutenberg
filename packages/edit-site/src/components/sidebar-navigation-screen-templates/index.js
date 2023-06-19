@@ -161,7 +161,6 @@ export default function SidebarNavigationScreenTemplates() {
 							<SidebarNavigationItem
 								as="a"
 								href="edit.php?post_type=wp_block"
-								withChevron
 							>
 								{ config[ postType ].labels.reusableBlocks }
 							</SidebarNavigationItem>
