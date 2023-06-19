@@ -335,7 +335,8 @@
 		background: rgba($black, 0.3);
 	}
 
-	.block-editor-list-view-block-select-button__lock {
+	.block-editor-list-view-block-select-button__lock,
+	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
 }

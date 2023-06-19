@@ -66,6 +66,6 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"layout": true
 	}
 }
