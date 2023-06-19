@@ -535,6 +535,8 @@ _Returns_
 
 ### getRedoEdit
 
+> **Deprecated** since 6.3
+
 Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
@@ -577,6 +579,8 @@ _Returns_
 -   `any`: Index data.
 
 ### getUndoEdit
+
+> **Deprecated** since 6.3
 
 Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
@@ -855,7 +859,7 @@ Resolves the specified entity records.
 _Usage_
 
 ```js
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 function PageTitlesList() {
 	const { records, isResolving } = useEntityRecords( 'postType', 'page' );

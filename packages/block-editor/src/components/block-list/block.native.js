@@ -345,6 +345,7 @@ function BlockListBlock( {
 							isSelectionEnabled={ isSelectionEnabled }
 							mergeBlocks={ canRemove ? onMerge : undefined }
 							name={ name }
+							onDeleteBlock={ onDeleteBlock }
 							onFocus={ onFocus }
 							onRemove={ canRemove ? onRemove : undefined }
 							onReplace={ canRemove ? onReplace : undefined }
@@ -481,26 +482,26 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				) {
 					removeBlock( _clientId );
 				} else {
-					if (
-						canInsertBlockType(
-							getBlockName( firstClientId ),
-							targetRootClientId
-						)
-					) {
-						moveBlocksToPosition(
-							[ firstClientId ],
-							_clientId,
-							targetRootClientId,
-							getBlockIndex( _clientId )
-						);
-					} else {
-						const replacement = switchToBlockType(
-							getBlock( firstClientId ),
-							getDefaultBlockName()
-						);
+					registry.batch( () => {
+						if (
+							canInsertBlockType(
+								getBlockName( firstClientId ),
+								targetRootClientId
+							)
+						) {
+							moveBlocksToPosition(
+								[ firstClientId ],
+								_clientId,
+								targetRootClientId,
+								getBlockIndex( _clientId )
+							);
+						} else {
+							const replacement = switchToBlockType(
+								getBlock( firstClientId ),
+								getDefaultBlockName()
+							);
 
-						if ( replacement && replacement.length ) {
-							registry.batch( () => {
+							if ( replacement && replacement.length ) {
 								insertBlocks(
 									replacement,
 									getBlockIndex( _clientId ),
@@ -508,16 +509,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 									changeSelection
 								);
 								removeBlock( firstClientId, false );
-							} );
+							}
 						}
-					}
 
-					if (
-						! getBlockOrder( _clientId ).length &&
-						isUnmodifiedBlock( getBlock( _clientId ) )
-					) {
-						removeBlock( _clientId, false );
-					}
+						if (
+							! getBlockOrder( _clientId ).length &&
+							isUnmodifiedBlock( getBlock( _clientId ) )
+						) {
+							removeBlock( _clientId, false );
+						}
+					} );
 				}
 			}
 

@@ -18,6 +18,7 @@ import {
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -35,7 +36,9 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		return (
+		return layout?.columnCount ? (
+			<GridLayoutColumnsControl layout={ layout } onChange={ onChange } />
+		) : (
 			<GridLayoutMinimumWidthControl
 				layout={ layout }
 				onChange={ onChange }
@@ -51,9 +54,9 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { minimumColumnWidth = '12rem' } = layout;
+		const { minimumColumnWidth = '12rem', columnCount = null } = layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -66,7 +69,11 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( minimumColumnWidth ) {
+		if ( columnCount ) {
+			rules.push(
+				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
+			);
+		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`
 			);
@@ -168,5 +175,25 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 			</Flex>
 		</fieldset>
+	);
+}
+
+// Enables setting number of grid columns
+function GridLayoutColumnsControl( { layout, onChange } ) {
+	const { columnCount = 3 } = layout;
+
+	return (
+		<RangeControl
+			label={ __( 'Columns' ) }
+			value={ columnCount }
+			onChange={ ( value ) =>
+				onChange( {
+					...layout,
+					columnCount: value,
+				} )
+			}
+			min={ 1 }
+			max={ 6 }
+		/>
 	);
 }

@@ -43,7 +43,7 @@ const config = {
 			manage: __( 'Manage all template parts' ),
 			reusableBlocks: __( 'Manage reusable blocks' ),
 			description: __(
-				'Manage what patterns are available when editing your site.'
+				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
 			),
 		},
 		sortCallback: ( items ) => {
@@ -147,33 +147,27 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
-								<>
-									<SidebarNavigationItem
-										className="edit-site-sidebar-navigation-screen-templates__see-all"
-										withChevron
-										{ ...browseAllLink }
-									>
-										{ config[ postType ].labels.manage }
-									</SidebarNavigationItem>
-									{ !! config[ postType ].labels
-										.reusableBlocks && (
-										<SidebarNavigationItem
-											as="a"
-											href="edit.php?post_type=wp_block"
-											withChevron
-										>
-											{
-												config[ postType ].labels
-													.reusableBlocks
-											}
-										</SidebarNavigationItem>
-									) }
-								</>
-							) }
 						</ItemGroup>
 					) }
 				</>
+			}
+			footer={
+				! isMobileViewport && (
+					<>
+						<SidebarNavigationItem withChevron { ...browseAllLink }>
+							{ config[ postType ].labels.manage }
+						</SidebarNavigationItem>
+						{ !! config[ postType ].labels.reusableBlocks && (
+							<SidebarNavigationItem
+								as="a"
+								href="edit.php?post_type=wp_block"
+								withChevron
+							>
+								{ config[ postType ].labels.reusableBlocks }
+							</SidebarNavigationItem>
+						) }
+					</>
+				)
 			}
 		/>
 	);

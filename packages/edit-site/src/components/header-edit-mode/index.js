@@ -43,7 +43,7 @@ import {
 	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -142,7 +142,8 @@ export default function HeaderEditMode() {
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const isFocusMode = templateType === 'wp_template_part';
+	const isFocusMode =
+		templateType === 'wp_template_part' || templateType === 'wp_navigation';
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(

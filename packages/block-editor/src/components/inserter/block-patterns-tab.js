@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, isRTL } from '@wordpress/i18n';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -17,7 +17,7 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -240,7 +240,13 @@ function BlockPatternsTabs( {
 										<FlexBlock>
 											{ category.label }
 										</FlexBlock>
-										<Icon icon={ chevronRight } />
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
 									</HStack>
 								</Item>
 							) ) }

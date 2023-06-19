@@ -217,17 +217,7 @@ class SiteEditorStyleVariations {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async browseStyles() {
-		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.page.click( 'role=button[name="Browse styles"i]' );
 	}

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/avatar",
 	"title": "Avatar",
 	"category": "theme",
@@ -25,7 +25,6 @@
 	},
 	"usesContext": [ "postType", "postId", "commentId" ],
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"align": true,
 		"alignWide": false,

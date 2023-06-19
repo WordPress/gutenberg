@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import {
@@ -15,10 +15,11 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
+import TemplateActions from '../template-actions';
 
 function useTemplateTitleAndDescription( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -36,17 +37,9 @@ function useTemplateTitleAndDescription( postType, postId ) {
 	let descriptionText = getDescription();
 
 	if ( ! descriptionText && addedBy.text ) {
-		if ( record.type === 'wp_template' && record.is_custom ) {
-			descriptionText = __(
-				'This is a custom template that can be applied manually to any Post or Page.'
-			);
-		} else if ( record.type === 'wp_template_part' ) {
-			descriptionText = sprintf(
-				// translators: %s: template part title e.g: "Header".
-				__( 'This is your %s template part.' ),
-				getTitle()
-			);
-		}
+		descriptionText = __(
+			'This is a custom template that can be applied manually to any Post or Page.'
+		);
 	}
 
 	const description = (
@@ -73,9 +66,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 
 					{ addedBy.isCustomized && (
 						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
-							{ postType === 'wp_template'
-								? _x( '(Customized)', 'template' )
-								: _x( '(Customized)', 'template part' ) }
+							{ _x( '(Customized)', 'template' ) }
 						</span>
 					) }
 				</span>
@@ -87,8 +78,10 @@ function useTemplateTitleAndDescription( postType, postId ) {
 }
 
 export default function SidebarNavigationScreenTemplate() {
-	const { params } = useNavigator();
-	const { postType, postId } = params;
+	const navigator = useNavigator();
+	const {
+		params: { postType, postId },
+	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { title, description } = useTemplateTitleAndDescription(
 		postType,
@@ -99,11 +92,21 @@ export default function SidebarNavigationScreenTemplate() {
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<>
+					<TemplateActions
+						postType={ postType }
+						postId={ postId }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( `/${ postType }/all` );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</>
 			}
 			description={ description }
 		/>
