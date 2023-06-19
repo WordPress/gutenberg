@@ -63,15 +63,13 @@ export const format = {
 
 				onChange( newValue );
 
-				const flattenBlocks = ( blocks ) =>
-					blocks.reduce(
-						( acc, block ) => [
-							...acc,
-							block,
-							...flattenBlocks( block.innerBlocks ),
-						],
-						[]
-					);
+				function flattenBlocks( blocks ) {
+					return blocks.flatMap( ( block ) => [
+						block,
+						...flattenBlocks( block.innerBlocks ),
+					] );
+				}
+
 				let fnBlock = flattenBlocks( getBlocks() ).find(
 					( block ) => block.name === name
 				);
