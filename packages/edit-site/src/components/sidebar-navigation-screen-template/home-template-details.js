@@ -10,6 +10,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
 	__experimentalTruncate as Truncate,
+	__experimentalItemGroup as ItemGroup,
 } from '@wordpress/components';
 import { header, footer, layout } from '@wordpress/icons';
 import { useMemo, useState, useEffect } from '@wordpress/element';
@@ -196,15 +197,17 @@ export default function HomeTemplateDetails() {
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 			<SidebarNavigationScreenDetailsPanel title={ __( 'Areas' ) }>
-				{ templateAreas.map( ( { label, icon, theme, slug } ) => (
-					<SidebarNavigationScreenDetailsPanelRow key={ slug }>
-						<TemplateAreaButton
-							postId={ `${ theme }//${ slug }` }
-							title={ label || slug }
-							icon={ icon }
-						/>
-					</SidebarNavigationScreenDetailsPanelRow>
-				) ) }
+				<ItemGroup>
+					{ templateAreas.map( ( { label, icon, theme, slug } ) => (
+						<SidebarNavigationScreenDetailsPanelRow key={ slug }>
+							<TemplateAreaButton
+								postId={ `${ theme }//${ slug }` }
+								title={ label || slug }
+								icon={ icon }
+							/>
+						</SidebarNavigationScreenDetailsPanelRow>
+					) ) }
+				</ItemGroup>
 			</SidebarNavigationScreenDetailsPanel>
 		</>
 	);
