@@ -14,6 +14,40 @@ const v0 = {
 			type: 'string',
 		},
 	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			width: true,
+			style: true,
+		},
+		html: false,
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+	},
 	save( { attributes } ) {
 		const { showContent } = attributes;
 		const summary = attributes.summary ? attributes.summary : 'Details';
