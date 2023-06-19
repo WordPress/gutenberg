@@ -394,7 +394,16 @@ export function getColorsAndGradients(
 	};
 }
 
-export function getGlobalStyles( rawStyles, rawFeatures ) {
+/**
+ * @deprecated See getGlobalStyles implementation.
+ *
+ * Retrieves global styles data.
+ *
+ * @param {string|undefined} rawStyles   The raw styles to parse.
+ * @param {string|undefined} rawFeatures The raw features to parse.
+ * @return {Object} The global styles data.
+ */
+export function deprecatedGetGlobalStylesData( rawStyles, rawFeatures ) {
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 	const mappedValues = getMappedValues( features, features?.color?.palette );
 	const colors = parseStylesVariables(
@@ -435,4 +444,59 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
+}
+
+/**
+ *
+ * Retrieves global styles data.
+ *
+ * @param {string|undefined} rawStyles   The raw styles to parse.
+ * @param {string|undefined} rawFeatures The raw features to parse.
+ * @return {Object} The global styles data.
+ */
+export function getGlobalStylesData( rawStyles, rawFeatures ) {
+	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
+	const globalStyles = rawStyles ? JSON.parse( rawStyles ) : {};
+	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
+
+	return {
+		__experimentalFeatures: {
+			color: {
+				palette: features?.color?.palette,
+				gradients: features?.color?.gradients,
+				text: features?.color?.text ?? true,
+				background: features?.color?.background ?? true,
+				defaultPalette: features?.color?.defaultPalette ?? true,
+				defaultGradients: features?.color?.defaultGradients ?? true,
+			},
+			typography: {
+				fontSizes,
+				customLineHeight: features?.custom?.[ 'line-height' ],
+			},
+			spacing: features?.spacing,
+		},
+		__experimentalGlobalStylesBaseStyles: globalStyles,
+	};
+}
+
+/**
+ *
+ * Retrieves global styles theme configuration.
+ *
+ * @param {string|undefined} rawStyles   The raw styles to parse.
+ * @param {string|undefined} rawFeatures The raw features to parse.
+ * @return {Object} The global styles data.
+ */
+export function getGlobalStyles( rawStyles, rawFeatures ) {
+	const styles = rawStyles ? JSON.parse( rawStyles ) : {};
+
+	// Check if the current Global styles data is already parsed,
+	// e.g it doesn't have a variable name as background.
+	if ( ! styles?.color?.background?.includes( 'var(--' ) ) {
+		return getGlobalStylesData( rawStyles, rawFeatures );
+	}
+
+	// We need to keep the old approach parsing the theme json data for users who
+	// haven't updated their Gutenberg plugin version to >= 16.2
+	return deprecatedGetGlobalStylesData( rawStyles, rawFeatures );
 }
