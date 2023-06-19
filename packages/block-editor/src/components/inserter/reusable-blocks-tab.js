@@ -21,10 +21,7 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	);
 
 	const filteredItems = useMemo( () => {
-		return items.filter(
-			( { category, syncStatus } ) =>
-				category === 'reusable' && syncStatus !== 'unsynced'
-		);
+		return items.filter( ( { category } ) => category === 'reusable' );
 	}, [ items ] );
 
 	if ( filteredItems.length === 0 ) {

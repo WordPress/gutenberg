@@ -51,12 +51,16 @@ function usePatternsCategories( rootClientId ) {
 		rootClientId
 	);
 
-	const [ unsyncedPatterns ] = useBlockTypesState( rootClientId );
+	const [ unsyncedPatterns ] = useBlockTypesState(
+		rootClientId,
+		undefined,
+		'unsynced'
+	);
+
 	const filteredUnsyncedPatterns = useMemo( () => {
 		return unsyncedPatterns.filter(
-			( { category: unsyncedPatternCategory, syncStatus } ) =>
-				unsyncedPatternCategory === 'reusable' &&
-				syncStatus === 'unsynced'
+			( { category: unsyncedPatternCategory } ) =>
+				unsyncedPatternCategory === 'reusable'
 		);
 	}, [ unsyncedPatterns ] );
 	const hasRegisteredCategory = useCallback(
@@ -165,13 +169,16 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-	const [ unsyncedPatterns ] = useBlockTypesState( rootClientId, onInsert );
+	const [ unsyncedPatterns ] = useBlockTypesState(
+		rootClientId,
+		onInsert,
+		'unsynced'
+	);
 	const filteredUnsyncedPatterns = useMemo( () => {
 		return unsyncedPatterns
 			.filter(
-				( { category: unsyncedPatternCategory, syncStatus } ) =>
-					unsyncedPatternCategory === 'reusable' &&
-					syncStatus === 'unsynced'
+				( { category: unsyncedPatternCategory } ) =>
+					unsyncedPatternCategory === 'reusable'
 			)
 			.map( ( syncedPattern ) => ( {
 				...syncedPattern,

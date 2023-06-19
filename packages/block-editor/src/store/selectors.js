@@ -1945,6 +1945,7 @@ const buildBlockTypeItem =
  *
  * @param    {Object}   state             Editor state.
  * @param    {?string}  rootClientId      Optional root client ID of block list.
+ * @param    {?string}  syncStatus        Optional sync status to filter pattern blocks by.
  *
  * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
@@ -1961,7 +1962,7 @@ const buildBlockTypeItem =
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
+	( state, rootClientId = null, syncStatus ) => {
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
 			buildScope: 'inserter',
 		} );
@@ -2026,7 +2027,6 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
-				syncStatus: reusableBlock.meta?.sync_status,
 				content: reusableBlock.content.raw,
 			};
 		};
@@ -2042,7 +2042,14 @@ export const getInserterItems = createSelector(
 			'core/block',
 			rootClientId
 		)
-			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
+			? getReusableBlocks( state )
+					.filter(
+						( reusableBlock ) =>
+							syncStatus === reusableBlock.meta?.sync_status ||
+							( ! syncStatus &&
+								reusableBlock.meta?.sync_status === '' )
+					)
+					.map( buildReusableBlockInserterItem )
 			: [];
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
