@@ -85,7 +85,8 @@ describe( 'Post Editor Performance', () => {
 	let traceResults;
 
 	beforeAll( async () => {
-		await activateTheme( 'emptytheme' );
+		// See https://github.com/WordPress/gutenberg/pull/50905/files#r1209014677;
+		await activateTheme( 'gutenberg-test-themes/twentytwentyone' );
 	} );
 
 	afterAll( async () => {

@@ -87,7 +87,6 @@ describe( 'Site Editor Performance', () => {
 		saveResultsFile( __filename, results );
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone' );
 	} );
 
 	// Number of loading measurements to take.
