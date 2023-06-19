@@ -102,7 +102,9 @@ export default function AspectRatioTool( {
 	defaultValue = DEFAULT_ASPECT_RATIO_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
 } ) {
-	const displayValue = value ?? defaultValue;
+	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
+	const displayValue = value ?? 'auto';
+
 	return (
 		<ToolsPanelItem
 			hasValue={ () => displayValue !== defaultValue }
