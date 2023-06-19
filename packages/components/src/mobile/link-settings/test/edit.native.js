@@ -4,7 +4,12 @@
  * External dependencies
  */
 import Clipboard from '@react-native-clipboard/clipboard';
-import { act, fireEvent, initializeEditor, waitFor } from 'test/helpers';
+import {
+	act,
+	fireEvent,
+	initializeEditor,
+	waitForElementToBeRemoved,
+} from 'test/helpers';
 /**
  * WordPress dependencies
  */
@@ -187,30 +192,27 @@ describe.each( [
 						subject.getByLabelText( 'Custom URL. Empty' )
 					);
 				}
-				const copyFromClipboardOption = await waitFor( () =>
-					subject.getByLabelText(
+				fireEvent.press(
+					await subject.findByLabelText(
 						`Copy URL from the clipboard, ${ url }`
 					)
 				);
-				fireEvent.press( copyFromClipboardOption );
-				const linkToButtonWithURL = await waitFor( () =>
-					subject.getByLabelText(
+				fireEvent.press(
+					await subject.findByLabelText(
 						`Link to, ${
 							type === 'core/image' ? 'Custom URL' : url
 						}`
 					)
 				);
-				// Wait for side effects produced by Clipboard and link suggestions
-				await act( () => fireEvent.press( linkToButtonWithURL ) );
 
 				if ( type === 'core/image' ) {
-					// Wait for side effects produced by Clipboard and link suggestions
-					await act( () =>
-						fireEvent.press(
-							subject.getByLabelText( `Custom URL, ${ url }` )
-						)
+					fireEvent.press(
+						subject.getByLabelText( `Custom URL, ${ url }` )
 					);
 				}
+				await waitForElementToBeRemoved( () =>
+					subject.getByTestId( 'link-picker-loading' )
+				);
 				await subject.findByLabelText( 'Apply' );
 
 				// Assert.
@@ -312,12 +314,11 @@ describe.each( [
 							subject.getByLabelText( /Custom URL/ )
 						);
 					}
-					const copyFromClipboardOption = await waitFor( () =>
-						subject.getByLabelText(
+					fireEvent.press(
+						await subject.findByLabelText(
 							`Copy URL from the clipboard, ${ url }`
 						)
 					);
-					fireEvent.press( copyFromClipboardOption );
 
 					// Assert.
 					const linkToField = await subject.findByLabelText(

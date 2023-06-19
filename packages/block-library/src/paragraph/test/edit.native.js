@@ -14,7 +14,6 @@ import {
 	waitFor,
 	within,
 	withFakeTimers,
-	waitForModalVisible,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -262,15 +261,12 @@ describe( 'Paragraph block', () => {
 		fireEvent.press(
 			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
-		await waitForModalVisible(
-			screen.getByTestId( 'link-settings-modal' )
+		const typeURLInput = await waitFor( () =>
+			screen.getByPlaceholderText( 'Search or type URL' )
 		);
 		// Wait for side effects produced by link suggestions
 		await act( () =>
-			fireEvent.changeText(
-				screen.getByPlaceholderText( 'Search or type URL' ),
-				'wordpress.org'
-			)
+			fireEvent.changeText( typeURLInput, 'wordpress.org' )
 		);
 		// Back navigation from link picker uses `setTimeout`
 		await withFakeTimers( () => {
@@ -308,15 +304,12 @@ describe( 'Paragraph block', () => {
 		fireEvent.press(
 			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
-		await waitForModalVisible(
-			screen.getByTestId( 'link-settings-modal' )
+		const typeURLInput = await waitFor( () =>
+			screen.getByPlaceholderText( 'Search or type URL' )
 		);
 		// Wait for side effects produced by link suggestions
 		await act( () =>
-			fireEvent.changeText(
-				screen.getByPlaceholderText( 'Search or type URL' ),
-				'wordpress.org'
-			)
+			fireEvent.changeText( typeURLInput, 'wordpress.org' )
 		);
 		// Back navigation from link picker uses `setTimeout`
 		await withFakeTimers( () => {
