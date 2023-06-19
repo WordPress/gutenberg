@@ -143,7 +143,7 @@ export function FlatTermSelector( { slug } ) {
 		return null;
 	}
 
-	async function createTerm( term ) {
+	async function findOrCreateTerm( term ) {
 		try {
 			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
 				throwOnError: true,
@@ -201,7 +201,9 @@ export function FlatTermSelector( { slug } ) {
 		}
 
 		Promise.all(
-			newTermNames.map( ( termName ) => createTerm( { name: termName } ) )
+			newTermNames.map( ( termName ) =>
+				findOrCreateTerm( { name: termName } )
+			)
 		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );
 			return onUpdateTerms(
