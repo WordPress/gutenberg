@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useReducer } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
+import { useReducer, useRef } from '@wordpress/element';
 import { lock } from '@wordpress/icons';
 
 /**
@@ -12,13 +13,15 @@ import { lock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
 
-export default function BlockLockToolbar( { clientId } ) {
+export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 	const { canEdit, canMove, canRemove, canLock } = useBlockLock( clientId );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive ) => ! isActive,
 		false
 	);
+
+	const lockButtonRef = useRef( null );
 
 	if ( ! canLock ) {
 		return null;
@@ -35,10 +38,36 @@ export default function BlockLockToolbar( { clientId } ) {
 					icon={ lock }
 					label={ __( 'Unlock' ) }
 					onClick={ toggleModal }
+					ref={ lockButtonRef }
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (
-				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
+				<BlockLockModal
+					clientId={ clientId }
+					onClose={ toggleModal }
+					onFocusReturn={ ( defaultFocusReturnElement ) => {
+						if ( defaultFocusReturnElement ) {
+							defaultFocusReturnElement.focus();
+						}
+
+						if (
+							defaultFocusReturnElement.ownerDocument
+								.activeElement !== defaultFocusReturnElement &&
+							wrapperRef.current
+						) {
+							focus.focusable
+								.find( wrapperRef.current, {
+									sequential: false,
+								} )
+								.find(
+									( element ) =>
+										element.tagName === 'BUTTON' &&
+										element !== lockButtonRef.current
+								)
+								?.focus();
+						}
+					} }
+				/>
 			) }
 		</>
 	);
