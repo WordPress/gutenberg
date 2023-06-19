@@ -328,6 +328,18 @@ _Parameters_
 
 -   _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
 
+### setNavigationMenu
+
+Action that sets a navigation menu.
+
+_Parameters_
+
+-   _navigationMenuId_ `string`: The Navigation Menu Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setNavigationPanelActiveMenu
 
 > **Deprecated**

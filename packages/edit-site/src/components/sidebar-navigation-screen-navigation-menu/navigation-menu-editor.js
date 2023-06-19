@@ -12,16 +12,17 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
-import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
-import { noop } from '.';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function NavigationMenuEditor( { navigationMenu } ) {
+const noop = () => {};
+
+export default function NavigationMenuEditor( { navigationMenuId } ) {
 	const history = useHistory();
 
 	const onSelect = useCallback(
@@ -63,16 +64,14 @@ export default function NavigationMenuEditor( { navigationMenu } ) {
 	}, [] );
 
 	const blocks = useMemo( () => {
-		if ( ! navigationMenu ) {
+		if ( ! navigationMenuId ) {
 			return [];
 		}
 
-		return [
-			createBlock( 'core/navigation', { ref: navigationMenu?.id } ),
-		];
-	}, [ navigationMenu ] );
+		return [ createBlock( 'core/navigation', { ref: navigationMenuId } ) ];
+	}, [ navigationMenuId ] );
 
-	if ( ! navigationMenu || ! blocks?.length ) {
+	if ( ! navigationMenuId || ! blocks?.length ) {
 		return null;
 	}
 

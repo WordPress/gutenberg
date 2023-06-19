@@ -539,18 +539,10 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return parents
-			.map( ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) )
-			.filter( ( { name } ) => {
-				if ( Array.isArray( blockName ) ) {
-					return blockName.includes( name );
-				}
-				return name === blockName;
-			} )
-			.map( ( { id } ) => id );
+		const hasName = Array.isArray( blockName )
+			? ( name ) => blockName.includes( name )
+			: ( name ) => blockName === name;
+		return parents.filter( ( id ) => hasName( getBlockName( state, id ) ) );
 	},
 	( state ) => [ state.blocks.parents ]
 );
@@ -1675,16 +1667,14 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return true;
 	}
-	if ( attributes.lock?.remove ) {
-		return false;
+	if ( attributes.lock?.remove !== undefined ) {
+		return ! attributes.lock.remove;
 	}
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1714,18 +1704,16 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
-		return;
+		return true;
 	}
-	if ( attributes.lock?.move ) {
-		return false;
+	if ( attributes.lock?.move !== undefined ) {
+		return ! attributes.lock.move;
 	}
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**

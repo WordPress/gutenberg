@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
+
 ### Bug Fix
 
 -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+-   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
+
+### Internal
+
+-   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
 
 ## 25.1.0 (2023-06-07)
 
@@ -27,7 +36,7 @@
 ### Experimental
 
 -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
--   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component  ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
+-   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
 -   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
 
 ## 25.0.0 (2023-05-24)
