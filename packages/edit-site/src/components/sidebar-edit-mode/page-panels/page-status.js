@@ -159,7 +159,7 @@ export default function PageStatus( {
 								<VStack spacing={ 3 }>
 									{ STATUS_OPTIONS.map( ( option, index ) => (
 										<div
-											key={ `edit-site-change-status__status-${ index }` }
+											key={ option.value }
 											className="components-radio-control__option with-hint"
 										>
 											<input
@@ -211,7 +211,7 @@ export default function PageStatus( {
 										}
 										value={ password }
 										/* eslint-disable jsx-a11y/no-autofocus */
-										autoFocus
+										autoFocus={ ! password }
 										/* eslint-enable jsx-a11y/no-autofocus */
 										placeholder={ __(
 											'Enter a secure password'
