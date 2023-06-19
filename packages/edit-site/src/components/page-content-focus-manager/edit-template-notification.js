@@ -60,7 +60,7 @@ function useEditTemplateNotification( contentRef ) {
 				return;
 			}
 			const { notice } = await createInfoNotice(
-				__( 'Edit your template to edit this block' ),
+				__( 'Edit your template to edit this block.' ),
 				{
 					isDismissible: true,
 					type: 'snackbar',

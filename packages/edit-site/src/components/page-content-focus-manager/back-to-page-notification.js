@@ -42,7 +42,7 @@ export function useBackToPageNotification() {
 			prevHasPageContentFocus.current &&
 			! hasPageContentFocus
 		) {
-			createInfoNotice( __( 'You are editing a template' ), {
+			createInfoNotice( __( 'You are editing a template.' ), {
 				isDismissible: true,
 				type: 'snackbar',
 				actions: [
