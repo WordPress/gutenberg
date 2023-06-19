@@ -18,7 +18,7 @@ const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
-export function DisableNonPageContentBlocks() {
+export default function DisableNonPageContentBlocks() {
 	useDisableNonPageContentBlocks();
 }
 

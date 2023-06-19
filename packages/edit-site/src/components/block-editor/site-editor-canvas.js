@@ -27,11 +27,11 @@ import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { usePageContentFocusNotifications } from '../page-content-focus';
 import useSiteEditorSettings from './use-site-editor-settings';
 import { store as editSiteStore } from '../../store';
 import { FOCUSABLE_ENTITIES } from './constants';
 import { unlock } from '../../lock-unlock';
+import PageContentFocusManager from '../page-content-focus-manager';
 
 const LAYOUT = {
 	type: 'default',
@@ -82,7 +82,6 @@ export default function SiteEditorCanvas() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
-		usePageContentFocusNotifications(),
 	] );
 
 	const isTemplateTypeNavigation = templateType === 'wp_navigation';
@@ -98,55 +97,59 @@ export default function SiteEditorCanvas() {
 			: undefined;
 
 	return (
-		<EditorCanvasContainer.Slot>
-			{ ( [ editorCanvasView ] ) =>
-				editorCanvasView ? (
-					<div className="edit-site-visual-editor is-focus-mode">
-						{ editorCanvasView }
-					</div>
-				) : (
-					<BlockTools
-						className={ classnames( 'edit-site-visual-editor', {
-							'is-focus-mode': isFocusMode || !! editorCanvasView,
-							'is-view-mode': isViewMode,
-						} ) }
-						__unstableContentRef={ contentRef }
-						onClick={ ( event ) => {
-							// Clear selected block when clicking on the gray background.
-							if ( event.target === event.currentTarget ) {
-								clearSelectedBlock();
-							}
-						} }
-					>
-						<BlockEditorKeyboardShortcuts.Register />
-						<BackButton />
-						<ResizableEditor
-							enableResizing={ enableResizing }
-							height={ sizes.height ?? '100%' }
+		<>
+			<EditorCanvasContainer.Slot>
+				{ ( [ editorCanvasView ] ) =>
+					editorCanvasView ? (
+						<div className="edit-site-visual-editor is-focus-mode">
+							{ editorCanvasView }
+						</div>
+					) : (
+						<BlockTools
+							className={ classnames( 'edit-site-visual-editor', {
+								'is-focus-mode':
+									isFocusMode || !! editorCanvasView,
+								'is-view-mode': isViewMode,
+							} ) }
+							__unstableContentRef={ contentRef }
+							onClick={ ( event ) => {
+								// Clear selected block when clicking on the gray background.
+								if ( event.target === event.currentTarget ) {
+									clearSelectedBlock();
+								}
+							} }
 						>
-							<EditorCanvas
+							<BlockEditorKeyboardShortcuts.Register />
+							<BackButton />
+							<ResizableEditor
 								enableResizing={ enableResizing }
-								settings={ settings }
-								contentRef={ mergedRefs }
-								readonly={ isViewMode }
+								height={ sizes.height ?? '100%' }
 							>
-								{ resizeObserver }
-								<BlockList
-									className={ classnames(
-										'edit-site-block-editor__block-list wp-site-blocks',
-										{
-											'is-navigation-block':
-												isTemplateTypeNavigation,
-										}
-									) }
-									layout={ LAYOUT }
-									renderAppender={ showBlockAppender }
-								/>
-							</EditorCanvas>
-						</ResizableEditor>
-					</BlockTools>
-				)
-			}
-		</EditorCanvasContainer.Slot>
+								<EditorCanvas
+									enableResizing={ enableResizing }
+									settings={ settings }
+									contentRef={ mergedRefs }
+									readonly={ isViewMode }
+								>
+									{ resizeObserver }
+									<BlockList
+										className={ classnames(
+											'edit-site-block-editor__block-list wp-site-blocks',
+											{
+												'is-navigation-block':
+													isTemplateTypeNavigation,
+											}
+										) }
+										layout={ LAYOUT }
+										renderAppender={ showBlockAppender }
+									/>
+								</EditorCanvas>
+							</ResizableEditor>
+						</BlockTools>
+					)
+				}
+			</EditorCanvasContainer.Slot>
+			<PageContentFocusManager contentRef={ contentRef } />
+		</>
 	);
 }
