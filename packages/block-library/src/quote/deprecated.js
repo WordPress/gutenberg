@@ -109,9 +109,7 @@ const v4 = {
 			</blockquote>
 		);
 	},
-	migrate( attributes ) {
-		return migrateTextAlign( migrateToQuoteV2( attributes ) );
-	},
+	migrate: migrateTextAlign,
 };
 
 const v3 = {
