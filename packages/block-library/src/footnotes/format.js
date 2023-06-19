@@ -26,6 +26,11 @@ export const format = {
 	title: __( 'Footnote' ),
 	tagName: 'a',
 	className: 'fn',
+	attributes: {
+		id: 'id',
+		href: 'href',
+		'data-fn': 'data-fn',
+	},
 	contentEditable: false,
 	edit: function Edit( { value, onChange, isObjectActive } ) {
 		const registry = useRegistry();
