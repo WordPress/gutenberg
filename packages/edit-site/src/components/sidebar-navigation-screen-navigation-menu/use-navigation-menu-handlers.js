@@ -11,17 +11,16 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { postType } from '.';
 
-function useDeleteNavigationMenu( navigationMenu ) {
+function useDeleteNavigationMenu() {
 	const { goTo } = useNavigator();
-
-	const postId = navigationMenu?.id;
 
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleDelete = async () => {
+	const handleDelete = async ( navigationMenu ) => {
+		const postId = navigationMenu?.id;
 		try {
 			await deleteEntityRecord(
 				'postType',
@@ -56,9 +55,7 @@ function useDeleteNavigationMenu( navigationMenu ) {
 	return handleDelete;
 }
 
-function useSaveNavigationMenu( navigationMenu ) {
-	const postId = navigationMenu?.id;
-
+function useSaveNavigationMenu() {
 	const { getEditedEntityRecord } = useSelect( ( select ) => {
 		const { getEditedEntityRecord: getEditedEntityRecordSelector } =
 			select( coreStore );
@@ -74,7 +71,8 @@ function useSaveNavigationMenu( navigationMenu ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleSave = async ( edits = {} ) => {
+	const handleSave = async ( navigationMenu, edits = {} ) => {
+		const postId = navigationMenu?.id;
 		// Prepare for revert in case of error.
 		const originalRecord = getEditedEntityRecord(
 			'postType',
@@ -114,7 +112,7 @@ function useSaveNavigationMenu( navigationMenu ) {
 	return handleSave;
 }
 
-function useDuplicateNavigationMenu( navigationMenu ) {
+function useDuplicateNavigationMenu() {
 	const { goTo } = useNavigator();
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -122,7 +120,7 @@ function useDuplicateNavigationMenu( navigationMenu ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleDuplicate = async () => {
+	const handleDuplicate = async ( navigationMenu ) => {
 		const menuTitle =
 			navigationMenu?.title?.rendered || navigationMenu?.slug;
 
@@ -168,10 +166,10 @@ function useDuplicateNavigationMenu( navigationMenu ) {
 	return handleDuplicate;
 }
 
-export default function useNavigationMenuHandlers( navigationMenu ) {
+export default function useNavigationMenuHandlers() {
 	return {
-		handleDelete: useDeleteNavigationMenu( navigationMenu ),
-		handleSave: useSaveNavigationMenu( navigationMenu ),
-		handleDuplicate: useDuplicateNavigationMenu( navigationMenu ),
+		handleDelete: useDeleteNavigationMenu(),
+		handleSave: useSaveNavigationMenu(),
+		handleDuplicate: useDuplicateNavigationMenu(),
 	};
 }

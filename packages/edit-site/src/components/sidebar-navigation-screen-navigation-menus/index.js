@@ -32,7 +32,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
 	const { handleSave, handleDelete, handleDuplicate } =
-		useNavigationMenuHandlers( firstNavigationMenu );
+		useNavigationMenuHandlers();
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
@@ -57,9 +57,9 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SingleNavigationMenu
 				navigationMenu={ firstNavigationMenu }
-				handleDelete={ handleDelete }
-				handleDuplicate={ handleDuplicate }
-				handleSave={ handleSave }
+				handleDelete={ () => handleDelete( firstNavigationMenu ) }
+				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
+				handleSave={ () => handleSave( firstNavigationMenu ) }
 			/>
 		);
 	}
