@@ -238,6 +238,8 @@ add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
  * @since 5.9.0
  * @since 6.3.0 the internal link format "var:preset|color|secondary" is resolved
  * to "var(--wp--preset--font-size--small)" so consumers don't have to.
+ * @since 6.3.0 `transforms` is now usable in the `context` parameter. In case [`transforms`]['resolve_variables']
+ * is defined, variables are resolved to their value in the styles.
  *
  * @param array $path    Path to the specific style to retrieve. Optional.
  *                       If empty, will return all styles.
@@ -249,6 +251,9 @@ add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
  *     @type string $origin     Which origin to take data from.
  *                              Valid values are 'all' (core, theme, and user) or 'base' (core and theme).
  *                              If empty or unknown, 'all' is used.
+ *     @type array $transforms Which transformation(s) to apply.
+ *                              Valid value is array( 'resolve-variables' ).
+ *                              If defined, variables are resolved to their value in the styles.
  * }
  * @return array The styles to retrieve.
  */
@@ -261,8 +266,16 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
 	}
-	$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles'];
 
+	$resolve_variables = isset( $context['transforms'] )
+	&& is_array( $context['transforms'] )
+	&& in_array( 'resolve-variables', $context['transforms'], true );
+
+	$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
+	if ( $resolve_variables ) {
+		$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
+	}
+	$styles = $merged_data->get_raw_data()['styles'];
 	return _wp_array_get( $styles, $path, $styles );
 }
 
