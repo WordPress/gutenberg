@@ -47,6 +47,7 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
 	const { canEditCSS, revisionsCount } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
@@ -71,6 +72,7 @@ function GlobalStylesActionMenu() {
 	);
 	const loadCustomCSS = () => goTo( '/css' );
 	const loadRevisions = () => {
+		setIsListViewOpened( false );
 		goTo( '/revisions' );
 		setEditorCanvasContainerView( 'global-styles-revisions' );
 	};
