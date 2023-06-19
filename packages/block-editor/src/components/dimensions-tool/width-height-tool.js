@@ -10,7 +10,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
 	grid-column: span 1;
@@ -22,28 +22,30 @@ const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
 
 /**
  * @typedef {Object} WidthHeightToolValue
- * @property {string} [width]
- * @property {string} [height]
+ * @property {string} [width]  Width value.
+ * @property {string} [height] Height value.
  */
 
 /**
  * @callback WidthHeightToolOnChange
- * @param {WidthHeightToolValue} nextValue
+ * @param {WidthHeightToolValue} nextValue Next dimensions value.
  * @return {void}
  */
 
 /**
  * @typedef {Object} WidthHeightToolProps
- * @property {string}                   [panelId]          ID of the panel that contains the controls.
- * @property {WidthHeightToolValue}     [value]            Current dimensions values.
- * @property {WidthHeightToolOnChange}  [onChange]         Callback to update the dimensions values.
- * @property {WPUnitControlUnit[]}      [units]            Units options.
- * @property {boolean}                  [isShownByDefault] Whether the panel is shown by default.
+ * @property {string}                  [panelId]          ID of the panel that contains the controls.
+ * @property {WidthHeightToolValue}    [value]            Current dimensions values.
+ * @property {WidthHeightToolOnChange} [onChange]         Callback to update the dimensions values.
+ * @property {WPUnitControlUnit[]}     [units]            Units options.
+ * @property {boolean}                 [isShownByDefault] Whether the panel is shown by default.
  */
 
 /**
  * Component that renders controls to edit the dimensions of an image or container.
+ *
  * @param {WidthHeightToolProps} props The component props.
+ *
  * @return {import('@wordpress/element').WPElement} The width and height tool.
  */
 export default function WidthHeightTool( {
@@ -69,7 +71,9 @@ export default function WidthHeightTool( {
 			<SingleColumnToolsPanelItem
 				label={ __( 'Width' ) }
 				isShownByDefault={ isShownByDefault }
-				hasValue={ () => value.width != null }
+				hasValue={ () =>
+					value.width !== null && value.width !== undefined
+				}
 				onDeselect={ onDimensionChange( 'width' ) }
 				panelId={ panelId }
 			>
@@ -86,7 +90,9 @@ export default function WidthHeightTool( {
 			<SingleColumnToolsPanelItem
 				label={ __( 'Height' ) }
 				isShownByDefault={ isShownByDefault }
-				hasValue={ () => value.height != null }
+				hasValue={ () =>
+					value.height !== null && value.height !== undefined
+				}
 				onDeselect={ onDimensionChange( 'height' ) }
 				panelId={ panelId }
 			>
