@@ -153,7 +153,7 @@ export default function HomeTemplateDetails() {
 
 	return (
 		<>
-			<SidebarNavigationScreenDetailsPanel>
+			<SidebarNavigationScreenDetailsPanel spacing={ 6 }>
 				{ postsPageId && (
 					<SidebarNavigationScreenDetailsPanelRow>
 						<InputControl
@@ -185,7 +185,10 @@ export default function HomeTemplateDetails() {
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
 
-			<SidebarNavigationScreenDetailsPanel title={ __( 'Discussion' ) }>
+			<SidebarNavigationScreenDetailsPanel
+				title={ __( 'Discussion' ) }
+				spacing={ 3 }
+			>
 				<SidebarNavigationScreenDetailsPanelRow>
 					<CheckboxControl
 						className="edit-site-sidebar-navigation-screen__input-control"
@@ -196,7 +199,10 @@ export default function HomeTemplateDetails() {
 					/>
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
-			<SidebarNavigationScreenDetailsPanel title={ __( 'Areas' ) }>
+			<SidebarNavigationScreenDetailsPanel
+				title={ __( 'Areas' ) }
+				spacing={ 3 }
+			>
 				<ItemGroup>
 					{ templateAreas.map( ( { label, icon, theme, slug } ) => (
 						<SidebarNavigationScreenDetailsPanelRow key={ slug }>

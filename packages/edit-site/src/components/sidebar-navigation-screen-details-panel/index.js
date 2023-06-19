@@ -13,11 +13,11 @@ import SidebarNavigationScreenDetailsPanelLabel from './sidebar-navigation-scree
 import SidebarNavigationScreenDetailsPanelRow from './sidebar-navigation-screen-details-panel-row';
 import SidebarNavigationScreenDetailsPanelValue from './sidebar-navigation-screen-details-panel-value';
 
-function SidebarNavigationScreenDetailsPanel( { title, children } ) {
+function SidebarNavigationScreenDetailsPanel( { title, children, spacing } ) {
 	return (
 		<VStack
 			className="edit-site-sidebar-navigation-details-screen-panel"
-			spacing={ 5 }
+			spacing={ spacing }
 		>
 			{ title && (
 				<Heading
