@@ -81,10 +81,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			if ( $latest_opening_tag_name === $tag_name ) {
 				array_pop( $tag_stack );
 
-				/*
-				 * If the matching opening tag didn't have any attribute directives,
-				 * we move on.
-				 */
+				// If the matching opening tag didn't have any directives, we move on.
 				if ( 0 === count( $attributes ) ) {
 					continue;
 				}
@@ -104,9 +101,9 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			}
 
 			/*
-			 * If this is an open tag, and if it either has attribute directives, or
-			 * if we're inside a tag that does, take note of this tag and its
-			 * attribute directives so we can call its directive processor once we
+			 * If this is an open tag, and if it either has directives, or if
+			 * we're inside a tag that does, take note of this tag and its
+			 * directives so we can call its directive processor once we
 			 * encounter the matching closing tag.
 			 */
 			if (
