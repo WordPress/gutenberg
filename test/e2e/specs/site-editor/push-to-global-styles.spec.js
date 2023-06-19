@@ -5,11 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Push to Global Styles button', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-		] );
+		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
