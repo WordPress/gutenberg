@@ -96,3 +96,19 @@ WithTabIconsAndTooltips.args = {
 		},
 	],
 };
+
+export const ManualActivation = Template.bind( {} );
+ManualActivation.args = {
+	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
+	tabs: [
+		{
+			name: 'tab1',
+			title: 'Tab 1',
+		},
+		{
+			name: 'tab2',
+			title: 'Tab 2',
+		},
+	],
+	selectOnMove: false,
+};
