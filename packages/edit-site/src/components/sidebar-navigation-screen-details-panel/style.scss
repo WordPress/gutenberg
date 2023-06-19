@@ -1,6 +1,10 @@
 .edit-site-sidebar-navigation-details-screen-panel {
 	margin-bottom: $grid-unit-30;
 
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+
 	.edit-site-sidebar-navigation-details-screen-panel__heading {
 		color: $gray-400;
 		text-transform: uppercase;
