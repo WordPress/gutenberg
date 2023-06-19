@@ -23,6 +23,10 @@ const reusableBlockNameInputSelector =
 	'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
+const syncToggleSelector =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle__input';
+const syncToggleSelectorChecked =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
 
 const saveAll = async () => {
 	const publishButtonSelector =
@@ -201,6 +205,9 @@ describe( 'Reusable blocks', () => {
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Multi-selection reusable block' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for creation to finish.
@@ -259,7 +266,7 @@ describe( 'Reusable blocks', () => {
 		// Save the reusable block.
 		await page.click( publishButtonSelector );
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Site updated."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Pattern updated."]'
 		);
 
 		await createNewPost();
@@ -345,7 +352,7 @@ describe( 'Reusable blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Reusable block' );
+		await clickBlockToolbarButton( 'Select Pattern' );
 		await clickBlockToolbarButton( 'Convert to regular block' );
 		await page.waitForXPath( selector, {
 			hidden: true,
@@ -382,6 +389,9 @@ describe( 'Reusable blocks', () => {
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Block with styles' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
 		const reusableBlock = await canvas().waitForSelector(
 			'.block-editor-block-list__block[aria-label="Block: Pattern"]'
