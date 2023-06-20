@@ -12,6 +12,7 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Flex,
 	Icon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -91,19 +92,32 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-function TemplateListItem( { title, className, description, icon, onClick } ) {
+function TemplateListItem( {
+	title,
+	direction,
+	className,
+	description,
+	icon,
+	onClick,
+} ) {
 	return (
 		<Button className={ className } onClick={ onClick }>
-			<VStack
+			<Flex
 				as="span"
 				spacing={ 2 }
-				alignment="center"
+				align="center"
+				justify="center"
 				style={ { width: '100%' } }
+				direction={ direction }
 			>
 				<div className="edit-site-add-new-template__template-icon">
 					<Icon icon={ icon } />
 				</div>
-				<VStack alignment="center" spacing={ 0 }>
+				<VStack
+					className="edit-site-add-new-template__template-name"
+					alignment="center"
+					spacing={ 0 }
+				>
 					<Text
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
@@ -118,7 +132,7 @@ function TemplateListItem( { title, className, description, icon, onClick } ) {
 						</Text>
 					) }
 				</VStack>
-			</VStack>
+			</Flex>
 		</Button>
 	);
 }
@@ -288,6 +302,7 @@ export default function NewTemplate( {
 									<TemplateListItem
 										key={ slug }
 										title={ title }
+										direction="column"
 										className="edit-site-add-new-template__template-button"
 										description={
 											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
@@ -303,6 +318,7 @@ export default function NewTemplate( {
 							} ) }
 							<TemplateListItem
 								title={ __( 'Custom template' ) }
+								direction="row"
 								className="edit-site-add-new-template__custom-template-button"
 								description={ __(
 									'A custom template can be manually applied to any post or page.'
