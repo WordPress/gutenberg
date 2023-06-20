@@ -85,7 +85,12 @@ export default function UnsavedInnerBlocks( {
 					[
 						'postType',
 						'wp_navigation',
-						{ per_page: -1, status: [ 'publish', 'draft' ] },
+						{
+							per_page: -1,
+							status: [ 'publish', 'draft' ],
+							order: 'desc',
+							orderby: 'date',
+						},
 					]
 				),
 			};
