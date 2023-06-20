@@ -100,7 +100,7 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 	/**
 	 * Adds revisions to links.
 	 *
-	 * @since 6.2.0
+	 * @since 6.3.0
 	 *
 	 * @param WP_Block_Template $template  Template instance.
 	 * @return array Links for the given post.
