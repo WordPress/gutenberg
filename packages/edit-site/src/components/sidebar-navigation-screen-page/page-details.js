@@ -7,6 +7,7 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -42,7 +43,11 @@ function getPageDetails( page ) {
 		},
 		{
 			label: __( 'Slug' ),
-			value: <Truncate numberOfLines={ 1 }>{ page.slug }</Truncate>,
+			value: (
+				<Truncate numberOfLines={ 1 }>
+					{ safeDecodeURIComponent( page.slug ) }
+				</Truncate>
+			),
 		},
 	];
 
