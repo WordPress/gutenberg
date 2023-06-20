@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
+import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -90,8 +91,8 @@ export default function SidebarNavigationScreenPage() {
 					className="edit-site-sidebar-navigation-screen__page-link"
 					href={ record.link }
 				>
-					{ decodeURI(
-						record.link.replace( /^(https?:\/\/)?/, '' )
+					{ filterURLForDisplay(
+						safeDecodeURIComponent( record.link )
 					) }
 				</ExternalLink>
 			}
