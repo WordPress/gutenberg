@@ -91,9 +91,7 @@ export default function GlobalStylesSidebar() {
 							} }
 						/>
 					</FlexItem>
-					<FlexItem>
-						<GlobalStylesMenuSlot />
-					</FlexItem>
+					<GlobalStylesMenuSlot />
 				</Flex>
 			}
 		>
