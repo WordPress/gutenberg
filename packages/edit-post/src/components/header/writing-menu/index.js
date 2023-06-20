@@ -25,16 +25,9 @@ function WritingMenu() {
 		[]
 	);
 
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
 	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
 		useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
@@ -42,9 +35,6 @@ function WritingMenu() {
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
-			if ( ! isDistractionFree && !! blocks.length ) {
-				selectBlock( blocks[ 0 ].clientId );
-			}
 		} );
 	};
 
