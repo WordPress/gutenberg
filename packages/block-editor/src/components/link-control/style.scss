@@ -113,19 +113,8 @@ $preview-image-height: 140px;
 .block-editor-link-control__search-item {
 
 	&.components-button.components-menu-item__button {
-		padding-left: $grid-unit-05;
-		padding-right: $grid-unit-10;
 		height: auto;
 		text-align: left;
-
-		&[aria-selected] {
-			background: $gray-100;
-		}
-
-		&:hover,
-		&:focus {
-			background-color: $gray-200;
-		}
 	}
 
 	.components-menu-item__item {
@@ -196,7 +185,6 @@ $preview-image-height: 140px;
 		width: 32px;
 		max-height: 32px;
 	}
-
 
 	.block-editor-link-control__search-item-title {
 		display: block;
