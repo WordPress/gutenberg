@@ -20,23 +20,17 @@ const DEFAULT_SCALE_OPTIONS = [
 	{
 		value: 'cover',
 		label: _x( 'Cover', 'Scale option for dimensions control' ),
-		help: __(
-			'Scale and crop to fill the space without being distorted.'
-		),
+		help: __( 'Scale and crop to fill the space without being distorted.' ),
 	},
 	{
 		value: 'contain',
 		label: _x( 'Contain', 'Scale option for dimensions control' ),
-		help: __(
-			'Scale to fill the space without clipping or distorting.'
-		),
+		help: __( 'Scale to fill the space without clipping or distorting.' ),
 	},
 	{
 		value: 'fill',
 		label: _x( 'Fill', 'Scale option for dimensions control' ),
-		help: __(
-			'Stretch and distort to fill the space.'
-		),
+		help: __( 'Stretch and distort to fill the space.' ),
 	},
 ];
 
