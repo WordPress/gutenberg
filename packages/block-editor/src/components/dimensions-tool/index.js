@@ -113,7 +113,19 @@ function DimensionsControls( {
 						nextValue.aspectRatio = nextAspectRatio;
 					}
 
-					if ( nextAspectRatio === 'auto' ) {
+					if (
+						nextValue.scale === null ||
+						nextValue.scale === undefined
+					) {
+						// Set the value to 'cover' since CSS uses 'fill' by default.
+						nextValue.scale = lastScale ?? 'cover';
+					}
+
+					if (
+						nextAspectRatio === 'auto' ||
+						nextAspectRatio === null ||
+						nextAspectRatio === undefined
+					) {
 						delete nextValue.scale;
 					}
 
@@ -123,14 +135,6 @@ function DimensionsControls( {
 						value.width !== undefined
 					) {
 						delete nextValue.height;
-					}
-
-					// Set the value to 'cover' since CSS uses 'fill' by default.
-					if (
-						nextValue.scale === null ||
-						nextValue.scale === undefined
-					) {
-						nextValue.scale = 'cover';
 					}
 
 					onChange( nextValue );
