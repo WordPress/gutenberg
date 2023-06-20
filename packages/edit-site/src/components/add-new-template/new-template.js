@@ -100,7 +100,9 @@ function TemplateListItem( { title, className, description, icon, onClick } ) {
 				alignment="center"
 				style={ { width: '100%' } }
 			>
-				<Icon icon={ icon } />
+				<div className="edit-site-add-new-template__template-icon">
+					<Icon icon={ icon } />
+				</div>
 				<VStack alignment="center" spacing={ 0 }>
 					<Text
 						weight={ 500 }
@@ -286,6 +288,7 @@ export default function NewTemplate( {
 									<TemplateListItem
 										key={ slug }
 										title={ title }
+										className="edit-site-add-new-template__template-button"
 										description={
 											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
 										}
