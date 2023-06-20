@@ -669,6 +669,7 @@ export default function Image( {
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: `${ elt.offsetHeight }px`,
+						aspectRatio: undefined,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
