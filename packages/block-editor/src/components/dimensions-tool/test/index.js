@@ -90,12 +90,15 @@ describe( 'DimensionsTool', () => {
 		await user.selectOptions( aspectRatioSelect, '16/9' );
 		expect( aspectRatioSelect ).toHaveValue( '16/9' );
 
-		expect( onChange ).toHaveBeenCalledTimes( 3 );
-		expect( onChange.mock.calls[ 2 ] ).toStrictEqual( [
-			{
-				aspectRatio: '16/9',
-				scale: 'contain',
-			},
+		expect( onChange.mock.calls ).toStrictEqual( [
+			[ { aspectRatio: '16/9', scale: 'contain' } ],
+			[ {} ],
+			[
+				{
+					aspectRatio: '16/9',
+					scale: 'contain',
+				},
+			],
 		] );
 	} );
 } );
