@@ -308,9 +308,10 @@ export const Tooltip = styled.span< TooltipProps >`
 
 const inputNumberWidth = ( {
 	size = 'default',
-}: Pick< NumberControlProps, 'size' > ) => {
+}: {
+	size: Exclude< Pick< NumberControlProps, 'size' >[ 'size' ], 'small' >;
+} ) => {
 	const sizes = {
-		small: space( 16 ),
 		default: space( 16 ),
 		'__unstable-large': space( 20 ),
 	};
