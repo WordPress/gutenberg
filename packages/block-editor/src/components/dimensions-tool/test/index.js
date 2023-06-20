@@ -22,11 +22,14 @@ const panelId = 'panel-id';
 describe( 'DimensionsTool', () => {
 	it( 'when aspect ratio is original scale and aspect ratio should be removed', async () => {
 		const user = userEvent.setup();
-		const onChangeProp = jest.fn();
+		const onChange = jest.fn();
 
-		const initialValue = { aspectRatio: '16/9', scale: 'cover' };
+		const initialValue = {
+			aspectRatio: '16/9',
+			scale: 'cover',
+		};
 
-		const { container } = render(
+		render(
 			<Panel>
 				<ToolsPanel
 					label="Dimensions"
@@ -35,22 +38,20 @@ describe( 'DimensionsTool', () => {
 				>
 					<DimensionsTool
 						panelId={ panelId }
-						onChange={ ( nextValue ) => {
-							onChangeProp( nextValue );
-						} }
+						onChange={ onChange }
 						value={ initialValue }
 					/>
 				</ToolsPanel>
 			</Panel>
 		);
+
 		const aspectRatioSelect = screen.getByRole( 'combobox', {
 			name: 'Aspect ratio',
 		} );
 
 		await user.selectOptions( aspectRatioSelect, 'auto' );
 
-		expect( onChangeProp ).toHaveBeenCalledWith( {} );
-
-		expect( aspectRatioSelect ).toHaveValue( 'auto' );
+		expect( onChange.mock.calls[ 0 ] ).toStrictEqual( [ {} ] );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
