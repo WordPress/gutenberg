@@ -29,7 +29,7 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { useLink } from '../routes/link';
 import { PATTERNS, USER_PATTERNS } from './use-patterns';
 
-const DeleteMenuItem = ( { item, onClose } ) => {
+function DeleteMenuItem( { item, onClose } ) {
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -59,9 +59,9 @@ const DeleteMenuItem = ( { item, onClose } ) => {
 	return (
 		<MenuItem onClick={ deleteReusableBlock }>{ __( 'Delete' ) }</MenuItem>
 	);
-};
+}
 
-const GridItem = ( { categoryId, composite, icon, item } ) => {
+export default function GridItem( { categoryId, composite, icon, item } ) {
 	const instanceId = useInstanceId( GridItem );
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
 
@@ -134,6 +134,4 @@ const GridItem = ( { categoryId, composite, icon, item } ) => {
 			</HStack>
 		</div>
 	);
-};
-
-export default GridItem;
+}
