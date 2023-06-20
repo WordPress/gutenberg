@@ -23,20 +23,15 @@ import type {
 import type { NumberControlProps } from '../../number-control/types';
 
 const rangeHeightValue = 30;
-const rangeHeightValueNext = 40;
 const railHeight = 4;
 const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
-const rootMinHeight = ( {
+const deprecatedHeight = ( {
 	__next40pxDefaultSize,
 }: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
-	css( {
-		minHeight: __next40pxDefaultSize
-			? rangeHeightValueNext
-			: rangeHeightValue,
-	} );
+	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
 
 type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
 export const Root = styled.div< RootProps >`
@@ -48,9 +43,9 @@ export const Root = styled.div< RootProps >`
 	position: relative;
 	touch-action: none;
 	width: 100%;
-
+	min-height: 40px;
 	/* TODO: remove after removing the __next40pxDefaultSize prop */
-	${ rootMinHeight }
+	${ deprecatedHeight };
 `;
 
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
