@@ -7,7 +7,7 @@
 
 if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	/**
-	 * Replaces view script for the Navigation block with version using Interactivity API.
+	 * Replaces view script for the File block with version using Interactivity API.
 	 *
 	 * @param array $metadata Block metadata as read in via block.json.
 	 *
