@@ -52,7 +52,6 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'category',
 	'date',
 	'tag',
-	'taxonomy',
 	'search',
 	'404',
 ];
