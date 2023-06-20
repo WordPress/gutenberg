@@ -46,15 +46,22 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 					clientId={ clientId }
 					onClose={ toggleModal }
 					onFocusReturn={ ( defaultFocusReturnElement ) => {
+						// Try to focus the element that should have received
+						// focus by default.
 						if ( defaultFocusReturnElement ) {
 							defaultFocusReturnElement.focus();
 						}
 
+						// Check if the element that should have received focus is effectively
+						// the current active element. This check is useful when the element
+						// that should have received focus is not being rendered in the DOM.
 						if (
 							defaultFocusReturnElement.ownerDocument
 								.activeElement !== defaultFocusReturnElement &&
 							wrapperRef.current
 						) {
+							// As a fallback, focus the first focusable button
+							// found in the toolbar
 							focus.focusable
 								.find( wrapperRef.current, {
 									sequential: false,
