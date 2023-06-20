@@ -21,6 +21,7 @@ import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
 import {
+	__unstableMotion as motion,
 	Button,
 	ToolbarItem,
 	MenuGroup,
@@ -161,6 +162,11 @@ export default function HeaderEditMode() {
 		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
+	const slideY = {
+		hidden: { y: '-50px' },
+		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
+
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
@@ -169,6 +175,8 @@ export default function HeaderEditMode() {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
+					as={ isDistractionFree ? motion.div : 'div' }
+					variants={ slideY }
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
 					shouldUseKeyboardFocusShortcut={
@@ -276,7 +284,10 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__end">
-				<div className="edit-site-header-edit-mode__actions">
+				<motion.div
+					variants={ slideY }
+					className="edit-site-header-edit-mode__actions"
+				>
 					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
@@ -312,7 +323,7 @@ export default function HeaderEditMode() {
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }
 					<MoreMenu showIconLabels={ showIconLabels } />
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

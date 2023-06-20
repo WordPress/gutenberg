@@ -143,6 +143,11 @@ export default function Layout() {
 		distractionFreeInactive: { opacity: 1 },
 	};
 
+	const slideX = {
+		hidden: { x: '-100%' },
+		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
+
 	return (
 		<>
 			<CommandMenu />
@@ -182,14 +187,23 @@ export default function Layout() {
 								? 'hidden'
 								: 'distractionFreeInactive'
 						}
-						transition={ { type: 'tween', delay: 0.8 } }
+						transition={ { type: 'tween', delay: 0.2 } }
 					>
-						<motion.div>
+						{ isDistractionFree && (
+							<SiteHub
+								as={ motion.div }
+								variants={ slideX }
+								ref={ hubRef }
+								className="edit-site-layout__hub"
+							/>
+						) }
+
+						{ ! isDistractionFree && (
 							<SiteHub
 								ref={ hubRef }
 								className="edit-site-layout__hub"
 							/>
-						</motion.div>
+						) }
 
 						<AnimatePresence initial={ false }>
 							{ isEditorPage && isEditing && (
