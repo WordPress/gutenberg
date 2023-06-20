@@ -110,7 +110,7 @@ function usePatternsCategories( rootClientId ) {
 		if ( filteredUnsyncedPatterns.length > 0 ) {
 			categories.push( {
 				name: 'reusable',
-				label: _x( 'Your patterns' ),
+				label: _x( 'Custom patterns' ),
 			} );
 		}
 
