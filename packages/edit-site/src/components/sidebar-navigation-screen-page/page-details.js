@@ -58,14 +58,12 @@ function getPageDetails( page ) {
 		} );
 	}
 
-	details.push( {
-		label: __( 'Parent' ),
-		// `null` indicates no parent.
-		value:
-			null === page?.parentTitle
-				? __( 'Top level' )
-				: decodeEntities( page?.parentTitle || __( '(no title)' ) ),
-	} );
+	if ( page?.parentTitle ) {
+		details.push( {
+			label: __( 'Parent' ),
+			value: decodeEntities( page.parentTitle || __( '(no title)' ) ),
+		} );
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
