@@ -17,6 +17,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	],
 	"include": [ "src/**/*" ]

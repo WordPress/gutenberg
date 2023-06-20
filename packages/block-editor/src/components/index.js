@@ -85,7 +85,6 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
-export { getRichTextValues as __unstableGetRichTextValues } from './rich-text/content';
 export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as URLInput } from './url-input';
