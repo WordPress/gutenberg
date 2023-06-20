@@ -11,7 +11,8 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 } from '@wordpress/components';
-import { chevronRightSmall, Icon } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
+import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 
 export default function SidebarNavigationItem( {
 	className,
@@ -39,7 +40,7 @@ export default function SidebarNavigationItem( {
 				<FlexBlock>{ children }</FlexBlock>
 				{ withChevron && (
 					<Icon
-						icon={ chevronRightSmall }
+						icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 						className="edit-site-sidebar-navigation-item__drilldown-indicator"
 						size={ 24 }
 					/>
