@@ -4,6 +4,14 @@
 import { Platform } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import { blockTypePromptMessages } from '../utils/block-removal';
+
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+/**
  * A list of private/experimental block editor settings that
  * should not become a part of the WordPress public API.
  * BlockEditorProvider will remove these settings from the
@@ -105,3 +113,121 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Yields action objects used in signalling that the blocks corresponding to
+ * the set of specified client IDs are to be removed.
+ *
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious True if the previous block
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
+ *                                         should be selected
+ *                                         when a block is removed.
+ * @param {boolean}         forceRemove    Whether to force the operation,
+ *                                         bypassing any checks for certain
+ *                                         block types.
+ */
+export const privateRemoveBlocks =
+	( clientIds, selectPrevious = true, forceRemove = false ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientIds || ! clientIds.length ) {
+			return;
+		}
+
+		clientIds = castArray( clientIds );
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		const canRemoveBlocks = select.canRemoveBlocks(
+			clientIds,
+			rootClientId
+		);
+
+		if ( ! canRemoveBlocks ) {
+			return;
+		}
+
+		// In certain editing contexts, we'd like to prevent accidental removal
+		// of important blocks. For example, in the site editor, the Query Loop
+		// block is deemed important. In such cases, we'll ask the user for
+		// confirmation that they intended to remove such block(s). However,
+		// the editor instance is responsible for presenting those confirmation
+		// prompts to the user. Any instance opting into removal prompts must
+		// enable `removalPromptExists()`.
+		//
+		// @see https://github.com/WordPress/gutenberg/pull/51145
+		if ( ! forceRemove && select.removalPromptExists() ) {
+			const blocksForPrompt = new Set();
+
+			// Given a list of client IDs of blocks that the user intended to
+			// remove, perform a tree search (BFS) to find all block names
+			// corresponding to "important" blocks, i.e. blocks that require a
+			// removal prompt.
+			//
+			// @see blockTypePromptMessages in ../utils/block-removal
+			const queue = [ ...clientIds ];
+			while ( queue.length ) {
+				const clientId = queue.shift();
+				const blockName = select.getBlockName( clientId );
+				if ( blockTypePromptMessages[ blockName ] ) {
+					blocksForPrompt.add( blockName );
+				}
+				const innerBlocks = select.getBlockOrder( clientId );
+				queue.push( ...innerBlocks );
+			}
+
+			// If any such blocks were found, trigger the removal prompt and
+			// skip any other steps (thus postponing actual removal).
+			if ( blocksForPrompt.size ) {
+				dispatch.displayRemovalPrompt( true, {
+					removalFunction() {
+						dispatch(
+							privateRemoveBlocks(
+								clientIds,
+								selectPrevious,
+								/* force */ true
+							)
+						);
+					},
+					blocksToPromptFor: Array.from( blocksForPrompt ),
+				} );
+				return;
+			}
+		}
+
+		if ( selectPrevious ) {
+			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
+		}
+
+		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+
+		// To avoid a focus loss when removing the last block, assure there is
+		// always a default block if the last of the blocks have been removed.
+		dispatch( ensureDefaultBlock() );
+	};
+
+/**
+ * Action which will insert a default block insert action if there
+ * are no other blocks at the root of the editor. This action should be used
+ * in actions which may result in no blocks remaining in the editor (removal,
+ * replacement, etc).
+ */
+export const ensureDefaultBlock =
+	() =>
+	( { select, dispatch } ) => {
+		// To avoid a focus loss when removing the last block, assure there is
+		// always a default block if the last of the blocks have been removed.
+		const count = select.getBlockCount();
+		if ( count > 0 ) {
+			return;
+		}
+
+		// If there's an custom appender, don't insert default block.
+		// We have to remember to manually move the focus elsewhere to
+		// prevent it from being lost though.
+		const { __unstableHasCustomAppender } = select.getSettings();
+		if ( __unstableHasCustomAppender ) {
+			return;
+		}
+
+		dispatch.insertDefaultBlock();
+	};

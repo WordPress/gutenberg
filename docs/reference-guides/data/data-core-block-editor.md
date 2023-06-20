@@ -1390,8 +1390,6 @@ _Parameters_
 
 -   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
 -   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
--   _options_ `[Object]`:
--   _options.forceRemove_ `[boolean]`: Whether to force the operation, bypassing any checks for certain block types.
 
 ### replaceBlock
 

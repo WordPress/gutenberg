@@ -25,40 +25,16 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
-import { __experimentalUpdateSettings } from './private-actions';
-import { blockTypePromptMessages } from '../utils/block-removal';
+import {
+	__experimentalUpdateSettings,
+	ensureDefaultBlock,
+	privateRemoveBlocks,
+} from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
-
-/**
- * Action which will insert a default block insert action if there
- * are no other blocks at the root of the editor. This action should be used
- * in actions which may result in no blocks remaining in the editor (removal,
- * replacement, etc).
- */
-const ensureDefaultBlock =
-	() =>
-	( { select, dispatch } ) => {
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		const count = select.getBlockCount();
-		if ( count > 0 ) {
-			return;
-		}
-
-		// If there's an custom appender, don't insert default block.
-		// We have to remember to manually move the focus elsewhere to
-		// prevent it from being lost though.
-		const { __unstableHasCustomAppender } = select.getSettings();
-		if ( __unstableHasCustomAppender ) {
-			return;
-		}
-
-		dispatch.insertDefaultBlock();
-	};
 
 /**
  * Action that resets blocks state to the specified array of blocks, taking precedence
@@ -1189,72 +1165,15 @@ export const mergeBlocks =
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
- * @param {string|string[]} clientIds             Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious        True if the previous block
- *                                                or the immediate parent
- *                                                (if no previous block exists)
- *                                                should be selected
- *                                                when a block is removed.
- * @param {Object}          [options]
- * @param {boolean}         [options.forceRemove] Whether to force the operation,
- *                                                bypassing any checks for certain
- *                                                block types.
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious True if the previous block
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
+ *                                         should be selected
+ *                                         when a block is removed.
  */
-export const removeBlocks =
-	( clientIds, selectPrevious = true, options = {} ) =>
-	( { select, dispatch } ) => {
-		if ( ! clientIds || ! clientIds.length ) {
-			return;
-		}
-
-		clientIds = castArray( clientIds );
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const canRemoveBlocks = select.canRemoveBlocks(
-			clientIds,
-			rootClientId
-		);
-
-		if ( ! canRemoveBlocks ) {
-			return;
-		}
-
-		if ( ! options.forceRemove && select.removalPromptExists() ) {
-			const blocksForPrompt = new Set();
-
-			const queue = [ ...clientIds ];
-			while ( queue.length ) {
-				const clientId = queue.shift();
-				const blockName = select.getBlockName( clientId );
-				if ( blockTypePromptMessages[ blockName ] ) {
-					blocksForPrompt.add( blockName );
-				}
-				const innerBlocks = select.getBlockOrder( clientId );
-				queue.push( ...innerBlocks );
-			}
-
-			if ( blocksForPrompt.size ) {
-				dispatch.displayRemovalPrompt( true, {
-					removalFunction() {
-						dispatch.removeBlocks( clientIds, selectPrevious, {
-							forceRemove: true,
-						} );
-					},
-					blocksToPromptFor: Array.from( blocksForPrompt ),
-				} );
-				return;
-			}
-		}
-
-		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
-		}
-
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
-	};
+export const removeBlocks = ( clientIds, selectPrevious = true ) =>
+	privateRemoveBlocks( clientIds, selectPrevious );
 
 /**
  * Returns an action object used in signalling that the block with the
