@@ -69,6 +69,7 @@ export default function PageStatus( {
 			// Anchor the popover to the middle of the entire row so that it doesn't
 			// move around when the label changes.
 			anchor: popoverAnchor,
+			ariaLabel: __( 'Change status' ),
 			placement: 'bottom-end',
 		} ),
 		[ popoverAnchor ]
