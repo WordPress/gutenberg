@@ -70,7 +70,6 @@ export default function ScaleTool( {
 	onChange,
 	options = DEFAULT_SCALE_OPTIONS,
 	defaultValue = DEFAULT_SCALE_OPTIONS[ 0 ].value,
-	showControl = true,
 	isShownByDefault = true,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
@@ -92,22 +91,20 @@ export default function ScaleTool( {
 			onDeselect={ () => onChange( defaultValue ) }
 			panelId={ panelId }
 		>
-			{ showControl && (
-				<ToggleGroupControl
-					label={ __( 'Scale' ) }
-					isBlock
-					help={ scaleHelp[ displayValue ] }
-					value={ displayValue }
-					onChange={ onChange }
-				>
-					{ options.map( ( option ) => (
-						<ToggleGroupControlOption
-							key={ option.value }
-							{ ...option }
-						/>
-					) ) }
-				</ToggleGroupControl>
-			) }
+			<ToggleGroupControl
+				label={ __( 'Scale' ) }
+				isBlock
+				help={ scaleHelp[ displayValue ] }
+				value={ displayValue }
+				onChange={ onChange }
+			>
+				{ options.map( ( option ) => (
+					<ToggleGroupControlOption
+						key={ option.value }
+						{ ...option }
+					/>
+				) ) }
+			</ToggleGroupControl>
 		</ToolsPanelItem>
 	);
 }
