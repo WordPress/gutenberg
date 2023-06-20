@@ -23,3 +23,26 @@
 		}
 	}
 }
+
+.edit-site-sidebar-navigation-screen-template__template-area-button {
+	color: $white;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	flex-wrap: nowrap;
+	border-radius: 4px;
+	&:hover,
+	&:focus {
+		background: $gray-800;
+		color: $white;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-template__template-area-label-text {
+	margin: 0 $grid-unit-20 0 $grid-unit-05;
+	flex-grow: 1;
+}
+
+.edit-site-sidebar-navigation-screen-template__template-icon {
+	display: flex;
+}

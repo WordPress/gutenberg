@@ -141,7 +141,8 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 }
 
 export default function SidebarNavigationScreenGlobalStyles() {
-	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { openGeneralSidebar, setIsListViewOpened } =
+		useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -169,7 +170,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		// and the global styles sidebar is open. This ensures that
 		// the Style Book is not prematurely closed.
 		setEditorCanvasContainerView( 'style-book' );
-	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
+		setIsListViewOpened( false );
+	}, [
+		openGlobalStyles,
+		setEditorCanvasContainerView,
+		setIsListViewOpened,
+	] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();

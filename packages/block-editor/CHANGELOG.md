@@ -6,6 +6,11 @@
 
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
+### Bug Fix
+
+-   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
+
+
 ## 12.3.0 (2023-06-07)
 
 ## 12.2.0 (2023-05-24)

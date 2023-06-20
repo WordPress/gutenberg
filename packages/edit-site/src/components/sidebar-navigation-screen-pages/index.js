@@ -180,37 +180,38 @@ export default function SidebarNavigationScreenPages() {
 										</PageItem>
 									);
 								} ) }
-								<VStack className="edit-site-sidebar-navigation-screen__sticky-section">
-									{ dynamicPageTemplates?.map( ( item ) => (
-										<PageItem
-											postType="wp_template"
-											postId={ item.id }
-											key={ item.id }
-											icon={ layout }
-											withChevron
-										>
-											<Truncate numberOfLines={ 1 }>
-												{ decodeEntities(
-													item.title?.rendered ||
-														__( '(no title)' )
-												) }
-											</Truncate>
-										</PageItem>
-									) ) }
-									<SidebarNavigationItem
-										className="edit-site-sidebar-navigation-screen-pages__see-all"
-										href="edit.php?post_type=page"
-										onClick={ () => {
-											document.location =
-												'edit.php?post_type=page';
-										} }
-									>
-										{ __( 'Manage all pages' ) }
-									</SidebarNavigationItem>
-								</VStack>
 							</ItemGroup>
 						) }
 					</>
+				}
+				footer={
+					<VStack spacing={ 0 }>
+						{ dynamicPageTemplates?.map( ( item ) => (
+							<PageItem
+								postType="wp_template"
+								postId={ item.id }
+								key={ item.id }
+								icon={ layout }
+								withChevron
+							>
+								<Truncate numberOfLines={ 1 }>
+									{ decodeEntities(
+										item.title?.rendered ||
+											__( '(no title)' )
+									) }
+								</Truncate>
+							</PageItem>
+						) ) }
+						<SidebarNavigationItem
+							className="edit-site-sidebar-navigation-screen-pages__see-all"
+							href="edit.php?post_type=page"
+							onClick={ () => {
+								document.location = 'edit.php?post_type=page';
+							} }
+						>
+							{ __( 'Manage all pages' ) }
+						</SidebarNavigationItem>
+					</VStack>
 				}
 			/>
 		</>

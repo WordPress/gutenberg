@@ -9,7 +9,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -18,8 +17,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import NavigationMenuEditor from './navigation-menu-editor';
-
-export const noop = () => {};
+import EditButton from './edit-button';
 
 export default function SidebarNavigationScreenNavigationMenu() {
 	const {
@@ -217,19 +215,35 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SidebarNavigationScreenWrapper
 			actions={
-				<ScreenNavigationMoreMenu
-					menuTitle={ decodeEntities( menuTitle ) }
-					onDelete={ handleDelete }
-					onSave={ handleSave }
-					onDuplicate={ handleDuplicate }
-				/>
+				<>
+					<EditButton />
+					<ScreenNavigationMoreMenu
+						menuTitle={ decodeEntities( menuTitle ) }
+						onDelete={ handleDelete }
+						onSave={ handleSave }
+						onDuplicate={ handleDuplicate }
+					/>
+				</>
 			}
 			title={ decodeEntities( menuTitle ) }
-			description={ __(
-				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
-			) }
+			description={
+				<>
+					<p>
+						{ sprintf(
+							/* translators: %s: Navigation menu title */
+							'This is your "%s" navigation menu. ',
+							decodeEntities( menuTitle )
+						) }
+					</p>
+					<p>
+						{ __(
+							'You can edit this menu here, but be aware that visual styles might be applied separately in templates or template parts, so the preview shown here can be incomplete.'
+						) }
+					</p>
+				</>
+			}
 		>
-			<NavigationMenuEditor navigationMenu={ navigationMenu } />
+			<NavigationMenuEditor navigationMenuId={ navigationMenu?.id } />
 		</SidebarNavigationScreenWrapper>
 	);
 }
