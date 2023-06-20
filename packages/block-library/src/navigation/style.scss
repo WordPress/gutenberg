@@ -52,7 +52,7 @@ $navigation-icon-size: 24px;
 	// This also fixes an issue where a navigation with an explicitly set color is overridden
 	// by link colors defined in Global Styles.
 	.wp-block-navigation-item__content.wp-block-navigation-item__content {
-		color: inherit;
+		//color: inherit;
 	}
 
 	// The following rules provide class based application of user selected text

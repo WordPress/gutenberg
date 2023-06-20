@@ -930,6 +930,82 @@ test.describe( 'Navigation block', () => {
 			await expect( linkControl.getSearchInput() ).not.toBeVisible();
 		} );
 	} );
+
+	test.describe( 'Navigation colors', () => {
+		test.beforeEach( async ( { requestUtils } ) => {
+			await Promise.all( [ requestUtils.deleteAllMenus() ] );
+		} );
+
+		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const firstlink = editor.canvas.locator(
+				`role=textbox[name="Navigation link text"i] >> text="First link"`
+			);
+
+			await expect( firstlink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			//TODO check frontend on desktop and mobile
+			//TODO then the same for second link
+			//Then the same for background colors
+		} );
+
+		test( 'As a user I expect my navigation links to inherit the colors from the parent container', async ( {
+			admin,
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			//We group the nav block and add colors to the links
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page.getByRole( 'button', { name: 'Color options' } ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+				.click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Link styles' } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid purple' } )
+				.click();
+
+			const firstlink = editor.canvas.locator(
+				`role=textbox[name="Navigation link text"i] >> text="First link"`
+			);
+
+			await expect( firstlink ).toHaveCSS( 'color', 'rgb(155, 81, 224)' );
+			//TODO check frontend on desktop and mobile
+			//TODO then the same for second link
+			//Then the same for background colors
+		} );
+	} );
 } );
 
 test.describe( 'Navigation block - Frontend interactivity', () => {
