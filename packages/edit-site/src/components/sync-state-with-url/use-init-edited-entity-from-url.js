@@ -31,8 +31,13 @@ export default function useInitEditedEntityFromURL() {
 		};
 	}, [] );
 
-	const { setReusableBlock, setTemplate, setTemplatePart, setPage, setNavigationMenu } =
-		useDispatch( editSiteStore );
+	const {
+		setReusableBlock,
+		setTemplate,
+		setTemplatePart,
+		setPage,
+		setNavigationMenu,
+	} = useDispatch( editSiteStore );
 
 	useEffect( () => {
 		if ( postType && postId ) {
