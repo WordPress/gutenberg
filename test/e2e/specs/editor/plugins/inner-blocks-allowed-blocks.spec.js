@@ -126,7 +126,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		// Insert list block.
 		await blockListBox.getByRole( 'option', { name: 'List' } ).click();
-		// Select the list wrapper so the image is insertable.
+		// Select the list wrapper and then parent block.
 		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
 
