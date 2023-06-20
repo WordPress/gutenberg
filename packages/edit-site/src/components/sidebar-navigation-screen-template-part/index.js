@@ -19,10 +19,10 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
-
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
 
-function useTemplateTitleAndDescription( postType, postId ) {
+function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
@@ -78,7 +78,13 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description };
+	const footer = !! record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter
+			lastModifiedDateTime={ record.modified }
+		/>
+	) : null;
+
+	return { title, description, footer };
 }
 
 export default function SidebarNavigationScreenTemplatePart() {
@@ -88,7 +94,7 @@ export default function SidebarNavigationScreenTemplatePart() {
 
 	const { record } = useEditedEntityRecord( postType, postId );
 
-	const { title, description } = useTemplateTitleAndDescription(
+	const { title, description, footer } = useTemplateDetails(
 		postType,
 		postId
 	);
@@ -118,6 +124,7 @@ export default function SidebarNavigationScreenTemplatePart() {
 			content={
 				<TemplatePartNavigationMenus menus={ navigationMenuIds } />
 			}
+			footer={ footer }
 		/>
 	);
 }

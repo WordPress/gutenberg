@@ -43,19 +43,16 @@ function useTemplateDetails( postType, postId ) {
 		);
 	}
 
-	let content = null;
-	if ( record?.slug === 'home' || record?.slug === 'index' ) {
-		content = <HomeTemplateDetails />;
-	}
+	const content =
+		record?.slug === 'home' || record?.slug === 'index' ? (
+			<HomeTemplateDetails />
+		) : null;
 
-	let footer = null;
-	if ( !! record?.modified ) {
-		footer = (
-			<SidebarNavigationScreenDetailsFooter
-				lastModifiedDateTime={ record.modified }
-			/>
-		);
-	}
+	const footer = !! record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter
+			lastModifiedDateTime={ record.modified }
+		/>
+	) : null;
 
 	const description = (
 		<>
