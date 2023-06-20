@@ -5,6 +5,23 @@
  * @package WordPress
  */
 
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	/**
+	 * Replaces view script for the File block with version using Interactivity API.
+	 *
+	 * @param array $metadata Block metadata as read in via block.json.
+	 *
+	 * @return array Filtered block type metadata.
+	 */
+	function gutenberg_block_core_file_update_interactive_view_script( $metadata ) {
+		if ( 'core/file' === $metadata['name'] ) {
+			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+		}
+		return $metadata;
+	}
+	add_filter( 'block_type_metadata', 'gutenberg_block_core_file_update_interactive_view_script', 10, 1 );
+}
+
 /**
  * When the `core/file` block is rendering, check if we need to enqueue the `'wp-block-file-view` script.
  *
@@ -54,7 +71,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 	);
 
 	// If it uses the Interactivity API, add the directives.
-	if ( $should_load_view_script ) {
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '' );
