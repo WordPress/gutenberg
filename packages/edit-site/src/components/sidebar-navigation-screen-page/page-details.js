@@ -95,15 +95,15 @@ function getPageDetails( page ) {
 
 export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
-
 	const { parentTitle, templateTitle } = useSelect(
 		( select ) => {
-			const { getEditedPostContext, getSettings } = unlock(
-				select( editSiteStore )
-			);
-			const defaultTemplateTypes = getSettings()?.defaultTemplateTypes;
+			const { getEditedPostContext } = unlock( select( editSiteStore ) );
 			const postContext = getEditedPostContext();
-
+			const templates = select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			);
 			// Template title.
 			const templateSlug =
 				// Checks that the post type matches the current theme's post type, otherwise
@@ -112,10 +112,10 @@ export default function PageDetails( { id } ) {
 					? postContext?.templateSlug
 					: null;
 			const _templateTitle =
-				defaultTemplateTypes && templateSlug
-					? defaultTemplateTypes.find(
+				templates && templateSlug
+					? templates.find(
 							( template ) => template.slug === templateSlug
-					  )?.title
+					  )?.title?.rendered
 					: null;
 
 			// Parent page title.
@@ -135,7 +135,7 @@ export default function PageDetails( { id } ) {
 				templateTitle: _templateTitle,
 			};
 		},
-		[ record ]
+		[ record?.parent ]
 	);
 	return (
 		<VStack spacing={ 5 }>
