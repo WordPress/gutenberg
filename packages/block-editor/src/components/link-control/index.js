@@ -322,6 +322,18 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+								size="__unstable-large"
+							/>
+						) }
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
@@ -341,17 +353,6 @@ function LinkControl( {
 							}
 							useLabel={ showTextControl }
 						/>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label={ __( 'Text' ) }
-								value={ internalControlValue?.title }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-							/>
-						) }
 					</div>
 					{ errorMessage && (
 						<Notice
