@@ -24,6 +24,7 @@ export default function SidebarNavigationItem( {
 		<Item
 			className={ classnames(
 				'edit-site-sidebar-navigation-item',
+				icon && 'with-icon',
 				className
 			) }
 			{ ...props }
