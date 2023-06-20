@@ -80,7 +80,7 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 		$content = sprintf(
 			/* translators: %s: The request URI. */
 			__( 'Form submission from %1$s', 'gutenberg' ) . '</br>',
-			'<a href="' . esc_url( $params['_wp_http_referer'] ) . '">' . get_bloginfo( 'name' ) . '</a>'
+			'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
 		);
 
 		$skip_fields = array( 'wp_rest', '_wp_http_referer', 'rest_route' );
