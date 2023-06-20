@@ -472,6 +472,7 @@ export default function Image( {
 						unitsOptions={ dimensionsUnitsOptions }
 					/>
 					<ResolutionTool
+						// TODO: Figure out what null means and if a defaultValue is needed.
 						value={ sizeSlug }
 						onChange={ updateImage }
 						options={ imageSizeOptions }
