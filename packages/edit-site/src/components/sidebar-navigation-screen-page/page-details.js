@@ -36,6 +36,7 @@ function getPageDetails( page ) {
 				<StatusLabel
 					status={ page?.password ? 'protected' : page.status }
 					date={ page?.date }
+					short
 				/>
 			),
 		},
