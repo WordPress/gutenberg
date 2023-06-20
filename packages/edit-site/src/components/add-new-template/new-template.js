@@ -107,11 +107,13 @@ function TemplateListItem( { title, className, description, icon, onClick } ) {
 				>
 					{ title }
 				</Text>
-				<Text
-					lineHeight={ 1.53846153846 } // 20px
-				>
-					{ description }
-				</Text>
+				{ description && (
+					<Text
+						lineHeight={ 1.53846153846 } // 20px
+					>
+						{ description }
+					</Text>
+				) }
 			</VStack>
 		</Button>
 	);
