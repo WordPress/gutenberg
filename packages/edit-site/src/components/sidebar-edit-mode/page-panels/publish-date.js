@@ -26,7 +26,7 @@ export default function ChangeStatus( { postType, postId, status, date } ) {
 			// Anchor the popover to the middle of the entire row so that it doesn't
 			// move around when the label changes.
 			anchor: popoverAnchor,
-			ariaLabel: __( 'Change publish date' ),
+			'aria-label': __( 'Change publish date' ),
 			placement: 'bottom-end',
 		} ),
 		[ popoverAnchor ]
