@@ -90,6 +90,8 @@ describe( 'DimensionsTool', () => {
 		await user.selectOptions( aspectRatioSelect, '16/9' );
 		expect( aspectRatioSelect ).toHaveValue( '16/9' );
 
+		// Use toStrictEqual so undefined properties are treated differently
+		// from missing properties.
 		expect( onChange.mock.calls ).toStrictEqual( [
 			[ { aspectRatio: '16/9', scale: 'contain' } ],
 			[ {} ],
