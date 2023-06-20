@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, set } from 'lodash';
+import { get, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,7 @@ import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
+import { kebabCase } from '../../utils/object';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
