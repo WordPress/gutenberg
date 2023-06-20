@@ -58,7 +58,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__field {
-	margin: $grid-unit-20 $grid-unit-20 0 $grid-unit-20; // allow margin collapse for vertical spacing.
+	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 
 	input[type="text"],
 	// Specificity overide of URLInput defaults.
@@ -405,6 +405,7 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__tools {
 	padding: $grid-unit-10;
+	margin-top: #{$grid-unit-20 * -1};
 
 	.components-button.block-editor-link-control__drawer-toggle {
 		padding-left: 0;
