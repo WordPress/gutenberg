@@ -73,19 +73,15 @@ export default function HomeTemplateDetails() {
 		postsPerPage,
 		postsPageTitle,
 		postsPageId,
-		templateRecord,
+		currentTemplateParts,
 	} = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
 			const { getSettings } = unlock( select( editSiteStore ) );
+			const _currentTemplateParts =
+				select( editSiteStore ).getCurrentTemplateTemplateParts();
 			const siteEditorSettings = getSettings();
-			const _templateRecord =
-				select( coreStore ).getEditedEntityRecord(
-					'postType',
-					postType,
-					postId
-				) || EMPTY_OBJECT;
 			const _postsPageRecord = siteSettings?.page_for_posts
 				? select( coreStore ).getEntityRecord(
 						'postType',
@@ -95,13 +91,13 @@ export default function HomeTemplateDetails() {
 				: EMPTY_OBJECT;
 
 			return {
-				templateRecord: _templateRecord,
 				allowCommentsOnNewPosts:
 					siteSettings?.default_comment_status === 'open',
 				postsPageTitle: _postsPageRecord?.title?.rendered,
 				postsPageId: _postsPageRecord?.id,
 				postsPerPage: siteSettings?.posts_per_page,
 				templatePartAreas: siteEditorSettings?.defaultTemplatePartAreas,
+				currentTemplateParts: _currentTemplateParts,
 			};
 		},
 		[ postType, postId ]
@@ -112,24 +108,31 @@ export default function HomeTemplateDetails() {
 	const [ postsCountValue, setPostsCountValue ] = useState( 1 );
 	const [ postsPageTitleValue, setPostsPageTitleValue ] = useState( '' );
 
+	/*
+	 * This hook serves to set the server-retrieved values,
+	 * postsPageTitle, allowCommentsOnNewPosts, postsPerPage,
+	 * to local state.
+	 */
 	useEffect( () => {
 		setCommentsOnNewPostsValue( allowCommentsOnNewPosts );
 		setPostsPageTitleValue( postsPageTitle );
 		setPostsCountValue( postsPerPage );
 	}, [ postsPageTitle, allowCommentsOnNewPosts, postsPerPage ] );
 
+	/*
+	 * Merge data in currentTemplateParts with templatePartAreas,
+	 * which contains the template icon and fallback labels
+	 */
 	const templateAreas = useMemo( () => {
-		return templateRecord?.blocks && templatePartAreas
-			? templateRecord.blocks
-					.filter( ( { name } ) => name === 'core/template-part' )
-					.map( ( { attributes } ) => ( {
-						...templatePartAreas?.find(
-							( { area } ) => area === attributes?.tagName
-						),
-						...attributes,
-					} ) )
+		return currentTemplateParts.length && templatePartAreas
+			? currentTemplateParts.map( ( { templatePart } ) => ( {
+					...templatePartAreas?.find(
+						( { area } ) => area === templatePart?.area
+					),
+					...templatePart,
+			  } ) )
 			: [];
-	}, [ templateRecord?.blocks, templatePartAreas ] );
+	}, [ currentTemplateParts, templatePartAreas ] );
 
 	const setAllowCommentsOnNewPosts = ( newValue ) => {
 		setCommentsOnNewPostsValue( newValue );
@@ -207,15 +210,19 @@ export default function HomeTemplateDetails() {
 				spacing={ 3 }
 			>
 				<ItemGroup>
-					{ templateAreas.map( ( { label, icon, theme, slug } ) => (
-						<SidebarNavigationScreenDetailsPanelRow key={ slug }>
-							<TemplateAreaButton
-								postId={ `${ theme }//${ slug }` }
-								title={ label || slug }
-								icon={ icon }
-							/>
-						</SidebarNavigationScreenDetailsPanelRow>
-					) ) }
+					{ templateAreas.map(
+						( { label, icon, theme, slug, title } ) => (
+							<SidebarNavigationScreenDetailsPanelRow
+								key={ slug }
+							>
+								<TemplateAreaButton
+									postId={ `${ theme }//${ slug }` }
+									title={ title?.rendered || label }
+									icon={ icon }
+								/>
+							</SidebarNavigationScreenDetailsPanelRow>
+						)
+					) }
 				</ItemGroup>
 			</SidebarNavigationScreenDetailsPanel>
 		</>

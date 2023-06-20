@@ -121,11 +121,9 @@ export default function SidebarNavigationScreenPage() {
 				</>
 			}
 			footer={
-				!! record?.modified && (
-					<SidebarNavigationScreenDetailsFooter
-						lastModifiedDateTime={ record.modified }
-					/>
-				)
+				<SidebarNavigationScreenDetailsFooter
+					lastModifiedDateTime={ record?.modified }
+				/>
 			}
 		/>
 	) : null;
