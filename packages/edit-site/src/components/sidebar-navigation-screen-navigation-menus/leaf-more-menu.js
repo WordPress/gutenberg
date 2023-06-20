@@ -117,7 +117,7 @@ export default function LeafMoreMenu( props ) {
 						{ block.attributes?.id && (
 							<MenuItem
 								onClick={ () => {
-									onGoToPage();
+									onGoToPage( block );
 									onClose();
 								} }
 							>
