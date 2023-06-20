@@ -16,10 +16,7 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit( props ) {
-			// Disable reason: this is a react component, but the rule of hook
-			// fails because the block's edit function has a lowercase 'e'.
-			// eslint-disable-next-line react-hooks/rules-of-hooks
+		edit: function Edit( props ) {
 			const numberOfChildren = useSelect(
 				( select ) => {
 					const { getBlockCount } = select( 'core/block-editor' );
