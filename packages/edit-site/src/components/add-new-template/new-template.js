@@ -22,7 +22,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	archive,
 	blockMeta,
+	calendar,
 	category,
+	commentAuthorAvatar,
+	edit,
 	home,
 	layout,
 	list,
@@ -30,9 +33,7 @@ import {
 	notFound,
 	page,
 	plus,
-	post,
-	postAuthor,
-	postDate,
+	pin,
 	postList,
 	search,
 	tag,
@@ -78,16 +79,16 @@ const DEFAULT_TEMPLATE_SLUGS = [
 const TEMPLATE_ICONS = {
 	'front-page': home,
 	home: postList,
-	single: post,
+	single: pin,
 	page,
 	archive,
 	search,
 	404: notFound,
 	index: list,
 	category,
-	author: postAuthor,
+	author: commentAuthorAvatar,
 	taxonomy: blockMeta,
-	date: postDate,
+	date: calendar,
 	tag,
 	attachment: media,
 };
@@ -312,7 +313,9 @@ export default function NewTemplate( {
 										description={
 											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
 										}
-										icon={ TEMPLATE_ICONS[ slug ] || post }
+										icon={
+											TEMPLATE_ICONS[ slug ] || layout
+										}
 										onClick={ () =>
 											onClick
 												? onClick( template )
@@ -328,7 +331,7 @@ export default function NewTemplate( {
 								description={ __(
 									'A custom template can be manually applied to any post or page.'
 								) }
-								icon={ layout }
+								icon={ edit }
 								onClick={ () =>
 									setModalContent(
 										modalContentMap.customGenericTemplate
