@@ -660,11 +660,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
 		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
 		}
 		// If the script is needed, but it was previously removed, add it again.
 		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
 		}
 	}
 
