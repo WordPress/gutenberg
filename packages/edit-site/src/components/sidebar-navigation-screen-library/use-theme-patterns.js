@@ -11,6 +11,13 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
+const CORE_PATTERN_SOURCES = [
+	'core',
+	'pattern-directory/core',
+	'pattern-directory/featured',
+	'pattern-directory/theme',
+];
+
 export default function useThemePatterns() {
 	const blockPatterns = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -28,7 +35,10 @@ export default function useThemePatterns() {
 	const patterns = useMemo(
 		() =>
 			[ ...( blockPatterns || [] ), ...( restBlockPatterns || [] ) ]
-				.filter( ( pattern ) => pattern.source !== 'core' )
+				.filter(
+					( pattern ) =>
+						! CORE_PATTERN_SOURCES.includes( pattern.source )
+				)
 				.filter(
 					( x, index, arr ) =>
 						index === arr.findIndex( ( y ) => x.name === y.name )

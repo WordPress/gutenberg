@@ -18,6 +18,12 @@ export const TEMPLATE_PARTS = 'wp_template_part';
 export const PATTERNS = 'pattern';
 export const USER_PATTERNS = 'wp_block';
 const USER_PATTERN_CATEGORY = 'custom-patterns';
+const CORE_PATTERN_SOURCES = [
+	'core',
+	'pattern-directory/core',
+	'pattern-directory/featured',
+	'pattern-directory/theme',
+];
 const SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
@@ -110,7 +116,10 @@ const useThemePatterns = (
 	const patterns = useMemo(
 		() =>
 			[ ...( blockPatterns || [] ), ...( restBlockPatterns || [] ) ]
-				.filter( ( pattern ) => pattern.source !== 'core' )
+				.filter(
+					( pattern ) =>
+						! CORE_PATTERN_SOURCES.includes( pattern.source )
+				)
 				.filter(
 					( x, index, arr ) =>
 						index === arr.findIndex( ( y ) => x.name === y.name )
