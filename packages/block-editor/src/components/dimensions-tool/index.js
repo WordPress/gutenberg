@@ -57,6 +57,7 @@ function DimensionsTool( {
 	value = {},
 	onChange = () => {},
 	aspectRatioOptions, // Default value is in AspectRatioTool.
+	scaleOptions, // Default value is in ScaleTool.
 	unitsOptions,
 } ) {
 	// TODO: 'spacing.units` was used in the featured image code, but we're
@@ -92,23 +93,6 @@ function DimensionsTool( {
 			value.width !== undefined &&
 			value.height !== null &&
 			value.height !== undefined );
-
-	const scaleOptions = [
-		{
-			value: 'cover',
-			label: _x( 'Cover', 'Scale option for dimensions control' ),
-			help: __(
-				'Image covers the space evenly.'
-			),
-		},
-		{
-			value: 'contain',
-			label: _x( 'Contain', 'Scale option for dimensions control' ),
-			help: __(
-				'Image is contained without distortion.'
-			),
-		},
-	];
 
 	return (
 		<>
