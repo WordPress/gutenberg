@@ -76,6 +76,7 @@ function ResizableFrame( {
 	isReady,
 	children,
 	oversizedClassName,
+	innerContentStyle,
 } ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
@@ -253,6 +254,7 @@ function ResizableFrame( {
 					borderRadius: isFullWidth ? 0 : 8,
 				} }
 				transition={ FRAME_TRANSITION }
+				style={ innerContentStyle }
 			>
 				{ children }
 			</motion.div>
