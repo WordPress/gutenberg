@@ -67,7 +67,11 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex className="edit-site-global-styles-sidebar__header">
+				<Flex
+					className="edit-site-global-styles-sidebar__header"
+					role="menubar"
+					aria-label={ __( 'Styles actions' ) }
+				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
@@ -87,9 +91,7 @@ export default function GlobalStylesSidebar() {
 							} }
 						/>
 					</FlexItem>
-					<FlexItem>
-						<GlobalStylesMenuSlot />
-					</FlexItem>
+					<GlobalStylesMenuSlot />
 				</Flex>
 			}
 		>
