@@ -128,7 +128,7 @@ const LinkControlSearchInput = forwardRef(
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
 					__nextHasNoMarginBottom
-					label={ useLabel ? 'URL' : undefined }
+					label={ useLabel ? 'Link' : undefined }
 					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }
