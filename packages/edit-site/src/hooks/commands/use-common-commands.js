@@ -68,6 +68,21 @@ export function useCommonCommands() {
 	} );
 
 	useCommand( {
+		name: 'core/edit-site/open-styles-css',
+		label: __( 'Open CSS' ),
+		icon: styles,
+		callback: ( { close } ) => {
+			close();
+			history.push( {
+				path: '/wp_global_styles',
+				canvas: 'edit',
+			} );
+			openGeneralSidebar( 'edit-site/global-styles' );
+			setEditorCanvasContainerView( 'global-styles-css' );
+		},
+	} );
+
+	useCommand( {
 		name: 'core/edit-site/open-styles',
 		label: __( 'Open styles' ),
 		callback: ( { close } ) => {
