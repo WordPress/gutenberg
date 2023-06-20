@@ -114,7 +114,7 @@ describe( 'Reusable block', () => {
 
 		// Get the reusable block.
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -131,7 +131,7 @@ describe( 'Reusable block', () => {
 		} );
 
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		const blockDeleted = within( reusableBlock ).getByText(
@@ -164,7 +164,7 @@ describe( 'Reusable block', () => {
 		} );
 
 		const [ reusableBlock ] = await screen.findByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		const innerBlockListWrapper = await within(

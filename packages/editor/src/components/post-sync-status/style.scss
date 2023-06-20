@@ -1,0 +1,16 @@
+.edit-post-sync-status {
+	width: 100%;
+	position: relative;
+	justify-content: flex-start;
+
+	> span {
+		display: block;
+		width: 45%;
+		flex-shrink: 0;
+	}
+
+	.components-base-control {
+		// Match padding on tertiary buttons for alignment.
+		padding-left: $grid-unit-15 * 0.5;
+	}
+}

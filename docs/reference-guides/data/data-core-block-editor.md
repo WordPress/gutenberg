@@ -538,6 +538,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
+-   _syncStatus_ `?string`: Optional sync status to filter pattern blocks by.
 
 _Returns_
 
