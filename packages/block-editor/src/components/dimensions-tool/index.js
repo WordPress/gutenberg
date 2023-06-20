@@ -136,16 +136,17 @@ function DimensionsControls( {
 					onChange( nextValue );
 				} }
 			/>
-			<ScaleTool
-				panelId={ panelId }
-				options={ scaleOptions }
-				defaultValue="cover"
-				value={ value.scale }
-				onChange={ ( nextScale ) => {
-					onChange( { ...value, scale: nextScale } );
-				} }
-				showControl={ showScaleControl }
-			/>
+			{ showScaleControl && (
+				<ScaleTool
+					panelId={ panelId }
+					options={ scaleOptions }
+					defaultValue="cover"
+					value={ value.scale }
+					onChange={ ( nextScale ) => {
+						onChange( { ...value, scale: nextScale } );
+					} }
+				/>
+			) }
 			<WidthHeightTool
 				panelId={ panelId }
 				units={ units }
