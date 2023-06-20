@@ -296,6 +296,11 @@ export default function NewTemplate( {
 							justify="center"
 							className="edit-site-add-new-template__template-list__contents"
 						>
+							<Flex className="edit-site-add-new-template__template-list__prompt">
+								{ __(
+									'Select what the new template should apply to:'
+								) }
+							</Flex>
 							{ missingTemplates.map( ( template ) => {
 								const { title, slug, onClick } = template;
 								return (
