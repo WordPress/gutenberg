@@ -182,47 +182,49 @@ export default function PageStatus( {
 							title={ __( 'Status' ) }
 							onClose={ onClose }
 						/>
-						<VStack spacing={ 5 }>
-							<RadioControl
-								className="edit-site-change-status__options"
-								hideLabelFromVision
-								label={ __( 'Status' ) }
-								options={ STATUS_OPTIONS }
-								onChange={ handleStatus }
-								selected={ status }
-							/>
-							{ status !== 'private' && (
-								<BaseControl
-									id={ `edit-site-change-status__password` }
-									label={ __( 'Password' ) }
-								>
-									<ToggleControl
-										label={ __(
-											'Hide this page behind a password'
-										) }
-										checked={ showPassword }
-										onChange={ handleTogglePassword }
-									/>
-									{ showPassword && (
-										<TextControl
-											onChange={ ( value ) =>
-												saveStatus( {
-													password: value,
-												} )
-											}
-											value={ password }
-											/* eslint-disable jsx-a11y/no-autofocus */
-											autoFocus={ ! password }
-											/* eslint-enable jsx-a11y/no-autofocus */
-											placeholder={ __(
-												'Enter a secure password'
+						<form>
+							<VStack spacing={ 5 }>
+								<RadioControl
+									className="edit-site-change-status__options"
+									hideLabelFromVision
+									label={ __( 'Status' ) }
+									options={ STATUS_OPTIONS }
+									onChange={ handleStatus }
+									selected={ status }
+								/>
+								{ status !== 'private' && (
+									<BaseControl
+										id={ `edit-site-change-status__password` }
+										label={ __( 'Password' ) }
+									>
+										<ToggleControl
+											label={ __(
+												'Hide this page behind a password'
 											) }
-											type="password"
+											checked={ showPassword }
+											onChange={ handleTogglePassword }
 										/>
-									) }
-								</BaseControl>
-							) }
-						</VStack>
+										{ showPassword && (
+											<TextControl
+												onChange={ ( value ) =>
+													saveStatus( {
+														password: value,
+													} )
+												}
+												value={ password }
+												/* eslint-disable jsx-a11y/no-autofocus */
+												autoFocus={ ! password }
+												/* eslint-enable jsx-a11y/no-autofocus */
+												placeholder={ __(
+													'Enter a secure password'
+												) }
+												type="password"
+											/>
+										) }
+									</BaseControl>
+								) }
+							</VStack>
+						</form>
 					</>
 				) }
 			/>
