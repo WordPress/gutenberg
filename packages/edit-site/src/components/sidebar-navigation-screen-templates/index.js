@@ -41,7 +41,7 @@ const config = {
 			loading: __( 'Loading library' ),
 			notFound: __( 'No patterns found' ),
 			manage: __( 'Manage all template parts' ),
-			reusableBlocks: __( 'Manage reusable blocks' ),
+			reusableBlocks: __( 'Manage patterns' ),
 			description: __(
 				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
 			),
