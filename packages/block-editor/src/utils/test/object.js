@@ -62,7 +62,7 @@ describe( 'kebabCase', () => {
 	} );
 
 	/**
-	 * Should cover all test cases of `_wp_to_kebab_case()`
+	 * Should cover all test cases of `_wp_to_kebab_case()`.
 	 *
 	 * @see https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/
 	 * @see https://github.com/WordPress/wordpress-develop/blob/76376fdbc3dc0b3261de377dffc350677345e7ba/tests/phpunit/tests/functions/wpToKebabCase.php#L35-L62
