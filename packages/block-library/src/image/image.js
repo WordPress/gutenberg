@@ -4,7 +4,6 @@
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
-	PanelBody,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -12,6 +11,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -419,29 +419,8 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					{ ! multiImageSelection && (
-						<TextareaControl
-							__nextHasNoMarginBottom
-							label={ __( 'Alternative text' ) }
-							value={ alt }
-							onChange={ updateAlt }
-							help={
-								<>
-									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-										{ __(
-											'Describe the purpose of the image.'
-										) }
-									</ExternalLink>
-									<br />
-									{ __( 'Leave empty if decorative.' ) }
-								</>
-							}
-						/>
-					) }
-				</PanelBody>
 				<ToolsPanel
-					label={ __( 'Image size' ) }
+					label={ __( 'Settings' ) }
 					resetAll={ () =>
 						setAttributes( {
 							width: undefined,
@@ -451,6 +430,32 @@ export default function Image( {
 						} )
 					}
 				>
+					{ ! multiImageSelection && (
+							<ToolsPanelItem
+								label={ __( 'Alternative text' ) }
+								isShownByDefault={ true }
+								hasValue={ () => alt !== '' }
+								onDeselect={ () => setAttributes( { alt: undefined } ) }
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt }
+									onChange={ updateAlt }
+									help={
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __( 'Leave empty if decorative.' ) }
+										</>
+									}
+									__nextHasNoMarginBottom
+								/>
+							</ToolsPanelItem>
+					) }
 					<DimensionsTool
 						value={ {
 							width,
