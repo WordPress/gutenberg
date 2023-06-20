@@ -137,7 +137,9 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 * @return array Filtered block type metadata.
 	 */
 	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
-		$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+		if ( 'core/navigation' === $metadata['name'] ) {
+			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+		}
 		return $metadata;
 	}
 	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
