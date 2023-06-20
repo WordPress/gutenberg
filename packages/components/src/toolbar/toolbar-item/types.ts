@@ -9,8 +9,7 @@ import type {
 	RefAttributes,
 } from 'react';
 
-export interface ToolbarItemProps
-	extends Omit< HTMLAttributes< any >, 'children' > {
+export type ToolbarItemProps = Omit< HTMLAttributes< any >, 'children' > & {
 	/**
 	 * Component type that will be used to render the toolbar item.
 	 */
@@ -25,4 +24,4 @@ export interface ToolbarItemProps
 		| ( (
 				props: HTMLAttributes< any > & RefAttributes< any >
 		  ) => ReactElement | null );
-}
+};
