@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -104,30 +99,20 @@ export default function SidebarNavigationScreenPage() {
 			}
 			content={
 				<>
-					<VStack
-						className="edit-site-sidebar-navigation-screen-page__featured-image-wrapper"
-						alignment="left"
-						spacing={ 2 }
-					>
-						<div
-							className={ classnames(
-								'edit-site-sidebar-navigation-screen-page__featured-image',
-								{
-									'has-image': !! featuredMediaSourceUrl,
-								}
-							) }
+					{ !! featuredMediaSourceUrl && (
+						<VStack
+							className="edit-site-sidebar-navigation-screen-page__featured-image-wrapper"
+							alignment="left"
+							spacing={ 2 }
 						>
-							{ !! featuredMediaSourceUrl && (
+							<div className="edit-site-sidebar-navigation-screen-page__featured-image has-image">
 								<img
 									alt={ featureImageAltText }
 									src={ featuredMediaSourceUrl }
 								/>
-							) }
-							{ ! record?.featured_media && (
-								<p>{ __( 'No featured image' ) }</p>
-							) }
-						</div>
-					</VStack>
+							</div>
+						</VStack>
+					) }
 					{ !! record?.excerpt?.rendered && (
 						<Truncate
 							className="edit-site-sidebar-navigation-screen-page__excerpt"

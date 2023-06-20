@@ -1075,6 +1075,8 @@ test.describe( 'Image - interactivity', () => {
 		editor,
 		page,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
 		const imageBlockFromUrl = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
