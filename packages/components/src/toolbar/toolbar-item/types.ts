@@ -16,7 +16,9 @@ export interface ToolbarItemProps
 	 */
 	as?: ElementType;
 	/**
-	 * Children render prop that will be used to render the toolbar item.
+	 * A function that receives the props that should be spread onto the element
+	 * that will be rendered as a toolbar item. If the `as` prop is not provided,
+	 * this prop will accept a ReactNode instead.
 	 */
 	children?:
 		| ReactNode
