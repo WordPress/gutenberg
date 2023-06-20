@@ -176,9 +176,10 @@ export default function HomeTemplateDetails() {
 						placeholder={ 0 }
 						value={ postsCountValue }
 						size={ '__unstable-large' }
+						spinControls="custom"
 						step="1"
 						min="1"
-						onChange={ debounce( setPostsPerPage, 300 ) }
+						onChange={ setPostsPerPage }
 						label={ __( 'Posts per page' ) }
 						help={ __(
 							'Set the default number of posts to display on blog pages, including categories and tags. Some templates may override this setting.'
@@ -197,7 +198,7 @@ export default function HomeTemplateDetails() {
 						label="Allow comments on new posts"
 						help="Changes will apply to new posts only. Individual posts may override these settings."
 						checked={ commentsOnNewPostsValue }
-						onChange={ debounce( setAllowCommentsOnNewPosts, 300 ) }
+						onChange={ setAllowCommentsOnNewPosts }
 					/>
 				</SidebarNavigationScreenDetailsPanelRow>
 			</SidebarNavigationScreenDetailsPanel>
