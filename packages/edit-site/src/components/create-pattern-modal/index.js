@@ -20,7 +20,7 @@ const SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
-const USER_PATTERN_CATEGORY = 'your-patterns';
+const USER_PATTERN_CATEGORY = 'custom-patterns';
 
 export default function CreatePatternModal( {
 	closeModal,

@@ -17,7 +17,7 @@ const EMPTY_PATTERN_LIST = [];
 export const TEMPLATE_PARTS = 'wp_template_part';
 export const PATTERNS = 'pattern';
 export const USER_PATTERNS = 'wp_block';
-const USER_PATTERN_CATEGORY = 'your-patterns';
+const USER_PATTERN_CATEGORY = 'custom-patterns';
 const SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',

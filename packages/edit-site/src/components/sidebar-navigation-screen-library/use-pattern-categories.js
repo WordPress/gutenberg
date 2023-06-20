@@ -52,8 +52,8 @@ export default function usePatternCategories() {
 		if ( userPatterns?.length ) {
 			categoriesWithCounts.push( {
 				count: userPatterns.length || 0,
-				name: 'your-patterns',
-				label: __( 'Your Patterns' ),
+				name: 'custom-patterns',
+				label: __( 'Custom patterns' ),
 			} );
 		}
 
