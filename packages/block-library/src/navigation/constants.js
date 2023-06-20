@@ -24,7 +24,7 @@ export const SELECT_NAVIGATION_MENUS_ARGS = [
 	'postType',
 	'wp_navigation',
 	{
-		per_page: -1,
+		per_page: 100,
 		status: [ 'publish', 'draft' ],
 		order: 'desc',
 		orderby: 'date',
