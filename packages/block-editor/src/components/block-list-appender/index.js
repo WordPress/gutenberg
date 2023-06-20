@@ -41,7 +41,7 @@ function DefaultAppender( { rootClientId } ) {
 }
 
 function useAppender( rootClientId, CustomAppender ) {
-	const { hideInserter, isParentSelected } = useSelect(
+	return useSelect(
 		( select ) => {
 			const {
 				getTemplateLock,
@@ -50,35 +50,36 @@ function useAppender( rootClientId, CustomAppender ) {
 				getBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
 
-			const selectedBlockClientId = getSelectedBlockClientId();
+			if ( CustomAppender === false ) {
+				return null;
+			}
 
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled' ||
-					__unstableGetEditorMode() === 'zoom-out',
-				isParentSelected:
+			if ( ! CustomAppender ) {
+				const selectedBlockClientId = getSelectedBlockClientId();
+				const isParentSelected =
 					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId ),
-			};
+					( ! rootClientId && ! selectedBlockClientId );
+				if ( ! isParentSelected ) {
+					return null;
+				}
+			}
+
+			if (
+				getTemplateLock( rootClientId ) ||
+				getBlockEditingMode( rootClientId ) === 'disabled' ||
+				__unstableGetEditorMode() === 'zoom-out'
+			) {
+				return null;
+			}
+
+			return CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			);
 		},
-		[ rootClientId ]
+		[ rootClientId, CustomAppender ]
 	);
-
-	if ( hideInserter || CustomAppender === false ) {
-		return null;
-	}
-
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		return <CustomAppender />;
-	}
-
-	if ( ! isParentSelected ) {
-		return null;
-	}
-
-	return <DefaultAppender rootClientId={ rootClientId } />;
 }
 
 function BlockListAppender( {
