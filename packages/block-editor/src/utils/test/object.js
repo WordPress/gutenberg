@@ -60,6 +60,42 @@ describe( 'kebabCase', () => {
 		expect( kebabCase( [] ) ).toEqual( '' );
 		expect( kebabCase( {} ) ).toEqual( 'object-object' );
 	} );
+
+	/**
+	 * Should cover all test cases of `_wp_to_kebab_case()`
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/
+	 * @see https://github.com/WordPress/wordpress-develop/blob/76376fdbc3dc0b3261de377dffc350677345e7ba/tests/phpunit/tests/functions/wpToKebabCase.php#L35-L62
+	 */
+	it.each( [
+		[ 'white', 'white' ],
+		[ 'white+black', 'white-black' ],
+		[ 'white:black', 'white-black' ],
+		[ 'white*black', 'white-black' ],
+		[ 'white.black', 'white-black' ],
+		[ 'white black', 'white-black' ],
+		[ 'white	black', 'white-black' ],
+		[ 'white-to-black', 'white-to-black' ],
+		[ 'white2white', 'white-2-white' ],
+		[ 'white2nd', 'white-2nd' ],
+		[ 'white2ndcolor', 'white-2-ndcolor' ],
+		[ 'white2ndColor', 'white-2nd-color' ],
+		[ 'white2nd_color', 'white-2nd-color' ],
+		[ 'white23color', 'white-23-color' ],
+		[ 'white23', 'white-23' ],
+		[ '23color', '23-color' ],
+		[ 'white4th', 'white-4th' ],
+		[ 'font2xl', 'font-2-xl' ],
+		[ 'whiteToWhite', 'white-to-white' ],
+		[ 'whiteTOwhite', 'white-t-owhite' ],
+		[ 'WHITEtoWHITE', 'whit-eto-white' ],
+		[ 42, '42' ],
+		[ "i've done", 'ive-done' ],
+		[ '#ffffff', 'ffffff' ],
+		[ '$ffffff', 'ffffff' ],
+	] )( 'converts %s properly to %s', ( input, expected ) => {
+		expect( kebabCase( input ) ).toEqual( expected );
+	} );
 } );
 
 describe( 'setImmutably', () => {
