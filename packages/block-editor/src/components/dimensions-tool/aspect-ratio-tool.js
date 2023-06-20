@@ -118,6 +118,8 @@ export default function AspectRatioTool( {
 				value={ displayValue }
 				options={ options }
 				onChange={ onChange }
+				size={ '__unstable-large' }
+				__nextHasNoMarginBottom
 			/>
 		</ToolsPanelItem>
 	);
