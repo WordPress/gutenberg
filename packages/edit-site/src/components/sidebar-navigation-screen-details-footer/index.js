@@ -18,22 +18,28 @@ export default function SidebarNavigationScreenDetailsFooter( {
 	lastModifiedDateTime,
 } ) {
 	return (
-		<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-details-footer">
-			<SidebarNavigationScreenDetailsPanelLabel>
-				{ __( 'Last modified' ) }
-			</SidebarNavigationScreenDetailsPanelLabel>
-			<SidebarNavigationScreenDetailsPanelValue>
-				{ createInterpolateElement(
-					sprintf(
-						/* translators: %s: is the relative time when the post was last modified. */
-						__( '<time>%s</time>' ),
-						humanTimeDiff( lastModifiedDateTime )
-					),
-					{
-						time: <time dateTime={ lastModifiedDateTime } />,
-					}
-				) }
-			</SidebarNavigationScreenDetailsPanelValue>
-		</SidebarNavigationScreenDetailsPanelRow>
+		<>
+			{ lastModifiedDateTime && (
+				<SidebarNavigationScreenDetailsPanelRow className="edit-site-sidebar-navigation-screen-details-footer">
+					<SidebarNavigationScreenDetailsPanelLabel>
+						{ __( 'Last modified' ) }
+					</SidebarNavigationScreenDetailsPanelLabel>
+					<SidebarNavigationScreenDetailsPanelValue>
+						{ createInterpolateElement(
+							sprintf(
+								/* translators: %s: is the relative time when the post was last modified. */
+								__( '<time>%s</time>' ),
+								humanTimeDiff( lastModifiedDateTime )
+							),
+							{
+								time: (
+									<time dateTime={ lastModifiedDateTime } />
+								),
+							}
+						) }
+					</SidebarNavigationScreenDetailsPanelValue>
+				</SidebarNavigationScreenDetailsPanelRow>
+			) }
+		</>
 	);
 }

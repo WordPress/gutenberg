@@ -139,7 +139,10 @@ export default function PageDetails( { id } ) {
 		[ record?.parent ]
 	);
 	return (
-		<SidebarNavigationScreenDetailsPanel title={ __( 'Details' ) }>
+		<SidebarNavigationScreenDetailsPanel
+			spacing={ 5 }
+			title={ __( 'Details' ) }
+		>
 			{ getPageDetails( {
 				parentTitle,
 				templateTitle,
