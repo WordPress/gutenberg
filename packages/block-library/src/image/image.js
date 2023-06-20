@@ -35,7 +35,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -66,6 +66,19 @@ import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 export default function Image( {
 	temporaryURL,
@@ -466,6 +479,7 @@ export default function Image( {
 								aspectRatio: newValue.aspectRatio,
 							} );
 						} }
+						scaleOptions={ scaleOptions }
 						unitsOptions={ dimensionsUnitsOptions }
 					/>
 					<ResolutionTool
