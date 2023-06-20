@@ -31,7 +31,8 @@ function useGlobalStylesResetCommands() {
 				name: 'core/edit-site/reset-global-styles',
 				label: __( 'Reset styles to defaults' ),
 				icon: trash,
-				callback: () => {
+				callback: ( { close } ) => {
+					close();
 					onReset();
 				},
 			},
@@ -55,7 +56,8 @@ export function useCommonCommands() {
 		name: 'core/edit-site/open-global-styles-revisions',
 		label: __( 'Open styles revisions' ),
 		icon: backup,
-		callback: () => {
+		callback: ( { close } ) => {
+			close();
 			history.push( {
 				path: '/wp_global_styles',
 				canvas: 'edit',
@@ -68,7 +70,8 @@ export function useCommonCommands() {
 	useCommand( {
 		name: 'core/edit-site/open-styles',
 		label: __( 'Open styles' ),
-		callback: () => {
+		callback: ( { close } ) => {
+			close();
 			history.push( {
 				path: '/wp_global_styles',
 				canvas: 'edit',
@@ -81,7 +84,8 @@ export function useCommonCommands() {
 	useCommand( {
 		name: 'core/edit-site/toggle-styles-welcome-guide',
 		label: __( 'Learn about styles' ),
-		callback: () => {
+		callback: ( { close } ) => {
+			close();
 			history.push( {
 				path: '/wp_global_styles',
 				canvas: 'edit',
