@@ -15,12 +15,10 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 
-const SYNC_TYPES = {
-	full: 'fully',
-	unsynced: 'unsynced',
-};
-
-const USER_PATTERN_CATEGORY = 'custom-patterns';
+/**
+ * Internal dependencies
+ */
+import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-library/constants';
 
 export default function CreatePatternModal( {
 	closeModal,

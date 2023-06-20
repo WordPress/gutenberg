@@ -8,15 +8,9 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { CORE_PATTERN_SOURCES } from '../page-library/constants';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-
-const CORE_PATTERN_SOURCES = [
-	'core',
-	'pattern-directory/core',
-	'pattern-directory/featured',
-	'pattern-directory/theme',
-];
 
 export default function useThemePatterns() {
 	const blockPatterns = useSelect( ( select ) => {

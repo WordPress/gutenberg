@@ -8,15 +8,13 @@ import { getQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from './constants';
 import Page from '../page';
 import PatternsList from './patterns-list';
 import useLibrarySettings from './use-library-settings';
 import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-
-const DEFAULT_TYPE = 'wp_template_part';
-const DEFAULT_CATEGORY = 'header';
 
 export default function PageLibrary() {
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );

@@ -19,12 +19,10 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-library/constants';
 import { store as editSiteStore } from '../../store';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
-
-const DEFAULT_CATEGORY = 'header';
-const DEFAULT_TYPE = 'wp_template_part';
 
 const templatePartAreaLabels = {
 	header: __( 'Headers' ),

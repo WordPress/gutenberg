@@ -9,25 +9,19 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import {
+	CORE_PATTERN_SOURCES,
+	PATTERNS,
+	SYNC_TYPES,
+	TEMPLATE_PARTS,
+	USER_PATTERNS,
+	USER_PATTERN_CATEGORY,
+} from './constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
-export const TEMPLATE_PARTS = 'wp_template_part';
-export const PATTERNS = 'pattern';
-export const USER_PATTERNS = 'wp_block';
-const USER_PATTERN_CATEGORY = 'custom-patterns';
-const CORE_PATTERN_SOURCES = [
-	'core',
-	'pattern-directory/core',
-	'pattern-directory/featured',
-	'pattern-directory/theme',
-];
-const SYNC_TYPES = {
-	full: 'fully',
-	unsynced: 'unsynced',
-};
 
 const createTemplatePartId = ( theme, slug ) =>
 	theme && slug ? theme + '//' + slug : null;
