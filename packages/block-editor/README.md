@@ -545,6 +545,18 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
+
 ### HeightControl
 
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
