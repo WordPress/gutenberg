@@ -37,6 +37,7 @@ import {
 
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import { space } from '../ui/utils/space';
 
 const noop = () => {};
 
@@ -312,6 +313,9 @@ function UnforwardedRangeControl(
 							__next40pxDefaultSize
 								? '__unstable-large'
 								: 'default'
+						}
+						__unstableInputWidth={
+							__next40pxDefaultSize ? space( 20 ) : space( 16 )
 						}
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary

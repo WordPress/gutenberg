@@ -20,7 +20,6 @@ import type {
 	WrapperProps,
 	RangeControlProps,
 } from '../types';
-import type { NumberControlProps } from '../../number-control/types';
 
 const rangeHeightValue = 30;
 const railHeight = 4;
@@ -301,28 +300,12 @@ export const Tooltip = styled.span< TooltipProps >`
 	) }
 `;
 
-const inputNumberWidth = ( {
-	size = 'default',
-}: {
-	size: Exclude< Pick< NumberControlProps, 'size' >[ 'size' ], 'small' >;
-} ) => {
-	const sizes = {
-		default: space( 16 ),
-		'__unstable-large': space( 20 ),
-	};
-
-	return css`
-		width: ${ sizes[ size ?? 'default' ] };
-	`;
-};
-
 // @todo: Refactor RangeControl with latest HStack configuration
 // @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	${ inputNumberWidth };
 
 	input[type='number']& {
 		${ rangeHeight };
