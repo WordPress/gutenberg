@@ -13,7 +13,6 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -48,16 +47,9 @@ export default function MoreMenu( { showIconLabels } ) {
 		[]
 	);
 
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
 	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
 		useDispatch( siteEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
@@ -65,9 +57,6 @@ export default function MoreMenu( { showIconLabels } ) {
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
-			if ( ! isDistractionFree && !! blocks.length ) {
-				selectBlock( blocks[ 0 ].clientId );
-			}
 		} );
 	};
 

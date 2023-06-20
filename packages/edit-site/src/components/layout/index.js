@@ -135,12 +135,12 @@ export default function Layout() {
 	}
 
 	const headerVariants = {
-		hidden:
-			isDistractionFree && isEditing ? { opacity: 0 } : { opacity: 1 },
+		hidden: { opacity: 0 },
 		hover: {
 			opacity: 1,
 			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
 		},
+		distractionFreeInactive: { opacity: 1 },
 	};
 
 	return (
@@ -163,20 +163,33 @@ export default function Layout() {
 					}
 				) }
 			>
-				{ isDistractionFree && isEditing && (
+				{ isEditing && (
 					<motion.div
 						className="edit-site-layout__header-container"
-						initial={
-							isDistractionFree && isEditing ? 'hidden' : 'hover'
-						}
-						whileHover="hover"
 						variants={ headerVariants }
+						initial={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						whileHover={
+							isDistractionFree
+								? 'hover'
+								: 'distractionFreeInactive'
+						}
+						animate={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
 						transition={ { type: 'tween', delay: 0.8 } }
 					>
-						<SiteHub
-							ref={ hubRef }
-							className="edit-site-layout__hub"
-						/>
+						<motion.div>
+							<SiteHub
+								ref={ hubRef }
+								className="edit-site-layout__hub"
+							/>
+						</motion.div>
 
 						<AnimatePresence initial={ false }>
 							{ isEditorPage && isEditing && (
@@ -206,43 +219,6 @@ export default function Layout() {
 							) }
 						</AnimatePresence>
 					</motion.div>
-				) }
-
-				{ ( ! isDistractionFree || ! isEditing ) && (
-					<>
-						<SiteHub
-							ref={ hubRef }
-							className="edit-site-layout__hub"
-						/>
-
-						<AnimatePresence initial={ false }>
-							{ isEditorPage && isEditing && (
-								<NavigableRegion
-									className="edit-site-layout__header"
-									ariaLabel={ __( 'Editor top bar' ) }
-									as={ motion.div }
-									animate={ {
-										y: 0,
-									} }
-									initial={ {
-										y: '-100%',
-									} }
-									exit={ {
-										y: '-100%',
-									} }
-									transition={ {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-								>
-									{ isEditing && <Header /> }
-								</NavigableRegion>
-							) }
-						</AnimatePresence>
-					</>
 				) }
 
 				<div className="edit-site-layout__content">
