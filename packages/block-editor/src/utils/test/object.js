@@ -1,7 +1,55 @@
 /**
  * Internal dependencies
  */
-import { setImmutably } from '../object';
+import { kebabCase, setImmutably } from '../object';
+
+describe( 'kebabCase', () => {
+	it( 'separates lowercase letters, followed by uppercase letters', () => {
+		expect( kebabCase( 'fooBar' ) ).toEqual( 'foo-bar' );
+	} );
+
+	it( 'separates numbers, followed by uppercase letters', () => {
+		expect( kebabCase( '123FOO' ) ).toEqual( '123-foo' );
+	} );
+
+	it( 'separates numbers, followed by lowercase characters', () => {
+		expect( kebabCase( '123bar' ) ).toEqual( '123-bar' );
+	} );
+
+	it( 'separates uppercase letters, followed by numbers', () => {
+		expect( kebabCase( 'FOO123' ) ).toEqual( 'foo-123' );
+	} );
+
+	it( 'separates lowercase letters, followed by numbers', () => {
+		expect( kebabCase( 'foo123' ) ).toEqual( 'foo-123' );
+	} );
+
+	it( 'separates uppercase groups from capitalized groups', () => {
+		expect( kebabCase( 'FOOBar' ) ).toEqual( 'foo-bar' );
+	} );
+
+	it( 'removes any non-dash special characters', () => {
+		expect(
+			kebabCase( 'foo±§!@#$%^&*()-_=+/?.>,<\\|{}[]`~\'";:bar' )
+		).toEqual( 'foo-bar' );
+	} );
+
+	it( 'removes any spacing characters', () => {
+		expect( kebabCase( ' foo \t \n \r \f \v bar ' ) ).toEqual( 'foo-bar' );
+	} );
+
+	it( 'groups multiple dashes into a single one', () => {
+		expect( kebabCase( 'foo---bar' ) ).toEqual( 'foo-bar' );
+	} );
+
+	it( 'returns an empty string unchanged', () => {
+		expect( kebabCase( '' ) ).toEqual( '' );
+	} );
+
+	it( 'returns an existing kebab case string unchanged', () => {
+		expect( kebabCase( 'foo-123-bar' ) ).toEqual( 'foo-123-bar' );
+	} );
+} );
 
 describe( 'setImmutably', () => {
 	describe( 'handling falsy values properly', () => {
