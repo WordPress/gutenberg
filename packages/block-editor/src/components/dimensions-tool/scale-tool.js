@@ -21,21 +21,21 @@ const DEFAULT_SCALE_OPTIONS = [
 		value: 'cover',
 		label: _x( 'Cover', 'Scale option for dimensions control' ),
 		help: __(
-			'Content is scaled and cropped to fill the entire space without being distorted.'
+			'Scale and crop to fill the space without being distorted.'
 		),
 	},
 	{
 		value: 'contain',
 		label: _x( 'Contain', 'Scale option for dimensions control' ),
 		help: __(
-			'Content is scaled to fill the space without clipping nor distorting.'
+			'Scale to fill the space without clipping or distorting.'
 		),
 	},
 	{
 		value: 'fill',
 		label: _x( 'Fill', 'Scale option for dimensions control' ),
 		help: __(
-			'Content will be stretched and distorted to completely fill the space.'
+			'Stretch and distort to fill the space.'
 		),
 	},
 ];
@@ -97,6 +97,7 @@ export default function ScaleTool( {
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
+				__nextHasNoMarginBottom
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption
