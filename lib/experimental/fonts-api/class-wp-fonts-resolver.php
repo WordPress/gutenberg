@@ -127,50 +127,6 @@ class WP_Fonts_Resolver {
 	}
 
 	/**
-	 * Add missing fonts to the global styles.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param WP_Theme_JSON_Gutenberg|WP_Theme_JSON $data The global styles.
-	 * @return WP_Theme_JSON_Gutenberg|WP_Theme_JSON The global styles with missing fonts.
-	 */
-	public static function add_missing_fonts_to_theme_json( $data ) {
-		$font_families_registered = wp_fonts()->get_registered_font_families();
-
-		$raw_data = $data->get_raw_data();
-
-		$font_families_from_theme = ! empty( $raw_data['settings']['typography']['fontFamilies']['theme'] )
-			? $raw_data['settings']['typography']['fontFamilies']['theme']
-			: array();
-
-		// Find missing fonts that are not in the theme's theme.json.
-		$to_add = array();
-		if ( ! empty( $font_families_registered ) ) {
-			$to_add = array_diff( $font_families_registered, static::get_font_families( $font_families_from_theme ) );
-		}
-
-		// Bail out early if there are no missing fonts.
-		if ( empty( $to_add ) ) {
-			return $data;
-		}
-
-		/*
-		 * Make sure the path to settings.typography.fontFamilies.theme exists
-		 * before adding missing fonts.
-		 */
-		if ( empty( $raw_data['settings'] ) ) {
-			$raw_data['settings'] = array();
-		}
-		$raw_data['settings'] = static::set_tyopgraphy_settings_array_structure( $raw_data['settings'] );
-
-		foreach ( $to_add as $font_family_handle ) {
-			$raw_data['settings']['typography']['fontFamilies']['theme'][] = wp_fonts()->to_theme_json( $font_family_handle );
-		}
-
-		return new WP_Theme_JSON_Gutenberg( $raw_data );
-	}
-
-	/**
 	 * Returns theme's settings and adds fonts defined in variations.
 	 *
 	 * @since X.X.X
@@ -213,27 +169,6 @@ class WP_Fonts_Resolver {
 		}
 
 		return $settings;
-	}
-
-	/**
-	 * Converts a list of font families into font handles and returns them as an array.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param array $families_data An array of font families data.
-	 * @return array An array containing font handles.
-	 */
-	private static function get_font_families( $families_data ) {
-		$families = array();
-		foreach ( $families_data as $family ) {
-			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $family );
-			$handle      = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
-			if ( ! empty( $handle ) ) {
-				$families[ $handle ] = true;
-			}
-		}
-
-		return ! empty( $families ) ? array_keys( $families ) : array();
 	}
 
 	/**
