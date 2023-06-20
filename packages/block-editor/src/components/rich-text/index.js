@@ -7,14 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	RawHTML,
 	useRef,
 	useCallback,
 	forwardRef,
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { children as childrenSource, getSaveElement } from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
@@ -46,6 +45,7 @@ import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
+import { Content } from './content';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -419,80 +419,10 @@ function RichTextWrapper(
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		deprecated( 'wp.blockEditor.RichText value prop as children type', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'value prop as string',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
-		} );
-
-		value = childrenSource.toHTML( value );
-	}
-
-	const MultilineTag = getMultilineTag( multiline );
-
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
-
-	const content = <RawHTML>{ value }</RawHTML>;
-
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ content }</Tag>;
-	}
-
-	return content;
-};
-
-ForwardedRichTextContainer.Content.__unstableIsRichTextContent = {};
+ForwardedRichTextContainer.Content = Content;
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
-
-function findContent( blocks, richTextValues = [] ) {
-	if ( ! Array.isArray( blocks ) ) {
-		blocks = [ blocks ];
-	}
-
-	for ( const block of blocks ) {
-		if (
-			block?.type?.__unstableIsRichTextContent ===
-			ForwardedRichTextContainer.Content.__unstableIsRichTextContent
-		) {
-			richTextValues.push( block.props.value );
-			continue;
-		}
-
-		if ( block?.props?.children ) {
-			findContent( block.props.children, richTextValues );
-		}
-	}
-
-	return richTextValues;
-}
-
-function _getSaveElement( { name, attributes, innerBlocks } ) {
-	return getSaveElement(
-		name,
-		attributes,
-		innerBlocks.map( _getSaveElement )
-	);
-}
-
-export function getRichTextValues( blocks = [] ) {
-	return findContent(
-		( Array.isArray( blocks ) ? blocks : [ blocks ] ).map( _getSaveElement )
-	);
-}
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
