@@ -10,12 +10,10 @@
 	"icon": "feedback",
 	"attributes": {
 		"action": {
-			"type": "string",
-			"default": "#"
+			"type": "string"
 		},
 		"method": {
-			"type": "string",
-			"default": "post"
+			"type": "string"
 		},
 		"formId": {
 			"type": "string",
