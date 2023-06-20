@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useId } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -158,39 +158,13 @@ export default function PageStatus( {
 								className={ 'components-radio-control' }
 							>
 								<VStack spacing={ 3 }>
-									{ STATUS_OPTIONS.map( ( option, index ) => (
-										<div
+									{ STATUS_OPTIONS.map( ( option ) => (
+										<RadioWithHelp
 											key={ option.value }
-											className="components-radio-control__option with-hint"
-										>
-											<input
-												id={ `edit-site-change-status__status-${ index }` }
-												className="components-radio-control__input"
-												type="radio"
-												name={ `edit-site-change-status__status` }
-												value={ option.value }
-												onChange={ ( e ) =>
-													handleStatus(
-														e.target.value
-													)
-												}
-												checked={
-													option.value === status
-												}
-											/>
-											<VStack spacing={ 1 }>
-												<label
-													htmlFor={ `edit-site-change-status__status-${ index }` }
-												>
-													{ option.label }
-												</label>
-												{ option.hint && (
-													<Text variant="muted">
-														{ option.hint }
-													</Text>
-												) }
-											</VStack>
-										</div>
+											option={ option }
+											checked={ option.value === status }
+											onChange={ handleStatus }
+										/>
 									) ) }
 								</VStack>
 							</BaseControl>
@@ -228,3 +202,30 @@ export default function PageStatus( {
 		</HStack>
 	);
 }
+
+const RadioWithHelp = ( { option, onChange, checked } ) => {
+	const id = useId();
+
+	return (
+		<div
+			key={ option.value }
+			className="components-radio-control__option with-hint"
+		>
+			<input
+				id={ `${ id }-${ option.value }` }
+				className="components-radio-control__input"
+				type="radio"
+				name={ `edit-site-change-status__status` }
+				value={ option.value }
+				onChange={ ( e ) => onChange( e.target.value ) }
+				checked={ checked }
+			/>
+			<VStack spacing={ 1 }>
+				<label htmlFor={ `${ id }-${ option.value }` }>
+					{ option.label }
+				</label>
+				{ option.hint && <Text variant="muted">{ option.hint }</Text> }
+			</VStack>
+		</div>
+	);
+};
