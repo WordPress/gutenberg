@@ -66,8 +66,11 @@ export function BlockRemovalWarningModal() {
 
 	// Signalling the removal prompt is in place.
 	useEffect( () => {
-		removalPromptExists();
-	}, [] );
+		removalPromptExists( true );
+		return () => {
+			removalPromptExists( false );
+		};
+	}, [ removalPromptExists ] );
 
 	const { getBlockType } = useSelect( blocksStore );
 

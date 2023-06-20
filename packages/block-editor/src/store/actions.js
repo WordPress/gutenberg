@@ -1257,14 +1257,15 @@ export function displayRemovalPrompt( displayPrompt, options = {} ) {
 }
 
 /**
- * Returns an action object used in signalling that a removal prompt display mechanism is available.
+ * Returns an action object used in signalling that a removal prompt display mechanism is available or unavailable.
  *
+ * @param {boolean} exists Whether a prompt display mechanism exists.
  * @return {Object} Action object.
  */
-
-export function removalPromptExists() {
+export function removalPromptExists( exists = true ) {
 	return {
 		type: 'PROMPT_EXISTS',
+		exists,
 	};
 }
 

@@ -1359,7 +1359,11 @@ _Returns_
 
 ### removalPromptExists
 
-Returns an action object used in signalling that a removal prompt display mechanism is available.
+Returns an action object used in signalling that a removal prompt display mechanism is available or unavailable.
+
+_Parameters_
+
+-   _exists_ `boolean`: Whether a prompt display mechanism exists.
 
 _Returns_
 
