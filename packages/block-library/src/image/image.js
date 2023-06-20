@@ -553,16 +553,16 @@ export default function Image( {
 	const fallbackClientWidth = imageRef.current?.width || clientWidth;
 
 	// TODO: Remove this once we have a better solution for the ImageEditor.
-	const pxWidth = width && parseInt( width, 10 );
-	const pxHeight = height && parseInt( height, 10 );
+	const pxWidth = width && parseFloat( width );
+	const pxHeight = height && parseFloat( height );
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
 				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
+				width={ pxWidth }
+				height={ pxHeight }
 				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
@@ -644,10 +644,17 @@ export default function Image( {
 		// TODO: Figure out why height depended on having a custom border.
 		img = (
 			<ResizableBox
-				style={ { display: 'block', objectFit: scale } }
+				style={ {
+					display: 'block',
+					objectFit: scale,
+					aspectRatio:
+						isAutoWidth && isAutoHeight && aspectRatio
+							? aspectRatio
+							: undefined,
+				} }
 				size={ {
-					width: currentWidth,
-					height: currentHeight,
+					width: currentWidth ?? 'auto',
+					height: currentHeight ?? 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
@@ -662,17 +669,14 @@ export default function Image( {
 					left: showLeftHandle,
 				} }
 				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
+				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+					// TODO: elt.offsetWidth seemed to be more reliable than
+					// calculating off the delta. Is there any reason that the
+					// delta was used before that I don't know about?
 					setAttributes( {
-						width: `${ parseInt(
-							currentWidth + delta.width,
-							10
-						) }px`,
-						height: `${ parseInt(
-							currentHeight + delta.height,
-							10
-						) }px`,
+						width: `${ elt.offsetWidth }px`,
+						height: `${ elt.offsetHeight }px`,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
