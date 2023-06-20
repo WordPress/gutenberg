@@ -10,10 +10,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	TextControl,
+	RadioControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { useState, useMemo, useId } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -24,29 +25,55 @@ import StatusLabel from '../../sidebar-navigation-screen-page/status-label';
 
 const STATUS_OPTIONS = [
 	{
-		label: __( 'Draft' ),
+		label: (
+			<>
+				{ __( 'Draft' ) }
+				<Text variant="muted">{ __( 'Not ready to publish.' ) }</Text>
+			</>
+		),
 		value: 'draft',
-		hint: __( 'Not ready to publish.' ),
 	},
 	{
-		label: __( 'Pending' ),
+		label: (
+			<>
+				{ __( 'Pending' ) }
+				<Text variant="muted">
+					{ __( 'Waiting for review before publishing.' ) }
+				</Text>
+			</>
+		),
 		value: 'pending',
-		hint: __( 'Waiting for review before publishing.' ),
 	},
 	{
-		label: __( 'Private' ),
+		label: (
+			<>
+				{ __( 'Private' ) }
+				<Text variant="muted">
+					{ __( 'Only visible to site admins and editors.' ) }
+				</Text>
+			</>
+		),
 		value: 'private',
-		hint: __( 'Only visible to site admins and editors.' ),
 	},
 	{
-		label: __( 'Scheduled' ),
+		label: (
+			<>
+				{ __( 'Scheduled' ) }
+				<Text variant="muted">
+					{ __( 'Publish automatically on a chosen date.' ) }
+				</Text>
+			</>
+		),
 		value: 'future',
-		hint: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
-		label: __( 'Published' ),
+		label: (
+			<>
+				{ __( 'Published' ) }
+				<Text variant="muted">{ __( 'Visible to everyone.' ) }</Text>
+			</>
+		),
 		value: 'publish',
-		hint: __( 'Visible to everyone.' ),
 	},
 ];
 
@@ -107,6 +134,7 @@ export default function PageStatus( {
 
 	const handleStatus = ( value ) => {
 		let newDate = date;
+		let newPassword = password;
 		if ( value === 'publish' ) {
 			if ( new Date( date ) > new Date() ) {
 				newDate = null;
@@ -116,10 +144,14 @@ export default function PageStatus( {
 				newDate = new Date();
 				newDate.setDate( newDate.getDate() + 7 );
 			}
+		} else if ( value === 'private' && password ) {
+			setShowPassword( false );
+			newPassword = '';
 		}
 		saveStatus( {
 			status: value,
 			date: newDate,
+			password: newPassword,
 		} );
 	};
 
@@ -151,50 +183,45 @@ export default function PageStatus( {
 							onClose={ onClose }
 						/>
 						<VStack spacing={ 5 }>
-							<BaseControl
+							<RadioControl
+								className="edit-site-change-status__options"
 								hideLabelFromVision
 								label={ __( 'Status' ) }
-								id={ `edit-site-change-status__status` }
-								className={ 'components-radio-control' }
-							>
-								<VStack spacing={ 3 }>
-									{ STATUS_OPTIONS.map( ( option ) => (
-										<RadioWithHelp
-											key={ option.value }
-											option={ option }
-											checked={ option.value === status }
-											onChange={ handleStatus }
-										/>
-									) ) }
-								</VStack>
-							</BaseControl>
-							<BaseControl
-								id={ `edit-site-change-status__password` }
-								label={ __( 'Password' ) }
-							>
-								<ToggleControl
-									label={ __(
-										'Hide this page behind a password'
-									) }
-									checked={ showPassword }
-									onChange={ handleTogglePassword }
-								/>
-								{ showPassword && (
-									<TextControl
-										onChange={ ( value ) =>
-											saveStatus( { password: value } )
-										}
-										value={ password }
-										/* eslint-disable jsx-a11y/no-autofocus */
-										autoFocus={ ! password }
-										/* eslint-enable jsx-a11y/no-autofocus */
-										placeholder={ __(
-											'Enter a secure password'
+								options={ STATUS_OPTIONS }
+								onChange={ handleStatus }
+								selected={ status }
+							/>
+							{ status !== 'private' && (
+								<BaseControl
+									id={ `edit-site-change-status__password` }
+									label={ __( 'Password' ) }
+								>
+									<ToggleControl
+										label={ __(
+											'Hide this page behind a password'
 										) }
-										type="password"
+										checked={ showPassword }
+										onChange={ handleTogglePassword }
 									/>
-								) }
-							</BaseControl>
+									{ showPassword && (
+										<TextControl
+											onChange={ ( value ) =>
+												saveStatus( {
+													password: value,
+												} )
+											}
+											value={ password }
+											/* eslint-disable jsx-a11y/no-autofocus */
+											autoFocus={ ! password }
+											/* eslint-enable jsx-a11y/no-autofocus */
+											placeholder={ __(
+												'Enter a secure password'
+											) }
+											type="password"
+										/>
+									) }
+								</BaseControl>
+							) }
 						</VStack>
 					</>
 				) }
@@ -202,30 +229,3 @@ export default function PageStatus( {
 		</HStack>
 	);
 }
-
-const RadioWithHelp = ( { option, onChange, checked } ) => {
-	const id = useId();
-
-	return (
-		<div
-			key={ option.value }
-			className="components-radio-control__option with-hint"
-		>
-			<input
-				id={ `${ id }-${ option.value }` }
-				className="components-radio-control__input"
-				type="radio"
-				name={ `edit-site-change-status__status` }
-				value={ option.value }
-				onChange={ ( e ) => onChange( e.target.value ) }
-				checked={ checked }
-			/>
-			<VStack spacing={ 1 }>
-				<label htmlFor={ `${ id }-${ option.value }` }>
-					{ option.label }
-				</label>
-				{ option.hint && <Text variant="muted">{ option.hint }</Text> }
-			</VStack>
-		</div>
-	);
-};

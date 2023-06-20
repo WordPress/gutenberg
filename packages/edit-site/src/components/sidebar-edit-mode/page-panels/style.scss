@@ -14,10 +14,16 @@
 		min-width: 320px;
 		padding: $grid-unit-20;
 	}
-	.components-radio-control__option.with-hint {
-		display: flex;
-		gap: $grid-unit-10;
-		align-items: center;
+	.edit-site-change-status__options {
+		.components-base-control__field > .components-v-stack {
+			gap: $grid-unit-10;
+		}
+		label {
+			.components-text {
+				display: block;
+				margin-left: $radio-input-size + $grid-unit-05;
+			}
+		}
 	}
 }
 
