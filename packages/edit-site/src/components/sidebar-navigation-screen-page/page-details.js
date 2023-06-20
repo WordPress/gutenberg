@@ -42,7 +42,11 @@ function getPageDetails( page ) {
 		},
 		{
 			label: __( 'Slug' ),
-			value: <Truncate numberOfLines={ 1 }>{ page.slug }</Truncate>,
+			value: (
+				<Truncate numberOfLines={ 1 }>
+					{ decodeURI( page.slug ) }
+				</Truncate>
+			),
 		},
 	];
 

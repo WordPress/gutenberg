@@ -90,7 +90,9 @@ export default function SidebarNavigationScreenPage() {
 					className="edit-site-sidebar-navigation-screen__page-link"
 					href={ record.link }
 				>
-					{ record.link.replace( /^(https?:\/\/)?/, '' ) }
+					{ decodeURI(
+						record.link.replace( /^(https?:\/\/)?/, '' )
+					) }
 				</ExternalLink>
 			}
 			content={
