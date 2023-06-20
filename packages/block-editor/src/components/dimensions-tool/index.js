@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
 
 /**
@@ -50,7 +51,7 @@ import WidthHeightTool from './width-height-tool';
  *
  * @return {WPElement} The dimensions controls.
  */
-function DimensionsControls( {
+function DimensionsTool( {
 	panelId,
 	value = {},
 	onChange = () => {},
@@ -71,6 +72,8 @@ function DimensionsControls( {
 		],
 	} );
 	const units = unitsOptions ?? customUnits;
+
+	const [ lastScale, setLastScale ] = useState( value.scale );
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
@@ -145,8 +148,9 @@ function DimensionsControls( {
 					panelId={ panelId }
 					options={ scaleOptions }
 					defaultValue="cover"
-					value={ value.scale }
+					value={ lastScale }
 					onChange={ ( nextScale ) => {
+						setLastScale( nextScale );
 						onChange( { ...value, scale: nextScale } );
 					} }
 				/>
@@ -167,14 +171,14 @@ function DimensionsControls( {
 						nextValue.height !== undefined
 					) {
 						delete nextValue.aspectRatio;
+					}
 
-						// Set the value to 'cover' since CSS uses 'fill' by default.
-						if (
-							nextValue.scale === null ||
-							nextValue.scale === undefined
-						) {
-							nextValue.scale = 'cover';
-						}
+					// Set the value to 'cover' since CSS uses 'fill' by default.
+					if (
+						nextValue.scale === null ||
+						nextValue.scale === undefined
+					) {
+						nextValue.scale = lastScale ?? 'cover';
 					}
 
 					onChange( nextValue );
@@ -184,4 +188,4 @@ function DimensionsControls( {
 	);
 }
 
-export default DimensionsControls;
+export default DimensionsTool;
