@@ -29,7 +29,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
-import { cloneBlock } from '@wordpress/blocks';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -55,24 +54,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
 
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
-
-	if (
-		hasResolved &&
-		record?.meta?.sync_status === 'unsynced' &&
-		blocks.length > 0
-	) {
-		replaceBlocks(
-			clientId,
-			blocks.map( ( block ) => cloneBlock( block ) )
-		);
-	}
 
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
