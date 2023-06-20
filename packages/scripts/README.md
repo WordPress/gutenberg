@@ -387,6 +387,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-	`--no-watch` – Starts the build for development without starting the watcher.
 
 #### Advanced information
 
