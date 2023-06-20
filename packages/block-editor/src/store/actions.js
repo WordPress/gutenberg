@@ -26,6 +26,7 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
 import { __experimentalUpdateSettings } from './private-actions';
+import { blockTypePromptMessages } from '../utils/block-removal';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1188,15 +1189,19 @@ export const mergeBlocks =
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
- * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block
- *                                         or the immediate parent
- *                                         (if no previous block exists)
- *                                         should be selected
- *                                         when a block is removed.
+ * @param {string|string[]} clientIds             Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious        True if the previous block
+ *                                                or the immediate parent
+ *                                                (if no previous block exists)
+ *                                                should be selected
+ *                                                when a block is removed.
+ * @param {Object}          [options]
+ * @param {boolean}         [options.forceRemove] Whether to force the operation,
+ *                                                bypassing any checks for certain
+ *                                                block types.
  */
 export const removeBlocks =
-	( clientIds, selectPrevious = true ) =>
+	( clientIds, selectPrevious = true, options = {} ) =>
 	( { select, dispatch } ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
@@ -1211,6 +1216,33 @@ export const removeBlocks =
 
 		if ( ! canRemoveBlocks ) {
 			return;
+		}
+
+		if ( ! options.forceRemove && select.removalPromptExists() ) {
+			const blocksForPrompt = new Set();
+
+			const queue = [ ...clientIds ];
+			while ( queue.length ) {
+				const clientId = queue.shift();
+				const blockName = select.getBlockName( clientId );
+				if ( blockTypePromptMessages[ blockName ] ) {
+					blocksForPrompt.add( blockName );
+				}
+				const innerBlocks = select.getBlockOrder( clientId );
+				queue.push( ...innerBlocks );
+			}
+
+			if ( blocksForPrompt.size ) {
+				dispatch.displayRemovalPrompt( true, {
+					removalFunction() {
+						dispatch.removeBlocks( clientIds, selectPrevious, {
+							forceRemove: true,
+						} );
+					},
+					blocksToPromptFor: Array.from( blocksForPrompt ),
+				} );
+				return;
+			}
 		}
 
 		if ( selectPrevious ) {

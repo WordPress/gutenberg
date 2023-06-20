@@ -15,7 +15,7 @@ import {
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -28,7 +28,6 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
-import { useBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 function ListViewBlockSelectButton(
 	{
@@ -59,9 +58,9 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
-
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 
@@ -72,8 +71,6 @@ function ListViewBlockSelectButton(
 				blockInformation.positionLabel
 		  )
 		: '';
-
-	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -119,7 +116,7 @@ function ListViewBlockSelectButton(
 				// fallback to focus the parent block.
 				firstBlockRootClientId;
 
-			removeBlocksWithOptionalWarning( blocksToDelete, false );
+			removeBlocks( blocksToDelete, false );
 
 			// Update the selection if the original selection has been removed.
 			const shouldUpdateSelection =

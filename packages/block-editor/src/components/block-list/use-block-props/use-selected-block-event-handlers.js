@@ -10,7 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-import { useBlockRemovalWarning } from '../../../utils/show-block-removal-warning';
 
 /**
  * Adds block behaviour:
@@ -28,8 +27,6 @@ export function useEventHandlers( clientId ) {
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
 	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
-
-	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
 
 	return useRefEffect(
 		( node ) => {
@@ -70,7 +67,7 @@ export function useEventHandlers( clientId ) {
 						getBlockIndex( clientId ) + 1
 					);
 				} else {
-					removeBlocksWithOptionalWarning( [ clientId ] );
+					removeBlock( clientId );
 				}
 			}
 

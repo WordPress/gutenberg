@@ -10,7 +10,6 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 /**
  * Handles input for selections across blocks.
@@ -25,11 +24,10 @@ export default function useInput() {
 	const {
 		replaceBlocks,
 		__unstableSplitSelection,
+		removeBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 	} = useDispatch( blockEditorStore );
-
-	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
@@ -68,9 +66,7 @@ export default function useInput() {
 				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
-					removeBlocksWithOptionalWarning(
-						getSelectedBlockClientIds()
-					);
+					removeBlocks( getSelectedBlockClientIds() );
 				} else if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {

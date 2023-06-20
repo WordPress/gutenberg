@@ -14,7 +14,6 @@ import {
 import { useNotifyCopy } from '../copy-handler';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
-import { useBlockRemovalWarning } from '../../utils/show-block-removal-warning';
 
 export default function BlockActions( {
 	clientIds,
@@ -59,6 +58,7 @@ export default function BlockActions( {
 	const canRemove = canRemoveBlocks( clientIds, rootClientId );
 
 	const {
+		removeBlocks,
 		replaceBlocks,
 		duplicateBlocks,
 		insertAfterBlock,
@@ -72,8 +72,6 @@ export default function BlockActions( {
 	const notifyCopy = useNotifyCopy();
 	const pasteStyles = usePasteStyles();
 
-	const removeBlocksWithOptionalWarning = useBlockRemovalWarning();
-
 	return children( {
 		canCopyStyles,
 		canDuplicate,
@@ -86,7 +84,7 @@ export default function BlockActions( {
 			return duplicateBlocks( clientIds, updateSelection );
 		},
 		onRemove() {
-			removeBlocksWithOptionalWarning( clientIds, updateSelection );
+			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
 			const clientId = Array.isArray( clientIds )
