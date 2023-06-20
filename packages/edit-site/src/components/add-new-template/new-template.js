@@ -101,19 +101,21 @@ function TemplateListItem( { title, className, description, icon, onClick } ) {
 				style={ { width: '100%' } }
 			>
 				<Icon icon={ icon } />
-				<Text
-					weight={ 500 }
-					lineHeight={ 1.53846153846 } // 20px
-				>
-					{ title }
-				</Text>
-				{ description && (
+				<VStack alignment="center" spacing={ 0 }>
 					<Text
+						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
-						{ description }
+						{ title }
 					</Text>
-				) }
+					{ description && (
+						<Text
+							lineHeight={ 1.53846153846 } // 20px
+						>
+							{ description }
+						</Text>
+					) }
+				</VStack>
 			</VStack>
 		</Button>
 	);
