@@ -54,7 +54,7 @@ function getPageDetails( page ) {
 	if ( page?.parentTitle ) {
 		details.push( {
 			label: __( 'Parent' ),
-			value: decodeEntities( page?.parentTitle || __( '(no title)' ) ),
+			value: decodeEntities( page.parentTitle || __( '(no title)' ) ),
 		} );
 	}
 
