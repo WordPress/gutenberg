@@ -23,11 +23,11 @@ export default {
 
 const EMPTY_OBJECT = {};
 
-export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
+export const Default = ( { panelId, onChange, ...props } ) => {
 	const [ value, setValue ] = useState( EMPTY_OBJECT );
 	const resetAll = () => {
 		setValue( EMPTY_OBJECT );
-		onChangeProp( EMPTY_OBJECT );
+		onChange( EMPTY_OBJECT );
 	};
 	return (
 		<Panel>
@@ -40,7 +40,7 @@ export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
 					panelId={ panelId }
 					onChange={ ( nextValue ) => {
 						setValue( nextValue );
-						onChangeProp( nextValue );
+						onChange( nextValue );
 					} }
 					value={ value }
 					{ ...props }
