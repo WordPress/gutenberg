@@ -74,7 +74,7 @@ function gutenberg_load_remote_block_patterns( $deprecated = null ) {
 		$patterns = $response->get_data();
 
 		foreach ( $patterns as $pattern ) {
-			$pattern['source']  = 'core'; // Added in 6.3.0.
+			$pattern['source']  = 'pattern-directory/core'; // Added in 6.3.0.
 			$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
 			$pattern_name       = 'core/' . sanitize_title( $normalized_pattern['title'] );
 			register_block_pattern( $pattern_name, (array) $normalized_pattern );
@@ -109,7 +109,7 @@ function gutenberg_load_remote_featured_patterns() {
 	$patterns = $response->get_data();
 	$registry = WP_Block_Patterns_Registry::get_instance();
 	foreach ( $patterns as $pattern ) {
-		$pattern['source']  = 'core'; // Added in 6.3.0.
+		$pattern['source']  = 'pattern-directory/featured'; // Added in 6.3.0.
 		$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
 		$pattern_name       = sanitize_title( $normalized_pattern['title'] );
 		// Some patterns might be already registered as core patterns with the `core` prefix.
@@ -153,7 +153,7 @@ function gutenberg_register_remote_theme_patterns() {
 	$patterns          = $response->get_data();
 	$patterns_registry = WP_Block_Patterns_Registry::get_instance();
 	foreach ( $patterns as $pattern ) {
-		$pattern['source']  = 'core'; // Added in 6.3.0.
+		$pattern['source']  = 'pattern-directory/theme'; // Added in 6.3.0.
 		$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
 		$pattern_name       = sanitize_title( $normalized_pattern['title'] );
 		// Some patterns might be already registered as core patterns with the `core` prefix.
