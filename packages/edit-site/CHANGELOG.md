@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+-   Site editor sidebar: add home template details and controls [#51223](https://github.com/WordPress/gutenberg/pull/51223).
+
 ## 5.12.0 (2023-06-07)
 
 ## 5.11.0 (2023-05-24)

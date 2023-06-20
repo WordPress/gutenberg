@@ -97,3 +97,25 @@
 	border-top: 1px solid $gray-800;
 }
 
+/* In general style overrides are discouraged.
+ * This is a temporary solution to override the InputControl component's styles.
+ * The `Theme` component will potentially be the more appropriate approach
+ * once that component is stabilized.
+ * See: packages/components/src/theme
+ */
+.edit-site-sidebar-navigation-screen__input-control {
+	width: 100%;
+	.components-input-control__container {
+		background: transparent;
+	}
+	.components-input-control__input {
+		color: $gray-200 !important;
+		background: $gray-800 !important;
+	}
+	.components-input-control__backdrop {
+		border: 4px !important;
+	}
+	.components-base-control__help {
+		color: $gray-600;
+	}
+}

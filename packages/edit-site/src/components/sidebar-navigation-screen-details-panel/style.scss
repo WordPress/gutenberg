@@ -1,0 +1,25 @@
+.edit-site-sidebar-navigation-details-screen-panel {
+	margin-bottom: $grid-unit-30;
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+
+	.edit-site-sidebar-navigation-details-screen-panel__heading {
+		color: $gray-400;
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+		padding: 0;
+		margin-bottom: 0;
+	}
+}
+
+.edit-site-sidebar-navigation-details-screen-panel__label.edit-site-sidebar-navigation-details-screen-panel__label {
+	color: $gray-600;
+	width: 100px;
+}
+
+.edit-site-sidebar-navigation-details-screen-panel__value.edit-site-sidebar-navigation-details-screen-panel__value {
+	color: $gray-200;
+}
