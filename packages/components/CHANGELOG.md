@@ -15,6 +15,7 @@
 ### Internal
 
 -   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
+-   `Toolbar`: Replace `reakit` dependency with `@ariakit/react` ([#51623](https://github.com/WordPress/gutenberg/pull/51623)).
 
 ## 25.1.0 (2023-06-07)
 
