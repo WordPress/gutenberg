@@ -34,7 +34,12 @@ function normalizePath( path ) {
  * @return {string} Kebab-cased string
  */
 export function kebabCase( str ) {
-	return paramCase( str, {
+	let input = str;
+	if ( typeof str !== 'string' ) {
+		input = str?.toString?.() ?? '';
+	}
+
+	return paramCase( input, {
 		splitRegexp: [
 			/([a-z0-9])([A-Z])/g, // fooBar => foo-bar, 3Bar => 3-bar
 			/([0-9])([a-z])/g, // 3bar => 3-bar

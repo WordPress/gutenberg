@@ -49,6 +49,17 @@ describe( 'kebabCase', () => {
 	it( 'returns an existing kebab case string unchanged', () => {
 		expect( kebabCase( 'foo-123-bar' ) ).toEqual( 'foo-123-bar' );
 	} );
+
+	it( 'returns an empty string if any nullish type is passed', () => {
+		expect( kebabCase( undefined ) ).toEqual( '' );
+		expect( kebabCase( null ) ).toEqual( '' );
+	} );
+
+	it( 'converts any unexpected non-nullish type to a string', () => {
+		expect( kebabCase( 12345 ) ).toEqual( '12345' );
+		expect( kebabCase( [] ) ).toEqual( '' );
+		expect( kebabCase( {} ) ).toEqual( 'object-object' );
+	} );
 } );
 
 describe( 'setImmutably', () => {
