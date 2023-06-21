@@ -86,6 +86,9 @@ function BehaviorsControl( {
 		return '';
 	};
 
+	const shouldShowAnimationSelector =
+		value() !== 'default' && behaviors?.lightbox.enabled;
+
 	return (
 		<InspectorControls group="advanced">
 			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
@@ -101,7 +104,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ behaviors?.lightbox.enabled && (
+				{ shouldShowAnimationSelector && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
