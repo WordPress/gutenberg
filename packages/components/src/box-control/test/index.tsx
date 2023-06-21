@@ -282,21 +282,25 @@ describe( 'BoxControl', () => {
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
 			const user = userEvent.setup();
-			const setState = jest.fn();
+			const onChangeSpy = jest.fn();
 
-			render( <BoxControl onChange={ setState } /> );
+			render( <BoxControl onChange={ onChangeSpy } /> );
 
-			// Typing the first letter of a unit blurs the input.
-			await user.type(
-				screen.getByRole( 'textbox', {
-					name: 'Box Control',
-				} ),
-				'7r'
-			);
+			const valueInput = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Typing the first letter of a unit blurs the input and focuses the combobox.
+			await user.type( valueInput, '7r' );
+
+			expect( unitSelect ).toHaveFocus();
 
 			// Due to the test environment not being a browser the units here
 			// are still "px". In a browser they would be expected to be "rem".
-			expect( setState ).toHaveBeenLastCalledWith( {
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
 				top: '7px',
 				right: '7px',
 				bottom: '7px',
