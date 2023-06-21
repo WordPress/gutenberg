@@ -534,7 +534,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
                 $new_font['fontFace'] = $new_font_faces;
             }
 
-            // If the font face assets were succesfully downloaded, we add the font to the new fonts array
+            // If the font face assets were successfully downloaded, we add the font to the new fonts array.
             // Fonts without no font faces successfully downloaded are not added to the new fonts array
             if ( ! empty ( $new_font['fontFace'] ) ){
                 $new_fonts[] = $new_font;
