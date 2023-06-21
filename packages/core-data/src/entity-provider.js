@@ -17,8 +17,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { STORE_NAME } from './name';
 import { unlock } from './private-apis';
 
-const { getRichTextValues } = unlock( blockEditorPrivateApis );
-
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
 const EMPTY_ARRAY = [];
@@ -198,6 +196,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			// If meta.footnotes is empty, it means the meta is not registered.
 			if ( meta.footnotes === undefined ) return;
 
+			const { getRichTextValues } = unlock( blockEditorPrivateApis );
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
 			const newOrder = [];
 
