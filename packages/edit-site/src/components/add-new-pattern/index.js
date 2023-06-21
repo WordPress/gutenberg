@@ -58,12 +58,12 @@ export default function AddNewPattern() {
 					{
 						icon: header,
 						onClick: () => setShowTemplatePartModal( true ),
-						title: 'Create a template part',
+						title: __( 'Create a template part' ),
 					},
 					{
 						icon: file,
 						onClick: () => setShowPatternModal( true ),
-						title: 'Create a pattern',
+						title: __( 'Create a pattern' ),
 					},
 				] }
 				icon={
@@ -72,7 +72,7 @@ export default function AddNewPattern() {
 						label={ __( 'Create a pattern' ) }
 					/>
 				}
-				label="Create a pattern."
+				label={ __( 'Create a pattern.' ) }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal
