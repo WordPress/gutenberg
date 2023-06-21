@@ -39,6 +39,61 @@ class GutenbergViewController: UIViewController {
     @objc func saveButtonPressed(sender: UIBarButtonItem) {
         gutenberg.requestHTML()
     }
+    
+    lazy var undoButton: UIButton = {
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        let undoImage = UIImage(systemName: "arrow.uturn.backward")?.withConfiguration(symbolConfiguration)
+
+        let button = UIButton(type: .system)
+        button.setImage(undoImage, for: .normal)
+        button.accessibilityIdentifier = "editor-undo-button"
+        button.accessibilityHint = "Double tap to undo last change"
+        button.addTarget(self, action: #selector(undoButtonPressed(sender:)), for: .touchUpInside)
+        button.sizeToFit()
+        button.alpha = 0.3
+        button.isUserInteractionEnabled = false
+        return button
+    }()
+    
+    lazy var redoButton: UIButton = {
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        let redoImage = UIImage(systemName: "arrow.uturn.forward")?.withConfiguration(symbolConfiguration)
+
+        let button = UIButton(type: .system)
+        button.setImage(redoImage, for: .normal)
+        button.accessibilityIdentifier = "editor-redo-button"
+        button.accessibilityHint = "Double tap to redo last change"
+        button.addTarget(self, action: #selector(redoButtonPressed(sender:)), for: .touchUpInside)
+        button.sizeToFit()
+        button.alpha = 0.3
+        button.isUserInteractionEnabled = false
+        return button
+    }()
+    
+    lazy var moreButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("...", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.titleLabel?.minimumScaleFactor = 0.5
+        button.titleLabel?.lineBreakMode = .byTruncatingTail
+        button.accessibilityIdentifier = "editor-menu-button"
+        button.addTarget(self, action: #selector(moreButtonPressed(sender:)), for: .touchUpInside)
+        button.sizeToFit()
+
+        let spacing: CGFloat = 2.0
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing, bottom: 10, right: 0)
+        return button
+    }()
+
+    
+    @objc func undoButtonPressed(sender: UIBarButtonItem) {
+        self.onUndoPressed()
+    }
+    
+    @objc func redoButtonPressed(sender: UIBarButtonItem) {
+        self.onRedoPressed()
+    }
 
     func registerLongPressGestureRecognizer() {
         longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -272,6 +327,24 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
         print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
     }
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool) -> Void {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.2) {
+                self.undoButton.isUserInteractionEnabled = isDisabled ? false : true
+                self.undoButton.alpha = isDisabled ? 0.3 : 1.0
+            }
+        }
+    }
+   
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool) -> Void {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.2) {
+                self.redoButton.isUserInteractionEnabled = isDisabled ? false : true
+                self.redoButton.alpha = isDisabled ? 0.3 : 1.0
+            }
+        }
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -362,7 +435,7 @@ extension GutenbergViewController {
 
     func configureNavigationBar() {
         addSaveButton()
-        addMoreButton()
+        addRightButtons()
     }
 
     func addSaveButton() {
@@ -371,11 +444,12 @@ extension GutenbergViewController {
                                                            action: #selector(saveButtonPressed(sender:)))
     }
 
-    func addMoreButton() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "...",
-                                                            style: .plain,
-                                                            target: self,
-                                                            action: #selector(moreButtonPressed(sender:)))
+    func addRightButtons() {
+        let undoButton = UIBarButtonItem(customView: self.undoButton)
+        let redoButton = UIBarButtonItem(customView: self.redoButton)
+        let moreButton = UIBarButtonItem(customView: self.moreButton)
+        
+        navigationItem.rightBarButtonItems = [moreButton, redoButton, undoButton]
     }
 }
 
@@ -459,11 +533,23 @@ extension GutenbergViewController {
     }
 
     func toggleHTMLMode(_ action: UIAlertAction) {
+        if !htmlMode {
+            self.gutenbergDidRequestToggleUndoButton(true)
+            self.gutenbergDidRequestToggleRedoButton(true)
+        }
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
     }
     
     func showEditorHelp() {
         gutenberg.showEditorHelp()
+    }
+    
+    func onUndoPressed() {
+        gutenberg.onUndoPressed()
+    }
+    
+    func onRedoPressed() {
+        gutenberg.onRedoPressed()
     }
 }

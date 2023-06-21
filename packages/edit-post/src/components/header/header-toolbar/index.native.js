@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useState, useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -17,12 +17,14 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import {
-	keyboardClose,
-	undo as undoIcon,
-	redo as redoIcon,
-} from '@wordpress/icons';
+import { keyboardClose } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
+import {
+	toggleUndoButton,
+	toggleRedoButton,
+	subscribeOnUndoPressed,
+	subscribeOnRedoPressed,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -45,6 +47,24 @@ function HeaderToolbar( {
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 
+	useEffect( () => {
+		const onUndoSubscription = subscribeOnUndoPressed( undo );
+		const onRedoSubscription = subscribeOnRedoPressed( redo );
+
+		return () => {
+			onUndoSubscription?.remove();
+			onRedoSubscription?.remove();
+		};
+	}, [ undo, redo ] );
+
+	useEffect( () => {
+		toggleUndoButton( ! hasUndo );
+	}, [ hasUndo ] );
+
+	useEffect( () => {
+		toggleRedoButton( ! hasRedo );
+	}, [ hasRedo ] );
+
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
@@ -54,33 +74,6 @@ function HeaderToolbar( {
 		} else {
 			scrollViewRef.current.scrollTo( { x: 0 } );
 		}
-	};
-	const renderHistoryButtons = () => {
-		const buttons = [
-			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
-			<ToolbarButton
-				key="undoButton"
-				title={ __( 'Undo' ) }
-				icon={ ! isRTL ? undoIcon : redoIcon }
-				isDisabled={ ! hasUndo }
-				onClick={ undo }
-				extraProps={ {
-					hint: __( 'Double tap to undo last change' ),
-				} }
-			/>,
-			<ToolbarButton
-				key="redoButton"
-				title={ __( 'Redo' ) }
-				icon={ ! isRTL ? redoIcon : undoIcon }
-				isDisabled={ ! hasRedo }
-				onClick={ redo }
-				extraProps={ {
-					hint: __( 'Double tap to redo last change' ),
-				} }
-			/>,
-		];
-
-		return isRTL ? buttons.reverse() : buttons;
 	};
 
 	const onToggleInserter = useCallback(
@@ -131,7 +124,6 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
-				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (

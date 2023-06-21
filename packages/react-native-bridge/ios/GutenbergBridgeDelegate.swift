@@ -279,6 +279,10 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     /// Tells the delegate the editor requested sending an event
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
+    
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
