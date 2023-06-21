@@ -460,7 +460,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $new_fonts = $this->download_or_move_fonts( $fonts_to_install, $files );
 
         if ( ! empty ( $new_fonts )  ){
-            // Updates the fonts library with the new fonts succesfully downloaded
+            // Updates the fonts library with the new successfully downloaded fonts.
             $new_library_fonts = $this->merge_fonts( $font_families, $new_fonts );
 
             // Sanitizes the fonts library using WP_Theme_JSON
