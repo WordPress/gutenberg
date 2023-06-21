@@ -31,7 +31,6 @@
 		flex-direction: column;
 		margin-bottom: $grid-unit-60;
 
-		// Temp styles for testing - delete asap
 		.edit-site-library__preview {
 			border-radius: $radius-block-ui;
 			cursor: pointer;
@@ -46,7 +45,6 @@
 		.edit-site-library__button {
 			color: $gray-600;
 		}
-		// END: temp styles for testing.
 	}
 
 	.edit-site-library__preview {
@@ -84,8 +82,4 @@
 
 .edit-site-library__no-results {
 	color: $gray-600;
-	// height: 100%,
-	// display: flex,
-	// alignItems: center,
-	// justifyContent: center,
 }

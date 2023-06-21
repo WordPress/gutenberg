@@ -19,8 +19,8 @@ export default function CategoryItem( {
 			categoryId: id,
 		},
 		{
-			// Keep record for where we came from in a state so we can
-			// use browser's back button to go back to the library.
+			// Keep a record of where we came from in state so we can
+			// use the browser's back button to go back to the library.
 			// See the implementation of the back button in patterns-list.
 			backPath: '/library',
 		}
