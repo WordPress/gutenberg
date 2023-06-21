@@ -62,12 +62,17 @@ function ToolbarEditButton( {
 	onSelectMedia,
 	toggleUseFeaturedImage,
 	useFeaturedImage,
+	featuredImageURL,
 } ) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
-				mediaURL={ mediaUrl }
+				mediaUrl={
+					useFeaturedImage && featuredImageURL
+						? featuredImageURL
+						: mediaUrl
+				}
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
@@ -126,13 +131,15 @@ function MediaContainer( props, ref ) {
 		enableResize,
 		toggleUseFeaturedImage,
 		useFeaturedImage,
+		featuredImageURL,
+		featuredImageAlt,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaUrl ) {
+	if ( mediaUrl || featuredImageURL ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -150,11 +157,16 @@ function MediaContainer( props, ref ) {
 
 		const backgroundStyles =
 			mediaType === 'image' && imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
+				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
 
 		const mediaTypeRenderers = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
+			image: () =>
+				useFeaturedImage && featuredImageURL ? (
+					<img src={ featuredImageURL } alt={ featuredImageAlt } />
+				) : (
+					mediaUrl && <img src={ mediaUrl } alt={ mediaAlt } />
+				),
 			video: () => <video controls src={ mediaUrl } />,
 		};
 
@@ -181,14 +193,18 @@ function MediaContainer( props, ref ) {
 			>
 				<ToolbarEditButton
 					onSelectMedia={ onSelectMedia }
-					mediaUrl={ mediaUrl }
+					mediaUrl={
+						useFeaturedImage && featuredImageURL
+							? featuredImageURL
+							: mediaUrl
+					}
 					mediaId={ mediaId }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
-				<PlaceholderContainer { ...props } />
+				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 			</ResizableBoxContainer>
 		);
 	}
