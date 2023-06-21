@@ -26,6 +26,7 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -53,6 +54,7 @@ import { useIsSiteEditorLoading } from './hooks';
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 
@@ -112,6 +114,9 @@ export default function Layout() {
 			? 'site-editor-edit'
 			: 'site-editor';
 	useCommandContext( commandContext );
+
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -261,6 +266,11 @@ export default function Layout() {
 													}
 													isFullWidth={ isEditing }
 													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+													innerContentStyle={ {
+														background:
+															gradientValue ??
+															backgroundColor,
+													} }
 												>
 													<Editor
 														isLoading={
