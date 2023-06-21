@@ -12,7 +12,6 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	VisuallyHidden,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__unstableCompositeItem as CompositeItem,
@@ -109,11 +108,16 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 				</CompositeItem>
 				{ ariaDescription && (
-					<VisuallyHidden id={ descriptionId }>
+					<div
+						aria-hidden="true"
+						style={ { display: 'none' } }
+						id={ descriptionId }
+					>
 						{ ariaDescription }
-					</VisuallyHidden>
+					</div>
 				) }
 				<HStack
+					aria-hidden="true"
 					className="edit-site-library__footer"
 					justify="space-between"
 				>
