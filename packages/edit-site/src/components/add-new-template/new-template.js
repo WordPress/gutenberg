@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	archive,
@@ -162,25 +162,6 @@ export default function NewTemplate( {
 		useDispatch( noticesStore );
 	const { setTemplate } = unlock( useDispatch( editSiteStore ) );
 
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
-
-	const TEMPLATE_SHORT_DESCRIPTIONS = {
-		'front-page': homeUrl,
-		date: sprintf(
-			// translators: %s: The homepage url.
-			__( 'E.g. %s' ),
-			homeUrl + '/' + new Date().getFullYear()
-		),
-	};
-
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
@@ -310,9 +291,6 @@ export default function NewTemplate( {
 										title={ title }
 										direction="column"
 										className="edit-site-add-new-template__template-button"
-										description={
-											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
-										}
 										icon={
 											TEMPLATE_ICONS[ slug ] || layout
 										}
