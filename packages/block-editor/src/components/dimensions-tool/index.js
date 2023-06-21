@@ -2,12 +2,10 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
 import AspectRatioTool from './aspect-ratio-tool';
 import ScaleTool from './scale-tool';
 import WidthHeightTool from './width-height-tool';
@@ -59,20 +57,6 @@ function DimensionsTool( {
 	scaleOptions, // Default value is in ScaleTool.
 	unitsOptions,
 } ) {
-	// TODO: 'spacing.units` was used in the featured image code, but we're
-	// setting width and height, not spacing here, so I'm not sure that's the
-	// right thing to use.
-	const customUnits = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'%',
-			'vw',
-			'em',
-			'rem',
-		],
-	} );
-	const units = unitsOptions ?? customUnits;
-
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
 	// previous value.
@@ -164,7 +148,7 @@ function DimensionsTool( {
 			) }
 			<WidthHeightTool
 				panelId={ panelId }
-				units={ units }
+				units={ unitsOptions }
 				value={ { width: value.width, height: value.height } }
 				onChange={ ( nextDimension ) => {
 					const { width, height, ...nextValue } = value;
