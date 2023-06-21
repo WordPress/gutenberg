@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, moreHorizontal } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -119,6 +119,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						toggleProps={ {
 							className: 'edit-site-library__button',
 							isSmall: true,
+							describedBy: sprintf(
+								/* translators: %s: pattern name */
+								__( 'Action menu for %s pattern' ),
+								item.title
+							),
 						} }
 					>
 						{ ( { onClose } ) => (
