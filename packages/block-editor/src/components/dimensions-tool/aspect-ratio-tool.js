@@ -12,8 +12,6 @@ import { __, _x } from '@wordpress/i18n';
  */
 
 /**
- * These should use the same values as AspectRatioDropdown in @wordpress/block-editor.
- *
  * @type {SelectControlProps[]}
  */
 export const DEFAULT_ASPECT_RATIO_OPTIONS = [
