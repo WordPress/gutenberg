@@ -15,7 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import SlotFillContext from './slot-fill-context';
 import type {
-	BubblesVirtuallySlotFillProviderProps,
+	SlotFillProviderProps,
 	BubblesVirtuallySlotFillContext,
 } from '../types';
 
@@ -108,7 +108,7 @@ function createSlotRegistry(): BubblesVirtuallySlotFillContext {
 
 export default function SlotFillProvider( {
 	children,
-}: BubblesVirtuallySlotFillProviderProps ) {
+}: SlotFillProviderProps ) {
 	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>

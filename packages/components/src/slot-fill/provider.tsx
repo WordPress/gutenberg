@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import type { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,12 +12,8 @@ import type {
 	BaseFillObject,
 	BaseSlotFillContext,
 	SlotComponentProps,
+	SlotFillProviderProps,
 } from './types';
-import { useState } from '@wordpress/element';
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
 
 export function createSlotRegistory(): BaseSlotFillContext {
 	const slots: Record< string, Component< SlotComponentProps > > = {};
@@ -119,7 +116,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 	};
 }
 
-export function SlotFillProvider( { children }: { children: ReactNode } ) {
+export function SlotFillProvider( { children }: SlotFillProviderProps ) {
 	const [ contextValue ] = useState( createSlotRegistory );
 	return (
 		<SlotFillContext.Provider value={ contextValue }>

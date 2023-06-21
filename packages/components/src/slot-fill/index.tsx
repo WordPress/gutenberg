@@ -16,6 +16,7 @@ import SlotFillProvider from './provider';
 import SlotFillContext from './bubbles-virtually/slot-fill-context';
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+import type { SlotFillProviderProps } from './types';
 
 export function Fill( props ) {
 	// We're adding both Fills here so they can register themselves before
@@ -35,13 +36,13 @@ export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
 	return <BaseSlot { ...props } />;
 } );
 
-export function Provider( { children, ...props } ) {
+export function Provider( { children }: SlotFillProviderProps ) {
 	const parent = useContext( SlotFillContext );
 	if ( ! parent.isDefault ) {
 		return children;
 	}
 	return (
-		<SlotFillProvider { ...props }>
+		<SlotFillProvider>
 			<BubblesVirtuallySlotFillProvider>
 				{ children }
 			</BubblesVirtuallySlotFillProvider>
