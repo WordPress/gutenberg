@@ -147,7 +147,7 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 	categories: reusableBlock.wp_pattern,
 	id: reusableBlock.id,
 	name: reusableBlock.slug,
-	syncStatus: reusableBlock.meta?.wp_block?.sync_status,
+	syncStatus: reusableBlock.meta?.sync_status,
 	title: reusableBlock.title.raw,
 	type: reusableBlock.type,
 	reusableBlock,
