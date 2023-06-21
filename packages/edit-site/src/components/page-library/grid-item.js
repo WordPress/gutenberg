@@ -73,13 +73,17 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		canvas: 'edit',
 	} );
 
+	const isEmpty = ! item.blocks?.length;
+	const patternClassNames = classnames( 'edit-site-library__pattern', {
+		'is-placeholder': isEmpty,
+	} );
 	const previewClassNames = classnames( 'edit-site-library__preview', {
 		'is-inactive': item.type === PATTERNS,
 	} );
 
 	return (
 		<div
-			className="edit-site-library__pattern"
+			className={ patternClassNames }
 			aria-label={ item.title }
 			aria-describedby={ item.description ? descriptionId : undefined }
 		>
@@ -90,7 +94,8 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 				{ ...composite }
 				onClick={ item.type !== PATTERNS ? onClick : undefined }
 			>
-				<BlockPreview blocks={ item.blocks } />
+				{ isEmpty && __( 'Empty pattern' ) }
+				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 				{ !! item.description && (
 					<VisuallyHidden id={ descriptionId }>
 						{ item.description }

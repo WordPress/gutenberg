@@ -52,6 +52,15 @@
 		.edit-site-library__button {
 			color: $gray-600;
 		}
+
+		&.is-placeholder .edit-site-library__preview {
+			min-height: $grid-unit-80;
+			color: $gray-600;
+			border: 1px dashed $gray-800;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 	}
 
 	.edit-site-library__preview {
