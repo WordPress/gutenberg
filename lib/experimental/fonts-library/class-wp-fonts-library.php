@@ -38,7 +38,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 		'woff2' => 'font/woff2',
 	);
 
-    function register_routes () {
+    public function register_routes () {
         
         register_rest_route(
 			$this->namespace,
