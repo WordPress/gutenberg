@@ -8,7 +8,7 @@ import { getQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { DEFAULT_CATEGORY, DEFAULT_TYPE } from './constants';
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from './utils';
 import Page from '../page';
 import PatternsList from './patterns-list';
 import useLibrarySettings from './use-library-settings';

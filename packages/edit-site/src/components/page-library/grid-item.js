@@ -26,7 +26,7 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 /**
  * Internal dependencies
  */
-import { PATTERNS, USER_PATTERNS } from './constants';
+import { PATTERNS, USER_PATTERNS } from './utils';
 import { useLink } from '../routes/link';
 
 function DeleteMenuItem( { item, onClose } ) {

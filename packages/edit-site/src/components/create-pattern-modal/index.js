@@ -18,7 +18,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-library/constants';
+import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-library/utils';
 
 export default function CreatePatternModal( {
 	closeModal,

@@ -8,7 +8,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CORE_PATTERN_SOURCES } from '../page-library/constants';
+import {
+	CORE_PATTERN_SOURCES,
+	filterOutDuplicatesByName,
+} from '../page-library/utils';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -33,10 +36,7 @@ export default function useThemePatterns() {
 					( pattern ) =>
 						! CORE_PATTERN_SOURCES.includes( pattern.source )
 				)
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				),
+				.filter( filterOutDuplicatesByName ),
 		[ blockPatterns, restBlockPatterns ]
 	);
 

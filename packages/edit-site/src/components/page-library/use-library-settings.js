@@ -10,6 +10,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import { filterOutDuplicatesByName } from './utils';
 
 export default function useLibrarySettings() {
 	const storedSettings = useSelect( ( select ) => {
@@ -31,10 +32,7 @@ export default function useLibrarySettings() {
 			[
 				...( settingsBlockPatterns || [] ),
 				...( restBlockPatterns || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
+			].filter( filterOutDuplicatesByName ),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 

@@ -16,3 +16,6 @@ export const SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
 };
+
+export const filterOutDuplicatesByName = ( currentItem, index, items ) =>
+	index === items.findIndex( ( item ) => currentItem.name === item.name );

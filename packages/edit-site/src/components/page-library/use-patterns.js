@@ -16,7 +16,8 @@ import {
 	TEMPLATE_PARTS,
 	USER_PATTERNS,
 	USER_PATTERN_CATEGORY,
-} from './constants';
+	filterOutDuplicatesByName,
+} from './utils';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
@@ -114,10 +115,7 @@ const useThemePatterns = (
 					( pattern ) =>
 						! CORE_PATTERN_SOURCES.includes( pattern.source )
 				)
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
+				.filter( filterOutDuplicatesByName )
 				.map( ( pattern ) => ( {
 					...pattern,
 					keywords: pattern.keywords || [],
