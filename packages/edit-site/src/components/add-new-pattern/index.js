@@ -66,13 +66,11 @@ export default function AddNewPattern() {
 						title: 'Create a pattern',
 					},
 				] }
-				icon={
-					<SidebarButton
-						icon={ plus }
-						label={ __( 'Create a pattern' ) }
-					/>
-				}
-				label="Create a pattern."
+				icon={ plus }
+				toggleProps={ {
+					as: SidebarButton,
+				} }
+				label={ __( 'Create a pattern.' ) }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal
