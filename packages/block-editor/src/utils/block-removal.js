@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Modal,
@@ -27,16 +26,7 @@ export function BlockRemovalWarningModal() {
 		( select ) => select( blockEditorStore ).isRemovalPromptDisplayed()
 	);
 
-	const { displayRemovalPrompt, removalPromptExists } =
-		useDispatch( blockEditorStore );
-
-	// Signalling the removal prompt is in place.
-	useEffect( () => {
-		removalPromptExists( true );
-		return () => {
-			removalPromptExists( false );
-		};
-	}, [ removalPromptExists ] );
+	const { displayRemovalPrompt } = useDispatch( blockEditorStore );
 
 	if ( ! blockNames ) {
 		return;
