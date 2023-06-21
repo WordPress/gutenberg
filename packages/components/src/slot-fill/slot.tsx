@@ -91,7 +91,8 @@ class SlotComponent extends Component< SlotComponentProps > {
 				// In some cases fills are rendered only when some conditions apply.
 				// This ensures that we only use non-empty fills when rendering, i.e.,
 				// it allows us to render wrappers only when the fills are actually present.
-				( element ) => ! isEmptyElement( element )
+				( element ): element is Exclude< typeof element, undefined > =>
+					! isEmptyElement( element )
 			);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
