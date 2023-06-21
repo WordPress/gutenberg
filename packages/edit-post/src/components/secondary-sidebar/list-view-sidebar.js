@@ -1,21 +1,17 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalListView as ListView,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button, TabPanel } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
+import { useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -28,16 +24,6 @@ import ListViewOutline from './list-view-outline';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
-	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
-	const { hasBlockSelection, selectedBlockClientIds } = useSelect(
-		( select ) => ( {
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
-			selectedBlockClientIds:
-				select( blockEditorStore ).getSelectedBlockClientIds(),
-		} ),
-		[]
-	);
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -45,39 +31,10 @@ export default function ListViewSidebar() {
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
-	const [ lastSelectedBlock, setLastSelectedBlock ] = useState();
-
-	useEffect( () => {
-		if ( selectedBlockClientIds?.length === 1 ) {
-			setLastSelectedBlock( selectedBlockClientIds[ 0 ] );
-		}
-	}, [] );
-
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
 			setIsListViewOpened( false );
-
-			// If there is no longer a block selection, but a single block was selected
-			// before opening the list view, then select that block again.
-			if ( ! hasBlockSelection && lastSelectedBlock ) {
-				selectBlock( lastSelectedBlock );
-			}
-		}
-	}
-
-	function clearSelectionOnEscape( event ) {
-		// If there is a block selection, then skip closing the list view
-		// and clear out the block selection instead.
-		if (
-			tab === 'list-view' &&
-			event.keyCode === ESCAPE &&
-			! event.defaultPrevented &&
-			hasBlockSelection
-		) {
-			event.preventDefault();
-			clearSelectedBlock();
-			speak( __( 'All blocks deselected.' ), 'assertive' );
 		}
 	}
 
@@ -139,14 +96,8 @@ export default function ListViewSidebar() {
 			)
 		) {
 			setIsListViewOpened( false );
-
-			// If there is no longer a block selection, but a single block was selected
-			// before opening the list view, then select that block again.
-			if ( ! hasBlockSelection && lastSelectedBlock ) {
-				selectBlock( lastSelectedBlock );
-			}
-		} else {
 			// If the list view or outline does not have focus, focus should be moved to it.
+		} else {
 			handleSidebarFocus( tab );
 		}
 	} );
