@@ -4,16 +4,19 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { CommandMenu } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -21,15 +24,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
+import { unlock } from './lock-unlock';
 
-function Editor( {
-	postId,
-	postType,
-	settings,
-	initialEdits,
-	onError,
-	...props
-} ) {
+const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { getLayoutStyles } = unlock( blockEditorPrivateApis );
+const { useCommands } = unlock( coreCommandsPrivateApis );
+
+function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	useCommands();
 	const {
 		hasFixedToolbar,
 		focusMode,
@@ -143,6 +145,7 @@ function Editor( {
 	}, [
 		settings,
 		hasFixedToolbar,
+		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
 		hiddenBlockTypes,
@@ -163,10 +166,29 @@ function Editor( {
 				presetStyles.push( style );
 			}
 		} );
+
 		const defaultEditorStyles = [
 			...settings.defaultEditorStyles,
 			...presetStyles,
 		];
+
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if (
+			! settings.disableLayoutStyles &&
+			! ( hasThemeStyles && themeStyles.length )
+		) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
+
 		return hasThemeStyles && themeStyles.length
 			? settings.styles
 			: defaultEditorStyles;
@@ -177,28 +199,25 @@ function Editor( {
 	}
 
 	return (
-		<StrictMode>
-			<ShortcutProvider>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ post }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						__unstableTemplate={
-							isTemplateMode ? template : undefined
-						}
-						{ ...props }
-					>
-						<ErrorBoundary onError={ onError }>
-							<EditorInitialization postId={ postId } />
-							<Layout styles={ styles } />
-						</ErrorBoundary>
-						<PostLockedModal />
-					</EditorProvider>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</StrictMode>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<ExperimentalEditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					__unstableTemplate={ isTemplateMode ? template : undefined }
+					{ ...props }
+				>
+					<ErrorBoundary>
+						<CommandMenu />
+						<EditorInitialization postId={ postId } />
+						<Layout styles={ styles } />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</ExperimentalEditorProvider>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }
 

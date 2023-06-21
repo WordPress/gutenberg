@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useEffect } from '@wordpress/element';
@@ -11,6 +6,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,6 +22,8 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
+import { store as blockEditorStore } from '../../store';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -53,6 +51,19 @@ function InserterSearchResults( {
 	selectBlockOnInsert,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
+
+	const { prioritizedBlocks } = useSelect(
+		( select ) => {
+			const blockListSettings =
+				select( blockEditorStore ).getBlockListSettings( rootClientId );
+
+			return {
+				prioritizedBlocks:
+					blockListSettings?.prioritizedInserterBlocks || EMPTY_ARRAY,
+			};
+		},
+		[ rootClientId ]
+	);
 
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
@@ -93,8 +104,18 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+
+		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+
+		if ( ! filterValue && prioritizedBlocks.length ) {
+			orderedItems = orderInserterBlockItems(
+				orderedItems,
+				prioritizedBlocks
+			);
+		}
+
 		const results = searchBlockItems(
-			orderBy( blockTypes, 'frecency', 'desc' ),
+			orderedItems,
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
@@ -108,7 +129,8 @@ function InserterSearchResults( {
 		blockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
-		maxBlockTypes,
+		maxBlockTypesToShow,
+		prioritizedBlocks,
 	] );
 
 	// Announce search results on change.
@@ -123,7 +145,12 @@ function InserterSearchResults( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [
+		filterValue,
+		debouncedSpeak,
+		filteredBlockTypes,
+		filteredBlockPatterns,
+	] );
 
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,
@@ -135,7 +162,7 @@ function InserterSearchResults( {
 	);
 
 	const hasItems =
-		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
+		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
 
 	const blocksUI = !! filteredBlockTypes.length && (
 		<InserterPanel
@@ -162,6 +189,7 @@ function InserterSearchResults( {
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
 					onClickPattern={ onSelectBlockPattern }
+					onHover={ onHover }
 					isDraggable={ isDraggable }
 				/>
 			</div>

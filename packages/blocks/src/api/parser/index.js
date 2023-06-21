@@ -190,7 +190,7 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
  * @param {WPRawBlock}   rawBlock The raw block object.
  * @param {ParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock} Fully parsed block.
+ * @return {WPBlock | undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );

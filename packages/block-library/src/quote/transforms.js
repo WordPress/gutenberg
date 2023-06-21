@@ -22,12 +22,6 @@ const transforms = {
 			},
 		},
 		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
-		},
-		{
 			type: 'prefix',
 			prefix: '>',
 			transform: ( content ) =>
@@ -132,20 +126,16 @@ const transforms = {
 						: innerBlocks
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { citation }, innerBlocks ) =>
-				citation
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ]
-					: innerBlocks,
-		},
 	],
+	ungroup: ( { citation }, innerBlocks ) =>
+		citation
+			? [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+			  ]
+			: innerBlocks,
 };
 
 export default transforms;

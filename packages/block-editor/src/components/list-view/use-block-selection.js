@@ -21,7 +21,6 @@ export default function useBlockSelection() {
 		getBlockName,
 		getBlockParents,
 		getBlockSelectionStart,
-		getBlockSelectionEnd,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
@@ -30,9 +29,9 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId ) => {
+		async ( event, clientId, destinationClientId, focusPosition ) => {
 			if ( ! event?.shiftKey ) {
-				selectBlock( clientId );
+				selectBlock( clientId, focusPosition );
 				return;
 			}
 
@@ -145,7 +144,7 @@ export default function useBlockSelection() {
 			}
 
 			if ( label ) {
-				speak( label );
+				speak( label, 'assertive' );
 			}
 		},
 		[
@@ -154,7 +153,6 @@ export default function useBlockSelection() {
 			getBlockType,
 			getBlockParents,
 			getBlockSelectionStart,
-			getBlockSelectionEnd,
 			getSelectedBlockClientIds,
 			hasMultiSelection,
 			hasSelectedBlock,

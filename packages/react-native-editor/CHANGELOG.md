@@ -10,6 +10,75 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
+## 1.97.0
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+-   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
+
+## 1.96.1
+-   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
+
+## 1.96.0
+-   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+-   [*] Add disabled style to `Cell` component [#50665]
+-   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
+-   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
+
+
+
+## 1.95.0
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [*] Use host app namespace in reusable block message [#50478]
+-   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
+
+## 1.94.0
+-   [*] Split pasted content between title and body. [#37169]
+
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
+## 1.93.0
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
+## 1.92.0
+* No User facing changes *
+
+## 1.91.0
+-   [*] Allow new block transformations for most blocks. [#48792]
+
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
+-   [*] Add metadata parameter to media upload events [#48103]  
+
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
+
+## 1.89.0 
+* No User facing changes *
+
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
 
 ## 1.87.1
 -   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]

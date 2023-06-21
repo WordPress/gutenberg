@@ -13,7 +13,7 @@ exports[`Search Block renders block with button inside option 1`] = `
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
         ]
@@ -21,9 +21,9 @@ exports[`Search Block renders block with button inside option 1`] = `
     >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -32,7 +32,6 @@ exports[`Search Block renders block with button inside option 1`] = `
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
-        lineHeight={1}
         maxImagesWidth={200}
         onBackspace={[Function]}
         onBlur={[Function]}
@@ -54,14 +53,14 @@ exports[`Search Block renders block with button inside option 1`] = `
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
@@ -69,13 +68,13 @@ exports[`Search Block renders block with button inside option 1`] = `
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
         false,
@@ -100,8 +99,8 @@ exports[`Search Block renders block with button inside option 1`] = `
         placeholder="Optional placeholder…"
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               false,
               undefined,
               undefined,
@@ -113,7 +112,7 @@ exports[`Search Block renders block with button inside option 1`] = `
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -129,7 +128,7 @@ exports[`Search Block renders block with button inside option 1`] = `
       >
         <View
           style={
-            Array [
+            [
               undefined,
               undefined,
             ]
@@ -137,9 +136,9 @@ exports[`Search Block renders block with button inside option 1`] = `
         >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -148,7 +147,6 @@ exports[`Search Block renders block with button inside option 1`] = `
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
-            lineHeight={1}
             maxImagesWidth={200}
             minWidth={75}
             onBackspace={[Function]}
@@ -171,14 +169,14 @@ exports[`Search Block renders block with button inside option 1`] = `
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
@@ -187,7 +185,7 @@ exports[`Search Block renders block with button inside option 1`] = `
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -209,7 +207,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
         ]
@@ -217,9 +215,9 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -228,7 +226,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
-        lineHeight={1}
         maxImagesWidth={200}
         onBackspace={[Function]}
         onBlur={[Function]}
@@ -250,14 +247,14 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
@@ -265,13 +262,13 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -296,8 +293,8 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         placeholder="Optional placeholder…"
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -309,7 +306,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -317,7 +314,17 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         ]
       }
     >
-      Svg
+      <Svg
+        fill="gray"
+        height={24}
+        onLayout={[Function]}
+        style={{}}
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        Path
+      </Svg>
     </View>
   </View>
 </View>
@@ -331,7 +338,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
 >
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -356,8 +363,8 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         placeholder="Optional placeholder…"
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -369,7 +376,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -385,7 +392,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       >
         <View
           style={
-            Array [
+            [
               undefined,
               undefined,
             ]
@@ -393,9 +400,9 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -404,7 +411,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
-            lineHeight={1}
             maxImagesWidth={200}
             minWidth={75}
             onBackspace={[Function]}
@@ -427,14 +433,14 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
@@ -443,7 +449,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -465,7 +471,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
         ]
@@ -473,9 +479,9 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -484,7 +490,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
-        lineHeight={1}
         maxImagesWidth={200}
         onBackspace={[Function]}
         onBlur={[Function]}
@@ -506,14 +511,14 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
@@ -521,13 +526,13 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -552,8 +557,8 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         placeholder="Optional placeholder…"
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -565,7 +570,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -581,7 +586,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       >
         <View
           style={
-            Array [
+            [
               undefined,
               undefined,
             ]
@@ -589,9 +594,9 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -600,7 +605,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             fontFamily="serif"
             fontSize={16}
             isMultiline={false}
-            lineHeight={1}
             maxImagesWidth={200}
             minWidth={75}
             onBackspace={[Function]}
@@ -623,14 +627,14 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
@@ -639,7 +643,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -661,7 +665,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
         ]
@@ -669,9 +673,9 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -680,7 +684,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
         fontFamily="serif"
         fontSize={16}
         isMultiline={false}
-        lineHeight={1}
         maxImagesWidth={200}
         onBackspace={[Function]}
         onBlur={[Function]}
@@ -702,14 +705,14 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
@@ -717,7 +720,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
@@ -739,8 +742,8 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       placeholder="Optional placeholder…"
       scrollEnabled={false}
       style={
-        Array [
-          Array [
+        [
+          [
             undefined,
             undefined,
             undefined,

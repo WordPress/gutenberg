@@ -77,3 +77,26 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		add_filter( 'render_block', $callback, 10, 2 );
 	}
 }
+
+
+/**
+ * Registers the metadata block attribute for block types.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_metadata_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
+		$args['attributes']['metadata'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );

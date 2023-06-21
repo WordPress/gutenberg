@@ -7,6 +7,7 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifyStretch,
 	arrowRight,
 	arrowDown,
 } from '@wordpress/icons';
@@ -30,6 +31,7 @@ import {
 	BlockVerticalAlignmentControl,
 } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
 const justifyContentMap = {
@@ -44,12 +46,15 @@ const alignItemsMap = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
+	stretch: 'stretch',
 };
 
 const verticalAlignmentMap = {
 	top: 'flex-start',
 	center: 'center',
 	bottom: 'flex-end',
+	stretch: 'stretch',
+	'space-between': 'space-between',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -101,14 +106,13 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
-				{ allowVerticalAlignment &&
-					layout?.orientation !== 'vertical' && (
-						<FlexLayoutVerticalAlignmentControl
-							layout={ layout }
-							onChange={ onChange }
-							isToolbar
-						/>
-					) }
+				{ allowVerticalAlignment && (
+					<FlexLayoutVerticalAlignmentControl
+						layout={ layout }
+						onChange={ onChange }
+						isToolbar
+					/>
+				) }
 			</BlockControls>
 		);
 	},
@@ -118,7 +122,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { orientation = 'horizontal' } = layout;
 
@@ -153,6 +157,9 @@ export default {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
 		} else {
+			if ( verticalAlignment ) {
+				rules.push( `justify-content: ${ verticalAlignment }` );
+			}
 			rules.push( 'flex-direction: column' );
 			rules.push( `align-items: ${ alignItems }` );
 		}
@@ -188,7 +195,14 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+	const { orientation = 'horizontal' } = layout;
+
+	const defaultVerticalAlignment =
+		orientation === 'horizontal'
+			? verticalAlignmentMap.center
+			: verticalAlignmentMap.top;
+
+	const { verticalAlignment = defaultVerticalAlignment } = layout;
 
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
@@ -201,6 +215,11 @@ function FlexLayoutVerticalAlignmentControl( {
 			<BlockVerticalAlignmentControl
 				onChange={ onVerticalAlignmentChange }
 				value={ verticalAlignment }
+				controls={
+					orientation === 'horizontal'
+						? [ 'top', 'center', 'bottom', 'stretch' ]
+						: [ 'top', 'center', 'bottom', 'space-between' ]
+				}
 			/>
 		);
 	}
@@ -240,6 +259,10 @@ function FlexLayoutVerticalAlignmentControl( {
 	);
 }
 
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
 function FlexLayoutJustifyContentControl( {
 	layout,
 	onChange,
@@ -255,6 +278,8 @@ function FlexLayoutJustifyContentControl( {
 	const allowedControls = [ 'left', 'center', 'right' ];
 	if ( orientation === 'horizontal' ) {
 		allowedControls.push( 'space-between' );
+	} else {
+		allowedControls.push( 'stretch' );
 	}
 	if ( isToolbar ) {
 		return (
@@ -262,10 +287,7 @@ function FlexLayoutJustifyContentControl( {
 				allowedControls={ allowedControls }
 				value={ justifyContent }
 				onChange={ onJustificationChange }
-				popoverProps={ {
-					position: 'bottom right',
-					variant: 'toolbar',
-				} }
+				popoverProps={ POPOVER_PROPS }
 			/>
 		);
 	}
@@ -293,10 +315,17 @@ function FlexLayoutJustifyContentControl( {
 			icon: justifySpaceBetween,
 			label: __( 'Space between items' ),
 		} );
+	} else {
+		justificationOptions.push( {
+			value: 'stretch',
+			icon: justifyStretch,
+			label: __( 'Stretch items' ),
+		} );
 	}
 
 	return (
 		<ToggleGroupControl
+			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -320,6 +349,7 @@ function FlexWrapControl( { layout, onChange } ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {
@@ -333,18 +363,43 @@ function FlexWrapControl( { layout, onChange } ) {
 }
 
 function OrientationControl( { layout, onChange } ) {
-	const { orientation = 'horizontal' } = layout;
+	const {
+		orientation = 'horizontal',
+		verticalAlignment,
+		justifyContent,
+	} = layout;
 	return (
 		<ToggleGroupControl
+			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }
-			onChange={ ( value ) =>
-				onChange( {
+			onChange={ ( value ) => {
+				// Make sure the vertical alignment and justification are compatible with the new orientation.
+				let newVerticalAlignment = verticalAlignment;
+				let newJustification = justifyContent;
+				if ( value === 'horizontal' ) {
+					if ( verticalAlignment === 'space-between' ) {
+						newVerticalAlignment = 'center';
+					}
+					if ( justifyContent === 'stretch' ) {
+						newJustification = 'left';
+					}
+				} else {
+					if ( verticalAlignment === 'stretch' ) {
+						newVerticalAlignment = 'top';
+					}
+					if ( justifyContent === 'space-between' ) {
+						newJustification = 'left';
+					}
+				}
+				return onChange( {
 					...layout,
 					orientation: value,
-				} )
-			}
+					verticalAlignment: newVerticalAlignment,
+					justifyContent: newJustification,
+				} );
+			} }
 		>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }

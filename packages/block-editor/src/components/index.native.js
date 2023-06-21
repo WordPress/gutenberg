@@ -28,6 +28,7 @@ export {
 	JustifyContentControl,
 } from './justify-content-control';
 export { default as LineHeightControl } from './line-height-control';
+export { default as HeadingLevelDropdown } from './block-heading-level-dropdown';
 export { default as PlainText } from './plain-text';
 export {
 	default as RichText,
@@ -74,6 +75,11 @@ export {
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
+export {
+	getSpacingPresetCssVar,
+	getCustomValueFromPreset,
+	isValueSpacingPreset,
+} from './spacing-sizes-control/utils';
 // Content Related Components.
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';

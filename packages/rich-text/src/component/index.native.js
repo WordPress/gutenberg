@@ -205,7 +205,7 @@ export class RichText extends Component {
 
 	valueToFormat( value ) {
 		// Remove the outer root tags.
-		return this.removeRootTagsProduceByAztec(
+		return this.removeRootTagsProducedByAztec(
 			toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
@@ -272,30 +272,27 @@ export class RichText extends Component {
 	 * Cleans up any root tags produced by aztec.
 	 * TODO: This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 	 */
-	removeRootTagsProduceByAztec( html ) {
+	removeRootTagsProducedByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
-		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
-		if ( this.props.rootTagsToEliminate ) {
-			this.props.rootTagsToEliminate.forEach( ( element ) => {
-				result = this.removeRootTag( element, result );
-			} );
-		}
 
 		if ( this.props.tagsToEliminate ) {
 			this.props.tagsToEliminate.forEach( ( element ) => {
 				result = this.removeTag( element, result );
 			} );
 		}
+
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
 	}
+
 	removeTag( tag, html ) {
 		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
@@ -312,7 +309,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
@@ -327,7 +324,7 @@ export class RichText extends Component {
 	}
 
 	onTextUpdate( event ) {
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		let formattedContent = contentWithoutRootTag;
@@ -652,7 +649,7 @@ export class RichText extends Component {
 		const realEnd = Math.max( start, end );
 
 		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		if (
@@ -854,13 +851,9 @@ export class RichText extends Component {
 		// we compare previous values to refresh the selected font size,
 		// this is also used when the tag name changes
 		// e.g Heading block and a level change like h1->h2.
-		const currentFontSizeStyle = this.getParsedCssValue(
-			style?.fontSize,
-			DEFAULT_FONT_SIZE
-		);
-		const prevFontSizeStyle = this.getParsedCssValue(
-			prevProps?.style?.fontSize,
-			DEFAULT_FONT_SIZE
+		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
+		const prevFontSizeStyle = this.getParsedFontSize(
+			prevProps?.style?.fontSize
 		);
 		const isDifferentTag = prevProps.tagName !== tagName;
 		if (
@@ -915,16 +908,16 @@ export class RichText extends Component {
 		};
 	}
 
-	getParsedCssValue( value, defaultValue, fontSize = DEFAULT_FONT_SIZE ) {
+	getParsedFontSize( fontSize ) {
 		const { height, width } = Dimensions.get( 'window' );
-		const cssUnitOptions = { height, width, fontSize };
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 
-		if ( ! value ) {
-			return value;
+		if ( ! fontSize ) {
+			return fontSize;
 		}
 
 		const selectedPxValue =
-			getPxFromCssUnit( value, cssUnitOptions ) ?? defaultValue;
+			getPxFromCssUnit( fontSize, cssUnitOptions ) ?? DEFAULT_FONT_SIZE;
 
 		return parseFloat( selectedPxValue );
 	}
@@ -935,6 +928,11 @@ export class RichText extends Component {
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
 
 		let newFontSize = DEFAULT_FONT_SIZE;
+
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
 
 		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize && tagName === 'p' ) {
@@ -961,40 +959,43 @@ export class RichText extends Component {
 
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = this.getParsedCssValue(
-			newFontSize,
-			DEFAULT_FONT_SIZE
-		);
+		const selectedPxValue = this.getParsedFontSize( newFontSize );
 
 		return selectedPxValue;
 	}
 
 	getLineHeight() {
 		const { baseGlobalStyles, tagName, lineHeight, style } = this.props;
-		const { currentFontSize } = this.state;
 		const tagNameLineHeight =
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let newLineHeight;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		if ( ! this.getIsBlockBasedTheme() ) {
-			return MIN_LINE_HEIGHT;
+			return;
 		}
 
 		// For block-based themes, get the default editor line height.
 		if ( baseGlobalStyles?.typography?.lineHeight && tagName === 'p' ) {
-			newLineHeight = baseGlobalStyles?.typography?.lineHeight;
+			newLineHeight = parseFloat(
+				baseGlobalStyles?.typography?.lineHeight
+			);
 		}
 
 		// For block-based themes, get the default element line height
 		// e.g h1, h2.
 		if ( tagNameLineHeight ) {
-			newLineHeight = tagNameLineHeight;
+			newLineHeight = parseFloat( tagNameLineHeight );
 		}
 
 		// For line height values provided from the styles,
 		// usually from values set from the line height picker.
 		if ( style?.lineHeight ) {
-			newLineHeight = style.lineHeight;
+			newLineHeight = parseFloat( style.lineHeight );
 		}
 
 		// Fall-back to a line height provided from its props (if there's any)
@@ -1003,34 +1004,17 @@ export class RichText extends Component {
 			newLineHeight = lineHeight;
 		}
 
-		// If it can't be converted into a floating point number is probably a CSS value
-		if ( ! parseFloat( newLineHeight ) ) {
-			const parsedLineHeight = this.getParsedCssValue(
-				newLineHeight,
-				MIN_LINE_HEIGHT,
-				currentFontSize
-			);
-
-			// Line height is in pixels
-			if ( Number.isInteger( parsedLineHeight ) ) {
-				const pxValue = parsedLineHeight / currentFontSize;
-				newLineHeight = parseFloat(
-					parseFloat( pxValue ).toFixed( 2 )
-				);
-			} else {
-				newLineHeight = parsedLineHeight;
-			}
-		}
-
 		// Check the final value is not over the minimum supported value.
-		if (
-			! newLineHeight ||
-			( newLineHeight && newLineHeight < MIN_LINE_HEIGHT )
-		) {
+		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
 			newLineHeight = MIN_LINE_HEIGHT;
 		}
 
-		return parseFloat( newLineHeight );
+		// Until we parse CSS values correctly, avoid passing NaN values to Aztec
+		if ( isNaN( newLineHeight ) ) {
+			return undefined;
+		}
+
+		return newLineHeight;
 	}
 
 	getIsBlockBasedTheme() {
@@ -1234,9 +1218,6 @@ export class RichText extends Component {
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
-					onCaretVerticalPositionChange={
-						this.props.onCaretVerticalPositionChange
-					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
 					color={
@@ -1323,10 +1304,9 @@ export default compose( [
 			: settings?.colors;
 
 		return {
-			areMentionsSupported:
-				getSettings( 'capabilities' ).mentions === true,
-			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
-			...{ parentBlockStyles },
+			areMentionsSupported: settings?.capabilities?.mentions === true,
+			areXPostsSupported: settings?.capabilities?.xposts === true,
+			parentBlockStyles,
 			baseGlobalStyles,
 			colorPalette,
 		};

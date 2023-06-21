@@ -28,7 +28,7 @@ registerPlugin( 'edit-post', {
 									post_type: 'wp_block',
 								} ) }
 							>
-								{ __( 'Manage Reusable blocks' ) }
+								{ __( 'Manage Patterns' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }
@@ -39,7 +39,7 @@ registerPlugin( 'edit-post', {
 								role="menuitem"
 								icon={ external }
 								href={ __(
-									'https://wordpress.org/support/article/wordpress-editor/'
+									'https://wordpress.org/documentation/article/wordpress-block-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"

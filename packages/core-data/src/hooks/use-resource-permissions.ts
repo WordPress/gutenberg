@@ -46,8 +46,8 @@ type ResourcePermissionsResolution< IdType > = [
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  resource The resource in question, e.g. media.
- * @param  id       ID of a specific resource entry, if needed, e.g. 10.
+ * @param    resource The resource in question, e.g. media.
+ * @param    id       ID of a specific resource entry, if needed, e.g. 10.
  *
  * @example
  * ```js

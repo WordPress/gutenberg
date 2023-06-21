@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -26,7 +21,7 @@ function TaxonomyPanel( {
 		return null;
 	}
 
-	const taxonomyMenuName = get( taxonomy, [ 'labels', 'menu_name' ] );
+	const taxonomyMenuName = taxonomy?.labels?.menu_name;
 	if ( ! taxonomyMenuName ) {
 		return null;
 	}
@@ -44,7 +39,7 @@ function TaxonomyPanel( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const slug = get( ownProps.taxonomy, [ 'slug' ] );
+		const slug = ownProps.taxonomy?.slug;
 		const panelName = slug ? `taxonomy-panel-${ slug }` : '';
 		return {
 			panelName,

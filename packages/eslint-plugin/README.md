@@ -24,7 +24,7 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 
 Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
 
-The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
+The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
 This preset offers an optional integration with the [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) package that runs [Prettier](https://prettier.io) code formatter and reports differences as individual ESLint issues. You can activate it by installing the [`prettier`](https://www.npmjs.com/package/prettier) package separately with:
 

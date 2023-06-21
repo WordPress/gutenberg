@@ -12,15 +12,23 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post Comments Form', () => {
+	let previousCommentStatus;
+
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
 		await deleteAllTemplates( 'wp_template' );
+		previousCommentStatus = await setOption(
+			'default_comment_status',
+			'closed'
+		);
+	} );
+
+	afterAll( async () => {
+		await setOption( 'default_comment_status', previousCommentStatus );
 	} );
 
 	describe( 'placeholder', () => {
 		it( 'displays in site editor even when comments are closed by default', async () => {
-			await setOption( 'default_comment_status', 'closed' );
-
 			// Navigate to "Singular" post template
 			await visitSiteEditor();
 			await expect( page ).toClick(

@@ -26,6 +26,7 @@ export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockStyles } from './block-styles';
+export { default as HeadingLevelDropdown } from './block-heading-level-dropdown';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
@@ -53,7 +54,7 @@ export { default as __experimentalColorGradientControl } from './colors-gradient
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
-export { default as __experimentalHeightControl } from './height-control';
+export { default as HeightControl } from './height-control';
 export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
 export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
@@ -71,7 +72,6 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
-export { default as __experimentalOffCanvasEditor } from './off-canvas-editor';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -93,7 +93,11 @@ export { default as URLPopover } from './url-popover';
 export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
 export { default as __experimentalSpacingSizesControl } from './spacing-sizes-control';
-
+export {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+	getCustomValueFromPreset,
+} from './spacing-sizes-control/utils';
 /*
  * Content Related Components
  */
@@ -107,7 +111,6 @@ export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
-export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
 export {
 	default as BlockPreview,

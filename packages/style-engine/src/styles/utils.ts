@@ -22,10 +22,10 @@ import {
 /**
  * Returns a JSON representation of the generated CSS rules.
  *
- * @param  style   Style object.
- * @param  options Options object with settings to adjust how the styles are generated.
- * @param  path    An array of strings representing the path to the style value in the style object.
- * @param  ruleKey A CSS property key.
+ * @param style   Style object.
+ * @param options Options object with settings to adjust how the styles are generated.
+ * @param path    An array of strings representing the path to the style value in the style object.
+ * @param ruleKey A CSS property key.
  *
  * @return GeneratedCSSRule[] CSS rules.
  */
@@ -51,11 +51,11 @@ export function generateRule(
 /**
  * Returns a JSON representation of the generated CSS rules taking into account box model properties, top, right, bottom, left.
  *
- * @param  style                Style object.
- * @param  options              Options object with settings to adjust how the styles are generated.
- * @param  path                 An array of strings representing the path to the style value in the style object.
- * @param  ruleKeys             An array of CSS property keys and patterns.
- * @param  individualProperties The "sides" or individual properties for which to generate rules.
+ * @param style                Style object.
+ * @param options              Options object with settings to adjust how the styles are generated.
+ * @param path                 An array of strings representing the path to the style value in the style object.
+ * @param ruleKeys             An array of CSS property keys and patterns.
+ * @param individualProperties The "sides" or individual properties for which to generate rules.
  *
  * @return GeneratedCSSRule[]  CSS rules.
  */
@@ -107,7 +107,7 @@ export function generateBoxRules(
 /**
  * Returns a CSS var value from incoming style value following the pattern `var:description|context|slug`.
  *
- * @param  styleValue A raw style value.
+ * @param styleValue A raw style value.
  *
  * @return string A CSS var value.
  */
@@ -129,7 +129,7 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 /**
  * Capitalizes the first letter in a string.
  *
- * @param  string The string whose first letter the function will capitalize.
+ * @param string The string whose first letter the function will capitalize.
  *
  * @return String with the first letter capitalized.
  */
@@ -141,7 +141,7 @@ export function upperFirst( string: string ): string {
 /**
  * Converts an array of strings into a camelCase string.
  *
- * @param  strings The strings to join into a camelCase string.
+ * @param strings The strings to join into a camelCase string.
  *
  * @return camelCase string.
  */

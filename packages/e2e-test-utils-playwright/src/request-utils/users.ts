@@ -30,7 +30,7 @@ export interface UserRequestData {
  * List all users.
  *
  * @see https://developer.wordpress.org/rest-api/reference/users/#list-users
- * @param  this
+ * @param this
  */
 async function listUsers( this: RequestUtils ) {
 	const response = await this.rest< User[] >( {
@@ -48,8 +48,8 @@ async function listUsers( this: RequestUtils ) {
  * Add a test user.
  *
  * @see https://developer.wordpress.org/rest-api/reference/users/#create-a-user
- * @param  this
- * @param  user User data to create.
+ * @param this
+ * @param user User data to create.
  */
 async function createUser( this: RequestUtils, user: UserData ) {
 	const userData: UserRequestData = {
@@ -86,8 +86,8 @@ async function createUser( this: RequestUtils, user: UserData ) {
  * Delete a user.
  *
  * @see https://developer.wordpress.org/rest-api/reference/users/#delete-a-user
- * @param  this
- * @param  userId The ID of the user.
+ * @param this
+ * @param userId The ID of the user.
  */
 async function deleteUser( this: RequestUtils, userId: number ) {
 	const response = await this.rest( {
@@ -102,7 +102,7 @@ async function deleteUser( this: RequestUtils, userId: number ) {
 /**
  * Delete all users except main root user.
  *
- * @param  this
+ * @param this
  */
 async function deleteAllUsers( this: RequestUtils ) {
 	const users = await listUsers.bind( this )();

@@ -16,7 +16,7 @@ import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
  *
  * @param {string} originalContent Deprecated Columns inner block HTML.
  *
- * @return {?number} Column to which inner block is to be assigned.
+ * @return {number | undefined} Column to which inner block is to be assigned.
  */
 function getDeprecatedLayoutColumn( originalContent ) {
 	let { doc } = getDeprecatedLayoutColumn;

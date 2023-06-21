@@ -10,92 +10,90 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
+import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
+import { search, external } from '@wordpress/icons';
+import { store as commandsStore } from '@wordpress/commands';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
-import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
-import useEditedEntityRecord from '../use-edited-entity-record';
+import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef(
-	( { isMobileCanvasVisible, setIsMobileCanvasVisible, ...props }, ref ) => {
-		const { params } = useLocation();
-		const isListPage = getIsListPage( params );
-		const isEditorPage = ! isListPage;
-		const { canvasMode, dashboardLink, entityConfig } = useSelect(
-			( select ) => {
-				select( editSiteStore ).getEditedPostType();
-				const {
-					__unstableGetCanvasMode,
-					getSettings,
-					getEditedPostType,
-				} = select( editSiteStore );
-				return {
-					canvasMode: __unstableGetCanvasMode(),
-					dashboardLink: getSettings().__experimentalDashboardLink,
-					entityConfig: select( coreStore ).getEntityConfig(
-						'postType',
-						getEditedPostType()
-					),
-				};
-			},
-			[]
+const SiteHub = forwardRef( ( props, ref ) => {
+	const { canvasMode, dashboardLink, homeUrl } = useSelect( ( select ) => {
+		const { getCanvasMode, getSettings } = unlock(
+			select( editSiteStore )
 		);
-		const disableMotion = useReducedMotion();
-		const isMobileViewport = useViewportMatch( 'medium', '<' );
-		const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
-		const { clearSelectedBlock } = useDispatch( blockEditorStore );
-		const showEditButton =
-			( isEditorPage && canvasMode === 'view' && ! isMobileViewport ) ||
-			( isMobileViewport &&
-				canvasMode === 'view' &&
-				isMobileCanvasVisible );
-		const isBackToDashboardButton =
-			( ! isMobileViewport && canvasMode === 'view' ) ||
-			( isMobileViewport && ! isMobileCanvasVisible );
-		const showLabels = canvasMode !== 'edit';
-		const siteIconButtonProps = isBackToDashboardButton
-			? {
-					href: dashboardLink || 'index.php',
-					'aria-label': __( 'Go back to the dashboard' ),
-			  }
-			: {
-					label: __( 'Open Navigation Sidebar' ),
-					onClick: () => {
-						clearSelectedBlock();
-						setIsMobileCanvasVisible( false );
-						__unstableSetCanvasMode( 'view' );
-					},
-			  };
-		const { getTitle } = useEditedEntityRecord();
 
-		return (
-			<motion.div
-				ref={ ref }
-				{ ...props }
-				className={ classnames(
-					'edit-site-site-hub',
-					props.className
-				) }
-				layout
-				transition={ {
-					type: 'tween',
-					duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-					ease: 'easeOut',
-				} }
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+
+		return {
+			canvasMode: getCanvasMode(),
+			dashboardLink:
+				getSettings().__experimentalDashboardLink || 'index.php',
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+	const { open: openCommandCenter } = useDispatch( commandsStore );
+
+	const disableMotion = useReducedMotion();
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const isBackToDashboardButton = canvasMode === 'view';
+	const siteIconButtonProps = isBackToDashboardButton
+		? {
+				href: dashboardLink,
+				label: __( 'Go back to the Dashboard' ),
+		  }
+		: {
+				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
+				role: 'button',
+				label: __( 'Open Navigation' ),
+				onClick: ( event ) => {
+					event.preventDefault();
+					if ( canvasMode === 'edit' ) {
+						clearSelectedBlock();
+						setCanvasMode( 'view' );
+					}
+				},
+		  };
+
+	const siteTitle = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
+		[]
+	);
+
+	return (
+		<motion.div
+			ref={ ref }
+			{ ...props }
+			className={ classnames( 'edit-site-site-hub', props.className ) }
+			initial={ false }
+			transition={ {
+				type: 'tween',
+				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
+				ease: 'easeOut',
+			} }
+		>
+			<HStack
+				justify="space-between"
+				alignment="center"
+				className="edit-site-site-hub__container"
 			>
 				<HStack
 					justify="flex-start"
@@ -117,46 +115,71 @@ const SiteHub = forwardRef(
 							{ ...siteIconButtonProps }
 							className="edit-site-layout__view-mode-toggle"
 						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							<motion.div
+								initial={ false }
+								animate={ {
+									scale: canvasMode === 'view' ? 0.5 : 1,
+								} }
+								whileHover={ {
+									scale: canvasMode === 'view' ? 0.5 : 0.96,
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: HUB_ANIMATION_DURATION,
+									ease: 'easeOut',
+								} }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</motion.div>
 						</Button>
 					</motion.div>
 
-					{ showLabels && (
-						<VStack spacing={ 0 }>
-							<div className="edit-site-site-hub__title">
-								{ getTitle() }
-							</div>
-							<div className="edit-site-site-hub__post-type">
-								{ entityConfig?.label }
-							</div>
-						</VStack>
+					<AnimatePresence>
+						<motion.div
+							layout={ canvasMode === 'edit' }
+							animate={ {
+								opacity: canvasMode === 'view' ? 1 : 0,
+							} }
+							exit={ {
+								opacity: 0,
+							} }
+							className="edit-site-site-hub__site-title"
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.2,
+								ease: 'easeOut',
+								delay: canvasMode === 'view' ? 0.1 : 0,
+							} }
+						>
+							{ decodeEntities( siteTitle ) }
+						</motion.div>
+					</AnimatePresence>
+					{ canvasMode === 'view' && (
+						<Button
+							href={ homeUrl }
+							target="_blank"
+							label={ __( 'View site' ) }
+							aria-label={ __(
+								'View site (opens in a new tab)'
+							) }
+							icon={ external }
+							className="edit-site-site-hub__site-view-link"
+						/>
 					) }
 				</HStack>
-
-				{ showEditButton && (
+				{ canvasMode === 'view' && (
 					<Button
-						className="edit-site-site-hub__edit-button"
-						label={ __( 'Open the editor' ) }
-						onClick={ () => {
-							__unstableSetCanvasMode( 'edit' );
-						} }
-						variant="primary"
-					>
-						{ __( 'Edit' ) }
-					</Button>
+						className="edit-site-site-hub_toggle-command-center"
+						icon={ search }
+						onClick={ () => openCommandCenter() }
+						label={ __( 'Open command center' ) }
+					/>
 				) }
-
-				{ isMobileViewport && ! isMobileCanvasVisible && (
-					<Button
-						onClick={ () => setIsMobileCanvasVisible( true ) }
-						variant="primary"
-					>
-						{ __( 'View Editor' ) }
-					</Button>
-				) }
-			</motion.div>
-		);
-	}
-);
+			</HStack>
+		</motion.div>
+	);
+} );
 
 export default SiteHub;

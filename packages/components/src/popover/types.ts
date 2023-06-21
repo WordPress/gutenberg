@@ -12,8 +12,10 @@ type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
+type PopoverPlacement = Placement | 'overlay';
+
 export type AnimatedWrapperProps = {
-	placement: Placement;
+	placement: PopoverPlacement;
 	shouldAnimate?: boolean;
 };
 
@@ -111,7 +113,7 @@ export type PopoverProps = {
 	 *
 	 * @default 'bottom-start'
 	 */
-	placement?: Placement;
+	placement?: PopoverPlacement;
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._

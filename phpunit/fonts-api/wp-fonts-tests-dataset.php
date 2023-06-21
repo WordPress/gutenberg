@@ -1035,15 +1035,15 @@ trait WP_Fonts_Tests_Datasets {
 	protected function get_registered_fonts_css() {
 		return array(
 			'merriweather-200-900-normal' => <<<CSS
-@font-face{font-family:Merriweather;font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local(Merriweather), url('https://example.com/assets/fonts/merriweather.ttf.woff2') format('woff2');}
+@font-face{font-family:Merriweather;font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/merriweather.ttf.woff2') format('woff2');}
 CSS
 		,
 			'Source Serif Pro-300-normal' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:300;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:300;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
 CSS
 		,
 			'Source Serif Pro-900-italic' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:900;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
 CSS
 		,
 			'font1-300-normal'            => 'font1-300-normal',
@@ -1157,6 +1157,238 @@ CSS
 					'font-style'   => 'normal',
 					'font-display' => 'fallback',
 					'font-stretch' => 'normal',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_print_user_selected_fonts() {
+		$global_styles = $this->get_mock_user_selected_fonts_global_styles();
+		$font_faces    = $this->get_registered_fonts_css();
+
+		return array(
+			'print font1'           => array(
+				'global_styles'   => $global_styles['font1'],
+				'expected_done'   => array(
+					'font1-300-normal',
+					'font1-300-italic',
+					'font1-900-normal',
+					'font1',
+				),
+				'expected_output' => sprintf(
+					'<mock id="wp-fonts-mock" attr="some-attr">%s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal']
+				),
+			),
+			'print font2'           => array(
+				'global_styles'   => $global_styles['font2'],
+				'expected_done'   => array( 'font2-200-900-normal', 'font2-200-900-italic', 'font2' ),
+				'expected_output' => sprintf(
+					'<mock id="wp-fonts-mock" attr="some-attr">%s; %s</mock>\n',
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic']
+				),
+			),
+			'print font3'           => array(
+				'global_styles'   => $global_styles['font3'],
+				'expected_done'   => array( 'font3', 'font3-bold-normal' ),
+				'expected_output' => sprintf(
+					'<mock id="wp-fonts-mock" attr="some-attr">%s</mock>\n',
+					$font_faces['font3-bold-normal']
+				),
+			),
+			'print all fonts'       => array(
+				'global_styles'   => $global_styles['all'],
+				'expected_done'   => array(
+					'font1-300-normal',
+					'font1-300-italic',
+					'font1-900-normal',
+					'font1',
+					'font2-200-900-normal',
+					'font2-200-900-italic',
+					'font2',
+					'font3-bold-normal',
+					'font3',
+				),
+				'expected_output' => sprintf(
+					'<mock id="wp-fonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal'],
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic'],
+					$font_faces['font3-bold-normal']
+				),
+			),
+			'print all valid fonts' => array(
+				'global_styles'   => $global_styles['all with invalid element'],
+				'expected_done'   => array(
+					'font1-300-normal',
+					'font1-300-italic',
+					'font1-900-normal',
+					'font1',
+					'font2-200-900-normal',
+					'font2-200-900-italic',
+					'font2',
+					'font3-bold-normal',
+					'font3',
+				),
+				'expected_output' => sprintf(
+					'<mock id="wp-fonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal'],
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic'],
+					$font_faces['font3-bold-normal']
+				),
+			),
+		);
+	}
+
+	/**
+	 * Gets user-selected fonts for global styles for the mock provider.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return array
+	 */
+	protected function get_mock_user_selected_fonts_global_styles() {
+		return array(
+			'font1'                    => array(
+				'elements'   => array(
+					'heading' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '300',
+						),
+					),
+					'caption' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '300',
+						),
+					),
+				),
+				'typography' => array(
+					'fontFamily' => 'var:preset|font-family|font1',
+					'fontStyle'  => 'normal',
+					'fontWeight' => '900',
+				),
+			),
+			'font2'                    => array(
+				'elements' => array(
+					'heading' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font2',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '200-900',
+						),
+					),
+					'button'  => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font2',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '200-900',
+						),
+					),
+				),
+			),
+			'font3'                    => array(
+				'typography' => array(
+					'fontFamily' => 'var:preset|font-family|font3',
+					'fontStyle'  => 'normal',
+					'fontWeight' => 'bold',
+				),
+			),
+			'all'                      => array(
+				'elements'   => array(
+					'link'    => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '300',
+						),
+					),
+					'heading' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '900',
+						),
+					),
+					'caption' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '300',
+						),
+					),
+					'button'  => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font2',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '200-900',
+						),
+					),
+				),
+				'typography' => array(
+					'fontFamily' => 'var:preset|font-family|font3',
+					'fontStyle'  => 'normal',
+					'fontWeight' => 'bold',
+				),
+			),
+			'all with invalid element' => array(
+				'elements'   => array(
+					'link'    => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '300',
+						),
+					),
+					'heading' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '900',
+						),
+					),
+					'caption' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font1',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '300',
+						),
+					),
+					'button'  => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font2',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '200-900',
+						),
+					),
+					'invalid' => array(
+						'typography' => array(
+							'fontFamily' => 'var:preset|font-family|font2',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '200-900',
+						),
+					),
+				),
+				'typography' => array(
+					'fontFamily' => 'var:preset|font-family|font3',
+					'fontStyle'  => 'normal',
+					'fontWeight' => 'bold',
 				),
 			),
 		);

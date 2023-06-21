@@ -6,7 +6,7 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = process.argv[ 2 ] || 'Backport to WP Minor Release';
+const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stderr?.toString()

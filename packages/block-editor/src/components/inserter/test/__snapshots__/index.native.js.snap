@@ -2,21 +2,21 @@
 
 exports[`Inserter can add blocks adds new block at the end of post 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Inserter can add blocks after another block 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:more -->
@@ -30,7 +30,7 @@ exports[`Inserter can add blocks after another block 1`] = `
 
 exports[`Inserter can add blocks before another block 1`] = `
 "<!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -40,11 +40,11 @@ exports[`Inserter can add blocks before another block 1`] = `
 
 exports[`Inserter can add blocks creates a new Paragraph block tapping on the empty area below the last block 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -54,7 +54,7 @@ exports[`Inserter can add blocks creates a new Paragraph block tapping on the em
 
 exports[`Inserter can add blocks inserts between 2 existing blocks 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:more -->
@@ -62,17 +62,17 @@ exports[`Inserter can add blocks inserts between 2 existing blocks 1`] = `
 <!-- /wp:more -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Inserter can add blocks inserts block at the end of post when no block is selected 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:more -->
@@ -86,11 +86,11 @@ exports[`Inserter can add blocks to the beginning 1`] = `
 <!-- /wp:more -->
 
 <!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -100,11 +100,11 @@ exports[`Inserter can add blocks to the beginning 1`] = `
 
 exports[`Inserter can add blocks to the end 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

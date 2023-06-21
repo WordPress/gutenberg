@@ -14,8 +14,6 @@ export default class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.reboot = this.reboot.bind( this );
-
 		this.state = {
 			error: null,
 		};
@@ -29,13 +27,8 @@ export default class ErrorBoundary extends Component {
 		return { error };
 	}
 
-	reboot() {
-		this.props.onError();
-	}
-
 	render() {
-		const { error } = this.state;
-		if ( ! error ) {
+		if ( ! this.state.error ) {
 			return this.props.children;
 		}
 
@@ -44,8 +37,7 @@ export default class ErrorBoundary extends Component {
 				message={ __(
 					'The editor has encountered an unexpected error.'
 				) }
-				error={ error }
-				reboot={ this.reboot }
+				error={ this.state.error }
 			/>
 		);
 	}

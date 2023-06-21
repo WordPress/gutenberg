@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -15,8 +15,8 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { useCallback, useMemo } from '@wordpress/element';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,6 +49,14 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
+	const mobileMediaCategories = useMemo(
+		() =>
+			mediaCategories.map( ( mediaCategory ) => ( {
+				...mediaCategory,
+				label: mediaCategory.labels.name,
+			} ) ),
+		[ mediaCategories ]
+	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -70,7 +78,7 @@ function MediaTab( {
 												mediaCategory,
 										}
 									) }
-									aria-label={ mediaCategory.label }
+									aria-label={ mediaCategory.labels.name }
 									aria-current={
 										mediaCategory === selectedCategory
 											? 'true'
@@ -79,9 +87,15 @@ function MediaTab( {
 								>
 									<HStack>
 										<FlexBlock>
-											{ mediaCategory.label }
+											{ mediaCategory.labels.name }
 										</FlexBlock>
-										<Icon icon={ chevronRight } />
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
 									</HStack>
 								</Item>
 							) ) }
@@ -118,7 +132,7 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ mediaCategories }>
+				<MobileTabNavigation categories={ mobileMediaCategories }>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

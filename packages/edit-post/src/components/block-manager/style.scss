@@ -16,7 +16,6 @@
 	padding: $grid-unit-10;
 	background-color: $white;
 	text-align: center;
-	font-style: italic;
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
 	top: -1px;
@@ -25,6 +24,9 @@
 	// Stick the category titles to the bottom
 	~ .edit-post-block-manager__results .edit-post-block-manager__category-title {
 		top: 35px;
+	}
+	.is-link {
+		margin-left: 12px;
 	}
 }
 

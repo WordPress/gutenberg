@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 			sections={ sections }
 			onSelect={ onSelect }
 			listProps={ listProps }
+			label={ __( 'Reusable blocks' ) }
 		/>
 	);
 }

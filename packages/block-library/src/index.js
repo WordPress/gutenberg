@@ -45,6 +45,7 @@ import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
+import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -83,6 +84,7 @@ import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
+import * as postTimeToRead from './post-time-to-read';
 import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
@@ -120,8 +122,8 @@ import isBlockMetadataExperimental from './utils/is-block-metadata-experimental'
 /**
  * Function to get all the block-library blocks in an array
  */
-const getAllBlocks = () =>
-	[
+const getAllBlocks = () => {
+	const blocks = [
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
 		paragraph,
@@ -145,6 +147,7 @@ const getAllBlocks = () =>
 		columns,
 		commentAuthorAvatar,
 		cover,
+		details,
 		embed,
 		file,
 		group,
@@ -197,6 +200,7 @@ const getAllBlocks = () =>
 		postTerms,
 		postNavigationLink,
 		postTemplate,
+		postTimeToRead,
 		queryPagination,
 		queryPaginationNext,
 		queryPaginationNumbers,
@@ -222,7 +226,9 @@ const getAllBlocks = () =>
 		termDescription,
 		queryTitle,
 		postAuthorBiography,
-	].filter( Boolean );
+	];
+	return blocks.filter( Boolean );
+};
 
 /**
  * Function to get all the core blocks in an array.

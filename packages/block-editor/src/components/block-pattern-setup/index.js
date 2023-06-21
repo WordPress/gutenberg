@@ -127,10 +127,7 @@ function BlockPatternSlide( { className, pattern, minHeight } ) {
 			aria-label={ title }
 			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview
-				blocks={ blocks }
-				__experimentalMinHeight={ minHeight }
-			/>
+			<BlockPreview blocks={ blocks } minHeight={ minHeight } />
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ description }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { PanelBody, Button, TextControl } from '@wordpress/components';
@@ -22,6 +17,7 @@ import PostScheduleLabel from '../post-schedule/label';
 import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
+const PAGENAME = '%pagename%';
 
 /**
  * Returns URL for a future post.
@@ -36,6 +32,10 @@ const getFuturePostUrl = ( post ) => {
 
 	if ( post.permalink_template.includes( POSTNAME ) ) {
 		return post.permalink_template.replace( POSTNAME, slug );
+	}
+
+	if ( post.permalink_template.includes( PAGENAME ) ) {
+		return post.permalink_template.replace( PAGENAME, slug );
 	}
 
 	return post.permalink_template;
@@ -90,9 +90,9 @@ class PostPublishPanelPostpublish extends Component {
 
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
-		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
-		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
-		const addNewPostLabel = get( postType, [ 'labels', 'add_new_item' ] );
+		const postLabel = postType?.labels?.singular_name;
+		const viewPostLabel = postType?.labels?.view_item;
+		const addNewPostLabel = postType?.labels?.add_new_item;
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
 		const addLink = addQueryArgs( 'post-new.php', {

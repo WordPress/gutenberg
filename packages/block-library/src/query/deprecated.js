@@ -6,12 +6,15 @@ import {
 	InnerBlocks,
 	useInnerBlocksProps,
 	useBlockProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import cleanEmptyObject from '../utils/clean-empty-object';
+import { unlock } from '../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;
@@ -123,6 +126,86 @@ const migrateColors = ( attributes, innerBlocks ) => {
 const hasSingleInnerGroupBlock = ( innerBlocks = [] ) =>
 	innerBlocks.length === 1 && innerBlocks[ 0 ].name === 'core/group';
 
+const migrateToConstrainedLayout = ( attributes ) => {
+	const { layout = null } = attributes;
+	if ( ! layout ) {
+		return attributes;
+	}
+	const { inherit = null, contentSize = null, ...newLayout } = layout;
+
+	if ( inherit || contentSize ) {
+		return {
+			...attributes,
+			layout: {
+				...newLayout,
+				contentSize,
+				type: 'constrained',
+			},
+		};
+	}
+
+	return attributes;
+};
+
+const findPostTemplateBlock = ( innerBlocks = [] ) => {
+	let foundBlock = null;
+	for ( const block of innerBlocks ) {
+		if ( block.name === 'core/post-template' ) {
+			foundBlock = block;
+			break;
+		} else if ( block.innerBlocks.length ) {
+			foundBlock = findPostTemplateBlock( block.innerBlocks );
+		}
+	}
+	return foundBlock;
+};
+
+const replacePostTemplateBlock = ( innerBlocks = [], replacementBlock ) => {
+	innerBlocks.forEach( ( block, index ) => {
+		if ( block.name === 'core/post-template' ) {
+			innerBlocks.splice( index, 1, replacementBlock );
+		} else if ( block.innerBlocks.length ) {
+			block.innerBlocks = replacePostTemplateBlock(
+				block.innerBlocks,
+				replacementBlock
+			);
+		}
+	} );
+	return innerBlocks;
+};
+
+const migrateDisplayLayout = ( attributes, innerBlocks ) => {
+	const { displayLayout = null, ...newAttributes } = attributes;
+	if ( ! displayLayout ) {
+		return [ attributes, innerBlocks ];
+	}
+	const postTemplateBlock = findPostTemplateBlock( innerBlocks );
+	if ( ! postTemplateBlock ) {
+		return [ attributes, innerBlocks ];
+	}
+
+	const { type, columns } = displayLayout;
+
+	// Convert custom displayLayout values to canonical layout types.
+	const updatedLayoutType = type === 'flex' ? 'grid' : 'default';
+
+	const newPostTemplateBlock = createBlock(
+		'core/post-template',
+		{
+			...postTemplateBlock.attributes,
+			layout: {
+				type: updatedLayoutType,
+				...( columns && { columnCount: columns } ),
+			},
+		},
+		postTemplateBlock.innerBlocks
+	);
+	return [
+		newAttributes,
+		replacePostTemplateBlock( innerBlocks, newPostTemplateBlock ),
+	];
+};
+
 // Version with NO wrapper `div` element.
 const v1 = {
 	attributes: {
@@ -157,13 +240,14 @@ const v1 = {
 	supports: {
 		html: false,
 	},
-	migrate( attributes ) {
+	migrate( attributes, innerBlocks ) {
 		const withTaxQuery = migrateToTaxQuery( attributes );
 		const { layout, ...restWithTaxQuery } = withTaxQuery;
-		return {
+		const newAttributes = {
 			...restWithTaxQuery,
 			displayLayout: withTaxQuery.layout,
 		};
+		return migrateDisplayLayout( newAttributes, innerBlocks );
 	},
 	save() {
 		return <InnerBlocks.Content />;
@@ -212,13 +296,22 @@ const v2 = {
 			gradients: true,
 			link: true,
 		},
-		__experimentalLayout: true,
+		layout: true,
 	},
 	isEligible: ( { query: { categoryIds, tagIds } = {} } ) =>
 		categoryIds || tagIds,
 	migrate( attributes, innerBlocks ) {
 		const withTaxQuery = migrateToTaxQuery( attributes );
-		return migrateColors( withTaxQuery, innerBlocks );
+		const [ withColorAttributes, withColorInnerBlocks ] = migrateColors(
+			withTaxQuery,
+			innerBlocks
+		);
+		const withConstrainedLayoutAttributes =
+			migrateToConstrainedLayout( withColorAttributes );
+		return migrateDisplayLayout(
+			withConstrainedLayoutAttributes,
+			withColorInnerBlocks
+		);
 	},
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
@@ -276,7 +369,7 @@ const v3 = {
 				text: true,
 			},
 		},
-		__experimentalLayout: true,
+		layout: true,
 	},
 	isEligible( attributes ) {
 		const { style, backgroundColor, gradient, textColor } = attributes;
@@ -288,7 +381,18 @@ const v3 = {
 			style?.elements?.link
 		);
 	},
-	migrate: migrateColors,
+	migrate( attributes, innerBlocks ) {
+		const [ withColorAttributes, withColorInnerBlocks ] = migrateColors(
+			attributes,
+			innerBlocks
+		);
+		const withConstrainedLayoutAttributes =
+			migrateToConstrainedLayout( withColorAttributes );
+		return migrateDisplayLayout(
+			withConstrainedLayoutAttributes,
+			withColorInnerBlocks
+		);
+	},
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
 		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
@@ -296,6 +400,128 @@ const v3 = {
 	},
 };
 
-const deprecated = [ v3, v2, v1 ];
+const v4 = {
+	attributes: {
+		queryId: {
+			type: 'number',
+		},
+		query: {
+			type: 'object',
+			default: {
+				perPage: null,
+				pages: 0,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				exclude: [],
+				sticky: '',
+				inherit: true,
+				taxQuery: null,
+				parents: [],
+			},
+		},
+		tagName: {
+			type: 'string',
+			default: 'div',
+		},
+		displayLayout: {
+			type: 'object',
+			default: {
+				type: 'list',
+			},
+		},
+		namespace: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		layout: true,
+	},
+	save( { attributes: { tagName: Tag = 'div' } } ) {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+		return <Tag { ...innerBlocksProps } />;
+	},
+	isEligible: ( { layout } ) =>
+		layout?.inherit ||
+		( layout?.contentSize && layout?.type !== 'constrained' ),
+	migrate( attributes, innerBlocks ) {
+		const withConstrainedLayoutAttributes =
+			migrateToConstrainedLayout( attributes );
+		return migrateDisplayLayout(
+			withConstrainedLayoutAttributes,
+			innerBlocks
+		);
+	},
+};
+
+const v5 = {
+	attributes: {
+		queryId: {
+			type: 'number',
+		},
+		query: {
+			type: 'object',
+			default: {
+				perPage: null,
+				pages: 0,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				exclude: [],
+				sticky: '',
+				inherit: true,
+				taxQuery: null,
+				parents: [],
+			},
+		},
+		tagName: {
+			type: 'string',
+			default: 'div',
+		},
+		displayLayout: {
+			type: 'object',
+			default: {
+				type: 'list',
+			},
+		},
+		namespace: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		layout: true,
+	},
+	save( { attributes: { tagName: Tag = 'div' } } ) {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+		return <Tag { ...innerBlocksProps } />;
+	},
+	isEligible: ( { displayLayout } ) => {
+		return !! displayLayout;
+	},
+	migrate: migrateDisplayLayout,
+};
+
+const deprecated = [ v5, v4, v3, v2, v1 ];
 
 export default deprecated;

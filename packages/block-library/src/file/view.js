@@ -3,4 +3,7 @@
  */
 import { hidePdfEmbedsOnUnsupportedBrowsers } from './utils';
 
-hidePdfEmbedsOnUnsupportedBrowsers();
+document.addEventListener(
+	'DOMContentLoaded',
+	hidePdfEmbedsOnUnsupportedBrowsers
+);

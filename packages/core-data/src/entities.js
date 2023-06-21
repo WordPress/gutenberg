@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +44,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+			return record?.title ?? __( 'Site Title' );
 		},
 	},
 	{
