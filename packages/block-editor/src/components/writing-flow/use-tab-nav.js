@@ -86,7 +86,7 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( event.keyCode === ESCAPE ) {
+			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
 				event.preventDefault();
 				setNavigationMode( true );
 				return;
