@@ -1,0 +1,29 @@
+{
+	"root": true,
+	"extends": "@aduth/eslint-config/es5",
+	"parserOptions": {
+		"ecmaVersion": 2015,
+		"sourceType": "module"
+	},
+	"settings": {
+		"jsdoc": {
+			"mode": "typescript"
+		}
+	},
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"rules": {
+		"one-var": "off"
+	},
+	"overrides": [
+		{
+			"files": "test/**/*",
+			"extends": "@aduth/eslint-config/esnext",
+			"env": {
+				"mocha": true
+			}
+		}
+	]
+}

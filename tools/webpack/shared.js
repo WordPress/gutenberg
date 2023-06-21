@@ -5,6 +5,7 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
+const path = require( 'path' );
 
 /**
  * WordPress dependencies
@@ -56,6 +57,11 @@ const baseConfig = {
 		aggregateTimeout: 500,
 	},
 	devtool,
+	resolve: {
+		alias: {
+			rememo: path.resolve( __dirname, '../../local-modules/rememo' ),
+		},
+	},
 };
 
 const plugins = [

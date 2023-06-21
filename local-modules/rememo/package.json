@@ -1,0 +1,65 @@
+{
+	"name": "rememo",
+	"type": "module",
+	"version": "5.0.0",
+	"description": "Memoized selectors for Redux and other immutable object derivation",
+	"main": "rememo.cjs",
+	"module": "rememo.js",
+	"types": "rememo.d.ts",
+	"exports": {
+		".": {
+			"import": "./rememo.js",
+			"require": "./rememo.cjs"
+		}
+	},
+	"files": [
+		"rememo.cjs",
+		"rememo.js",
+		"rememo.d.ts",
+		"dist"
+	],
+	"scripts": {
+		"test:lint": "eslint . --ignore-pattern dist",
+		"test:typecheck": "tsc",
+		"test:unit": "mocha",
+		"test": "npm-run-all --parallel test:*",
+		"build:bundle": "npx rollup -c",
+		"build:types": "tsc -p tsconfig.decl.json",
+		"build": "npm-run-all --parallel build:*",
+		"prepublishOnly": "npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aduth/rememo.git"
+	},
+	"bugs": {
+		"url": "https://github.com/aduth/rememo/issues"
+	},
+	"author": {
+		"name": "Andrew Duthie",
+		"email": "andrew@andrewduthie.com",
+		"url": "http://andrewduthie.com"
+	},
+	"keywords": [
+		"redux",
+		"selector",
+		"selectors",
+		"memoize",
+		"memoization",
+		"cache"
+	],
+	"license": "MIT",
+	"devDependencies": {
+		"@aduth/eslint-config": "^4.4.1",
+		"eslint": "^8.24.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-jsdoc": "^39.3.6",
+		"eslint-plugin-prettier": "^4.2.1",
+		"mocha": "^10.0.0",
+		"npm-run-all": "^4.1.5",
+		"prettier": "^2.7.1",
+		"rollup-plugin-terser": "^7.0.2",
+		"sinon": "^14.0.1",
+		"typescript": "^4.8.4"
+	}
+}
