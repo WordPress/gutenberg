@@ -27,25 +27,27 @@ store( {
 						window.document.activeElement;
 					context.core.image.scrollDelta = 0;
 
+					context.core.image.lightboxEnabled = true;
+					if ( context.core.image.lightboxAnimation === 'zoom' ) {
+						setZoomStyles(
+							event.target.nextElementSibling,
+							context,
+							event
+						);
+					}
+					// Hide overflow only when the animation is in progress,
+					// otherwise the removal of the scrollbars will draw attention
+					// to itself and look like an error
+					document.documentElement.classList.add(
+						'has-lightbox-open'
+					);
+
 					// Since the img is hidden and its src not loaded until
 					// the lightbox is opened, let's create an img element on the fly
 					// so we can get the dimensions we need to calculate the styles
 					const imgDom = document.createElement( 'img' );
-
 					imgDom.onload = function () {
-						// Enable the lightbox only after the image
-						// is loaded to prevent flashing of unstyled content
-						context.core.image.lightboxEnabled = true;
-						if ( context.core.image.lightboxAnimation === 'zoom' ) {
-							setZoomStyles( imgDom, context, event );
-						}
-
-						// Hide overflow only when the animation is in progress,
-						// otherwise the removal of the scrollbars will draw attention
-						// to itself and look like an error
-						document.documentElement.classList.add(
-							'has-lightbox-open'
-						);
+						context.core.image.activateLargeImage = true;
 					};
 					imgDom.setAttribute( 'src', context.core.image.imageSrc );
 				},
@@ -131,7 +133,17 @@ store( {
 				roleAttribute: ( { context } ) => {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
-				imageSrc: ( { context } ) => {
+				responsiveImgSrc: ( { context } ) => {
+					return context.core.image.activateLargeImage
+						? ''
+						: context.core.image.imageSrc;
+				},
+				responsiveImgSrcSet: ( { context } ) => {
+					return context.core.image.activateLargeImage
+						? ''
+						: context.core.image.imageSrcSet;
+				},
+				enlargedImgSrc: ( { context } ) => {
 					return context.core.image.initialized
 						? context.core.image.imageSrc
 						: '';
@@ -163,8 +175,8 @@ store( {
 } );
 
 function setZoomStyles( imgDom, context, event ) {
-	let targetWidth = imgDom.naturalWidth;
-	let targetHeight = imgDom.naturalHeight;
+	let targetWidth = context.core.image.targetWidth;
+	let targetHeight = context.core.image.targetHeight;
 
 	const verticalPadding = 40;
 

@@ -87,11 +87,16 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
 	$z = new WP_HTML_Tag_Processor( $content );
 	$z->next_tag( 'img' );
+	$img_metadata = wp_get_attachment_metadata( $block['attrs']['id'] );
+	$img_width    = $img_metadata['width'];
+	$img_height   = $img_metadata['height'];
+
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
 	} else {
 		$img_src = $z->get_attribute( 'src' );
 	}
+	$img_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 
 	$w = new WP_HTML_Tag_Processor( $content );
 	$w->next_tag( 'figure' );
@@ -99,7 +104,26 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$w->set_attribute( 'data-wp-interactive', true );
 	$w->set_attribute(
 		'data-wp-context',
-		sprintf( '{ "core":{ "image": { "initialized": false, "imageSrc": "%s", "lightboxEnabled": false, "lightboxAnimation": "%s", "hideAnimationEnabled": false } } }', $img_src, $lightbox_animation )
+		sprintf(
+			'{ "core":
+				{ "image":
+					{ 	"initialized": false,
+						"lightboxEnabled": false,
+						"hideAnimationEnabled": false,
+						"lightboxAnimation": "%s",
+						"imageSrc": "%s",
+						"imageSrcSet": "%s",
+						"targetWidth": "%s",
+						"targetHeight": "%s"
+					}
+				}
+			}',
+			$lightbox_animation,
+			$img_src,
+			$img_srcset,
+			$img_width,
+			$img_height
+		)
 	);
 	$body_content = $w->get_updated_html();
 
@@ -114,9 +138,19 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	// Add src to the modal image.
 	$m = new WP_HTML_Tag_Processor( $content );
+	$m->next_tag( 'figure' );
+	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
-	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
-	$modal_content = $m->get_updated_html();
+	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
+	$m->set_attribute( 'data-wp-bind--srcset', 'selectors.core.image.responsiveImgSrcSet' );
+	$initial_image_content = $m->get_updated_html();
+
+	$q = new WP_HTML_Tag_Processor( $content );
+	$q->next_tag( 'figure' );
+	$q->add_class( 'enlarged-image' );
+	$q->next_tag( 'img' );
+	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
+	$enlarged_image_content = $q->get_updated_html();
 
 	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
 
@@ -142,7 +176,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
-                $modal_content
+                $initial_image_content
+				$enlarged_image_content
                 <div class="scrim" style="background-color: $background_color"></div>
         </div>
 HTML;
