@@ -3,7 +3,6 @@
  */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { getRichTextValues } from './components/rich-text/content';
 import { lock } from './lock-unlock';
 
 /**
@@ -13,5 +12,4 @@ export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
-	getRichTextValues,
 } );
