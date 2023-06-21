@@ -611,7 +611,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 }
 
 function fonts_library_register_routes () {
-	$fonts_library = new WP_Fonts_Library();
+	$fonts_library = new WP_Fonts_Library_Controller();
 	$fonts_library->register_routes();
 }
 
