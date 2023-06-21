@@ -4,7 +4,7 @@
 import { NEW_TAB_REL } from './constants';
 
 /**
- * Evaluates the aspect ratio of a CSS aspect-ratio property value as a number.
+ * Evaluates a CSS aspect-ratio property value as a number.
  *
  * Degenerate or invalid ratios behave as 'auto'. And 'auto' ratios return NaN.
  *
