@@ -81,7 +81,8 @@ describe( 'Buttons block', () => {
 			);
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
-				'Increment'
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -181,7 +182,7 @@ describe( 'Buttons block', () => {
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await screen.findByText( 'Button' ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {

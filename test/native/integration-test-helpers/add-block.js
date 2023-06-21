@@ -12,7 +12,6 @@ import { AccessibilityInfo } from 'react-native';
 /**
  * Internal dependencies
  */
-import { waitFor } from './wait-for';
 import { withFakeTimers } from './with-fake-timers';
 
 /**
@@ -28,13 +27,11 @@ export const addBlock = async (
 	blockName,
 	{ isPickerOpened } = {}
 ) => {
-	const { getByLabelText, getByTestId, getByText } = screen;
-
 	if ( ! isPickerOpened ) {
-		fireEvent.press( getByLabelText( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 	}
 
-	const blockList = getByTestId( 'InserterUI-Blocks' );
+	const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items
 	fireEvent.scroll( blockList, {
 		nativeEvent: {
@@ -44,7 +41,7 @@ export const addBlock = async (
 		},
 	} );
 
-	fireEvent.press( await waitFor( () => getByText( blockName ) ) );
+	fireEvent.press( await screen.findByText( blockName ) );
 
 	// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
 	// Hence, we need to wait for the different steps until the the block is inserted.
