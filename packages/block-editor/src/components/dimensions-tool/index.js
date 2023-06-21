@@ -53,9 +53,11 @@ function DimensionsTool( {
 	panelId,
 	value = {},
 	onChange = () => {},
-	aspectRatioOptions, // Default value is in AspectRatioTool.
-	scaleOptions, // Default value is in ScaleTool.
-	unitsOptions, // Default value is in UnitControl.
+	aspectRatioOptions, // Default options handled by AspectRatioTool.
+	defaultAspectRatio,
+	scaleOptions, // Default options handled by ScaleTool.
+	defaultScale,
+	unitsOptions, // Default options handled by UnitControl.
 } ) {
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
@@ -88,7 +90,7 @@ function DimensionsTool( {
 			<AspectRatioTool
 				panelId={ panelId }
 				options={ aspectRatioOptions }
-				defaultValue="auto"
+				defaultValue={ defaultAspectRatio }
 				value={ aspectRatioValue }
 				onChange={ ( nextAspectRatio ) => {
 					const { aspectRatio, ...nextValue } = value;
@@ -110,8 +112,7 @@ function DimensionsTool( {
 						nextValue.scale === null ||
 						nextValue.scale === undefined
 					) {
-						// Set the value to 'cover' since CSS uses 'fill' by default.
-						nextValue.scale = lastScale ?? 'cover';
+						nextValue.scale = lastScale ?? defaultScale;
 					}
 
 					if (
@@ -138,7 +139,7 @@ function DimensionsTool( {
 				<ScaleTool
 					panelId={ panelId }
 					options={ scaleOptions }
-					defaultValue="cover"
+					defaultValue={ defaultScale }
 					value={ lastScale }
 					onChange={ ( nextScale ) => {
 						setLastScale( nextScale );
