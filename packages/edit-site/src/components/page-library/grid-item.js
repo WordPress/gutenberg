@@ -22,6 +22,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Icon, moreHorizontal } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -29,41 +30,14 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { PATTERNS, USER_PATTERNS } from './utils';
 import { useLink } from '../routes/link';
 
-function DeleteMenuItem( { item, onClose } ) {
+export default function GridItem( { categoryId, composite, icon, item } ) {
+	const instanceId = useInstanceId( GridItem );
+	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-
-	if ( item.type !== USER_PATTERNS ) {
-		return;
-	}
-
-	const deleteReusableBlock = async () => {
-		try {
-			await __experimentalDeleteReusableBlock( item.id );
-			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
-				type: 'snackbar',
-			} );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while deleting the pattern.' );
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		} finally {
-			onClose();
-		}
-	};
-
-	return (
-		<MenuItem onClick={ deleteReusableBlock }>{ __( 'Delete' ) }</MenuItem>
-	);
-}
-
-export default function GridItem( { categoryId, composite, icon, item } ) {
-	const instanceId = useInstanceId( GridItem );
-	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
 
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -81,6 +55,21 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		'is-inactive': item.type === PATTERNS,
 	} );
 
+	const deletePattern = async () => {
+		try {
+			await __experimentalDeleteReusableBlock( item.id );
+			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while deleting the pattern.' );
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	};
+
 	return (
 		<div
 			className={ patternClassNames }
@@ -93,6 +82,14 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 				as="div"
 				{ ...composite }
 				onClick={ item.type !== PATTERNS ? onClick : undefined }
+				onKeyDown={ ( event ) => {
+					if (
+						DELETE === event.keyCode ||
+						BACKSPACE === event.keyCode
+					) {
+						deletePattern( item );
+					}
+				} }
 			>
 				{ isEmpty && __( 'Empty pattern' ) }
 				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
@@ -129,14 +126,22 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 								__( 'Action menu for %s pattern' ),
 								item.title
 							),
+							// The dropdown menu is not focusable using the
+							// keyboard as this would interfere with the grid's
+							// roving tab index system. Instead, keyboard users
+							// use keyboard shortcuts to trigger actions.
+							tabIndex: -1,
 						} }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup>
-								<DeleteMenuItem
-									item={ item }
-									onClose={ onClose }
-								/>
+								<MenuItem
+									onClick={ () =>
+										deletePattern.then( onClose )
+									}
+								>
+									{ __( 'Delete' ) }
+								</MenuItem>
 							</MenuGroup>
 						) }
 					</DropdownMenu>
