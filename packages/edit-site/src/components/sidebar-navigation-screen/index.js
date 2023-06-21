@@ -3,9 +3,10 @@
  */
 import {
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalHeading as Heading,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
@@ -31,6 +32,7 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
+	backPath,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -39,7 +41,9 @@ export default function SidebarNavigationScreen( {
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
+	const { goTo } = useNavigator();
 	const theme = getTheme( currentlyPreviewingTheme() );
+	const icon = isRTL() ? chevronRight : chevronLeft;
 
 	return (
 		<>
@@ -53,15 +57,23 @@ export default function SidebarNavigationScreen( {
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ ! isRoot ? (
+					{ ! isRoot && ! backPath && (
 						<NavigatorToParentButton
 							as={ SidebarButton }
 							icon={ isRTL() ? chevronRight : chevronLeft }
+							aria-label={ __( 'Back' ) }
+						/>
+					) }
+					{ ! isRoot && backPath && (
+						<SidebarButton
+							onClick={ () => goTo( backPath, { isBack: true } ) }
+							icon={ icon }
 							label={ __( 'Back' ) }
 						/>
-					) : (
+					) }
+					{ isRoot && (
 						<SidebarButton
-							icon={ isRTL() ? chevronRight : chevronLeft }
+							icon={ icon }
 							label={
 								! isPreviewingTheme()
 									? __( 'Go back to the Dashboard' )
@@ -77,7 +89,7 @@ export default function SidebarNavigationScreen( {
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
 						color={ 'white' }
-						level={ 2 }
+						level={ 1 }
 						size={ 20 }
 					>
 						{ ! isPreviewingTheme()

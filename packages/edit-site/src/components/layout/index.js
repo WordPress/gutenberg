@@ -26,6 +26,7 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -53,6 +54,7 @@ import { useIsSiteEditorLoading } from './hooks';
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 
@@ -65,7 +67,8 @@ export default function Layout() {
 
 	const hubRef = useRef();
 	const { params } = useLocation();
-	const isListPage = getIsListPage( params );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isListPage = getIsListPage( params, isMobileViewport );
 	const isEditorPage = ! isListPage;
 	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
 		useSelect( ( select ) => {
@@ -91,7 +94,6 @@ export default function Layout() {
 		next: nextShortcut,
 	} );
 	const disableMotion = useReducedMotion();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
@@ -112,6 +114,9 @@ export default function Layout() {
 			? 'site-editor-edit'
 			: 'site-editor';
 	useCommandContext( commandContext );
+
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -171,20 +176,31 @@ export default function Layout() {
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
-						{ showSidebar && (
+						{
 							<motion.div
 								initial={ {
 									opacity: 0,
 								} }
-								animate={ {
-									opacity: 1,
-								} }
+								animate={
+									showSidebar
+										? { opacity: 1, display: 'block' }
+										: {
+												opacity: 0,
+												transitionEnd: {
+													display: 'none',
+												},
+										  }
+								}
 								exit={ {
 									opacity: 0,
 								} }
 								transition={ {
 									type: 'tween',
-									duration: ANIMATION_DURATION,
+									duration:
+										// Disable transition in mobile to emulate a full page transition.
+										disableMotion || isMobileViewport
+											? 0
+											: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
 								className="edit-site-layout__sidebar"
@@ -195,7 +211,7 @@ export default function Layout() {
 									<Sidebar />
 								</NavigableRegion>
 							</motion.div>
-						) }
+						}
 					</AnimatePresence>
 
 					<SavePanel />
@@ -250,6 +266,11 @@ export default function Layout() {
 													}
 													isFullWidth={ isEditing }
 													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+													innerContentStyle={ {
+														background:
+															gradientValue ??
+															backgroundColor,
+													} }
 												>
 													<Editor
 														isLoading={

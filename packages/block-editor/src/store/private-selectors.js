@@ -73,41 +73,31 @@ export function getLastInsertedBlocksClientIds( state ) {
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
-export const getBlockEditingMode = createSelector(
-	( state, clientId = '' ) => {
-		if ( state.blockEditingModes.has( clientId ) ) {
-			return state.blockEditingModes.get( clientId );
-		}
-		if ( ! clientId ) {
-			return 'default';
-		}
-		const rootClientId = getBlockRootClientId( state, clientId );
-		const templateLock = getTemplateLock( state, rootClientId );
-		if ( templateLock === 'contentOnly' ) {
-			const name = getBlockName( state, clientId );
-			// TODO: Terrible hack! We're calling the global select() function
-			// here instead of using createRegistrySelector(). The problem with
-			// using createRegistrySelector() is that then the public
-			// block-editor selectors (e.g. canInsertBlockTypeUnmemoized) can't
-			// call this private block-editor selector due to a bug in
-			// @wordpress/data. See
-			// https://github.com/WordPress/gutenberg/pull/50985.
-			const isContent =
-				select( blocksStore ).__experimentalHasContentRoleAttribute(
-					name
-				);
-			return isContent ? 'contentOnly' : 'disabled';
-		}
-		const parentMode = getBlockEditingMode( state, rootClientId );
-		return parentMode === 'contentOnly' ? 'default' : parentMode;
-	},
-	( state ) => [
-		state.blockEditingModes,
-		state.blocks.parents,
-		state.settings.templateLock,
-		state.blockListSettings,
-	]
-);
+export function getBlockEditingMode( state, clientId = '' ) {
+	if ( state.blockEditingModes.has( clientId ) ) {
+		return state.blockEditingModes.get( clientId );
+	}
+	if ( ! clientId ) {
+		return 'default';
+	}
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+	if ( templateLock === 'contentOnly' ) {
+		const name = getBlockName( state, clientId );
+		// TODO: Terrible hack! We're calling the global select() function
+		// here instead of using createRegistrySelector(). The problem with
+		// using createRegistrySelector() is that then the public
+		// block-editor selectors (e.g. canInsertBlockTypeUnmemoized) can't
+		// call this private block-editor selector due to a bug in
+		// @wordpress/data. See
+		// https://github.com/WordPress/gutenberg/pull/50985.
+		const isContent =
+			select( blocksStore ).__experimentalHasContentRoleAttribute( name );
+		return isContent ? 'contentOnly' : 'disabled';
+	}
+	const parentMode = getBlockEditingMode( state, rootClientId );
+	return parentMode === 'contentOnly' ? 'default' : parentMode;
+}
 
 /**
  * Returns true if the block with the given client ID and all of its descendants
