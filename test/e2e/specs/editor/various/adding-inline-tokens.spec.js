@@ -23,6 +23,7 @@ test.describe( 'adding inline tokens', () => {
 	} ) => {
 		// Create a paragraph.
 		await page.click( 'role=button[name="Add default block"i]' );
+
 		await page.keyboard.type( 'a ' );
 
 		await editor.showBlockToolbar();
@@ -48,10 +49,15 @@ test.describe( 'adding inline tokens', () => {
 		await page.click( 'role=button[name="Select"i]' );
 
 		// Check the content.
-		const regex = new RegExp(
-			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+		const contentRegex = new RegExp(
+			`a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?>`
 		);
-		expect( await editor.getEditedPostContent() ).toMatch( regex );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: expect.stringMatching( contentRegex ) },
+			},
+		] );
 
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
 
@@ -61,9 +67,14 @@ test.describe( 'adding inline tokens', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Check the content.
-		const regex2 = new RegExp(
-			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+		const contentRegex2 = new RegExp(
+			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?>`
 		);
-		expect( await editor.getEditedPostContent() ).toMatch( regex2 );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: expect.stringMatching( contentRegex2 ) },
+			},
+		] );
 	} );
 } );
