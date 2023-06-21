@@ -602,12 +602,6 @@ describe( 'DimensionsTool', () => {
 			name: 'Aspect ratio',
 		} );
 
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
 		const scaleContainRadio = screen.getByRole( 'radio', {
 			name: 'Contain',
 		} );
