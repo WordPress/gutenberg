@@ -59,6 +59,20 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 
+const headerVariants = {
+	hidden: { opacity: 0 },
+	hover: {
+		opacity: 1,
+		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+	},
+	distractionFreeInactive: { opacity: 1 },
+};
+
+const slideX = {
+	hidden: { x: '-100%' },
+	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
@@ -133,20 +147,6 @@ export default function Layout() {
 	if ( canvasMode === 'init' ) {
 		return null;
 	}
-
-	const headerVariants = {
-		hidden: { opacity: 0 },
-		hover: {
-			opacity: 1,
-			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-		},
-		distractionFreeInactive: { opacity: 1 },
-	};
-
-	const slideX = {
-		hidden: { x: '-100%' },
-		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
 
 	return (
 		<>
