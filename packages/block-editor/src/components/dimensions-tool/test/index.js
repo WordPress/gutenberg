@@ -56,8 +56,7 @@ describe( 'DimensionsTool', () => {
 
 		await user.selectOptions( aspectRatioSelect, 'auto' );
 
-		expect( onChange.mock.calls[ 0 ] ).toStrictEqual( [ {} ] );
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls ).toStrictEqual( [ [ {} ] ] );
 	} );
 
 	it( 'when aspect ratio is changed to original and width is set height should be removed', async () => {} );
