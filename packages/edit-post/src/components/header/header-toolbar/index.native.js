@@ -19,6 +19,7 @@ import {
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
+	media as mediaIcon,
 	undo as undoIcon,
 	redo as redoIcon,
 } from '@wordpress/icons';
@@ -83,6 +84,11 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
+	function insertMedia() {
+		// eslint-disable-next-line no-console
+		console.log( 'insert media' );
+	}
+
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
 			if ( isOpen ) {
@@ -130,6 +136,16 @@ function HeaderToolbar( {
 					disabled={ ! showInserter }
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
+				/>
+				<ToolbarButton
+					key="mediaButton"
+					title={ __( 'Media' ) }
+					icon={ mediaIcon }
+					isDisabled={ ! hasUndo }
+					onClick={ insertMedia }
+					extraProps={ {
+						hint: __( 'Insert media' ),
+					} }
 				/>
 				{ renderHistoryButtons() }
 				<BlockToolbar />
