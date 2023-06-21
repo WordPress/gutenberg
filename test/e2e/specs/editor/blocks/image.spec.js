@@ -997,7 +997,7 @@ test.describe( 'Image - interactivity', () => {
 			).not.toBeInViewport();
 		} );
 
-		test( 'lightbox markup should not appear if Lightbox is disabled', async ( {
+		test( 'markup should not appear if Lightbox is disabled', async ( {
 			editor,
 			page,
 		} ) => {
