@@ -14,23 +14,43 @@ import { __, _x } from '@wordpress/i18n';
  */
 
 /**
+ * The descriptions are purposely made generic as object-fit could be used for
+ * any replaced element. Provide your own set of options if you need different
+ * help text or labels.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Replaced_element
+ *
  * @type {SelectControlProps[]}
  */
 const DEFAULT_SCALE_OPTIONS = [
 	{
-		value: 'cover',
-		label: _x( 'Cover', 'Scale option for dimensions control' ),
-		help: __( 'Scale and crop to fill the space without being distorted.' ),
+		value: 'fill',
+		label: _x( 'Fill', 'Scale option for dimensions control' ),
+		help: __( 'Fill the space by stretching the content.' ),
 	},
 	{
 		value: 'contain',
 		label: _x( 'Contain', 'Scale option for dimensions control' ),
-		help: __( 'Scale to fill the space without clipping or distorting.' ),
+		help: __( 'Fit the content to the space without clipping.' ),
 	},
 	{
-		value: 'fill',
-		label: _x( 'Fill', 'Scale option for dimensions control' ),
-		help: __( 'Stretch and distort to fill the space.' ),
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( "Fill the space by clipping what doesn't fit." ),
+	},
+	{
+		value: 'none',
+		label: _x( 'None', 'Scale option for dimensions control' ),
+		help: __(
+			'Do not adjust the sizing of the content. Content that is too large will be clipped, and content that is too small will have additional padding.'
+		),
+	},
+	{
+		value: 'scale-down',
+		label: _x( 'Scale down', 'Scale option for dimensions control' ),
+		help: __(
+			'Scale down the content to fit the space if it is too big. Content that is too small will have additional padding.'
+		),
 	},
 ];
 
@@ -69,7 +89,6 @@ export default function ScaleTool( {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'fill';
 
-	// TODO: Since we're passing in options, would it make sense to hardcode the help text as a lookup for all CSS values inste?
 	const scaleHelp = useMemo( () => {
 		return options.reduce( ( acc, option ) => {
 			acc[ option.value ] = option.help;
