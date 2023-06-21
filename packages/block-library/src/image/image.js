@@ -693,9 +693,6 @@ export default function Image( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
-					// TODO: elt.offsetWidth seemed to be more reliable than
-					// calculating off the delta. Is there any reason that the
-					// delta was used before that I don't know about?
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: `${ elt.offsetHeight }px`,
