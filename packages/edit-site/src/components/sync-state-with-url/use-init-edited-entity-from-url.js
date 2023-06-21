@@ -32,7 +32,7 @@ export default function useInitEditedEntityFromURL() {
 	}, [] );
 
 	const {
-		setReusableBlock,
+		setEditedEntity,
 		setTemplate,
 		setTemplatePart,
 		setPage,
@@ -52,7 +52,7 @@ export default function useInitEditedEntityFromURL() {
 					setNavigationMenu( postId );
 					break;
 				case 'wp_block':
-					setReusableBlock( postId );
+					setEditedEntity( postType, postId );
 					break;
 				default:
 					setPage( {
@@ -79,6 +79,7 @@ export default function useInitEditedEntityFromURL() {
 		postType,
 		homepageId,
 		isRequestingSite,
+		setEditedEntity,
 		setPage,
 		setTemplate,
 		setTemplatePart,

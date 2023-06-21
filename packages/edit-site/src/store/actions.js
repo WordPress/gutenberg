@@ -192,17 +192,18 @@ export function setNavigationMenu( navigationMenuId ) {
 }
 
 /**
- * Action that sets a reusable block.
+ * Action that sets an edited entity.
  *
- * @param {string} reusableBlockId The reusable block ID.
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
  *
  * @return {Object} Action object.
  */
-export function setReusableBlock( reusableBlockId ) {
+export function setEditedEntity( postType, postId ) {
 	return {
 		type: 'SET_EDITED_POST',
-		postType: 'wp_block',
-		id: reusableBlockId,
+		postType,
+		id: postId,
 	};
 }
 
