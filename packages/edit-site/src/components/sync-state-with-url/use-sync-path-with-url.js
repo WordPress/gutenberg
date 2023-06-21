@@ -18,6 +18,7 @@ export function getPathFromURL( urlParams ) {
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
+			case 'wp_block':
 			case 'wp_template':
 			case 'wp_template_part':
 			case 'page':
@@ -86,10 +87,19 @@ export default function useSyncPathWithURL() {
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );
+		} else if ( navigatorLocation.path === '/library' ) {
+			updateUrlParams( {
+				postType: undefined,
+				postId: undefined,
+				canvas: undefined,
+				path: navigatorLocation.path,
+			} );
 		} else {
 			updateUrlParams( {
 				postType: undefined,
 				postId: undefined,
+				categoryType: undefined,
+				categoryId: undefined,
 				path:
 					navigatorLocation.path === '/'
 						? undefined

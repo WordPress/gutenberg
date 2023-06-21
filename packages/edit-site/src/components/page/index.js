@@ -1,12 +1,24 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
-
 import Header from './header';
 
-export default function Page( { title, subTitle, actions, children } ) {
+export default function Page( {
+	title,
+	subTitle,
+	actions,
+	children,
+	className,
+} ) {
+	const classes = classnames( 'edit-site-page', className );
+
 	return (
-		<div className="edit-site-page">
+		<div className={ classes }>
 			{ title && (
 				<Header
 					title={ title }

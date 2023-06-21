@@ -19,7 +19,7 @@ export default function PageMain() {
 
 	if ( path === '/wp_template/all' ) {
 		return <PageTemplates />;
-	} else if ( path === '/wp_template_part/all' ) {
+	} else if ( path === '/library' ) {
 		return <PageLibrary />;
 	}
 
