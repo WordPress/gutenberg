@@ -61,8 +61,6 @@ export default function save( { attributes } ) {
 				aspectRatio,
 				objectFit: scale,
 			} }
-			width={ width }
-			height={ height }
 			title={ title }
 		/>
 	);
