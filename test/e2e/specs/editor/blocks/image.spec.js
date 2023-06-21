@@ -997,6 +997,25 @@ test.describe( 'Image - interactivity', () => {
 			).not.toBeInViewport();
 		} );
 
+		test( 'markup should not appear if Lightbox is disabled', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			const behaviorSelect = page.getByRole( 'combobox', {
+				name: 'Behaviors',
+			} );
+			await behaviorSelect.selectOption( '' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			// The lightbox markup should not appear in the DOM at all
+			await expect(
+				page.getByRole( 'button', { name: 'Enlarge image' } )
+			).not.toBeInViewport();
+		} );
+
 		test.describe( 'keyboard navigation', () => {
 			let openLightboxButton;
 			let lightbox;
