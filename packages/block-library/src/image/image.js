@@ -655,7 +655,6 @@ export default function Image( {
 		}
 		/* eslint-enable no-lonely-if */
 
-		// TODO: Figure out why height depended on having a custom border.
 		img = (
 			<ResizableBox
 				style={ {
