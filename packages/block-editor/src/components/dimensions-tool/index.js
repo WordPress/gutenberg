@@ -74,7 +74,13 @@ function DimensionsTool( {
 	} );
 	const units = unitsOptions ?? customUnits;
 
+	// Keep track of state internally, so when the value is cleared by means
+	// other than directly editing that field, it's easier to restore the
+	// previous value.
 	const [ lastScale, setLastScale ] = useState( value.scale );
+	const [ lastAspectRatio, setLastAspectRatio ] = useState(
+		value.aspectRatio
+	);
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
@@ -141,6 +147,7 @@ function DimensionsTool( {
 						delete nextValue.height;
 					}
 
+					setLastAspectRatio( nextAspectRatio );
 					onChange( nextValue );
 				} }
 			/>
@@ -163,6 +170,15 @@ function DimensionsTool( {
 				onChange={ ( nextDimension ) => {
 					const { width, height, ...nextValue } = value;
 					Object.assign( nextValue, nextDimension );
+
+					if (
+						( nextValue.height !== null &&
+							nextValue.height !== undefined ) !==
+						( nextValue.width !== null &&
+							nextValue.width !== undefined )
+					) {
+						nextValue.aspectRatio = lastAspectRatio;
+					}
 
 					// Setting both width and height values overrides the aspect ratio.
 					if (
