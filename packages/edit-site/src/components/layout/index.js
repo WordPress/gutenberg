@@ -168,72 +168,64 @@ export default function Layout() {
 					}
 				) }
 			>
-				{ isEditing && (
-					<motion.div
-						className="edit-site-layout__header-container"
-						variants={ headerVariants }
-						initial={
-							isDistractionFree
-								? 'hidden'
-								: 'distractionFreeInactive'
-						}
-						whileHover={
-							isDistractionFree
-								? 'hover'
-								: 'distractionFreeInactive'
-						}
-						animate={
-							isDistractionFree
-								? 'hidden'
-								: 'distractionFreeInactive'
-						}
-						transition={ { type: 'tween', delay: 0.2 } }
-					>
-						{ isDistractionFree && (
-							<SiteHub
+				<motion.div
+					className="edit-site-layout__header-container"
+					variants={ isEditing ? headerVariants : null }
+					initial={
+						isDistractionFree ? 'hidden' : 'distractionFreeInactive'
+					}
+					whileHover={
+						isDistractionFree ? 'hover' : 'distractionFreeInactive'
+					}
+					animate={
+						isDistractionFree ? 'hidden' : 'distractionFreeInactive'
+					}
+					transition={ { type: 'tween', delay: 0.2 } }
+				>
+					{ isDistractionFree && isEditing && (
+						<SiteHub
+							as={ motion.div }
+							variants={ slideX }
+							ref={ hubRef }
+							className="edit-site-layout__hub"
+						/>
+					) }
+
+					{ ( ! isDistractionFree || ! isEditing ) && (
+						<SiteHub
+							ref={ hubRef }
+							className="edit-site-layout__hub"
+						/>
+					) }
+
+					<AnimatePresence initial={ false }>
+						{ isEditorPage && isEditing && (
+							<NavigableRegion
+								className="edit-site-layout__header"
+								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
-								variants={ slideX }
-								ref={ hubRef }
-								className="edit-site-layout__hub"
-							/>
+								animate={ {
+									y: 0,
+								} }
+								initial={ {
+									y: '-100%',
+								} }
+								exit={ {
+									y: '-100%',
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
+									ease: 'easeOut',
+								} }
+							>
+								{ isEditing && <Header /> }
+							</NavigableRegion>
 						) }
-
-						{ ! isDistractionFree && (
-							<SiteHub
-								ref={ hubRef }
-								className="edit-site-layout__hub"
-							/>
-						) }
-
-						<AnimatePresence initial={ false }>
-							{ isEditorPage && isEditing && (
-								<NavigableRegion
-									className="edit-site-layout__header"
-									ariaLabel={ __( 'Editor top bar' ) }
-									as={ motion.div }
-									animate={ {
-										y: 0,
-									} }
-									initial={ {
-										y: '-100%',
-									} }
-									exit={ {
-										y: '-100%',
-									} }
-									transition={ {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-								>
-									{ isEditing && <Header /> }
-								</NavigableRegion>
-							) }
-						</AnimatePresence>
-					</motion.div>
-				) }
+					</AnimatePresence>
+				</motion.div>
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
