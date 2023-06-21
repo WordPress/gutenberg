@@ -298,8 +298,9 @@ describe( 'BoxControl', () => {
 
 			expect( unitSelect ).toHaveFocus();
 
-			// Due to the test environment not being a browser the units here
-			// are still "px". In a browser they would be expected to be "rem".
+			// The correct expected behavior would be for the values to have "rem"
+			// as their unit, but the test environment doesn't seem to change
+			// values on `select` elements when using the keyboard.
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
 				top: '7px',
 				right: '7px',

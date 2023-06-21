@@ -297,8 +297,10 @@ describe( 'UnitControl', () => {
 			// Called only once because `isPressEnterToChange` is `true`.
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 
-			// True for the test environment but in common browsers this would
-			// be last called with '41vw' (after the call with '41px').
+			// The correct expected behavior would be for the `onChangeSpy` callback
+			// to be called twice, first with `41px` and immediately after with `41vh`,
+			// but the test environment doesn't seem to change values on `select`
+			// elements when using the keyboard.
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				'41px',
 				expect.anything()
@@ -625,6 +627,10 @@ describe( 'UnitControl', () => {
 				// The unit character was not entered in the input.
 				expect( input ).toHaveValue( 55 );
 
+				// The correct expected behavior would be for onChangeSpy to be
+				// called 4 times, and for the last value it was called with to be
+				// `55${testUnit}`, but the test environment doesn't seem to change
+				// values on `select` elements when using the keyboard.
 				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 				expect( onChangeSpy ).toHaveBeenLastCalledWith(
 					'55%',
