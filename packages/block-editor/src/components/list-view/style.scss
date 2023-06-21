@@ -51,13 +51,6 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block-contents {
-		// Hide selection styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			background: none;
-			color: $gray-900;
-		}
-	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
@@ -77,7 +70,7 @@
 	}
 
 	&.is-dragging {
-		display: none;
+		opacity: 0.5;
 	}
 
 	// Border radius for corners of the selected item.
