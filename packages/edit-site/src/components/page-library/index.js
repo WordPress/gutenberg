@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
 
 /**
@@ -28,11 +27,7 @@ export default function PageLibrary() {
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page className="edit-site-library">
-				<PatternsList
-					type={ type }
-					categoryId={ category }
-					label={ __( 'Patterns list' ) }
-				/>
+				<PatternsList type={ type } categoryId={ category } />
 			</Page>
 		</ExperimentalBlockEditorProvider>
 	);

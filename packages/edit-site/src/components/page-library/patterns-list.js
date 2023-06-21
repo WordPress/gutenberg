@@ -27,7 +27,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-export default function PatternsList( { categoryId, label, type } ) {
+export default function PatternsList( { categoryId, type } ) {
 	const location = useLocation();
 	const history = useHistory();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -85,7 +85,7 @@ export default function PatternsList( { categoryId, label, type } ) {
 					<Grid
 						icon={ symbol }
 						categoryId={ categoryId }
-						label={ label }
+						label={ __( 'Synced patterns' ) }
 						items={ syncedPatterns }
 					/>
 				</>
@@ -102,7 +102,7 @@ export default function PatternsList( { categoryId, label, type } ) {
 					</VStack>
 					<Grid
 						categoryId={ categoryId }
-						label={ label }
+						label={ __( 'Standard patterns' ) }
 						items={ unsyncedPatterns }
 					/>
 				</>
