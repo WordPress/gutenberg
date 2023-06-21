@@ -523,7 +523,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
                         $new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'file' ] ] );
                     }
                     
-                    // If the font face assets were succesfully downloaded, we add the font face to the new font
+                    // If the font face assets were successfully downloaded, we add the font face to the new font.
                     // Font faces with failed downloads are not added to the new font
                     if ( !empty ( $new_font_face['src'] ) ){
                         $new_font_faces[] = $new_font_face;
