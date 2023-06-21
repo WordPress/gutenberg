@@ -106,7 +106,15 @@ export type SlotComponentProps = {
 
 export type BaseFillObject = {
 	name: string;
-	children:
+	children?:
+		| ReactElement
+		| string
+		| ( ( props: any ) => ReactElement | string );
+};
+
+export type FillComponentProps = {
+	name: string;
+	children?:
 		| ReactElement
 		| string
 		| ( ( props: any ) => ReactElement | string );
