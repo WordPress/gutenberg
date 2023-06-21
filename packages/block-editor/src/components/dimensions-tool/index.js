@@ -3,7 +3,6 @@
  */
 import { useState } from '@wordpress/element';
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
