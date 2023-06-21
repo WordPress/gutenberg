@@ -1480,10 +1480,17 @@ export function isSelectionEnabled( state = true, action ) {
 export function isRemovalPromptDisplayed( state = false, action ) {
 	switch ( action.type ) {
 		case 'PROMPT_REMOVAL':
+			const {
+				displayPrompt,
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+			} = action;
 			return {
-				displayPrompt: action.displayPrompt,
-				removalFunction: action.removalFunction,
-				blocksToPromptFor: action.blocksToPromptFor,
+				displayPrompt,
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
 			};
 	}
 
@@ -1501,7 +1508,7 @@ export function isRemovalPromptDisplayed( state = false, action ) {
 export function removalPromptExists( state = false, action ) {
 	switch ( action.type ) {
 		case 'PROMPT_EXISTS':
-			return action.exists;
+			return action.status;
 	}
 
 	return state;

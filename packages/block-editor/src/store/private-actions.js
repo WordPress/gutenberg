@@ -7,6 +7,7 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { blockTypePromptMessages } from '../utils/block-removal';
+import { removalPromptExists } from './private-selectors';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -152,11 +153,16 @@ export const privateRemoveBlocks =
 		// confirmation that they intended to remove such block(s). However,
 		// the editor instance is responsible for presenting those confirmation
 		// prompts to the user. Any instance opting into removal prompts must
-		// enable `removalPromptExists()`.
+		// register using `setRemovalPromptStatus()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
-		if ( ! forceRemove && select.removalPromptExists() ) {
-			const blocksForPrompt = new Set();
+		if (
+			! forceRemove &&
+			// FIXME what's the best way to unlock a private selector in this
+			// context?
+			select( ( state ) => removalPromptExists( state.root ) )
+		) {
+			const blockNamesForPrompt = new Set();
 
 			// Given a list of client IDs of blocks that the user intended to
 			// remove, perform a tree search (BFS) to find all block names
@@ -169,7 +175,7 @@ export const privateRemoveBlocks =
 				const clientId = queue.shift();
 				const blockName = select.getBlockName( clientId );
 				if ( blockTypePromptMessages[ blockName ] ) {
-					blocksForPrompt.add( blockName );
+					blockNamesForPrompt.add( blockName );
 				}
 				const innerBlocks = select.getBlockOrder( clientId );
 				queue.push( ...innerBlocks );
@@ -177,19 +183,14 @@ export const privateRemoveBlocks =
 
 			// If any such blocks were found, trigger the removal prompt and
 			// skip any other steps (thus postponing actual removal).
-			if ( blocksForPrompt.size ) {
-				dispatch.displayRemovalPrompt( true, {
-					removalFunction() {
-						dispatch(
-							privateRemoveBlocks(
-								clientIds,
-								selectPrevious,
-								/* force */ true
-							)
-						);
-					},
-					blocksToPromptFor: Array.from( blocksForPrompt ),
-				} );
+			if ( blockNamesForPrompt.size ) {
+				dispatch(
+					displayRemovalPrompt( true, {
+						clientIds,
+						selectPrevious,
+						blockNamesForPrompt: Array.from( blockNamesForPrompt ),
+					} )
+				);
 				return;
 			}
 		}
@@ -231,3 +232,36 @@ export const ensureDefaultBlock =
 
 		dispatch.insertDefaultBlock();
 	};
+
+/**
+ * Returns an action object used in signalling that a removal prompt must be displayed.
+ *
+ * @param {boolean}  displayPrompt Whether to prompt for removal.
+ * @param {Function} options       Function to call if removal is confirmed and blockName.
+ *
+ * @return {Object} Action object.
+ */
+export function displayRemovalPrompt( displayPrompt, options = {} ) {
+	const { clientIds, selectPrevious, blockNamesForPrompt } = options;
+	return {
+		type: 'PROMPT_REMOVAL',
+		displayPrompt,
+		clientIds,
+		selectPrevious,
+		blockNamesForPrompt,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a removal prompt display
+ * mechanism is available or unavailable.
+ *
+ * @param {boolean} status Whether a prompt display mechanism exists.
+ * @return {Object} Action object.
+ */
+export function setRemovalPromptStatus( status = true ) {
+	return {
+		type: 'PROMPT_EXISTS',
+		status,
+	};
+}

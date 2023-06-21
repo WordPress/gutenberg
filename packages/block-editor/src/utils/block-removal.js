@@ -14,6 +14,7 @@ import { __, _n } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 export const blockTypePromptMessages = {
 	'core/query': __( 'Query Loop displays a list of posts.' ),
@@ -23,29 +24,33 @@ export const blockTypePromptMessages = {
 };
 
 export function BlockRemovalWarningModal() {
-	const { removalFunction, blocksToPromptFor: blockNames } = useSelect(
-		( select ) => select( blockEditorStore ).isRemovalPromptDisplayed()
+	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).isRemovalPromptDisplayed()
 	);
 
-	const { displayRemovalPrompt, removalPromptExists } =
-		useDispatch( blockEditorStore );
+	const {
+		displayRemovalPrompt,
+		setRemovalPromptStatus,
+		privateRemoveBlocks,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	// Signalling the removal prompt is in place.
 	useEffect( () => {
-		removalPromptExists( true );
+		setRemovalPromptStatus( true );
 		return () => {
-			removalPromptExists( false );
+			setRemovalPromptStatus( false );
 		};
-	}, [ removalPromptExists ] );
+	}, [ setRemovalPromptStatus ] );
 
-	if ( ! blockNames ) {
+	if ( ! blockNamesForPrompt ) {
 		return;
 	}
 
 	const closeModal = () => displayRemovalPrompt( false );
 
 	const onConfirmRemoval = () => {
-		removalFunction();
+		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );
 		closeModal();
 	};
 
@@ -54,15 +59,15 @@ export function BlockRemovalWarningModal() {
 			title={ _n(
 				'Really delete this block?',
 				'Really delete these blocks?',
-				blockNames.length
+				clientIds.length
 			) }
 			onRequestClose={ closeModal }
 		>
-			{ blockNames.length === 1 ? (
-				<p>{ blockTypePromptMessages[ blockNames[ 0 ] ] }</p>
+			{ blockNamesForPrompt.length === 1 ? (
+				<p>{ blockTypePromptMessages[ blockNamesForPrompt[ 0 ] ] }</p>
 			) : (
 				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
-					{ blockNames.map( ( name ) => (
+					{ blockNamesForPrompt.map( ( name ) => (
 						<li key={ name }>
 							{ blockTypePromptMessages[ name ] }
 						</li>
@@ -73,7 +78,7 @@ export function BlockRemovalWarningModal() {
 				{ _n(
 					'Removing this block is not advised.',
 					'Removing these blocks is not advised.',
-					blockNames.length
+					blockNamesForPrompt.length
 				) }
 			</p>
 			<HStack justify="right">

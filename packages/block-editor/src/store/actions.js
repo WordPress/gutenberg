@@ -1189,37 +1189,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/**
- * Returns an action object used in signalling that a removal prompt must be displayed.
- *
- * @param {boolean}  displayPrompt Whether to prompt for removal.
- * @param {Function} options       Function to call if removal is confirmed and blockName.
- *
- * @return {Object} Action object.
- */
-export function displayRemovalPrompt( displayPrompt, options = {} ) {
-	const { removalFunction, blocksToPromptFor } = options;
-	return {
-		type: 'PROMPT_REMOVAL',
-		displayPrompt,
-		removalFunction,
-		blocksToPromptFor,
-	};
-}
-
-/**
- * Returns an action object used in signalling that a removal prompt display mechanism is available or unavailable.
- *
- * @param {boolean} exists Whether a prompt display mechanism exists.
- * @return {Object} Action object.
- */
-export function removalPromptExists( exists = true ) {
-	return {
-		type: 'PROMPT_EXISTS',
-		exists,
-	};
-}
-
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the

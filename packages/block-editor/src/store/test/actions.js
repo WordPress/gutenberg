@@ -614,11 +614,17 @@ describe( 'actions', () => {
 			const clientId = 'clientId';
 			const clientIds = [ clientId ];
 
-			const select = {
-				getBlockRootClientId: () => undefined,
-				canRemoveBlocks: () => true,
-				removalPromptExists: () => false,
-			};
+			// FIXME: Once the private action `privateRemoveBlocks` is properly
+			// unlocking the private selector `removalPromptExists`, this test
+			// should rewritten to do the right thing.
+			const select = Object.assign(
+				( selector ) =>
+					selector( { root: { removalPromptExists: false } } ),
+				{
+					getBlockRootClientId: () => undefined,
+					canRemoveBlocks: () => true,
+				}
+			);
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
@@ -725,11 +731,17 @@ describe( 'actions', () => {
 		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'myclientid';
 
-			const select = {
-				getBlockRootClientId: () => null,
-				canRemoveBlocks: () => true,
-				removalPromptExists: () => false,
-			};
+			// FIXME: Once the private action `privateRemoveBlocks` is properly
+			// unlocking the private selector `removalPromptExists`, this test
+			// should rewritten to do the right thing.
+			const select = Object.assign(
+				( selector ) =>
+					selector( { root: { removalPromptExists: false } } ),
+				{
+					getBlockRootClientId: () => null,
+					canRemoveBlocks: () => true,
+				}
+			);
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
@@ -750,11 +762,17 @@ describe( 'actions', () => {
 		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
-			const select = {
-				getBlockRootClientId: () => null,
-				canRemoveBlocks: () => true,
-				removalPromptExists: () => false,
-			};
+			// FIXME: Once the private action `privateRemoveBlocks` is properly
+			// unlocking the private selector `removalPromptExists`, this test
+			// should rewritten to do the right thing.
+			const select = Object.assign(
+				( selector ) =>
+					selector( { root: { removalPromptExists: false } } ),
+				{
+					getBlockRootClientId: () => null,
+					canRemoveBlocks: () => true,
+				}
+			);
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
