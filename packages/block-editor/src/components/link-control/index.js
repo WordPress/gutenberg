@@ -292,6 +292,8 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
@@ -375,7 +377,7 @@ function LinkControl( {
 				/>
 			) }
 
-			{ isEditingLink && hasLinkValue && (
+			{ showSettings && (
 				<div className="block-editor-link-control__tools">
 					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
