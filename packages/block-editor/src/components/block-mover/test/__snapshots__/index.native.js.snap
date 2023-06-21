@@ -42,7 +42,7 @@ exports[`Block Mover Picker moving blocks moves blocks up and down 1`] = `
 <!-- /wp:spacer -->"
 `;
 
-exports[`Block Mover Picker should match snapshot 1`] = `
+exports[`Block Mover Picker should render without crashing and match snapshot 1`] = `
 [
   <View>
     <View
@@ -76,7 +76,7 @@ exports[`Block Mover Picker should match snapshot 1`] = `
     >
       <View
         collapsable={false}
-        handlerTag={3}
+        handlerTag={1}
         handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -144,7 +144,7 @@ exports[`Block Mover Picker should match snapshot 1`] = `
     >
       <View
         collapsable={false}
-        handlerTag={4}
+        handlerTag={2}
         handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}

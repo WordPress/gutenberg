@@ -44,7 +44,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
 } from './constants';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 

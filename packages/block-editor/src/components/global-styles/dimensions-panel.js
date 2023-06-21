@@ -208,7 +208,7 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 } ) {
 	const decodeValue = ( rawValue ) => {
-		if ( typeof rawValue === 'object' ) {
+		if ( rawValue && typeof rawValue === 'object' ) {
 			return Object.keys( rawValue ).reduce( ( acc, key ) => {
 				acc[ key ] = getValueFromVariable(
 					{ settings },
@@ -499,7 +499,6 @@ export default function DimensionsPanel( {
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialPadding }
 							onMouseOver={ onMouseOverPadding }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -540,7 +539,6 @@ export default function DimensionsPanel( {
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialMargin }
 							onMouseOver={ onMouseOverMargin }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -587,10 +585,10 @@ export default function DimensionsPanel( {
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
+							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
-							splitOnAxis={ isAxialGap }
 						/>
 					) }
 				</ToolsPanelItem>

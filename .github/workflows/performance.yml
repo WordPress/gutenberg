@@ -59,13 +59,13 @@ jobs:
             - name: Compare performance with base branch
               if: github.event_name == 'push'
               # The base hash used here need to be a commit that is compatible with the current WP version
-              # The current one is debd225d007f4e441ceec80fbd6fa96653f94737 and it needs to be updated every WP major release.
+              # The current one is 34af5829ac9edb31833167ff6a3b51bea982999c and it needs to be updated every WP major release.
               # It is used as a base comparison point to avoid fluctuation in the performance metrics.
               run: |
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf $GITHUB_SHA 34af5829ac9edb31833167ff6a3b51bea982999c --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -88,7 +88,7 @@ jobs:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
                   COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%ct")
-                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA 34af5829ac9edb31833167ff6a3b51bea982999c $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2

@@ -12,8 +12,10 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenLibrary from '../sidebar-navigation-screen-library';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
@@ -22,7 +24,7 @@ import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
@@ -51,13 +53,19 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+			<NavigatorScreen path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			<NavigatorScreen path="/library">
+				<SidebarNavigationScreenLibrary />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
+			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
 			</NavigatorScreen>
 		</>
@@ -76,9 +84,7 @@ function Sidebar() {
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
-			<div className="edit-site-sidebar__footer">
-				<SaveHub />
-			</div>
+			<SaveHub />
 		</>
 	);
 }

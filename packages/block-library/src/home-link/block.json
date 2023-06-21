@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/home-link",
 	"category": "design",
 	"parent": [ "core/navigation" ],
@@ -22,7 +22,6 @@
 		"style"
 	],
 	"supports": {
-		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {

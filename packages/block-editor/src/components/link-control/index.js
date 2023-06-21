@@ -181,12 +181,6 @@ function LinkControl( {
 			isMounting.current = false;
 			return;
 		}
-		// Unless we are mounting, we always want to focus either:
-		// - the URL input
-		// - the first focusable element in the Link UI.
-		// But in editing mode if there is a text input present then
-		// the URL input is at index 1. If not then it is at index 0.
-		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
 		// Scenario - when:
 		// - switching between editable and non editable LinkControl
@@ -194,9 +188,8 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[
-				whichFocusTargetIndex
-			] || wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			wrapperNode.current;
 
 		nextFocusTarget.focus();
 
@@ -307,6 +300,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 
 	return (
 		<div
@@ -347,6 +341,17 @@ function LinkControl( {
 							}
 							useLabel={ showTextControl }
 						/>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -373,42 +378,27 @@ function LinkControl( {
 
 			{ isEditing && (
 				<div className="block-editor-link-control__tools">
-					{ ( showSettings || showTextControl ) && (
+					{ showSettings && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
 						>
-							{ showTextControl && (
-								<TextControl
-									__nextHasNoMarginBottom
-									ref={ textInputRef }
-									className="block-editor-link-control__setting block-editor-link-control__text-content"
-									label="Text"
-									value={ internalControlValue?.title }
-									onChange={ setInternalTextInputValue }
-									onKeyDown={ handleSubmitWithEnter }
-								/>
-							) }
-							{ showSettings && (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings }
-									onChange={ createSetInternalSettingValueHandler(
-										settingsKeys
-									) }
-								/>
-							) }
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
 						</LinkControlSettingsDrawer>
 					) }
 
 					<div className="block-editor-link-control__search-actions">
 						<Button
 							variant="primary"
-							onClick={ handleSubmit }
+							onClick={ isDisabled ? noop : handleSubmit }
 							className="block-editor-link-control__search-submit"
-							disabled={
-								! valueHasChanges || currentInputIsEmpty
-							}
+							aria-disabled={ isDisabled }
 						>
 							{ __( 'Save' ) }
 						</Button>

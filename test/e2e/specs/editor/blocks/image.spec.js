@@ -32,10 +32,13 @@ test.describe( 'Image', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'can be inserted', async ( { editor, page, imageBlockUtils } ) => {
+	test( 'can be inserted via image upload', async ( {
+		editor,
+		imageBlockUtils,
+	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();
@@ -63,7 +66,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -134,7 +137,7 @@ test.describe( 'Image', () => {
 		{
 			// Focus outside the block to avoid the image caption being selected
 			// It can happen on CI specially.
-			await page.click( 'role=textbox[name="Add title"i]' );
+			await editor.canvas.click( 'role=textbox[name="Add title"i]' );
 			await image.click();
 			await page.keyboard.press( 'Backspace' );
 
@@ -149,7 +152,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -165,7 +168,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.type( '2' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '12' );
 	} );
 
@@ -176,7 +181,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -193,7 +198,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 
@@ -205,7 +212,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -245,7 +252,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowRight' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( '<strong>a</strong>' );
 	} );
 
@@ -256,7 +265,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -300,7 +309,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -366,7 +375,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -423,7 +432,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -459,7 +468,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -513,13 +522,12 @@ test.describe( 'Image', () => {
 
 	test( 'should undo without broken temporary state', async ( {
 		editor,
-		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		const image = imageBlock.locator( 'role=img' );
@@ -529,7 +537,7 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-		await page.focus( '.wp-block-image' );
+		await editor.canvas.focus( '.wp-block-image' );
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a
@@ -543,8 +551,15 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
@@ -637,7 +652,7 @@ test.describe( 'Image', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 
@@ -692,13 +707,13 @@ test.describe( 'Image', () => {
 		);
 	} );
 
-	test( 'should appear in the frontend published post content', async ( {
+	test( 'image inserted via upload should appear in the frontend published post content', async ( {
 		editor,
 		imageBlockUtils,
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = page.locator(
+		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
 		await expect( imageBlock ).toBeVisible();
@@ -727,11 +742,92 @@ test.describe( 'Image', () => {
 			new RegExp( filename )
 		);
 	} );
+
+	test( 'image inserted via link should appear in the frontend published post content', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlock
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		// This form lacks distinguishing qualities other than the
+		// class name, so we use page.locator() instead of page.getByRole()
+		const form = page.locator(
+			'form.block-editor-media-placeholder__url-input-form'
+		);
+
+		const imgUrl =
+			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute( 'src', imgUrl );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
+	} );
+
+	test( 'adding a link should reflect configuration in published post content', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await page
+			.getByLabel( 'Block tools' )
+			.getByLabel( 'Insert link' )
+			.click();
+
+		// This form lacks distinguishing qualities other than the
+		// class name, so we use page.locator() instead of page.getByRole()
+		const form = page.locator( '.block-editor-url-popover__link-editor' );
+
+		const url = 'https://wordpress.org';
+
+		await form.getByLabel( 'URL' ).fill( url );
+
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const linkDom = figureDom.locator( 'a' );
+		await expect( linkDom ).toBeVisible();
+		await expect( linkDom ).toHaveAttribute( 'href', url );
+	} );
 } );
 
 test.describe( 'Image - interactivity', () => {
-	let filename = null;
-
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
@@ -740,7 +836,7 @@ test.describe( 'Image - interactivity', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin, page, editor, imageBlockUtils } ) => {
+	test.beforeEach( async ( { admin, page, editor } ) => {
 		await admin.visitAdminPage(
 			'/admin.php',
 			'page=gutenberg-experiments'
@@ -755,20 +851,6 @@ test.describe( 'Image - interactivity', () => {
 
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		filename = await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-		const image = imageBlock.locator( 'role=img' );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-
-		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test.afterEach( async ( { requestUtils, admin, page } ) => {
@@ -788,35 +870,257 @@ test.describe( 'Image - interactivity', () => {
 		await page.waitForLoadState();
 	} );
 
-	test( 'should toggle "lightbox" in saved attributes', async ( {
-		editor,
-		page,
-	} ) => {
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page
-			.getByRole( 'combobox', { name: 'Behaviors' } )
-			.selectOption( 'lightbox' );
+	test.describe( 'tests using uploaded image', () => {
+		let filename = null;
 
-		let blocks = await editor.getBlocks();
-		expect( blocks[ 0 ].attributes ).toMatchObject( {
-			behaviors: { lightbox: true },
-			linkDestination: 'none',
-		} );
-		expect( blocks[ 0 ].attributes.url ).toContain( filename );
+		test.beforeEach( async ( { editor, imageBlockUtils } ) => {
+			const imageBlock = editor.canvas.locator(
+				'role=document[name="Block: Image"i]'
+			);
+			await expect( imageBlock ).toBeVisible();
 
-		await page.getByLabel( 'Behaviors' ).selectOption( '' );
-		blocks = await editor.getBlocks();
-		expect( blocks[ 0 ].attributes ).toMatchObject( {
-			behaviors: { lightbox: false },
-			linkDestination: 'none',
+			filename = await imageBlockUtils.upload(
+				imageBlock.locator( 'data-testid=form-file-upload-input' )
+			);
+			const image = imageBlock.locator( 'role=img' );
+			await expect( image ).toBeVisible();
+			await expect( image ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+
+			await editor.openDocumentSettingsSidebar();
 		} );
-		expect( blocks[ 0 ].attributes.url ).toContain( filename );
+
+		test( 'should toggle "lightbox" in saved attributes', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Behaviors' } )
+				.selectOption( 'lightbox' );
+
+			let blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes ).toMatchObject( {
+				behaviors: {
+					lightbox: {
+						animation: 'zoom',
+						enabled: true,
+					},
+				},
+				linkDestination: 'none',
+			} );
+			expect( blocks[ 0 ].attributes.url ).toContain( filename );
+
+			await page.getByLabel( 'Behaviors' ).selectOption( '' );
+			blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes ).toMatchObject( {
+				behaviors: {
+					lightbox: {
+						animation: '',
+						enabled: false,
+					},
+				},
+				linkDestination: 'none',
+			} );
+			expect( blocks[ 0 ].attributes.url ).toContain( filename );
+		} );
+
+		test( 'should open and close the image in a lightbox when using a mouse and dynamically load src', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Behaviors' } )
+				.selectOption( 'lightbox' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const lightbox = page.locator( '.wp-lightbox-overlay' );
+			await expect( lightbox ).toBeHidden();
+			const image = lightbox.locator( 'img' );
+
+			await expect( image ).toHaveAttribute( 'src', '' );
+
+			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
+
+			await expect( image ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+
+			await expect( lightbox ).toBeVisible();
+
+			const closeButton = lightbox.getByRole( 'button', {
+				name: 'Close',
+			} );
+			await closeButton.click();
+
+			await expect( lightbox ).toBeHidden();
+		} );
+
+		test( 'lightbox should be overriden when link is configured for image', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			const behaviorSelect = page.getByRole( 'combobox', {
+				name: 'Behaviors',
+			} );
+			await behaviorSelect.selectOption( 'lightbox' );
+
+			await page
+				.getByLabel( 'Block tools' )
+				.getByLabel( 'Insert link' )
+				.click();
+
+			const form = page.locator(
+				'.block-editor-url-popover__link-editor'
+			);
+
+			const url = 'https://wordpress.org';
+
+			await form.getByLabel( 'URL' ).fill( url );
+
+			await form.getByRole( 'button', { name: 'Apply' } ).click();
+			await expect( behaviorSelect ).toBeDisabled();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			// The lightbox markup should not appear in the DOM at all
+			await expect(
+				page.getByRole( 'button', { name: 'Enlarge image' } )
+			).not.toBeInViewport();
+		} );
+
+		test( 'markup should not appear if Lightbox is disabled', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			const behaviorSelect = page.getByRole( 'combobox', {
+				name: 'Behaviors',
+			} );
+			await behaviorSelect.selectOption( '' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			// The lightbox markup should not appear in the DOM at all
+			await expect(
+				page.getByRole( 'button', { name: 'Enlarge image' } )
+			).not.toBeInViewport();
+		} );
+
+		test.describe( 'keyboard navigation', () => {
+			let openLightboxButton;
+			let lightbox;
+			let closeButton;
+
+			test.beforeEach( async ( { page, editor } ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page
+					.getByRole( 'combobox', { name: 'Behaviors' } )
+					.selectOption( 'lightbox' );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				openLightboxButton = page.getByRole( 'button', {
+					name: 'Enlarge image',
+				} );
+				lightbox = page.getByRole( 'dialog' );
+				closeButton = lightbox.getByRole( 'button', {
+					name: 'Close',
+				} );
+			} );
+
+			test( 'should open and focus appropriately using enter key', async ( {
+				page,
+			} ) => {
+				// Open and close lightbox using the close button
+				await openLightboxButton.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( lightbox ).toBeVisible();
+				await expect( closeButton ).toBeFocused();
+			} );
+
+			test( 'should close and focus appropriately using enter key on close button', async ( {
+				page,
+			} ) => {
+				// Open and close lightbox using the close button
+				await openLightboxButton.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( lightbox ).toBeVisible();
+				await expect( closeButton ).toBeFocused();
+				await page.keyboard.press( 'Enter' );
+				await expect( lightbox ).toBeHidden();
+				await expect( openLightboxButton ).toBeFocused();
+			} );
+
+			test( 'should close and focus appropriately using escape key', async ( {
+				page,
+			} ) => {
+				await openLightboxButton.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( lightbox ).toBeVisible();
+				await expect( closeButton ).toBeFocused();
+				await page.keyboard.press( 'Escape' );
+				await expect( lightbox ).toBeHidden();
+				await expect( openLightboxButton ).toBeFocused();
+			} );
+
+			// TO DO: Add these tests, which will involve adding a caption
+			// to uploaded test images
+			// test( 'should trap focus appropriately when using tab', async ( {
+			// 	page,
+			// } ) => {
+
+			// } );
+
+			// test( 'should trap focus appropriately using shift+tab', async ( {
+			// 	page,
+			// } ) => {
+
+			// } );
+		} );
 	} );
 
-	test( 'should open and close the image in a lightbox using the mouse', async ( {
+	test( 'lightbox should work as expected when inserting image from URL', async ( {
 		editor,
 		page,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
+		const imageBlockFromUrl = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlockFromUrl ).toBeVisible();
+
+		await imageBlockFromUrl
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'.block-editor-media-placeholder__url-input-form'
+		);
+
+		const imgUrl =
+			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+
+		await form.getByLabel( 'URL' ).fill( imgUrl );
+
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const image = imageBlockFromUrl.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', imgUrl );
+
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
 		await page
 			.getByRole( 'combobox', { name: 'Behaviors' } )
@@ -826,96 +1130,12 @@ test.describe( 'Image - interactivity', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		await expect( lightbox ).toBeHidden();
+		const imageDom = lightbox.locator( 'img' );
+		await expect( imageDom ).toHaveAttribute( 'src', '' );
 
-		const image = lightbox.locator( 'img' );
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-		await page
-			.getByRole( 'button', { name: 'Open image lightbox' } )
-			.click();
-
-		await expect( lightbox ).toBeVisible();
-
-		const closeButton = page.getByRole( 'button', {
-			name: 'Close lightbox',
-		} );
-		await closeButton.click();
-
-		await expect( lightbox ).toBeHidden();
-	} );
-
-	test.describe( 'keyboard navigation', () => {
-		let openLightboxButton;
-		let lightbox;
-		let closeButton;
-
-		test.beforeEach( async ( { page, editor } ) => {
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			await page
-				.getByRole( 'combobox', { name: 'Behaviors' } )
-				.selectOption( 'lightbox' );
-
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
-
-			openLightboxButton = page.getByRole( 'button', {
-				name: 'Open image lightbox',
-			} );
-			lightbox = page.getByRole( 'dialog' );
-			closeButton = lightbox.getByRole( 'button', {
-				name: 'Close lightbox',
-			} );
-		} );
-
-		test( 'should open and focus appropriately using enter key', async ( {
-			page,
-		} ) => {
-			// Open and close lightbox using the close button
-			await openLightboxButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeVisible();
-			await expect( closeButton ).toBeFocused();
-		} );
-
-		test( 'should close and focus appropriately using enter key on close button', async ( {
-			page,
-		} ) => {
-			// Open and close lightbox using the close button
-			await openLightboxButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeVisible();
-			await expect( closeButton ).toBeFocused();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeHidden();
-			await expect( openLightboxButton ).toBeFocused();
-		} );
-
-		test( 'should close and focus appropriately using escape key', async ( {
-			page,
-		} ) => {
-			await openLightboxButton.focus();
-			await page.keyboard.press( 'Enter' );
-			await expect( lightbox ).toBeVisible();
-			await expect( closeButton ).toBeFocused();
-			await page.keyboard.press( 'Escape' );
-			await expect( lightbox ).toBeHidden();
-			await expect( openLightboxButton ).toBeFocused();
-		} );
-
-		// TO DO: Add these tests, which will involve adding a caption
-		// to uploaded test images
-		// test( 'should trap focus appropriately when using tab', async ( {
-		// 	page,
-		// } ) => {
-
-		// } );
-
-		// test( 'should trap focus appropriately using shift+tab', async ( {
-		// 	page,
-		// } ) => {
-
-		// } );
+		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
 

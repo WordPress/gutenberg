@@ -16,7 +16,10 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import {
+	store as keyboardShortcutsStore,
+	__unstableUseShortcutEventMatch,
+} from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
@@ -30,17 +33,15 @@ import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
-const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
@@ -63,7 +64,6 @@ export function BlockSettingsDropdown( {
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
-		nextBlockClientId,
 		selectedBlockClientIds,
 	} = useSelect(
 		( select ) => {
@@ -72,7 +72,6 @@ export function BlockSettingsDropdown( {
 				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
-				getNextBlockClientId,
 				getSelectedBlockClientIds,
 				getSettings,
 				getBlockAttributes,
@@ -98,12 +97,13 @@ export function BlockSettingsDropdown( {
 						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
-				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ firstBlockClientId ]
 	);
+	const { getBlockOrder, getSelectedBlockClientIds } =
+		useSelect( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -120,51 +120,47 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
+	const isMatch = __unstableUseShortcutEventMatch();
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
+	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	const updateSelectionAfterDuplicate = useCallback(
-		__experimentalSelectBlock
-			? async ( clientIdsPromise ) => {
-					const ids = await clientIdsPromise;
-					if ( ids && ids[ 0 ] ) {
-						__experimentalSelectBlock( ids[ 0 ] );
-					}
-			  }
-			: noop,
+		async ( clientIdsPromise ) => {
+			if ( __experimentalSelectBlock ) {
+				const ids = await clientIdsPromise;
+				if ( ids && ids[ 0 ] ) {
+					__experimentalSelectBlock( ids[ 0 ], false );
+				}
+			}
+		},
 		[ __experimentalSelectBlock ]
 	);
 
-	const updateSelectionAfterRemove = useCallback(
-		__experimentalSelectBlock
-			? () => {
-					const blockToSelect =
-						previousBlockClientId ||
-						nextBlockClientId ||
-						firstParentClientId;
+	const updateSelectionAfterRemove = useCallback( () => {
+		if ( __experimentalSelectBlock ) {
+			let blockToFocus = previousBlockClientId || firstParentClientId;
 
-					if (
-						blockToSelect &&
-						// From the block options dropdown, it's possible to remove a block that is not selected,
-						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
-						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
-						// In case someone selects all blocks and removes them at once.
-						! selectedBlockClientIds.includes( blockToSelect )
-					) {
-						__experimentalSelectBlock( blockToSelect );
-					}
-			  }
-			: noop,
-		[
-			__experimentalSelectBlock,
-			previousBlockClientId,
-			nextBlockClientId,
-			firstParentClientId,
-			selectedBlockClientIds,
-		]
-	);
+			// Focus the first block if there's no previous block nor parent block.
+			if ( ! blockToFocus ) {
+				blockToFocus = getBlockOrder()[ 0 ];
+			}
+
+			// Only update the selection if the original selection is removed.
+			const shouldUpdateSelection =
+				hasSelectedBlocks && getSelectedBlockClientIds().length === 0;
+
+			__experimentalSelectBlock( blockToFocus, shouldUpdateSelection );
+		}
+	}, [
+		__experimentalSelectBlock,
+		previousBlockClientId,
+		firstParentClientId,
+		getBlockOrder,
+		hasSelectedBlocks,
+		getSelectedBlockClientIds,
+	] );
 
 	const removeBlockLabel =
 		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
@@ -193,6 +189,7 @@ export function BlockSettingsDropdown( {
 			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
 		>
 			{ ( {
+				canCopyStyles,
 				canDuplicate,
 				canInsertDefaultBlock,
 				canMove,
@@ -212,6 +209,49 @@ export function BlockSettingsDropdown( {
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
+					menuProps={ {
+						/**
+						 * @param {KeyboardEvent} event
+						 */
+						onKeyDown( event ) {
+							if ( event.defaultPrevented ) return;
+
+							if (
+								isMatch( 'core/block-editor/remove', event ) &&
+								canRemove
+							) {
+								event.preventDefault();
+								updateSelectionAfterRemove( onRemove() );
+							} else if (
+								isMatch(
+									'core/block-editor/duplicate',
+									event
+								) &&
+								canDuplicate
+							) {
+								event.preventDefault();
+								updateSelectionAfterDuplicate( onDuplicate() );
+							} else if (
+								isMatch(
+									'core/block-editor/insert-after',
+									event
+								) &&
+								canInsertDefaultBlock
+							) {
+								event.preventDefault();
+								onInsertAfter();
+							} else if (
+								isMatch(
+									'core/block-editor/insert-before',
+									event
+								) &&
+								canInsertDefaultBlock
+							) {
+								event.preventDefault();
+								onInsertBefore();
+							}
+						},
+					} }
 					{ ...props }
 				>
 					{ ( { onClose } ) => (
@@ -291,16 +331,18 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 							</MenuGroup>
-							<MenuGroup>
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-									label={ __( 'Copy styles' ) }
-								/>
-								<MenuItem onClick={ onPasteStyles }>
-									{ __( 'Paste styles' ) }
-								</MenuItem>
-							</MenuGroup>
+							{ canCopyStyles && (
+								<MenuGroup>
+									<CopyMenuItem
+										blocks={ blocks }
+										onCopy={ onCopy }
+										label={ __( 'Copy styles' ) }
+									/>
+									<MenuItem onClick={ onPasteStyles }>
+										{ __( 'Paste styles' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
 							<BlockSettingsMenuControls.Slot
 								fillProps={ {
 									onClose,

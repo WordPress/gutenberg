@@ -114,7 +114,7 @@ describe( 'Reusable block', () => {
 
 		// Get the reusable block.
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -131,7 +131,7 @@ describe( 'Reusable block', () => {
 		} );
 
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		const blockDeleted = within( reusableBlock ).getByText(
@@ -142,9 +142,7 @@ describe( 'Reusable block', () => {
 		expect( blockDeleted ).toBeDefined();
 	} );
 
-	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
-	// triggering `onLayout*` on the element: https://github.com/callstack/react-native-testing-library/issues/897.
-	it.skip( 'renders block content', async () => {
+	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
@@ -163,8 +161,8 @@ describe( 'Reusable block', () => {
 			initialHtml,
 		} );
 
-		const [ reusableBlock ] = await screen.findByLabelText(
-			/Reusable block Block\. Row 1/
+		const reusableBlock = await screen.findByLabelText(
+			/Pattern Block\. Row 1/
 		);
 
 		const innerBlockListWrapper = await within(
