@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
-import { __, isRTL } from '@wordpress/i18n';
+import { _x, isRTL } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
 function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
@@ -31,7 +31,7 @@ function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
 				icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 				aria-controls={ settingsDrawerId }
 			>
-				{ __( 'Advanced' ) }
+				{ _x( 'Advanced', 'Additional link settings' ) }
 			</Button>
 			<MaybeAnimatePresence>
 				{ settingsOpen && (
