@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { paramCase as kebabCase } from 'change-case';
-import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -21,6 +20,25 @@ import {
 } from './constants';
 
 /**
+ * Helper util to return a value from a certain path of the object.
+ * Path is specified as an array of properties, like `[ 'x', 'y' ]`.
+ *
+ * @param object Input object.
+ * @param path   Path to the object property.
+ * @return Value of the object property at the specified path.
+ */
+export const getStyleValueByPath = (
+	object: Record< any, any >,
+	path: string[]
+) => {
+	let value: any = object;
+	path.forEach( ( fieldName: string ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
+/**
  * Returns a JSON representation of the generated CSS rules.
  *
  * @param style   Style object.
@@ -36,7 +54,7 @@ export function generateRule(
 	path: string[],
 	ruleKey: string
 ): GeneratedCSSRule[] {
-	const styleValue: string | undefined = get( style, path );
+	const styleValue: string | undefined = getStyleValueByPath( style, path );
 
 	return styleValue
 		? [
@@ -67,7 +85,10 @@ export function generateBoxRules(
 	ruleKeys: CssRulesKeys,
 	individualProperties: string[] = [ 'top', 'right', 'bottom', 'left' ]
 ): GeneratedCSSRule[] {
-	const boxStyle: Box | string | undefined = get( style, path );
+	const boxStyle: Box | string | undefined = getStyleValueByPath(
+		style,
+		path
+	);
 	if ( ! boxStyle ) {
 		return [];
 	}
@@ -83,7 +104,7 @@ export function generateBoxRules(
 		const sideRules = individualProperties.reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
 				const value: string | undefined = getCSSVarFromStyleValue(
-					get( boxStyle, [ side ] )
+					getStyleValueByPath( boxStyle, [ side ] )
 				);
 				if ( value ) {
 					acc.push( {
