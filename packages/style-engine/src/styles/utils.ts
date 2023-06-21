@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { get, kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -119,7 +120,16 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 		const variable = styleValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.map( ( presetVariable ) => kebabCase( presetVariable ) )
+			.map( ( presetVariable ) =>
+				kebabCase( presetVariable, {
+					splitRegexp: [
+						/([a-z0-9])([A-Z])/g, // fooBar => foo-bar, 3Bar => 3-bar
+						/([0-9])([a-z])/g, // 3bar => 3-bar
+						/([A-Za-z])([0-9])/g, // Foo3 => foo-3, foo3 => foo-3
+						/([A-Z])([A-Z][a-z])/g, // FOOBar => foo-bar
+					],
+				} )
+			)
 			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
 		return `var(--wp--${ variable })`;
 	}
