@@ -60,8 +60,8 @@ export default function SidebarNavigationScreen( {
 					{ ! isRoot && ! backPath && (
 						<NavigatorToParentButton
 							as={ SidebarButton }
-							icon={ icon }
-							label={ __( 'Back' ) }
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							aria-label={ __( 'Back' ) }
 						/>
 					) }
 					{ ! isRoot && backPath && (
