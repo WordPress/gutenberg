@@ -44,6 +44,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-global-styles-controller-6-2.php';
 
 	// WordPress 6.3 compat.
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-block-patterns-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-revisions-controller-6-3.php';
@@ -52,6 +53,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/link-template.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/block-patterns.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
