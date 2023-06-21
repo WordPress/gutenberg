@@ -55,7 +55,7 @@ function DimensionsTool( {
 	onChange = () => {},
 	aspectRatioOptions, // Default value is in AspectRatioTool.
 	scaleOptions, // Default value is in ScaleTool.
-	unitsOptions,
+	unitsOptions, // Default value is in UnitControl.
 } ) {
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
