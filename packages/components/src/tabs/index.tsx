@@ -12,14 +12,16 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useCallback,
+	useRef,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
-
 import type { TabPanelProps } from '../tab-panel/types';
+
+type Tab = TabPanelProps[ 'tabs' ][ number ];
 
 const disabledTabProps = {
 	'aria-disabled': true,
@@ -32,6 +34,34 @@ const disabledTabProps = {
 		event.stopPropagation();
 	},
 };
+
+const getTab = (
+	tabs: TabPanelProps[ 'tabs' ],
+	currentTab: Tab,
+	offset: 1 | -1
+) => {
+	const currentIndex = tabs.indexOf( currentTab );
+	if ( currentIndex === -1 ) {
+		return;
+	}
+	const nextIndex = ( tabs.length + currentIndex + offset ) % tabs.length;
+
+	return tabs[ nextIndex ];
+};
+const getNextTab = ( tabs: TabPanelProps[ 'tabs' ], currentTab: Tab ) => {
+	return getTab( tabs, currentTab, 1 );
+};
+const getPreviousTab = ( tabs: TabPanelProps[ 'tabs' ], currentTab: Tab ) => {
+	return getTab( tabs, currentTab, -1 );
+};
+
+const keyToGetTab: Record< string, typeof getPreviousTab | typeof getNextTab > =
+	{
+		ArrowLeft: getPreviousTab,
+		ArrowUp: getPreviousTab,
+		ArrowRight: getNextTab,
+		ArrowDown: getNextTab,
+	};
 
 /**
  * Tabs is an ARIA-compliant tabpanel.
@@ -84,20 +114,22 @@ export const Tabs = ( props: TabPanelProps ) => {
 
 	const [ selectedTabName, setSelectedTabName ] = useState< string >();
 
+	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
+
 	const selectTab = useCallback(
 		( tabValue: string ) => {
 			const newTab = tabs.find( ( t ) => t.name === tabValue );
-			if ( newTab?.disabled ) {
+			if ( newTab?.disabled || newTab === selectedTab ) {
 				return;
 			}
 
 			setSelectedTabName( tabValue );
 			onSelect?.( tabValue );
 		},
-		[ onSelect, tabs ]
+		[ onSelect, tabs, selectedTab ]
 	);
 
-	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
+	const nextTabToBeAutomaticallyActivated = useRef< Tab >();
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
@@ -143,7 +175,7 @@ export const Tabs = ( props: TabPanelProps ) => {
 			value={ selectedTab?.name }
 			onValueChange={ selectTab }
 			orientation={ orientation }
-			activationMode={ selectOnMove ? 'automatic' : 'manual' }
+			activationMode={ 'manual' }
 		>
 			<RadixTabs.TabsList
 				className={ 'components-tab-panel__tabs' }
@@ -162,6 +194,32 @@ export const Tabs = ( props: TabPanelProps ) => {
 							selectedTab?.name === tab.name ? undefined : -1
 						}
 						asChild
+						onKeyDown={ ( event ) => {
+							const getTabFunction = keyToGetTab[ event.key ];
+
+							if ( ! getTabFunction ) {
+								nextTabToBeAutomaticallyActivated.current =
+									undefined;
+								return;
+							}
+
+							nextTabToBeAutomaticallyActivated.current =
+								getTabFunction( tabs, tab );
+						} }
+						onFocus={ () => {
+							if (
+								selectOnMove &&
+								tab ===
+									nextTabToBeAutomaticallyActivated.current
+							) {
+								selectTab(
+									nextTabToBeAutomaticallyActivated.current
+										.name
+								);
+								nextTabToBeAutomaticallyActivated.current =
+									undefined;
+							}
+						} }
 						{ ...( tab.disabled ? disabledTabProps : null ) }
 					>
 						<Button
