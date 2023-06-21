@@ -54,7 +54,7 @@ export default function CreatePatternModal( {
 					title: name || __( 'Untitled Pattern' ),
 					content: '',
 					status: 'publish',
-					meta: { wp_block: { sync_status: syncType } },
+					meta: { sync_status: syncType },
 				},
 				{ throwOnError: true }
 			);
