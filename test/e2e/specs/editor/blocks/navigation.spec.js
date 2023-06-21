@@ -934,20 +934,40 @@ test.describe( 'Navigation block', () => {
 	test.describe( 'Navigation colors', () => {
 		test.beforeEach( async ( { requestUtils } ) => {
 			await Promise.all( [ requestUtils.deleteAllMenus() ] );
+			await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
+			} );
+		} );
+
+		test( 'As a user I expect my navigation links to have good default colors', async ( {
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			//we want emptytheme because it doesn't have any styles
+			await requestUtils.activateTheme( 'emptytheme' );
+
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const firstlink = editor.canvas.locator(
+				`role=textbox[name="Navigation link text"i] >> text="First link"`
+			);
+			//Expect the first link to default to black when the theme doesn't define a link color
+			await expect( firstlink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			//TODO check frontend on desktop and mobile
+			//TODO then the same for second link (make sure it has a background color!)
+			//Then the same for background colors
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
 			admin,
 			editor,
-			requestUtils,
 		} ) => {
+			//setup: define a link color in the theme
 			await admin.createNewPost();
-
-			await requestUtils.createNavigationMenu( {
-				title: 'Test Menu',
-				content:
-					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
-			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -955,7 +975,11 @@ test.describe( 'Navigation block', () => {
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
 
-			await expect( firstlink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			await admin.page.pause();
+			//Expect the first link to inherit the link color from the theme.
+			//In this case TT3 defines the link colors inside the post-content block to be --wp--preset--color--secondary = #345C00
+			await expect( firstlink ).toHaveCSS( 'color', 'rgb(52, 92, 0)' );
+			//Expect the first link to inherit the nav link color from the theme
 			//TODO check frontend on desktop and mobile
 			//TODO then the same for second link
 			//Then the same for background colors
@@ -965,19 +989,12 @@ test.describe( 'Navigation block', () => {
 			admin,
 			page,
 			editor,
-			requestUtils,
 		} ) => {
 			await admin.createNewPost();
 
-			await requestUtils.createNavigationMenu( {
-				title: 'Test Menu',
-				content:
-					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
-			} );
-
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			//We group the nav block and add colors to the links
+			//We group the nav block and add colors to the links inside the group block
 			await page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Options' } )
@@ -1000,6 +1017,7 @@ test.describe( 'Navigation block', () => {
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
 
+			//Expect the first link to inherit the link color from the parent group block
 			await expect( firstlink ).toHaveCSS( 'color', 'rgb(155, 81, 224)' );
 			//TODO check frontend on desktop and mobile
 			//TODO then the same for second link
