@@ -110,6 +110,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 					{ 	"initialized": false,
 						"lightboxEnabled": false,
 						"hideAnimationEnabled": false,
+						"preloadInitialized": false,
 						"lightboxAnimation": "%s",
 						"imageSrc": "%s",
 						"imageSrcSet": "%s",
@@ -131,7 +132,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$img = null;
 	preg_match( '/<img[^>]+>/', $content, $img );
 	$button       = '<div class="img-container">
-                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox"></button>'
+                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-effect="effects.core.image.preloadLightboxImage"></button>'
 		. $img[0] .
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );

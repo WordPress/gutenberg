@@ -45,6 +45,7 @@ store( {
 					// Since the img is hidden and its src not loaded until
 					// the lightbox is opened, let's create an img element on the fly
 					// so we can get the dimensions we need to calculate the styles
+					context.core.image.preloadInitialized = true;
 					const imgDom = document.createElement( 'img' );
 					imgDom.onload = function () {
 						context.core.image.activateLargeImage = true;
@@ -154,6 +155,18 @@ store( {
 	effects: {
 		core: {
 			image: {
+				preloadLightboxImage: ( { context, ref } ) => {
+					ref.addEventListener( 'mouseover', () => {
+						if ( ! context.core.image.preloadInitialized ) {
+							context.core.image.preloadInitialized = true;
+							const imgDom = document.createElement( 'img' );
+							imgDom.setAttribute(
+								'src',
+								context.core.image.imageSrc
+							);
+						}
+					} );
+				},
 				initLightbox: async ( { context, ref } ) => {
 					context.core.image.figureRef =
 						ref.querySelector( 'figure' );
