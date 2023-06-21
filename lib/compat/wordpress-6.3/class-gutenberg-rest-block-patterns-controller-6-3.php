@@ -138,6 +138,12 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends Gutenberg_REST_Block_
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
+					'enum'        => array(
+						'core',
+						'pattern-directory/core',
+						'pattern-directory/theme',
+						'pattern-directory/featured',
+					),
 				),
 			),
 		);
