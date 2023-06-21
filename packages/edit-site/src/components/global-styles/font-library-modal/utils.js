@@ -1,8 +1,11 @@
-export function setFallbackValues( font ) {
+export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name ) {
 		font.name = font.fontFamily || font.slug;
 	}
-	return font;
+	return {
+		...font,
+		...extraValues,
+	};
 }
 
 export function isUrlEncoded( url ) {

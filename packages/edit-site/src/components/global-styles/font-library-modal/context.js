@@ -22,31 +22,54 @@ import {
 import { unlock } from '../../../private-apis';
 import { DEFAULT_DEMO_CONFIG } from './constants';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import { setFallbackValues, isUrlEncoded } from './utils';
+import { setUIValuesNeeded, isUrlEncoded } from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
-	// Global settings fonts
+	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
 	);
-
-	const themeFonts = fontFamilies.theme
-		? fontFamilies.theme
-			.map( setFallbackValues )
-			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
-		: [];
-	const customFonts = fontFamilies.custom
-		? fontFamilies.custom
-			.map( setFallbackValues )
-			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
-		: [];
+	// theme.json file font families
+	const [ baseFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies', undefined, 'base'
+	);
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
 	const [ libraryFonts, setLibraryFonts ] = useState( [] );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
+
+	const baseThemeFonts = baseFontFamilies?.theme
+	? baseFontFamilies.theme
+		.map( f => setUIValuesNeeded(f, { source: 'theme' }) )
+		.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+	: [];
+
+	const themeFonts = fontFamilies.theme
+		? fontFamilies.theme
+			.map( f => setUIValuesNeeded(f, { source: 'theme' }) )
+			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		: [];
+
+	const customFonts = fontFamilies.custom
+		? fontFamilies.custom
+			.map( f => setUIValuesNeeded(f, { source: 'custom' }) )
+			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		: [];
+
+	const baseCustomFonts = libraryFonts
+		? libraryFonts
+			.map( f => setUIValuesNeeded(f, { source: 'custom' }) )
+			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		: [];
+
+	useEffect( () => {
+		if ( ! modalTabOepn ) {
+			setLibraryFontSelected( null );
+		} 
+	}, [ modalTabOepn ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
 		// If font is null, reset the selected font
@@ -55,26 +78,20 @@ function FontLibraryProvider( { children } ) {
 			return;
 		}
 
+		const fonts = font.source === 'theme' ? baseThemeFonts : baseCustomFonts;
+
 		// Tries to find the font in the installed fonts 
-		const installedFontSelected = installedFonts.find( ( f ) => f.slug === font.slug );
+		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
 		// If the font is not found (it is only defined in custom styles), use the font from custom styles
-		setLibraryFontSelected ( installedFontSelected || font );
+		setLibraryFontSelected ({
+			...( fontSelected || font ),
+			source: font.source,
+		});
 	};
 
 	const toggleModal = ( tabName ) => {
 		setModalTabOepn( tabName || null );
 	};
-
-	// Installed fonts
-	const installedFonts = useMemo( () => {
-		const fromTheme =
-			themeFonts.map( ( f ) => ( {
-				...f,
-				source: 'theme',
-			} ) ) || [];
-		const fromLibrary = libraryFonts || [];
-		return [ ...fromTheme, ...fromLibrary ];
-	}, [ themeFonts, libraryFonts ] );
 
 	// Google Fonts
 	const [ googleFonts, setGoogleFonts ] = useState( null );
@@ -139,7 +156,7 @@ function FontLibraryProvider( { children } ) {
 
 	const activatedFontsOutline = useMemo( () => {
 		return getAvailableFontsOutline(
-			customFonts === null ? themeFonts : customFonts
+			[].concat( themeFonts, customFonts )
 		);
 	}, [ customFonts ] );
 
@@ -165,14 +182,12 @@ function FontLibraryProvider( { children } ) {
 	}
 
 	const toggleActivateFont = ( font, face ) => {
+		const source = font.source || 'custom';
+
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts =
-			customFonts !== null ? customFonts : themeFonts;
+		const initialCustomFonts = fontFamilies[ source ] || [];
 
-		const installedFont = installedFonts.find(
-			( f ) => f.slug === font.slug
-		);
 		const activatedFont = initialCustomFonts.find(
 			( f ) => f.slug === font.slug
 		);
@@ -182,7 +197,7 @@ function FontLibraryProvider( { children } ) {
 		if ( ! face ) {
 			if ( ! activatedFont ) {
 				// If the font is not active, activate the entire font family
-				newCustomFonts = [ ...initialCustomFonts, installedFont ];
+				newCustomFonts = [ ...initialCustomFonts, font ];
 			} else {
 				// If the font is already active, deactivate the entire font family
 				newCustomFonts = initialCustomFonts.filter(
@@ -242,10 +257,10 @@ function FontLibraryProvider( { children } ) {
 				];
 			}
 		}
-
+		console.log('source', newCustomFonts);
 		setFontFamilies( {
-			theme: themeFonts,
-			custom: newCustomFonts,
+			...fontFamilies,
+			[ source ]: newCustomFonts,
 		} );
 	};
 
@@ -296,9 +311,9 @@ function FontLibraryProvider( { children } ) {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				themeFonts,
+				baseThemeFonts,
 				customFonts,
-				libraryFonts,
-				installedFonts,
+				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
 				googleFonts,
