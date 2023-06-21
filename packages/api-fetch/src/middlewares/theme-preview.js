@@ -19,21 +19,14 @@ const createThemePreviewMiddleware = ( themePath ) => ( options, next ) => {
 			wp_theme_preview: themePath,
 		} );
 	}
-	//window.__experimentalThemePreview
 
 	if (
 		typeof options.path === 'string' &&
 		! hasQueryArg( options.path, 'wp_theme_preview' )
 	) {
-		if ( window.__experimentalThemePreview ) {
-			options.path = addQueryArgs( options.path, {
-				wp_theme_preview: themePath,
-			} );
-		} else {
-			options.path = addQueryArgs( options.path, {
-				wp_theme_preview: themePath,
-			} );
-		}
+		options.path = addQueryArgs( options.path, {
+			wp_theme_preview: themePath,
+		} );
 	}
 
 	return next( options );
