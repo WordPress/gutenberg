@@ -338,7 +338,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $weight = sanitize_title( $font_face['fontWeight'] );
         $filename = "{$family}_{$style}_{$weight}";
         if ($i > 0) {
-            $filename = "{$filename}_{$i}";
+            $filename .= "_{$i}";
         }
         return "{$filename}.{$extension}";
     } 
