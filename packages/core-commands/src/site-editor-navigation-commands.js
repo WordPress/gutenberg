@@ -162,7 +162,7 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
-			name: 'core/edit-site/open-styles',
+			name: 'core/edit-site/open-style-variations',
 			label: __( 'Open style variations' ),
 			icon: styles,
 			callback: ( { close } ) => {

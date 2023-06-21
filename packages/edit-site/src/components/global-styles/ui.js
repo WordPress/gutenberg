@@ -311,7 +311,10 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// Switching to any container other than revisions should
 			// redirect from the revisions screen to the root global styles screen.
 			goTo( '/' );
+		} else if ( editorCanvasContainerView === 'global-styles-css' ) {
+			goTo( '/css' );
 		}
+
 		// location?.path is not a dependency because we don't want to track it.
 		// Doing so will cause an infinite loop. We could abstract logic to avoid
 		// having to disable the check later.
