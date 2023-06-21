@@ -73,21 +73,29 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		}
 	};
 
+	let ariaDescription;
+	if ( item.type === USER_PATTERNS ) {
+		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
+		ariaDescription = __(
+			'Press Enter to edit, or Delete to delete the pattern.'
+		);
+	} else if ( item.description ) {
+		ariaDescription = item.description;
+	}
+
 	return (
 		<>
-			<div
-				className={ patternClassNames }
-				aria-label={ item.title }
-				aria-describedby={
-					item.description ? descriptionId : undefined
-				}
-			>
+			<div className={ patternClassNames }>
 				<CompositeItem
 					className={ previewClassNames }
 					role="option"
 					as="div"
 					{ ...composite }
 					onClick={ item.type !== PATTERNS ? onClick : undefined }
+					aria-label={ item.title }
+					aria-describedby={
+						ariaDescription ? descriptionId : undefined
+					}
 					onKeyDown={ ( event ) => {
 						if (
 							DELETE === event.keyCode ||
@@ -99,12 +107,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 				>
 					{ isEmpty && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
-					{ !! item.description && (
-						<VisuallyHidden id={ descriptionId }>
-							{ item.description }
-						</VisuallyHidden>
-					) }
 				</CompositeItem>
+				{ ariaDescription && (
+					<VisuallyHidden id={ descriptionId }>
+						{ ariaDescription }
+					</VisuallyHidden>
+				) }
 				<HStack
 					className="edit-site-library__footer"
 					justify="space-between"
