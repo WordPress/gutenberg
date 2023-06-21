@@ -482,6 +482,8 @@ export default function Image( {
 								aspectRatio: newValue.aspectRatio,
 							} );
 						} }
+						defaultScale="cover"
+						defaultAspectRatio="auto"
 						scaleOptions={ scaleOptions }
 						unitsOptions={ dimensionsUnitsOptions }
 					/>
