@@ -41,7 +41,7 @@ function DefaultAppender( { rootClientId } ) {
 }
 
 function useAppender( rootClientId, CustomAppender ) {
-	return useSelect(
+	const isVisible = useSelect(
 		( select ) => {
 			const {
 				getTemplateLock,
@@ -51,7 +51,7 @@ function useAppender( rootClientId, CustomAppender ) {
 			} = unlock( select( blockEditorStore ) );
 
 			if ( CustomAppender === false ) {
-				return null;
+				return false;
 			}
 
 			if ( ! CustomAppender ) {
@@ -60,7 +60,7 @@ function useAppender( rootClientId, CustomAppender ) {
 					rootClientId === selectedBlockClientId ||
 					( ! rootClientId && ! selectedBlockClientId );
 				if ( ! isParentSelected ) {
-					return null;
+					return false;
 				}
 			}
 
@@ -69,16 +69,22 @@ function useAppender( rootClientId, CustomAppender ) {
 				getBlockEditingMode( rootClientId ) === 'disabled' ||
 				__unstableGetEditorMode() === 'zoom-out'
 			) {
-				return null;
+				return false;
 			}
 
-			return CustomAppender ? (
-				<CustomAppender />
-			) : (
-				<DefaultAppender rootClientId={ rootClientId } />
-			);
+			return true;
 		},
 		[ rootClientId, CustomAppender ]
+	);
+
+	if ( ! isVisible ) {
+		return null;
+	}
+
+	return CustomAppender ? (
+		<CustomAppender />
+	) : (
+		<DefaultAppender rootClientId={ rootClientId } />
 	);
 }
 
