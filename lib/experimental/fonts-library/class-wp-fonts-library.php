@@ -557,7 +557,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $filename =  $this->get_filename_from_font_face( $font_face, $file['name'] );
         $filepath= path_join( $this->wp_fonts_dir, $filename );
 
-        // Remove the uploaded font asset reference from the font face definition because is not longer needed
+        // Remove the uploaded font asset reference from the font face definition because it is no longer needed.
         unset( $new_font_face['file'] );
 
         // If the filepath has not a font mime type, we don't move the file and return the font face definition without src to be ignored later
