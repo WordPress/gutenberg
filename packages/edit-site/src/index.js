@@ -15,7 +15,6 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -86,8 +85,6 @@ export function initializeEditor( id, settings ) {
 		defaultTemplateTypes: settings.defaultTemplateTypes,
 		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
 	} );
-
-	dispatch( blockEditorStore ).setRemovalPromptStatus( true );
 
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
