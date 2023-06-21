@@ -94,11 +94,15 @@ describe( 'DimensionsTool', () => {
 
 		// Use toStrictEqual so undefined properties are treated differently
 		// from missing properties.
-		// expect( onChange.mock.calls ).toStrictEqual( [
-		// 	[ { aspectRatio: '16/9', scale: 'contain' } ],
-		// 	[ {} ],
-		// 	[ { aspectRatio: '16/9', scale: 'contain' } ],
-		// ] );
+		expect( onChange.mock.calls ).toStrictEqual( [
+			[ { aspectRatio: '16/9', scale: 'cover', width: '1px' } ],
+			[ { aspectRatio: '16/9', scale: 'cover', width: '10px' } ],
+			[ { aspectRatio: '16/9', scale: 'cover', width: '100px' } ],
+			[ { scale: 'cover', width: '100px', height: '2px' } ],
+			[ { scale: 'cover', width: '100px', height: '20px' } ],
+			[ { scale: 'cover', width: '100px', height: '200px' } ],
+			[ { aspectRatio: '16/9', scale: 'cover', height: '200px' } ],
+		] );
 	} );
 
 	it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back', async () => {
