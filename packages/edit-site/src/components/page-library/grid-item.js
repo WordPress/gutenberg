@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { BlockPreview } from '@wordpress/block-editor';
 import {
+	__experimentalConfirmDialog as ConfirmDialog,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -18,6 +19,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, moreHorizontal } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -33,6 +35,7 @@ import { useLink } from '../routes/link';
 export default function GridItem( { categoryId, composite, icon, item } ) {
 	const instanceId = useInstanceId( GridItem );
 	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
@@ -71,82 +74,94 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	};
 
 	return (
-		<div
-			className={ patternClassNames }
-			aria-label={ item.title }
-			aria-describedby={ item.description ? descriptionId : undefined }
-		>
-			<CompositeItem
-				className={ previewClassNames }
-				role="option"
-				as="div"
-				{ ...composite }
-				onClick={ item.type !== PATTERNS ? onClick : undefined }
-				onKeyDown={ ( event ) => {
-					if (
-						DELETE === event.keyCode ||
-						BACKSPACE === event.keyCode
-					) {
-						deletePattern( item );
-					}
-				} }
+		<>
+			<div
+				className={ patternClassNames }
+				aria-label={ item.title }
+				aria-describedby={
+					item.description ? descriptionId : undefined
+				}
 			>
-				{ isEmpty && __( 'Empty pattern' ) }
-				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
-				{ !! item.description && (
-					<VisuallyHidden id={ descriptionId }>
-						{ item.description }
-					</VisuallyHidden>
-				) }
-			</CompositeItem>
-			<HStack
-				className="edit-site-library__footer"
-				justify="space-between"
-			>
-				<HStack
-					alignment="center"
-					justify="left"
-					spacing={ 3 }
-					className="edit-site-library__pattern-title"
+				<CompositeItem
+					className={ previewClassNames }
+					role="option"
+					as="div"
+					{ ...composite }
+					onClick={ item.type !== PATTERNS ? onClick : undefined }
+					onKeyDown={ ( event ) => {
+						if (
+							DELETE === event.keyCode ||
+							BACKSPACE === event.keyCode
+						) {
+							setIsDeleteDialogOpen( true );
+						}
+					} }
 				>
-					{ icon && <Icon icon={ icon } /> }
-					<Heading level={ 5 }>{ item.title }</Heading>
-				</HStack>
-				{ item.type === USER_PATTERNS && (
-					<DropdownMenu
-						icon={ moreHorizontal }
-						label={ __( 'Actions' ) }
-						className="edit-site-library__dropdown"
-						popoverProps={ { placement: 'bottom-end' } }
-						toggleProps={ {
-							className: 'edit-site-library__button',
-							isSmall: true,
-							describedBy: sprintf(
-								/* translators: %s: pattern name */
-								__( 'Action menu for %s pattern' ),
-								item.title
-							),
-							// The dropdown menu is not focusable using the
-							// keyboard as this would interfere with the grid's
-							// roving tab index system. Instead, keyboard users
-							// use keyboard shortcuts to trigger actions.
-							tabIndex: -1,
-						} }
+					{ isEmpty && __( 'Empty pattern' ) }
+					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+					{ !! item.description && (
+						<VisuallyHidden id={ descriptionId }>
+							{ item.description }
+						</VisuallyHidden>
+					) }
+				</CompositeItem>
+				<HStack
+					className="edit-site-library__footer"
+					justify="space-between"
+				>
+					<HStack
+						alignment="center"
+						justify="left"
+						spacing={ 3 }
+						className="edit-site-library__pattern-title"
 					>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								<MenuItem
-									onClick={ () =>
-										deletePattern.then( onClose )
-									}
-								>
-									{ __( 'Delete' ) }
-								</MenuItem>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-				) }
-			</HStack>
-		</div>
+						{ icon && <Icon icon={ icon } /> }
+						<Heading level={ 5 }>{ item.title }</Heading>
+					</HStack>
+					{ item.type === USER_PATTERNS && (
+						<DropdownMenu
+							icon={ moreHorizontal }
+							label={ __( 'Actions' ) }
+							className="edit-site-library__dropdown"
+							popoverProps={ { placement: 'bottom-end' } }
+							toggleProps={ {
+								className: 'edit-site-library__button',
+								isSmall: true,
+								describedBy: sprintf(
+									/* translators: %s: pattern name */
+									__( 'Action menu for %s pattern' ),
+									item.title
+								),
+								// The dropdown menu is not focusable using the
+								// keyboard as this would interfere with the grid's
+								// roving tab index system. Instead, keyboard users
+								// use keyboard shortcuts to trigger actions.
+								tabIndex: -1,
+							} }
+						>
+							{ () => (
+								<MenuGroup>
+									<MenuItem
+										onClick={ () =>
+											setIsDeleteDialogOpen( true )
+										}
+									>
+										{ __( 'Delete' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</DropdownMenu>
+					) }
+				</HStack>
+			</div>
+			{ isDeleteDialogOpen && (
+				<ConfirmDialog
+					onConfirm={ deletePattern }
+					onCancel={ () => setIsDeleteDialogOpen( false ) }
+				>
+					{ __( 'Are you sure you want to delete this pattern?' ) }
+				</ConfirmDialog>
+			) }
+		</>
 	);
 }
