@@ -62,7 +62,7 @@ export default function SidebarNavigationScreenLibrary() {
 							href="edit.php?post_type=wp_block"
 							withChevron
 						>
-							{ __( 'Manage all reusable blocks' ) }
+							{ __( 'Manage all custom patterns' ) }
 						</SidebarNavigationItem>
 					) }
 				</ItemGroup>
