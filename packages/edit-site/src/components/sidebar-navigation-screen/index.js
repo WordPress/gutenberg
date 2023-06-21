@@ -61,14 +61,17 @@ export default function SidebarNavigationScreen( {
 						<NavigatorToParentButton
 							as={ SidebarButton }
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							aria-label={ __( 'Back' ) }
+							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ ! isRoot && backPath && (
 						<SidebarButton
+							as={ SidebarButton }
 							onClick={ () => goTo( backPath, { isBack: true } ) }
 							icon={ icon }
 							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ isRoot && (
