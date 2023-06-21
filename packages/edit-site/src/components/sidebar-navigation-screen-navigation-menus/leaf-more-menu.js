@@ -67,7 +67,7 @@ export default function LeafMoreMenu( props ) {
 					postType: attributes.type,
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
+						wp_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}
@@ -76,7 +76,7 @@ export default function LeafMoreMenu( props ) {
 					postType: 'page',
 					postId: attributes.id,
 					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
+						wp_theme_preview: currentlyPreviewingTheme(),
 					} ),
 				} );
 			}
