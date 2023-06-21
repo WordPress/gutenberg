@@ -59,6 +59,10 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		}
 	}
 
+	if ( isset( $lightbox_settings['enabled'] ) && false === $lightbox_settings['enabled'] ) {
+		return $block_content;
+	}
+
 	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
 		return $block_content;
 	}
