@@ -85,8 +85,10 @@ describe( 'DimensionsTool', () => {
 			name: 'Height',
 		} );
 
-		await user.type( widthInput, '100' );
-		await user.type( heightInput, '200' );
+		await user.type( widthInput, '8' );
+		expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+		await user.type( heightInput, '6' );
 		expect( aspectRatioSelect ).toHaveValue( 'custom' );
 
 		await user.clear( widthInput, '' );
@@ -95,13 +97,9 @@ describe( 'DimensionsTool', () => {
 		// Use toStrictEqual so undefined properties are treated differently
 		// from missing properties.
 		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover', width: '1px' } ],
-			[ { aspectRatio: '16/9', scale: 'cover', width: '10px' } ],
-			[ { aspectRatio: '16/9', scale: 'cover', width: '100px' } ],
-			[ { scale: 'cover', width: '100px', height: '2px' } ],
-			[ { scale: 'cover', width: '100px', height: '20px' } ],
-			[ { scale: 'cover', width: '100px', height: '200px' } ],
-			[ { aspectRatio: '16/9', scale: 'cover', height: '200px' } ],
+			[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
+			[ { scale: 'cover', width: '8px', height: '6px' } ],
+			[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
 		] );
 	} );
 
