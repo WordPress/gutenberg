@@ -116,6 +116,7 @@ export default function Layout() {
 	useCommandContext( commandContext );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -255,7 +256,9 @@ export default function Layout() {
 													isFullWidth={ isEditing }
 													oversizedClassName="edit-site-layout__resizable-frame-oversized"
 													innerContentStyle={ {
-														backgroundColor,
+														background:
+															gradientValue ??
+															backgroundColor,
 													} }
 												>
 													<Editor
