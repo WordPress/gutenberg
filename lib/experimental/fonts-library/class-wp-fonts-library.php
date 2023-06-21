@@ -569,7 +569,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $file_was_moved = move_uploaded_file( $file['tmp_name'], $filepath );
         
         if ( $file_was_moved ) {
-            // If the file was succesfully moved, we update the font face definition to reference the new file location
+            // If the file was successfully moved, we update the font face definition to reference the new file location
             $new_font_face['src'] = "{$this->relative_fonts_path}{$filename}";
         }
 
