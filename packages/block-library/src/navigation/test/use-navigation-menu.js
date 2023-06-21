@@ -8,7 +8,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import { SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -34,14 +33,26 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 
 function resolveRecords( registry, menus ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.startResolution(
-		'getEntityRecords',
-		SELECT_NAVIGATION_MENUS_ARGS
-	);
-	dispatch.finishResolution(
-		'getEntityRecords',
-		SELECT_NAVIGATION_MENUS_ARGS
-	);
+	dispatch.startResolution( 'getEntityRecords', [
+		'postType',
+		'wp_navigation',
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
+	] );
+	dispatch.finishResolution( 'getEntityRecords', [
+		'postType',
+		'wp_navigation',
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
+	] );
 	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
 		per_page: 100,
 		status: [ 'publish', 'draft' ],
