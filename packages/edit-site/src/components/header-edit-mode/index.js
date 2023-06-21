@@ -269,8 +269,7 @@ export default function HeaderEditMode() {
 							<PreviewOptions
 								deviceType={ deviceType }
 								setDeviceType={ setPreviewDeviceType }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								viewLabel={ __( 'View' ) }
+								label={ __( 'View' ) }
 							>
 								<MenuGroup>
 									<MenuItem

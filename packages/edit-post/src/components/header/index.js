@@ -86,12 +86,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<ViewLink />
 				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
 				/>
+				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
