@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { trash, backup, help, styles } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,6 +40,59 @@ function useGlobalStylesResetCommands() {
 		];
 	}, [ canReset, onReset ] );
 
+	return {
+		isLoading: false,
+		commands,
+	};
+}
+
+function useGlobalStylesOpenCssCommands() {
+	const { openGeneralSidebar, setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+	const history = useHistory();
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
+
+	const commands = useMemo( () => {
+		if ( ! canEditCSS ) {
+			return [];
+		}
+
+		return [
+			{
+				name: 'core/edit-site/open-styles-css',
+				label: __( 'Open CSS' ),
+				icon: styles,
+				callback: ( { close } ) => {
+					close();
+					history.push( {
+						path: '/wp_global_styles',
+						canvas: 'edit',
+					} );
+					openGeneralSidebar( 'edit-site/global-styles' );
+					setEditorCanvasContainerView( 'global-styles-css' );
+				},
+			},
+		];
+	}, [
+		history,
+		openGeneralSidebar,
+		setEditorCanvasContainerView,
+		canEditCSS,
+	] );
 	return {
 		isLoading: false,
 		commands,
@@ -104,5 +158,10 @@ export function useCommonCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/reset-global-styles',
 		hook: useGlobalStylesResetCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/open-styles-css',
+		hook: useGlobalStylesOpenCssCommands,
 	} );
 }
