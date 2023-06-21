@@ -23,6 +23,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -36,6 +37,7 @@ import {
 
 export default function CreateTemplatePartModal( {
 	closeModal,
+	blocks = [],
 	onCreate,
 	onError,
 } ) {
@@ -75,12 +77,12 @@ export default function CreateTemplatePartModal( {
 				{
 					slug: cleanSlug,
 					title: uniqueTitle,
-					content: '',
+					content: serialize( blocks ),
 					area,
 				},
 				{ throwOnError: true }
 			);
-			onCreate( templatePart );
+			await onCreate( templatePart );
 
 			// TODO: Add a success notice?
 		} catch ( error ) {
@@ -93,7 +95,7 @@ export default function CreateTemplatePartModal( {
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 
-			onError();
+			onError?.();
 		}
 	}
 
