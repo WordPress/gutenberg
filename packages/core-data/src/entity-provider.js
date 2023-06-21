@@ -150,6 +150,7 @@ export function useEntityProp( kind, name, prop, _id ) {
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
+	const [] = useEntityProp( kind, name, 'meta', _id );
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
