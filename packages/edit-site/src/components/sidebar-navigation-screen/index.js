@@ -89,7 +89,7 @@ export default function SidebarNavigationScreen( {
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
 						color={ 'white' }
-						level={ 2 }
+						level={ 1 }
 						size={ 20 }
 					>
 						{ ! isPreviewingTheme()
