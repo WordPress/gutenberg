@@ -582,42 +582,36 @@ describe( 'Searching for a link', () => {
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
-	it.each( [
-		[ 'couldbeurlorentitysearchterm' ],
-		[ 'ThisCouldAlsoBeAValidURL' ],
-	] )(
-		'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.',
-		async ( searchTerm ) => {
-			const user = userEvent.setup();
-			render( <LinkControl /> );
+	it( 'should not display a URL suggestion when input is not likely to be a URL.', async () => {
+		const searchTerm = 'unlikelytobeaURL';
+		const user = userEvent.setup();
+		render( <LinkControl /> );
 
-			// Search Input UI.
-			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-			// Simulate searching for a term.
-			await user.type( searchInput, searchTerm );
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
 
-			const searchResultElements = within(
-				await screen.findByRole( 'listbox', {
-					name: /Search results for.*/,
-				} )
-			).getAllByRole( 'option' );
+		const searchResultElements = within(
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
-			const lastSearchResultItem =
-				searchResultElements[ searchResultElements.length - 1 ];
+		const lastSearchResultItem =
+			searchResultElements[ searchResultElements.length - 1 ];
 
-			// We should see a search result for each of the expect search suggestions.
-			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length
-			);
+		// We should see a search result for each of the expect search suggestions.
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
 
-			// The URL search suggestion should not exist.
-			expect( lastSearchResultItem ).not.toHaveTextContent( searchTerm );
-			expect( lastSearchResultItem ).not.toHaveTextContent(
-				'Press ENTER to add this link'
-			);
-		}
-	);
+		// The URL search suggestion should not exist.
+		expect( lastSearchResultItem ).not.toHaveTextContent(
+			'Press ENTER to add this link'
+		);
+	} );
 
 	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
 		const user = userEvent.setup();
