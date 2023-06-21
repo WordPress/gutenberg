@@ -69,10 +69,6 @@ export const PressEnterToChange: ComponentStory< typeof UnitControl > =
 PressEnterToChange.args = {
 	...Default.args,
 	isPressEnterToChange: true,
-	onChange: ( v ) => {
-		// eslint-disable-next-line no-console
-		console.log( v );
-	},
 };
 
 /**
