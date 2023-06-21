@@ -39,7 +39,7 @@ add_action( 'init', 'gutenberg_register_core_block_patterns_and_categories' );
  * @since 5.8.0
  * @since 5.9.0 The $current_screen argument was removed.
  * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
- * @since 6.3.0 Add 'core' to the pattern's 'source'.
+ * @since 6.3.0 Add 'pattern-directory/core' to the pattern's 'source'.
  *
  * @param WP_Screen $deprecated Unused. Formerly the screen that the current request was triggered from.
  */
@@ -87,7 +87,7 @@ function gutenberg_load_remote_block_patterns( $deprecated = null ) {
  *
  * @since 5.9.0
  * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
- * @since 6.3.0 Add 'core' to the pattern's 'source'.
+ * @since 6.3.0 Add 'pattern-directory/featured' to the pattern's 'source'.
  */
 function gutenberg_load_remote_featured_patterns() {
 	$supports_core_patterns = get_theme_support( 'core-block-patterns' );
@@ -126,7 +126,7 @@ function gutenberg_load_remote_featured_patterns() {
  *
  * @since 6.0.0
  * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
- * @since 6.3.0 Add 'core' to the pattern's 'source'.
+ * @since 6.3.0 Add 'pattern-directory/theme' to the pattern's 'source'.
  * @access private
  */
 function gutenberg_register_remote_theme_patterns() {
