@@ -176,8 +176,8 @@ export default function NewTemplate( {
 		'front-page': homeUrl,
 		date: sprintf(
 			// translators: %s: The homepage url.
-			__( 'E.g. %s/2023/' ),
-			homeUrl
+			__( 'E.g. %s' ),
+			homeUrl + '/' + new Date().getFullYear()
 		),
 	};
 
