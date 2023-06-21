@@ -1604,18 +1604,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
+				let id = blockName;
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				const match = select( blocksStore ).getActiveBlockVariation(
 					blockName,
 					attributes
 				);
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				let id = match?.name
-					? `${ blockName }/${ match.name }`
-					: blockName;
-				const insert = { name: id };
+				if ( match?.name ) {
+					id += '/' + match.name;
+				}
 				if ( blockName === 'core/block' ) {
-					insert.ref = attributes.ref;
 					id += '/' + attributes.ref;
 				}
 
@@ -1628,7 +1627,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 							count: prevState.insertUsage[ id ]
 								? prevState.insertUsage[ id ].count + 1
 								: 1,
-							insert,
 						},
 					},
 				};

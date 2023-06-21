@@ -40,6 +40,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import { unlock } from '../../lock-unlock';
+import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -297,12 +298,9 @@ function ListViewBlock( {
 							ariaDescribedBy={ descriptionId }
 							updateFocusAndSelection={ updateFocusAndSelection }
 						/>
-						<div
-							className="block-editor-list-view-block-select-button__description"
-							id={ descriptionId }
-						>
+						<AriaReferencedText id={ descriptionId }>
 							{ blockPositionDescription }
-						</div>
+						</AriaReferencedText>
 					</div>
 				) }
 			</TreeGridCell>

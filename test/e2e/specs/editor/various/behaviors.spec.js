@@ -49,43 +49,6 @@ test.describe( 'Testing behaviors functionality', () => {
 		await page.waitForLoadState();
 	} );
 
-	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
-		admin,
-		editor,
-		requestUtils,
-		page,
-		behaviorUtils,
-	} ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await admin.createNewPost();
-		const media = await behaviorUtils.createMedia();
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				alt: filename,
-				id: media.id,
-				url: media.source_url,
-			},
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings
-			.getByRole( 'button', { name: 'Advanced' } )
-			.click();
-		const select = editorSettings.getByRole( 'combobox', {
-			name: 'Behavior',
-		} );
-
-		// By default, no behaviors should be selected.
-		await expect( select ).toHaveValue( '' );
-
-		// By default, you should be able to select the Lightbox behavior.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
-	} );
-
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
 		admin,
 		editor,
@@ -143,7 +106,12 @@ test.describe( 'Testing behaviors functionality', () => {
 				id: media.id,
 				url: media.source_url,
 				// Explicitly set the value for behaviors to true.
-				behaviors: { lightbox: true },
+				behaviors: {
+					lightbox: {
+						enabled: true,
+						animation: 'zoom',
+					},
+				},
 			},
 		} );
 
@@ -162,8 +130,8 @@ test.describe( 'Testing behaviors functionality', () => {
 		// attributes takes precedence over the theme's value.
 		await expect( select ).toHaveValue( 'lightbox' );
 
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+		// There should be 3 options available: `No behaviors` and `Lightbox`.
+		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
 
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
@@ -173,7 +141,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		// lightbox even though the theme.json has it set to false.
 	} );
 
-	test( 'You can set the default value for the behaviors in the theme.json', async ( {
+	test( 'Lightbox behavior is disabled if the Image has a link', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -191,6 +159,7 @@ test.describe( 'Testing behaviors functionality', () => {
 				alt: filename,
 				id: media.id,
 				url: media.source_url,
+				linkDestination: 'custom',
 			},
 		} );
 
@@ -205,16 +174,58 @@ test.describe( 'Testing behaviors functionality', () => {
 			name: 'Behavior',
 		} );
 
-		// The behaviors dropdown should be present and the value should be set to
-		// `lightbox`.
-		await expect( select ).toHaveValue( 'lightbox' );
+		// The behaviors dropdown should be present but disabled.
+		await expect( select ).toBeDisabled();
+	} );
 
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+	test( 'Lightbox behavior control has a default option that removes the markup', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		const date = new Date();
+		const year = date.getFullYear();
+		const month = ( date.getMonth() + 1 ).toString().padStart( 2, '0' );
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
 
-		// We can change the value of the behaviors dropdown to `No behaviors`.
-		await select.selectOption( { label: 'No behaviors' } );
-		await expect( select ).toHaveValue( '' );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: { lightbox: true },
+			},
+		} );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id },"behaviors":{"lightbox":true}} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.last()
+			.click();
+
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
+		} );
+
+		await select.selectOption( { label: 'Default' } );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"id":${ media.id }} -->
+<figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
+<!-- /wp:image -->` );
 	} );
 } );
 

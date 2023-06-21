@@ -11,7 +11,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import ScreenHeader from './header';
 import Palette from './palette';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,

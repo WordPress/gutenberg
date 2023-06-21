@@ -345,6 +345,7 @@ function BlockListBlock( {
 							isSelectionEnabled={ isSelectionEnabled }
 							mergeBlocks={ canRemove ? onMerge : undefined }
 							name={ name }
+							onDeleteBlock={ onDeleteBlock }
 							onFocus={ onFocus }
 							onRemove={ canRemove ? onRemove : undefined }
 							onReplace={ canRemove ? onReplace : undefined }

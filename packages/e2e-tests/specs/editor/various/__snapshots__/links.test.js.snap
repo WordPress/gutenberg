@@ -47,15 +47,3 @@ exports[`Links can be removed 1`] = `
 <p>This is Gutenberg</p>
 <!-- /wp:paragraph -->"
 `;
-
-exports[`Links should contain a label when it should open in a new tab 1`] = `
-"<!-- wp:paragraph -->
-<p>This is <a href="http://w.org" target="_blank" rel="noreferrer noopener">WordPress</a></p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Links should contain a label when it should open in a new tab 2`] = `
-"<!-- wp:paragraph -->
-<p>This is <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">WordPress</a></p>
-<!-- /wp:paragraph -->"
-`;

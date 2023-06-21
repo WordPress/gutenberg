@@ -39,7 +39,7 @@ describe( 'iframed masonry block', () => {
 		await insertBlock( 'Iframed Masonry Block' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		expect( await didMasonryLoadCorrectly( page ) ).toBe( true );
+		expect( await didMasonryLoadCorrectly( canvas() ) ).toBe( true );
 
 		await createNewTemplate( 'Iframed Test' );
 		await canvas().waitForSelector( '.grid-item[style]' );

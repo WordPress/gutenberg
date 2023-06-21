@@ -19,7 +19,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
-import { unlock } from '../../lockUnlock';
+import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 

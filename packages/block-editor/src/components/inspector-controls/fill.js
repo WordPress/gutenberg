@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -82,7 +77,8 @@ function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
 	// access to any React Context whose Provider is part of
 	// the InspectorControlsSlot tree. So we re-create the
 	// Provider in this subtree.
-	const value = ! isEmpty( fillProps ) ? fillProps : null;
+	const value =
+		fillProps && Object.keys( fillProps ).length > 0 ? fillProps : null;
 	return (
 		<ToolsPanelContext.Provider value={ value }>
 			{ children }

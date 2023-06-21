@@ -209,7 +209,9 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/, {
+			hidden: true,
+		} );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption

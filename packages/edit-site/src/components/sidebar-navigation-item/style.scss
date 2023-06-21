@@ -4,6 +4,7 @@
 	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
 	border: none;
 	min-height: $grid-unit-50;
+	border-radius: $radius-block-ui;
 
 	&:hover,
 	&:focus,
@@ -22,11 +23,17 @@
 
 	&:is(a) {
 		text-decoration: none;
+		display: flex;
+		align-items: center;
 
 		&:focus {
 			box-shadow: none;
 			outline: none;
 		}
+	}
+
+	&.with-suffix {
+		padding-right: $grid-unit-20;
 	}
 }
 
