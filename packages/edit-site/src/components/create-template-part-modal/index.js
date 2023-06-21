@@ -56,7 +56,7 @@ export default function CreateTemplatePartModal( {
 
 	async function createTemplatePart() {
 		if ( ! title ) {
-			createErrorNotice( __( 'Title is not defined.' ), {
+			createErrorNotice( __( 'Please enter a title.' ), {
 				type: 'snackbar',
 			} );
 			return;

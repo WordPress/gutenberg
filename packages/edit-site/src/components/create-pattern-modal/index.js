@@ -40,7 +40,7 @@ export default function CreatePatternModal( {
 
 	async function createPattern() {
 		if ( ! name ) {
-			createErrorNotice( __( 'Name is not defined.' ), {
+			createErrorNotice( __( 'Please enter a pattern name.' ), {
 				type: 'snackbar',
 			} );
 			return;
@@ -77,11 +77,7 @@ export default function CreatePatternModal( {
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-pattern-modal"
 		>
-			<p>
-				{ __(
-					'Turn this block into a pattern for you to reuse later'
-				) }
-			</p>
+			<p>{ __( 'Turn this block into a pattern to reuse later' ) }</p>
 
 			<form
 				onSubmit={ async ( event ) => {
