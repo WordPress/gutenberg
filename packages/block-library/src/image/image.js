@@ -344,8 +344,9 @@ export default function Image( {
 		);
 	}
 
-	// TODO: Can allow more units after figuring out how they interact with
-	// the ResizableBox and ImageEditor components.
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
 	const dimensionsUnitsOptions = useCustomUnits( {
 		availableUnits: [ 'px' ],
 	} );
@@ -566,7 +567,6 @@ export default function Image( {
 	// So we try using the imageRef width first and fallback to clientWidth.
 	const fallbackClientWidth = imageRef.current?.width || clientWidth;
 
-	// TODO: Remove this once we have a better solution for the ImageEditor.
 	const pxWidth = width && parseFloat( width );
 	const pxHeight = height && parseFloat( height );
 
