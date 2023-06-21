@@ -6,7 +6,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { blockTypePromptMessages } from '../utils/block-removal';
+import { blockTypePromptMessages } from '../components/block-removal-warning-modal';
 import { removalPromptExists } from './private-selectors';
 
 const castArray = ( maybeArray ) =>
@@ -169,7 +169,7 @@ export const privateRemoveBlocks =
 			// corresponding to "important" blocks, i.e. blocks that require a
 			// removal prompt.
 			//
-			// @see blockTypePromptMessages in ../utils/block-removal
+			// @see blockTypePromptMessages in ../components/block-removal-warning-modal
 			const queue = [ ...clientIds ];
 			while ( queue.length ) {
 				const clientId = queue.shift();

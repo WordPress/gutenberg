@@ -13,8 +13,8 @@ import { __, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
-import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export const blockTypePromptMessages = {
 	'core/query': __( 'Query Loop displays a list of posts.' ),
