@@ -476,8 +476,12 @@ export default function Image( {
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
 							setAttributes( {
-								width: parseInt( newValue.width, 10 ),
-								height: parseInt( newValue.height, 10 ),
+								width:
+									newValue.width &&
+									parseInt( newValue.width, 10 ),
+								height:
+									newValue.height &&
+									parseInt( newValue.height, 10 ),
 								scale: newValue.scale,
 								aspectRatio: newValue.aspectRatio,
 							} );
