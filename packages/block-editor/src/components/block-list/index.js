@@ -64,6 +64,7 @@ function Root( { className, ...settings } ) {
 	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
+
 	const delayedBlockVisibilityUpdates = useDebounce(
 		useCallback( () => {
 			const updates = {};
@@ -150,7 +151,6 @@ function Items( {
 				getSelectedBlockClientIds,
 				__unstableGetVisibleBlocks,
 			} = select( blockEditorStore );
-
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),
