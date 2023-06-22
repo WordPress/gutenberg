@@ -1737,10 +1737,7 @@ describe( 'Addition Settings UI', () => {
 
 		render( <LinkControlConsumer /> );
 
-		const settingsToggle = screen.queryByRole( 'button', {
-			name: 'Link Settings',
-			ariaControls: 'link-settings-1',
-		} );
+		const settingsToggle = getSettingsDrawerToggle();
 
 		expect( settingsToggle ).not.toBeInTheDocument();
 	} );
@@ -1757,10 +1754,7 @@ describe( 'Addition Settings UI', () => {
 
 		const user = userEvent.setup();
 
-		const settingsToggle = screen.queryByRole( 'button', {
-			name: 'Link Settings',
-			ariaControls: 'link-settings-1',
-		} );
+		const settingsToggle = getSettingsDrawerToggle();
 
 		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
 
@@ -2406,10 +2400,14 @@ describe( 'Controlling link title text', () => {
 	} );
 } );
 
-async function toggleSettingsDrawer( user ) {
-	const settingsToggle = screen.queryByRole( 'button', {
+function getSettingsDrawerToggle() {
+	return screen.queryByRole( 'button', {
 		name: 'Advanced',
 	} );
+}
+
+async function toggleSettingsDrawer( user ) {
+	const settingsToggle = getSettingsDrawerToggle();
 
 	await user.click( settingsToggle );
 }
