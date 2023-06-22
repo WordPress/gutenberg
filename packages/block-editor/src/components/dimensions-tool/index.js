@@ -59,31 +59,38 @@ function DimensionsTool( {
 	defaultScale = 'fill', // Match CSS default value for object-fit.
 	unitsOptions, // Default options handled by UnitControl.
 } ) {
+	// Coerce undefined and CSS default values to be null.
+	const width =
+		value.width === undefined || value.width === 'auto'
+			? null
+			: value.width;
+	const height =
+		value.height === undefined || value.height === 'auto'
+			? null
+			: value.height;
+	const aspectRatio =
+		value.aspectRatio === undefined || value.aspectRatio === 'auto'
+			? null
+			: value.aspectRatio;
+	const scale =
+		value.scale === undefined || value.scale === 'fill'
+			? null
+			: value.scale;
+
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
 	// previous value.
-	const [ lastScale, setLastScale ] = useState( value.scale );
-	const [ lastAspectRatio, setLastAspectRatio ] = useState(
-		value.aspectRatio
-	);
+	const [ lastScale, setLastScale ] = useState( scale );
+	const [ lastAspectRatio, setLastAspectRatio ] = useState( aspectRatio );
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
 	// as a custom aspect ratio.
 	const aspectRatioValue =
-		value.width !== null &&
-		value.width !== undefined &&
-		value.height !== null &&
-		value.height !== undefined
-			? 'custom'
-			: value.aspectRatio;
+		width !== null && height !== null ? 'custom' : lastAspectRatio;
 
 	const showScaleControl =
-		( value.aspectRatio !== null && value.aspectRatio !== undefined ) ||
-		( value.width !== null &&
-			value.width !== undefined &&
-			value.height !== null &&
-			value.height !== undefined );
+		aspectRatio !== null || ( width !== null && height !== null );
 
 	return (
 		<>
@@ -93,45 +100,41 @@ function DimensionsTool( {
 				defaultValue={ defaultAspectRatio }
 				value={ aspectRatioValue }
 				onChange={ ( nextAspectRatio ) => {
-					const { aspectRatio, ...nextValue } = value;
+					// 'custom' is disabled and hidden, so it should never be
+					// passed as a value. However, it should still be displayed
+					// if both width and height are set.
+					setLastAspectRatio( nextAspectRatio );
 
-					// 'auto' is CSS default and our default, so setting the
-					// new aspect ratio isn't needed. And 'custom' doesn't
-					// require an aspect ratio either because with and height
-					// are both set overriding any CSS aspect-ratio.
-					if (
-						nextAspectRatio !== 'custom' &&
-						nextAspectRatio !== 'auto' &&
-						nextAspectRatio !== null &&
-						nextAspectRatio !== undefined
-					) {
+					const { ...nextValue } = value;
+
+					// Update aspectRatio.
+					if ( nextAspectRatio === 'auto' ) {
+						delete nextValue.aspectRatio;
+					} else {
 						nextValue.aspectRatio = nextAspectRatio;
 					}
 
-					if (
-						nextValue.scale === null ||
-						nextValue.scale === undefined
-					) {
-						nextValue.scale = lastScale ?? defaultScale;
-					}
-
-					if (
-						nextAspectRatio === 'auto' ||
-						nextAspectRatio === null ||
-						nextAspectRatio === undefined
-					) {
+					// Auto-update scale.
+					if ( nextAspectRatio === 'auto' ) {
 						delete nextValue.scale;
+					} else if ( scale === null ) {
+						if ( lastScale === null ) {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						} else {
+							nextValue.scale = lastScale;
+						}
 					}
 
+					// Auto-update width and height.
 					if (
-						nextAspectRatio !== 'custom' &&
-						value.width !== null &&
-						value.width !== undefined
+						nextAspectRatio !== 'auto' &&
+						height !== null &&
+						width !== null
 					) {
 						delete nextValue.height;
 					}
 
-					setLastAspectRatio( nextAspectRatio );
 					onChange( nextValue );
 				} }
 			/>
@@ -143,43 +146,81 @@ function DimensionsTool( {
 					value={ lastScale }
 					onChange={ ( nextScale ) => {
 						setLastScale( nextScale );
-						onChange( { ...value, scale: nextScale } );
+
+						const { ...nextValue } = value;
+
+						// Update scale.
+						if ( nextScale === 'fill' ) {
+							// 'fill' is CSS default, so instead of outputting a
+							// redundant value, we just remove the property.
+							delete nextValue.scale;
+						} else {
+							nextValue.scale = nextScale;
+						}
+
+						onChange( nextValue );
 					} }
 				/>
 			) }
 			<WidthHeightTool
 				panelId={ panelId }
 				units={ unitsOptions }
-				value={ { width: value.width, height: value.height } }
+				value={ { width, height } }
 				onChange={ ( nextDimension ) => {
-					const { width, height, ...nextValue } = value;
-					Object.assign( nextValue, nextDimension );
+					const nextWidth = nextDimension.width ?? null;
+					const nextHeight = nextDimension.height ?? null;
 
+					const { ...nextValue } = value;
+
+					// Update width.
+					if ( nextWidth === null ) {
+						delete nextValue.width;
+					} else {
+						nextValue.width = nextWidth;
+					}
+
+					// Update height.
+					if ( nextHeight === null ) {
+						delete nextValue.height;
+					} else {
+						nextValue.height = nextHeight;
+					}
+
+					// Auto-update aspect ratio.
 					if (
-						( nextValue.height !== null &&
-							nextValue.height !== undefined ) !==
-						( nextValue.width !== null &&
-							nextValue.width !== undefined )
+						( height !== null && nextWidth !== null ) ||
+						( width !== null && nextHeight !== null )
+					) {
+						delete nextValue.aspectRatio;
+					} else if (
+						lastAspectRatio !== null &&
+						( ( nextWidth === null &&
+							width !== null &&
+							height !== null ) ||
+							( nextHeight === null &&
+								width !== null &&
+								height !== null ) )
 					) {
 						nextValue.aspectRatio = lastAspectRatio;
 					}
 
-					// Setting both width and height values overrides the aspect ratio.
+					// Auto-update scale.
 					if (
-						nextValue.width !== null &&
-						nextValue.width !== undefined &&
-						nextValue.height !== null &&
-						nextValue.height !== undefined
+						width !== null &&
+						height !== null &&
+						( nextWidth === null || nextHeight === null )
 					) {
-						delete nextValue.aspectRatio;
-					}
-
-					// Set the value to 'cover' since CSS uses 'fill' by default.
-					if (
-						nextValue.scale === null ||
-						nextValue.scale === undefined
+						delete nextValue.scale;
+					} else if (
+						( height !== null && nextWidth !== null ) ||
+						( width !== null && nextHeight !== null )
 					) {
-						nextValue.scale = lastScale ?? 'cover';
+						if ( lastScale === null ) {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						} else {
+							nextValue.scale = lastScale;
+						}
 					}
 
 					onChange( nextValue );
