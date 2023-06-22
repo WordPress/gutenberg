@@ -19,8 +19,8 @@ import {
 	fetchInstallFonts,
 	fetchUninstallFonts,
 } from './resolvers';
-import { unlock } from '../../../private-apis';
 import { DEFAULT_DEMO_CONFIG } from './constants';
+import { unlock } from "../../../lock-unlock";
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import { setUIValuesNeeded, isUrlEncoded } from './utils';
 

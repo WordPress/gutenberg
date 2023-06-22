@@ -157,7 +157,7 @@ export default function SaveHub() {
 					variant={ disabled ? null : 'primary' }
 					showTooltip={ false }
 					icon={ disabled && ! isSaving ? check : null }
-					defaultLabel={ label }
+					textForDefaultState={ label }
 				/>
 			) }
 		</HStack>
