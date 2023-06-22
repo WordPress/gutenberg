@@ -64,10 +64,10 @@
 			"__experimentalRole": "content"
 		},
 		"width": {
-			"type": "string"
+			"type": "number"
 		},
 		"height": {
-			"type": "string"
+			"type": "number"
 		},
 		"aspectRatio": {
 			"type": "string"
