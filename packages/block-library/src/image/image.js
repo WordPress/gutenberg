@@ -484,8 +484,8 @@ export default function Image( {
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
 							setAttributes( {
-								width: newValue.width,
-								height: newValue.height,
+								width: parseInt( newValue.width, 10 ),
+								height: parseInt( newValue.height, 10 ),
 								scale: newValue.scale,
 								aspectRatio: newValue.aspectRatio,
 							} );
@@ -695,8 +695,8 @@ export default function Image( {
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
 					setAttributes( {
-						width: `${ elt.offsetWidth }px`,
-						height: `${ elt.offsetHeight }px`,
+						width: elt.offsetWidth,
+						height: elt.offsetHeight,
 						aspectRatio: undefined,
 					} );
 				} }
