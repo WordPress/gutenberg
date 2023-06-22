@@ -615,11 +615,11 @@ describe( 'actions', () => {
 			const clientIds = [ clientId ];
 
 			// FIXME: Once the private action `privateRemoveBlocks` is properly
-			// unlocking the private selector `removalPromptExists`, this test
+			// unlocking the private selector `isRemovalPromptSupported`, this test
 			// should rewritten to do the right thing.
 			const select = Object.assign(
 				( selector ) =>
-					selector( { root: { removalPromptExists: false } } ),
+					selector( { root: { isRemovalPromptSupported: false } } ),
 				{
 					getBlockRootClientId: () => undefined,
 					canRemoveBlocks: () => true,
@@ -732,11 +732,11 @@ describe( 'actions', () => {
 			const clientId = 'myclientid';
 
 			// FIXME: Once the private action `privateRemoveBlocks` is properly
-			// unlocking the private selector `removalPromptExists`, this test
+			// unlocking the private selector `isRemovalPromptSupported`, this test
 			// should rewritten to do the right thing.
 			const select = Object.assign(
 				( selector ) =>
-					selector( { root: { removalPromptExists: false } } ),
+					selector( { root: { isRemovalPromptSupported: false } } ),
 				{
 					getBlockRootClientId: () => null,
 					canRemoveBlocks: () => true,
@@ -763,11 +763,11 @@ describe( 'actions', () => {
 			const clientId = 'myclientid';
 
 			// FIXME: Once the private action `privateRemoveBlocks` is properly
-			// unlocking the private selector `removalPromptExists`, this test
+			// unlocking the private selector `isRemovalPromptSupported`, this test
 			// should rewritten to do the right thing.
 			const select = Object.assign(
 				( selector ) =>
-					selector( { root: { removalPromptExists: false } } ),
+					selector( { root: { isRemovalPromptSupported: false } } ),
 				{
 					getBlockRootClientId: () => null,
 					canRemoveBlocks: () => true,

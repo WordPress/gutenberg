@@ -197,14 +197,15 @@ export const getEnabledBlockParents = createSelector(
 );
 
 /**
- * Selector that returns if the removal prompt needs to be displayed.
+ * Selector that returns the data needed to display a prompt when certain
+ * blocks are removed, or `false` if no such prompt is requested.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Boolean indicating if prompt should be displayed and removal function.
+ * @return {Object|false} Data for removal prompt display, if any.
  */
-export function isRemovalPromptDisplayed( state ) {
-	return state.isRemovalPromptDisplayed;
+export function getRemovalPromptData( state ) {
+	return state.removalPromptData;
 }
 
 /**
@@ -214,6 +215,6 @@ export function isRemovalPromptDisplayed( state ) {
  *
  * @return {boolean} Whether removal prompt exists.
  */
-export function removalPromptExists( state ) {
-	return state.removalPromptExists;
+export function isRemovalPromptSupported( state ) {
+	return state.isRemovalPromptSupported;
 }

@@ -7,7 +7,7 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { blockTypePromptMessages } from '../components/block-removal-warning-modal';
-import { removalPromptExists } from './private-selectors';
+import { isRemovalPromptSupported } from './private-selectors';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -160,7 +160,7 @@ export const privateRemoveBlocks =
 			! forceRemove &&
 			// FIXME what's the best way to unlock a private selector in this
 			// context?
-			select( ( state ) => removalPromptExists( state.root ) )
+			select( ( state ) => isRemovalPromptSupported( state.root ) )
 		) {
 			const blockNamesForPrompt = new Set();
 

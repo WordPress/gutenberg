@@ -1470,14 +1470,15 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
- * Reducer returning whether to display a prompt when certain blocks are removed.
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {Object|false} Data for removal prompt display, if any.
  */
-export function isRemovalPromptDisplayed( state = false, action ) {
+export function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_REMOVAL_PROMPT':
 			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
@@ -1501,7 +1502,7 @@ export function isRemovalPromptDisplayed( state = false, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function removalPromptExists( state = false, action ) {
+export function isRemovalPromptSupported( state = false, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_REMOVAL_PROMPT_SUPPORT':
 			return action.status;
@@ -1922,8 +1923,8 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
-	isRemovalPromptDisplayed,
-	removalPromptExists,
+	removalPromptData,
+	isRemovalPromptSupported,
 } );
 
 function withAutomaticChangeReset( reducer ) {

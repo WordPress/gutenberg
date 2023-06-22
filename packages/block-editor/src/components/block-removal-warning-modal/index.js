@@ -32,7 +32,7 @@ export const blockTypePromptMessages = {
 export function BlockRemovalWarningModal() {
 	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
 		( select ) =>
-			unlock( select( blockEditorStore ) ).isRemovalPromptDisplayed()
+			unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
