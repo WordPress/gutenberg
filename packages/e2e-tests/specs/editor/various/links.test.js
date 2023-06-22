@@ -105,7 +105,8 @@ describe( 'Links', () => {
 		await waitForURLFieldAutoFocus();
 
 		const urlInputValue = await page.evaluate(
-			() => document.querySelector( '[aria-label="URL"]' ).value
+			() =>
+				document.querySelector( '.block-editor-url-input__input' ).value
 		);
 
 		expect( urlInputValue ).toBe( '' );
@@ -496,7 +497,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Advanced")]'
 			);
 			await settingsToggle.click();
 
@@ -614,8 +615,9 @@ describe( 'Links', () => {
 			);
 			await editButton.click();
 
-			// tab forward to the text input.
-			await page.keyboard.press( 'Tab' );
+			await waitForURLFieldAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
@@ -661,7 +663,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Advanced")]'
 			);
 			await settingsToggle.click();
 
