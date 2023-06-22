@@ -265,6 +265,8 @@ export function displayRemovalPrompt(
  * Returns an action object used in signalling that a block removal prompt must
  * be cleared, either be cause the user has confirmed or canceled the request
  * for removal.
+ *
+ * @return {Object} Action object.
  */
 export function clearRemovalPrompt() {
 	return {
