@@ -67,7 +67,6 @@ export default function SidebarNavigationScreen( {
 					) }
 					{ ! isRoot && backPath && (
 						<SidebarButton
-							as={ SidebarButton }
 							onClick={ () => goTo( backPath, { isBack: true } ) }
 							icon={ icon }
 							label={ __( 'Back' ) }

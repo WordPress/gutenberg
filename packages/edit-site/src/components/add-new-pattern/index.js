@@ -12,6 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
+import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -66,7 +67,7 @@ export default function AddNewPattern() {
 					},
 				] }
 				toggleProps={ {
-					className: 'edit-site-sidebar-button',
+					as: SidebarButton,
 				} }
 				icon={ plus }
 				label={ __( 'Create pattern' ) }
