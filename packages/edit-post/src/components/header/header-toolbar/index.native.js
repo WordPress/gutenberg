@@ -19,7 +19,10 @@ import {
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
-	media as mediaIcon,
+	audio as audioIcon,
+	media as imageIcon,
+	video as videoIcon,
+	gallery as galleryIcon,
 	undo as undoIcon,
 	redo as redoIcon,
 } from '@wordpress/icons';
@@ -56,6 +59,7 @@ function HeaderToolbar( {
 			scrollViewRef.current.scrollTo( { x: 0 } );
 		}
 	};
+
 	const renderHistoryButtons = () => {
 		const buttons = [
 			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
@@ -84,10 +88,54 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
-	function insertMedia() {
+	function insertBlock( blockType ) {
 		// eslint-disable-next-line no-console
-		console.log( 'insert media' );
+		console.log( blockType );
+		// insertBlocksAfter( createBlock( blockType ) );
 	}
+
+	const renderMediaButtons = () => {
+		const buttons = [
+			<ToolbarButton
+				key="imageButton"
+				title={ __( 'Image' ) }
+				icon={ imageIcon }
+				onClick={ () => insertBlock( 'core/image' ) }
+				extraProps={ {
+					hint: __( 'Insert Image Block' ),
+				} }
+			/>,
+			<ToolbarButton
+				key="videoButton"
+				title={ __( 'Video' ) }
+				icon={ videoIcon }
+				onClick={ () => insertBlock( 'core/video' ) }
+				extraProps={ {
+					hint: __( 'Insert Video Block' ),
+				} }
+			/>,
+			<ToolbarButton
+				key="galleryButton"
+				title={ __( 'Gallery' ) }
+				icon={ galleryIcon }
+				onClick={ () => insertBlock( 'core/gallery' ) }
+				extraProps={ {
+					hint: __( 'Insert Gallery Block' ),
+				} }
+			/>,
+			<ToolbarButton
+				key="audioButton"
+				title={ __( 'Audio' ) }
+				icon={ audioIcon }
+				onClick={ () => insertBlock( 'core/audio' ) }
+				extraProps={ {
+					hint: __( 'Insert Audio Block' ),
+				} }
+			/>,
+		];
+
+		return buttons;
+	};
 
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
@@ -137,16 +185,7 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
-				<ToolbarButton
-					key="mediaButton"
-					title={ __( 'Media' ) }
-					icon={ mediaIcon }
-					isDisabled={ ! hasUndo }
-					onClick={ insertMedia }
-					extraProps={ {
-						hint: __( 'Insert media' ),
-					} }
-				/>
+				{ renderMediaButtons() }
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
