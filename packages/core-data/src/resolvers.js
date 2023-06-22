@@ -585,12 +585,14 @@ export const getNavigationFallbackId =
 		dispatch.receiveNavigationFallbackId( fallback?.id );
 
 		if ( record ) {
+			const invalidateNavigationQueries = true;
+
 			dispatch.receiveEntityRecords(
 				'postType',
 				'wp_navigation',
 				record,
 				undefined,
-				true
+				invalidateNavigationQueries
 			);
 
 			// Resolve to avoid further network requests.
