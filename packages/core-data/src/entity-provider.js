@@ -196,22 +196,20 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 			const { getRichTextValues } = unlock( blockEditorPrivateApis );
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
-			// const newOrder = [];
+			const newOrder = [];
 
-			// if ( _content.indexOf( 'data-fn' ) !== -1 ) {
-			// 	const regex = /data-fn="([^"]+)"/g;
-			// 	let match;
-			// 	while ( ( match = regex.exec( _content ) ) !== null ) {
-			// 		newOrder.push( match[ 1 ] );
-			// 	}
-			// }
+			if ( _content.indexOf( 'data-fn' ) !== -1 ) {
+				const regex = /data-fn="([^"]+)"/g;
+				let match;
+				while ( ( match = regex.exec( _content ) ) !== null ) {
+					newOrder.push( match[ 1 ] );
+				}
+			}
 
-			// const footnotes = JSON.parse( meta.footnotes || '[]' );
-			// const currentOrder = footnotes.map( ( fn ) => fn.id );
+			const footnotes = JSON.parse( meta.footnotes || '[]' );
+			const currentOrder = footnotes.map( ( fn ) => fn.id );
 
-			// if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
-
-			//
+			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
 		},
 		[ meta, updateMeta ]
 	);
