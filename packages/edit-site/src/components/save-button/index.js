@@ -17,6 +17,7 @@ export default function SaveButton( {
 	textForDisabledState = __( 'Saved' ),
 	textForIsDirtyState = __( 'Activate & Save' ),
 	textForDefaultState = __( 'Save' ),
+	textForIsSavingState = __( 'Saving' ),
 	className = 'edit-site-save-button__button',
 	variant = 'primary',
 	showTooltip = true,
@@ -41,14 +42,23 @@ export default function SaveButton( {
 	const disabled = isSaving || ! activateSaveEnabled;
 
 	const getLabel = () => {
-		if ( disabled ) {
-			return textForDisabledState;
+		if ( isPreviewingTheme() ) {
+			if ( isSaving ) {
+				return __( 'Activating' );
+			} else if ( disabled ) {
+				return __( 'Saved' );
+			} else if ( isDirty ) {
+				return __( 'Activate & Save' );
+			}
+			return __( 'Activate' );
 		}
 
-		if ( isPreviewingTheme() && isDirty ) {
+		if ( isDirty ) {
 			return textForIsDirtyState;
-		} else if ( isPreviewingTheme() ) {
-			return __( 'Activate' );
+		} else if ( isSaving ) {
+			return textForIsSavingState;
+		} else if ( disabled ) {
+			return textForDisabledState;
 		}
 
 		return textForDefaultState;

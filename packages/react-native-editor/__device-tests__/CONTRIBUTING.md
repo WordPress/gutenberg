@@ -38,7 +38,7 @@ Using one or a combination of these tools will make it much easier to identify w
 
 -   You'll write any functions needed to interact with the page in the `EditorPage` page object and then call those interactions within the test. The code you'll need to write to actually do the finding will use a combination of
 
--   Appium's spec https://appium.io/docs/en/about-appium/intro/ which you can find examples of a variety of functions under the commands tab
+-   Appium's spec https://github.com/appium/appium/blob/1.x/docs/en/about-appium/intro.md which you can find examples of a variety of functions under the commands tab
 -   WebDriver I/O Appium protocols https://webdriver.io/docs/api/appium.html which provides examples and descriptions of what those look like.
 
 It takes some getting used to but looking at the existing code should be helpful in identifying common commands that it'd help to be familiar with.

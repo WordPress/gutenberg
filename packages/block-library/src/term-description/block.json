@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/term-description",
 	"title": "Term Description",
 	"category": "theme",
@@ -12,7 +12,6 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {

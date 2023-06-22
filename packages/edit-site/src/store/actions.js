@@ -177,6 +177,37 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
+ * Action that sets a navigation menu.
+ *
+ * @param {string} navigationMenuId The Navigation Menu Post ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationMenu( navigationMenuId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType: 'wp_navigation',
+		id: navigationMenuId,
+	};
+}
+
+/**
+ * Action that sets an edited entity.
+ *
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditedEntity( postType, postId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
+	};
+}
+
+/**
  * @deprecated
  */
 export function setHomeTemplateId() {
@@ -529,4 +560,23 @@ export const switchEditorMode =
 		} else if ( mode === 'text' ) {
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
+	};
+
+/**
+ * Sets whether or not the editor allows only page content to be edited.
+ *
+ * @param {boolean} hasPageContentFocus True to allow only page content to be
+ *                                      edited, false to allow template to be
+ *                                      edited.
+ */
+export const setHasPageContentFocus =
+	( hasPageContentFocus ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentFocus ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
+		} );
 	};

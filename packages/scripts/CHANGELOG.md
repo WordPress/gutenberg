@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## 26.6.0 (2023-06-07)
+
 ### Enhancements
 
 -   The bundled `terser-webpack-plugin` dependency has been updated from requiring `^5.1.4` to requiring `^5.3.9` ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
+-   Optimize updating render paths when developing blocks with the `start` command ([#51162](https://github.com/WordPress/gutenberg/pull/51162)).
+
+### Bug Fixes
+
+-   Ensure files listed in `render` field of `block.json` files are always copied to the build folder when using the `start` command ([#50939](https://github.com/WordPress/gutenberg/pull/50939)).
 
 ## 26.5.0 (2023-05-24)
 

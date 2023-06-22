@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
+import { setHasPageContentFocus } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -213,6 +214,36 @@ describe( 'actions', () => {
 			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'setHasPageContentFocus', () => {
+		it( 'toggles the page content lock on', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentFocus( true )( { dispatch, registry } );
+			expect( clearSelectedBlock ).toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: true,
+			} );
+		} );
+
+		it( 'toggles the page content lock off', () => {
+			const dispatch = jest.fn();
+			const clearSelectedBlock = jest.fn();
+			const registry = {
+				dispatch: () => ( { clearSelectedBlock } ),
+			};
+			setHasPageContentFocus( false )( { dispatch, registry } );
+			expect( clearSelectedBlock ).not.toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+				hasPageContentFocus: false,
+			} );
 		} );
 	} );
 } );

@@ -169,7 +169,7 @@ test.describe( 'Comments', () => {
 			'role=button[name="Switch to editable mode"i]'
 		);
 
-		const commentTemplate = block.locator(
+		const commentTemplate = editor.canvas.locator(
 			'role=document[name="Block: Comment Template"i]'
 		);
 		await expect( block ).toHaveClass( /has-vivid-purple-color/ );

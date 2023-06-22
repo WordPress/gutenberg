@@ -7,7 +7,6 @@ import {
 	initializeEditor,
 	getEditorHtml,
 	render,
-	waitFor,
 	setupApiFetch,
 } from 'test/helpers';
 import { Image } from 'react-native';
@@ -173,7 +172,7 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		await waitFor(
+		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
 		);
 
@@ -196,25 +195,16 @@ describe( 'Image Block', () => {
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
-		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
 		fireEvent.press( screen.getByText( 'None' ) );
-		fireEvent.press( screen.getByText( 'Media File' ) );
-		await screen.findByText( 'Custom URL' );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
-		// Await asynchronous fetch of clipboard
-		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
 		fireEvent.press( await screen.findByText( 'Custom URL' ) );
-		// Await asynchronous fetch of clipboard
-		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->

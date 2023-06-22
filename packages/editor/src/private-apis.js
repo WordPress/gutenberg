@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { ExperimentalEditorProvider } from './components/provider';
-import { lock } from './lockUnlock';
+import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 
 export const privateApis = {};

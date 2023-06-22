@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	pressKeyTimes,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -57,7 +58,7 @@ describe( 'Links', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		const actualText = await page.evaluate(
+		const actualText = await canvas().evaluate(
 			() =>
 				document.querySelector( '.block-editor-rich-text__editable a' )
 					.textContent
@@ -172,7 +173,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click somewhere else - it doesn't really matter where.
-		await page.click( '.editor-post-title' );
+		await canvas().click( '.editor-post-title' );
 	} );
 
 	const createAndReselectLink = async () => {
@@ -311,7 +312,7 @@ describe( 'Links', () => {
 
 	const createPostWithTitle = async ( titleText ) => {
 		await createNewPost();
-		await page.type( '.editor-post-title__input', titleText );
+		await canvas().type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
 		// Disable reason: Wait for the animation to complete, since otherwise the
@@ -584,7 +585,9 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			// Tabbing back should land us in the text input.
+			// Tabbing forward should land us in the "Text" input.
+			await page.keyboard.press( 'Tab' );
+
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
 			);
@@ -611,7 +614,9 @@ describe( 'Links', () => {
 			);
 			await editButton.click();
 
-			// Tabbing should land us in the text input.
+			// tab forward to the text input.
+			await page.keyboard.press( 'Tab' );
+
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
 			);
@@ -630,7 +635,7 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Check the created link reflects the link text.
-			const actualLinkText = await page.evaluate(
+			const actualLinkText = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable a'
@@ -664,7 +669,9 @@ describe( 'Links', () => {
 			await page.waitForXPath( `//label[text()='Open in new tab']` );
 
 			// Move focus back to RichText for the underlying link.
-			await pressKeyTimes( 'Tab', 3 );
+			await pressKeyWithModifier( 'shift', 'Tab' );
+			await pressKeyWithModifier( 'shift', 'Tab' );
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
@@ -880,7 +887,7 @@ describe( 'Links', () => {
 
 			await page.keyboard.press( 'Enter' );
 
-			const richTextText = await page.evaluate(
+			const richTextText = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable'
@@ -889,7 +896,7 @@ describe( 'Links', () => {
 			// Check that the correct (i.e. last) instance of "a" was replaced with "z".
 			expect( richTextText ).toBe( 'a b c z' );
 
-			const richTextLink = await page.evaluate(
+			const richTextLink = await canvas().evaluate(
 				() =>
 					document.querySelector(
 						'.block-editor-rich-text__editable a'
