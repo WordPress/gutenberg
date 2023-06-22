@@ -180,9 +180,19 @@ export default function Layout() {
 					variants={ {
 						isDistractionFree: {
 							opacity: 0,
+							transition: {
+								type: 'tween',
+								delay: 0.8,
+								delayChildren: 0.8,
+							}, // How long to wait before the header exits
 						},
 						isDistractionFreeHovering: {
 							opacity: 1,
+							transition: {
+								type: 'tween',
+								delay: 0.2,
+								delayChildren: 0.2,
+							}, // How long to wait before the header shows
 						},
 						view: { opacity: 1 },
 						edit: { opacity: 1 },
@@ -193,7 +203,6 @@ export default function Layout() {
 							: undefined
 					}
 					animate={ headerAnimationState }
-					transition={ { type: 'tween', delay: 0.2 } }
 				>
 					<SiteHub
 						as={ motion.div }
@@ -221,11 +230,8 @@ export default function Layout() {
 								} }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
+									duration: disableMotion ? 0 : 0.2,
 									ease: 'easeOut',
-									delayChildren: 0.2,
 								} }
 							>
 								{ isEditing && <Header /> }
