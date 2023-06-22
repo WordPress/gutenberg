@@ -771,38 +771,16 @@ describe( 'Manual link entry', () => {
 	} );
 
 	describe( 'Handling cancellation', () => {
-		it( 'should allow cancellation of the link creation process and reset any entered values', async () => {
-			const user = userEvent.setup();
+		it( 'should not show cancellation button during link creation', async () => {
 			const mockOnRemove = jest.fn();
-			const mockOnCancel = jest.fn();
 
 			render( <LinkControl onRemove={ mockOnRemove } /> );
-
-			// Search Input UI.
-			const searchInput = screen.getByRole( 'combobox', {
-				name: 'URL',
-			} );
 
 			const cancelButton = screen.queryByRole( 'button', {
 				name: 'Cancel',
 			} );
 
-			expect( cancelButton ).toBeEnabled();
-			expect( cancelButton ).toBeVisible();
-
-			// Simulate adding a link for a term.
-			await user.type( searchInput, 'https://www.wordpress.org' );
-
-			// Attempt to submit the empty search value in the input.
-			await user.click( cancelButton );
-
-			// Verify the consumer can handle the cancellation.
-			expect( mockOnRemove ).toHaveBeenCalled();
-
-			// Ensure optional callback is not called.
-			expect( mockOnCancel ).not.toHaveBeenCalled();
-
-			expect( searchInput ).toHaveValue( '' );
+			expect( cancelButton ).not.toBeInTheDocument();
 		} );
 
 		it( 'should allow cancellation of the link editing process and reset any entered values', async () => {
