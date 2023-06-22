@@ -572,16 +572,13 @@ export default function Image( {
 	// So we try using the imageRef width first and fallback to clientWidth.
 	const fallbackClientWidth = imageRef.current?.width || clientWidth;
 
-	const pxWidth = width && parseFloat( width );
-	const pxHeight = height && parseFloat( height );
-
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
 				id={ id }
 				url={ url }
-				width={ pxWidth }
-				height={ pxHeight }
+				width={ width }
+				height={ height }
 				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
@@ -610,9 +607,9 @@ export default function Image( {
 		const isAutoHeight = ! height || height === 'auto';
 
 		const currentWidth =
-			isAutoWidth && ! isAutoHeight ? pxHeight * ratio : pxWidth;
+			isAutoWidth && ! isAutoHeight ? height * ratio : width;
 		const currentHeight =
-			isAutoHeight && ! isAutoWidth ? pxWidth / ratio : pxHeight;
+			isAutoHeight && ! isAutoWidth ? width / ratio : height;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
