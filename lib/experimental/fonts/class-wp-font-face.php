@@ -168,7 +168,7 @@ class WP_Font_Face {
 	 * @return false|array Validated font-face on success. Else, false.
 	 */
 	private function validate_font_face_properties( array $font_face ) {
-		$font_face = wp_parse_args( $font_face, $this->font_face_property_default );
+		$font_face = wp_parse_args( $font_face, $this->font_face_property_defaults );
 
 		// Check the font-family.
 		if ( empty( $font_face['font-family'] ) || ! is_string( $font_face['font-family'] ) ) {
