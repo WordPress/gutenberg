@@ -2408,7 +2408,7 @@ describe( 'Controlling link title text', () => {
 
 async function toggleSettingsDrawer( user ) {
 	const settingsToggle = screen.queryByRole( 'button', {
-		name: 'Link Settings',
+		name: 'Advanced',
 	} );
 
 	await user.click( settingsToggle );
