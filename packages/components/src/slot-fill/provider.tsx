@@ -16,7 +16,7 @@ import type {
 	SlotKey,
 } from './types';
 
-export function createSlotRegistory(): BaseSlotFillContext {
+function createSlotRegistry(): BaseSlotFillContext {
 	const slots: Record< SlotKey, Component< BaseSlotComponentProps > > = {};
 	const fills: Record< SlotKey, FillComponentProps[] > = {};
 	let listeners: Array< () => void > = [];
@@ -118,7 +118,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 }
 
 export function SlotFillProvider( { children }: SlotFillProviderProps ) {
-	const [ contextValue ] = useState( createSlotRegistory );
+	const [ contextValue ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ contextValue }>
 			{ children }
