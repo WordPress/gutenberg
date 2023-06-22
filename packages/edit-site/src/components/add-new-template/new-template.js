@@ -98,11 +98,18 @@ function TemplateListItem( {
 	direction,
 	className,
 	description,
+	hideDescription = true,
 	icon,
 	onClick,
+	showTooltip = true,
 } ) {
 	return (
-		<Button className={ className } onClick={ onClick }>
+		<Button
+			className={ className }
+			onClick={ onClick }
+			label={ description }
+			showTooltip={ showTooltip }
+		>
 			<Flex
 				as="span"
 				spacing={ 2 }
@@ -125,7 +132,7 @@ function TemplateListItem( {
 					>
 						{ title }
 					</Text>
-					{ description && (
+					{ description && ! hideDescription && (
 						<Text
 							lineHeight={ 1.53846153846 } // 20px
 						>
@@ -331,6 +338,8 @@ export default function NewTemplate( {
 								description={ __(
 									'A custom template can be manually applied to any post or page.'
 								) }
+								hideDescription={ false }
+								showTooltip={ false }
 								icon={ edit }
 								onClick={ () =>
 									setModalContent(
