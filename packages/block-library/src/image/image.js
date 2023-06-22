@@ -565,8 +565,6 @@ export default function Image( {
 				ref={ imageRef }
 				className={ borderProps.className }
 				style={ {
-					width: '100%',
-					height: '100%',
 					objectFit: scale,
 					...borderProps.style,
 				} }
@@ -600,24 +598,15 @@ export default function Image( {
 			/>
 		);
 	} else if ( ! isResizable ) {
-		img = (
-			<div style={ { width, height, aspectRatio, objectFit: scale } }>
-				{ img }
-			</div>
-		);
+		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
 	} else {
 		const ratio =
 			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
 			( width && height && width / height ) ||
 			naturalWidth / naturalHeight;
 
-		const isAutoWidth = ! width || width === 'auto';
-		const isAutoHeight = ! height || height === 'auto';
-
-		const currentWidth =
-			isAutoWidth && ! isAutoHeight ? height * ratio : width;
-		const currentHeight =
-			isAutoHeight && ! isAutoWidth ? width / ratio : height;
+		const currentWidth = ! width && height ? height * ratio : width;
+		const currentHeight = ! height && width ? width / ratio : height;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -670,7 +659,7 @@ export default function Image( {
 					display: 'block',
 					objectFit: scale,
 					aspectRatio:
-						isAutoWidth && isAutoHeight && aspectRatio
+						! width && ! height && aspectRatio
 							? aspectRatio
 							: undefined,
 				} }
