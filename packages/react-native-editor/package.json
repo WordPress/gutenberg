@@ -66,7 +66,7 @@
 		"react-native-prompt-android": "https://raw.githubusercontent.com/wordpress-mobile/react-native-prompt-android/v1.0.0-wp-4/react-native-prompt-android-1.0.0-wp-4.tgz",
 		"react-native-reanimated": "2.17.0",
 		"react-native-safe-area": "^0.5.0",
-		"react-native-safe-area-context": "3.2.0",
+		"react-native-safe-area-context": "4.6.3",
 		"react-native-sass-transformer": "^1.1.1",
 		"react-native-screens": "2.9.0",
 		"react-native-svg": "9.13.6",
