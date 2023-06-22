@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
-import { children as childrenSource, getSaveElement } from '@wordpress/blocks';
+import {
+	children as childrenSource,
+	getSaveElement,
+	__unstableGetBlockProps as getBlockProps,
+} from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -72,7 +76,10 @@ function _getSaveElement( { name, attributes, innerBlocks } ) {
 }
 
 export function getRichTextValues( blocks = [] ) {
-	return findContent(
+	getBlockProps.skipFilters = true;
+	const values = findContent(
 		( Array.isArray( blocks ) ? blocks : [ blocks ] ).map( _getSaveElement )
 	);
+	getBlockProps.skipFilters = false;
+	return values;
 }

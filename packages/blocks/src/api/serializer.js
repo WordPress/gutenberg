@@ -81,12 +81,14 @@ const innerBlocksPropsProvider = {};
  */
 export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
-	return applyFilters(
-		'blocks.getSaveContent.extraProps',
-		{ ...props },
-		blockType,
-		attributes
-	);
+	return getBlockProps.skipFilters
+		? props
+		: applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...props },
+				blockType,
+				attributes
+		  );
 }
 
 /**
