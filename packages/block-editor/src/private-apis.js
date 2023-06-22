@@ -13,6 +13,7 @@ import { cleanEmptyObject } from './hooks/utils';
 import { useBlockEditingMode } from './components/block-editing-mode';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
+import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 
 /**
@@ -31,6 +32,7 @@ lock( privateApis, {
 	useBlockEditingMode,
 	BlockQuickNavigation,
 	LayoutStyle,
+	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
 } );
