@@ -362,6 +362,9 @@ export function ImageEdit( {
 					context={ context }
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
+					// TODO: We need to confirm that the current image supports
+					// the default size, otherwise we should use the 'full' size.
+					defaultResolution={ imageDefaultSize }
 				/>
 			) }
 			{ ! url && blockEditingMode === 'default' && (

@@ -94,6 +94,7 @@ export default function Image( {
 	context,
 	clientId,
 	blockEditingMode,
+	defaultResolution,
 } ) {
 	const {
 		url = '',
@@ -493,6 +494,7 @@ export default function Image( {
 					/>
 					<ResolutionTool
 						value={ sizeSlug }
+						defaultValue={ defaultResolution }
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
