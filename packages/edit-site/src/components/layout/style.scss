@@ -36,6 +36,10 @@
 	}
 }
 
+.edit-site-layout__header-container {
+	z-index: z-index(".edit-site-layout__header-container");
+}
+
 .edit-site-layout__header {
 	height: $header-height;
 	display: flex;
@@ -261,6 +265,7 @@
 .is-edit-mode.is-distraction-free {
 
 	.edit-site-layout__header-container {
+		height: $header-height;
 		position: absolute;
 		top: 0;
 		left: 0;

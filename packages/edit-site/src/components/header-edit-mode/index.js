@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
@@ -114,6 +114,7 @@ export default function HeaderEditMode() {
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const disableMotion = useReducedMotion();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -162,9 +163,15 @@ export default function HeaderEditMode() {
 		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
-	const slideY = {
-		hidden: { y: '-50px' },
-		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+	const toolbarVariants = {
+		isDistractionFree: { y: '-50px' },
+		isDistractionFreeHovering: { y: 0 },
+	};
+
+	const toolbarTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : 0.2,
+		ease: 'easeOut',
 	};
 
 	return (
@@ -176,12 +183,13 @@ export default function HeaderEditMode() {
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					as={ isDistractionFree ? motion.div : 'div' }
-					variants={ slideY }
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
 					shouldUseKeyboardFocusShortcut={
 						! blockToolbarCanBeFocused
 					}
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
 						{ ! isDistractionFree && (
@@ -285,8 +293,9 @@ export default function HeaderEditMode() {
 
 			<div className="edit-site-header-edit-mode__end">
 				<motion.div
-					variants={ slideY }
 					className="edit-site-header-edit-mode__actions"
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
 				>
 					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div

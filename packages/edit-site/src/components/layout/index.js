@@ -59,20 +59,6 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const ANIMATION_DURATION = 0.5;
 
-const headerVariants = {
-	hidden: { opacity: 0 },
-	hover: {
-		opacity: 1,
-		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-	},
-	distractionFreeInactive: { opacity: 1 },
-};
-
-const slideX = {
-	hidden: { x: '-100%' },
-	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-};
-
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
@@ -131,6 +117,27 @@ export default function Layout() {
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
 
+	// This determines which animation variant should apply to the header.
+	// There is also a `isDistractionFreeHovering` state that gets priority
+	// when hovering the `edit-site-layout__header-container` in distraction
+	// free mode. It's set via framer and trickles down to all the children
+	// so they can use this variant state too.
+	//
+	// TODO: The issue with this is we want to have the hover state stick when hovering
+	// a popover opened via the header. We'll probably need to lift this state to
+	// handle it ourselves. Also, focusWithin the header needs to be handled.
+	let headerAnimationState;
+
+	if ( canvasMode === 'view' ) {
+		// We need 'view' to always take priority so 'isDistractionFree'
+		// doesn't bleed over into the view (sidebar) state
+		headerAnimationState = 'view';
+	} else if ( isDistractionFree ) {
+		headerAnimationState = 'isDistractionFree';
+	} else {
+		headerAnimationState = canvasMode; // edit, view, init
+	}
+
 	// Sets the right context for the command center
 	const commandContext =
 		canvasMode === 'edit' && isEditorPage
@@ -170,33 +177,35 @@ export default function Layout() {
 			>
 				<motion.div
 					className="edit-site-layout__header-container"
-					variants={ isEditing ? headerVariants : null }
-					initial={
-						isDistractionFree ? 'hidden' : 'distractionFreeInactive'
-					}
+					variants={ {
+						isDistractionFree: {
+							opacity: 0,
+						},
+						isDistractionFreeHovering: {
+							opacity: 1,
+						},
+						view: { opacity: 1 },
+						edit: { opacity: 1 },
+					} }
 					whileHover={
-						isDistractionFree ? 'hover' : 'distractionFreeInactive'
+						isDistractionFree
+							? 'isDistractionFreeHovering'
+							: undefined
 					}
-					animate={
-						isDistractionFree ? 'hidden' : 'distractionFreeInactive'
-					}
+					animate={ headerAnimationState }
 					transition={ { type: 'tween', delay: 0.2 } }
 				>
-					{ isDistractionFree && isEditing && (
-						<SiteHub
-							as={ motion.div }
-							variants={ slideX }
-							ref={ hubRef }
-							className="edit-site-layout__hub"
-						/>
-					) }
-
-					{ ( ! isDistractionFree || ! isEditing ) && (
-						<SiteHub
-							ref={ hubRef }
-							className="edit-site-layout__hub"
-						/>
-					) }
+					<SiteHub
+						as={ motion.div }
+						variants={ {
+							isDistractionFree: { x: '-100%' },
+							isDistractionFreeHovering: { x: 0 },
+							view: { x: 0 },
+							edit: { x: 0 },
+						} }
+						ref={ hubRef }
+						className="edit-site-layout__hub"
+					/>
 
 					<AnimatePresence initial={ false }>
 						{ isEditorPage && isEditing && (
@@ -204,14 +213,21 @@ export default function Layout() {
 								className="edit-site-layout__header"
 								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
-								animate={ {
-									y: 0,
+								variants={ {
+									isDistractionFree: { opacity: 0 },
+									isDistractionFreeHovering: { opacity: 1 },
+									view: { opacity: 1 },
+									edit: { opacity: 1 },
 								} }
 								initial={ {
-									y: '-100%',
+									isDistractionFree: {
+										opacity: 0,
+									},
 								} }
 								exit={ {
-									y: '-100%',
+									isDistractionFree: {
+										opacity: 0,
+									},
 								} }
 								transition={ {
 									type: 'tween',
@@ -219,6 +235,7 @@ export default function Layout() {
 										? 0
 										: ANIMATION_DURATION,
 									ease: 'easeOut',
+									delayChildren: 0.2,
 								} }
 							>
 								{ isEditing && <Header /> }
