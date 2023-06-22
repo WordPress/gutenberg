@@ -559,7 +559,7 @@ describe( 'DimensionsTool', () => {
 	} );
 
 	describe( 'internal component state', () => {
-		it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio', async () => {
+		it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio (1100) -> (1110) -> (0111) -> (1101)', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
 
@@ -598,7 +598,7 @@ describe( 'DimensionsTool', () => {
 			] );
 		} );
 
-		it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back', async () => {
+		it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back (1100) -> (1100) -> (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
 
