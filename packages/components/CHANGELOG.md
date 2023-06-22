@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `Navigator`: focus screen wrapper instead of first tabbable element. ([#51816](https://github.com/WordPress/gutenberg/pull/51816)).
 -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
 -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
 -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
