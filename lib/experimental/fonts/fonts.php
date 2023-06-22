@@ -55,3 +55,17 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 		wp_font_face()->generate_and_print( $fonts );
 	}
 }
+
+add_filter(
+	'block_editor_settings_all',
+	static function( $settings ) {
+		ob_start();
+		wp_print_font_faces();
+		$styles = ob_get_clean();
+
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
+		return $settings;
+	},
+	11
+);
