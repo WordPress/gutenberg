@@ -1228,7 +1228,7 @@ describe( 'actions', () => {
 			it( 'has labels.name', () => {
 				registerInserterMediaCategory( { name: 'a' } )( {} );
 				expect( console ).toHaveErroredWith(
-					'Category should have a `labels` property of `InserterMediaCategoryLabels` type.'
+					'Category should have a `labels.name`.'
 				);
 			} );
 			it( 'has proper media type', () => {

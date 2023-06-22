@@ -1718,33 +1718,37 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  */
 
 /**
- * Interface for inserter media category labels.
- *
- * @typedef {Object} InserterMediaCategoryLabels
- * @property {string} name                    General name of the media category. It's used in the inserter media items list.
- * @property {string} [search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
- */
-
-/**
- * Interface for inserter media category.
- *
- * @typedef {Object} InserterMediaCategory
- * @property {string}                                                 name                 The name of the media category, that should be unique among all media categories.
- * @property {InserterMediaCategoryLabels}                            labels               Labels for the media category.
- * @property {('image'|'audio'|'video')}                              mediaType            The media type of the media category.
- * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                The function to fetch media items for the category.
- * @property {(InserterMediaItem) => string}                          [getReportUrl]       If the media category supports reporting media items, this function should return
- *                                                                                         the report url for the media item. It accepts the `InserterMediaItem` as an argument.
- * @property {boolean}                                                [isExternalResource] If the media category is an external resource, this should be set to true.
- *                                                                                         This is used to avoid making a request to the external resource when the user
- *                                                                                         opens the inserter for the first time.
- */
-
-/**
  * Registers a new inserter media category. Once registered, the media category is
  * available in the inserter's media tab.
  *
- * @param {InserterMediaCategory} category The inserter media category to register.
+ * The following interfaces are used:
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+ *
+ * _Properties_
+ *
+ * - _per_page_ `number`: How many items to fetch per page.
+ * - _search_ `string`: The search term to use for filtering the results.
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ *
+ * _Properties_
+ *
+ * - _title_ `string`: The title of the media item.
+ * - _url_ `string: The source url of the media item.
+ * - _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+ * - _id_ `[number]`: The WordPress id of the media item.
+ * - _sourceId_ `[number|string]`: The id of the media item from external source.
+ * - _alt_ `[string]`: The alt text of the media item.
+ * - _caption_ `[string]`: The caption of the media item.
+ *
+ * @param    {InserterMediaCategory}                                  category                       The inserter media category to register.
  *
  * @example
  * ```js
@@ -1799,6 +1803,19 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * 	 isExternalResource: true,
  * } );
  * ```
+ *
+ * @typedef {Object} InserterMediaCategory Interface for inserter media category.
+ * @property {string}                                                 name                           The name of the media category, that should be unique among all media categories.
+ * @property {Object}                                                 labels                         Labels for the media category.
+ * @property {string}                                                 labels.name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string}                                                 [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ * @property {('image'|'audio'|'video')}                              mediaType                      The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                          The function to fetch media items for the category.
+ * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
+ *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
+ *                                                                                                   This is used to avoid making a request to the external resource when the user
+ *
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -1816,9 +1833,7 @@ export const registerInserterMediaCategory =
 			return;
 		}
 		if ( ! category.labels?.name ) {
-			console.error(
-				'Category should have a `labels` property of `InserterMediaCategoryLabels` type.'
-			);
+			console.error( 'Category should have a `labels.name`.' );
 			return;
 		}
 		if ( ! [ 'image', 'audio', 'video' ].includes( category.mediaType ) ) {

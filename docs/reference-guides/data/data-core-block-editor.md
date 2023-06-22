@@ -1324,6 +1324,31 @@ _Returns_
 
 Registers a new inserter media category. Once registered, the media category is available in the inserter's media tab.
 
+The following interfaces are used:
+
+_Type Definition_
+
+-   _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+
+_Properties_
+
+-   _per_page_ `number`: How many items to fetch per page.
+-   _search_ `string`: The search term to use for filtering the results.
+
+_Type Definition_
+
+-   _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should map their response to this interface, in order to create the core WordPress media blocks (image, video, audio).
+
+_Properties_
+
+-   _title_ `string`: The title of the media item.
+-   _url_ \`string: The source url of the media item.
+-   _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+-   _id_ `[number]`: The WordPress id of the media item.
+-   _sourceId_ `[number|string]`: The id of the media item from external source.
+-   _alt_ `[string]`: The alt text of the media item.
+-   _caption_ `[string]`: The caption of the media item.
+
 _Usage_
 
 ```js
@@ -1381,6 +1406,21 @@ wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
 _Parameters_
 
 -   _category_ `InserterMediaCategory`: The inserter media category to register.
+
+_Type Definition_
+
+-   _InserterMediaCategory_ `Object`: Interface for inserter media category.
+
+_Properties_
+
+-   _name_ `string`: The name of the media category, that should be unique among all media categories.
+-   _labels_ `Object`: Labels for the media category.
+-   _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
+-   _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+-   _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
+-   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]>`: The function to fetch media items for the category.
+-   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+-   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when the user
 
 ### removeBlock
 
