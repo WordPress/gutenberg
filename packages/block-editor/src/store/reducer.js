@@ -1478,7 +1478,7 @@ export function isSelectionEnabled( state = true, action ) {
  *
  * @return {Object|false} Data for removal prompt display, if any.
  */
-export function removalPromptData( state = false, action ) {
+function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_REMOVAL_PROMPT':
 			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
@@ -1502,7 +1502,7 @@ export function removalPromptData( state = false, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function isRemovalPromptSupported( state = false, action ) {
+function isRemovalPromptSupported( state = false, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_REMOVAL_PROMPT_SUPPORT':
 			return action.status;

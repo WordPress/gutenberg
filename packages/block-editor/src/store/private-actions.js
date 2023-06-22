@@ -118,6 +118,9 @@ export function unsetBlockEditingMode( clientId = '' ) {
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
+ * Compared to `removeBlocks`, this private interface exposes an additional
+ * parameter; see `forceRemove`.
+ *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
  * @param {boolean}         selectPrevious True if the previous block
  *                                         or the immediate parent
