@@ -50,580 +50,592 @@ function Example( { initialValue, onChange, ...props } ) {
 // properties are treated differently from missing properties.
 
 describe( 'DimensionsTool', () => {
-	it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
+	describe( 'updating aspectRatio', () => {
+		it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		const initialValue = {
-			// aspectRatio,
-			// scale,
-			// width,
-			// height,
-		};
+			const initialValue = {
+				// aspectRatio,
+				// scale,
+				// width,
+				// height,
+			};
 
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
 
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, '16/9' );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'cover' } ],
+			] );
 		} );
 
-		await user.selectOptions( aspectRatioSelect, '16/9' );
+		it( 'when starting with just height, setting aspectRatio also sets scale (0001) -> (1101)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			const initialValue = {
+				// aspectRatio,
+				// scale,
+				// width,
+				height: '6px',
+			};
 
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, '16/9' );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
+			] );
 		} );
 
-		expect( scaleRadioGroup ).toBeInTheDocument();
+		it( 'when starting with just width, setting aspectRatio also sets scale (0010) -> (1110)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
+			const initialValue = {
+				// aspectRatio,
+				// scale,
+				width: '8px',
+				// height,
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, '16/9' );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
+			] );
 		} );
 
-		expect( scaleCoverRadio ).toBeChecked();
+		it( 'when starting with scale, width, and height, setting aspectRatio also clears height (0111) -> (1110)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover' } ],
-		] );
+			const initialValue = {
+				// aspectRatio,
+				scale: 'cover',
+				width: '8px',
+				height: '6px',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, '16/9' );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
+			] );
+		} );
+
+		it( 'when starting with aspectRatio and scale, setting aspectRatio to "Original" also clears scale (1100) -> (0000)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+				// width,
+				// height,
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, 'auto' );
+
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).not.toBeInTheDocument();
+
+			expect( onChange.mock.calls ).toStrictEqual( [ [ {} ] ] );
+		} );
+
+		it( 'when starting with aspectRatio, scale, and height, setting aspectRatio to "Original" also clears scale (1101) -> (0001)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+				// width,
+				height: '6px',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, 'auto' );
+
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).not.toBeInTheDocument();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { height: '6px' } ],
+			] );
+		} );
+
+		it( 'when starting with aspectRatio, scale, and width, setting aspectRatio to "Original" also clears scale (1110) -> (0010)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+				width: '8px',
+				// height,
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			await user.selectOptions( aspectRatioSelect, 'auto' );
+
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).not.toBeInTheDocument();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { width: '8px' } ],
+			] );
+		} );
 	} );
 
-	it( 'when starting with just height, setting width also sets scale (0001) -> (0111)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			// aspectRatio,
-			// scale,
-			// width,
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const widthInput = screen.getByRole( 'spinbutton', {
-			name: 'Width',
-		} );
-
-		await user.type( widthInput, '8' );
-
-		expect( widthInput ).toHaveValue( 8 );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { scale: 'cover', width: '8px', height: '6px' } ],
-		] );
+	describe( 'updating scale', () => {
+		// No custom interactions here. Things should just update normally.
 	} );
 
-	it( 'when starting with just height, setting aspectRatio also sets scale (0001) -> (1101)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
+	describe( 'updating dimensions', () => {
+		it( 'when starting with just height, setting width also sets scale (0001) -> (0111)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		const initialValue = {
-			// aspectRatio,
-			// scale,
-			// width,
-			height: '6px',
-		};
+			const initialValue = {
+				// aspectRatio,
+				// scale,
+				// width,
+				height: '6px',
+			};
 
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
 
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			await user.type( widthInput, '8' );
+
+			expect( widthInput ).toHaveValue( 8 );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { scale: 'cover', width: '8px', height: '6px' } ],
+			] );
 		} );
 
-		await user.selectOptions( aspectRatioSelect, '16/9' );
+		it( 'when starting with just width, setting height also sets scale (0010) -> (0111)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			const initialValue = {
+				// aspectRatio,
+				// scale,
+				width: '8px',
+				// height,
+			};
 
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+
+			await user.type( heightInput, '6' );
+
+			expect( heightInput ).toHaveValue( 6 );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { scale: 'cover', width: '8px', height: '6px' } ],
+			] );
 		} );
 
-		expect( scaleRadioGroup ).toBeInTheDocument();
+		it( 'when starting with scale, width, and height, clearing width also clears scale (0111) -> (0001)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
+			const initialValue = {
+				// aspectRatio,
+				scale: 'cover',
+				width: '8px',
+				height: '6px',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			await user.clear( widthInput );
+
+			expect( widthInput ).toHaveValue( null );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).not.toBeInTheDocument();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { height: '6px' } ],
+			] );
 		} );
 
-		expect( scaleCoverRadio ).toBeChecked();
+		it( 'when starting with scale, width, and height, clearing height also clears scale (0111) -> (0010)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
-		] );
+			const initialValue = {
+				// aspectRatio,
+				scale: 'cover',
+				width: '8px',
+				height: '6px',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+
+			await user.clear( heightInput );
+
+			expect( heightInput ).toHaveValue( null );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).not.toBeInTheDocument();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { width: '8px' } ],
+			] );
+		} );
+
+		it( 'when starting with aspectRatio, scale, and height, setting width also clears aspectRatio (1101) -> (0111)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+				// width,
+				height: '6px',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			await user.type( widthInput, '8' );
+
+			expect( widthInput ).toHaveValue( 8 );
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { scale: 'cover', width: '8px', height: '6px' } ],
+			] );
+		} );
+
+		it( 'when starting with aspectRatio, scale, and width, setting height also clears aspectRatio (1110) -> (0111)', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+				width: '8px',
+				// height,
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+
+			await user.type( heightInput, '6' );
+
+			expect( heightInput ).toHaveValue( 6 );
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+
+			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
+				name: 'Scale',
+			} );
+
+			expect( scaleRadioGroup ).toBeInTheDocument();
+
+			const scaleCoverRadio = screen.getByRole( 'radio', {
+				name: 'Cover',
+			} );
+
+			expect( scaleCoverRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { scale: 'cover', width: '8px', height: '6px' } ],
+			] );
+		} );
 	} );
 
-	it( 'when starting with just width, setting height also sets scale (0010) -> (0111)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
+	describe( 'internal component state', () => {
+		it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		const initialValue = {
-			// aspectRatio,
-			// scale,
-			width: '8px',
-			// height,
-		};
+			const value = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+			};
 
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
+			render( <Example initialValue={ value } onChange={ onChange } /> );
 
-		const heightInput = screen.getByRole( 'spinbutton', {
-			name: 'Height',
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+
+			await user.type( widthInput, '8' );
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			await user.type( heightInput, '6' );
+			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+
+			await user.clear( widthInput, '' );
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
+				[ { scale: 'cover', width: '8px', height: '6px' } ],
+				[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
+			] );
 		} );
 
-		await user.type( heightInput, '6' );
+		it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
 
-		expect( heightInput ).toHaveValue( 6 );
+			const value = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+			};
 
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
+			render( <Example initialValue={ value } onChange={ onChange } /> );
+
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			const scaleContainRadio = screen.getByRole( 'radio', {
+				name: 'Contain',
+			} );
+
+			await user.click( scaleContainRadio );
+			expect( scaleContainRadio ).toBeChecked();
+
+			await user.selectOptions( aspectRatioSelect, 'auto' );
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+
+			await user.selectOptions( aspectRatioSelect, '16/9' );
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'contain' } ],
+				[ {} ],
+				[
+					{
+						aspectRatio: '16/9',
+						scale: 'contain',
+					},
+				],
+			] );
 		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { scale: 'cover', width: '8px', height: '6px' } ],
-		] );
-	} );
-
-	it( 'when starting with just width, setting aspectRatio also sets scale (0010) -> (1110)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			// aspectRatio,
-			// scale,
-			width: '8px',
-			// height,
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		await user.selectOptions( aspectRatioSelect, '16/9' );
-
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
-		] );
-	} );
-
-	it( 'when starting with scale, width, and height, clearing width also clears scale (0111) -> (0001)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			// aspectRatio,
-			scale: 'cover',
-			width: '8px',
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const widthInput = screen.getByRole( 'spinbutton', {
-			name: 'Width',
-		} );
-
-		await user.clear( widthInput );
-
-		expect( widthInput ).toHaveValue( null );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).not.toBeInTheDocument();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { height: '6px' } ],
-		] );
-	} );
-
-	it( 'when starting with scale, width, and height, clearing height also clears scale (0111) -> (0010)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			// aspectRatio,
-			scale: 'cover',
-			width: '8px',
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const heightInput = screen.getByRole( 'spinbutton', {
-			name: 'Height',
-		} );
-
-		await user.clear( heightInput );
-
-		expect( heightInput ).toHaveValue( null );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).not.toBeInTheDocument();
-
-		expect( onChange.mock.calls ).toStrictEqual( [ [ { width: '8px' } ] ] );
-	} );
-
-	it( 'when starting with scale, width, and height, setting aspectRatio also clears height (0111) -> (1110)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			// aspectRatio,
-			scale: 'cover',
-			width: '8px',
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		await user.selectOptions( aspectRatioSelect, '16/9' );
-
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
-		] );
-	} );
-
-	it( 'when starting with aspectRatio and scale, setting aspectRatio to "Original" also clears scale (1100) -> (0000)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-			// width,
-			// height,
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		await user.selectOptions( aspectRatioSelect, 'auto' );
-
-		expect( aspectRatioSelect ).toHaveValue( 'auto' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).not.toBeInTheDocument();
-
-		expect( onChange.mock.calls ).toStrictEqual( [ [ {} ] ] );
-	} );
-
-	it( 'when starting with aspectRatio, scale, and height, setting aspectRatio to "Original" also clears scale (1101) -> (0001)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-			// width,
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		await user.selectOptions( aspectRatioSelect, 'auto' );
-
-		expect( aspectRatioSelect ).toHaveValue( 'auto' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).not.toBeInTheDocument();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { height: '6px' } ],
-		] );
-	} );
-
-	it( 'when starting with aspectRatio, scale, and height, setting width also clears aspectRatio (1101) -> (0111)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-			// width,
-			height: '6px',
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const widthInput = screen.getByRole( 'spinbutton', {
-			name: 'Width',
-		} );
-
-		await user.type( widthInput, '8' );
-
-		expect( widthInput ).toHaveValue( 8 );
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		expect( aspectRatioSelect ).toHaveValue( 'custom' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { scale: 'cover', width: '8px', height: '6px' } ],
-		] );
-	} );
-
-	it( 'when starting with aspectRatio, scale, and width, setting aspectRatio to "Original" also clears scale (1110) -> (0010)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-			width: '8px',
-			// height,
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		await user.selectOptions( aspectRatioSelect, 'auto' );
-
-		expect( aspectRatioSelect ).toHaveValue( 'auto' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).not.toBeInTheDocument();
-
-		expect( onChange.mock.calls ).toStrictEqual( [ [ { width: '8px' } ] ] );
-	} );
-
-	it( 'when starting with aspectRatio, scale, and width, setting height also clears aspectRatio (1110) -> (0111)', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const initialValue = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-			width: '8px',
-			// height,
-		};
-
-		render(
-			<Example initialValue={ initialValue } onChange={ onChange } />
-		);
-
-		const heightInput = screen.getByRole( 'spinbutton', {
-			name: 'Height',
-		} );
-
-		await user.type( heightInput, '6' );
-
-		expect( heightInput ).toHaveValue( 6 );
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		expect( aspectRatioSelect ).toHaveValue( 'custom' );
-
-		const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
-			name: 'Scale',
-		} );
-
-		expect( scaleRadioGroup ).toBeInTheDocument();
-
-		const scaleCoverRadio = screen.getByRole( 'radio', {
-			name: 'Cover',
-		} );
-
-		expect( scaleCoverRadio ).toBeChecked();
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { scale: 'cover', width: '8px', height: '6px' } ],
-		] );
-	} );
-
-	////////////////////////////////////////////////////////////////////////////
-
-	it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const value = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-		};
-
-		render( <Example initialValue={ value } onChange={ onChange } /> );
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		const widthInput = screen.getByRole( 'spinbutton', {
-			name: 'Width',
-		} );
-
-		const heightInput = screen.getByRole( 'spinbutton', {
-			name: 'Height',
-		} );
-
-		await user.type( widthInput, '8' );
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
-
-		await user.type( heightInput, '6' );
-		expect( aspectRatioSelect ).toHaveValue( 'custom' );
-
-		await user.clear( widthInput, '' );
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
-			[ { scale: 'cover', width: '8px', height: '6px' } ],
-			[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
-		] );
-	} );
-
-	it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		const value = {
-			aspectRatio: '16/9',
-			scale: 'cover',
-		};
-
-		render( <Example initialValue={ value } onChange={ onChange } /> );
-
-		const aspectRatioSelect = screen.getByRole( 'combobox', {
-			name: 'Aspect ratio',
-		} );
-
-		const scaleContainRadio = screen.getByRole( 'radio', {
-			name: 'Contain',
-		} );
-
-		await user.click( scaleContainRadio );
-		expect( scaleContainRadio ).toBeChecked();
-
-		await user.selectOptions( aspectRatioSelect, 'auto' );
-		expect( aspectRatioSelect ).toHaveValue( 'auto' );
-
-		await user.selectOptions( aspectRatioSelect, '16/9' );
-		expect( aspectRatioSelect ).toHaveValue( '16/9' );
-
-		expect( onChange.mock.calls ).toStrictEqual( [
-			[ { aspectRatio: '16/9', scale: 'contain' } ],
-			[ {} ],
-			[
-				{
-					aspectRatio: '16/9',
-					scale: 'contain',
-				},
-			],
-		] );
 	} );
 } );
