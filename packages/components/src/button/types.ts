@@ -45,10 +45,6 @@ type BaseButtonProps = {
 	/**
 	 * Whether the button is focused.
 	 */
-	focus?: boolean;
-	/**
-	 * If provided, renders an Icon component inside the button.
-	 */
 	icon?: IconProps[ 'icon' ];
 	/**
 	 * If provided with `icon`, sets the position of icon relative to the `text`.
