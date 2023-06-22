@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type { Component, MutableRefObject, ReactNode, ReactElement } from 'react';
+import type { Component, MutableRefObject, ReactNode } from 'react';
 
-export type BubblesVirtuallySlotProps = {
+export type SlotProps = {
 	/**
 	 * Slot name.
 	 */
@@ -14,6 +14,18 @@ export type BubblesVirtuallySlotProps = {
 	 * @default {}
 	 */
 	fillProps?: any;
+
+	/**
+	 * A function that returns nodes to be rendered.
+	 *
+	 * @param fills
+	 */
+	children?: ( fills: ReactNode[] ) => ReactNode;
+
+	/**
+	 * If true, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+	 */
+	bubblesVirtually?: boolean;
 };
 
 export type BubblesVirtuallyFillProps = {
@@ -25,7 +37,7 @@ export type BubblesVirtuallyFillProps = {
 	/**
 	 * Children elements.
 	 */
-	children: ReactNode;
+	children: ReactNode | ( ( fillProps: any ) => ReactNode );
 };
 
 export type BubblesVirtuallySlotFillContext = {
@@ -86,7 +98,7 @@ export type BaseSlotFillContext = {
 export type BaseSlotProps = {
 	name: string;
 	fillProps?: any;
-	children?: ( fills: ( string | ReactElement )[][] ) => ReactNode;
+	children?: ( fills: ReactNode[] ) => ReactNode;
 };
 
 export type SlotComponentProps = {
@@ -106,16 +118,10 @@ export type SlotComponentProps = {
 
 export type BaseFillObject = {
 	name: string;
-	children?:
-		| ReactElement
-		| string
-		| ( ( props: any ) => ReactElement | string );
+	children: ReactNode | ( ( fillProps: any ) => ReactNode );
 };
 
 export type FillComponentProps = {
 	name: string;
-	children?:
-		| ReactElement
-		| string
-		| ( ( props: any ) => ReactElement | string );
+	children: ReactNode | ( ( fillProps: any ) => ReactNode );
 };

@@ -20,10 +20,13 @@ import { useMergeRefs } from '@wordpress/compose';
 import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { BubblesVirtuallySlotProps } from '../types';
+import type { SlotProps } from '../types';
 
 function Slot(
-	props: WordPressComponentProps< BubblesVirtuallySlotProps, 'div' >,
+	props: Omit<
+		WordPressComponentProps< SlotProps, 'div' >,
+		'bubblesVirtually'
+	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -58,6 +61,8 @@ function Slot(
 	} );
 
 	return (
+		// TODO: REMOVE ts-ignore
+		// @ts-ignore
 		<View
 			as={ as }
 			ref={ useMergeRefs( [ forwardedRef, ref ] ) }
