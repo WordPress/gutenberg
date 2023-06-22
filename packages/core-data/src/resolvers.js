@@ -588,7 +588,9 @@ export const getNavigationFallbackId =
 			dispatch.receiveEntityRecords(
 				'postType',
 				'wp_navigation',
-				record
+				record,
+				undefined,
+				true
 			);
 
 			// Resolve to avoid further network requests.
