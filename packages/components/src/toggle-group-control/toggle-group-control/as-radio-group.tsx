@@ -8,14 +8,13 @@ import { RadioGroup, useRadioState } from 'reakit';
 /**
  * WordPress dependencies
  */
-import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import { useUpdateLayoutEffect } from '../utils';
 import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
@@ -28,9 +27,10 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		children,
 		isAdaptiveWidth,
 		label,
-		onChange,
+		onChange: onChangeProp,
 		size,
-		value,
+		value: valueProp,
+		defaultValue: defaultValueProp,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -43,39 +43,50 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
 	).toString();
-	const radio = useRadioState( {
+
+	// Handle controlled and uncontrolled updates to the component.
+	// Similar to the logic in the `useControlledState` hook, but with:
+	// - `useRadioState` instead of `useState`
+	// - a guard in `onChange` so that it doesn't fire if the value doesn't change
+	const hasValue = typeof valueProp !== 'undefined';
+	const initialValue = hasValue ? valueProp : defaultValueProp;
+	const { state, setState, ...radio } = useRadioState( {
 		baseId,
-		state: value,
+		state: initialValue,
 	} );
-	const previousValue = usePrevious( value );
+	const value = hasValue ? valueProp : state;
+	const onChange =
+		typeof onChangeProp === 'function'
+			? ( ( ( newValue ) => {
+					if ( newValue !== value ) {
+						onChangeProp( newValue );
+					}
+			  } ) as typeof onChangeProp )
+			: undefined;
+
+	let setValue: ( nextValue: typeof value ) => void;
+	if ( hasValue && typeof onChange === 'function' ) {
+		setValue = onChange;
+	} else if ( ! hasValue && typeof onChange === 'function' ) {
+		setValue = ( nextValue ) => {
+			onChange( nextValue );
+			setState( nextValue );
+		};
+	} else {
+		setValue = setState;
+	}
 
 	const groupContextValue = useMemo(
 		() =>
 			( {
 				...radio,
+				state: value,
+				setState: setValue,
 				isBlock: ! isAdaptiveWidth,
 				size,
 			} as ToggleGroupControlContextProps ),
-		[ radio, isAdaptiveWidth, size ]
+		[ radio, setValue, value, isAdaptiveWidth, size ]
 	);
-
-	const { setState: groupSetState, state: groupState } = groupContextValue;
-
-	// Propagate groupContext.state change.
-	useUpdateLayoutEffect( () => {
-		// Avoid calling onChange if groupContext state changed
-		// from incoming value.
-		if ( previousValue !== groupState ) {
-			onChange( groupState );
-		}
-	}, [ groupState, onChange, previousValue ] );
-
-	// Sync incoming value with groupContext.state.
-	useUpdateLayoutEffect( () => {
-		if ( value !== groupState ) {
-			groupSetState( value );
-		}
-	}, [ groupSetState, groupState, value ] );
 
 	return (
 		<ToggleGroupControlContext.Provider value={ groupContextValue }>

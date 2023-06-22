@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { forwardRef, useMemo, useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import { useUpdateLayoutEffect } from '../utils';
+import { useControlledValue } from '../../utils';
 import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
@@ -29,6 +29,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		onChange,
 		size,
 		value,
+		defaultValue,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -41,8 +42,12 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
-	const [ selectedValue, setSelectedValue ] = useState( value );
-	const previousValue = usePrevious( value );
+
+	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+		defaultValue,
+		value,
+		onChange,
+	} );
 
 	const groupContextValue = useMemo(
 		() =>
@@ -54,26 +59,8 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				isDeselectable: true,
 				size,
 			} as ToggleGroupControlContextProps ),
-		[ baseId, selectedValue, isAdaptiveWidth, size ]
+		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
 	);
-
-	const { setState: groupSetState, state: groupState } = groupContextValue;
-
-	// Propagate groupContext.state change.
-	useUpdateLayoutEffect( () => {
-		// Avoid calling onChange if groupContext state changed
-		// from incoming value.
-		if ( previousValue !== groupState ) {
-			onChange( groupState );
-		}
-	}, [ groupState, onChange, previousValue ] );
-
-	// Sync incoming value with groupContext.state.
-	useUpdateLayoutEffect( () => {
-		if ( value !== groupState ) {
-			groupSetState( value );
-		}
-	}, [ groupSetState, groupState, value ] );
 
 	return (
 		<ToggleGroupControlContext.Provider value={ groupContextValue }>
