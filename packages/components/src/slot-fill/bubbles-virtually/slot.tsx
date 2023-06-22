@@ -20,12 +20,12 @@ import { useMergeRefs } from '@wordpress/compose';
 import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { SlotProps } from '../types';
+import type { SlotComponentProps } from '../types';
 
 function Slot(
-	props: Omit<
-		WordPressComponentProps< SlotProps, 'div' >,
-		'bubblesVirtually'
+	props: WordPressComponentProps<
+		Omit< SlotComponentProps, 'bubblesVirtually' >,
+		'div'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {

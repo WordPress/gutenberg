@@ -3,7 +3,7 @@
  */
 import type { Component, MutableRefObject, ReactNode } from 'react';
 
-export type SlotProps = {
+export type SlotComponentProps = {
 	/**
 	 * Slot name.
 	 */
@@ -28,7 +28,7 @@ export type SlotProps = {
 	bubblesVirtually?: boolean;
 };
 
-export type BubblesVirtuallyFillProps = {
+export type FillComponentProps = {
 	/**
 	 * Slot name.
 	 */
@@ -38,6 +38,13 @@ export type BubblesVirtuallyFillProps = {
 	 * Children elements.
 	 */
 	children: ReactNode | ( ( fillProps: any ) => ReactNode );
+};
+
+export type SlotFillProviderProps = {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
 };
 
 export type BubblesVirtuallySlotFillContext = {
@@ -69,59 +76,29 @@ export type BubblesVirtuallySlotFillContext = {
 	) => void;
 };
 
-export type SlotFillProviderProps = {
-	/**
-	 * The children elements.
-	 */
-	children: ReactNode;
-};
-
 export type BaseSlotFillContext = {
 	registerSlot: (
 		name: string,
-		slot: Component< SlotComponentProps >
+		slot: Component< BaseSlotComponentProps >
 	) => void;
 	unregisterSlot: (
 		name: string,
-		slot: Component< SlotComponentProps >
+		slot: Component< BaseSlotComponentProps >
 	) => void;
-	registerFill: ( name: string, instance: BaseFillObject ) => void;
-	unregisterFill: ( name: string, instance: BaseFillObject ) => void;
-	getSlot: ( name: string ) => Component< SlotComponentProps > | undefined;
+	registerFill: ( name: string, instance: FillComponentProps ) => void;
+	unregisterFill: ( name: string, instance: FillComponentProps ) => void;
+	getSlot: (
+		name: string
+	) => Component< BaseSlotComponentProps > | undefined;
 	getFills: (
 		name: string,
-		slotInstance: Component< SlotComponentProps >
-	) => BaseFillObject[];
+		slotInstance: Component< BaseSlotComponentProps >
+	) => FillComponentProps[];
 	subscribe: ( listener: () => void ) => () => void;
 };
 
-export type BaseSlotProps = {
-	name: string;
-	fillProps?: any;
-	children?: ( fills: ReactNode[] ) => ReactNode;
-};
-
-export type SlotComponentProps = {
-	registerSlot: (
-		name: string,
-		slot: Component< SlotComponentProps >
-	) => void;
-	unregisterSlot: (
-		name: string,
-		slot: Component< SlotComponentProps >
-	) => void;
-	getFills: (
-		name: string,
-		slotInstance: Component< SlotComponentProps >
-	) => BaseFillObject[];
-} & BaseSlotProps;
-
-export type BaseFillObject = {
-	name: string;
-	children: ReactNode | ( ( fillProps: any ) => ReactNode );
-};
-
-export type FillComponentProps = {
-	name: string;
-	children: ReactNode | ( ( fillProps: any ) => ReactNode );
-};
+export type BaseSlotComponentProps = Pick<
+	BaseSlotFillContext,
+	'registerSlot' | 'unregisterSlot' | 'getFills'
+> &
+	Omit< SlotComponentProps, 'bubblesVirtually' >;

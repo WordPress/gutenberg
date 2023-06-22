@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactElement, ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,11 +17,7 @@ import {
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import type { BaseSlotProps, SlotComponentProps } from './types';
-/**
- * External dependencies
- */
-import type { ReactElement, ReactNode } from 'react';
+import type { BaseSlotComponentProps, SlotComponentProps } from './types';
 
 /**
  * Whether the argument is a function.
@@ -28,10 +29,10 @@ function isFunction( maybeFunc: any ): maybeFunc is Function {
 	return typeof maybeFunc === 'function';
 }
 
-class SlotComponent extends Component< SlotComponentProps > {
+class SlotComponent extends Component< BaseSlotComponentProps, {} > {
 	private isUnmounted: boolean;
 
-	constructor( props: SlotComponentProps ) {
+	constructor( props: BaseSlotComponentProps ) {
 		super( props );
 
 		this.isUnmounted = false;
@@ -49,7 +50,7 @@ class SlotComponent extends Component< SlotComponentProps > {
 		unregisterSlot( this.props.name, this );
 	}
 
-	componentDidUpdate( prevProps: SlotComponentProps ) {
+	componentDidUpdate( prevProps: BaseSlotComponentProps ) {
 		const { name, unregisterSlot, registerSlot } = this.props;
 
 		if ( prevProps.name !== name ) {
@@ -104,7 +105,7 @@ class SlotComponent extends Component< SlotComponentProps > {
 	}
 }
 
-const Slot = ( props: BaseSlotProps ) => (
+const Slot = ( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) => (
 	<SlotFillContext.Consumer>
 		{ ( { registerSlot, unregisterSlot, getFills } ) => (
 			<SlotComponent

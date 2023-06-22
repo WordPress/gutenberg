@@ -9,20 +9,20 @@ import { useState } from '@wordpress/element';
  */
 import SlotFillContext from './context';
 import type {
-	BaseFillObject,
+	FillComponentProps,
 	BaseSlotFillContext,
-	SlotComponentProps,
+	BaseSlotComponentProps,
 	SlotFillProviderProps,
 } from './types';
 
 export function createSlotRegistory(): BaseSlotFillContext {
-	const slots: Record< string, Component< SlotComponentProps > > = {};
-	const fills: Record< string, BaseFillObject[] > = {};
+	const slots: Record< string, Component< BaseSlotComponentProps > > = {};
+	const fills: Record< string, FillComponentProps[] > = {};
 	let listeners: Array< () => void > = [];
 
 	function registerSlot(
 		name: string,
-		slot: Component< SlotComponentProps >
+		slot: Component< BaseSlotComponentProps >
 	) {
 		const previousSlot = slots[ name ];
 		slots[ name ] = slot;
@@ -41,14 +41,14 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		}
 	}
 
-	function registerFill( name: string, instance: BaseFillObject ) {
+	function registerFill( name: string, instance: FillComponentProps ) {
 		fills[ name ] = [ ...( fills[ name ] || [] ), instance ];
 		forceUpdateSlot( name );
 	}
 
 	function unregisterSlot(
 		name: string,
-		instance: Component< SlotComponentProps >
+		instance: Component< BaseSlotComponentProps >
 	) {
 		// If a previous instance of a Slot by this name unmounts, do nothing,
 		// as the slot and its fills should only be removed for the current
@@ -61,7 +61,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		triggerListeners();
 	}
 
-	function unregisterFill( name: string, instance: BaseFillObject ) {
+	function unregisterFill( name: string, instance: FillComponentProps ) {
 		fills[ name ] =
 			fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
 		forceUpdateSlot( name );
@@ -69,14 +69,14 @@ export function createSlotRegistory(): BaseSlotFillContext {
 
 	function getSlot(
 		name: string
-	): Component< SlotComponentProps > | undefined {
+	): Component< BaseSlotComponentProps > | undefined {
 		return slots[ name ];
 	}
 
 	function getFills(
 		name: string,
-		slotInstance: Component< SlotComponentProps >
-	): BaseFillObject[] {
+		slotInstance: Component< BaseSlotComponentProps >
+	): FillComponentProps[] {
 		// Fills should only be returned for the current instance of the slot
 		// in which they occupy.
 		if ( slots[ name ] !== slotInstance ) {

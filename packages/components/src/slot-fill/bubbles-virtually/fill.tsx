@@ -9,7 +9,7 @@ import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
  */
 import useSlot from './use-slot';
 import StyleProvider from '../../style-provider';
-import type { BubblesVirtuallyFillProps } from '../types';
+import type { FillComponentProps } from '../types';
 
 function useForceUpdate() {
 	const [ , setState ] = useState( {} );
@@ -29,7 +29,7 @@ function useForceUpdate() {
 	};
 }
 
-export default function Fill( props: BubblesVirtuallyFillProps ) {
+export default function Fill( props: FillComponentProps ) {
 	const { name, children } = props;
 	const { registerFill, unregisterFill, ...slot } = useSlot( name );
 	const rerender = useForceUpdate();
