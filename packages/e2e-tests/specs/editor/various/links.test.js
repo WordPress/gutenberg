@@ -497,7 +497,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Advanced")]'
+				'//button[contains(text(), "Advanced")]'
 			);
 			await settingsToggle.click();
 
@@ -663,7 +663,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Advanced")]'
+				'//button[contains(text(), "Advanced")]'
 			);
 			await settingsToggle.click();
 
