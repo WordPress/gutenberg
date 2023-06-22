@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	HeadingLevelDropdown,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
@@ -22,7 +23,6 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
@@ -34,7 +34,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
 } ) {
-	const TagName = 0 === level ? 'p' : 'h' + level;
+	const TagName = 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	/**
 	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
@@ -120,7 +120,7 @@ export default function PostTitleEdit( {
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<HeadingLevelDropdown
-						selectedLevel={ level }
+						value={ level }
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}

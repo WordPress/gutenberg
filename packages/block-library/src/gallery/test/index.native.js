@@ -27,6 +27,8 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -73,6 +75,24 @@ describe( 'Gallery block', () => {
 
 		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( "renders gallery block placeholder correctly if the block doesn't have inner blocks", async () => {
+		const getBlockSpy = jest
+			.spyOn( select( blockEditorStore ), 'getBlock' )
+			.mockReturnValue( {
+				innerBlocks: undefined,
+				attributes: {
+					content: '',
+				},
+			} );
+
+		const screen = await addGalleryBlock();
+
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+
+		getBlockSpy.mockReset();
 	} );
 
 	it( 'selects a gallery item', async () => {
@@ -209,7 +229,9 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/, {
+			hidden: true,
+		} );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption

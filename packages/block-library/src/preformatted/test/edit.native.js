@@ -24,24 +24,12 @@ import PreformattedEdit from '../edit';
 setupCoreBlocks();
 
 describe( 'Preformatted', () => {
-	it( 'renders without crashing', () => {
-		const screen = render(
-			<PreformattedEdit
-				attributes={ {} }
-				setAttributes={ jest.fn() }
-				getStylesFromColorScheme={ jest.fn() }
-			/>
-		);
-
-		expect( screen.container ).toBeDefined();
-	} );
-
 	it( 'should match snapshot when content is empty', () => {
 		const screen = render(
 			<PreformattedEdit
 				attributes={ {} }
 				setAttributes={ jest.fn() }
-				getStylesFromColorScheme={ ( styles1 ) => styles1 }
+				getStylesFromColorScheme={ jest.fn() }
 			/>
 		);
 		expect( screen.toJSON() ).toMatchSnapshot();

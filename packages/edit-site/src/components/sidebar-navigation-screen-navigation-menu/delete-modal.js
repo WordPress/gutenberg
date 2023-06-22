@@ -25,7 +25,6 @@ export default function RenameModal( { onClose, onConfirm } ) {
 						</Button>
 
 						<Button
-							isDestructive
 							variant="primary"
 							type="submit"
 							onClick={ ( e ) => {
@@ -36,7 +35,7 @@ export default function RenameModal( { onClose, onConfirm } ) {
 								onClose();
 							} }
 						>
-							{ __( 'Confirm' ) }
+							{ __( 'Delete' ) }
 						</Button>
 					</HStack>
 				</VStack>

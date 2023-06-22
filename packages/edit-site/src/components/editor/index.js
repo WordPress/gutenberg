@@ -54,6 +54,12 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+const typeLabels = {
+	wp_template: __( 'Template Part' ),
+	wp_template_part: __( 'Template Part' ),
+	wp_block: __( 'Pattern' ),
+};
+
 export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
@@ -114,7 +120,7 @@ export default function Editor( { isLoading } ) {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -144,10 +150,7 @@ export default function Editor( { isLoading } ) {
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type =
-			editedPostType === 'wp_template'
-				? __( 'Template' )
-				: __( 'Template Part' );
+		const type = typeLabels[ editedPostType ] ?? __( 'Template' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
@@ -157,7 +160,7 @@ export default function Editor( { isLoading } ) {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
 	return (
@@ -227,7 +230,7 @@ export default function Editor( { isLoading } ) {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={
 											hasPageContentFocus
