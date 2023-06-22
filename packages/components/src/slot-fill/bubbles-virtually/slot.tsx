@@ -61,8 +61,6 @@ function Slot(
 	} );
 
 	return (
-		// TODO: REMOVE ts-ignore
-		// @ts-ignore
 		<View
 			as={ as }
 			ref={ useMergeRefs( [ forwardedRef, ref ] ) }
