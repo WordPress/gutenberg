@@ -7,13 +7,15 @@ import {
 	useCallback,
 	useEffect,
 } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { unlock } from './private-apis';
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
@@ -150,7 +152,8 @@ export function useEntityProp( kind, name, prop, _id ) {
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
-	const [] = useEntityProp( kind, name, 'meta', _id );
+	const [ meta, updateMeta ] = useEntityProp( kind, name, 'meta', _id );
+	const registry = useRegistry();
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
@@ -185,6 +188,34 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		}
 	}, [ content ] );
 
+	const updateFootnotes = useCallback(
+		( _blocks ) => {
+			if ( ! meta ) return;
+			// If meta.footnotes is empty, it means the meta is not registered.
+			if ( meta.footnotes === undefined ) return;
+
+			const { getRichTextValues } = unlock( blockEditorPrivateApis );
+			// const _content = getRichTextValues( _blocks ).join( '' ) || '';
+			// const newOrder = [];
+
+			// if ( _content.indexOf( 'data-fn' ) !== -1 ) {
+			// 	const regex = /data-fn="([^"]+)"/g;
+			// 	let match;
+			// 	while ( ( match = regex.exec( _content ) ) !== null ) {
+			// 		newOrder.push( match[ 1 ] );
+			// 	}
+			// }
+
+			// const footnotes = JSON.parse( meta.footnotes || '[]' );
+			// const currentOrder = footnotes.map( ( fn ) => fn.id );
+
+			// if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
+
+			//
+		},
+		[ meta, updateMeta ]
+	);
+
 	const onChange = useCallback(
 		( newBlocks, options ) => {
 			const { selection } = options;
@@ -201,18 +232,24 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
 				__unstableSerializeAndClean( blocksForSerialization );
 
-			editEntityRecord( kind, name, id, edits );
+			registry.batch( () => {
+				updateFootnotes( edits.blocks );
+				editEntityRecord( kind, name, id, edits );
+			} );
 		},
-		[ kind, name, id, blocks ]
+		[ kind, name, id, blocks, updateFootnotes ]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection } = options;
 			const edits = { blocks: newBlocks, selection };
-			editEntityRecord( kind, name, id, edits );
+			registry.batch( () => {
+				updateFootnotes( edits.blocks );
+				editEntityRecord( kind, name, id, edits );
+			} );
 		},
-		[ kind, name, id ]
+		[ kind, name, id, updateFootnotes ]
 	);
 
 	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
