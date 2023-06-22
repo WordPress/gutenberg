@@ -62,7 +62,7 @@ test.describe( 'Navigation block', () => {
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -138,7 +138,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom"} /-->',
 			} );
 
 			//FIXME this is needed because if the two menus are created at the same time, the API will return them in the wrong order.
@@ -148,7 +148,7 @@ test.describe( 'Navigation block', () => {
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -250,7 +250,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content:
-					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -960,8 +960,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
-					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
-					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
@@ -1023,18 +1023,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
-					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- wp:navigation-submenu {"label":"Simple Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- /wp:navigation-submenu -->
 					<!-- wp:navigation-submenu {"label":"Complex Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- /wp:navigation-submenu -->
-						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- /wp:navigation-submenu -->
-					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
@@ -1142,9 +1142,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Hidden menu',
 				content: `
 					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- wp:navigation-submenu {"label":"Nested Menu","type":"internal","url":"#heading","kind":"custom"} -->
-							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- /wp:navigation-submenu -->
 					<!-- /wp:navigation-submenu -->
 					`,
@@ -1207,7 +1207,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Page list menu',
 				content: `
 					<!-- wp:page-list /-->
-					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
