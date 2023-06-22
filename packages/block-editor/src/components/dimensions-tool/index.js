@@ -173,54 +173,34 @@ function DimensionsTool( {
 					const { ...nextValue } = value;
 
 					// Update width.
-					if ( nextWidth === null ) {
+					if ( ! nextWidth ) {
 						delete nextValue.width;
 					} else {
 						nextValue.width = nextWidth;
 					}
 
 					// Update height.
-					if ( nextHeight === null ) {
+					if ( ! nextHeight ) {
 						delete nextValue.height;
 					} else {
 						nextValue.height = nextHeight;
 					}
 
-					// Auto-update aspect ratio.
-					if (
-						( height !== null && nextWidth !== null ) ||
-						( width !== null && nextHeight !== null )
-					) {
+					// Auto-update aspectRatio.
+					if ( nextWidth && nextHeight ) {
 						delete nextValue.aspectRatio;
-					} else if (
-						lastAspectRatio !== null &&
-						( ( nextWidth === null &&
-							width !== null &&
-							height !== null ) ||
-							( nextHeight === null &&
-								width !== null &&
-								height !== null ) )
-					) {
+					} else if ( lastAspectRatio ) {
 						nextValue.aspectRatio = lastAspectRatio;
 					}
 
 					// Auto-update scale.
-					if (
-						width !== null &&
-						height !== null &&
-						( nextWidth === null || nextHeight === null )
-					) {
+					if ( ! lastAspectRatio && !! nextWidth !== !! nextHeight ) {
 						delete nextValue.scale;
-					} else if (
-						( height !== null && nextWidth !== null ) ||
-						( width !== null && nextHeight !== null )
-					) {
-						if ( lastScale === null ) {
-							nextValue.scale = defaultScale;
-							setLastScale( defaultScale );
-						} else {
-							nextValue.scale = lastScale;
-						}
+					} else if ( lastScale ) {
+						nextValue.scale = lastScale;
+					} else {
+						nextValue.scale = defaultScale;
+						setLastScale( defaultScale );
 					}
 
 					onChange( nextValue );
