@@ -113,7 +113,11 @@ function CustomCSSControl( { blockName } ) {
 					className="edit-site-global-styles__custom-css-input"
 					spellCheck={ false }
 					/// If we are customizing at the Block level we can include placeholder text with suggested syntax
-					placeholder={ block ? 'color:red;' : undefined }
+					placeholder={
+						block
+							? 'color:red; \\ Replace this CSS with your own'
+							: undefined
+					}
 				/>
 				{ cssError && (
 					<Tooltip text={ cssError }>
