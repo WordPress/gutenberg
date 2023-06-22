@@ -191,14 +191,20 @@ function curateResults( testSuite, results ) {
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
+ * @param {string} framework                Framework to be used by the test.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+async function runTestSuite(
+	testSuite,
+	performanceTestDirectory,
+	runKey,
+	framework
+) {
 	const resultsFilename = `${ runKey }.performance-results.json`;
 
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite }`,
+		`npm run test:performance:${ framework } -- ${ testSuite }`,
 		performanceTestDirectory,
 		{
 			...process.env,
@@ -431,6 +437,7 @@ async function runPerformanceTests( branches, options ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
+				const framework = branch.split( '-' )[ 1 ];
 				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
@@ -444,7 +451,8 @@ async function runPerformanceTests( branches, options ) {
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
-					runKey
+					runKey,
+					framework
 				);
 				log( '            >> Stopping the environment' );
 				await runShellScript(
