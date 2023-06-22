@@ -71,7 +71,11 @@ function useSaveNavigationMenu() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleSave = async ( navigationMenu, edits = {} ) => {
+	const handleSave = async ( navigationMenu, edits ) => {
+		if ( ! edits ) {
+			return;
+		}
+
 		const postId = navigationMenu?.id;
 		// Prepare for revert in case of error.
 		const originalRecord = getEditedEntityRecord(
