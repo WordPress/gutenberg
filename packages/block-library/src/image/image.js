@@ -614,10 +614,8 @@ export default function Image( {
 			( width && height && width / height ) ||
 			naturalWidth / naturalHeight;
 
-		const isAutoWidth =
-			width === null || width === undefined || width === 'auto';
-		const isAutoHeight =
-			height === null || height === undefined || height === 'auto';
+		const isAutoWidth = ! width || width === 'auto';
+		const isAutoHeight = ! height || height === 'auto';
 
 		const currentWidth =
 			isAutoWidth && ! isAutoHeight ? pxHeight * ratio : pxWidth;
