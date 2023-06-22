@@ -147,7 +147,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( paragraphBlock1, paragraphBlock2 );
 
 		// Convert block to a template part.
-		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
+		await editor.clickBlockOptionsMenuItem( 'Create template part' );
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
 		await page.keyboard.press( 'Enter' );
 
