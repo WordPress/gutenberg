@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
-import type { ForwardedRef } from 'react';
+import type { CSSProperties, ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -16,7 +16,11 @@ import type { WordPressComponentProps } from '../ui/context';
 import { forwardRef } from '@wordpress/element';
 
 export function UnforwardedSpinner(
-	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
+	{
+		className,
+		trackStyles,
+		...props
+	}: WordPressComponentProps< { trackStyles?: CSSProperties }, 'svg', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	return (
@@ -37,6 +41,7 @@ export function UnforwardedSpinner(
 				cy="50"
 				r="50"
 				vectorEffect="non-scaling-stroke"
+				style={ trackStyles }
 			/>
 
 			{ /* Theme-colored arc */ }
