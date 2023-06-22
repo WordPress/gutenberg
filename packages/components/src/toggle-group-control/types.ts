@@ -113,6 +113,10 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	value?: ReactText;
 	/**
+	 * The selected value.
+	 */
+	defaultValue?: ReactText;
+	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
 	 */
@@ -149,4 +153,5 @@ export type ToggleGroupControlMainControlProps = Pick<
 	| 'size'
 	| 'onChange'
 	| 'value'
+	| 'defaultValue'
 >;

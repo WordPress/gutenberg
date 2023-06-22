@@ -40,6 +40,7 @@ function UnconnectedToggleGroupControl(
 		help,
 		onChange,
 		size = 'default',
+		defaultValue,
 		value,
 		children,
 		...otherProps
@@ -85,6 +86,7 @@ function UnconnectedToggleGroupControl(
 				ref={ forwardedRef }
 				size={ size }
 				value={ value }
+				defaultValue={ defaultValue }
 			>
 				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
 			</MainControl>
