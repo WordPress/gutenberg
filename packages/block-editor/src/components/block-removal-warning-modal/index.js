@@ -60,11 +60,7 @@ export function BlockRemovalWarningModal() {
 
 	return (
 		<Modal
-			title={ _n(
-				'Really delete this block?',
-				'Really delete these blocks?',
-				clientIds.length
-			) }
+			title={ __( 'Are you sure?' ) }
 			onRequestClose={ clearRemovalPrompt }
 		>
 			{ blockNamesForPrompt.length === 1 ? (
@@ -90,7 +86,7 @@ export function BlockRemovalWarningModal() {
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button variant="primary" onClick={ onConfirmRemoval }>
-					{ __( 'Confirm' ) }
+					{ __( 'Delete' ) }
 				</Button>
 			</HStack>
 		</Modal>
