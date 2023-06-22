@@ -48,6 +48,14 @@ const SCREEN_TEXT = {
 	invalidHtmlPath: 'This is the screen with an invalid HTML value as a path.',
 };
 
+const SCREEN_TITLE = {
+	home: 'Home screen.',
+	child: 'Child screen.',
+	nested: 'Nested screen.',
+	product: 'Product screen.',
+	invalidHtmlPath: 'Screen with an invalid HTML value as a path.',
+};
+
 const BUTTON_TEXT = {
 	toNonExistingScreen: 'Navigate to non-existing screen.',
 	toChildScreen: 'Navigate to child screen.',
@@ -173,7 +181,10 @@ const ProductScreen = ( {
 	const { params } = useNavigator();
 
 	return (
-		<NavigatorScreen path={ PATHS.PRODUCT_PATTERN }>
+		<NavigatorScreen
+			path={ PATHS.PRODUCT_PATTERN }
+			aria-label={ SCREEN_TITLE.product }
+		>
 			<p>{ SCREEN_TEXT.product }</p>
 			<p>Product ID is { params.productId }</p>
 			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
@@ -195,7 +206,10 @@ const MyNavigation = ( {
 	return (
 		<>
 			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+				<NavigatorScreen
+					path={ PATHS.HOME }
+					aria-label={ SCREEN_TITLE.home }
+				>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -235,7 +249,10 @@ const MyNavigation = ( {
 					</CustomNavigatorButton>
 				</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<NavigatorScreen
+					path={ PATHS.CHILD }
+					aria-label={ SCREEN_TITLE.child }
+				>
 					<p>{ SCREEN_TEXT.child }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -267,7 +284,10 @@ const MyNavigation = ( {
 					/>
 				</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<NavigatorScreen
+					path={ PATHS.NESTED }
+					aria-label={ SCREEN_TITLE.nested }
+				>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
@@ -278,7 +298,10 @@ const MyNavigation = ( {
 
 				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
 
-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+				<NavigatorScreen
+					path={ PATHS.INVALID_HTML_ATTRIBUTE }
+					aria-label={ SCREEN_TITLE.invalidHtmlPath }
+				>
 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
@@ -314,7 +337,10 @@ const MyHierarchicalNavigation = ( {
 	return (
 		<>
 			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+				<NavigatorScreen
+					path={ PATHS.HOME }
+					aria-label={ SCREEN_TITLE.home }
+				>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -330,7 +356,10 @@ const MyHierarchicalNavigation = ( {
 					</CustomNavigatorButton>
 				</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<NavigatorScreen
+					path={ PATHS.CHILD }
+					aria-label={ SCREEN_TITLE.child }
+				>
 					<p>{ SCREEN_TEXT.child }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -351,7 +380,10 @@ const MyHierarchicalNavigation = ( {
 					</CustomNavigatorToParentButton>
 				</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<NavigatorScreen
+					path={ PATHS.NESTED }
+					aria-label={ SCREEN_TITLE.nested }
+				>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorToParentButton
 						onClick={ onNavigatorButtonClick }
@@ -376,8 +408,8 @@ const MyHierarchicalNavigation = ( {
 	);
 };
 
-const getScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
-	screen.getByText( SCREEN_TEXT[ screenKey ] );
+const getScreen = ( screenKey: keyof typeof SCREEN_TITLE ) =>
+	screen.getByLabelText( SCREEN_TITLE[ screenKey ] );
 const queryScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
 	screen.queryByText( SCREEN_TEXT[ screenKey ] );
 const getNavigationButton = ( buttonKey: keyof typeof BUTTON_TEXT ) =>
@@ -599,18 +631,14 @@ describe( 'Navigator', () => {
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-			// The first tabbable element receives focus.
-			expect(
-				screen.getByRole( 'button', {
-					name: 'First tabbable child screen button',
-				} )
-			).toHaveFocus();
+			// The child screen element received focus.
+			expect( getScreen( 'child' ) ).toHaveFocus();
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
 
-			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'back' ) ).toHaveFocus();
+			// The nested screen element received focus.
+			expect( getScreen( 'nested' ) ).toHaveFocus();
 
 			// Navigate back to child screen.
 			await user.click( getNavigationButton( 'back' ) );
@@ -629,8 +657,8 @@ describe( 'Navigator', () => {
 			// Navigate to product screen for product 2
 			await user.click( getNavigationButton( 'toProductScreen2' ) );
 
-			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'back' ) ).toHaveFocus();
+			// The nested screen element received focus.
+			expect( getScreen( 'product' ) ).toHaveFocus();
 
 			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
@@ -648,12 +676,8 @@ describe( 'Navigator', () => {
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-			// The first tabbable element receives focus.
-			expect(
-				screen.getByRole( 'button', {
-					name: 'First tabbable child screen button',
-				} )
-			).toHaveFocus();
+			// The child screen element received focus.
+			expect( getScreen( 'child' ) ).toHaveFocus();
 
 			// Interact with the inner input.
 			// The focus should stay on the input element.
@@ -670,12 +694,8 @@ describe( 'Navigator', () => {
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-			// The first tabbable element receives focus.
-			expect(
-				screen.getByRole( 'button', {
-					name: 'First tabbable child screen button',
-				} )
-			).toHaveFocus();
+			// The child screen element received focus.
+			expect( getScreen( 'child' ) ).toHaveFocus();
 
 			// Interact with the outer input.
 			// The focus should stay on the input element.
@@ -761,12 +781,9 @@ describe( 'Navigator', () => {
 			// Navigate back to parent screen.
 			await user.click( getNavigationButton( 'back' ) );
 			expect( getScreen( 'child' ) ).toBeInTheDocument();
-			// The first tabbable element receives focus.
-			expect(
-				screen.getByRole( 'button', {
-					name: 'First tabbable child screen button',
-				} )
-			).toHaveFocus();
+
+			// The child screen element received focus.
+			expect( getScreen( 'child' ) ).toHaveFocus();
 		} );
 	} );
 
