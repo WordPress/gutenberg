@@ -109,7 +109,7 @@ const Toolbar = () => {
 	};
 	return (
 		<div className="toolbar">
-			<Slot fillProps={ { hideToolbar } } />
+			<Slot fillProps={ { hideToolbar } }/>
 		</div>
 	);
 };
