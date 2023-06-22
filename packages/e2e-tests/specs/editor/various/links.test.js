@@ -683,7 +683,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
 			// Move back to the text input.
-			await pressKeyTimes( 'Tab', 2 );
+			await pressKeyTimes( 'Tab', 1 );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
