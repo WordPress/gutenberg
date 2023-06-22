@@ -68,7 +68,7 @@
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "4.6.3",
 		"react-native-sass-transformer": "^1.1.1",
-		"react-native-screens": "2.9.0",
+		"react-native-screens": "3.22.0",
 		"react-native-svg": "9.13.6",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-6/react-native-video-5.2.0-wp-6.tgz",
