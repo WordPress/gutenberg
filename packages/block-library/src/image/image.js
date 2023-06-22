@@ -565,6 +565,10 @@ export default function Image( {
 				ref={ imageRef }
 				className={ borderProps.className }
 				style={ {
+					width:
+						( width && height ) || aspectRatio ? '100%' : 'inherit',
+					height:
+						( width && height ) || aspectRatio ? '100%' : 'inherit',
 					objectFit: scale,
 					...borderProps.style,
 				} }
