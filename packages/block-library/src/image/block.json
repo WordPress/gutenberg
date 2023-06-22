@@ -73,8 +73,7 @@
 			"type": "string"
 		},
 		"scale": {
-			"type": "string",
-			"default": "cover"
+			"type": "string"
 		},
 		"sizeSlug": {
 			"type": "string"
