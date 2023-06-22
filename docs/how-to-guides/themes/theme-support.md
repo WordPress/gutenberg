@@ -477,6 +477,14 @@ Use this setting to enable the following Global Styles settings:
 add_theme_support( 'appearance-tools' );
 ```
 
+## Border
+
+Use this to enable all border settings:
+
+```php
+add_theme_support( 'border' );
+```
+
 ## Link color
 
 Use this to enable the link color setting:
