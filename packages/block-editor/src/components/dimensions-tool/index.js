@@ -54,9 +54,9 @@ function DimensionsTool( {
 	value = {},
 	onChange = () => {},
 	aspectRatioOptions, // Default options handled by AspectRatioTool.
-	defaultAspectRatio,
+	defaultAspectRatio = 'auto', // Match CSS default value for aspect-ratio.
 	scaleOptions, // Default options handled by ScaleTool.
-	defaultScale,
+	defaultScale = 'fill', // Match CSS default value for object-fit.
 	unitsOptions, // Default options handled by UnitControl.
 } ) {
 	// Keep track of state internally, so when the value is cleared by means
