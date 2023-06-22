@@ -614,15 +614,10 @@ describe( 'actions', () => {
 			const clientId = 'clientId';
 			const clientIds = [ clientId ];
 
-			const select = Object.assign(
-				( selector ) =>
-					selector( { root: { isRemovalPromptSupported: false } } ),
-				{
-					isRemovalPromptSupported: () => false,
-					getBlockRootClientId: () => undefined,
-					canRemoveBlocks: () => true,
-				}
-			);
+			const select = {
+				getBlockRootClientId: () => undefined,
+				canRemoveBlocks: () => true,
+			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
@@ -729,15 +724,10 @@ describe( 'actions', () => {
 		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'myclientid';
 
-			const select = Object.assign(
-				( selector ) =>
-					selector( { root: { isRemovalPromptSupported: false } } ),
-				{
-					isRemovalPromptSupported: () => false,
-					getBlockRootClientId: () => null,
-					canRemoveBlocks: () => true,
-				}
-			);
+			const select = {
+				getBlockRootClientId: () => null,
+				canRemoveBlocks: () => true,
+			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
@@ -758,15 +748,10 @@ describe( 'actions', () => {
 		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
-			const select = Object.assign(
-				( selector ) =>
-					selector( { root: { isRemovalPromptSupported: false } } ),
-				{
-					isRemovalPromptSupported: () => false,
-					getBlockRootClientId: () => null,
-					canRemoveBlocks: () => true,
-				}
-			);
+			const select = {
+				getBlockRootClientId: () => null,
+				canRemoveBlocks: () => true,
+			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
