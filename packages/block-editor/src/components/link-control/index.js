@@ -351,7 +351,7 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
-							useLabel={ showTextControl }
+							hideLabelFromVision={ ! showTextControl }
 						/>
 					</div>
 					{ errorMessage && (
