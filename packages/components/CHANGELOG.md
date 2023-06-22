@@ -132,6 +132,10 @@
 
 ## 25.2.0 (2023-06-23)
 
+### Documentation
+
+-   Button `focus` prop: Update documentation to remove the button `focus` prop ([#50972](https://github.com/WordPress/gutenberg/issues/50972)).
+
 ### Enhancements
 
 -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
