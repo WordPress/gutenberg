@@ -7,6 +7,11 @@ export type SlotKey = string | symbol;
 
 export type SlotComponentProps = {
 	/**
+	 * If true, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+	 */
+	bubblesVirtually?: boolean;
+
+	/**
 	 * Slot name.
 	 */
 	name: SlotKey;
@@ -19,15 +24,11 @@ export type SlotComponentProps = {
 
 	/**
 	 * A function that returns nodes to be rendered.
+	 * Not supported when bubblesVirtually is true.
 	 *
 	 * @param fills
 	 */
-	children?: ( fills: ReactNode[] ) => ReactNode;
-
-	/**
-	 * If true, events will bubble to their parents on the DOM hierarchy (native event bubbling).
-	 */
-	bubblesVirtually?: boolean;
+	children?: ( fills: ReactNode ) => ReactNode;
 };
 
 export type FillComponentProps = {
