@@ -36,9 +36,11 @@ export const Input = styled( InputControl )`
 `;
 
 const spinButtonSizeStyles = ( {
-	size,
-}: Pick< NumberControlProps, 'size' > ) => {
-	if ( size !== 'small' ) {
+	spinButtonSize,
+}: {
+	spinButtonSize: NumberControlProps[ 'size' ];
+} ) => {
+	if ( spinButtonSize !== 'small' ) {
 		return ``;
 	}
 

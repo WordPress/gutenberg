@@ -218,6 +218,17 @@ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) com
 
 -   Required: No
 
+#### `size`: `'default'` | `'compact'` | `'small'`
+
+The size of the button.
+
+-   `'default'`: For normal text-label buttons, unless it is a toggle button.
+-   `'compact'`: For toggle buttons and icon buttons.
+-   `'small'`: For icon buttons associated with more advanced or auxiliary features.
+
+
+-   Required: No
+
 #### `target`: `string`
 
 If provided with `href`, sets the `target` attribute to the `a`.

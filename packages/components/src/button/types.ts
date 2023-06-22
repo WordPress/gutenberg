@@ -67,6 +67,10 @@ type BaseButtonProps = {
 	isPressed?: boolean;
 	/**
 	 * Decreases the size of the button.
+	 *
+	 * Deprecated in favor of the `size` prop.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
 	 */
 	isSmall?: boolean;
 	/**
@@ -83,6 +87,16 @@ type BaseButtonProps = {
 	 * If provided, renders a Tooltip component for the button.
 	 */
 	showTooltip?: boolean;
+	/**
+	 * The size of the button.
+	 *
+	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
+	 * - `'compact'`: For toggle buttons and icon buttons.
+	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact' | 'small';
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */

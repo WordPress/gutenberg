@@ -244,7 +244,7 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'up'
 									) }
-									size={ size }
+									spinButtonSize={ size }
 								/>
 								<SpinButton
 									icon={ resetIcon }
@@ -255,7 +255,7 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'down'
 									) }
-									size={ size }
+									spinButtonSize={ size }
 								/>
 							</HStack>
 						</Spacer>
