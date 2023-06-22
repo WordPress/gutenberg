@@ -76,18 +76,14 @@ function BehaviorsControl( {
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: '';
 
-	const value = () => {
-		if ( blockBehaviors === undefined ) {
-			return 'default';
-		}
-		if ( behaviors?.lightbox.enabled ) {
-			return 'lightbox';
-		}
-		return '';
-	};
+	let behaviorsValue = '';
 
-	const shouldShowAnimationSelector =
-		value() !== 'default' && behaviors?.lightbox.enabled;
+	if ( blockBehaviors === undefined ) {
+		behaviorsValue = 'default';
+	}
+	if ( behaviors?.lightbox.enabled ) {
+		behaviorsValue = 'lightbox';
+	}
 
 	return (
 		<InspectorControls group="advanced">
@@ -96,7 +92,7 @@ function BehaviorsControl( {
 				<SelectControl
 					label={ __( 'Behaviors' ) }
 					// At the moment we are only supporting one behavior (Lightbox)
-					value={ value() }
+					value={ behaviorsValue }
 					options={ options }
 					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
@@ -104,7 +100,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ shouldShowAnimationSelector && (
+				{ behaviorsValue === 'lightbox' && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
@@ -118,7 +114,10 @@ function BehaviorsControl( {
 								value: 'zoom',
 								label: __( 'Zoom' ),
 							},
-							{ value: 'fade', label: 'Fade' },
+							{
+								value: 'fade',
+								label: __( 'Fade' ),
+							},
 						] }
 						onChange={ onChangeAnimation }
 						hideCancelButton={ false }
