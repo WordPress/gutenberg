@@ -176,11 +176,13 @@ export default function Image( {
 		if (
 			! isExternalImage( id, url ) ||
 			! isSelected ||
-			! canUploadMedia ||
-			externalBlob
+			! canUploadMedia
 		) {
+			setExternalBlob();
 			return;
 		}
+
+		if ( externalBlob ) return;
 
 		window
 			// Avoid cache, which seems to help avoid CORS problems.
