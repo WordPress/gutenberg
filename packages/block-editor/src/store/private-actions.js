@@ -7,7 +7,6 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { blockTypePromptMessages } from '../components/block-removal-warning-modal';
-import { isRemovalPromptSupported } from './private-selectors';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -156,12 +155,7 @@ export const privateRemoveBlocks =
 		// register using `toggleRemovalPromptSupport()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
-		if (
-			! forceRemove &&
-			// FIXME what's the best way to unlock a private selector in this
-			// context?
-			select( ( state ) => isRemovalPromptSupported( state.root ) )
-		) {
+		if ( ! forceRemove && select.isRemovalPromptSupported() ) {
 			const blockNamesForPrompt = new Set();
 
 			// Given a list of client IDs of blocks that the user intended to
