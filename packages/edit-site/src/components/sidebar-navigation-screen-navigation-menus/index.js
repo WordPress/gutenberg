@@ -11,6 +11,8 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -19,8 +21,8 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
-import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
-import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import { unlock } from '../../lock-unlock';
+const { useHistory } = unlock( routerPrivateApis );
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
@@ -71,12 +73,25 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		getNavigationFallbackId();
 	}
 
-	const { handleSave, handleDelete, handleDuplicate } =
-		useNavigationMenuHandlers();
+	const history = useHistory();
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
-	if ( isLoading ) {
+	// If there is a **single** menu, then immediately
+	// redirect to the route for that menu. There are no
+	// dependencies for this effect because we always
+	// want it to run and it does no work if there is
+	// more than one menu.
+	useEffect( () => {
+		if ( navigationMenus?.length === 1 ) {
+			history.push( {
+				postId: navigationMenus[ 0 ].id,
+				postType: 'wp_navigation',
+			} );
+		}
+	} );
+
+	if ( isLoading || navigationMenus?.length === 1 ) {
 		return (
 			<SidebarNavigationScreenWrapper>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
@@ -88,20 +103,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __( 'No Navigation Menus found.' ) }
-			/>
-		);
-	}
-
-	// if single menu then render it
-	if ( navigationMenus?.length === 1 ) {
-		return (
-			<SingleNavigationMenu
-				navigationMenu={ firstNavigationMenu }
-				handleDelete={ () => handleDelete( firstNavigationMenu ) }
-				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
-				handleSave={ ( edits ) =>
-					handleSave( firstNavigationMenu, edits )
-				}
 			/>
 		);
 	}
@@ -129,6 +130,7 @@ export function SidebarNavigationScreenWrapper( {
 	actions,
 	title,
 	description,
+	backPath,
 } ) {
 	return (
 		<SidebarNavigationScreen
@@ -136,6 +138,7 @@ export function SidebarNavigationScreenWrapper( {
 			actions={ actions }
 			description={ description || __( 'Manage your Navigation menus.' ) }
 			content={ children }
+			backPath={ backPath }
 		/>
 	);
 }

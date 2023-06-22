@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityRecord,
+	useEntityRecords,
+	store as coreStore,
+} from '@wordpress/core-data';
+
 import {
 	__experimentalUseNavigator as useNavigator,
 	Spinner,
@@ -13,6 +18,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from '../sidebar-navigation-screen-navigation-menus/constants';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
@@ -29,6 +35,12 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		'postType',
 		postType,
 		postId
+	);
+
+	const { records: navigationMenus } = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
 	const { isSaving, isDeleting } = useSelect(
@@ -63,12 +75,18 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const _handleSave = ( edits ) => handleSave( navigationMenu, edits );
 	const _handleDuplicate = () => handleDuplicate( navigationMenu );
 
+	// If we have a single menu then the backpath should skip the
+	// navigation menus screen (as that would cause an infinite redirect)
+	// and instead go back to the root.
+	const backPath = navigationMenus?.length === 1 ? '/' : undefined;
+
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __(
 					'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
 				) }
+				backPath={ backPath }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
@@ -79,6 +97,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __( 'Navigation Menu missing.' ) }
+				backPath={ backPath }
 			/>
 		);
 	}
@@ -96,6 +115,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				}
 				title={ decodeEntities( menuTitle ) }
 				description={ __( 'This Navigation Menu is empty.' ) }
+				backPath={ backPath }
 			/>
 		);
 	}
@@ -106,6 +126,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			handleDelete={ _handleDelete }
 			handleSave={ _handleSave }
 			handleDuplicate={ _handleDuplicate }
+			backPath={ backPath }
 		/>
 	);
 }

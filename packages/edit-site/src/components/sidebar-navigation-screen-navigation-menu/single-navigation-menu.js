@@ -15,6 +15,7 @@ export default function SingleNavigationMenu( {
 	handleDelete,
 	handleDuplicate,
 	handleSave,
+	backPath,
 } ) {
 	const menuTitle = navigationMenu?.title?.rendered;
 
@@ -32,6 +33,7 @@ export default function SingleNavigationMenu( {
 			description={ __(
 				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
 			) }
+			backPath={ backPath }
 		>
 			<NavigationMenuEditor navigationMenuId={ navigationMenu?.id } />
 		</SidebarNavigationScreenWrapper>
