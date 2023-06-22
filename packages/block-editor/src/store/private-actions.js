@@ -185,11 +185,11 @@ export const privateRemoveBlocks =
 			// skip any other steps (thus postponing actual removal).
 			if ( blockNamesForPrompt.size ) {
 				dispatch(
-					displayRemovalPrompt( true, {
+					displayRemovalPrompt(
 						clientIds,
 						selectPrevious,
-						blockNamesForPrompt: Array.from( blockNamesForPrompt ),
-					} )
+						Array.from( blockNamesForPrompt )
+					)
 				);
 				return;
 			}
@@ -235,21 +235,38 @@ export const ensureDefaultBlock =
 
 /**
  * Returns an action object used in signalling that a block removal prompt must
- * be displayed or hidden.
+ * be displayed.
  *
- * @param {boolean}  displayPrompt Whether to prompt for removal.
- * @param {Function} options       Function to call if removal is confirmed and blockName.
- *
+ * @param {string|string[]} clientIds           Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious      True if the previous block
+ *                                              or the immediate parent
+ *                                              (if no previous block exists)
+ *                                              should be selected
+ *                                              when a block is removed.
+ * @param {string[]}        blockNamesForPrompt Names of blocks requiring user
  * @return {Object} Action object.
  */
-export function displayRemovalPrompt( displayPrompt, options = {} ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = options;
+export function displayRemovalPrompt(
+	clientIds,
+	selectPrevious,
+	blockNamesForPrompt
+) {
 	return {
-		type: 'PROMPT_REMOVAL',
-		displayPrompt,
+		type: 'DISPLAY_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
 		blockNamesForPrompt,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a block removal prompt must
+ * be cleared, either be cause the user has confirmed or canceled the request
+ * for removal.
+ */
+export function clearRemovalPrompt() {
+	return {
+		type: 'CLEAR_REMOVAL_PROMPT',
 	};
 }
 

@@ -1479,19 +1479,15 @@ export function isSelectionEnabled( state = true, action ) {
  */
 export function isRemovalPromptDisplayed( state = false, action ) {
 	switch ( action.type ) {
-		case 'PROMPT_REMOVAL':
-			const {
-				displayPrompt,
-				clientIds,
-				selectPrevious,
-				blockNamesForPrompt,
-			} = action;
+		case 'DISPLAY_REMOVAL_PROMPT':
+			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
 			return {
-				displayPrompt,
 				clientIds,
 				selectPrevious,
 				blockNamesForPrompt,
 			};
+		case 'CLEAR_REMOVAL_PROMPT':
+			return false;
 	}
 
 	return state;

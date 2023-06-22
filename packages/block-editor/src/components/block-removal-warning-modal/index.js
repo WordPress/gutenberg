@@ -35,11 +35,8 @@ export function BlockRemovalWarningModal() {
 			unlock( select( blockEditorStore ) ).isRemovalPromptDisplayed()
 	);
 
-	const {
-		displayRemovalPrompt,
-		setRemovalPromptStatus,
-		privateRemoveBlocks,
-	} = unlock( useDispatch( blockEditorStore ) );
+	const { clearRemovalPrompt, setRemovalPromptStatus, privateRemoveBlocks } =
+		unlock( useDispatch( blockEditorStore ) );
 
 	// Signalling the removal prompt is in place.
 	useEffect( () => {
@@ -53,11 +50,9 @@ export function BlockRemovalWarningModal() {
 		return;
 	}
 
-	const closeModal = () => displayRemovalPrompt( false );
-
 	const onConfirmRemoval = () => {
 		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );
-		closeModal();
+		clearRemovalPrompt();
 	};
 
 	return (
@@ -67,7 +62,7 @@ export function BlockRemovalWarningModal() {
 				'Really delete these blocks?',
 				clientIds.length
 			) }
-			onRequestClose={ closeModal }
+			onRequestClose={ clearRemovalPrompt }
 		>
 			{ blockNamesForPrompt.length === 1 ? (
 				<p>{ blockTypePromptMessages[ blockNamesForPrompt[ 0 ] ] }</p>
@@ -88,7 +83,7 @@ export function BlockRemovalWarningModal() {
 				) }
 			</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ closeModal }>
+				<Button variant="tertiary" onClick={ clearRemovalPrompt }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button variant="primary" onClick={ onConfirmRemoval }>
