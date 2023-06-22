@@ -21,7 +21,7 @@ import { unlock } from './private-apis';
 
 const EMPTY_ARRAY = [];
 
-let oldFootnotes = {};
+const oldFootnotes = {};
 
 /**
  * Internal dependencies
@@ -198,49 +198,49 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 			const { getRichTextValues } = unlock( blockEditorPrivateApis );
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
-			const newOrder = [];
+			// const newOrder = [];
 
-			// This can be avoided when
-			// https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
-			// get the order directly from the rich text values.
-			if ( _content.indexOf( 'data-fn' ) !== -1 ) {
-				const regex = /data-fn="([^"]+)"/g;
-				let match;
-				while ( ( match = regex.exec( _content ) ) !== null ) {
-					newOrder.push( match[ 1 ] );
-				}
-			}
+			// // This can be avoided when
+			// // https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
+			// // get the order directly from the rich text values.
+			// if ( _content.indexOf( 'data-fn' ) !== -1 ) {
+			// 	const regex = /data-fn="([^"]+)"/g;
+			// 	let match;
+			// 	while ( ( match = regex.exec( _content ) ) !== null ) {
+			// 		newOrder.push( match[ 1 ] );
+			// 	}
+			// }
 
-			const footnotes = meta.footnotes
-				? JSON.parse( meta.footnotes )
-				: [];
-			const currentOrder = footnotes.map( ( fn ) => fn.id );
+			// const footnotes = meta.footnotes
+			// 	? JSON.parse( meta.footnotes )
+			// 	: [];
+			// const currentOrder = footnotes.map( ( fn ) => fn.id );
 
-			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
+			// if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
 
-			const newFootnotes = newOrder.map(
-				( fnId ) =>
-					footnotes.find( ( fn ) => fn.id === fnId ) ||
-					oldFootnotes[ fnId ] || {
-						id: fnId,
-						content: '',
-					}
-			);
+			// const newFootnotes = newOrder.map(
+			// 	( fnId ) =>
+			// 		footnotes.find( ( fn ) => fn.id === fnId ) ||
+			// 		oldFootnotes[ fnId ] || {
+			// 			id: fnId,
+			// 			content: '',
+			// 		}
+			// );
 
-			oldFootnotes = {
-				...oldFootnotes,
-				...footnotes.reduce( ( acc, fn ) => {
-					if ( ! newOrder.includes( fn.id ) ) {
-						acc[ fn.id ] = fn;
-					}
-					return acc;
-				}, {} ),
-			};
+			// oldFootnotes = {
+			// 	...oldFootnotes,
+			// 	...footnotes.reduce( ( acc, fn ) => {
+			// 		if ( ! newOrder.includes( fn.id ) ) {
+			// 			acc[ fn.id ] = fn;
+			// 		}
+			// 		return acc;
+			// 	}, {} ),
+			// };
 
-			updateMeta( {
-				...meta,
-				footnotes: JSON.stringify( newFootnotes ),
-			} );
+			// updateMeta( {
+			// 	...meta,
+			// 	footnotes: JSON.stringify( newFootnotes ),
+			// } );
 		},
 		[ meta, updateMeta ]
 	);

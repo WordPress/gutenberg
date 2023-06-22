@@ -569,3 +569,25 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+/**
+ * Registers the `core/footnotes` block on the server.
+ */
+function register_block_core_footnotes() {
+	register_post_meta(
+		'post',
+		'footnotes',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
+	register_block_type_from_metadata(
+		__DIR__ . '/footnotes',
+		array(
+			'render_callback' => 'render_block_core_footnotes',
+		)
+	);
+}
+add_action( 'init', 'register_block_core_footnotes' );
