@@ -879,8 +879,11 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			// Move to Link Text field.
-			await page.keyboard.press( 'Tab' );
+			// Move to "Text" field.
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Delete existing value from "Text" field
+			await page.keyboard.press( 'Delete' );
 
 			// Change text to "z"
 			await page.keyboard.type( 'z' );
