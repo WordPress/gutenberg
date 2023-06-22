@@ -143,8 +143,10 @@ export type ToggleGroupControlContextProps = Pick<
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'size'
-> & {
-	onChange: ( value: ReactText | undefined ) => void;
-	value?: ReactText;
-};
+	| 'children'
+	| 'isAdaptiveWidth'
+	| 'label'
+	| 'size'
+	| 'onChange'
+	| 'value'
+>;
