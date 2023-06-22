@@ -9,7 +9,6 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
 import {
 	useContext,
 	useEffect,
@@ -75,12 +74,16 @@ function UnconnectedNavigatorScreen(
 	const classes = useMemo(
 		() =>
 			cx(
-				css( {
-					// Ensures horizontal overflow is visually accessible.
-					overflowX: 'auto',
-					// In case the root has a height, it should not be exceeded.
-					maxHeight: '100%',
-				} ),
+				css`
+					/* Ensures horizontal overflow is visually accessible. */
+					overflow-x: auto;
+					/* In case the root has a height, it should not be exceeded. */
+					max-height: 100%;
+
+					&:focus {
+						outline: none;
+					}
+				`,
 				className
 			),
 		[ className, cx ]
@@ -130,12 +133,9 @@ function UnconnectedNavigatorScreen(
 		}
 
 		// If the previous query didn't run or find any element to focus, fallback
-		// to the first tabbable element in the screen (or the screen itself).
+		// to the screen itself.
 		if ( ! elementToFocus ) {
-			const firstTabbable = (
-				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
-			 )[ 0 ];
-			elementToFocus = firstTabbable ?? wrapperRef.current;
+			elementToFocus = wrapperRef.current;
 		}
 
 		locationRef.current.hasRestoredFocus = true;
@@ -211,6 +211,7 @@ function UnconnectedNavigatorScreen(
 		<motion.div
 			ref={ mergedWrapperRef }
 			className={ classes }
+			tabIndex={ -1 }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>
