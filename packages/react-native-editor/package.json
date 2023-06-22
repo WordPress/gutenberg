@@ -30,7 +30,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.20.0",
-		"@react-native-clipboard/clipboard": "1.9.0",
+		"@react-native-clipboard/clipboard": "1.11.2",
 		"@react-native-community/blur": "4.2.0",
 		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/v3.0.2-wp-4/react-native-community-slider-3.0.2-wp-4.tgz",
 		"@react-native-masked-view/masked-view": "0.2.9",
