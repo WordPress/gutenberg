@@ -25,11 +25,11 @@ function getWrappingPopoverElement( element: HTMLElement ) {
 }
 
 const ControlledToggleGroupControl = ( {
-	value: valueProp,
+	defaultValue,
 	onChange,
 	...props
 }: ToggleGroupControlProps ) => {
-	const [ value, setValue ] = useState( valueProp );
+	const [ value, setValue ] = useState( defaultValue );
 
 	return (
 		<ToggleGroupControl
@@ -42,36 +42,40 @@ const ControlledToggleGroupControl = ( {
 		/>
 	);
 };
+const options = (
+	<>
+		<ToggleGroupControlOption value="rigas" label="R" />
+		<ToggleGroupControlOption value="jack" label="J" />
+	</>
+);
+const optionsWithTooltip = (
+	<>
+		<ToggleGroupControlOption
+			value="gnocchi"
+			label="Delicious Gnocchi"
+			aria-label="Click for Delicious Gnocchi"
+			showTooltip={ true }
+		/>
+		<ToggleGroupControlOption
+			value="caponata"
+			label="Sumptuous Caponata"
+			aria-label="Click for Sumptuous Caponata"
+		/>
+	</>
+);
 
-describe( 'ToggleGroupControl', () => {
-	const options = (
-		<>
-			<ToggleGroupControlOption value="rigas" label="R" />
-			<ToggleGroupControlOption value="jack" label="J" />
-		</>
-	);
-	const optionsWithTooltip = (
-		<>
-			<ToggleGroupControlOption
-				value="gnocchi"
-				label="Delicious Gnocchi"
-				aria-label="Click for Delicious Gnocchi"
-				showTooltip={ true }
-			/>
-			<ToggleGroupControlOption
-				value="caponata"
-				label="Sumptuous Caponata"
-				aria-label="Click for Sumptuous Caponata"
-			/>
-		</>
-	);
+describe.each( [
+	[ 'uncontrolled', ToggleGroupControl ],
+	[ 'controlled', ControlledToggleGroupControl ],
+] )( 'ToggleGroupControl %s', ( ...modeAndComponent ) => {
+	const [ , Component ] = modeAndComponent;
 
 	describe( 'should render correctly', () => {
 		it( 'with text options', () => {
 			const { container } = render(
-				<ControlledToggleGroupControl label="Test Toggle Group Control">
+				<Component label="Test Toggle Group Control">
 					{ options }
-				</ControlledToggleGroupControl>
+				</Component>
 			);
 
 			expect( container ).toMatchSnapshot();
@@ -79,8 +83,8 @@ describe( 'ToggleGroupControl', () => {
 
 		it( 'with icons', () => {
 			const { container } = render(
-				<ControlledToggleGroupControl
-					value="uppercase"
+				<Component
+					defaultValue="uppercase"
 					label="Test Toggle Group Control"
 				>
 					<ToggleGroupControlOptionIcon
@@ -93,7 +97,7 @@ describe( 'ToggleGroupControl', () => {
 						icon={ formatLowercase }
 						label="Lowercase"
 					/>
-				</ControlledToggleGroupControl>
+				</Component>
 			);
 
 			expect( container ).toMatchSnapshot();
@@ -104,13 +108,13 @@ describe( 'ToggleGroupControl', () => {
 		const mockOnChange = jest.fn();
 
 		render(
-			<ControlledToggleGroupControl
-				value="jack"
+			<Component
+				defaultValue="jack"
 				onChange={ mockOnChange }
 				label="Test Toggle Group Control"
 			>
 				{ options }
-			</ControlledToggleGroupControl>
+			</Component>
 		);
 
 		await user.click( screen.getByRole( 'radio', { name: 'R' } ) );
@@ -121,9 +125,9 @@ describe( 'ToggleGroupControl', () => {
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
 		const user = userEvent.setup();
 		render(
-			<ControlledToggleGroupControl label="Test Toggle Group Control">
+			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
-			</ControlledToggleGroupControl>
+			</Component>
 		);
 
 		const firstRadio = screen.getByLabelText(
@@ -148,9 +152,9 @@ describe( 'ToggleGroupControl', () => {
 	it( 'should not render tooltip', async () => {
 		const user = userEvent.setup();
 		render(
-			<ControlledToggleGroupControl label="Test Toggle Group Control">
+			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
-			</ControlledToggleGroupControl>
+			</Component>
 		);
 
 		const secondRadio = screen.getByLabelText(
@@ -173,13 +177,13 @@ describe( 'ToggleGroupControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<ControlledToggleGroupControl
-						value="rigas"
+					<Component
+						defaultValue="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 					>
 						{ options }
-					</ControlledToggleGroupControl>
+					</Component>
 				);
 
 				const rigas = screen.getByRole( 'radio', {
@@ -194,9 +198,9 @@ describe( 'ToggleGroupControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<ControlledToggleGroupControl value="rigas" label="Test">
+					<Component defaultValue="rigas" label="Test">
 						{ options }
-					</ControlledToggleGroupControl>
+					</Component>
 				);
 
 				const rigas = screen.getByRole( 'radio', {
@@ -217,14 +221,14 @@ describe( 'ToggleGroupControl', () => {
 				const user = userEvent.setup();
 
 				render(
-					<ControlledToggleGroupControl
-						value="rigas"
+					<Component
+						defaultValue="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 						isDeselectable
 					>
 						{ options }
-					</ControlledToggleGroupControl>
+					</Component>
 				);
 
 				await user.click(
@@ -234,26 +238,25 @@ describe( 'ToggleGroupControl', () => {
 					} )
 				);
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( undefined );
-				expect(
+				expect( mockOnChange ).toHaveBeenLastCalledWith( '' );
+
+				await user.click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: false,
 					} )
-				).toBeVisible();
+				);
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'rigas' );
 			} );
 
 			it( 'should tab to the next option button', async () => {
 				const user = userEvent.setup();
 
 				render(
-					<ControlledToggleGroupControl
-						isDeselectable
-						value="rigas"
-						label="Test"
-					>
+					<Component isDeselectable defaultValue="rigas" label="Test">
 						{ options }
-					</ControlledToggleGroupControl>
+					</Component>
 				);
 
 				await user.tab();
