@@ -610,7 +610,8 @@ export default function Image( {
 		);
 	} else {
 		const ratio =
-			( aspectRatio && evalAspectRatio( aspectRatio ) ) ??
+			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
+			( width && height && width / height ) ||
 			naturalWidth / naturalHeight;
 
 		const isAutoWidth =
