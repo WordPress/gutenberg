@@ -30,7 +30,9 @@
 		// This resolves a bug where while dragging, the hover styles would be applied to
 		// the wrong list item while scrolling long lists, particularly in Chrome.
 		.is-dragging-components-draggable & {
-			color: inherit;
+			&:hover {
+				color: inherit;
+			}
 		}
 	}
 
