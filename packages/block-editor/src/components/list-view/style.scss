@@ -25,7 +25,9 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+	}
 
+	&:not(.is-selected) .block-editor-list-view-block-select-button {
 		// While components are being dragged, ensure that hover styles are not applied.
 		// This resolves a bug where while dragging, the hover styles would be applied to
 		// the wrong list item while scrolling long lists, particularly in Chrome.
