@@ -144,7 +144,10 @@ function GalleryEdit( props ) {
 
 	const innerBlockImages = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+			const innerBlocks =
+				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
+				[];
+			return innerBlocks;
 		},
 		[ clientId ]
 	);
