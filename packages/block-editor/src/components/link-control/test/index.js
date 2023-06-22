@@ -817,7 +817,7 @@ describe( 'Manual link entry', () => {
 			await toggleSettingsDrawer( user );
 
 			let searchInput = screen.getByRole( 'combobox', {
-				name: 'URL',
+				name: 'Link',
 			} );
 
 			let textInput = screen.getByRole( 'textbox', {
@@ -852,7 +852,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
-				name: 'URL',
+				name: 'Link',
 			} );
 
 			textInput = screen.getByRole( 'textbox', {
@@ -868,7 +868,13 @@ describe( 'Manual link entry', () => {
 			const user = userEvent.setup();
 			const mockOnCancel = jest.fn();
 
-			render( <LinkControl onCancel={ mockOnCancel } /> );
+			render(
+				<LinkControl
+					value={ fauxEntitySuggestions[ 0 ] }
+					onCancel={ mockOnCancel }
+					forceIsEditingLink
+				/>
+			);
 
 			const cancelButton = screen.queryByRole( 'button', {
 				name: 'Cancel',
