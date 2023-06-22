@@ -163,15 +163,9 @@ export default function ReusableBlockConvertButton( {
 										label={ __(
 											'Synced (formerly Reusable block)'
 										) }
-										help={
-											syncType === 'fully'
-												? __(
-														'Editing the pattern will update it anywhere it is used.'
-												  )
-												: __(
-														'Each instance of the pattern can be updated independently.'
-												  )
-										}
+										help={ __(
+											'Editing the pattern will update it anywhere it is used.'
+										) }
 										checked={ syncType === 'fully' }
 										onChange={ () => {
 											setSyncType(
