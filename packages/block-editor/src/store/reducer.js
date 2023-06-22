@@ -1503,7 +1503,7 @@ export function isRemovalPromptDisplayed( state = false, action ) {
  */
 export function removalPromptExists( state = false, action ) {
 	switch ( action.type ) {
-		case 'PROMPT_EXISTS':
+		case 'TOGGLE_REMOVAL_PROMPT_SUPPORT':
 			return action.status;
 	}
 

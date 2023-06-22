@@ -35,16 +35,19 @@ export function BlockRemovalWarningModal() {
 			unlock( select( blockEditorStore ) ).isRemovalPromptDisplayed()
 	);
 
-	const { clearRemovalPrompt, setRemovalPromptStatus, privateRemoveBlocks } =
-		unlock( useDispatch( blockEditorStore ) );
+	const {
+		clearRemovalPrompt,
+		toggleRemovalPromptSupport,
+		privateRemoveBlocks,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	// Signalling the removal prompt is in place.
 	useEffect( () => {
-		setRemovalPromptStatus( true );
+		toggleRemovalPromptSupport( true );
 		return () => {
-			setRemovalPromptStatus( false );
+			toggleRemovalPromptSupport( false );
 		};
-	}, [ setRemovalPromptStatus ] );
+	}, [ toggleRemovalPromptSupport ] );
 
 	if ( ! blockNamesForPrompt ) {
 		return;

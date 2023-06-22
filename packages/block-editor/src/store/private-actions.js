@@ -153,7 +153,7 @@ export const privateRemoveBlocks =
 		// confirmation that they intended to remove such block(s). However,
 		// the editor instance is responsible for presenting those confirmation
 		// prompts to the user. Any instance opting into removal prompts must
-		// register using `setRemovalPromptStatus()`.
+		// register using `toggleRemovalPromptSupport()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
 		if (
@@ -237,6 +237,8 @@ export const ensureDefaultBlock =
  * Returns an action object used in signalling that a block removal prompt must
  * be displayed.
  *
+ * Contrast with `toggleRemovalPromptSupport`.
+ *
  * @param {string|string[]} clientIds           Client IDs of blocks to remove.
  * @param {boolean}         selectPrevious      True if the previous block
  *                                              or the immediate parent
@@ -272,14 +274,16 @@ export function clearRemovalPrompt() {
 
 /**
  * Returns an action object used in signalling that a removal prompt display
- * mechanism is available or unavailable.
+ * mechanism is available or unavailable in the current editor.
+ *
+ * Contrast with `displayRemovalPrompt`.
  *
  * @param {boolean} status Whether a prompt display mechanism exists.
  * @return {Object} Action object.
  */
-export function setRemovalPromptStatus( status = true ) {
+export function toggleRemovalPromptSupport( status = true ) {
 	return {
-		type: 'PROMPT_EXISTS',
+		type: 'TOGGLE_REMOVAL_PROMPT_SUPPORT',
 		status,
 	};
 }
