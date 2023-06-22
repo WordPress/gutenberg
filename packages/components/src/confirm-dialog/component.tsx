@@ -43,6 +43,7 @@ function ConfirmDialog(
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
 	const cancelButtonRef = useRef();
+	const confirmButtonRef = useRef();
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
@@ -70,11 +71,13 @@ function ConfirmDialog(
 
 	const handleEnter = useCallback(
 		( event: KeyboardEvent< HTMLDivElement > ) => {
-			// Avoid triggering the 'confirm' action when the cancel button is focused.
-			if ( event.target === cancelButtonRef.current ) {
-				return;
-			}
-			if ( event.key === 'Enter' ) {
+			// Avoid triggering the 'confirm' action when the a button is focused.
+			// As this can cause a double submission.
+			const isConfirmOrCancelButton =
+				event.target === cancelButtonRef.current ||
+				event.target === confirmButtonRef.current;
+
+			if ( ! isConfirmOrCancelButton && event.key === 'Enter' ) {
 				handleEvent( onConfirm )( event );
 			}
 		},
@@ -108,6 +111,7 @@ function ConfirmDialog(
 								{ cancelLabel }
 							</Button>
 							<Button
+								ref={ confirmButtonRef }
 								variant="primary"
 								onClick={ handleEvent( onConfirm ) }
 							>
