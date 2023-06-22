@@ -89,16 +89,16 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$z->next_tag( 'img' );
 
 	if ( isset( $block['attrs']['id'] ) ) {
-		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
+		$img_src      = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata = wp_get_attachment_metadata( $block['attrs']['id'] );
 		$img_width    = $img_metadata['width'];
 		$img_height   = $img_metadata['height'];
-		$img_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
+		$img_srcset   = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
-		$img_src = $z->get_attribute( 'src' );
+		$img_src        = $z->get_attribute( 'src' );
 		$img_dimensions = getimagesize( $img_src );
-		$img_width    	= $img_dimensions[0];
-		$img_height   	= $img_dimensions[1];
+		$img_width      = $img_dimensions[0];
+		$img_height     = $img_dimensions[1];
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
@@ -124,7 +124,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 			}',
 			$lightbox_animation,
 			$img_src,
-			$img_srcset ?? '',
+			$img_srcset ? $img_srcset : '',
 			$img_width,
 			$img_height
 		)
