@@ -56,8 +56,8 @@ export default function WidthHeightTool( {
 	isShownByDefault = true,
 } ) {
 	// null, undefined, and 'auto' all represent the default value.
-	const width = value.width !== 'auto' ? value.width : '' ?? '';
-	const height = value.height !== 'auto' ? value.height : '' ?? '';
+	const width = value.width === 'auto' ? '' : value.width ?? '';
+	const height = value.height === 'auto' ? '' : value.height ?? '';
 
 	const onDimensionChange = ( dimension ) => ( nextDimension ) => {
 		const nextValue = { ...value };
