@@ -145,6 +145,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
+	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
 	$m->set_attribute( 'data-wp-bind--srcset', 'selectors.core.image.responsiveImgSrcSet' );
 	$initial_image_content = $m->get_updated_html();
@@ -153,6 +154,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );
+	$q->set_attribute( 'src', '' );
 	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
 	$enlarged_image_content = $q->get_updated_html();
 

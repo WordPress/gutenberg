@@ -135,14 +135,22 @@ store( {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
 				responsiveImgSrc: ( { context } ) => {
-					return context.core.image.activateLargeImage
-						? ''
-						: context.core.image.imageSrc;
+					if (
+						! context.core.image.initialized ||
+						context.core.image.activateLargeImage
+					) {
+						return '';
+					}
+					return context.core.image.imageSrc;
 				},
 				responsiveImgSrcSet: ( { context } ) => {
-					return context.core.image.activateLargeImage
-						? ''
-						: context.core.image.imageSrcSet;
+					if (
+						! context.core.image.initialized ||
+						context.core.image.activateLargeImage
+					) {
+						return '';
+					}
+					return context.core.image.imageSrcSet;
 				},
 				enlargedImgSrc: ( { context } ) => {
 					return context.core.image.initialized
