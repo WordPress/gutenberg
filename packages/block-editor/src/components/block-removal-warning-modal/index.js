@@ -16,8 +16,14 @@ import { __, _n } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+// In certain editing contexts, we'd like to prevent accidental removal of
+// important blocks. For example, in the site editor, the Query Loop block is
+// deemed important. In such cases, we'll ask the user for confirmation that
+// they intended to remove such block(s).
+//
+// @see https://github.com/WordPress/gutenberg/pull/51145
 export const blockTypePromptMessages = {
-	'core/query': __( 'Query Loop displays a list of posts.' ),
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
 	'core/post-content': __(
 		'Post Content displays the content of a post or page.'
 	),

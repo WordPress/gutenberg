@@ -169,7 +169,7 @@ export const privateRemoveBlocks =
 			// corresponding to "important" blocks, i.e. blocks that require a
 			// removal prompt.
 			//
-			// @see blockTypePromptMessages in ../components/block-removal-warning-modal
+			// @see blockTypePromptMessages
 			const queue = [ ...clientIds ];
 			while ( queue.length ) {
 				const clientId = queue.shift();
@@ -234,7 +234,8 @@ export const ensureDefaultBlock =
 	};
 
 /**
- * Returns an action object used in signalling that a removal prompt must be displayed.
+ * Returns an action object used in signalling that a block removal prompt must
+ * be displayed or hidden.
  *
  * @param {boolean}  displayPrompt Whether to prompt for removal.
  * @param {Function} options       Function to call if removal is confirmed and blockName.
