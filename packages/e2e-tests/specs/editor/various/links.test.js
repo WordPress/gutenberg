@@ -529,7 +529,7 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			await page.keyboard.press( 'Tab' );
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			// Tabbing should land us in the text input.
 			const { isTextInput, textValue } = await page.evaluate( () => {
