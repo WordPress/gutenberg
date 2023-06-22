@@ -166,6 +166,8 @@ export default function HeaderEditMode() {
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
 		isDistractionFreeHovering: { y: 0 },
+		view: { y: 0 },
+		edit: { y: 0 },
 	};
 
 	const toolbarTransition = {
@@ -182,7 +184,7 @@ export default function HeaderEditMode() {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
-					as={ isDistractionFree ? motion.div : 'div' }
+					as={ motion.div }
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
 					shouldUseKeyboardFocusShortcut={
