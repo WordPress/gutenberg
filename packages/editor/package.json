@@ -35,6 +35,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

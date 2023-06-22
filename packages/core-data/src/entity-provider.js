@@ -146,10 +146,16 @@ export function useEntityProp( kind, name, prop, _id ) {
  * @param {string} name         The entity name.
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
+ * @param {?Array} parseDeps    Optional dependencies to trigger entity content re-parsing.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
+export function useEntityBlockEditor(
+	kind,
+	name,
+	{ id: _id } = {},
+	parseDeps = undefined
+) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
@@ -169,8 +175,8 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	useEffect( () => {
 		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
-		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
+		// set content to a function already.
+		if ( content && typeof content !== 'function' ) {
 			const parsedContent = parse( content );
 			editEntityRecord(
 				kind,
@@ -182,7 +188,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				{ undoIgnore: true }
 			);
 		}
-	}, [ content ] );
+	}, [ content, parseDeps ] );
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
