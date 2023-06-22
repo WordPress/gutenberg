@@ -207,7 +207,7 @@ function ListViewBranch( props ) {
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
-								isBranchDragged={ isDragged }
+								isBranchDragged={ isDragged || isBranchDragged }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }
