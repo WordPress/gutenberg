@@ -219,16 +219,6 @@ export default function Layout() {
 									view: { opacity: 1 },
 									edit: { opacity: 1 },
 								} }
-								initial={ {
-									isDistractionFree: {
-										opacity: 0,
-									},
-								} }
-								exit={ {
-									isDistractionFree: {
-										opacity: 0,
-									},
-								} }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion
