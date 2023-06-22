@@ -586,8 +586,10 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			// Tabbing forward should land us in the "Text" input.
-			await page.keyboard.press( 'Tab' );
+			await waitForURLFieldAutoFocus();
+
+			// Tabbing backward should land us in the "Text" input.
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
