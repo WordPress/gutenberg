@@ -24,7 +24,7 @@ function MySearchControl( { className, setState } ) {
 
     return (
         <SearchControl
-			label={ __( 'Search posts' ) }
+            label={ __( 'Search posts' ) }
             value={ searchInput }
             onChange={ setSearchInput }
         />
