@@ -272,6 +272,19 @@
 		right: 0;
 		z-index: 9998;
 		width: 100%;
+
+		// We need ! important because we override inline styles
+		// set by the motion component.
+		&:focus-within {
+			opacity: 1 !important;
+			div {
+				transform: translateX(0) translateY(0) translateZ(0) !important;
+			}
+
+			.edit-site-layout__header {
+				opacity: 1 !important;
+			}
+		}
 	}
 
 	.edit-site-site-hub,
@@ -286,4 +299,5 @@
 	.edit-site-layout__header {
 		width: 100%;
 	}
+
 }
