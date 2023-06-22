@@ -129,7 +129,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: `core/edit-site/transform-heading-to-paragraph`,
+			name: 'core/edit-site/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
