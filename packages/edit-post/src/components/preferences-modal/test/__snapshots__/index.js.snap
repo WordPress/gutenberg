@@ -539,6 +539,10 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   max-height: 100%;
 }
 
+.emotion-2:focus {
+  outline: none;
+}
+
 .emotion-3 {
   background-color: #fff;
   color: #1e1e1e;
@@ -740,6 +744,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
           data-wp-c16t="true"
           data-wp-component="NavigatorScreen"
           style="opacity: 1; transform: none;"
+          tabindex="-1"
         >
           <div
             class="components-surface components-card emotion-3 emotion-1"
