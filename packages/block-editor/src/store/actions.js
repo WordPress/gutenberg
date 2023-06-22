@@ -1805,7 +1805,7 @@ export const registerInserterMediaCategory =
 	( { select, dispatch } ) => {
 		if ( ! category || typeof category !== 'object' ) {
 			console.error(
-				'Category should be an `InserterMediaCategory` object'
+				'Category should be an `InserterMediaCategory` object.'
 			);
 			return;
 		}
@@ -1840,7 +1840,7 @@ export const registerInserterMediaCategory =
 			)
 		) {
 			console.error(
-				`A category is already registered with the same name: "${ category.name }". `
+				`A category is already registered with the same name: "${ category.name }".`
 			);
 			return;
 		}
@@ -1850,7 +1850,7 @@ export const registerInserterMediaCategory =
 			)
 		) {
 			console.error(
-				`A category is already registered with the same labels.name: "${ category.labels.name }". `
+				`A category is already registered with the same labels.name: "${ category.labels.name }".`
 			);
 			return;
 		}
