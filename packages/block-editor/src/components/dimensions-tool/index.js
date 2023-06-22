@@ -100,38 +100,33 @@ function DimensionsTool( {
 				defaultValue={ defaultAspectRatio }
 				value={ aspectRatioValue }
 				onChange={ ( nextAspectRatio ) => {
-					// 'custom' is disabled and hidden, so it should never be
-					// passed as a value. However, it should still be displayed
-					// if both width and height are set.
+					const nextValue = { ...value };
+
+					// 'auto' is CSS default, so it gets treated as null.
+					nextAspectRatio =
+						nextAspectRatio === 'auto' ? null : nextAspectRatio;
+
 					setLastAspectRatio( nextAspectRatio );
 
-					const { ...nextValue } = value;
-
 					// Update aspectRatio.
-					if ( nextAspectRatio === 'auto' ) {
+					if ( ! nextAspectRatio ) {
 						delete nextValue.aspectRatio;
 					} else {
 						nextValue.aspectRatio = nextAspectRatio;
 					}
 
 					// Auto-update scale.
-					if ( nextAspectRatio === 'auto' ) {
+					if ( ! nextAspectRatio ) {
 						delete nextValue.scale;
-					} else if ( scale === null ) {
-						if ( lastScale === null ) {
-							nextValue.scale = defaultScale;
-							setLastScale( defaultScale );
-						} else {
-							nextValue.scale = lastScale;
-						}
+					} else if ( lastScale ) {
+						nextValue.scale = lastScale;
+					} else {
+						nextValue.scale = defaultScale;
+						setLastScale( defaultScale );
 					}
 
 					// Auto-update width and height.
-					if (
-						nextAspectRatio !== 'auto' &&
-						height !== null &&
-						width !== null
-					) {
+					if ( nextAspectRatio && width && height ) {
 						delete nextValue.height;
 					}
 
@@ -145,14 +140,15 @@ function DimensionsTool( {
 					defaultValue={ defaultScale }
 					value={ lastScale }
 					onChange={ ( nextScale ) => {
+						const nextValue = { ...value };
+
+						// 'fill' is CSS default, so it gets treated as null.
+						nextScale = nextScale === 'fill' ? null : nextScale;
+
 						setLastScale( nextScale );
 
-						const { ...nextValue } = value;
-
 						// Update scale.
-						if ( nextScale === 'fill' ) {
-							// 'fill' is CSS default, so instead of outputting a
-							// redundant value, we just remove the property.
+						if ( ! nextScale ) {
 							delete nextValue.scale;
 						} else {
 							nextValue.scale = nextScale;
@@ -166,11 +162,12 @@ function DimensionsTool( {
 				panelId={ panelId }
 				units={ unitsOptions }
 				value={ { width, height } }
-				onChange={ ( nextDimension ) => {
-					const nextWidth = nextDimension.width ?? null;
-					const nextHeight = nextDimension.height ?? null;
+				onChange={ ( { width: nextWidth, height: nextHeight } ) => {
+					const nextValue = { ...value };
 
-					const { ...nextValue } = value;
+					// 'auto' is CSS default, so it gets treated as null.
+					nextWidth = nextWidth === 'auto' ? null : nextWidth;
+					nextHeight = nextHeight === 'auto' ? null : nextHeight;
 
 					// Update width.
 					if ( ! nextWidth ) {
@@ -191,6 +188,10 @@ function DimensionsTool( {
 						delete nextValue.aspectRatio;
 					} else if ( lastAspectRatio ) {
 						nextValue.aspectRatio = lastAspectRatio;
+					} else {
+						// No setting defaultAspectRatio here, because
+						// aspectRatio is optional in this scenario,
+						// unlike scale.
 					}
 
 					// Auto-update scale.
