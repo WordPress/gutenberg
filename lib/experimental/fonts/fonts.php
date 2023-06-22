@@ -19,7 +19,7 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 	 * @param array $fonts Optional. The fonts to generate and print @font-face styles.
 	 *                     Default empty array.
 	 */
-	function wp_print_font_faces( array $fonts = array() ) {
+	function wp_print_font_faces( $fonts = array() ) {
 		static $wp_font_face = null;
 
 		if ( empty( $fonts ) ) {
@@ -31,28 +31,15 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 		}
 
 		if (
-			null !== $wp_font_face &&
+			null === $wp_font_face ||
 
-			/*
-			 * Ignore static cache when `WP_DEBUG` is enabled. Why? To avoid interfering with
-			 * the theme developer's workflow.
-			 *
-			 * @todo Replace `WP_DEBUG` once an "in development mode" check is available in Core.
-			 */
-			! WP_DEBUG &&
-
-			/*
-			 * Ignore cache when automated test suites are running. Why? To ensure
-			 * the static cache is reset between each test.
-			 */
-			! ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS )
+			// Ignore cache when automated test suites are running.
+			( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS )
 		) {
-			return $wp_font_face;
+			$wp_font_face = new WP_Font_Face();
 		}
 
-		$wp_font_face = new WP_Font_Face();
-
-		wp_font_face()->generate_and_print( $fonts );
+		$wp_font_face->generate_and_print( $fonts );
 	}
 }
 
