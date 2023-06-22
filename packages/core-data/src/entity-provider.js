@@ -195,7 +195,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( meta.footnotes === undefined ) return;
 
 			const { getRichTextValues } = unlock( blockEditorPrivateApis );
-			// const _content = getRichTextValues( _blocks ).join( '' ) || '';
+			const _content = getRichTextValues( _blocks ).join( '' ) || '';
 			// const newOrder = [];
 
 			// if ( _content.indexOf( 'data-fn' ) !== -1 ) {
