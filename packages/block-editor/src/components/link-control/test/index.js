@@ -692,16 +692,6 @@ describe( 'Manual link entry', () => {
 					name: 'Link',
 				} );
 
-				let submitButton = screen.getByRole( 'button', {
-					name: 'Save',
-				} );
-
-				expect( submitButton ).toHaveAttribute(
-					'aria-disabled',
-					'true'
-				);
-				expect( submitButton ).toBeVisible();
-
 				if ( searchString.length ) {
 					// Simulate searching for a term.
 					await user.type( searchInput, searchString );
@@ -713,17 +703,9 @@ describe( 'Manual link entry', () => {
 				// Attempt to submit the empty search value in the input.
 				await user.keyboard( '[Enter]' );
 
-				submitButton = screen.getByRole( 'button', {
-					name: 'Save',
-				} );
-
-				// Verify the UI hasn't allowed submission.
+				// Verify the UI hasn't allowed submission because
+				// the search input is still visible.
 				expect( searchInput ).toBeVisible();
-				expect( submitButton ).toHaveAttribute(
-					'aria-disabled',
-					'true'
-				);
-				expect( submitButton ).toBeVisible();
 			}
 		);
 
@@ -744,6 +726,9 @@ describe( 'Manual link entry', () => {
 					name: 'Link',
 				} );
 
+				// Remove the existing link.
+				await user.clear( searchInput );
+
 				if ( searchString.length ) {
 					await user.type( searchInput, searchString );
 				} else {
@@ -751,19 +736,25 @@ describe( 'Manual link entry', () => {
 					await user.clear( searchInput );
 				}
 
-				// Attempt to submit the empty search value in the input.
-				await user.click( submitButton );
-
 				const submitButton = screen.queryByRole( 'button', {
 					name: 'Save',
 				} );
 
-				// Verify the UI hasn't allowed submission.
+				// debug the UI state
+				// screen.debug();
+
+				// Verify the submission UI is disabled.
+				expect( submitButton ).toBeVisible();
 				expect( submitButton ).toHaveAttribute(
 					'aria-disabled',
 					'true'
 				);
-				expect( submitButton ).toBeVisible();
+
+				// Attempt to submit the empty search value in the input.
+				await user.click( submitButton );
+
+				// Verify the UI hasn't allowed submission because
+				// the search input is still visible.
 				expect( searchInput ).toBeVisible();
 			}
 		);
