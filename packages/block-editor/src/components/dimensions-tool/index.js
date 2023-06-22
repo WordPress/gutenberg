@@ -86,11 +86,9 @@ function DimensionsTool( {
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
 	// as a custom aspect ratio.
-	const aspectRatioValue =
-		width !== null && height !== null ? 'custom' : lastAspectRatio;
+	const aspectRatioValue = width && height ? 'custom' : lastAspectRatio;
 
-	const showScaleControl =
-		aspectRatio !== null || ( width !== null && height !== null );
+	const showScaleControl = aspectRatio || ( width && height );
 
 	return (
 		<>
