@@ -12,8 +12,9 @@ import { useMemo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
+import type { SlotKey } from '../types';
 
-export default function useSlot( name: string ) {
+export default function useSlot( name: SlotKey ) {
 	const registry = useContext( SlotFillContext );
 	const slots = useSnapshot( registry.slots, { sync: true } );
 	// The important bit here is that the `useSnapshot` call ensures that the

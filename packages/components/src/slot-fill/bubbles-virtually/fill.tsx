@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -49,10 +48,8 @@ export default function Fill( props: FillComponentProps ) {
 		return null;
 	}
 
-	let newChildren = children;
-	if ( typeof children === 'function' ) {
-		newChildren = children( slot.fillProps );
-	}
+	const newChildren =
+		typeof children === 'function' ? children( slot.fillProps ) : children;
 
 	// When using a `Fill`, the `children` will be rendered in the document of the
 	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`

@@ -13,15 +13,16 @@ import type {
 	BaseSlotFillContext,
 	BaseSlotComponentProps,
 	SlotFillProviderProps,
+	SlotKey,
 } from './types';
 
 export function createSlotRegistory(): BaseSlotFillContext {
-	const slots: Record< string, Component< BaseSlotComponentProps > > = {};
-	const fills: Record< string, FillComponentProps[] > = {};
+	const slots: Record< SlotKey, Component< BaseSlotComponentProps > > = {};
+	const fills: Record< SlotKey, FillComponentProps[] > = {};
 	let listeners: Array< () => void > = [];
 
 	function registerSlot(
-		name: string,
+		name: SlotKey,
 		slot: Component< BaseSlotComponentProps >
 	) {
 		const previousSlot = slots[ name ];
@@ -41,13 +42,13 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		}
 	}
 
-	function registerFill( name: string, instance: FillComponentProps ) {
+	function registerFill( name: SlotKey, instance: FillComponentProps ) {
 		fills[ name ] = [ ...( fills[ name ] || [] ), instance ];
 		forceUpdateSlot( name );
 	}
 
 	function unregisterSlot(
-		name: string,
+		name: SlotKey,
 		instance: Component< BaseSlotComponentProps >
 	) {
 		// If a previous instance of a Slot by this name unmounts, do nothing,
@@ -61,20 +62,20 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		triggerListeners();
 	}
 
-	function unregisterFill( name: string, instance: FillComponentProps ) {
+	function unregisterFill( name: SlotKey, instance: FillComponentProps ) {
 		fills[ name ] =
 			fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
 		forceUpdateSlot( name );
 	}
 
 	function getSlot(
-		name: string
+		name: SlotKey
 	): Component< BaseSlotComponentProps > | undefined {
 		return slots[ name ];
 	}
 
 	function getFills(
-		name: string,
+		name: SlotKey,
 		slotInstance: Component< BaseSlotComponentProps >
 	): FillComponentProps[] {
 		// Fills should only be returned for the current instance of the slot
@@ -85,7 +86,7 @@ export function createSlotRegistory(): BaseSlotFillContext {
 		return fills[ name ];
 	}
 
-	function forceUpdateSlot( name: string ) {
+	function forceUpdateSlot( name: SlotKey ) {
 		const slot = getSlot( name );
 
 		if ( slot ) {

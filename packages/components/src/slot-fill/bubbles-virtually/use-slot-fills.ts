@@ -12,8 +12,9 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
+import type { SlotKey } from '../types';
 
-export default function useSlotFills( name: string ) {
+export default function useSlotFills( name: SlotKey ) {
 	const registry = useContext( SlotFillContext );
 	const fills = useSnapshot( registry.fills, { sync: true } );
 	// The important bit here is that this call ensures that the hook

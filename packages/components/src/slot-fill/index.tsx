@@ -1,4 +1,8 @@
-// @ts-nocheck
+/**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
@@ -18,7 +22,12 @@ import type { WordPressComponentProps } from '../ui/context';
 
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
-import type { FillComponentProps, SlotFillProviderProps } from './types';
+import type {
+	FillComponentProps,
+	SlotComponentProps,
+	SlotFillProviderProps,
+	SlotKey,
+} from './types';
 
 export function Fill( props: FillComponentProps ) {
 	// We're adding both Fills here so they can register themselves before
@@ -31,20 +40,18 @@ export function Fill( props: FillComponentProps ) {
 		</>
 	);
 }
-export const Slot = forwardRef(
-	(
-		{
-			bubblesVirtually,
-			...props
-		}: WordPressComponentProps< SlotProps, 'div' >,
-		ref
-	) => {
-		if ( bubblesVirtually ) {
-			return <BubblesVirtuallySlot { ...props } ref={ ref } />;
-		}
-		return <BaseSlot { ...props } />;
+
+export function UnforwardedSlot(
+	props: WordPressComponentProps< SlotComponentProps, 'div' >,
+	ref: ForwardedRef< any >
+) {
+	const { bubblesVirtually, ...restProps } = props;
+	if ( bubblesVirtually ) {
+		return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
 	}
-);
+	return <BaseSlot { ...restProps } />;
+}
+export const Slot = forwardRef( UnforwardedSlot );
 
 export function Provider( { children }: SlotFillProviderProps ) {
 	const parent = useContext( SlotFillContext );
@@ -60,12 +67,16 @@ export function Provider( { children }: SlotFillProviderProps ) {
 	);
 }
 
-export function createSlotFill( key ) {
+export function createSlotFill( key: SlotKey ) {
 	const baseName = typeof key === 'symbol' ? key.description : key;
-	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
+	const FillComponent = ( props: Omit< FillComponentProps, 'name' > ) => (
+		<Fill name={ key } { ...props } />
+	);
 	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = ( props ) => <Slot name={ key } { ...props } />;
+	const SlotComponent = ( props: Omit< SlotComponentProps, 'name' > ) => (
+		<Slot name={ key } { ...props } />
+	);
 	SlotComponent.displayName = `${ baseName }Slot`;
 	SlotComponent.__unstableName = key;
 
@@ -75,7 +86,7 @@ export function createSlotFill( key ) {
 	};
 }
 
-export const createPrivateSlotFill = ( name ) => {
+export const createPrivateSlotFill = ( name: string ) => {
 	const privateKey = Symbol( name );
 	const privateSlotFill = createSlotFill( privateKey );
 

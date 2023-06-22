@@ -3,11 +3,13 @@
  */
 import type { Component, MutableRefObject, ReactNode } from 'react';
 
+export type SlotKey = string | symbol;
+
 export type SlotComponentProps = {
 	/**
 	 * Slot name.
 	 */
-	name: string;
+	name: SlotKey;
 	/**
 	 * props to pass from `Slot` to `Fill`.
 	 *
@@ -32,7 +34,7 @@ export type FillComponentProps = {
 	/**
 	 * Slot name.
 	 */
-	name: string;
+	name: SlotKey;
 
 	/**
 	 * Children elements.
@@ -49,49 +51,49 @@ export type SlotFillProviderProps = {
 
 export type BubblesVirtuallySlotFillContext = {
 	slots: Map<
-		string,
+		SlotKey,
 		{
 			ref: MutableRefObject< HTMLElement | undefined >;
 			fillProps: any;
 		}
 	>;
-	fills: Map< string, MutableRefObject< { rerender: () => {} } >[] >;
+	fills: Map< SlotKey, MutableRefObject< { rerender: () => void } >[] >;
 	registerSlot: (
-		name: string,
+		name: SlotKey,
 		ref: MutableRefObject< HTMLElement | undefined >,
 		fillProps: any
 	) => void;
 	unregisterSlot: (
-		name: string,
+		name: SlotKey,
 		ref: MutableRefObject< HTMLElement | undefined >
 	) => void;
-	updateSlot: ( name: string, fillProps: any ) => void;
+	updateSlot: ( name: SlotKey, fillProps: any ) => void;
 	registerFill: (
-		name: string,
-		ref: MutableRefObject< { rerender: () => {} } >
+		name: SlotKey,
+		ref: MutableRefObject< { rerender: () => void } >
 	) => void;
 	unregisterFill: (
-		name: string,
-		ref: MutableRefObject< { rerender: () => {} } >
+		name: SlotKey,
+		ref: MutableRefObject< { rerender: () => void } >
 	) => void;
 };
 
 export type BaseSlotFillContext = {
 	registerSlot: (
-		name: string,
+		name: SlotKey,
 		slot: Component< BaseSlotComponentProps >
 	) => void;
 	unregisterSlot: (
-		name: string,
+		name: SlotKey,
 		slot: Component< BaseSlotComponentProps >
 	) => void;
-	registerFill: ( name: string, instance: FillComponentProps ) => void;
-	unregisterFill: ( name: string, instance: FillComponentProps ) => void;
+	registerFill: ( name: SlotKey, instance: FillComponentProps ) => void;
+	unregisterFill: ( name: SlotKey, instance: FillComponentProps ) => void;
 	getSlot: (
-		name: string
+		name: SlotKey
 	) => Component< BaseSlotComponentProps > | undefined;
 	getFills: (
-		name: string,
+		name: SlotKey,
 		slotInstance: Component< BaseSlotComponentProps >
 	) => FillComponentProps[];
 	subscribe: ( listener: () => void ) => () => void;
