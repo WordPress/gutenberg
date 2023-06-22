@@ -20,8 +20,8 @@ import WidthHeightTool from './width-height-tool';
 
 /**
  * @typedef {Object} Dimensions
- * @property {number} [width]       CSS width property.
- * @property {number} [height]      CSS height property.
+ * @property {string} [width]       CSS width property.
+ * @property {string} [height]      CSS height property.
  * @property {string} [scale]       CSS object-fit property.
  * @property {string} [aspectRatio] CSS aspect-ratio property.
  */
