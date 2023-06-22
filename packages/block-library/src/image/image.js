@@ -474,8 +474,8 @@ export default function Image( {
 					) }
 					<DimensionsTool
 						value={ {
-							width,
-							height,
+							width: width && `${ width }px`,
+							height: height && `${ height }px`,
 							scale,
 							aspectRatio,
 						} }
