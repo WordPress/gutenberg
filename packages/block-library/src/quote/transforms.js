@@ -119,7 +119,7 @@ const transforms = {
 							createBlock( 'core/paragraph', {
 								content: citation,
 							} ),
-					]
+					  ]
 					: innerBlocks,
 		},
 		{
