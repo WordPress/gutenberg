@@ -198,6 +198,8 @@ Renders a pressed button style.
 
 Decreases the size of the button.
 
+Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+
 -   Required: No
 
 #### `label`: `string`
@@ -226,6 +228,7 @@ The size of the button.
 -   `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
 -   `'small'`: For icon buttons associated with more advanced or auxiliary features.
 
+If the deprecated `isSmall` prop is also defined, this prop will take precedence.
 
 -   Required: No
 -   Default: `'default'`

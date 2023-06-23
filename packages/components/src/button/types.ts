@@ -69,7 +69,7 @@ type BaseButtonProps = {
 	/**
 	 * Decreases the size of the button.
 	 *
-	 * Deprecated in favor of the `size` prop.
+	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
 	 *
 	 * @deprecated Use the `'small'` value on the `size` prop instead.
 	 */
@@ -94,6 +94,8 @@ type BaseButtonProps = {
 	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
 	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
 	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
+	 *
+	 * If the deprecated `isSmall` prop is also defined, this prop will take precedence.
 	 *
 	 * @default 'default'
 	 */
