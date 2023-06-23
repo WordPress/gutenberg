@@ -434,6 +434,8 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
 					const isExpanded = blockElement.dataset.expanded === 'true';
+					const isDraggedBlock =
+						blockElement.classList.contains( 'is-dragging' );
 
 					// Get nesting level from `aria-level` attribute because Firefox does not support `element.ariaLevel`.
 					const nestingLevel = parseInt(
@@ -449,9 +451,7 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
 						nestingLevel: nestingLevel || undefined,
-						isDraggedBlock: isBlockDrag
-							? draggedBlockClientIds.includes( clientId )
-							: false,
+						isDraggedBlock: isBlockDrag ? isDraggedBlock : false,
 						innerBlockCount: getBlockCount( clientId ),
 						canInsertDraggedBlocksAsSibling: isBlockDrag
 							? canInsertBlocks(
