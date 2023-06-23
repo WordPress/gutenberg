@@ -53,6 +53,7 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	registerInserterMediaCategory,
 } = actions;
 
 describe( 'actions', () => {
@@ -1207,6 +1208,113 @@ describe( 'actions', () => {
 			);
 
 			expect( result ).toEqual( false );
+		} );
+	} );
+
+	describe( 'registerInserterMediaCategory', () => {
+		describe( 'should log errors when invalid', () => {
+			it( 'valid object', () => {
+				registerInserterMediaCategory()( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should be an `InserterMediaCategory` object.'
+				);
+			} );
+			it( 'has name', () => {
+				registerInserterMediaCategory( {} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `name` that should be unique among all media categories.'
+				);
+			} );
+			it( 'has labels.name', () => {
+				registerInserterMediaCategory( { name: 'a' } )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `labels.name`.'
+				);
+			} );
+			it( 'has proper media type', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'b',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have `mediaType` property that is one of `image|audio|video`.'
+				);
+			} );
+			it( 'has fetch function', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: 'c',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				);
+			} );
+			it( 'has unique name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getSettings: () => ( {
+							inserterMediaCategories: [ { name: 'a' } ],
+						} ),
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same name: "a".'
+				);
+			} );
+			it( 'has unique labels.name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getSettings: () => ( {
+							inserterMediaCategories: [
+								{ labels: { name: 'a' } },
+							],
+						} ),
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same labels.name: "a".'
+				);
+			} );
+		} );
+		it( 'should register a media category', () => {
+			const category = {
+				name: 'new',
+				labels: { name: 'new' },
+				mediaType: 'image',
+				fetch: () => {},
+			};
+			const inserterMediaCategories = [
+				{ name: 'a', labels: { name: 'a' } },
+			];
+			const dispatch = jest.fn();
+			registerInserterMediaCategory( category )( {
+				select: {
+					getSettings: () => ( { inserterMediaCategories } ),
+				},
+				dispatch,
+			} );
+			expect( dispatch ).toHaveBeenLastCalledWith( {
+				type: 'UPDATE_SETTINGS',
+				settings: {
+					inserterMediaCategories: [
+						...inserterMediaCategories,
+						{ ...category, isExternalResource: true },
+					],
+				},
+			} );
 		} );
 	} );
 } );
