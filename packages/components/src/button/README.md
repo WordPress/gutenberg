@@ -223,7 +223,7 @@ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) com
 The size of the button.
 
 -   `'default'`: For normal text-label buttons, unless it is a toggle button.
--   `'compact'`: For toggle buttons and icon buttons.
+-   `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
 -   `'small'`: For icon buttons associated with more advanced or auxiliary features.
 
 
