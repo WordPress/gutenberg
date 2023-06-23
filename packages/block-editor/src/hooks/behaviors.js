@@ -14,6 +14,16 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 
+const getBehaviorValue = ( blockBehaviors, behaviors ) => {
+	if ( blockBehaviors === undefined ) {
+		return 'default';
+	}
+	if ( behaviors?.lightbox.enabled ) {
+		return 'lightbox';
+	}
+	return '';
+};
+
 function BehaviorsControl( {
 	blockName,
 	blockBehaviors,
@@ -76,15 +86,7 @@ function BehaviorsControl( {
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: '';
 
-	const value = () => {
-		if ( blockBehaviors === undefined ) {
-			return 'default';
-		}
-		if ( behaviors?.lightbox.enabled ) {
-			return 'lightbox';
-		}
-		return '';
-	};
+	const behaviorValue = getBehaviorValue( blockBehaviors, behaviors );
 
 	return (
 		<InspectorControls group="advanced">
@@ -93,7 +95,7 @@ function BehaviorsControl( {
 				<SelectControl
 					label={ __( 'Behaviors' ) }
 					// At the moment we are only supporting one behavior (Lightbox)
-					value={ value() }
+					value={ behaviorValue }
 					options={ options }
 					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
@@ -101,7 +103,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ value() === 'lightbox' && (
+				{ behaviorValue === 'lightbox' && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
