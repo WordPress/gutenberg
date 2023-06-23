@@ -1,7 +1,5 @@
 package com.gutenberg;
 
-import static org.wordpress.mobile.WPAndroidGlue.Media.createRNMediaUsingMimeType;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -296,6 +294,22 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void sendEventToHost(final String eventName, final ReadableMap properties) {
                 Log.d("SendEventToHost", String.format("Gutenberg requested sending '%s' event to host with properties: %s", eventName, properties));
             }
+
+            @Override
+            public void toggleUndoButton(boolean isDisabled) {
+                MainActivity mainActivity = MainActivity.getInstance();
+                if (mainActivity != null) {
+                    mainActivity.updateUndoItem(isDisabled);
+                }
+            }
+
+            @Override
+            public void toggleRedoButton(boolean isDisabled) {
+                MainActivity mainActivity = MainActivity.getInstance();
+                if (mainActivity != null) {
+                    mainActivity.updateRedoItem(isDisabled);
+                }
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -339,6 +353,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
         int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
         return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    public void toggleUndo() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onUndoPressed();
+    }
+
+    public void toggleRedo() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onRedoPressed();
     }
 
     private void openGutenbergWebView(String content,
