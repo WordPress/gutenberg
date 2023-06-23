@@ -990,7 +990,10 @@ test.describe( 'Image - interactivity', () => {
 			const responsiveImage = lightbox.locator( '.responsive-image img' );
 			const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
-			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
 			await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
@@ -1182,7 +1185,10 @@ test.describe( 'Image - interactivity', () => {
 		const responsiveImage = lightbox.locator( '.responsive-image img' );
 		const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
-		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( responsiveImage ).toHaveAttribute(
+			'src',
+			new RegExp( imgUrl )
+		);
 		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();

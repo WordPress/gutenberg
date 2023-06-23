@@ -89,17 +89,17 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$z->next_tag( 'img' );
 
 	if ( isset( $block['attrs']['id'] ) ) {
-		$img_src      = wp_get_attachment_url( $block['attrs']['id'] );
-		$img_metadata = wp_get_attachment_metadata( $block['attrs']['id'] );
-		$img_width    = $img_metadata['width'];
-		$img_height   = $img_metadata['height'];
-		$img_srcset   = wp_get_attachment_image_srcset( $block['attrs']['id'] );
+		$img_uploaded_src    = wp_get_attachment_url( $block['attrs']['id'] );
+		$img_metadata        = wp_get_attachment_metadata( $block['attrs']['id'] );
+		$img_width           = $img_metadata['width'];
+		$img_height          = $img_metadata['height'];
+		$img_uploaded_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
-		$img_src        = $z->get_attribute( 'src' );
-		$img_dimensions = wp_getimagesize( $img_src );
-		$img_width      = $img_dimensions[0];
-		$img_height     = $img_dimensions[1];
-		$img_srcset     = '';
+		$img_uploaded_src    = $z->get_attribute( 'src' );
+		$img_dimensions      = wp_getimagesize( $img_uploaded_src );
+		$img_width           = $img_dimensions[0];
+		$img_height          = $img_dimensions[1];
+		$img_uploaded_srcset = '';
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
@@ -111,12 +111,14 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		sprintf(
 			'{ "core":
 				{ "image":
-					{ 	"initialized": false,
+					{   "imageLoaded": false,
+						"initialized": false,
 						"lightboxEnabled": false,
 						"hideAnimationEnabled": false,
 						"preloadInitialized": false,
 						"lightboxAnimation": "%s",
-						"imageSrc": "%s",
+						"imageUploadedSrc": "%s",
+						"imageCurrentSrc": "",
 						"imageSrcSet": "%s",
 						"targetWidth": "%s",
 						"targetHeight": "%s"
@@ -124,17 +126,19 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 				}
 			}',
 			$lightbox_animation,
-			$img_src,
-			$img_srcset,
+			$img_uploaded_src,
+			$img_uploaded_srcset,
 			$img_width,
 			$img_height
 		)
 	);
+	$w->next_tag( 'img' );
+	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
 	$img = null;
-	preg_match( '/<img[^>]+>/', $content, $img );
+	preg_match( '/<img[^>]+>/', $body_content, $img );
 	$button       = '<div class="img-container">
                              <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-effect="effects.core.image.preloadLightboxImage"></button>'
 		. $img[0] .
@@ -148,7 +152,6 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'img' );
 	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
-	$m->set_attribute( 'data-wp-bind--srcset', 'selectors.core.image.responsiveImgSrcSet' );
 	$initial_image_content = $m->get_updated_html();
 
 	$q = new WP_HTML_Tag_Processor( $content );

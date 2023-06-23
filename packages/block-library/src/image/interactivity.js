@@ -22,6 +22,11 @@ store( {
 		core: {
 			image: {
 				showLightbox: ( { context, event } ) => {
+					// We can't initialize the lightbox until the reference
+					// image is loaded, otherwise the UX is broken.
+					if ( ! context.core.image.imageLoaded ) {
+						return;
+					}
 					context.core.image.initialized = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
@@ -50,7 +55,10 @@ store( {
 					imgDom.onload = function () {
 						context.core.image.activateLargeImage = true;
 					};
-					imgDom.setAttribute( 'src', context.core.image.imageSrc );
+					imgDom.setAttribute(
+						'src',
+						context.core.image.imageUploadedSrc
+					);
 				},
 				hideLightbox: async ( { context, event } ) => {
 					context.core.image.hideAnimationEnabled = true;
@@ -135,26 +143,13 @@ store( {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
 				responsiveImgSrc: ( { context } ) => {
-					if (
-						! context.core.image.initialized ||
-						context.core.image.activateLargeImage
-					) {
-						return '';
-					}
-					return context.core.image.imageSrc;
-				},
-				responsiveImgSrcSet: ( { context } ) => {
-					if (
-						! context.core.image.initialized ||
-						context.core.image.activateLargeImage
-					) {
-						return '';
-					}
-					return context.core.image.imageSrcSet;
+					return context.core.image.activateLargeImage
+						? ''
+						: context.core.image.imageCurrentSrc;
 				},
 				enlargedImgSrc: ( { context } ) => {
 					return context.core.image.initialized
-						? context.core.image.imageSrc
+						? context.core.image.imageUploadedSrc
 						: '';
 				},
 			},
@@ -163,6 +158,18 @@ store( {
 	effects: {
 		core: {
 			image: {
+				setCurrentSrc: ( { context, ref } ) => {
+					if ( ref.complete ) {
+						context.core.image.imageLoaded = true;
+						context.core.image.imageCurrentSrc = ref.currentSrc;
+					} else {
+						ref.addEventListener( 'load', function () {
+							context.core.image.imageLoaded = true;
+							context.core.image.imageCurrentSrc =
+								this.currentSrc;
+						} );
+					}
+				},
 				preloadLightboxImage: ( { context, ref } ) => {
 					ref.addEventListener( 'mouseover', () => {
 						if ( ! context.core.image.preloadInitialized ) {
@@ -170,7 +177,7 @@ store( {
 							const imgDom = document.createElement( 'img' );
 							imgDom.setAttribute(
 								'src',
-								context.core.image.imageSrc
+								context.core.image.imageUploadedSrc
 							);
 						}
 					} );
