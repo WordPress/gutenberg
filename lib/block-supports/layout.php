@@ -602,7 +602,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$global_settings = gutenberg_get_global_settings();
-	if ( isset( $block_type->supports['layout']['default'] ) ! empty( $block_type->supports['layout']['default'] ) ) {
+	if ( isset( $block_type->supports['layout']['default'] ) && ! empty( $block_type->supports['layout']['default'] ) ) {
 		$fallback_layout = isset( $block_type->supports['layout']['default'] )
 			? $block_type->supports['layout']['default']
 			: array();
