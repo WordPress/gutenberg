@@ -99,7 +99,9 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				navigationMenu={ firstNavigationMenu }
 				handleDelete={ () => handleDelete( firstNavigationMenu ) }
 				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
-				handleSave={ () => handleSave( firstNavigationMenu ) }
+				handleSave={ ( edits ) =>
+					handleSave( firstNavigationMenu, edits )
+				}
 			/>
 		);
 	}

@@ -60,7 +60,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		useNavigationMenuHandlers();
 
 	const _handleDelete = () => handleDelete( navigationMenu );
-	const _handleSave = () => handleSave( navigationMenu );
+	const _handleSave = ( edits ) => handleSave( navigationMenu, edits );
 	const _handleDuplicate = () => handleDuplicate( navigationMenu );
 
 	if ( isLoading ) {
