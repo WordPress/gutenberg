@@ -293,6 +293,7 @@ function LinkControl( {
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -393,19 +394,22 @@ function LinkControl( {
 							/>
 						</LinkControlSettingsDrawer>
 					) }
-					<div className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ isDisabled ? noop : handleSubmit }
-							className="block-editor-link-control__search-submit"
-							aria-disabled={ isDisabled }
-						>
-							{ __( 'Save' ) }
-						</Button>
-						<Button variant="tertiary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</div>
+				</div>
+			) }
+
+			{ showActions && (
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						variant="primary"
+						onClick={ isDisabled ? noop : handleSubmit }
+						className="block-editor-link-control__search-submit"
+						aria-disabled={ isDisabled }
+					>
+						{ __( 'Save' ) }
+					</Button>
+					<Button variant="tertiary" onClick={ handleCancel }>
+						{ __( 'Cancel' ) }
+					</Button>
 				</div>
 			) }
 
