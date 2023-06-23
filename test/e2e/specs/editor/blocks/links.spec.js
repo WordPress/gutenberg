@@ -28,8 +28,23 @@ test.describe( 'Links', () => {
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
+		await page.keyboard.press( 'Enter' );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
 		// Open settings.
-		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		const checkbox = page.getByLabel( 'Open in new tab' );
