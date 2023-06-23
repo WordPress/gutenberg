@@ -86,8 +86,10 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
-				hasFixedToolbar:
-					select( preferencesStore ).get( 'fixedToolbar' ),
+				hasFixedToolbar: select( preferencesStore ).get(
+					'core/edit-site',
+					'fixedToolbar'
+				),
 			};
 		}, [] );
 	const isEditing = canvasMode === 'edit';
