@@ -98,17 +98,16 @@ function TemplateListItem( {
 	direction,
 	className,
 	description,
-	hideDescription = true,
 	icon,
 	onClick,
-	showTooltip = true,
+	children,
 } ) {
 	return (
 		<Button
 			className={ className }
 			onClick={ onClick }
 			label={ description }
-			showTooltip={ showTooltip }
+			showTooltip={ !! description }
 		>
 			<Flex
 				as="span"
@@ -132,13 +131,7 @@ function TemplateListItem( {
 					>
 						{ title }
 					</Text>
-					{ description && ! hideDescription && (
-						<Text
-							lineHeight={ 1.53846153846 } // 20px
-						>
-							{ description }
-						</Text>
-					) }
+					{ children }
 				</VStack>
 			</Flex>
 		</Button>
@@ -335,18 +328,21 @@ export default function NewTemplate( {
 								title={ __( 'Custom template' ) }
 								direction="row"
 								className="edit-site-add-new-template__custom-template-button"
-								description={ __(
-									'A custom template can be manually applied to any post or page.'
-								) }
-								hideDescription={ false }
-								showTooltip={ false }
 								icon={ edit }
 								onClick={ () =>
 									setModalContent(
 										modalContentMap.customGenericTemplate
 									)
 								}
-							/>
+							>
+								<Text
+									lineHeight={ 1.53846153846 } // 20px
+								>
+									{ __(
+										'A custom template can be manually applied to any post or page.'
+									) }
+								</Text>
+							</TemplateListItem>
 						</Grid>
 					) }
 					{ modalContent === modalContentMap.customTemplate && (
