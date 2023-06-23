@@ -1,28 +1,20 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
-import { humanTimeDiff } from '@wordpress/date';
-import { createInterpolateElement } from '@wordpress/element';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
+import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -31,9 +23,9 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import SidebarNavigationSubtitle from '../sidebar-navigation-subtitle';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 export default function SidebarNavigationScreenPage() {
 	const navigator = useNavigator();
@@ -99,35 +91,27 @@ export default function SidebarNavigationScreenPage() {
 					className="edit-site-sidebar-navigation-screen__page-link"
 					href={ record.link }
 				>
-					{ record.link.replace( /^(https?:\/\/)?/, '' ) }
+					{ filterURLForDisplay(
+						safeDecodeURIComponent( record.link )
+					) }
 				</ExternalLink>
 			}
 			content={
 				<>
-					<VStack
-						className="edit-site-sidebar-navigation-screen-page__featured-image-wrapper"
-						alignment="left"
-						spacing={ 2 }
-					>
-						<div
-							className={ classnames(
-								'edit-site-sidebar-navigation-screen-page__featured-image',
-								{
-									'has-image': !! featuredMediaSourceUrl,
-								}
-							) }
+					{ !! featuredMediaSourceUrl && (
+						<VStack
+							className="edit-site-sidebar-navigation-screen-page__featured-image-wrapper"
+							alignment="left"
+							spacing={ 2 }
 						>
-							{ !! featuredMediaSourceUrl && (
+							<div className="edit-site-sidebar-navigation-screen-page__featured-image has-image">
 								<img
 									alt={ featureImageAltText }
 									src={ featuredMediaSourceUrl }
 								/>
-							) }
-							{ ! record?.featured_media && (
-								<p>{ __( 'No featured image' ) }</p>
-							) }
-						</div>
-					</VStack>
+							</div>
+						</VStack>
+					) }
 					{ !! record?.excerpt?.rendered && (
 						<Truncate
 							className="edit-site-sidebar-navigation-screen-page__excerpt"
@@ -136,36 +120,13 @@ export default function SidebarNavigationScreenPage() {
 							{ stripHTML( record.excerpt.rendered ) }
 						</Truncate>
 					) }
-					<SidebarNavigationSubtitle>
-						{ __( 'Details' ) }
-					</SidebarNavigationSubtitle>
 					<PageDetails id={ postId } />
 				</>
 			}
 			footer={
-				!! record?.modified && (
-					<HStack
-						spacing={ 5 }
-						alignment="left"
-						className="edit-site-sidebar-navigation-screen-page__details edit-site-sidebar-navigation-screen-page__footer"
-					>
-						<Text className="edit-site-sidebar-navigation-screen-page__details-label">
-							{ __( 'Last modified' ) }
-						</Text>
-						<Text className="edit-site-sidebar-navigation-screen-page__details-value">
-							{ createInterpolateElement(
-								sprintf(
-									/* translators: %s: is the relative time when the post was last modified. */
-									__( '<time>%s</time>' ),
-									humanTimeDiff( record.modified )
-								),
-								{
-									time: <time dateTime={ record.modified } />,
-								}
-							) }
-						</Text>
-					</HStack>
-				)
+				<SidebarNavigationScreenDetailsFooter
+					lastModifiedDateTime={ record?.modified }
+				/>
 			}
 		/>
 	) : null;

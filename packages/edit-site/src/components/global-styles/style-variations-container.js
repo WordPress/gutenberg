@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __experimentalGrid as Grid } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -60,6 +60,16 @@ function Variation( { variation } ) {
 		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
 
+	let label = variation?.title;
+	if ( variation?.description ) {
+		label = sprintf(
+			/* translators: %1$s: variation title. %2$s variation description. */
+			__( '%1$s (%2$s)' ),
+			variation?.title,
+			variation?.description
+		);
+	}
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
@@ -73,7 +83,7 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.title }
+				aria-label={ label }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
