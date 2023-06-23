@@ -257,16 +257,26 @@
 		/* stylelint-enable */
 	}
 
+	&.is-compact {
+		height: $button-size-compact;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			width: $button-size-compact;
+			min-width: $button-size-compact;
+		}
+	}
+
 	&.is-small {
-		height: $icon-size;
+		height: $button-size-small;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			width: $icon-size;
-			min-width: $icon-size;
+			width: $button-size-small;
+			min-width: $button-size-small;
 		}
 	}
 
