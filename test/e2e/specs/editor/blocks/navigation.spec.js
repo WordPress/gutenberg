@@ -1304,7 +1304,9 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.locator(
+				'.components-menu-item__info-wrapper .components-menu-item__item'
+			) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }
