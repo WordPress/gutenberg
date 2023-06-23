@@ -124,15 +124,12 @@ export default function useTabNav() {
 			// such as two sibling image blocks in the placeholder state,
 			// we want shift + tab from the first form element to move to the image
 			// block toolbar and not the previous image block's form element.
+			const currentBlock = event.target.closest( '[data-block]' );
 			const isElementPartOfSelectedBlock =
-				isInSameBlock(
-					event.target.closest( '[data-block]' ),
-					nextTabbable
-				) ||
-				isInsideRootBlock(
-					event.target.closest( '[data-block]' ),
-					nextTabbable
-				);
+				currentBlock &&
+				nextTabbable &&
+				( isInSameBlock( currentBlock, nextTabbable ) ||
+					isInsideRootBlock( currentBlock, nextTabbable ) );
 
 			// Allow tabbing from the block wrapper to a form element,
 			// and between form elements rendered in a block and its child blocks,
