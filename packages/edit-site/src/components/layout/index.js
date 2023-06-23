@@ -72,31 +72,36 @@ export default function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
 	const isEditorPage = ! isListPage;
-<<<<<<< HEAD
-	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
-		useSelect( ( select ) => {
-			const { getAllShortcutKeyCombinations } = select(
-				keyboardShortcutsStore
-			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
-			return {
-				canvasMode: getCanvasMode(),
-				previousShortcut: getAllShortcutKeyCombinations(
-					'core/edit-site/previous-region'
-				),
-				nextShortcut: getAllShortcutKeyCombinations(
-					'core/edit-site/next-region'
-				),
-				hasFixedToolbar: select( preferencesStore ).get(
-					'core/edit-site',
-					'fixedToolbar'
-				),
-				isDistractionFree: select( preferencesStore ).get(
-					'core/edit-site',
-					'distractionFree'
-				),
-			};
-		}, [] );
+
+	const {
+		isDistractionFree,
+		hasFixedToolbar,
+		canvasMode,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect( ( select ) => {
+		const { getAllShortcutKeyCombinations } = select(
+			keyboardShortcutsStore
+		);
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		return {
+			canvasMode: getCanvasMode(),
+			previousShortcut: getAllShortcutKeyCombinations(
+				'core/edit-site/previous-region'
+			),
+			nextShortcut: getAllShortcutKeyCombinations(
+				'core/edit-site/next-region'
+			),
+			hasFixedToolbar: select( preferencesStore ).get(
+				'core/edit-site',
+				'fixedToolbar'
+			),
+			isDistractionFree: select( preferencesStore ).get(
+				'core/edit-site',
+				'distractionFree'
+			),
+		};
+	}, [] );
 	const isEditing = canvasMode === 'edit';
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
