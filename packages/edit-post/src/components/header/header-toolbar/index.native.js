@@ -27,6 +27,7 @@ import {
 	redo as redoIcon,
 } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
+	insertBlocks,
 	onHideKeyboard,
 	isRTL,
 	noContentSelected,
@@ -88,10 +90,8 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
-	function insertBlock( blockType ) {
-		// eslint-disable-next-line no-console
-		console.log( blockType );
-		// insertBlocksAfter( createBlock( blockType ) );
+	function onInsertBlock( blockType ) {
+		insertBlocks( [ createBlock( blockType ) ] );
 	}
 
 	const renderMediaButtons = () => {
@@ -100,7 +100,7 @@ function HeaderToolbar( {
 				key="imageButton"
 				title={ __( 'Image' ) }
 				icon={ imageIcon }
-				onClick={ () => insertBlock( 'core/image' ) }
+				onClick={ () => onInsertBlock( 'core/image' ) }
 				extraProps={ {
 					hint: __( 'Insert Image Block' ),
 				} }
@@ -109,7 +109,7 @@ function HeaderToolbar( {
 				key="videoButton"
 				title={ __( 'Video' ) }
 				icon={ videoIcon }
-				onClick={ () => insertBlock( 'core/video' ) }
+				onClick={ () => onInsertBlock( 'core/video' ) }
 				extraProps={ {
 					hint: __( 'Insert Video Block' ),
 				} }
@@ -118,7 +118,7 @@ function HeaderToolbar( {
 				key="galleryButton"
 				title={ __( 'Gallery' ) }
 				icon={ galleryIcon }
-				onClick={ () => insertBlock( 'core/gallery' ) }
+				onClick={ () => onInsertBlock( 'core/gallery' ) }
 				extraProps={ {
 					hint: __( 'Insert Gallery Block' ),
 				} }
@@ -127,7 +127,7 @@ function HeaderToolbar( {
 				key="audioButton"
 				title={ __( 'Audio' ) }
 				icon={ audioIcon }
-				onClick={ () => insertBlock( 'core/audio' ) }
+				onClick={ () => onInsertBlock( 'core/audio' ) }
 				extraProps={ {
 					hint: __( 'Insert Audio Block' ),
 				} }
@@ -236,7 +236,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock, insertBlocks } =
+			dispatch( blockEditorStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -246,6 +247,7 @@ export default compose( [
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
 			},
+			insertBlocks,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
