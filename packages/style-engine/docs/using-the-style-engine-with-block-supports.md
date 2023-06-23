@@ -135,14 +135,12 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	// Set the color style values according to whether the block has support and does not skip serialization.
 	$spacing_block_styles['text']       = null;
 	if ( $has_text_support && ! $skips_serialization_of_color_text ) {
-		$spacing_block_styles['text'] = isset( $block_color_styles['text'] )
-			? _wp_array_get( $block_color_styles, array( 'text' ), null )
-			: null;
+		$spacing_block_styles['text'] = isset( $block_color_styles['text'] ) ? $block_color_styles['text'] : null;
 	}
 	$spacing_block_styles['background'] = null;
 	if ( $has_background_support && ! $skips_serialization_of_color_background ) {
 		$spacing_block_styles['background'] = isset( $block_color_styles['background'] )
-			? _wp_array_get( $block_color_styles, array( 'background' ), null )
+			? $block_color_styles['background']
 			: null;
 	}
 

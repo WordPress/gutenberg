@@ -16,7 +16,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	}
 
 	$typography_supports = isset( $block_type->supports['typography'] )
-		? _wp_array_get( $block_type->supports, array( 'typography' ), false )
+		? $block_type->supports['typography']
 		: false;
 	if ( false === $typography_supports ) {
 		return;
@@ -83,7 +83,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$typography_supports = isset( $block_type->supports['typography'] ) && $block_type->supports['typography']
-		? _wp_array_get( $block_type->supports, array( 'typography' ), array() )
+		? $block_type->supports['typography']
 		: array();
 	if ( ! $typography_supports || array() === $typography_supports ) {
 		return array();
@@ -145,13 +145,13 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_line_height_support && ! $should_skip_line_height ) {
 			$typography_block_styles['lineHeight'] = isset( $block_attributes['style']['typography']['lineHeight'] )
-				? _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null )
+				? $block_attributes['style']['typography']['lineHeight']
 				: null;
 	}
 
 	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumns'] ) ) {
 		$typography_block_styles['textColumns'] = isset( $block_attributes['style']['typography']['textColumns'] )
-			? _wp_array_get( $block_attributes, array( 'style', 'typography', 'textColumns' ), null )
+			? $block_attributes['style']['typography']['textColumns']
 			: null;
 	}
 

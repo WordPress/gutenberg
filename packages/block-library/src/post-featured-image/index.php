@@ -184,16 +184,12 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 
 	// Border color.
 	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = isset( $attributes['style']['border']['color'] )
-		? _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null )
-		: null;
+	$custom_color           = isset( $attributes['style']['border']['color'] ) ? $attributes['style']['border']['color'] : null;
 	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
-		$border                 = isset( $attributes['style']['border'][ $side ] )
-			? _wp_array_get( $attributes, array( 'style', 'border', $side ), array() )
-			: array();
+		$border                 = isset( $attributes['style']['border'][ $side ] ) ? $attributes['style']['border'][ $side ] : array();
 		$border_styles[ $side ] = array(
 			'color' => isset( $border['color'] ) ? $border['color'] : null,
 			'style' => isset( $border['style'] ) ? $border['style'] : null,

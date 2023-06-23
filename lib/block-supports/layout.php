@@ -404,7 +404,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$process_value = $gap_value;
 				if ( ! is_string( $gap_value ) ) {
 					$process_value = isset( $gap_value[ $gap_side ] )
-						? _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value )
+						? $gap_value[ $gap_side ]
 						: $fallback_gap_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
@@ -489,9 +489,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( ! is_string( $gap_value ) ) {
-					$process_value = isset( $gap_value[ $gap_side ] )
-						? _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value )
-						: $fallback_gap_value;
+					$process_value = isset( $gap_value[ $gap_side ] ) ? $gap_value[ $gap_side ] : $fallback_gap_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
@@ -604,8 +602,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$global_settings = gutenberg_get_global_settings();
-	$fallback_layout = ! empty( _wp_array_get( $block_type->supports, array( 'layout', 'default' ), array() ) ) ? _wp_array_get( $block_type->supports, array( 'layout', 'default' ), array() ) : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout     = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $fallback_layout;
+	if ( isset( $block_type->supports['layout']['default'] ) ! empty( $block_type->supports['layout']['default'] ) ) {
+		$fallback_layout = isset( $block_type->supports['layout']['default'] )
+			? $block_type->supports['layout']['default']
+			: array();
+	} else {
+		$fallback_layout = isset( $block_type->supports['__experimentalLayout']['default'] )
+			? $block_type->supports['__experimentalLayout']['default']
+			: array();
+	}
+	$used_layout = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $fallback_layout;
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
@@ -617,7 +623,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$root_padding_aware_alignments = isset( $global_settings['useRootPaddingAwareAlignments'] )
-		? _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false )
+		? $global_settings['useRootPaddingAwareAlignments']
 		: false;
 
 	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) && 'constrained' === $used_layout['type'] ) {
@@ -645,11 +651,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Get classname for layout type.
 	if ( isset( $used_layout['type'] ) ) {
 		$layout_classname = isset( $layout_definitions[ $used_layout['type'] ]['className'] )
-			? _wp_array_get( $layout_definitions, array( $used_layout['type'], 'className' ), '' )
+			? $layout_definitions[ $used_layout['type'] ]['className']
 			: '';
 	} else {
 		$layout_classname = isset( $layout_definitions['default']['className'] )
-			? _wp_array_get( $layout_definitions, array( 'default', 'className' ), '' )
+			? $layout_definitions['default']['className']
 			: '';
 	}
 
@@ -664,7 +670,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
 		$gap_value = isset( $block['attrs']['style']['spacing']['blockGap'] )
-			? _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) )
+			? $block['attrs']['style']['spacing']['blockGap']
 			: null;
 
 		/*
@@ -681,10 +687,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 
 		$fallback_gap_value = isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] )
-			? _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' )
+			? $block_type->supports['spacing']['blockGap']['__experimentalDefault']
 			: '0.5em';
 		$block_spacing      = isset( $block['attrs']['style']['spacing'] )
-			? _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null )
+			? $block['attrs']['style']['spacing']
 			: null;
 
 		/*
@@ -694,7 +700,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$block_gap             = isset( $global_settings['spacing']['blockGap'] )
-			? _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null )
+			? $global_settings['spacing']['blockGap']
 			: null;
 		$has_block_gap_support = null !== $block_gap;
 

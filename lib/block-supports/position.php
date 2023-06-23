@@ -54,15 +54,11 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		$allowed_position_types[] = 'fixed';
 	}
 
-	$style_attribute = isset( $block['attrs']['style'] )
-		? _wp_array_get( $block, array( 'attrs', 'style' ), array() )
-		: array();
+	$style_attribute = isset( $block['attrs']['style'] ) ? $block['attrs']['style'] : array();
 	$class_name      = wp_unique_id( 'wp-container-' );
 	$selector        = ".$class_name";
 	$position_styles = array();
-	$position_type   = isset( $style_attribute['position']['type'] )
-		? _wp_array_get( $style_attribute, array( 'position', 'type' ), '' )
-		: '';
+	$position_type   = isset( $style_attribute['position']['type'] ) ? $style_attribute['position']['type'] : '';
 	$wrapper_classes = array();
 
 	if (
@@ -73,9 +69,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		$sides             = array( 'top', 'right', 'bottom', 'left' );
 
 		foreach ( $sides as $side ) {
-			$side_value = isset( $style_attribute['position'][ $side ] )
-				? _wp_array_get( $style_attribute, array( 'position', $side ) )
-				: null;
+			$side_value = isset( $style_attribute['position'][ $side ] ) ? $style_attribute['position'][ $side ] : null;
 
 			if ( null !== $side_value ) {
 				/*

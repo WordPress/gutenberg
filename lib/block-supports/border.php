@@ -95,7 +95,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	) {
 		$preset_border_color          = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
 		$custom_border_color          = isset( $block_attributes['style']['border']['color'] )
-			? _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null )
+			? $block_attributes['style']['border']['color']
 			: null;
 		$border_block_styles['color'] = $preset_border_color ? $preset_border_color : $custom_border_color;
 	}
@@ -104,7 +104,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	if ( $has_border_color_support || $has_border_width_support ) {
 		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 			$border                       = isset( $block_attributes['style']['border'][ $side ] )
-				? _wp_array_get( $block_attributes, array( 'style', 'border', $side ), null )
+				? $block_attributes['style']['border'][ $side ]
 				: null;
 			$border_side_values           = array(
 				'width' => isset( $border['width'] ) && ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' ) ? $border['width'] : null,

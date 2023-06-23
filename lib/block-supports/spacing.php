@@ -61,12 +61,12 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	if ( $has_padding_support && ! $skip_padding ) {
 		$spacing_block_styles['padding'] = isset( $block_styles['spacing']['padding'] )
-			? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null )
+			? $block_styles['spacing']['padding']
 			: null;
 	}
 	if ( $has_margin_support && ! $skip_margin ) {
 		$spacing_block_styles['margin'] = isset( $block_styles['spacing']['margin'] )
-			? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null )
+			? $block_styles['spacing']['margin']
 			: null;
 	}
 	$styles = gutenberg_style_engine_get_styles( array( 'spacing' => $spacing_block_styles ) );

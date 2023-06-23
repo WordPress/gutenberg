@@ -934,7 +934,7 @@ class WP_Theme_JSON_Gutenberg {
 					$root_selector    = wp_get_block_css_selector( $block_type );
 					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector(
 						$root_selector,
-						_wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null )
+						$block_type->supports['color']['__experimentalDuotone']
 					);
 				}
 			}
@@ -1164,15 +1164,13 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_custom_css() {
 		// Add the global styles root CSS.
-		$stylesheet = isset( $this->theme_json['styles']['css'] )
-			? _wp_array_get( $this->theme_json, array( 'styles', 'css' ), '' )
-			: '';
+		$stylesheet = isset( $this->theme_json['styles']['css'] ) ? $this->theme_json['styles']['css'] : '';
 
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
 				$custom_block_css = isset( $this->theme_json['styles']['blocks'][ $name ]['css'] )
-					? _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) )
+					? $this->theme_json['styles']['blocks'][ $name ]['css']
 					: '';
 
 				if ( $custom_block_css ) {
@@ -1308,7 +1306,7 @@ class WP_Theme_JSON_Gutenberg {
 				if ( ! empty( $block_type )
 					&& isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] )
 				) {
-					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), null );
+					$block_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'];
 				}
 			} else {
 				$block_gap_value = static::get_property_value( $node, array( 'spacing', 'blockGap' ) );
@@ -1824,9 +1822,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function compute_theme_vars( $settings ) {
 		$declarations  = array();
-		$custom_values = isset( $settings['custom'] )
-			? _wp_array_get( $settings, array( 'custom' ), array() )
-			: array();
+		$custom_values = isset( $settings['custom'] ) ? $settings['custom'] : array();
 		$css_vars      = static::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -2338,9 +2334,7 @@ class WP_Theme_JSON_Gutenberg {
 		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
-		$settings         = isset( $this->theme_json['settings'] )
-			? _wp_array_get( $this->theme_json, array( 'settings' ) )
-			: array();
+		$settings         = isset( $this->theme_json['settings'] ) ? $this->theme_json['settings'] : array();
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -2493,7 +2487,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_root_layout_rules( $selector, $block_metadata ) {
 		$css              = '';
-		$settings         = isset( $this->theme_json['settings'] ) ? _wp_array_get( $this->theme_json, array( 'settings' ) ) : array();
+		$settings         = isset( $this->theme_json['settings'] ) ? $this->theme_json['settings'] : array();
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
 		/*
@@ -2543,7 +2537,7 @@ class WP_Theme_JSON_Gutenberg {
 		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
 		$block_gap_value = isset( $this->theme_json['styles']['spacing']['blockGap'] )
-			? _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' )
+			? $this->theme_json['styles']['spacing']['blockGap']
 			: '0.5em';
 		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
@@ -3376,7 +3370,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function set_spacing_sizes() {
 		$spacing_scale = isset( $this->theme_json['settings']['spacing']['spacingScale'] )
-			? _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() )
+			? $this->theme_json['settings']['spacing']['spacingScale']
 			: array();
 
 		// Gutenberg didn't have the 1st isset check.
@@ -3563,9 +3557,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$settings = isset( $this->theme_json['settings'] )
-			? _wp_array_get( $this->theme_json, array( 'settings' ) )
-			: array();
+		$settings = isset( $this->theme_json['settings'] ) ? $this->theme_json['settings'] : array();
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector or the block doesn't
