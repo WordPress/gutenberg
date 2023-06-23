@@ -825,6 +825,52 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toBeVisible();
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
+
+	test( 'should upload external image', async ( { editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Upload external image' );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.locator( 'img[src^="http"]' );
+		const src = await image.getAttribute( 'src' );
+
+		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	} );
+
+	test( 'should upload through prepublish panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Publish', exact: true } )
+			.click();
+		await page.getByRole( 'button', { name: 'Upload all' } ).click();
+
+		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.locator( 'img[src^="http"]' );
+		const src = await image.getAttribute( 'src' );
+
+		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	} );
 } );
 
 test.describe( 'Image - interactivity', () => {

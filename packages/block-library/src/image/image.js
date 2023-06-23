@@ -10,6 +10,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -175,14 +176,17 @@ export default function Image( {
 		if (
 			! isExternalImage( id, url ) ||
 			! isSelected ||
-			! canUploadMedia ||
-			externalBlob
+			! canUploadMedia
 		) {
+			setExternalBlob();
 			return;
 		}
 
+		if ( externalBlob ) return;
+
 		window
-			.fetch( url )
+			// Avoid cache, which seems to help avoid CORS problems.
+			.fetch( url.includes( '?' ) ? url : url + '?' )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
@@ -370,13 +374,6 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ externalBlob && (
-					<ToolbarButton
-						onClick={ uploadExternal }
-						icon={ upload }
-						label={ __( 'Upload external image' ) }
-					/>
-				) }
 				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
@@ -396,6 +393,17 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
+				</BlockControls>
+			) }
+			{ ! multiImageSelection && externalBlob && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
+						/>
+					</ToolbarGroup>
 				</BlockControls>
 			) }
 			<InspectorControls>
