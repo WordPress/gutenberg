@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.2.0 (2023-06-23)
+
 ### Enhancements
 
 -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
