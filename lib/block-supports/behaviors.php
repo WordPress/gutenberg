@@ -96,7 +96,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$img_srcset   = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
 		$img_src        = $z->get_attribute( 'src' );
-		$img_dimensions = getimagesize( $img_src );
+		$img_dimensions = wp_getimagesize( $img_src );
 		$img_width      = $img_dimensions[0];
 		$img_height     = $img_dimensions[1];
 		$img_srcset     = '';
