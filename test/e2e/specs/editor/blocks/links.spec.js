@@ -82,11 +82,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 
-		await page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -107,7 +103,11 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Update the link.
-		await page.keyboard.press( 'Enter' );
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 
 		// Navigate back to the popover.
 		await page.keyboard.press( 'ArrowLeft' );
