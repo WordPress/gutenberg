@@ -121,6 +121,10 @@
 		}
 	}
 
+	&:has(.block-editor-block-toolbar:empty) {
+		display: none;
+	}
+
 	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
 

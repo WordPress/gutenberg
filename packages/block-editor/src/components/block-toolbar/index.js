@@ -127,9 +127,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			{ ! isMultiToolbar &&
 				isLargeViewport &&
 				blockEditingMode === 'default' && <BlockParentSelector /> }
-			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					blockEditingMode === 'default' && (
+			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+				blockEditingMode === 'default' && (
+					<div ref={ nodeRef } { ...showMoversGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockSwitcher clientIds={ blockClientIds } />
 							{ ! isMultiToolbar && (
@@ -142,8 +142,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 								hideDragHandle={ hideDragHandle }
 							/>
 						</ToolbarGroup>
-					) }
-			</div>
+					</div>
+				) }
 			{ shouldShowVisualToolbar && isMultiToolbar && (
 				<BlockGroupToolbar />
 			) }
