@@ -407,6 +407,14 @@ describe( 'Button', () => {
 			render( <Button isSmall /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
 		} );
+
+		it( 'should prioritize the `size` prop over `isSmall`', () => {
+			render( <Button size="compact" isSmall /> );
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'is-small'
+			);
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-compact' );
+		} );
 	} );
 
 	describe( 'static typing', () => {
