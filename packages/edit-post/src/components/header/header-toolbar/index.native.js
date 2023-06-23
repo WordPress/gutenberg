@@ -185,7 +185,7 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
-				{ renderMediaButtons() }
+				{ noContentSelected && renderMediaButtons() }
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
