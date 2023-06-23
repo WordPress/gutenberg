@@ -65,6 +65,7 @@ type BaseButtonProps = {
 	 * Renders a pressed button style.
 	 */
 	isPressed?: boolean;
+	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
 	/**
 	 * Decreases the size of the button.
 	 *
