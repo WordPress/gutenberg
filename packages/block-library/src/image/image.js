@@ -10,6 +10,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -175,14 +176,17 @@ export default function Image( {
 		if (
 			! isExternalImage( id, url ) ||
 			! isSelected ||
-			! canUploadMedia ||
-			externalBlob
+			! canUploadMedia
 		) {
+			setExternalBlob();
 			return;
 		}
 
+		if ( externalBlob ) return;
+
 		window
-			.fetch( url )
+			// Avoid cache, which seems to help avoid CORS problems.
+			.fetch( url.includes( '?' ) ? url : url + '?' )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
@@ -370,13 +374,6 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ externalBlob && (
-					<ToolbarButton
-						onClick={ uploadExternal }
-						icon={ upload }
-						label={ __( 'Upload external image' ) }
-					/>
-				) }
 				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
@@ -396,6 +393,17 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
+				</BlockControls>
+			) }
+			{ ! multiImageSelection && externalBlob && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
+						/>
+					</ToolbarGroup>
 				</BlockControls>
 			) }
 			<InspectorControls>
@@ -515,6 +523,10 @@ export default function Image( {
 			: naturalHeight;
 	}
 
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback to clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
@@ -522,7 +534,7 @@ export default function Image( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
+				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) =>

@@ -1,0 +1,37 @@
+.edit-site-table-wrapper {
+	width: 100%;
+}
+
+.edit-site-table {
+	width: 100%;
+	text-indent: 0;
+	border-color: inherit;
+	border-collapse: collapse;
+	position: relative;
+	a {
+		text-decoration: none;
+	}
+	th {
+		text-align: left;
+		font-weight: normal;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+		color: $gray-700;
+	}
+	td {
+		padding: $grid-unit-20;
+	}
+	td,
+	th {
+		vertical-align: center;
+		&:first-child {
+			padding-left: 0;
+		}
+		&:last-child {
+			padding-right: 0;
+			text-align: right;
+		}
+	}
+	tr {
+		border-bottom: 1px solid $gray-100;
+	}
+}

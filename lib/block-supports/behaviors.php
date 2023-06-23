@@ -48,18 +48,22 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$lightbox = $block['attrs']['behaviors']['lightbox'];
+		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
 	} else {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
 		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
-			$lightbox = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
+			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
 		} else {
-			$lightbox = false;
+			$lightbox_settings = null;
 		}
 	}
 
-	if ( ! $lightbox || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
+	if ( isset( $lightbox_settings['enabled'] ) && false === $lightbox_settings['enabled'] ) {
+		return $block_content;
+	}
+
+	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
 		return $block_content;
 	}
 
@@ -75,11 +79,28 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
+	$lightbox_animation = '';
+	if ( isset( $lightbox_settings['animation'] ) ) {
+		$lightbox_animation = $lightbox_settings['animation'];
+	}
+
+	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
+	$z = new WP_HTML_Tag_Processor( $content );
+	$z->next_tag( 'img' );
+	if ( isset( $block['attrs']['id'] ) ) {
+		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
+	} else {
+		$img_src = $z->get_attribute( 'src' );
+	}
+
 	$w = new WP_HTML_Tag_Processor( $content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
-	$w->set_attribute( 'data-wp-context', '{ "core": { "image": { "initialized": false, "lightboxEnabled": false } } }' );
+	$w->set_attribute(
+		'data-wp-context',
+		sprintf( '{ "core":{ "image": { "initialized": false, "imageSrc": "%s", "lightboxEnabled": false, "lightboxAnimation": "%s", "hideAnimationEnabled": false } } }', $img_src, $lightbox_animation )
+	);
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -91,15 +112,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-	// Add directive to expand modal image if appropriate.
+	// Add src to the modal image.
 	$m = new WP_HTML_Tag_Processor( $content );
 	$m->next_tag( 'img' );
-	if ( isset( $block['attrs']['id'] ) ) {
-		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
-	} else {
-		$img_src = $m->get_attribute( 'src' );
-	}
-	$m->set_attribute( 'data-wp-context', '{ "core": { "image": { "imageSrc": "' . $img_src . '"} } }' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
 	$modal_content = $m->get_updated_html();
 
@@ -111,11 +126,12 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$close_button_label = esc_attr__( 'Close', 'gutenberg' );
 
 	$lightbox_html = <<<HTML
-        <div data-wp-body="" class="wp-lightbox-overlay"
+        <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
             data-wp-bind--role="selectors.core.image.roleAttribute"
             aria-label="$dialog_label"
             data-wp-class--initialized="context.core.image.initialized"
             data-wp-class--active="context.core.image.lightboxEnabled"
+			data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
             data-wp-bind--aria-hidden="!context.core.image.lightboxEnabled"
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
             data-wp-effect="effects.core.image.initLightbox"

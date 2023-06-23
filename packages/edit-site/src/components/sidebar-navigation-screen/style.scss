@@ -14,12 +14,18 @@
 .edit-site-sidebar-navigation-screen__content {
 	color: $gray-400;
 	padding: 0 $grid-unit-20;
+
 	.components-item-group {
 		margin-left: -$grid-unit-20;
 		margin-right: -$grid-unit-20;
 	}
+
 	.components-text {
 		color: $gray-400;
+	}
+
+	.components-heading {
+		margin-bottom: $grid-unit-10;
 	}
 }
 
@@ -51,7 +57,6 @@
 	top: 0;
 	background: $gray-900;
 	padding-top: $grid-unit-60 + $header-height;
-	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
@@ -82,7 +87,7 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__sticky-section.edit-site-sidebar-navigation-screen__sticky-section {
+.edit-site-sidebar-navigation-screen__footer {
 	position: sticky;
 	bottom: 0;
 	background-color: $gray-900;
@@ -90,12 +95,27 @@
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
-	box-shadow: 0 #{-$grid-unit-10} $grid-unit-20 $gray-900;
 }
 
-.edit-site-sidebar-navigation-screen__footer {
-	position: sticky;
-	bottom: 0;
-	background-color: $gray-900;
-	padding: $grid-unit-20 0;
+/* In general style overrides are discouraged.
+ * This is a temporary solution to override the InputControl component's styles.
+ * The `Theme` component will potentially be the more appropriate approach
+ * once that component is stabilized.
+ * See: packages/components/src/theme
+ */
+.edit-site-sidebar-navigation-screen__input-control {
+	width: 100%;
+	.components-input-control__container {
+		background: transparent;
+	}
+	.components-input-control__input {
+		color: $gray-200 !important;
+		background: $gray-800 !important;
+	}
+	.components-input-control__backdrop {
+		border: 4px !important;
+	}
+	.components-base-control__help {
+		color: $gray-600;
+	}
 }

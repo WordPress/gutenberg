@@ -7,6 +7,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { navigation as navigationIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ import SidebarCard from '../sidebar-card';
 export default function TemplatePanel() {
 	const {
 		info: { title, description, icon },
-		template,
+		record,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
@@ -29,11 +30,11 @@ export default function TemplatePanel() {
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEditedEntityRecord( 'postType', postType, postId );
+		const _record = getEditedEntityRecord( 'postType', postType, postId );
 
-		const info = record ? getTemplateInfo( record ) : {};
+		const info = _record ? getTemplateInfo( _record ) : {};
 
-		return { info, template: record };
+		return { info, record: _record };
 	}, [] );
 
 	if ( ! title && ! description ) {
@@ -45,9 +46,11 @@ export default function TemplatePanel() {
 			<SidebarCard
 				className="edit-site-template-card"
 				title={ decodeEntities( title ) }
-				icon={ icon }
+				icon={
+					record?.type === 'wp_navigation' ? navigationIcon : icon
+				}
 				description={ decodeEntities( description ) }
-				actions={ <TemplateActions template={ template } /> }
+				actions={ <TemplateActions template={ record } /> }
 			>
 				<TemplateAreas />
 			</SidebarCard>

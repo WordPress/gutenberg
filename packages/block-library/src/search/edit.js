@@ -226,7 +226,7 @@ export default function SearchEdit( {
 		},
 		{
 			role: 'menuitemradio',
-			title: __( 'Button Only' ),
+			title: __( 'Button only' ),
 			isActive: buttonPosition === 'button-only',
 			icon: buttonOnly,
 			onClick: () => {
@@ -440,8 +440,8 @@ export default function SearchEdit( {
 										key={ widthValue }
 										isSmall
 										variant={
-											`${ widthValue }%` ===
-											`${ width }${ widthUnit }`
+											widthValue === width &&
+											widthUnit === '%'
 												? 'primary'
 												: undefined
 										}

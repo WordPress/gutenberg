@@ -8,7 +8,7 @@ test.describe( 'Duplicating blocks', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should duplicate blocks using the block settings menu', async ( {
+	test( 'should duplicate blocks using the block settings menu and keyboard shortcut', async ( {
 		page,
 		pageUtils,
 		editor,
@@ -16,11 +16,7 @@ test.describe( 'Duplicating blocks', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Clone me' );
 
-		// Select the test we just typed
-		// This doesn't do anything but we previously had a duplicationi bug
-		// When the selection was not collapsed.
-		await pageUtils.pressKeys( 'primary+a' );
-
+		// Test: Duplicate using the block settings menu.
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name=/Duplicate/i]' );
 
@@ -33,26 +29,16 @@ test.describe( 'Duplicating blocks', () => {
 <p>Clone me</p>
 <!-- /wp:paragraph -->`
 		);
-	} );
 
-	test( 'should duplicate blocks using the keyboard shortcut', async ( {
-		page,
-		pageUtils,
-		editor,
-	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type( 'Clone me' );
-
-		// Select the test we just typed
-		// This doesn't do anything but we previously had a duplicationi bug
-		// When the selection was not collapsed.
-		await pageUtils.pressKeys( 'primary+a' );
-
-		// Duplicate using the keyboard shortccut.
+		// Test: Duplicate using the keyboard shortccut.
 		await pageUtils.pressKeys( 'primaryShift+d' );
 
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
+<p>Clone me</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
 <p>Clone me</p>
 <!-- /wp:paragraph -->
 

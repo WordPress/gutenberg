@@ -21,7 +21,7 @@ import { useCallback } from '@wordpress/element';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import StyleVariationsContainer from '../global-styles/style-variations-container';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
@@ -141,7 +141,8 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 }
 
 export default function SidebarNavigationScreenGlobalStyles() {
-	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { openGeneralSidebar, setIsListViewOpened } =
+		useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -169,7 +170,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		// and the global styles sidebar is open. This ensures that
 		// the Style Book is not prematurely closed.
 		setEditorCanvasContainerView( 'style-book' );
-	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
+		setIsListViewOpened( false );
+	}, [
+		openGlobalStyles,
+		setEditorCanvasContainerView,
+		setIsListViewOpened,
+	] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();

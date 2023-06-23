@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, isRTL } from '@wordpress/i18n';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -17,7 +17,8 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { parse } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -27,6 +28,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import useBlockTypesState from './hooks/use-block-types-state';
 
 const noop = () => {};
 
@@ -49,6 +51,18 @@ function usePatternsCategories( rootClientId ) {
 		rootClientId
 	);
 
+	const [ unsyncedPatterns ] = useBlockTypesState(
+		rootClientId,
+		undefined,
+		'unsynced'
+	);
+
+	const filteredUnsyncedPatterns = useMemo( () => {
+		return unsyncedPatterns.filter(
+			( { category: unsyncedPatternCategory } ) =>
+				unsyncedPatternCategory === 'reusable'
+		);
+	}, [ unsyncedPatterns ] );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -93,9 +107,20 @@ function usePatternsCategories( rootClientId ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
+		if ( filteredUnsyncedPatterns.length > 0 ) {
+			categories.push( {
+				name: 'reusable',
+				label: _x( 'Custom patterns' ),
+			} );
+		}
 
 		return categories;
-	}, [ allPatterns, allCategories ] );
+	}, [
+		allCategories,
+		allPatterns,
+		filteredUnsyncedPatterns.length,
+		hasRegisteredCategory,
+	] );
 
 	return populatedCategories;
 }
@@ -144,6 +169,24 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
+	const [ unsyncedPatterns ] = useBlockTypesState(
+		rootClientId,
+		onInsert,
+		'unsynced'
+	);
+	const filteredUnsyncedPatterns = useMemo( () => {
+		return unsyncedPatterns
+			.filter(
+				( { category: unsyncedPatternCategory } ) =>
+					unsyncedPatternCategory === 'reusable'
+			)
+			.map( ( syncedPattern ) => ( {
+				...syncedPattern,
+				blocks: parse( syncedPattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} ),
+			} ) );
+	}, [ unsyncedPatterns ] );
 
 	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
@@ -167,13 +210,19 @@ export function BlockPatternsCategoryPanel( {
 			} ),
 		[ allPatterns, category ]
 	);
-
-	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
+	const patterns =
+		category.name === 'reusable'
+			? filteredUnsyncedPatterns
+			: currentCategoryPatterns;
+	const currentShownPatterns = useAsyncList( patterns );
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
-	if ( ! currentCategoryPatterns.length ) {
+	if (
+		! currentCategoryPatterns.length &&
+		! filteredUnsyncedPatterns.length
+	) {
 		return null;
 	}
 
@@ -185,7 +234,7 @@ export function BlockPatternsCategoryPanel( {
 			<p>{ category.description }</p>
 			<BlockPatternList
 				shownPatterns={ currentShownPatterns }
-				blockPatterns={ currentCategoryPatterns }
+				blockPatterns={ patterns }
 				onClickPattern={ onClick }
 				onHover={ onHover }
 				label={ category.label }
@@ -240,7 +289,13 @@ function BlockPatternsTabs( {
 										<FlexBlock>
 											{ category.label }
 										</FlexBlock>
-										<Icon icon={ chevronRight } />
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
 									</HStack>
 								</Item>
 							) ) }

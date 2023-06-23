@@ -12,6 +12,7 @@ import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -224,11 +225,35 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
-}
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( typeof state.blockInserterPanel === 'object' ) {
+			const { rootClientId, insertionIndex, filterValue } =
+				state.blockInserterPanel;
+			return { rootClientId, insertionIndex, filterValue };
+		}
+
+		if ( hasPageContentFocus( state ) ) {
+			const [ postContentClientId ] =
+				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+					'core/post-content'
+				);
+			if ( postContentClientId ) {
+				return {
+					rootClientId: postContentClientId,
+					insertionIndex: undefined,
+					filterValue: undefined,
+				};
+			}
+		}
+
+		return {
+			rootClientId: undefined,
+			insertionIndex: undefined,
+			filterValue: undefined,
+		};
+	}
+);
 
 /**
  * Returns the current opened/closed state of the list view panel.
@@ -336,12 +361,12 @@ export function isPage( state ) {
 }
 
 /**
- * Whether or not the editor is locked so that only page content can be edited.
+ * Whether or not the editor allows only page content to be edited.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Whether or not the editor is locked.
+ * @return {boolean} Whether or not focus is on editing page content.
  */
-export function hasPageContentLock( state ) {
-	return isPage( state ) ? state.hasPageContentLock : false;
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }
