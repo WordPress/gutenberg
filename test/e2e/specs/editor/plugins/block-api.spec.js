@@ -15,14 +15,13 @@ test.describe( 'Using Block API', () => {
 	test( 'Inserts the filtered hello world block even when filter added after block registration', async ( {
 		admin,
 		editor,
+		page,
 	} ) => {
 		await admin.createNewPost();
 
 		await editor.insertBlock( { name: 'e2e-tests/hello-world' } );
 
-		const block = editor.canvas.locator(
-			'[data-type="e2e-tests/hello-world"]'
-		);
-		await expect( block ).toHaveText( 'Hello Editor!' );
+		const blockTitle = page.locator( '.block-editor-block-card__title' );
+		await expect( blockTitle ).toHaveText( 'Filtered Hello World' );
 	} );
 } );
