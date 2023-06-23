@@ -35,7 +35,9 @@ function UnconnectedZStack(
 
 	const clonedChildren = validChildren.map( ( child, index ) => {
 		const zIndex = isReversed ? childrenLastIndex - index : index;
-		const offsetAmount = offset * index;
+		// Only when the component is layered, the offset needs to be multiplied
+		// the item's index, so that items can correctly stack at the right distance
+		const offsetAmount = isLayered ? offset * index : offset;
 
 		const key = isValidElement( child ) ? child.key : index;
 

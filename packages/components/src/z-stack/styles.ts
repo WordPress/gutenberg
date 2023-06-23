@@ -7,10 +7,10 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { rtl } from '../utils';
 
 export const ZStackView = styled.div`
-	display: flex;
+	display: inline-grid;
+	grid-auto-flow: column;
 	position: relative;
 `;
 
@@ -19,21 +19,20 @@ export const ZStackChildView = styled.div< {
 	offsetAmount: number;
 	zIndex: number;
 } >`
-	${ ( { isLayered, offsetAmount } ) =>
-		isLayered
-			? css( rtl( { marginLeft: offsetAmount } )() )
-			: css( rtl( { right: offsetAmount * -1 } )() ) }
+	position: relative;
 
 	${ ( { isLayered } ) =>
-		isLayered ? positionAbsolute : positionRelative }
+		isLayered
+			? // When `isLayered` is true, all items overlap in the same grid cell
+			  css( { gridRowStart: 1, gridColumnStart: 1 } )
+			: undefined };
 
-	${ ( { zIndex } ) => css( { zIndex } ) }
-`;
+	&:not( :first-child ) {
+		${ ( { offsetAmount } ) =>
+			css( {
+				marginInlineStart: offsetAmount,
+			} ) };
+	}
 
-const positionAbsolute = css`
-	position: absolute;
-`;
-
-const positionRelative = css`
-	position: relative;
+	${ ( { zIndex } ) => css( { zIndex } ) };
 `;
