@@ -154,20 +154,20 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							} }
 						>
 							{ decodeEntities( siteTitle ) }
+							{ canvasMode === 'view' && (
+								<Button
+									href={ homeUrl }
+									target="_blank"
+									label={ __( 'View site' ) }
+									aria-label={ __(
+										'View site (opens in a new tab)'
+									) }
+									icon={ external }
+									className="edit-site-site-hub__site-view-link"
+								/>
+							) }
 						</motion.div>
 					</AnimatePresence>
-					{ canvasMode === 'view' && (
-						<Button
-							href={ homeUrl }
-							target="_blank"
-							label={ __( 'View site' ) }
-							aria-label={ __(
-								'View site (opens in a new tab)'
-							) }
-							icon={ external }
-							className="edit-site-site-hub__site-view-link"
-						/>
-					) }
 				</HStack>
 				{ canvasMode === 'view' && (
 					<Button
