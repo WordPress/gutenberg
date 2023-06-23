@@ -7,22 +7,13 @@ import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-
-const getBehaviorValue = ( blockBehaviors, behaviors ) => {
-	if ( blockBehaviors === undefined ) {
-		return 'default';
-	}
-	if ( behaviors?.lightbox.enabled ) {
-		return 'lightbox';
-	}
-	return '';
-};
 
 function BehaviorsControl( {
 	blockName,
@@ -75,27 +66,40 @@ function BehaviorsControl( {
 		...behaviorsOptions,
 	];
 
+	const { behaviors, behaviorsValue } = useMemo( () => {
+		const mergedBehaviors = {
+			...themeBehaviors,
+			...( blockBehaviors || {} ),
+		};
+
+		let value = '';
+		if ( blockBehaviors === undefined ) {
+			value = 'default';
+		}
+		if ( blockBehaviors?.lightbox.enabled ) {
+			value = 'lightbox';
+		}
+		return {
+			behaviors: mergedBehaviors,
+			behaviorsValue: value,
+		};
+	}, [ blockBehaviors, themeBehaviors ] );
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) {
 		return null;
 	}
-	// Block behaviors take precedence over theme behaviors.
-	const behaviors = { ...themeBehaviors, ...( blockBehaviors || {} ) };
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: '';
 
-	const behaviorValue = getBehaviorValue( blockBehaviors, behaviors );
-
 	return (
 		<InspectorControls group="advanced">
-			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
 			<div>
 				<SelectControl
 					label={ __( 'Behaviors' ) }
 					// At the moment we are only supporting one behavior (Lightbox)
-					value={ behaviorValue }
+					value={ behaviorsValue }
 					options={ options }
 					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
@@ -103,7 +107,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ behaviorValue === 'lightbox' && (
+				{ behaviorsValue === 'lightbox' && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
