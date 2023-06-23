@@ -71,8 +71,8 @@ function ConfirmDialog(
 
 	const handleEnter = useCallback(
 		( event: KeyboardEvent< HTMLDivElement > ) => {
-			// Avoid triggering the 'confirm' action when the a button is focused.
-			// As this can cause a double submission.
+			// Avoid triggering the 'confirm' action when a button is focused,
+			// as this can cause a double submission.
 			const isConfirmOrCancelButton =
 				event.target === cancelButtonRef.current ||
 				event.target === confirmButtonRef.current;
