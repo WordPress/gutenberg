@@ -49,6 +49,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		canvas: 'edit',
 	} );
 
+	const onKeyDown = ( event ) => {
+		if ( DELETE === event.keyCode || BACKSPACE === event.keyCode ) {
+			setIsDeleteDialogOpen( true );
+		}
+	};
+
 	const isEmpty = ! item.blocks?.length;
 	const patternClassNames = classnames( 'edit-site-library__pattern', {
 		'is-placeholder': isEmpty,
@@ -72,8 +78,9 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		}
 	};
 
+	const isUserPattern = item.type === USER_PATTERNS;
 	let ariaDescription;
-	if ( item.type === USER_PATTERNS ) {
+	if ( isUserPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
 		ariaDescription = __(
 			'Press Enter to edit, or Delete to delete the pattern.'
@@ -90,19 +97,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					role="option"
 					as="div"
 					{ ...composite }
-					onClick={ item.type !== PATTERNS ? onClick : undefined }
+					onClick={ isUserPattern ? onClick : undefined }
+					onKeyDown={ isUserPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={
 						ariaDescription ? descriptionId : undefined
 					}
-					onKeyDown={ ( event ) => {
-						if (
-							DELETE === event.keyCode ||
-							BACKSPACE === event.keyCode
-						) {
-							setIsDeleteDialogOpen( true );
-						}
-					} }
 				>
 					{ isEmpty && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
