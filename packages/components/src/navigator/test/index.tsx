@@ -796,6 +796,7 @@ describe( 'Navigator', () => {
 					<NavigatorScreen
 						path="/"
 						onAnimationStart={ onHomeAnimationStartSpy }
+						aria-label="Home screen"
 					>
 						<CustomNavigatorButton path="/child">
 							To child
@@ -818,6 +819,7 @@ describe( 'Navigator', () => {
 					<NavigatorScreen
 						path="/"
 						onAnimationStart={ onHomeAnimationStartSpy }
+						aria-label="Home screen"
 					>
 						<CustomNavigatorButton path="/child">
 							To child
@@ -826,6 +828,7 @@ describe( 'Navigator', () => {
 					<NavigatorScreen
 						path="/child"
 						onAnimationStart={ onChildAnimationStartSpy }
+						aria-label="Child screen"
 					>
 						<CustomNavigatorBackButton>
 							Back to home
@@ -848,6 +851,75 @@ describe( 'Navigator', () => {
 			);
 			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'role and labelling', () => {
+		it( 'should log a warning if neither the `aria-label` nor the `aria-labelledby` props are passed', async () => {
+			const { rerender } = render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen path="/" aria-label="Home screen">
+						<h1>Welcome</h1>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( console ).not.toHaveWarned();
+
+			rerender(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen path="/" aria-labelledby="screen-title">
+						{ /* eslint-disable-next-line no-restricted-syntax */ }
+						<h1 id="screen-title">Welcome</h1>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( console ).not.toHaveWarned();
+
+			rerender(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen path="/">
+						{ /* eslint-disable-next-line no-restricted-syntax */ }
+						<h1 id="screen-title">Welcome</h1>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith(
+				'The "NavigatorScreen" component with path "/" should be always labelled, either via the "aria-label" prop, or via the "aria-labelledby" prop.'
+			);
+		} );
+
+		it( 'should assign a default "region" role to screen, unless an explicit role is passed', async () => {
+			const { rerender } = render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen path="/" aria-label="Home screen">
+						<h1>Welcome</h1>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect(
+				screen.getByRole( 'region', { name: 'Home screen' } )
+			).toBeInTheDocument();
+
+			rerender(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen
+						path="/"
+						aria-label="Home screen"
+						role="navigation"
+					>
+						<h1>Welcome</h1>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect(
+				screen.getByRole( 'navigation', { name: 'Home screen' } )
+			).toBeInTheDocument();
 		} );
 	} );
 } );

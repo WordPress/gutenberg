@@ -57,6 +57,22 @@ export type NavigatorScreenProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+	/**
+	 * The aria-role attributed to the screen.
+	 *
+	 * @default 'region'
+	 */
+	role?: React.HTMLAttributes< Element >[ 'role' ];
+	/**
+	 * The text labelling the screen element. When this prop is not defined, the
+	 * `aria-labelledby` prop should be defined instead.
+	 */
+	'aria-label'?: React.HTMLAttributes< Element >[ 'aria-label' ];
+	/**
+	 * The id of another element used to label this screen element. When this prop
+	 * is not defined, the `aria-label` prop should be defined instead.
+	 */
+	'aria-labelledby'?: React.HTMLAttributes< Element >[ 'aria-labelledby' ];
 };
 
 export type NavigatorBackButtonProps = ButtonAsButtonProps;

@@ -19,3 +19,22 @@ The component accepts the following props:
 The screen's path, matched against the current path stored in the navigator.
 
 -   Required: Yes
+
+### `aria-label`: `string`
+
+The id of another element used to label this screen element.
+
+-   Required: Yes (either this prop or the `aria-labelledby` prop should be provided to the component)
+
+### `aria-labelledby`: `string`
+
+The id of another element used to label this screen element.
+
+-   Required: Yes (either this prop or the `aria-label` prop should be provided to the component)
+
+### `role`: `string`
+
+The aria-role attributed to the screen.
+
+-   Required: No
+-   Default: `'region'`

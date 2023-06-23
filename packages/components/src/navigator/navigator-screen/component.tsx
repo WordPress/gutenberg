@@ -50,10 +50,22 @@ function UnconnectedNavigatorScreen(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const screenId = useId();
-	const { children, className, path, ...otherProps } = useContextSystem(
-		props,
-		'NavigatorScreen'
-	);
+	const {
+		children,
+		className,
+		path,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		role = 'region',
+		...otherProps
+	} = useContextSystem( props, 'NavigatorScreen' );
+
+	if ( ! ariaLabel && ! ariaLabelledBy ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The "NavigatorScreen" component with path "${ path }" should be always labelled, either via the "aria-label" prop, or via the "aria-labelledby" prop.`
+		);
+	}
 
 	const prefersReducedMotion = useReducedMotion();
 	const { location, match, addScreen, removeScreen } =
@@ -212,6 +224,9 @@ function UnconnectedNavigatorScreen(
 			ref={ mergedWrapperRef }
 			className={ classes }
 			tabIndex={ -1 }
+			role={ role }
+			aria-label={ ariaLabel }
+			aria-labelledby={ ariaLabelledBy }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>
