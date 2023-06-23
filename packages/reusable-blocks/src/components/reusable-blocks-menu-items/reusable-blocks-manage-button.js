@@ -53,7 +53,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 			<MenuItem
 				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 			>
-				{ __( 'Manage Patterns/Reusable blocks' ) }
+				{ __( 'Manage Patterns' ) }
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>

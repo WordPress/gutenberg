@@ -5,6 +5,7 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
+	ReusableBlocksRenameHint,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -132,6 +133,7 @@ export default function ReusableBlockConvertButton( {
 					>
 						{ __( 'Create pattern' ) }
 					</MenuItem>
+					<ReusableBlocksRenameHint />
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create pattern' ) }
@@ -160,9 +162,7 @@ export default function ReusableBlockConvertButton( {
 									/>
 
 									<ToggleControl
-										label={ __(
-											'Synced (formerly Reusable block)'
-										) }
+										label={ __( 'Synced' ) }
 										help={ __(
 											'Editing the pattern will update it anywhere it is used.'
 										) }

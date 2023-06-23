@@ -13,6 +13,7 @@ import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
+import ReusableBlocksRenameHint from './reusable-block-rename-hint';
 
 function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	const [ items, , , onSelectItem ] = useBlockTypesState(
@@ -29,12 +30,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Synced patterns/Reusable blocks' ) }>
+		<InserterPanel title={ __( 'Synced patterns' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Synced patterns/Reusable blocks' ) }
+				label={ __( 'Synced patterns' ) }
 			/>
 		</InserterPanel>
 	);
@@ -54,6 +55,7 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 	return (
 		<>
+			<ReusableBlocksRenameHint />
 			<ReusableBlocksList
 				onHover={ onHover }
 				onInsert={ onInsert }
