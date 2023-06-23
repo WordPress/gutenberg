@@ -10,12 +10,14 @@
 	"references": [
 		{ "path": "../api-fetch" },
 		{ "path": "../compose" },
+		{ "path": "../block-editor" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	],
 	"include": [ "src/**/*" ]

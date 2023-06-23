@@ -130,11 +130,11 @@ export default function ReusableBlockConvertButton( {
 						icon={ symbol }
 						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Create a Pattern' ) }
+						{ __( 'Create pattern' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create a Pattern' ) }
+							title={ __( 'Create pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );

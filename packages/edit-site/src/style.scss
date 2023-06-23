@@ -66,6 +66,10 @@ body.site-editor-php {
 	@include wp-admin-reset(".edit-site");
 }
 
+body.site-editor-php {
+	background: $gray-900;
+}
+
 .edit-site,
 // The modals are shown outside the .edit-site wrapper, they need these styles.
 .components-modal__frame {
