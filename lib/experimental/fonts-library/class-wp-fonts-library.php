@@ -480,7 +480,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
             $new_library_fonts = $this->merge_fonts( $font_families, $new_fonts );
 
             // Sanitizes the fonts library using WP_Theme_JSON
-            $sanitized_font_families = $this->sanitize_font_families( $new_library_fonts );
+            $this->sanitize_font_families( $new_library_fonts );
 
             // Updates the fonts library post content and returns it
             return $this->update_fonts_library( $new_library_fonts );
