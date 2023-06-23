@@ -80,10 +80,6 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 	}
 
-	&.is-dragging {
-		opacity: 0.5;
-	}
-
 	// Border radius for corners of the selected item.
 	&.is-first-selected td:first-child {
 		border-top-left-radius: $radius-block-ui;
