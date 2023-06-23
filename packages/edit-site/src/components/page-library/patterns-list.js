@@ -66,6 +66,7 @@ export default function PatternsList( { categoryId, type } ) {
 						className="edit-site-library__search"
 						onChange={ ( value ) => setFilterValue( value ) }
 						placeholder={ __( 'Search patterns' ) }
+						label={ __( 'Search patterns' ) }
 						value={ filterValue }
 						__nextHasNoMarginBottom
 					/>

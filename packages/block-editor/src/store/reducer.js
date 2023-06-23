@@ -1470,6 +1470,48 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
+function removalPromptData( state = false, action ) {
+	switch ( action.type ) {
+		case 'DISPLAY_REMOVAL_PROMPT':
+			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			return {
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+			};
+		case 'CLEAR_REMOVAL_PROMPT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer prompt availability state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function isRemovalPromptSupported( state = false, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_REMOVAL_PROMPT_SUPPORT':
+			return action.status;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
@@ -1881,6 +1923,8 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
+	removalPromptData,
+	isRemovalPromptSupported,
 } );
 
 function withAutomaticChangeReset( reducer ) {
