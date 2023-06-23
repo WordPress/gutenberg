@@ -214,6 +214,9 @@
 }
 
 .edit-site-add-new-template__template-list__contents {
+	// Small top padding required to avoid cutting off the visible outline when hovering items
+	padding-top: $border-width-focus-fallback;
+
 	> .components-button {
 		height: 100%;
 		text-align: start;
