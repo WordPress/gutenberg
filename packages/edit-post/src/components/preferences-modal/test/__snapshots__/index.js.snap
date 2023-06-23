@@ -616,7 +616,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
-.emotion-13:focus {
+.emotion-13:focus-visible {
   box-shadow: 0 0 0 var( --wp-admin-border-width-focus ) var(
   				--wp-components-color-accent,
   				var( --wp-admin-theme-color, var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) )
