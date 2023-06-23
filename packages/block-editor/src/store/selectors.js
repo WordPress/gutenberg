@@ -1758,6 +1758,27 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {Object} state    Editor state.
  * @param {string} clientId The block client Id.
  *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { canEditBlock, getBlocks } = useSelect( ( select ) =>
+ *        select( blockEditorStore )
+ *     );
+ *
+ *     // Retrieve the clientId of the block to check.
+ *     const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *     return canEditBlock( blockToCheck?.clientId ) ? (
+ *         <p>{ __( 'Block is editable.' ) }</p>
+ *     ) : (
+ *         <p>{ __( 'Block is NOT editable.' ) }</p>
+ *     );
+ * };
+ * ```
+ *
  * @return {boolean} Whether the given block is allowed to be edited.
  */
 export function canEditBlock( state, clientId ) {

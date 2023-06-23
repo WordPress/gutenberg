@@ -47,6 +47,28 @@ _Returns_
 
 Determines if the given block is allowed to be edited.
 
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { canEditBlock, getBlocks } = useSelect( ( select ) =>
+		select( blockEditorStore )
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return canEditBlock( blockToCheck?.clientId ) ? (
+		<p>{ __( 'Block is editable.' ) }</p>
+	) : (
+		<p>{ __( 'Block is NOT editable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
