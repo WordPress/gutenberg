@@ -402,6 +402,11 @@ describe( 'Button', () => {
 			);
 			expect( console ).toHaveWarned();
 		} );
+
+		it( 'should not break when the legacy isSmall prop is passed', () => {
+			render( <Button isSmall /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
+		} );
 	} );
 
 	describe( 'static typing', () => {
