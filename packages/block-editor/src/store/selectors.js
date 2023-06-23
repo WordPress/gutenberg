@@ -2700,8 +2700,32 @@ export function isBlockHighlighted( state, clientId ) {
 /**
  * Checks if a given block has controlled inner blocks.
  *
+ * An example of an inner block controller is a template part block, which provides
+ * its own blocks from the template part entity data source.
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block to check.
+ *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { areInnerBlocksControlled, getBlocks } = useSelect( ( select ) =>
+ *         select( blockEditorStore )
+ *     );
+ *
+ *    // Retrieve the clientId of the block to check.
+ *    const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *    return areInnerBlocksControlled( blockToCheck ) ? (
+ *        <p>{ __( 'Inner blocks are controlled' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Inner blocks are NOT controlled' ) }</p>
+ *    );
+ * };
+ * ```
  *
  * @return {boolean} True if the block has controlled inner blocks.
  */

@@ -10,6 +10,30 @@ Namespace: `core/block-editor`.
 
 Checks if a given block has controlled inner blocks.
 
+An example of an inner block controller is a template part block, which provides its own blocks from the template part entity data source.
+
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { areInnerBlocksControlled, getBlocks } = useSelect( ( select ) =>
+		select( blockEditorStore )
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return areInnerBlocksControlled( blockToCheck ) ? (
+		<p>{ __( 'Inner blocks are controlled' ) }</p>
+	) : (
+		<p>{ __( 'Inner blocks are NOT controlled' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
