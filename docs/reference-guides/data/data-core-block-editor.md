@@ -19,8 +19,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const { areInnerBlocksControlled, getBlocks } = useSelect( ( select ) =>
-		select( blockEditorStore )
+	const { areInnerBlocksControlled, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
 	);
 
 	// Retrieve the clientId of the block to check.
@@ -54,8 +55,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const { canEditBlock, getBlocks } = useSelect( ( select ) =>
-		select( blockEditorStore )
+	const { canEditBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
 	);
 
 	// Retrieve the clientId of the block to check.

@@ -1764,8 +1764,9 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  * import { useSelect } from '@wordpress/data';
  *
  * const ExampleComponent = () => {
- *     const { canEditBlock, getBlocks } = useSelect( ( select ) =>
- *        select( blockEditorStore )
+ *     const { canEditBlock, getBlocks } = useSelect(
+ *         ( select ) => select( blockEditorStore ),
+ *         []
  *     );
  *
  *     // Retrieve the clientId of the block to check.
@@ -2733,8 +2734,9 @@ export function isBlockHighlighted( state, clientId ) {
  * import { useSelect } from '@wordpress/data';
  *
  * const ExampleComponent = () => {
- *     const { areInnerBlocksControlled, getBlocks } = useSelect( ( select ) =>
- *         select( blockEditorStore )
+ *     const { areInnerBlocksControlled, getBlocks } = useSelect(
+ *         ( select ) => select( blockEditorStore ),
+ *         []
  *     );
  *
  *    // Retrieve the clientId of the block to check.
