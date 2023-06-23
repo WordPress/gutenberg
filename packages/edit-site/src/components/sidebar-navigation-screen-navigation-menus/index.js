@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 import { decodeEntities } from '@wordpress/html-entities';
 import {
@@ -41,14 +42,34 @@ function buildMenuLabel( title, id, status ) {
 }
 
 export default function SidebarNavigationScreenNavigationMenus() {
-	const { records: navigationMenus, isResolving: isLoading } =
-		useEntityRecords(
-			'postType',
-			`wp_navigation`,
-			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	const isLoading =
+		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
+
+	const getNavigationFallbackId = useSelect(
+		( select ) => select( coreStore ).getNavigationFallbackId
+	);
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
+
+	// If there is no navigation menu found
+	// then trigger fallback algorithm to create one.
+	if (
+		! firstNavigationMenu &&
+		! isResolvingNavigationMenus &&
+		hasResolvedNavigationMenus
+	) {
+		getNavigationFallbackId();
+	}
 
 	const { handleSave, handleDelete, handleDuplicate } =
 		useNavigationMenuHandlers();
