@@ -325,13 +325,12 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 
         // Moves the file to the fonts directory or return false
         $renamed_file = rename( $temp_file, $file_path );
-        if ( ! $renamed_file ) {
-            @unlink( $temp_file );
-            return false;
-        }
-
         // Cleans the temp file
         @unlink( $temp_file );
+        
+        if ( ! $renamed_file ) {            
+            return false;
+        }
 
         // Returns the relative path to the downloaded font asset to be used as font face src
         return "{$this->relative_fonts_path}{$filename}";
