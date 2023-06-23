@@ -32,7 +32,7 @@ export default function WelcomeGuideEditor() {
 		<Guide
 			className="edit-site-welcome-guide"
 			contentLabel={ __( 'Welcome to the site editor' ) }
-			finishButtonText={ __( 'Get Started' ) }
+			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuide' ) }
 			pages={ [
 				{

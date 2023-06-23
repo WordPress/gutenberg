@@ -2021,4 +2021,158 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
 
 	}
+
+	public function test_resolve_variables() {
+		$primary_color   = '#9DFF20';
+		$secondary_color = '#9DFF21';
+		$contrast_color  = '#000';
+		$raw_color_value = '#efefef';
+		$large_font      = '18px';
+		$small_font      = '12px';
+		$theme_json      = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'color' => $primary_color,
+									'name'  => 'Primary',
+									'slug'  => 'primary',
+								),
+								array(
+									'color' => $secondary_color,
+									'name'  => 'Secondary',
+									'slug'  => 'secondary',
+								),
+								array(
+									'color' => $contrast_color,
+									'name'  => 'Contrast',
+									'slug'  => 'contrast',
+								),
+							),
+						),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'size' => $small_font,
+								'name' => 'Font size small',
+								'slug' => 'small',
+							),
+							array(
+								'size' => $large_font,
+								'name' => 'Font size large',
+								'slug' => 'large',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'color'    => array(
+						'background' => 'var(--wp--preset--color--primary)',
+						'text'       => $raw_color_value,
+					),
+					'elements' => array(
+						'button' => array(
+							'color'      => array(
+								'text' => 'var(--wp--preset--color--contrast)',
+							),
+							'typography' => array(
+								'fontSize' => 'var(--wp--preset--font-size--small)',
+							),
+						),
+					),
+					'blocks'   => array(
+						'core/post-terms'      => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+							'color'      => array( 'background' => $raw_color_value ),
+						),
+						'core/more'            => array(
+							'typography' => array( 'fontSize' => 'var(--undefined--font-size--small)' ),
+							'color'      => array( 'background' => 'linear-gradient(90deg, var(--wp--preset--color--primary) 0%, var(--wp--preset--color--secondary) 35%, var(--wp--undefined--color--secondary) 100%)' ),
+						),
+						'core/comment-content' => array(
+							'typography' => array( 'fontSize' => 'calc(var(--wp--preset--font-size--small, 12px) + 20px)' ),
+							'color'      => array(
+								'text'       => 'var(--wp--preset--color--primary, red)',
+								'background' => 'var(--wp--preset--color--primary, var(--wp--preset--font-size--secondary))',
+								'link'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+							),
+						),
+						'core/comments'        => array(
+							'color' => array(
+								'text'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--small))',
+								'background' => 'var(--wp--preset--color--primary, var(--undefined--color--primary))',
+							),
+						),
+						'core/navigation'      => array(
+							'elements' => array(
+								'link' => array(
+									'color'      => array(
+										'background' => 'var(--wp--preset--color--primary)',
+										'text'       => 'var(--wp--preset--color--secondary)',
+									),
+									'typography' => array(
+										'fontSize' => 'var(--wp--preset--font-size--large)',
+									),
+								),
+							),
+						),
+						'core/quote'           => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--large)' ),
+							'color'      => array( 'background' => 'var(--wp--preset--color--primary)' ),
+							'variations' => array(
+								'plain' => array(
+									'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+									'color'      => array( 'background' => 'var(--wp--preset--color--secondary)' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$styles = $theme_json::resolve_variables( $theme_json )->get_raw_data()['styles'];
+
+		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
+		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
+
+		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
+		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
+
+		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
+		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
+		$this->assertEquals(
+			"linear-gradient(90deg, $primary_color 0%, $secondary_color 35%, var(--wp--undefined--color--secondary) 100%)",
+			$styles['blocks']['core/more']['color']['background'],
+			'Blocks: multiple colors and undefined color'
+		);
+		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
+		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
+		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+
+		$this->assertEquals(
+			"var(--undefined--color--primary, $small_font)",
+			$styles['blocks']['core/comments']['color']['text'],
+			'Blocks: text color with undefined var and fallback'
+		);
+		$this->assertEquals(
+			$primary_color,
+			$styles['blocks']['core/comments']['color']['background'],
+			'Blocks: background color with variable and undefined fallback'
+		);
+
+		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
+	}
+
 }

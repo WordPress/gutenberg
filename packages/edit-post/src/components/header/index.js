@@ -27,7 +27,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
-		isDistractionFreeMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -36,21 +35,17 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFreeMode:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 		} ),
 		[]
 	);
 
-	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
-
 	const slideY = {
-		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
+		hidden: { y: '-50px' },
 		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
 	const slideX = {
-		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
+		hidden: { x: '-100%' },
 		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
@@ -91,12 +86,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<ViewLink />
 				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
 				/>
+				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }

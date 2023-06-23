@@ -73,7 +73,8 @@
 		"memize": "^2.1.0",
 		"micromodal": "^0.4.10",
 		"preact": "^10.13.2",
-		"remove-accents": "^0.4.2"
+		"remove-accents": "^0.4.2",
+		"uuid": "^8.3.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
