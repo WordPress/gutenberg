@@ -40,6 +40,12 @@ type SelectControlBaseProps = Pick<
 			 * @default false
 			 */
 			disabled?: boolean;
+			/**
+			 * Whether or not the option should be hidden.
+			 *
+			 * @default false
+			 */
+			hidden?: boolean;
 		}[];
 		/**
 		 * As an alternative to the `options` prop, `optgroup`s and `options` can be
