@@ -5,14 +5,7 @@ import type { Component, MutableRefObject, ReactNode } from 'react';
 
 export type SlotKey = string | symbol;
 
-export type SlotComponentProps = {
-	/**
-	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
-	 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
-	 * also accept an optional `className`, `id`, etc.  to add to the slot container.
-	 */
-	bubblesVirtually?: boolean;
-
+type SlotPropBase = {
 	/**
 	 * Slot name.
 	 */
@@ -25,13 +18,28 @@ export type SlotComponentProps = {
 	fillProps?: any;
 
 	/**
-	 * A function that returns nodes to be rendered.
-	 * Not supported when `bubblesVirtually` is true.
-	 *
-	 * @param fills
+	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+	 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
+	 * also accept an optional `className`, `id`, etc.  to add to the slot container.
 	 */
-	children?: ( fills: ReactNode ) => ReactNode;
+	bubblesVirtually?: boolean;
 };
+
+export type SlotComponentProps =
+	| ( SlotPropBase & {
+			bubblesVirtually: true;
+	  } )
+	| ( SlotPropBase & {
+			bubblesVirtually?: false;
+
+			/**
+			 * A function that returns nodes to be rendered.
+			 * Not supported when `bubblesVirtually` is true.
+			 *
+			 * @param fills
+			 */
+			children?: ( fills: ReactNode ) => ReactNode;
+	  } );
 
 export type FillComponentProps = {
 	/**
@@ -106,4 +114,6 @@ export type BaseSlotComponentProps = Pick<
 	BaseSlotFillContext,
 	'registerSlot' | 'unregisterSlot' | 'getFills'
 > &
-	Omit< SlotComponentProps, 'bubblesVirtually' >;
+	Omit< SlotComponentProps, 'bubblesVirtually' > & {
+		children?: ( fills: ReactNode ) => ReactNode;
+	};

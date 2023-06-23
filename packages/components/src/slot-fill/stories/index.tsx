@@ -81,7 +81,7 @@ export const WithSlotChildren: ComponentStory< typeof Slot > = ( props ) => {
 		<SlotFillProvider>
 			<h2>Profile</h2>
 			<p>
-				Name:{ ' ' }
+				Name: { /* @ts-ignore */ }
 				<Slot { ...props } name="name">
 					{ ( fills ) => {
 						return (
@@ -91,7 +91,7 @@ export const WithSlotChildren: ComponentStory< typeof Slot > = ( props ) => {
 				</Slot>
 			</p>
 			<p>
-				Age:{ ' ' }
+				Age: { /* @ts-ignore */ }
 				<Slot { ...props } name="age">
 					{ ( fills ) => {
 						return (
