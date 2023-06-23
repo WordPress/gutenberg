@@ -228,6 +228,7 @@ The size of the button.
 
 
 -   Required: No
+-   Default: `'default'`
 
 #### `target`: `string`
 
