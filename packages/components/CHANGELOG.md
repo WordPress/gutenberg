@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.2.0 (2023-06-23)
+
 ### Enhancements
 
 -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
