@@ -592,7 +592,7 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
