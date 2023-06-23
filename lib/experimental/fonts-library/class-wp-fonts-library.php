@@ -372,10 +372,9 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $new_font_face = $font_face;
         if ( is_array( $font_face['src'] ) ) {
             $new_font_face['src'] = array();
-            $i;
-            foreach ( $font_face['src'] as $src ) {
-                !$i ? $i = 0 : $i++;
-                $filename = $this->get_filename_from_font_face( $font_face, $src, $i );
+            $i = 0;
+            foreach ( $font_face['src'] as $src ) {              
+                $filename = $this->get_filename_from_font_face( $font_face, $src, ++$i );
                 $new_src = $this->download_asset($src, $filename);
                 if ( $new_src ) {
                     $new_font_face['src'][] = $new_src;
