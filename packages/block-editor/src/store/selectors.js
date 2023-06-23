@@ -2837,10 +2837,11 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
-	// can't be selected, and prevents non-disabled nested blocks from being
-	// selected.
-	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
+	// 'disabled' then the overlay is redundant since the block can't be
+	// selected. If the mode is 'contentOnly' then the overlay is redundant
+	// since there will be no controls to interact with once selected.
+	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
 		return false;
 	}
 
