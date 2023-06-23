@@ -20,7 +20,7 @@ function gutenberg_interactivity_process_wp_bind( $tags, $context ) {
 	$prefixed_attributes = $tags->get_attribute_names_with_prefix( 'data-wp-bind--' );
 
 	foreach ( $prefixed_attributes as $attr ) {
-		list( , $bound_attr ) = explode( '--', $attr );
+		list( , $bound_attr ) = WP_Directive_Processor::parse_attribute_name( $attr );
 		if ( empty( $bound_attr ) ) {
 			continue;
 		}

@@ -127,7 +127,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist' ) );
 	}
 
-	public function test_evaluate_function_should_execute_functions() {
+	public function test_evaluate_function_should_execute_anonymous_functions() {
 		$context = new WP_Directive_Context( array( 'count' => 2 ) );
 		$helper  = new Helper_Class;
 
@@ -140,6 +140,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 					'anonymous_function'           => function( $store ) {
 						return $store['state']['count'] + $store['context']['count'];
 					},
+					// Other types of callables should not be executed.
 					'function_name'                => 'gutenberg_test_process_directives_helper_increment',
 					'class_method'                 => array( $helper, 'increment' ),
 					'class_static_method'          => 'Helper_Class::static_increment',
@@ -149,8 +150,21 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.anonymous_function', $context->get_context() ) );
-		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() ) );
-		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() ) );
-		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method_as_array', $context->get_context() ) );
+		$this->assertSame(
+			'gutenberg_test_process_directives_helper_increment',
+			gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() )
+		);
+		$this->assertSame(
+			array( $helper, 'increment' ),
+			gutenberg_interactivity_evaluate_reference( 'selectors.class_method', $context->get_context() )
+		);
+		$this->assertSame(
+			'Helper_Class::static_increment',
+			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() )
+		);
+		$this->assertSame(
+			array( 'Helper_Class', 'static_increment' ),
+			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method_as_array', $context->get_context() )
+		);
 	}
 }

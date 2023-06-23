@@ -69,7 +69,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 	$tag_stack = array();
 
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
-		$tag_name = strtolower( $tags->get_tag() );
+		$tag_name = $tags->get_tag();
 
 		// Is this a tag that closes the latest opening tag?
 		if ( $tags->is_tag_closer() ) {
@@ -81,27 +81,31 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			if ( $latest_opening_tag_name === $tag_name ) {
 				array_pop( $tag_stack );
 
-				// If the matching opening tag didn't have any attribute directives,
-				// we move on.
+				// If the matching opening tag didn't have any directives, we move on.
 				if ( 0 === count( $attributes ) ) {
 					continue;
 				}
 			}
 		} else {
-			// Helper that removes the part after the double hyphen before looking for
-			// the directive processor inside `$attribute_directives`.
-			$get_directive_type = function ( $attr ) {
-				return explode( '--', $attr )[0];
-			};
+			$attributes = array();
+			foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
+				/*
+				 * Removes the part after the double hyphen before looking for
+				 * the directive processor inside `$directives`, e.g., "wp-bind"
+				 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
+				 */
+				list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
+				if ( array_key_exists( $type, $directives ) ) {
+					$attributes[] = $type;
+				}
+			}
 
-			$attributes = $tags->get_attribute_names_with_prefix( $prefix );
-			$attributes = array_map( $get_directive_type, $attributes );
-			$attributes = array_intersect( $attributes, array_keys( $directives ) );
-
-			// If this is an open tag, and if it either has attribute directives, or
-			// if we're inside a tag that does, take note of this tag and its
-			// attribute directives so we can call its directive processor once we
-			// encounter the matching closing tag.
+			/*
+			 * If this is an open tag, and if it either has directives, or if
+			 * we're inside a tag that does, take note of this tag and its
+			 * directives so we can call its directive processor once we
+			 * encounter the matching closing tag.
+			 */
 			if (
 				! WP_Directive_Processor::is_html_void_element( $tags->get_tag() ) &&
 				( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
@@ -131,14 +135,17 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 		array( 'context' => $context )
 	);
 
-	if ( strpos( $path, '!' ) === 0 ) {
-		$path                  = substr( $path, 1 );
-		$has_negation_operator = true;
-	}
+	/*
+	 * Check first if the directive path is preceded by a negator operator (!),
+	 * indicating that the value obtained from the Interactivity Store (or the
+	 * passed context) using the subsequent path should be negated.
+	 */
+	$should_negate_value = '!' === $path[0];
 
-	$array   = explode( '.', $path );
-	$current = $store;
-	foreach ( $array as $p ) {
+	$path          = $should_negate_value ? substr( $path, 1 ) : $path;
+	$path_segments = explode( '.', $path );
+	$current       = $store;
+	foreach ( $path_segments as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
 		} else {
@@ -146,11 +153,18 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 		}
 	}
 
-	// Check if $current is a function and if so, call it passing the store.
-	if ( is_callable( $current ) ) {
+	/*
+	 * Check if $current is an anonymous function or an arrow function, and if
+	 * so, call it passing the store. Other types of callables are ignored on
+	 * purpose, as arbitrary strings or arrays could be wrongly evaluated as
+	 * "callables".
+	 *
+	 * E.g., "file" is an string and a "callable" (the "file" function exists).
+	 */
+	if ( $current instanceof Closure ) {
 		$current = call_user_func( $current, $store );
 	}
 
 	// Return the opposite if it has a negator operator (!).
-	return isset( $has_negation_operator ) ? ! $current : $current;
+	return $should_negate_value ? ! $current : $current;
 }
