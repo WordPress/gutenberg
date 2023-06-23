@@ -1,0 +1,27 @@
+.wp-block-breadcrumbs {
+	ol {
+		list-style-type: none;
+		padding-left: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+	}
+
+	&.is-content-justification-left ol {
+		justify-content: flex-start;
+	}
+
+	&.is-content-justification-center ol {
+		justify-content: center;
+	}
+
+	&.is-content-justification-right ol {
+		justify-content: flex-end;
+	}
+
+	.wp-block-breadcrumbs__item {
+		display: flex;
+		gap: 0.5em;
+	}
+}

@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": "fse",
+	"name": "core/breadcrumbs",
+	"title": "Breadcrumbs",
+	"category": "theme",
+	"description": "Displays breadcrumbs of a page's hierarchy, or a post's categories",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"contentJustification": {
+			"type": "string"
+		},
+		"separator": {
+			"type": "string",
+			"default": "/"
+		},
+		"showCurrentPageTitle": {
+			"type": "boolean",
+			"default": false
+		},
+		"showLeadingSeparator": {
+			"type": "boolean",
+			"default": false
+		},
+		"showSiteTitle": {
+			"type": "boolean",
+			"default": true
+		},
+		"siteTitleOverride": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"color": {
+			"background": false,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"link": true
+			}
+		},
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"editorStyle": "wp-block-breadcrumbs-editor",
+	"style": "wp-block-breadcrumbs"
+}

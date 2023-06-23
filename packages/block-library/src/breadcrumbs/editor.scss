@@ -1,0 +1,11 @@
+/**
+ * Editor only CSS.
+ */
+
+// Undo default editor styles.
+// These need extra specificity.
+.editor-styles-wrapper .wp-block-breadcrumbs {
+	ol {
+		padding-left: 0;
+	}
+}

@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/breadcrumbs",
+		"isValid": true,
+		"attributes": {
+			"separator": "|",
+			"showCurrentPageTitle": false,
+			"showLeadingSeparator": true,
+			"showSiteTitle": true
+		},
+		"innerBlocks": []
+	}
+]

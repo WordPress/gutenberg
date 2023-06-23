@@ -116,6 +116,7 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as breadcrumbs from './breadcrumbs';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
@@ -226,6 +227,7 @@ const getAllBlocks = () => {
 		termDescription,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
 	return blocks.filter( Boolean );
 };
