@@ -27,7 +27,7 @@ export const ZStackChildView = styled.div< {
 			  css( { gridRowStart: 1, gridColumnStart: 1 } )
 			: undefined };
 
-	&:not( :first-child ) {
+	&:not( :first-of-type ) {
 		${ ( { offsetAmount } ) =>
 			css( {
 				marginInlineStart: offsetAmount,
