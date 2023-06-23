@@ -88,6 +88,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$z = new WP_HTML_Tag_Processor( $content );
 	$z->next_tag( 'img' );
 
+	$img_srcset = '';
+
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_src      = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata = wp_get_attachment_metadata( $block['attrs']['id'] );
@@ -124,7 +126,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 			}',
 			$lightbox_animation,
 			$img_src,
-			$img_srcset ? $img_srcset : '',
+			$img_srcset,
 			$img_width,
 			$img_height
 		)
