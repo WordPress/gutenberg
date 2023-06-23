@@ -150,6 +150,28 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
+	test( 'can resize width', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
+		await page.click(
+			'role=group[name="Button width"i] >> role=button[name="25%"i]'
+		);
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"width":25} -->
+<div class="wp-block-button has-custom-width wp-block-button__width-25"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
 	test( 'can apply named colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
