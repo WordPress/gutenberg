@@ -32,6 +32,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@emotion/styled": "^11.6.0",
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
