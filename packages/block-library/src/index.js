@@ -116,6 +116,7 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
@@ -176,6 +177,7 @@ const getAllBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		footnotes,
 
 		// theme blocks
 		navigation,
