@@ -243,7 +243,7 @@ function InlineLinkUI( {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( 'Create Page: <mark>%s</mark>' ),
+				__( 'Create page: <mark>%s</mark>' ),
 				searchTerm
 			),
 			{ mark: <mark /> }

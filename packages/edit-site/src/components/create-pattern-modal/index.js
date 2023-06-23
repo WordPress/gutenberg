@@ -73,7 +73,7 @@ export default function CreatePatternModal( {
 
 	return (
 		<Modal
-			title={ __( 'Create a pattern' ) }
+			title={ __( 'Create pattern' ) }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-pattern-modal"
 		>
