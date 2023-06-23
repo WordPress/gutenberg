@@ -180,6 +180,7 @@ export default function Editor( { isLoading } ) {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
 							className={ classnames(
 								'edit-site-editor__interface-skeleton',
