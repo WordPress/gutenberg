@@ -1,104 +1,39 @@
 /**
  * WordPress dependencies
  */
-import {
-	VisuallyHidden,
-	__experimentalHeading as Heading,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from './utils';
 import Page from '../page';
-import Table from '../table';
-import Link from '../routes/link';
-import AddedBy from '../list/added-by';
-import TemplateActions from '../template-actions';
-import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
+import PatternsList from './patterns-list';
+import useLibrarySettings from './use-library-settings';
+import { unlock } from '../../lock-unlock';
 
-export default function PageTemplates() {
-	const { records: templateParts } = useEntityRecords(
-		'postType',
-		'wp_template_part',
-		{
-			per_page: -1,
-		}
-	);
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
-	const { canCreate } = useSelect( ( select ) => {
-		const { supportsTemplatePartsMode } =
-			select( editSiteStore ).getSettings();
-		return {
-			postType: select( coreStore ).getPostType( 'wp_template_part' ),
-			canCreate: ! supportsTemplatePartsMode,
-		};
-	} );
+export default function PageLibrary() {
+	const { categoryType, categoryId } = getQueryArgs( window.location.href );
+	const type = categoryType || DEFAULT_TYPE;
+	const category = categoryId || DEFAULT_CATEGORY;
+	const settings = useLibrarySettings();
 
-	const columns = [
-		{
-			header: __( 'Template Part' ),
-			cell: ( templatePart ) => (
-				<VStack>
-					<Heading level={ 5 }>
-						<Link
-							params={ {
-								postId: templatePart.id,
-								postType: templatePart.type,
-								canvas: 'edit',
-							} }
-						>
-							{ decodeEntities(
-								templatePart.title?.rendered ||
-									templatePart.slug
-							) }
-						</Link>
-					</Heading>
-				</VStack>
-			),
-			maxWidth: 400,
-		},
-		{
-			header: __( 'Added by' ),
-			cell: ( templatePart ) => (
-				<AddedBy
-					postType={ templatePart.type }
-					postId={ templatePart.id }
-				/>
-			),
-		},
-		{
-			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-			cell: ( templatePart ) => (
-				<TemplateActions
-					postType={ templatePart.type }
-					postId={ templatePart.id }
-				/>
-			),
-		},
-	];
-
+	// Wrap everything in a block editor provider.
+	// This ensures 'styles' that are needed for the previews are synced
+	// from the site editor store to the block editor store.
 	return (
-		<Page
-			title={ __( 'Template Parts' ) }
-			actions={
-				canCreate && (
-					<AddNewTemplate
-						templateType={ 'wp_template_part' }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
-				)
-			}
-		>
-			{ templateParts && (
-				<Table data={ templateParts } columns={ columns } />
-			) }
-		</Page>
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<Page
+				className="edit-site-library"
+				title={ __( 'Library content' ) }
+				hideTitleFromUI
+			>
+				<PatternsList type={ type } categoryId={ category } />
+			</Page>
+		</ExperimentalBlockEditorProvider>
 	);
 }

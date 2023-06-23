@@ -12,6 +12,7 @@ import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -224,11 +225,35 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
-}
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( typeof state.blockInserterPanel === 'object' ) {
+			const { rootClientId, insertionIndex, filterValue } =
+				state.blockInserterPanel;
+			return { rootClientId, insertionIndex, filterValue };
+		}
+
+		if ( hasPageContentFocus( state ) ) {
+			const [ postContentClientId ] =
+				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+					'core/post-content'
+				);
+			if ( postContentClientId ) {
+				return {
+					rootClientId: postContentClientId,
+					insertionIndex: undefined,
+					filterValue: undefined,
+				};
+			}
+		}
+
+		return {
+			rootClientId: undefined,
+			insertionIndex: undefined,
+			filterValue: undefined,
+		};
+	}
+);
 
 /**
  * Returns the current opened/closed state of the list view panel.

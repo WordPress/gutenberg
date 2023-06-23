@@ -16,13 +16,12 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentythree' );
+		await activateTheme( 'gutenberg-test-themes/twentytwentythree' );
 		await logout();
 	} );
 
 	afterAll( async () => {
 		saveResultsFile( __filename, results );
-		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {
