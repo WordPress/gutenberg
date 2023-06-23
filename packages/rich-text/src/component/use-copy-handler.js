@@ -19,9 +19,10 @@ export function useCopyHandler( props ) {
 		function onCopy( event ) {
 			const { record, multilineTag, preserveWhiteSpace } =
 				propsRef.current;
+			const { ownerDocument } = element;
 			if (
 				isCollapsed( record.current ) ||
-				! element.contains( element.ownerDocument.activeElement )
+				! element.contains( ownerDocument.activeElement )
 			) {
 				return;
 			}
@@ -41,11 +42,17 @@ export function useCopyHandler( props ) {
 				multilineTag || ''
 			);
 			event.preventDefault();
+
+			if ( event.type === 'cut' ) {
+				ownerDocument.execCommand( 'delete' );
+			}
 		}
 
 		element.addEventListener( 'copy', onCopy );
+		element.addEventListener( 'cut', onCopy );
 		return () => {
 			element.removeEventListener( 'copy', onCopy );
+			element.removeEventListener( 'cut', onCopy );
 		};
 	}, [] );
 }
