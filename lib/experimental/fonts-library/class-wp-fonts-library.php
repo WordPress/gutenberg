@@ -529,8 +529,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
             if ( isset( $font['fontFace'] ) ) {
                 $new_font_faces = array();
                 foreach ( $font['fontFace'] as $font_face ) {
-                    $new_font_face;
-
+                    
                     if ( empty( $files ) ){ 
                         // If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory
                         $new_font_face = $this->download_font_face_assets( $font_face );
