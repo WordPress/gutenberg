@@ -29,7 +29,10 @@ export async function createNewPost( {
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'post-new.php', query );
-	await this.page.waitForSelector( '.edit-post-layout' );
+	await this.page
+		.frameLocator( '[name="editor-canvas"]' )
+		.locator( '.block-editor-iframe__body' )
+		.waitFor();
 
 	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data
