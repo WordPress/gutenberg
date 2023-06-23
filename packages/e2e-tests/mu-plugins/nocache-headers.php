@@ -13,8 +13,8 @@
 add_filter(
 	'nocache_headers',
 	static function( $headers ) {
-		$cache_control_parts = explode( ', ', $headers['Cache-Control'] );
-		$cache_control_parts = array_diff( $cache_control_parts, array( 'no-store' ) );
+		$cache_control_parts      = explode( ', ', $headers['Cache-Control'] );
+		$cache_control_parts      = array_diff( $cache_control_parts, array( 'no-store' ) );
 		$headers['Cache-Control'] = implode( ', ', $cache_control_parts );
 		return $headers;
 	}
