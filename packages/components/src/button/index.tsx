@@ -42,7 +42,7 @@ function useDeprecatedProps( {
 	let computedVariant = variant;
 
 	if ( isSmall ) {
-		computedSize = 'small';
+		computedSize ??= 'small';
 	}
 
 	if ( isPrimary ) {
