@@ -76,14 +76,15 @@ function BehaviorsControl( {
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: '';
 
-	let behaviorsValue = '';
-
-	if ( blockBehaviors === undefined ) {
-		behaviorsValue = 'default';
-	}
-	if ( behaviors?.lightbox.enabled ) {
-		behaviorsValue = 'lightbox';
-	}
+	const value = () => {
+		if ( blockBehaviors === undefined ) {
+			return 'default';
+		}
+		if ( behaviors?.lightbox.enabled ) {
+			return 'lightbox';
+		}
+		return '';
+	};
 
 	return (
 		<InspectorControls group="advanced">
@@ -92,7 +93,7 @@ function BehaviorsControl( {
 				<SelectControl
 					label={ __( 'Behaviors' ) }
 					// At the moment we are only supporting one behavior (Lightbox)
-					value={ behaviorsValue }
+					value={ value() }
 					options={ options }
 					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
@@ -100,7 +101,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ behaviorsValue === 'lightbox' && (
+				{ value() === 'lightbox' && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
