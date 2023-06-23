@@ -9,6 +9,15 @@ include(ABSPATH . "wp-admin/includes/admin.php");
  * 
  */
 class WP_Fonts_Library_Controller extends WP_REST_Controller {
+    
+    private $wp_fonts_dir;
+    private $relative_fonts_path;
+    private $post_type;
+    private $post_name;
+    private $post_title;
+    private $post_status;
+    private $base_post_query;
+
     public function __construct() {
         $this->wp_fonts_dir = path_join( WP_CONTENT_DIR, 'fonts' );
         $this->relative_fonts_path = content_url('/fonts/');
