@@ -130,6 +130,7 @@
 .components-modal__content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-15;
+	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
 	padding: $border-width-focus-fallback $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
