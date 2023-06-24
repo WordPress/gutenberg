@@ -73,9 +73,7 @@ export default function StartPageOptions() {
 	const [ modalState, setModalState ] = useState(
 		START_PAGE_MODAL_STATES.INITIAL
 	);
-
 	const blockPatterns = useStartPatterns();
-
 	const hasStartPattern = blockPatterns.length > 0;
 	const shouldOpenModel = useSelect(
 		( select ) => {
