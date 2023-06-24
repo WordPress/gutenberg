@@ -17,6 +17,7 @@
 -   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
 -   `Autocomplete`: Announce how many results are available to screen readers when suggestions list first renders ([#51018](https://github.com/WordPress/gutenberg/pull/51018)).
 -   `ConfirmDialog`: Ensure onConfirm isn't called an extra time when submitting one of the buttons using the keyboard ([#51730](https://github.com/WordPress/gutenberg/pull/51730)).
+-   `Modal`: Add small top padding to the content so that avoid cutting off the visible outline when hovering items ([#51829](https://github.com/WordPress/gutenberg/pull/51829)).
 
 ### Internal
 
