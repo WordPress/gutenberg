@@ -2,7 +2,7 @@
 	const registerBlockType = wp.blocks.registerBlockType;
 	const createBlock = wp.blocks.createBlock;
 	const el = wp.element.createElement;
-	const InnerBlocks = wp.blockEditor.InnerBlocks;
+	const { InnerBlocks, useBlockProps } = wp.blockEditor;
 	const useState = window.wp.element.useState;
 
 	const TEMPLATE = [
@@ -47,6 +47,7 @@
 	};
 
 	registerBlockType( 'test/test-inner-blocks-no-locking', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks no locking',
 		icon: 'cart',
 		category: 'text',
@@ -61,6 +62,7 @@
 	} );
 
 	registerBlockType( 'test/test-inner-blocks-locking-all', {
+		apiVersion: 3,
 		title: 'Test InnerBlocks locking all',
 		icon: 'cart',
 		category: 'text',
@@ -76,6 +78,7 @@
 	} );
 
 	registerBlockType( 'test/test-inner-blocks-update-locked-template', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks update locked template',
 		icon: 'cart',
 		category: 'text',
@@ -112,6 +115,7 @@
 	} );
 
 	registerBlockType( 'test/test-inner-blocks-paragraph-placeholder', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks Paragraph Placeholder',
 		icon: 'cart',
 		category: 'text',
@@ -127,6 +131,7 @@
 	} );
 
 	registerBlockType( 'test/test-inner-blocks-transformer-target', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks transformer target',
 		icon: 'cart',
 		category: 'text',
@@ -182,14 +187,15 @@
 			setTemplate( TEMPLATE_TWO_PARAGRAPHS );
 		}, 1000 );
 
-		return el( InnerBlocks, {
+		return el('div', useBlockProps(), el( InnerBlocks, {
 			template,
-		} );
+		} ) );
 	}
 
 	registerBlockType(
 		'test/test-inner-blocks-async-template',
 		{
+			apiVersion: 3,
 			title: 'Test Inner Blocks Async Template',
 			icon: 'cart',
 			category: 'text',
