@@ -917,6 +917,51 @@ test.describe( 'Image - interactivity', () => {
 			).not.toBeInViewport();
 		} );
 
+		test.describe( 'Animation Select visibility', () => {
+			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'lightbox' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is None', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( '' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'default' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
+		} );
+
 		test.describe( 'keyboard navigation', () => {
 			let openLightboxButton;
 			let lightbox;
