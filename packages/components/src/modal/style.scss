@@ -130,7 +130,7 @@
 .components-modal__content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-15;
-	padding: 0 $grid-unit-40 $grid-unit-40;
+	padding: $border-width-focus-fallback $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {
