@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash, backup, help, styles } from '@wordpress/icons';
+import { trash, backup, help, styles, external } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -105,6 +105,15 @@ export function useCommonCommands() {
 	);
 	const { set } = useDispatch( preferencesStore );
 	const history = useHistory();
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
 
 	useCommand( {
 		name: 'core/edit-site/open-global-styles-revisions',
@@ -153,6 +162,16 @@ export function useCommonCommands() {
 			}, 500 );
 		},
 		icon: help,
+	} );
+
+	useCommand( {
+		name: 'core/edit-site/view-site',
+		label: __( 'View site' ),
+		callback: ( { close } ) => {
+			close();
+			window.open( homeUrl, '_blank' );
+		},
+		icon: external,
 	} );
 
 	useCommandLoader( {
