@@ -17,6 +17,7 @@ import {
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -118,14 +119,17 @@ function useEditModeCommandLoader() {
 }
 
 function useEditUICommandLoader() {
-	const { openGeneralSidebar, switchEditorMode } =
+	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
 		useDispatch( editSiteStore );
-	const { canvasMode, editorMode } = useSelect(
+	const { canvasMode, editorMode, activeSidebar } = useSelect(
 		( select ) => ( {
 			isPage: select( editSiteStore ).isPage(),
 			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: select( editSiteStore ).getEditorMode(),
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
 		} ),
 		[]
 	);
@@ -139,21 +143,29 @@ function useEditUICommandLoader() {
 
 	commands.push( {
 		name: 'core/open-settings-sidebar',
-		label: __( 'Open settings sidebar' ),
+		label: __( 'Toggle settings sidebar' ),
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
-			openGeneralSidebar( 'edit-site/template' );
 			close();
+			if ( activeSidebar === 'edit-site/template' ) {
+				closeGeneralSidebar();
+			} else {
+				openGeneralSidebar( 'edit-site/template' );
+			}
 		},
 	} );
 
 	commands.push( {
 		name: 'core/open-block-inspector',
-		label: __( 'Open block inspector' ),
+		label: __( 'Toggle block inspector' ),
 		icon: blockDefault,
 		callback: ( { close } ) => {
-			openGeneralSidebar( 'edit-site/block-inspector' );
 			close();
+			if ( activeSidebar === 'edit-site/block-inspector' ) {
+				closeGeneralSidebar();
+			} else {
+				openGeneralSidebar( 'edit-site/block-inspector' );
+			}
 		},
 	} );
 
