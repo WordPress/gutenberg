@@ -111,3 +111,24 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
+
+/**
+ * Hook in to the template and template part post types and decorate
+ * the rest endpoint with the revision count.
+ *
+ * When merging to core, this can be removed once Gutenberg_REST_Template_Revision_Count is
+ * merged with WP_REST_Template_Controller.
+ *
+ * @param array  $args Current registered post type args.
+ * @param string $post_type Name of post type.
+ *
+ * @return array
+ */
+function wp_api_template_revision_args( $args, $post_type ) {
+	if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
+		$args['rest_controller_class'] = 'Gutenberg_REST_Template_Revision_Count';
+	}
+
+	return $args;
+}
+add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
