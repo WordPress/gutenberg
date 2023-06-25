@@ -2018,7 +2018,7 @@ export const getInserterItems = createSelector(
 
 			return {
 				id,
-				name: 'core/block',
+				name: id,
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
 				icon,
