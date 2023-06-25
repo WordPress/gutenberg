@@ -137,7 +137,11 @@ function BlockPatternList( {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (
 					<BlockPattern
-						key={ pattern.name }
+						key={
+							pattern.name === 'core/block'
+								? pattern.id
+								: pattern.name
+						}
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						onHover={ onHover }
