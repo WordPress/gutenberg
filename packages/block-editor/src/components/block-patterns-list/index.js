@@ -133,11 +133,11 @@ function BlockPatternList( {
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
 		>
-			{ blockPatterns.map( ( pattern ) => {
+			{ blockPatterns.map( ( pattern, index ) => {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (
 					<BlockPattern
-						key={ pattern.name }
+						key={ index }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						onHover={ onHover }
@@ -146,7 +146,7 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
+					<BlockPatternPlaceholder key={ index } />
 				);
 			} ) }
 		</Composite>
