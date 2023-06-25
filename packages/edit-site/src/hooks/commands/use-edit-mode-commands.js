@@ -132,7 +132,7 @@ function useEditUICommandLoader() {
 	const { toggle } = useDispatch( preferencesStore );
 
 	if ( canvasMode !== 'edit' ) {
-		return { isLoading: true, commands: [] };
+		return { isLoading: false, commands: [] };
 	}
 
 	const commands = [];
