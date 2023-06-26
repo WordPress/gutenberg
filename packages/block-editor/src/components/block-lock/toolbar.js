@@ -27,6 +27,9 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 	const shouldHideBlockLockUI =
 		! canLock || ( canEdit && canMove && canRemove );
 
+	// Restore focus manually on the first focusable element in the toolbar
+	// when the block lock modal is closed and the block is not locked anymore.
+	// See https://github.com/WordPress/gutenberg/issues/51447
 	useEffect( () => {
 		if ( isFirstRender.current ) {
 			isFirstRender.current = false;
