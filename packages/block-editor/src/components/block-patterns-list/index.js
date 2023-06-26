@@ -137,11 +137,7 @@ function BlockPatternList( {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (
 					<BlockPattern
-						key={
-							pattern.name === 'core/block'
-								? pattern.id
-								: pattern.name
-						}
+						key={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						onHover={ onHover }
@@ -150,13 +146,7 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder
-						key={
-							pattern.name === 'core/block'
-								? pattern.id
-								: pattern.name
-						}
-					/>
+					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
 		</Composite>
