@@ -150,7 +150,13 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
+					<BlockPatternPlaceholder
+						key={
+							pattern.name === 'core/block'
+								? pattern.id
+								: pattern.name
+						}
+					/>
 				);
 			} ) }
 		</Composite>
