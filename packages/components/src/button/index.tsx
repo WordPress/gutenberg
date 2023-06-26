@@ -33,10 +33,17 @@ function useDeprecatedProps( {
 	isSecondary,
 	isTertiary,
 	isLink,
+	isSmall,
+	size,
 	variant,
 	...otherProps
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
+	let computedSize = size;
 	let computedVariant = variant;
+
+	if ( isSmall ) {
+		computedSize ??= 'small';
+	}
 
 	if ( isPrimary ) {
 		computedVariant ??= 'primary';
@@ -66,6 +73,7 @@ function useDeprecatedProps( {
 
 	return {
 		...otherProps,
+		size: computedSize,
 		variant: computedVariant,
 	};
 }
@@ -76,8 +84,6 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
-		__next32pxSmallSize,
-		isSmall,
 		isPressed,
 		isBusy,
 		isDestructive,
@@ -91,6 +97,7 @@ export function UnforwardedButton(
 		shortcut,
 		label,
 		children,
+		size = 'default',
 		text,
 		variant,
 		__experimentalIsFocusable: isFocusable,
@@ -118,10 +125,10 @@ export function UnforwardedButton(
 
 	const classes = classnames( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
-		'is-next-32px-small-size': __next32pxSmallSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
-		'is-small': isSmall,
+		'is-small': size === 'small',
+		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
 		'is-pressed': isPressed,
 		'is-busy': isBusy,

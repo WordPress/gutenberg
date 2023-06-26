@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,6 +30,7 @@ import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
+import { kebabCase } from '../utils/object';
 
 const layoutBlockSupportKey = 'layout';
 

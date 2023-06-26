@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -13,48 +12,10 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
-
-const { useHistory } = unlock( routerPrivateApis );
 
 const noop = () => {};
 
 export default function NavigationMenuEditor( { navigationMenuId } ) {
-	const history = useHistory();
-
-	const onSelect = useCallback(
-		( selectedBlock ) => {
-			const { attributes, name } = selectedBlock;
-			if (
-				attributes.kind === 'post-type' &&
-				attributes.id &&
-				attributes.type &&
-				history
-			) {
-				history.push( {
-					postType: attributes.type,
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
-			}
-			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.push( {
-					postType: 'page',
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
-			}
-		},
-		[ history ]
-	);
-
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -83,10 +44,7 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 			onInput={ noop }
 		>
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-				<NavigationMenuContent
-					rootClientId={ blocks[ 0 ].clientId }
-					onSelect={ onSelect }
-				/>
+				<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
 			</div>
 		</BlockEditorProvider>
 	);

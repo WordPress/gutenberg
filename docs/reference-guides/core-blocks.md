@@ -36,7 +36,7 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 -	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
-## Reusable block
+## Pattern
 
 Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
 
@@ -269,6 +269,15 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
+## Footnotes
+
+ ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+
+-	**Name:** core/footnotes
+-	**Category:** text
+-	**Supports:** ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Classic
 
 Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
@@ -331,7 +340,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 -	**Name:** core/image
 -	**Category:** media
 -	**Supports:** anchor, behaviors (lightbox), color (~~background~~, ~~text~~), filter (duotone)
--	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
+-	**Attributes:** align, alt, aspectRatio, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -473,14 +482,14 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
-## Pattern
+## Pattern placeholder
 
 Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug, syncStatus
+-	**Attributes:** slug
 
 ## Post Author
 
