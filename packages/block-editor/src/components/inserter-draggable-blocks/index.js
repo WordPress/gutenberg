@@ -21,10 +21,15 @@ const InserterDraggableBlocks = ( {
 		blocks,
 	};
 
-	const blockType = useSelect( ( select ) => {
-		const { getBlockType } = select( blocksStore );
-		return blocks.length === 1 && getBlockType( blocks[ 0 ].name );
-	} );
+	const blockTypeIcon = useSelect(
+		( select ) => {
+			const { getBlockType } = select( blocksStore );
+			return (
+				blocks.length === 1 && getBlockType( blocks[ 0 ].name )?.icon
+			);
+		},
+		[ blocks ]
+	);
 
 	return (
 		<Draggable
@@ -36,7 +41,7 @@ const InserterDraggableBlocks = ( {
 			__experimentalDragComponent={
 				<BlockDraggableChip
 					count={ blocks.length }
-					icon={ icon || ( ! isPattern && blockType?.icon ) }
+					icon={ icon || ( ! isPattern && blockTypeIcon ) }
 					isPattern={ isPattern }
 				/>
 			}
