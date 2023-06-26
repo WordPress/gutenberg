@@ -32,6 +32,7 @@ import type {
 	Screen,
 } from '../types';
 import { patternMatch, findParent } from '../utils/router';
+import { useControlledValue } from '../../utils';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: Screen };
@@ -56,16 +57,23 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { initialPath, children, className, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
+	const {
+		initialPath,
+		location: locationProp,
+		onChange,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
+	const [ location, updatedLocation ] = useControlledValue( {
+		onChange,
+		value: locationProp,
+		defaultValue: { path: initialPath },
+	} );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]
-	>( [
-		{
-			path: initialPath,
-		},
-	] );
+	>( [ location ?? { path: initialPath } ] );
 	const currentLocationHistory = useRef< NavigatorLocation[] >( [] );
 	const [ screens, dispatch ] = useReducer( screensReducer, [] );
 	const currentScreens = useRef< Screen[] >( [] );
@@ -75,6 +83,87 @@ function UnconnectedNavigatorProvider(
 	useEffect( () => {
 		currentLocationHistory.current = locationHistory;
 	}, [ locationHistory ] );
+	useEffect( () => {
+		if ( ! location ) {
+			return;
+		}
+
+		const {
+			focusTargetSelector,
+			isBack = false,
+			skipFocus = false,
+			replace = false,
+			path: destinationPath,
+			...restOptions
+		} = location;
+
+		const isNavigatingToPreviousPath =
+			isBack &&
+			currentLocationHistory.current.length > 1 &&
+			currentLocationHistory.current[
+				currentLocationHistory.current.length - 2
+			].path === destinationPath;
+
+		if ( isNavigatingToPreviousPath ) {
+			setLocationHistory( ( prevLocationHistory ) => {
+				if ( prevLocationHistory.length <= 1 ) {
+					return prevLocationHistory;
+				}
+				return [
+					...prevLocationHistory.slice( 0, -2 ),
+					{
+						...prevLocationHistory[
+							prevLocationHistory.length - 2
+						],
+						isBack: true,
+						hasRestoredFocus: false,
+					},
+				];
+			} );
+			return;
+		}
+
+		setLocationHistory( ( prevLocationHistory ) => {
+			const newLocation = {
+				...restOptions,
+				path: destinationPath,
+				isBack,
+				hasRestoredFocus: false,
+				skipFocus,
+			};
+
+			if ( prevLocationHistory.length === 0 ) {
+				return replace ? [] : [ newLocation ];
+			}
+
+			// Form the new location history array.
+			// Start by picking all previous history items, apart from the last one.
+			// A check is in place to make sure that the array doesn't grow
+			// beyond a max length.
+			const newLocationHistory = prevLocationHistory.slice(
+				prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
+				-1
+			);
+
+			// If we're not replacing history, add the last location history item (the
+			// one what was just navigated from). We also assign it a
+			// `focusTargetSelector` for enhanced focus restoration when navigating
+			// back to it.
+			if ( ! replace ) {
+				newLocationHistory.push( {
+					...prevLocationHistory[ prevLocationHistory.length - 1 ],
+					focusTargetSelector,
+				} );
+			}
+
+			// In any case, append the new location to the array (the one that
+			// was just navigated to)
+			newLocationHistory.push( newLocation );
+
+			return newLocationHistory;
+		} );
+	}, [ location ] );
+
 	const currentMatch = useRef< MatchedPath >();
 	const matchedPath = useMemo( () => {
 		let currentPath: string | undefined;
@@ -88,8 +177,8 @@ function UnconnectedNavigatorProvider(
 			return undefined;
 		}
 
-		const resolvePath = ( path: string ) => {
-			const newMatch = patternMatch( path, screens );
+		const resolvePath = ( pathToResolve: string ) => {
+			const newMatch = patternMatch( pathToResolve, screens );
 
 			// If the new match is the same as the current match,
 			// return the previous one for performance reasons.
@@ -124,80 +213,26 @@ function UnconnectedNavigatorProvider(
 	);
 
 	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
-		setLocationHistory( ( prevLocationHistory ) => {
-			if ( prevLocationHistory.length <= 1 ) {
-				return prevLocationHistory;
-			}
-			return [
-				...prevLocationHistory.slice( 0, -2 ),
-				{
-					...prevLocationHistory[ prevLocationHistory.length - 2 ],
-					isBack: true,
-					hasRestoredFocus: false,
-				},
-			];
+		if ( currentLocationHistory.current.length < 2 ) {
+			return;
+		}
+
+		updatedLocation( {
+			isBack: true,
+			path: currentLocationHistory.current[
+				currentLocationHistory.current.length - 2
+			].path,
 		} );
-	}, [] );
+	}, [ updatedLocation ] );
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, options = {} ) => {
-			const {
-				focusTargetSelector,
-				isBack = false,
-				skipFocus = false,
-				replace = false,
-				...restOptions
-			} = options;
-
-			const isNavigatingToPreviousPath =
-				isBack &&
-				currentLocationHistory.current.length > 1 &&
-				currentLocationHistory.current[
-					currentLocationHistory.current.length - 2
-				].path === path;
-
-			if ( isNavigatingToPreviousPath ) {
-				goBack();
-				return;
-			}
-
-			setLocationHistory( ( prevLocationHistory ) => {
-				const newLocation = {
-					...restOptions,
-					path,
-					isBack,
-					hasRestoredFocus: false,
-					skipFocus,
-				};
-
-				if ( prevLocationHistory.length === 0 ) {
-					return replace ? [] : [ newLocation ];
-				}
-
-				const newLocationHistory = prevLocationHistory.slice(
-					prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
-					-1
-				);
-
-				if ( ! replace ) {
-					newLocationHistory.push(
-						// Assign `focusTargetSelector` to the previous location in history
-						// (the one we just navigated from).
-						{
-							...prevLocationHistory[
-								prevLocationHistory.length - 1
-							],
-							focusTargetSelector,
-						}
-					);
-				}
-
-				newLocationHistory.push( newLocation );
-
-				return newLocationHistory;
+		( destinationPath, options = {} ) => {
+			updatedLocation( {
+				...options,
+				path: destinationPath,
 			} );
 		},
-		[ goBack ]
+		[ updatedLocation ]
 	);
 
 	const goToParent: NavigatorContextType[ 'goToParent' ] = useCallback(

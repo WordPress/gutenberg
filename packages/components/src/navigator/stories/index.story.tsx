@@ -4,6 +4,11 @@
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Button from '../../button';
@@ -18,6 +23,7 @@ import {
 	NavigatorToParentButton,
 	useNavigator,
 } from '..';
+import type { NavigatorLocation } from '../types';
 
 const meta: Meta< typeof NavigatorProvider > = {
 	component: NavigatorProvider,
@@ -363,4 +369,72 @@ SkipFocus.args = {
 			</NavigatorButtonWithSkipFocus>
 		</>
 	),
+};
+
+export const ControlledNavigator: StoryFn< typeof NavigatorProvider > = (
+	props
+) => {
+	const [ location, setLocation ] = useState< NavigatorLocation >( {
+		path: props.initialPath ?? '/',
+	} );
+	return (
+		<NavigatorProvider
+			{ ...props }
+			location={ location }
+			onChange={ setLocation }
+			style={ { ...props.style, height: '100vh', maxHeight: '450px' } }
+		>
+			<NavigatorScreen path="/">
+				<Card>
+					<CardBody>
+						<NavigatorButton variant="secondary" path="/child1">
+							Go to first child.
+						</NavigatorButton>
+						<NavigatorButton variant="secondary" path="/child2">
+							Go to second child.
+						</NavigatorButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+			<NavigatorScreen path="/child1">
+				<Card>
+					<CardBody>
+						This is the first child
+						<NavigatorToParentButton variant="secondary">
+							Go back to parent
+						</NavigatorToParentButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+			<NavigatorScreen path="/child2">
+				<Card>
+					<CardBody>
+						This is the second child
+						<NavigatorToParentButton variant="secondary">
+							Go back to parent
+						</NavigatorToParentButton>
+						<NavigatorButton
+							variant="secondary"
+							path="/child2/grandchild"
+						>
+							Go to grand child.
+						</NavigatorButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+			<NavigatorScreen path="/child2/grandchild">
+				<Card>
+					<CardBody>
+						This is the grand child
+						<NavigatorToParentButton variant="secondary">
+							Go back to parent
+						</NavigatorToParentButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
+		</NavigatorProvider>
+	);
+};
+ControlledNavigator.args = {
+	initialPath: '/child2/grandchild',
 };
