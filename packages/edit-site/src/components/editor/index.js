@@ -15,6 +15,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -43,6 +44,8 @@ import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
 	body: __( 'Editor content' ),
@@ -52,6 +55,12 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+};
+
+const typeLabels = {
+	wp_template: __( 'Template Part' ),
+	wp_template_part: __( 'Template Part' ),
+	wp_block: __( 'Pattern' ),
 };
 
 export default function Editor( { isLoading } ) {
@@ -114,7 +123,7 @@ export default function Editor( { isLoading } ) {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -144,10 +153,7 @@ export default function Editor( { isLoading } ) {
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type =
-			editedPostType === 'wp_template'
-				? __( 'Template' )
-				: __( 'Template Part' );
+		const type = typeLabels[ editedPostType ] ?? __( 'Template' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
@@ -157,7 +163,7 @@ export default function Editor( { isLoading } ) {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
 	return (
@@ -174,6 +180,7 @@ export default function Editor( { isLoading } ) {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
 							className={ classnames(
 								'edit-site-editor__interface-skeleton',
@@ -188,7 +195,10 @@ export default function Editor( { isLoading } ) {
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal />
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
@@ -227,7 +237,7 @@ export default function Editor( { isLoading } ) {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={
 											hasPageContentFocus

@@ -12,9 +12,9 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
-		await editor.openDocumentSettingsSidebar();
 		await page.click( 'role=button[name="Color Text styles"i]' );
 		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
 
@@ -44,7 +44,7 @@ test.describe( 'Keep styles on block transforms', () => {
 				title: 'test',
 			} );
 		} );
-		// Create a paragraph block with some content.
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.keyboard.press( 'Enter' );
@@ -77,7 +77,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
-		// Create a paragraph block with some content.
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.click( 'role=radio[name="Large"i]' );

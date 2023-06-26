@@ -7,35 +7,26 @@ import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
-	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId } ) => {
-	const { slug, syncStatus } = attributes;
-	const { selectedPattern, innerBlocks } = useSelect(
-		( select ) => {
-			return {
-				selectedPattern:
-					select( blockEditorStore ).__experimentalGetParsedPattern(
-						slug
-					),
-				innerBlocks:
-					select( blockEditorStore ).getBlock( clientId )
-						?.innerBlocks,
-			};
-		},
-		[ slug, clientId ]
+	const selectedPattern = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__experimentalGetParsedPattern(
+				attributes.slug
+			),
+		[ attributes.slug ]
 	);
-	const {
-		replaceBlocks,
-		replaceInnerBlocks,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+
+	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
+	// This change won't be saved.
+	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
-		if ( selectedPattern?.blocks && ! innerBlocks?.length ) {
+		if ( selectedPattern?.blocks ) {
 			// We batch updates to block list settings to avoid triggering cascading renders
 			// for each container block included in a tree and optimize initial render.
 			// Since the above uses microtasks, we need to use a microtask here as well,
@@ -48,36 +39,19 @@ const PatternEdit = ( { attributes, clientId } ) => {
 					cloneBlock( block )
 				);
 				__unstableMarkNextChangeAsNotPersistent();
-				if ( syncStatus === 'partial' ) {
-					replaceInnerBlocks( clientId, clonedBlocks );
-					return;
-				}
 				replaceBlocks( clientId, clonedBlocks );
 			} );
 		}
 	}, [
 		clientId,
 		selectedPattern?.blocks,
-		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-		innerBlocks,
-		syncStatus,
 		replaceBlocks,
 	] );
 
-	const blockProps = useBlockProps( {
-		className: slug?.replace( '/', '-' ),
-	} );
+	const props = useBlockProps();
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: syncStatus === 'partial' ? 'contentOnly' : false,
-	} );
-
-	if ( syncStatus !== 'partial' ) {
-		return <div { ...blockProps } />;
-	}
-
-	return <div { ...innerBlocksProps } />;
+	return <div { ...props } />;
 };
 
 export default PatternEdit;

@@ -3326,36 +3326,36 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/test-block-a'
 			);
 			expect( testBlockAItem ).toEqual( {
-				id: 'core/test-block-a',
-				name: 'core/test-block-a',
-				initialAttributes: {},
-				title: 'Test Block A',
-				icon: {
-					src: 'test',
-				},
 				category: 'design',
-				keywords: [ 'testing' ],
-				variations: [],
-				isDisabled: false,
-				utility: 1,
+				description: undefined,
+				example: undefined,
 				frecency: 0,
+				icon: { src: 'test' },
+				id: 'core/test-block-a',
+				initialAttributes: {},
+				isDisabled: false,
+				keywords: [ 'testing' ],
+				name: 'core/test-block-a',
+				title: 'Test Block A',
+				utility: 1,
+				variations: [],
 			} );
 			const reusableBlockItem = items.find(
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
-				id: 'core/block/1',
-				name: 'core/block',
-				initialAttributes: { ref: 1 },
-				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
 				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 1,
+				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
+				icon: { src: 'test' },
+				id: 'core/block/1',
+				initialAttributes: { ref: 1 },
+				isDisabled: false,
+				keywords: [],
+				name: 'core/block',
+				syncStatus: undefined,
+				title: 'Reusable Block 1',
+				utility: 1,
 			} );
 		} );
 
@@ -4734,6 +4734,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
+		expect( console ).toHaveWarned();
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {

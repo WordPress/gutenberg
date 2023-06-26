@@ -28,7 +28,7 @@ export default function useCommand( command ) {
 			label: command.label,
 			searchLabel: command.searchLabel,
 			icon: command.icon,
-			callback: currentCallback.current,
+			callback: ( ...args ) => currentCallback.current( ...args ),
 		} );
 		return () => {
 			unregisterCommand( command.name );

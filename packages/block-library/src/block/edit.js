@@ -59,6 +59,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		'wp_block',
 		{ id: ref }
 	);
+
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		'wp_block',

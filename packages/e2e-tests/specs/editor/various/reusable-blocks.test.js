@@ -23,6 +23,10 @@ const reusableBlockNameInputSelector =
 	'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
+const syncToggleSelector =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle__input';
+const syncToggleSelectorChecked =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
 
 const saveAll = async () => {
 	const publishButtonSelector =
@@ -193,7 +197,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create pattern' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -201,11 +205,14 @@ describe( 'Reusable blocks', () => {
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Multi-selection reusable block' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
 		);
 
 		await clearAllBlocks();
@@ -259,7 +266,7 @@ describe( 'Reusable blocks', () => {
 		// Save the reusable block.
 		await page.click( publishButtonSelector );
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block updated."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Pattern updated."]'
 		);
 
 		await createNewPost();
@@ -340,12 +347,12 @@ describe( 'Reusable blocks', () => {
 		await canvas().click( 'p[aria-label="Paragraph block"]' );
 		await page.keyboard.type( '2' );
 		const selector =
-			'//div[@aria-label="Block: Reusable block"]//p[@aria-label="Paragraph block"][.="12"]';
+			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Paragraph block"][.="12"]';
 		const reusableBlockWithParagraph = await page.$x( selector );
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Reusable block' );
+		await clickBlockToolbarButton( 'Select Pattern' );
 		await clickBlockToolbarButton( 'Convert to regular block' );
 		await page.waitForXPath( selector, {
 			hidden: true,
@@ -376,15 +383,18 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create pattern' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Block with styles' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
 		const reusableBlock = await canvas().waitForSelector(
-			'.block-editor-block-list__block[aria-label="Block: Reusable block"]'
+			'.block-editor-block-list__block[aria-label="Block: Pattern"]'
 		);
 		expect( reusableBlock ).toBeTruthy();
 	} );

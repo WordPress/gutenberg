@@ -28,7 +28,7 @@ registerPlugin( 'edit-post', {
 									post_type: 'wp_block',
 								} ) }
 							>
-								{ __( 'Manage Reusable blocks' ) }
+								{ __( 'Manage Patterns' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }

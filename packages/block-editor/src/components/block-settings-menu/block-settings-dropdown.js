@@ -41,7 +41,7 @@ const POPOVER_PROPS = {
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
@@ -189,6 +189,7 @@ export function BlockSettingsDropdown( {
 			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
 		>
 			{ ( {
+				canCopyStyles,
 				canDuplicate,
 				canInsertDefaultBlock,
 				canMove,
@@ -330,16 +331,18 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 							</MenuGroup>
-							<MenuGroup>
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-									label={ __( 'Copy styles' ) }
-								/>
-								<MenuItem onClick={ onPasteStyles }>
-									{ __( 'Paste styles' ) }
-								</MenuItem>
-							</MenuGroup>
+							{ canCopyStyles && (
+								<MenuGroup>
+									<CopyMenuItem
+										blocks={ blocks }
+										onCopy={ onCopy }
+										label={ __( 'Copy styles' ) }
+									/>
+									<MenuItem onClick={ onPasteStyles }>
+										{ __( 'Paste styles' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
 							<BlockSettingsMenuControls.Slot
 								fillProps={ {
 									onClose,
