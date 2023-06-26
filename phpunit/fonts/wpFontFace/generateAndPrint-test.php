@@ -13,6 +13,16 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
  * @covers WP_Font_Face::generate_and_print
  */
 class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
+	/**
+	 * @var WP_Font_Face
+	 */
+	private $font_face;
+
+	public function set_up() {
+		parent::set_up();
+
+		$this->font_face = new WP_Font_Face();
+	}
 
 	/**
 	 * @dataProvider data_test_generate_and_print
@@ -23,7 +33,7 @@ class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
 	public function test_generate_and_print( array $fonts, $expected ) {
 		$expected_output = sprintf( $expected['style-element'], $expected['font-face-css'] );
 		$this->expectOutputString( $expected_output );
-		$this->provider->print_styles();
+		$this->font_face->generate_and_print( $fonts );
 	}
 
 	/**
