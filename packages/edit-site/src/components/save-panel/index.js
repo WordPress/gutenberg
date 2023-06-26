@@ -21,7 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';
 import {
 	currentlyPreviewingTheme,

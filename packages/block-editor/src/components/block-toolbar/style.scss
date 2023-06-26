@@ -110,10 +110,6 @@
 		}
 	}
 
-	.block-editor-block-lock-toolbar {
-		margin-left: -$grid-unit-15 * 0.5 !important;
-	}
-
 	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	.components-toolbar-group {

@@ -5,6 +5,9 @@
 	.components-navigator-screen {
 		@include custom-scrollbars-on-hover(transparent, $gray-700);
 		scrollbar-gutter: stable;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 }
 

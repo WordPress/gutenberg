@@ -25,7 +25,6 @@
 	},
 	"usesContext": [ "postType", "postId", "commentId" ],
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"align": true,
 		"alignWide": false,
@@ -49,6 +48,6 @@
 			"__experimentalDuotone": "img"
 		}
 	},
-	"editorStyle": "wp-block-avatar",
+	"editorStyle": "wp-block-avatar-editor",
 	"style": "wp-block-avatar"
 }

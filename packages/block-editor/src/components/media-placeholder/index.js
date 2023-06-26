@@ -30,8 +30,14 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
-const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
-	<URLPopover onClose={ onClose }>
+const InsertFromURLPopover = ( {
+	src,
+	onChange,
+	onSubmit,
+	onClose,
+	popoverAnchor,
+} ) => (
+	<URLPopover anchor={ popoverAnchor } onClose={ onClose }>
 		<form
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
@@ -53,6 +59,44 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 		</form>
 	</URLPopover>
 );
+
+const URLSelectionUI = ( {
+	isURLInputVisible,
+	src,
+	onChangeSrc,
+	onSubmitSrc,
+	openURLInput,
+	closeURLInput,
+} ) => {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	return (
+		<div
+			className="block-editor-media-placeholder__url-input-container"
+			ref={ setPopoverAnchor }
+		>
+			<Button
+				className="block-editor-media-placeholder__button"
+				onClick={ openURLInput }
+				isPressed={ isURLInputVisible }
+				variant="tertiary"
+			>
+				{ __( 'Insert from URL' ) }
+			</Button>
+			{ isURLInputVisible && (
+				<InsertFromURLPopover
+					src={ src }
+					onChange={ onChangeSrc }
+					onSubmit={ onSubmitSrc }
+					onClose={ closeURLInput }
+					popoverAnchor={ popoverAnchor }
+				/>
+			) }
+		</div>
+	);
+};
 
 export function MediaPlaceholder( {
 	value = {},
@@ -359,24 +403,14 @@ export function MediaPlaceholder( {
 	const renderUrlSelectionUI = () => {
 		return (
 			onSelectURL && (
-				<div className="block-editor-media-placeholder__url-input-container">
-					<Button
-						className="block-editor-media-placeholder__button"
-						onClick={ openURLInput }
-						isPressed={ isURLInputVisible }
-						variant="tertiary"
-					>
-						{ __( 'Insert from URL' ) }
-					</Button>
-					{ isURLInputVisible && (
-						<InsertFromURLPopover
-							src={ src }
-							onChange={ onChangeSrc }
-							onSubmit={ onSubmitSrc }
-							onClose={ closeURLInput }
-						/>
-					) }
-				</div>
+				<URLSelectionUI
+					isURLInputVisible={ isURLInputVisible }
+					src={ src }
+					onChangeSrc={ onChangeSrc }
+					onSubmitSrc={ onSubmitSrc }
+					openURLInput={ openURLInput }
+					closeURLInput={ closeURLInput }
+				/>
 			)
 		);
 	};

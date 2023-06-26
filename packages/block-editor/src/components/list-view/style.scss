@@ -27,6 +27,17 @@
 		}
 	}
 
+	&:not(.is-selected) .block-editor-list-view-block-select-button {
+		// While components are being dragged, ensure that hover styles are not applied.
+		// This resolves a bug where while dragging, the hover styles would be applied to
+		// the wrong list item while scrolling long lists, particularly in Chrome.
+		.is-dragging-components-draggable & {
+			&:hover {
+				color: inherit;
+			}
+		}
+	}
+
 	// The background has to be applied to the td, not tr, or border-radius won't work.
 	&.is-selected td {
 		background: var(--wp-admin-theme-color);
@@ -51,13 +62,6 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block-contents {
-		// Hide selection styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			background: none;
-			color: $gray-900;
-		}
-	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
@@ -74,10 +78,6 @@
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
-	}
-
-	&.is-dragging {
-		display: none;
 	}
 
 	// Border radius for corners of the selected item.
@@ -335,7 +335,8 @@
 		background: rgba($black, 0.3);
 	}
 
-	.block-editor-list-view-block-select-button__lock {
+	.block-editor-list-view-block-select-button__lock,
+	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
 }

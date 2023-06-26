@@ -15,6 +15,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -39,9 +40,11 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -52,6 +55,12 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+};
+
+const typeLabels = {
+	wp_template: __( 'Template Part' ),
+	wp_template_part: __( 'Template Part' ),
+	wp_block: __( 'Pattern' ),
 };
 
 export default function Editor( { isLoading } ) {
@@ -73,7 +82,7 @@ export default function Editor( { isLoading } ) {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
-		hasPageContentLock,
+		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -81,7 +90,7 @@ export default function Editor( { isLoading } ) {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
-			hasPageContentLock: _hasPageContentLock,
+			hasPageContentFocus: _hasPageContentFocus,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -106,7 +115,7 @@ export default function Editor( { isLoading } ) {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
-			hasPageContentLock: _hasPageContentLock(),
+			hasPageContentFocus: _hasPageContentFocus(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -114,7 +123,7 @@ export default function Editor( { isLoading } ) {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -127,7 +136,7 @@ export default function Editor( { isLoading } ) {
 	const blockContext = useMemo( () => {
 		const { postType, postId, ...nonPostFields } = context ?? {};
 		return {
-			...( hasPageContentLock ? context : nonPostFields ),
+			...( hasPageContentFocus ? context : nonPostFields ),
 			queryContext: [
 				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -140,14 +149,11 @@ export default function Editor( { isLoading } ) {
 					} ),
 			],
 		};
-	}, [ hasPageContentLock, context, setEditedPostContext ] );
+	}, [ hasPageContentFocus, context, setEditedPostContext ] );
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type =
-			editedPostType === 'wp_template'
-				? __( 'Template' )
-				: __( 'Template Part' );
+		const type = typeLabels[ editedPostType ] ?? __( 'Template' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
@@ -157,7 +163,7 @@ export default function Editor( { isLoading } ) {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
 	return (
@@ -174,6 +180,7 @@ export default function Editor( { isLoading } ) {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
 							className={ classnames(
 								'edit-site-editor__interface-skeleton',
@@ -188,7 +195,10 @@ export default function Editor( { isLoading } ) {
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal />
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
@@ -227,10 +237,10 @@ export default function Editor( { isLoading } ) {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={
-											hasPageContentLock
+											hasPageContentFocus
 												? __( 'Page' )
 												: __( 'Template' )
 										}

@@ -4,7 +4,12 @@
  * External dependencies
  */
 import Clipboard from '@react-native-clipboard/clipboard';
-import { act, fireEvent, initializeEditor } from 'test/helpers';
+import {
+	act,
+	fireEvent,
+	initializeEditor,
+	waitForElementToBeRemoved,
+} from 'test/helpers';
 /**
  * WordPress dependencies
  */
@@ -199,17 +204,15 @@ describe.each( [
 						}`
 					)
 				);
-				// Wait for side effects produced by Clipboard and link suggestions
-				await act( async () => {} );
 
 				if ( type === 'core/image' ) {
-					// Wait for side effects produced by Clipboard and link suggestions
-					await act( () =>
-						fireEvent.press(
-							subject.getByLabelText( `Custom URL, ${ url }` )
-						)
+					fireEvent.press(
+						subject.getByLabelText( `Custom URL, ${ url }` )
 					);
 				}
+				await waitForElementToBeRemoved( () =>
+					subject.getByTestId( 'link-picker-loading' )
+				);
 				await subject.findByLabelText( 'Apply' );
 
 				// Assert.
