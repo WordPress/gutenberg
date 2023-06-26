@@ -60,9 +60,11 @@ function Edit( {
 		}
 	}
 
-	function stopAddingLink() {
+	function stopAddingLink( returnFocus = true ) {
 		setAddingLink( false );
-		onFocus();
+		if ( returnFocus ) {
+			onFocus();
+		}
 	}
 
 	function onRemoveFormat() {

@@ -15,15 +15,6 @@ function gutenberg_register_rest_block_pattern_categories() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
 
 /**
- * Registers the block patterns REST API routes.
- */
-function gutenberg_register_rest_block_patterns() {
-	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_2();
-	$block_patterns->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-
-/**
  * Add extra collection params to pattern directory requests.
  *
  * @param array $query_params JSON Schema-formatted collection parameters.

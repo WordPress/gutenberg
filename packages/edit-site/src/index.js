@@ -63,6 +63,7 @@ export function initializeEditor( id, settings ) {
 		editorMode: 'visual',
 		fixedToolbar: false,
 		focusMode: false,
+		distractionFree: false,
 		keepCaretInsideBlock: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,

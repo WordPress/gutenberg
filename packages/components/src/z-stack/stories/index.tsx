@@ -8,7 +8,6 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  * Internal dependencies
  */
 import { Elevation } from '../../elevation';
-import { HStack } from '../../h-stack';
 import { View } from '../../view';
 import { ZStack } from '..';
 
@@ -55,18 +54,12 @@ const Avatar = ( {
 
 const Template: ComponentStory< typeof ZStack > = ( args ) => {
 	return (
-		<View>
-			<HStack>
-				<View>
-					<ZStack { ...args }>
-						<Avatar backgroundColor="#444" />
-						<Avatar backgroundColor="#777" />
-						<Avatar backgroundColor="#aaa" />
-						<Avatar backgroundColor="#fff" />
-					</ZStack>
-				</View>
-			</HStack>
-		</View>
+		<ZStack { ...args }>
+			<Avatar backgroundColor="#444" />
+			<Avatar backgroundColor="#777" />
+			<Avatar backgroundColor="#aaa" />
+			<Avatar backgroundColor="#fff" />
+		</ZStack>
 	);
 };
 
