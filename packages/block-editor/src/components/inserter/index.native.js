@@ -35,20 +35,15 @@ const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 const defaultRenderToggle = ( {
 	onToggle,
 	disabled,
-	style,
-	containerStyle,
+	iconStyle,
+	buttonStyle,
 	onLongPress,
 	useExpandedMode,
 } ) => {
 	// The "expanded mode" refers to the editor's appearance when no blocks
-	// are currently selected. The "add block" button has a separate style
-	// for the "expanded mode", which are added via the below "expandedModeViewProps"
-	// and "expandedModeViewText" variables.
-	const expandedModeViewProps = useExpandedMode && {
-		icon: <Icon icon={ plus } style={ style } />,
-		customContainerStyles: containerStyle,
-		fixedRatio: false,
-	};
+	// are currently selected. The "add block" button has an style object
+	// for the expanded mode to correct the margins and padding:
+	//   .inserter-menu__add-block-button--expanded
 	const expandedModeViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
 			{ __( 'Add blocks' ) }
@@ -61,7 +56,7 @@ const defaultRenderToggle = ( {
 				'Add block',
 				'Generic label for block inserter button'
 			) }
-			icon={ <Icon icon={ plusCircleFilled } style={ style } /> }
+			icon={ <Icon icon={ plus } style={ iconStyle } /> }
 			onClick={ onToggle }
 			extraProps={ {
 				hint: __( 'Double tap to add a block' ),
@@ -71,7 +66,8 @@ const defaultRenderToggle = ( {
 				onLongPress,
 			} }
 			isDisabled={ disabled }
-			{ ...expandedModeViewProps }
+			customContainerStyles={ buttonStyle }
+			fixedRatio={ false }
 		>
 			{ useExpandedMode && expandedModeViewText }
 		</ToolbarButton>
@@ -254,16 +250,22 @@ export class Inserter extends Component {
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = useExpandedMode
-			? styles[ 'inserter-menu__add-block-button-icon--expanded' ]
-			: getStylesFromColorScheme(
-					styles[ 'inserter-menu__add-block-button-icon' ],
-					styles[ 'inserter-menu__add-block-button-icon--dark' ]
-			  );
 
-		const containerStyle = getStylesFromColorScheme(
+		const buttonColorScheme = getStylesFromColorScheme(
 			styles[ 'inserter-menu__add-block-button' ],
 			styles[ 'inserter-menu__add-block-button--dark' ]
+		);
+
+		const buttonStyle = {
+			...buttonColorScheme,
+			...( useExpandedMode
+				? styles[ 'inserter-menu__add-block-button--expanded' ]
+				: {} ),
+		};
+
+		const iconStyle = getStylesFromColorScheme(
+			styles[ 'inserter-menu__add-block-button-icon' ],
+			styles[ 'inserter-menu__add-block-button-icon--dark' ]
 		);
 
 		const onPress = () => {
@@ -301,8 +303,8 @@ export class Inserter extends Component {
 					onToggle: onPress,
 					isOpen,
 					disabled,
-					style,
-					containerStyle,
+					iconStyle,
+					buttonStyle,
 					onLongPress,
 					useExpandedMode,
 				} ) }
