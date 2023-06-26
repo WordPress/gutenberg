@@ -204,7 +204,6 @@
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
-		padding: 30px;
 
 		figcaption {
 			display: none;
@@ -231,22 +230,68 @@
 		opacity: 0.9;
 	}
 
-	&.initialized {
-		animation: both turn-off-visibility 300ms;
-
-		img {
-			animation: both turn-off-visibility 250ms;
-		}
-
+	&.fade {
 		&.active {
 			visibility: visible;
-			animation: both turn-on-visibility 250ms;
+			animation: both turn-on-visibility 0.25s;
 
 			img {
-				animation: both turn-on-visibility 300ms;
+				animation: both turn-on-visibility 0.3s;
+			}
+		}
+		&.hideanimationenabled {
+			&:not(.active) {
+				animation: both turn-off-visibility 0.3s;
+
+				img {
+					animation: both turn-off-visibility 0.25s;
+				}
 			}
 		}
 	}
+
+	&.zoom {
+		img {
+			position: absolute;
+			transform-origin: top left;
+			width: var(--lightbox-image-max-width);
+			height: var(--lightbox-image-max-height);
+			cursor: zoom-out;
+		}
+
+		&.active {
+			opacity: 1;
+			visibility: visible;
+			.wp-block-image img {
+				animation: lightbox-zoom-in 0.4s forwards;
+
+				@media (prefers-reduced-motion) {
+					animation: both turn-on-visibility 0.4s;
+				}
+			}
+			.scrim {
+				animation: turn-on-visibility 0.4s forwards;
+			}
+		}
+		&.hideanimationenabled {
+			&:not(.active) {
+				.wp-block-image img {
+					animation: lightbox-zoom-out 0.4s forwards;
+
+					@media (prefers-reduced-motion) {
+						animation: both turn-off-visibility 0.4s;
+					}
+				}
+				.scrim {
+					animation: turn-off-visibility 0.4s forwards;
+				}
+			}
+		}
+	}
+}
+
+html.has-lightbox-open {
+	overflow: hidden;
 }
 
 @keyframes turn-on-visibility {
@@ -273,6 +318,32 @@
 	}
 }
 
-html.has-lightbox-open {
-	overflow: hidden;
+@keyframes lightbox-zoom-in {
+	0% {
+		left: var(--lightbox-initial-left-position);
+		top: var(--lightbox-initial-top-position);
+		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+	}
+	100% {
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
+	}
+}
+
+@keyframes lightbox-zoom-out {
+	0% {
+		visibility: visible;
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
+	}
+	99% {
+		visibility: visible;
+	}
+	100% {
+		left: var(--lightbox-initial-left-position);
+		top: var(--lightbox-initial-top-position);
+		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+	}
 }

@@ -62,7 +62,7 @@ test.describe( 'Navigation block', () => {
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -138,7 +138,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom"} /-->',
 			} );
 
 			//FIXME this is needed because if the two menus are created at the same time, the API will return them in the wrong order.
@@ -148,7 +148,7 @@ test.describe( 'Navigation block', () => {
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -250,7 +250,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content:
-					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -960,8 +960,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
-					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
-					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
@@ -971,7 +971,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'Overlay menu interactions', async ( { page } ) => {
+		test( 'Overlay menu interactions', async ( { page, pageUtils } ) => {
 			await page.goto( '/' );
 			const overlayMenuFirstElement = page.getByRole( 'link', {
 				name: 'Item 1',
@@ -993,11 +993,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( overlayMenuFirstElement ).toBeFocused();
 
 			// Test: overlay menu traps focus
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
 			await expect( closeMenuButton ).toBeFocused();
-			await page.keyboard.press( 'Shift+Tab' );
-			await page.keyboard.press( 'Shift+Tab' );
+			await pageUtils.pressKeys( 'Shift+Tab', { times: 2, delay: 50 } );
 			await expect( overlayMenuFirstElement ).toBeFocused();
 
 			// Test: overlay menu closes on click on close menu button
@@ -1007,7 +1005,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Test: overlay menu closes on ESC key
 			await openMenuButton.click();
 			await expect( overlayMenuFirstElement ).toBeVisible();
-			await page.keyboard.press( 'Escape' );
+			await pageUtils.pressKeys( 'Escape' );
 			await expect( overlayMenuFirstElement ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
 		} );
@@ -1023,18 +1021,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
-					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- wp:navigation-submenu {"label":"Simple Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- /wp:navigation-submenu -->
 					<!-- wp:navigation-submenu {"label":"Complex Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- /wp:navigation-submenu -->
-						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					<!-- /wp:navigation-submenu -->
-					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
@@ -1044,7 +1042,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'Submenu interactions', async ( { page } ) => {
+		test( 'Submenu interactions', async ( { page, pageUtils } ) => {
 			await page.goto( '/' );
 			const simpleSubmenuButton = page.getByRole( 'button', {
 				name: 'Simple Submenu',
@@ -1090,28 +1088,26 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			// Test: submenu opens on Enter keypress
 			await simpleSubmenuButton.focus();
-			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on ESC key and focuses parent link
-			await page.keyboard.press( 'Escape' );
+			await pageUtils.pressKeys( 'Escape' );
 			await expect( innerElement ).toBeHidden();
 			await expect( simpleSubmenuButton ).toBeFocused();
 
 			// Test: submenu closes on tab outside submenu
 			await simpleSubmenuButton.focus();
-			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'Enter' );
 			await expect( innerElement ).toBeVisible();
-			// Tab to first element.
-			await page.keyboard.press( 'Tab' );
-			// Tab outside the submenu.
-			await page.keyboard.press( 'Tab' );
+			// Tab to first element, then tab outside the submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
 			await expect( innerElement ).toBeHidden();
 			await expect( complexSubmenuButton ).toBeFocused();
 
 			// Test: only nested submenu closes on tab outside
 			await complexSubmenuButton.focus();
-			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'Enter' );
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -1119,10 +1115,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeVisible();
 
-			// Tab to nested submenu first element.
-			await page.keyboard.press( 'Tab' );
-			// Tab outside the nested submenu.
-			await page.keyboard.press( 'Tab' );
+			// Tab to nested submenu first element, then tab outside the nested
+			// submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 			// Tab outside the complex submenu.
@@ -1142,9 +1137,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Hidden menu',
 				content: `
 					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
-						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- wp:navigation-submenu {"label":"Nested Menu","type":"internal","url":"#heading","kind":"custom"} -->
-							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 						<!-- /wp:navigation-submenu -->
 					<!-- /wp:navigation-submenu -->
 					`,
@@ -1207,7 +1202,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				title: 'Page list menu',
 				content: `
 					<!-- wp:page-list /-->
-					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/"} /-->
 					`,
 			} );
 			await editor.insertBlock( {
@@ -1217,7 +1212,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'page-list submenu user interactions', async ( { page } ) => {
+		test( 'page-list submenu user interactions', async ( {
+			page,
+			pageUtils,
+		} ) => {
 			await page.goto( '/' );
 			const submenuButton = page.getByRole( 'button', {
 				name: 'Parent Page',
@@ -1237,20 +1235,18 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			// page-list submenu opens on enter keypress
 			await submenuButton.focus();
-			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'Enter' );
 			await expect( innerElement ).toBeVisible();
 
 			// page-list submenu closes on ESC key and focuses submenu button
-			await page.keyboard.press( 'Escape' );
+			await pageUtils.pressKeys( 'Escape' );
 			await expect( innerElement ).toBeHidden();
 			await expect( submenuButton ).toBeFocused();
 
 			// page-list submenu closes on tab outside submenu
-			await page.keyboard.press( 'Enter' );
-			// Tab to first element.
-			await page.keyboard.press( 'Tab' );
-			// Tab outside the submenu.
-			await page.keyboard.press( 'Tab' );
+			await pageUtils.pressKeys( 'Enter', { delay: 50 } );
+			// Tab to first element, then tab outside the submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
 			await expect( innerElement ).toBeHidden();
 		} );
 	} );
@@ -1308,7 +1304,9 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.locator(
+				'.components-menu-item__info-wrapper .components-menu-item__item'
+			) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }
