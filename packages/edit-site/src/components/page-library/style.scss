@@ -1,0 +1,105 @@
+.edit-site-library {
+	background: rgba(0, 0, 0, 0.05);
+	margin: $header-height 0 0;
+	.components-text {
+		color: $gray-600;
+	}
+
+	.components-heading {
+		color: $white;
+	}
+
+	@include break-medium {
+		margin: 0;
+	}
+}
+
+.edit-site-library__grid {
+	column-gap: $grid-unit-30;
+	@include break-large() {
+		column-count: 2;
+	}
+
+	// Small top padding required to avoid cutting off the visible outline
+	// when hovering items.
+	padding-top: $border-width-focus-fallback;
+	margin-bottom: $grid-unit-40;
+
+	.edit-site-library__pattern {
+		break-inside: avoid-column;
+		display: flex;
+		flex-direction: column;
+		margin-bottom: $grid-unit-60;
+
+		.edit-site-library__preview {
+			border-radius: $radius-block-ui;
+			cursor: pointer;
+			overflow: hidden;
+
+			&:focus {
+				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+
+			&.is-inactive {
+				cursor: default;
+			}
+		}
+
+		.edit-site-library__footer,
+		.edit-site-library__button {
+			color: $gray-600;
+		}
+
+		&.is-placeholder .edit-site-library__preview {
+			min-height: $grid-unit-80;
+			color: $gray-600;
+			border: 1px dashed $gray-800;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&:focus {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
+		}
+	}
+
+	.edit-site-library__preview {
+		flex: 1;
+		margin-bottom: $grid-unit-20;
+	}
+}
+
+// The increased specificity here is to overcome component styles
+// without relying on internal component class names.
+.edit-site-library__search {
+	&#{&} input[type="search"] {
+		background: $gray-800;
+		color: $gray-100;
+
+		&:focus {
+			background: $gray-800;
+		}
+	}
+
+	svg {
+		fill: $gray-600;
+	}
+}
+
+.edit-site-library__pattern-title {
+	color: $gray-600;
+
+	svg {
+		border-radius: $grid-unit-05;
+		background: var(--wp-block-synced-color);
+		fill: $white;
+	}
+}
+
+.edit-site-library__no-results {
+	color: $gray-600;
+}

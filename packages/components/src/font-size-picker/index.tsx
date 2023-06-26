@@ -14,6 +14,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
 import {
@@ -31,7 +32,6 @@ import {
 	HeaderLabel,
 	HeaderToggle,
 	Controls,
-	ResetButton,
 } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
@@ -268,17 +268,21 @@ const UnforwardedFontSizePicker = (
 						) }
 						{ withReset && (
 							<FlexItem>
-								<ResetButton
+								<Button
 									disabled={ value === undefined }
 									onClick={ () => {
 										onChange?.( undefined );
 									} }
-									isSmall
 									variant="secondary"
-									size={ size }
+									__next40pxDefaultSize
+									size={
+										size !== '__unstable-large'
+											? 'small'
+											: 'default'
+									}
 								>
 									{ __( 'Reset' ) }
-								</ResetButton>
+								</Button>
 							</FlexItem>
 						) }
 					</Flex>

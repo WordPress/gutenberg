@@ -23,15 +23,14 @@
  */
 function gutenberg_update_templates_template_parts_rest_controller( $args, $post_type ) {
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-		$template_edit_link            = 'site-editor.php?' . build_query(
+		$template_edit_link = 'site-editor.php?' . build_query(
 			array(
 				'postType' => $post_type,
 				'postId'   => '%s',
 				'canvas'   => 'edit',
 			)
 		);
-		$args['_edit_link']            = $template_edit_link;
-		$args['rest_controller_class'] = 'Gutenberg_REST_Templates_Controller_6_3';
+		$args['_edit_link'] = $template_edit_link;
 	}
 
 	if ( in_array( $post_type, array( 'wp_global_styles' ), true ) ) {
@@ -101,3 +100,12 @@ function add_modified_wp_template_schema() {
 		);
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
+
+/**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );

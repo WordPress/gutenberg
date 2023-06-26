@@ -90,7 +90,7 @@ describe( 'block editor keyboard shortcuts', () => {
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Create Reusable block' );
+			await clickMenuItem( 'Create pattern' );
 			const reusableBlockNameInputSelector =
 				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 			const nameInput = await page.waitForSelector(

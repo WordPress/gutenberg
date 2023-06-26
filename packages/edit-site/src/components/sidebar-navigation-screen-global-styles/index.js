@@ -15,6 +15,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -31,8 +32,9 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
-	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { openGeneralSidebar, toggleFeature } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { createNotice } = useDispatch( noticesStore );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -53,9 +55,19 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		<SidebarNavigationItem
 			{ ...props }
 			onClick={ () => {
-				// switch to edit mode.
+				// Disable distraction free mode.
+				toggleFeature( 'distractionFree', false );
+				createNotice(
+					'info',
+					__( 'Distraction free mode turned off' ),
+					{
+						isDismissible: true,
+						type: 'snackbar',
+					}
+				);
+				// Switch to edit mode.
 				setCanvasMode( 'edit' );
-				// open global styles sidebar.
+				// Open global styles sidebar.
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
 		/>
@@ -141,7 +153,8 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 }
 
 export default function SidebarNavigationScreenGlobalStyles() {
-	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { openGeneralSidebar, setIsListViewOpened } =
+		useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -169,7 +182,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		// and the global styles sidebar is open. This ensures that
 		// the Style Book is not prematurely closed.
 		setEditorCanvasContainerView( 'style-book' );
-	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
+		setIsListViewOpened( false );
+	}, [
+		openGlobalStyles,
+		setEditorCanvasContainerView,
+		setIsListViewOpened,
+	] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();
