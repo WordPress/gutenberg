@@ -202,6 +202,28 @@ _Returns_
 
 Determines if the given block is allowed to be deleted.
 
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+const ExampleComponent = () => {
+	const { canRemoveBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	return canRemoveBlock( availableBlocks[ 0 ]?.clientId ) ? (
+		<p>{ __( 'Blocks is removable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks is NOT removable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
@@ -216,10 +238,36 @@ _Returns_
 
 Determines if the given blocks are allowed to be removed.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { canRemoveBlocks, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	// Define the list of blocks to check.
+	const blocksToCheck = [
+		availableBlocks[ 0 ]?.clientId,
+		availableBlocks[ 1 ]?.clientId,
+	];
+
+	return canRemoveBlocks( blocksToCheck ) ? (
+		<p>{ __( 'Blocks are removable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks are NOT removable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be removed.
+-   _clientIds_ `Array`: The block client IDs to be removed.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
