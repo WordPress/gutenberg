@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	PanelBody,
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -53,7 +53,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostAuthor />
 						<PostSyncStatus />
 						{ fills }
-						<HStack
+						<VStack
 							style={ {
 								marginTop: '16px',
 							} }
@@ -61,7 +61,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						>
 							<PostSwitchToDraftButton />
 							<PostTrash />
-						</HStack>
+						</VStack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>

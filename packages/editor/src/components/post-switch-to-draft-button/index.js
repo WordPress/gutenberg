@@ -3,7 +3,6 @@
  */
 import {
 	Button,
-	FlexItem,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -41,7 +40,7 @@ function PostSwitchToDraftButton( {
 	};
 
 	return (
-		<FlexItem isBlock>
+		<>
 			<Button
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
@@ -60,7 +59,7 @@ function PostSwitchToDraftButton( {
 			>
 				{ alertMessage }
 			</ConfirmDialog>
-		</FlexItem>
+		</>
 	);
 }
 
