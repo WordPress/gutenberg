@@ -6,6 +6,7 @@ import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
+import useBlockTypesState from '../hooks/use-block-types-state';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 
@@ -52,6 +54,25 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		onInsertBlocks,
 		destinationRootClientId
 	);
+	const [ unsyncedPatterns ] = useBlockTypesState(
+		destinationRootClientId,
+		onInsertBlocks,
+		'unsynced'
+	);
+	const filteredUnsyncedPatterns = useMemo( () => {
+		return unsyncedPatterns
+			.filter(
+				( { category: unsyncedPatternCategory } ) =>
+					unsyncedPatternCategory === 'reusable'
+			)
+			.map( ( syncedPattern ) => ( {
+				...syncedPattern,
+				blocks: parse( syncedPattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} ),
+			} ) );
+	}, [ unsyncedPatterns ] );
+
 	const registeredPatternCategories = useMemo(
 		() =>
 			patternCategories.map(
@@ -91,11 +112,16 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
+	const patterns =
+		selectedCategory === 'reusable'
+			? filteredUnsyncedPatterns
+			: filteredBlockPatterns;
+
+	const currentShownPatterns = useAsyncList( patterns, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
-	const hasItems = !! filteredBlockPatterns?.length;
+	const hasItems = !! patterns?.length;
 	return (
 		<div className="block-editor-block-patterns-explorer__list">
 			{ hasItems && (
@@ -109,7 +135,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
-						blockPatterns={ filteredBlockPatterns }
+						blockPatterns={ patterns }
 						onClickPattern={ onSelectBlockPattern }
 						isDraggable={ false }
 					/>
