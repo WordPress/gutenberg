@@ -138,6 +138,7 @@ function BlockPatternList( {
 				return isShown ? (
 					<BlockPattern
 						key={
+							// User added unsynced patterns do not have a unique name so we use the id instead.
 							pattern.name === 'core/block'
 								? pattern.id
 								: pattern.name
