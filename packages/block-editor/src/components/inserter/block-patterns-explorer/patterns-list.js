@@ -97,11 +97,11 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
-	const blockPatterns = useAsyncList( filteredBlockPatterns, {
+	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
-	const hasItems = !! blockPatterns?.length;
+	const hasItems = !! filteredBlockPatterns?.length;
 	return (
 		<div className="block-editor-block-patterns-explorer__list">
 			{ hasItems && (
@@ -114,8 +114,8 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 				{ ! hasItems && <InserterNoResults /> }
 				{ hasItems && (
 					<BlockPatternsList
-						shownPatterns={ blockPatterns }
-						blockPatterns={ blockPatterns }
+						shownPatterns={ currentShownPatterns }
+						blockPatterns={ filteredBlockPatterns }
 						onClickPattern={ onSelectBlockPattern }
 						isDraggable={ false }
 					/>
