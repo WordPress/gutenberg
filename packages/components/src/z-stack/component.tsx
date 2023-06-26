@@ -43,7 +43,6 @@ function UnconnectedZStack(
 
 		return (
 			<ZStackChildView
-				isLayered={ isLayered }
 				offsetAmount={ offsetAmount }
 				zIndex={ zIndex }
 				key={ key }
@@ -57,6 +56,7 @@ function UnconnectedZStack(
 		<ZStackView
 			{ ...otherProps }
 			className={ className }
+			isLayered={ isLayered }
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }
