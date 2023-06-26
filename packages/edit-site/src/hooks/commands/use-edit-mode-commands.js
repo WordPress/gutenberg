@@ -30,16 +30,54 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-function useEditModeCommandLoader() {
-	const { isLoaded, record: template } = useEditedEntityRecord();
-	const { removeTemplate, revertTemplate, setHasPageContentFocus } =
-		useDispatch( editSiteStore );
-	const history = useHistory();
-	const { isPage, hasPageContentFocus } = useSelect(
+function usePageContentFocusCommands() {
+	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
 		( select ) => ( {
 			isPage: select( editSiteStore ).isPage(),
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		} ),
+		[]
+	);
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	if ( ! isPage || canvasMode !== 'edit' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( hasPageContentFocus ) {
+		commands.push( {
+			name: 'core/switch-to-template-focus',
+			label: __( 'Edit template' ),
+			icon: layout,
+			callback: ( { close } ) => {
+				setHasPageContentFocus( false );
+				close();
+			},
+		} );
+	} else {
+		commands.push( {
+			name: 'core/switch-to-page-focus',
+			label: __( 'Back to page' ),
+			icon: page,
+			callback: ( { close } ) => {
+				setHasPageContentFocus( true );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
+function useManipulateDocumentCommands() {
+	const { isLoaded, record: template } = useEditedEntityRecord();
+	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
+	const history = useHistory();
+	const hasPageContentFocus = useSelect(
+		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
 
@@ -48,32 +86,6 @@ function useEditModeCommandLoader() {
 	}
 
 	const commands = [];
-
-	if ( isPage ) {
-		if ( hasPageContentFocus ) {
-			commands.push( {
-				name: 'core/switch-to-template-focus',
-				label: __( 'Edit template' ),
-				icon: layout,
-				context: 'site-editor-edit',
-				callback: ( { close } ) => {
-					setHasPageContentFocus( false );
-					close();
-				},
-			} );
-		} else {
-			commands.push( {
-				name: 'core/switch-to-page-focus',
-				label: __( 'Back to page' ),
-				icon: page,
-				context: 'site-editor-edit',
-				callback: ( { close } ) => {
-					setHasPageContentFocus( true );
-					close();
-				},
-			} );
-		}
-	}
 
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
@@ -100,7 +112,6 @@ function useEditModeCommandLoader() {
 			name: 'core/remove-template',
 			label,
 			icon: trash,
-			context: 'site-editor-edit',
 			callback: ( { close } ) => {
 				removeTemplate( template );
 				// Navigate to the template list
@@ -118,13 +129,11 @@ function useEditModeCommandLoader() {
 	};
 }
 
-function useEditUICommandLoader() {
+function useEditUICommands() {
 	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
 		useDispatch( editSiteStore );
 	const { canvasMode, editorMode, activeSidebar } = useSelect(
 		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: select( editSiteStore ).getEditorMode(),
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
@@ -207,13 +216,19 @@ function useEditUICommandLoader() {
 
 export function useEditModeCommands() {
 	useCommandLoader( {
+		name: 'core/edit-site/page-content-focus',
+		hook: usePageContentFocusCommands,
+		context: 'site-editor-edit',
+	} );
+
+	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
-		hook: useEditModeCommandLoader,
+		hook: useManipulateDocumentCommands,
 		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {
 		name: 'core/edit-site/edit-ui',
-		hook: useEditUICommandLoader,
+		hook: useEditUICommands,
 	} );
 }
