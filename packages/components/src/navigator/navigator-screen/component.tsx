@@ -17,7 +17,7 @@ import {
 	useId,
 } from '@wordpress/element';
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
@@ -54,18 +54,10 @@ function UnconnectedNavigatorScreen(
 		children,
 		className,
 		path,
-		'aria-label': ariaLabel,
-		'aria-labelledby': ariaLabelledBy,
+		'aria-label': ariaLabel = __( 'Navigator screen' ),
 		role = 'region',
 		...otherProps
 	} = useContextSystem( props, 'NavigatorScreen' );
-
-	if ( ! ariaLabel && ! ariaLabelledBy ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`The "NavigatorScreen" component with path "${ path }" should be always labelled, either via the "aria-label" prop, or via the "aria-labelledby" prop.`
-		);
-	}
 
 	const prefersReducedMotion = useReducedMotion();
 	const { location, match, addScreen, removeScreen } =
@@ -243,7 +235,6 @@ function UnconnectedNavigatorScreen(
 			tabIndex={ -1 }
 			role={ role }
 			aria-label={ ariaLabel }
-			aria-labelledby={ ariaLabelledBy }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>

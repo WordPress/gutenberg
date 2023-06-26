@@ -64,15 +64,11 @@ export type NavigatorScreenProps = {
 	 */
 	role?: React.HTMLAttributes< Element >[ 'role' ];
 	/**
-	 * The text labelling the screen element. When this prop is not defined, the
-	 * `aria-labelledby` prop should be defined instead.
+	 * Additional text used to label the component for assistive technology.
+	 *
+	 * @default 'Navigator screen'
 	 */
 	'aria-label'?: React.HTMLAttributes< Element >[ 'aria-label' ];
-	/**
-	 * The id of another element used to label this screen element. When this prop
-	 * is not defined, the `aria-label` prop should be defined instead.
-	 */
-	'aria-labelledby'?: React.HTMLAttributes< Element >[ 'aria-labelledby' ];
 };
 
 export type NavigatorBackButtonProps = ButtonAsButtonProps;

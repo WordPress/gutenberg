@@ -22,19 +22,14 @@ The screen's path, matched against the current path stored in the navigator.
 
 ### `aria-label`: `string`
 
-The id of another element used to label this screen element.
+Additional text used to label the component for assistive technology.
 
--   Required: Yes (either this prop or the `aria-labelledby` prop should be provided to the component)
-
-### `aria-labelledby`: `string`
-
-The id of another element used to label this screen element.
-
--   Required: Yes (either this prop or the `aria-label` prop should be provided to the component)
+-   Required: No
+-   Default: `"Navigator screen"`
 
 ### `role`: `string`
 
 The aria-role attributed to the screen.
 
 -   Required: No
--   Default: `'region'`
+-   Default: `"region"`
