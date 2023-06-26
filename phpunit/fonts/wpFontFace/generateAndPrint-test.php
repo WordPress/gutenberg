@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../wp-fonts-testcase.php';
-
 /**
  * Test WP_Font_Face::generate_and_print().
  *
