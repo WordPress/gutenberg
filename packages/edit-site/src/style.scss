@@ -77,6 +77,13 @@ body.site-editor-php {
 	@include reset;
 }
 
+// Temporary fix for the modal not being full height.
+// Can be removed once WordPress Core is updated.
+// See https://github.com/WordPress/wordpress-develop/pull/4695
+.site-editor {
+	height: 100vh;
+}
+
 .edit-site {
 	height: 100vh;
 
