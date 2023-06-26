@@ -9,6 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -26,6 +27,7 @@ import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
@@ -164,10 +166,29 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				presetStyles.push( style );
 			}
 		} );
+
 		const defaultEditorStyles = [
 			...settings.defaultEditorStyles,
 			...presetStyles,
 		];
+
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if (
+			! settings.disableLayoutStyles &&
+			! ( hasThemeStyles && themeStyles.length )
+		) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
+
 		return hasThemeStyles && themeStyles.length
 			? settings.styles
 			: defaultEditorStyles;

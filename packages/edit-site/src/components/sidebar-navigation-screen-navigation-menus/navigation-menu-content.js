@@ -9,8 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { VisuallyHidden } from '@wordpress/components';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -18,6 +17,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
+
+const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -35,37 +36,40 @@ const PAGES_QUERY = [
 	},
 ];
 
-export default function NavigationMenuContent( { rootClientId, onSelect } ) {
-	const [ isLoading, setIsLoading ] = useState( true );
-	const { clientIdsTree, shouldKeepLoading, isSinglePageList } = useSelect(
+export default function NavigationMenuContent( { rootClientId } ) {
+	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
-				__unstableGetClientIdsTree,
 				areInnerBlocksControlled,
 				getBlockName,
+				getBlockCount,
+				getBlockOrder,
 			} = select( blockEditorStore );
 			const { isResolving } = select( coreStore );
 
-			const _clientIdsTree = __unstableGetClientIdsTree( rootClientId );
+			const blockClientIds = getBlockOrder( rootClientId );
+
 			const hasOnlyPageListBlock =
-				_clientIdsTree.length === 1 &&
-				getBlockName( _clientIdsTree[ 0 ].clientId ) ===
-					'core/page-list';
+				blockClientIds.length === 1 &&
+				getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
+			const pageListHasBlocks =
+				hasOnlyPageListBlock &&
+				getBlockCount( blockClientIds[ 0 ] ) > 0;
+
 			const isLoadingPages = isResolving(
 				'getEntityRecords',
 				PAGES_QUERY
 			);
+
 			return {
-				clientIdsTree: _clientIdsTree,
+				listViewRootClientId: pageListHasBlocks
+					? blockClientIds[ 0 ]
+					: rootClientId,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
-				shouldKeepLoading:
+				isLoading:
 					! areInnerBlocksControlled( rootClientId ) ||
 					isLoadingPages,
-				isSinglePageList:
-					hasOnlyPageListBlock &&
-					! isLoadingPages &&
-					_clientIdsTree[ 0 ].innerBlocks.length > 0,
 			};
 		},
 		[ rootClientId ]
@@ -73,26 +77,6 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	// Delay loading stop by 50ms to avoid flickering.
-	useEffect( () => {
-		let timeoutId;
-		if ( shouldKeepLoading && ! isLoading ) {
-			setIsLoading( true );
-		}
-		if ( ! shouldKeepLoading && isLoading ) {
-			timeoutId = setTimeout( () => {
-				setIsLoading( false );
-				timeoutId = undefined;
-			}, 50 );
-		}
-		return () => {
-			if ( timeoutId ) {
-				clearTimeout( timeoutId );
-			}
-		};
-	}, [ shouldKeepLoading, clientIdsTree, isLoading ] );
-
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	const offCanvasOnselect = useCallback(
 		( block ) => {
 			if (
@@ -104,11 +88,9 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					block.clientId,
 					createBlock( 'core/navigation-link', block.attributes )
 				);
-			} else {
-				onSelect( block );
 			}
 		},
-		[ onSelect, __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -117,21 +99,17 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		<>
 			{ ! isLoading && (
 				<PrivateListView
-					blocks={
-						isSinglePageList
-							? clientIdsTree[ 0 ].innerBlocks
-							: clientIdsTree
-					}
+					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
 				/>
 			) }
-			<VisuallyHidden aria-hidden="true">
+			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
 				<BlockTools>
 					<BlockList />
 				</BlockTools>
-			</VisuallyHidden>
+			</div>
 		</>
 	);
 }

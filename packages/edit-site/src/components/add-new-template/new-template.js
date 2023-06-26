@@ -12,12 +12,32 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Flex,
+	Icon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { plus } from '@wordpress/icons';
+import {
+	archive,
+	blockMeta,
+	calendar,
+	category,
+	commentAuthorAvatar,
+	edit,
+	home,
+	layout,
+	list,
+	media,
+	notFound,
+	page,
+	plus,
+	pin,
+	postList,
+	search,
+	tag,
+} from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -52,32 +72,68 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'category',
 	'date',
 	'tag',
-	'taxonomy',
 	'search',
 	'404',
 ];
 
-function TemplateListItem( { title, description, onClick } ) {
+const TEMPLATE_ICONS = {
+	'front-page': home,
+	home: postList,
+	single: pin,
+	page,
+	archive,
+	search,
+	404: notFound,
+	index: list,
+	category,
+	author: commentAuthorAvatar,
+	taxonomy: blockMeta,
+	date: calendar,
+	tag,
+	attachment: media,
+};
+
+function TemplateListItem( {
+	title,
+	direction,
+	className,
+	description,
+	icon,
+	onClick,
+	children,
+} ) {
 	return (
-		<Button onClick={ onClick }>
-			<VStack
+		<Button
+			className={ className }
+			onClick={ onClick }
+			label={ description }
+			showTooltip={ !! description }
+		>
+			<Flex
 				as="span"
 				spacing={ 2 }
-				justify="flex-start"
+				align="center"
+				justify="center"
 				style={ { width: '100%' } }
+				direction={ direction }
 			>
-				<Text
-					weight={ 500 }
-					lineHeight={ 1.53846153846 } // 20px
+				<div className="edit-site-add-new-template__template-icon">
+					<Icon icon={ icon } />
+				</div>
+				<VStack
+					className="edit-site-add-new-template__template-name"
+					alignment="center"
+					spacing={ 0 }
 				>
-					{ title }
-				</Text>
-				<Text
-					lineHeight={ 1.53846153846 } // 20px
-				>
-					{ description }
-				</Text>
-			</VStack>
+					<Text
+						weight={ 500 }
+						lineHeight={ 1.53846153846 } // 20px
+					>
+						{ title }
+					</Text>
+					{ children }
+				</VStack>
+			</Flex>
 		</Button>
 	);
 }
@@ -105,6 +161,26 @@ export default function NewTemplate( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate } = unlock( useDispatch( editSiteStore ) );
+
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
+	const TEMPLATE_SHORT_DESCRIPTIONS = {
+		'front-page': homeUrl,
+		date: sprintf(
+			// translators: %s: The homepage url.
+			__( 'E.g. %s' ),
+			homeUrl + '/' + new Date().getFullYear()
+		),
+	};
+
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
@@ -221,14 +297,25 @@ export default function NewTemplate( {
 							justify="center"
 							className="edit-site-add-new-template__template-list__contents"
 						>
+							<Flex className="edit-site-add-new-template__template-list__prompt">
+								{ __(
+									'Select what the new template should apply to:'
+								) }
+							</Flex>
 							{ missingTemplates.map( ( template ) => {
-								const { title, description, slug, onClick } =
-									template;
+								const { title, slug, onClick } = template;
 								return (
 									<TemplateListItem
 										key={ slug }
 										title={ title }
-										description={ description }
+										direction="column"
+										className="edit-site-add-new-template__template-button"
+										description={
+											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
+										}
+										icon={
+											TEMPLATE_ICONS[ slug ] || layout
+										}
 										onClick={ () =>
 											onClick
 												? onClick( template )
@@ -239,15 +326,23 @@ export default function NewTemplate( {
 							} ) }
 							<TemplateListItem
 								title={ __( 'Custom template' ) }
-								description={ __(
-									'A custom template can be manually applied to any post or page.'
-								) }
+								direction="row"
+								className="edit-site-add-new-template__custom-template-button"
+								icon={ edit }
 								onClick={ () =>
 									setModalContent(
 										modalContentMap.customGenericTemplate
 									)
 								}
-							/>
+							>
+								<Text
+									lineHeight={ 1.53846153846 } // 20px
+								>
+									{ __(
+										'A custom template can be manually applied to any post or page.'
+									) }
+								</Text>
+							</TemplateListItem>
 						</Grid>
 					) }
 					{ modalContent === modalContentMap.customTemplate && (
