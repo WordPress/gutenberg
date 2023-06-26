@@ -3,7 +3,6 @@
  */
 import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -52,13 +51,11 @@ export default function useNestedSettingsUpdate(
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
-	const { blockListSettings, parentLock } = useSelect(
+	const { parentLock } = useSelect(
 		( select ) => {
 			const rootClientId =
 				select( blockEditorStore ).getBlockRootClientId( clientId );
 			return {
-				blockListSettings:
-					select( blockEditorStore ).getBlockListSettings( clientId ),
 				parentLock:
 					select( blockEditorStore ).getTemplateLock( rootClientId ),
 			};
@@ -83,14 +80,16 @@ export default function useNestedSettingsUpdate(
 		prioritizedInserterBlocks
 	);
 
+	const _templateLock =
+		templateLock === undefined || parentLock === 'contentOnly'
+			? parentLock
+			: templateLock;
+
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
-			templateLock:
-				templateLock === undefined || parentLock === 'contentOnly'
-					? parentLock
-					: templateLock,
+			templateLock: _templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -116,41 +115,37 @@ export default function useNestedSettingsUpdate(
 			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
 		}
 
-		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			// Batch updates to block list settings to avoid triggering cascading renders
-			// for each container block included in a tree and optimize initial render.
-			// To avoid triggering updateBlockListSettings for each container block
-			// causing X re-renderings for X container blocks,
-			// we batch all the updatedBlockListSettings in a single "data" batch
-			// which results in a single re-render.
-			if ( ! pendingSettingsUpdates.get( registry ) ) {
-				pendingSettingsUpdates.set( registry, [] );
-			}
-			pendingSettingsUpdates
-				.get( registry )
-				.push( [ clientId, newSettings ] );
-			window.queueMicrotask( () => {
-				if ( pendingSettingsUpdates.get( registry )?.length ) {
-					registry.batch( () => {
-						pendingSettingsUpdates
-							.get( registry )
-							.forEach( ( args ) => {
-								updateBlockListSettings( ...args );
-							} );
-						pendingSettingsUpdates.set( registry, [] );
-					} );
-				}
-			} );
+		// Batch updates to block list settings to avoid triggering cascading renders
+		// for each container block included in a tree and optimize initial render.
+		// To avoid triggering updateBlockListSettings for each container block
+		// causing X re-renderings for X container blocks,
+		// we batch all the updatedBlockListSettings in a single "data" batch
+		// which results in a single re-render.
+		if ( ! pendingSettingsUpdates.get( registry ) ) {
+			pendingSettingsUpdates.set( registry, [] );
 		}
+		pendingSettingsUpdates
+			.get( registry )
+			.push( [ clientId, newSettings ] );
+		window.queueMicrotask( () => {
+			if ( pendingSettingsUpdates.get( registry )?.length ) {
+				registry.batch( () => {
+					pendingSettingsUpdates
+						.get( registry )
+						.forEach( ( args ) => {
+							updateBlockListSettings( ...args );
+						} );
+					pendingSettingsUpdates.set( registry, [] );
+				} );
+			}
+		} );
 	}, [
 		clientId,
-		blockListSettings,
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
+		_templateLock,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
-		templateLock,
-		parentLock,
 		captureToolbars,
 		orientation,
 		updateBlockListSettings,

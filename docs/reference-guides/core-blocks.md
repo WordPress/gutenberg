@@ -36,7 +36,7 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 -	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
-## Reusable block
+## Pattern
 
 Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
 
@@ -61,7 +61,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
 ## Calendar
@@ -98,7 +98,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 -	**Name:** core/column
 -	**Category:** design
 -	**Parent:** core/columns
--	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, link, text), layout, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
 ## Columns
@@ -107,7 +107,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 
 -	**Name:** core/columns
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
@@ -191,7 +191,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 -	**Name:** core/comments-pagination
 -	**Category:** theme
 -	**Parent:** core/comments
--	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Comments Next Page
@@ -239,7 +239,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (text, ~~background~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (text, ~~background~~), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -269,6 +269,15 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
+## Footnotes
+
+ ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+
+-	**Name:** core/footnotes
+-	**Category:** text
+-	**Supports:** ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
 ## Classic
 
 Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
@@ -284,7 +293,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 -	**Name:** core/gallery
 -	**Category:** media
--	**Supports:** align, anchor, color (background, gradients, ~~text~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
+-	**Supports:** align, anchor, color (background, gradients, ~~text~~), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
 
 ## Group
@@ -293,7 +302,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, color (background, gradients, link, text), dimensions (minHeight), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, color (background, gradients, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
@@ -331,7 +340,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 -	**Name:** core/image
 -	**Category:** media
 -	**Supports:** anchor, behaviors (lightbox), color (~~background~~, ~~text~~), filter (duotone)
--	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
+-	**Attributes:** align, alt, aspectRatio, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -412,7 +421,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), inserter, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
 
 ## Custom Link
@@ -473,14 +482,14 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
-## Pattern
+## Pattern placeholder
 
 Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug, syncStatus
+-	**Attributes:** slug
 
 ## Post Author
 
@@ -554,7 +563,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/post-content
 -	**Category:** theme
--	**Supports:** align (full, wide), dimensions (minHeight), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), dimensions (minHeight), layout, typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
 ## Post Date
@@ -600,7 +609,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** core/post-template
 -	**Category:** theme
 -	**Parent:** core/query
--	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Post Terms
@@ -655,7 +664,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), ~~html~~
+-	**Supports:** align (full, wide), layout, ~~html~~
 -	**Attributes:** namespace, query, queryId, tagName
 
 ## No results
@@ -675,7 +684,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 -	**Name:** core/query-pagination
 -	**Category:** theme
 -	**Parent:** core/query
--	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
 ## Next Page
@@ -814,7 +823,7 @@ Display icons linking to your social media profiles or sites. ([Source](https://
 
 -	**Name:** core/social-links
 -	**Category:** widgets
--	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), spacing (blockGap, margin, padding, units)
+-	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units)
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer

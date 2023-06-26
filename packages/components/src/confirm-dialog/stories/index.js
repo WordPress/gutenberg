@@ -7,7 +7,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import { Heading } from '../../heading';
 import { ConfirmDialog } from '..';
 
 const meta = {
@@ -26,12 +25,8 @@ const meta = {
 		isOpen: {
 			control: { type: null },
 		},
-		onConfirm: {
-			control: { type: null },
-		},
-		onCancel: {
-			control: { type: null },
-		},
+		onConfirm: { action: 'onConfirm' },
+		onCancel: { action: 'onCancel' },
 	},
 	args: {
 		children: 'Would you like to privately publish the post now?',
@@ -43,19 +38,19 @@ const meta = {
 
 export default meta;
 
-const Template = ( args ) => {
+const Template = ( { onConfirm, onCancel, ...args } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState( '' );
 
-	const handleConfirm = () => {
-		setConfirmVal( 'Confirmed!' );
+	const handleConfirm = ( ...confirmArgs ) => {
+		onConfirm( ...confirmArgs );
 		setIsOpen( false );
 	};
 
-	const handleCancel = () => {
-		setConfirmVal( 'Cancelled' );
+	const handleCancel = ( ...cancelArgs ) => {
+		onCancel( ...cancelArgs );
 		setIsOpen( false );
 	};
+
 	return (
 		<>
 			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
@@ -70,8 +65,6 @@ const Template = ( args ) => {
 			>
 				{ args.children }
 			</ConfirmDialog>
-
-			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
 };

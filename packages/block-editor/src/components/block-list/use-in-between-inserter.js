@@ -23,9 +23,7 @@ export function useInBetweenInserter() {
 	);
 	const {
 		getBlockListSettings,
-		getBlockRootClientId,
 		getBlockIndex,
-		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
@@ -172,9 +170,7 @@ export function useInBetweenInserter() {
 		[
 			openRef,
 			getBlockListSettings,
-			getBlockRootClientId,
 			getBlockIndex,
-			isBlockInsertionPointVisible,
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,

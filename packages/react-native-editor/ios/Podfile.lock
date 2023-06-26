@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.69.4)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.97.0):
+  - Gutenberg (1.98.0):
     - React-Core (= 0.69.4)
     - React-CoreModules (= 0.69.4)
     - React-RCTImage (= 0.69.4)
@@ -360,7 +360,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6):
     - React-Core
-  - RNTAztecView (1.97.0):
+  - RNTAztecView (1.98.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.8)
   - SDWebImage (5.11.1):
@@ -540,7 +540,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
-  Gutenberg: 75e04d6a42ecfb201115f1ccbb066680915a35aa
+  Gutenberg: 6f80407f2b764d6c3075791509c9355f87ed5c58
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
@@ -582,7 +582,7 @@ SPEC CHECKSUMS:
   RNReanimated: 5740ec9926f80bccd404bacd3e71108e87c94afa
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
-  RNTAztecView: 221ecdc2998b979bd0994b9100101ba755cbb1d8
+  RNTAztecView: 0b0641adb02bcc0fcdc8a174640c208405f65bc3
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
