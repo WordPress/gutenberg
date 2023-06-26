@@ -135,14 +135,12 @@ function BlockPatternList( {
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
+				// User added unsynced patterns do not have a unique name so we use the id instead.
+				const key =
+					pattern.name === 'core/block' ? pattern.id : pattern.name;
 				return isShown ? (
 					<BlockPattern
-						key={
-							// User added unsynced patterns do not have a unique name so we use the id instead.
-							pattern.name === 'core/block'
-								? pattern.id
-								: pattern.name
-						}
+						key={ key }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						onHover={ onHover }
@@ -151,13 +149,7 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder
-						key={
-							pattern.name === 'core/block'
-								? pattern.id
-								: pattern.name
-						}
-					/>
+					<BlockPatternPlaceholder key={ key } />
 				);
 			} ) }
 		</Composite>
