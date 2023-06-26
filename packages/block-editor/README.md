@@ -545,6 +545,18 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
+
 ### HeightControl
 
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
@@ -699,6 +711,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode

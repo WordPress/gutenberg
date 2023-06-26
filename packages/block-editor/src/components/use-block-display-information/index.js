@@ -7,6 +7,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,6 +27,26 @@ import { store as blockEditorStore } from '../../store';
  * @property {string}  description A detailed block type description.
  * @property {string}  anchor      HTML anchor.
  */
+
+/**
+ * Get the display label for a block's position type.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} The position type label.
+ */
+function getPositionTypeLabel( attributes ) {
+	const positionType = attributes?.style?.position?.type;
+
+	if ( positionType === 'sticky' ) {
+		return __( 'Sticky' );
+	}
+
+	if ( positionType === 'fixed' ) {
+		return __( 'Fixed' );
+	}
+
+	return null;
+}
 
 /**
  * Hook used to try to find a matching block variation and return
@@ -57,12 +78,15 @@ export default function useBlockDisplayInformation( clientId ) {
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
+				positionType: attributes?.style?.position?.type,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -72,6 +96,8 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
+				positionType: attributes?.style?.position?.type,
 			};
 		},
 		[ clientId ]

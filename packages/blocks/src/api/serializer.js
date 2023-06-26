@@ -81,12 +81,14 @@ const innerBlocksPropsProvider = {};
  */
 export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
-	return applyFilters(
-		'blocks.getSaveContent.extraProps',
-		{ ...props },
-		blockType,
-		attributes
-	);
+	return getBlockProps.skipFilters
+		? props
+		: applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...props },
+				blockType,
+				attributes
+		  );
 }
 
 /**
@@ -96,6 +98,12 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
+	const [ firstBlock ] = innerBlocks ?? [];
+	if ( ! firstBlock ) return props;
+	// If the innerBlocks passed to `getSaveElement` are not blocks but already
+	// components, return the props as is. This is the case for
+	// `getRichTextValues`.
+	if ( ! firstBlock.clientId ) return { ...props, children: innerBlocks };
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );
 	// Use special-cased raw HTML tag to avoid default escaping.
@@ -120,6 +128,9 @@ export function getSaveElement(
 	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	if ( ! blockType?.save ) return null;
+
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must

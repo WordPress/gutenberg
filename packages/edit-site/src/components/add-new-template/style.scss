@@ -138,17 +138,39 @@
 	@include break-large() {
 		width: calc(100% - #{$grid-unit-80 * 2});
 	}
+
+	.edit-site-add-new-template__template-button,
+	.edit-site-add-new-template__custom-template-button {
+		svg {
+			fill: var(--wp-admin-theme-color);
+		}
+	}
+
+	.edit-site-add-new-template__custom-template-button {
+		.edit-site-add-new-template__template-name {
+			flex-grow: 1;
+			align-items: flex-start;
+		}
+	}
+
+	.edit-site-add-new-template__template-icon {
+		padding: $grid-unit-10;
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		border-radius: 100%;
+		max-height: $grid-unit-50;
+		max-width: $grid-unit-50;
+	}
 }
 
 .edit-site-custom-template-modal__contents,
 .edit-site-add-new-template__template-list__contents {
 	> .components-button {
-		padding: $grid-unit-30;
+		padding: $grid-unit-40;
 		border-radius: $radius-block-ui;
 		display: flex;
 		flex-direction: column;
 		border: $border-width solid $gray-300;
-		min-height: $grid-unit-80 * 3;
+		justify-content: center;
 
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
@@ -182,6 +204,12 @@
 				color: var(--wp-admin-theme-color);
 			}
 		}
+	}
+
+	.edit-site-add-new-template__custom-template-button,
+	.edit-site-add-new-template__template-list__prompt {
+		grid-column-start: 1;
+		grid-column-end: 4;
 	}
 }
 
