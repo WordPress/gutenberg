@@ -50,7 +50,7 @@ describe( 'List block', () => {
 		await triggerBlockListLayout( listBlock );
 
 		// Get List item
-		const listItemBlock = await getBlock( screen, 'List item' );
+		const listItemBlock = await getBlock( screen, 'List Item' );
 		fireEvent.press( listItemBlock );
 
 		expect( listItemBlock ).toBeVisible();
