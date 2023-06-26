@@ -41,7 +41,7 @@ function getTemplateLockValue( lock ) {
 	return false;
 }
 
-export default function BlockLockModal( { clientId, onClose, onFocusReturn } ) {
+export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
 	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
@@ -89,7 +89,6 @@ export default function BlockLockModal( { clientId, onClose, onFocusReturn } ) {
 			) }
 			overlayClassName="block-editor-block-lock-modal"
 			onRequestClose={ onClose }
-			onFocusReturn={ onFocusReturn }
 		>
 			<p>
 				{ __(

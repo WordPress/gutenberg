@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
-import { useReducer, useRef } from '@wordpress/element';
+import { useReducer, useRef, useEffect } from '@wordpress/element';
 import { lock } from '@wordpress/icons';
 
 /**
@@ -22,12 +22,33 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 	);
 
 	const lockButtonRef = useRef( null );
+	const isFirstRender = useRef( true );
 
-	if ( ! canLock ) {
-		return null;
-	}
+	const shouldHideBlockLockUI =
+		! canLock || ( canEdit && canMove && canRemove );
 
-	if ( canEdit && canMove && canRemove ) {
+	useEffect( () => {
+		if ( isFirstRender.current ) {
+			isFirstRender.current = false;
+			return;
+		}
+
+		if ( ! isModalOpen && shouldHideBlockLockUI ) {
+			focus.focusable
+				.find( wrapperRef.current, {
+					sequential: false,
+				} )
+				.find(
+					( element ) =>
+						element.tagName === 'BUTTON' &&
+						element !== lockButtonRef.current
+				)
+				?.focus();
+		}
+		// wrapperRef is a reference object and should be stable
+	}, [ isModalOpen, shouldHideBlockLockUI, wrapperRef ] );
+
+	if ( shouldHideBlockLockUI ) {
 		return null;
 	}
 
@@ -42,39 +63,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (
-				<BlockLockModal
-					clientId={ clientId }
-					onClose={ toggleModal }
-					onFocusReturn={ ( defaultFocusReturnElement ) => {
-						// Try to focus the element that should have received
-						// focus by default.
-						if ( defaultFocusReturnElement ) {
-							defaultFocusReturnElement.focus();
-						}
-
-						// Check if the element that should have received focus is effectively
-						// the current active element. This check is useful when the element
-						// that should have received focus is not being rendered in the DOM.
-						if (
-							defaultFocusReturnElement.ownerDocument
-								.activeElement !== defaultFocusReturnElement &&
-							wrapperRef.current
-						) {
-							// As a fallback, focus the first focusable button
-							// found in the toolbar
-							focus.focusable
-								.find( wrapperRef.current, {
-									sequential: false,
-								} )
-								.find(
-									( element ) =>
-										element.tagName === 'BUTTON' &&
-										element !== lockButtonRef.current
-								)
-								?.focus();
-						}
-					} }
-				/>
+				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) }
 		</>
 	);
