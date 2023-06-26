@@ -94,14 +94,23 @@ function block_core_home_link_build_css_font_sizes( $context ) {
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
 	$colors          = block_core_home_link_build_css_colors( $context );
 	$font_sizes      = block_core_home_link_build_css_font_sizes( $context );
-	$is_active       = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
-	$classes[]       = 'wp-block-navigation-item';
-	$classes[]       = $is_active ? 'current-menu-item' : '';
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
+	$classes[]       = 'wp-block-navigation-item';
+	// The ID of the static page assigned to the blog posts index (posts page). String, '0' if not set.
+	$page_for_posts  = get_option( 'page_for_posts' );
+	// The ID of the current page
+	$page_id         = get_queried_object_id();
+
+	if ( is_front_page() ) {
+		$classes[] = 'current-menu-item';
+	} elseif ( is_home() && ( (int)$page_for_posts !== $page_id ) ) { 
+		// Edge case where the Reading settings has a posts page set but not a static homepage.
+		$classes[] = 'current-menu-item';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -126,8 +135,18 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 	if ( empty( $attributes['label'] ) ) {
 		return '';
 	}
+	$aria_current   = '';
+	// The ID of the static page assigned to the blog posts index (posts page). String, '0' if not set.
+	$page_for_posts = get_option( 'page_for_posts' );
+	// The ID of the current page
+	$page_id        = get_queried_object_id();
 
-	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
+	if ( is_front_page() ) {
+		$aria_current = ' aria-current="page"';
+	} elseif ( is_home() && ( (int)$page_for_posts !== $page_id ) ) { 
+		// Edge case where the Reading settings has a posts page set but not a static homepage.
+		$aria_current = ' aria-current="page"';
+	}
 
 	return sprintf(
 		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" rel="home"%3$s>%4$s</a></li>',
