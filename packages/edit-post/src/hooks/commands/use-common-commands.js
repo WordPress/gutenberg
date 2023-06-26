@@ -27,6 +27,7 @@ export default function useCommonCommands() {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
 			),
+			editorMode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
