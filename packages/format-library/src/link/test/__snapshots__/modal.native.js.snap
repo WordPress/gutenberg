@@ -60,7 +60,7 @@ exports[`LinksUI LinksUI renders 1`] = `
             }
           }
         >
-          <View
+          <RNSScreenContainer
             onLayout={[Function]}
             style={
               {
@@ -68,7 +68,18 @@ exports[`LinksUI LinksUI renders 1`] = `
               }
             }
           >
-            <View
+            <RNSScreen
+              activityState={2}
+              collapsable={false}
+              forwardedRef={[Function]}
+              gestureResponseDistance={
+                {
+                  "bottom": -1,
+                  "end": -1,
+                  "start": -1,
+                  "top": -1,
+                }
+              }
               pointerEvents="box-none"
               style={
                 {
@@ -220,6 +231,14 @@ exports[`LinksUI LinksUI renders 1`] = `
                           >
                             <View>
                               <View
+                                accessibilityValue={
+                                  {
+                                    "max": undefined,
+                                    "min": undefined,
+                                    "now": undefined,
+                                    "text": undefined,
+                                  }
+                                }
                                 accessible={false}
                                 focusable={false}
                                 onClick={[Function]}
@@ -239,7 +258,19 @@ exports[`LinksUI LinksUI renders 1`] = `
                                     accessibilityRole="button"
                                     accessibilityState={
                                       {
+                                        "busy": undefined,
+                                        "checked": undefined,
                                         "disabled": false,
+                                        "expanded": undefined,
+                                        "selected": undefined,
+                                      }
+                                    }
+                                    accessibilityValue={
+                                      {
+                                        "max": undefined,
+                                        "min": undefined,
+                                        "now": undefined,
+                                        "text": undefined,
                                       }
                                     }
                                     accessible={true}
@@ -349,7 +380,19 @@ exports[`LinksUI LinksUI renders 1`] = `
                                     accessibilityRole="button"
                                     accessibilityState={
                                       {
+                                        "busy": undefined,
+                                        "checked": undefined,
                                         "disabled": false,
+                                        "expanded": undefined,
+                                        "selected": undefined,
+                                      }
+                                    }
+                                    accessibilityValue={
+                                      {
+                                        "max": undefined,
+                                        "min": undefined,
+                                        "now": undefined,
+                                        "text": undefined,
                                       }
                                     }
                                     accessible={true}
@@ -466,8 +509,8 @@ exports[`LinksUI LinksUI renders 1`] = `
                   </View>
                 </View>
               </View>
-            </View>
-          </View>
+            </RNSScreen>
+          </RNSScreenContainer>
         </RNGestureHandlerRootView>
       </View>
     </View>
