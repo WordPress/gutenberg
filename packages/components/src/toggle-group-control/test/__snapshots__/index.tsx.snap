@@ -314,6 +314,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
       </div>
     </div>
   </div>
+  <button
+    class="components-button"
+    type="button"
+  >
+    Reset
+  </button>
 </div>
 `;
 
@@ -526,6 +532,12 @@ exports[`ToggleGroupControl controlled should render correctly with text options
       </div>
     </div>
   </div>
+  <button
+    class="components-button"
+    type="button"
+  >
+    Reset
+  </button>
 </div>
 `;
 

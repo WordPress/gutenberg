@@ -15,8 +15,9 @@ import { forwardRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { View } from '../../view';
-import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
+import ToggleGroupControlContext from '../context';
+import { useAdjustUndefinedValue } from './utils';
 import type {
 	ToggleGroupControlMainControlProps,
 	ToggleGroupControlContextProps,
@@ -44,17 +45,22 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		'toggle-group-control-as-radio-group'
 	).toString();
 
+	// Use a heuristic to understand if `undefined` values should be intended as
+	// "no value" values for controlled mode, or that the component is being
+	// used in an uncontrolled way.
+	const adjustedValueProp = useAdjustUndefinedValue( valueProp );
+
 	// Handle controlled and uncontrolled updates to the component.
 	// Similar to the logic in the `useControlledState` hook, but with:
 	// - `useRadioState` instead of `useState`
 	// - a guard in `onChange` so that it doesn't fire if the value doesn't change
-	const hasValue = typeof valueProp !== 'undefined';
-	const initialValue = hasValue ? valueProp : defaultValueProp;
+	const hasValue = typeof adjustedValueProp !== 'undefined';
+	const initialValue = hasValue ? adjustedValueProp : defaultValueProp;
 	const { state, setState, ...radio } = useRadioState( {
 		baseId,
 		state: initialValue,
 	} );
-	const value = hasValue ? valueProp : state;
+	const value = hasValue ? adjustedValueProp : state;
 	const onChange =
 		typeof onChangeProp === 'function'
 			? ( ( ( newValue ) => {

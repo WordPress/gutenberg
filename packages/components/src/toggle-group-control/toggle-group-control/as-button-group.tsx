@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ForwardedRef } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -14,8 +9,9 @@ import { forwardRef, useMemo } from '@wordpress/element';
  */
 import { View } from '../../view';
 import { useControlledValue } from '../../utils';
-import ToggleGroupControlContext from '../context';
 import type { WordPressComponentProps } from '../../ui/context';
+import ToggleGroupControlContext from '../context';
+import { useAdjustUndefinedValue } from './utils';
 import type {
 	ToggleGroupControlMainControlProps,
 	ToggleGroupControlContextProps,
@@ -28,7 +24,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		label,
 		onChange,
 		size,
-		value,
+		value: valueProp,
 		defaultValue,
 		...otherProps
 	}: WordPressComponentProps<
@@ -36,16 +32,21 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		'div',
 		false
 	>,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const baseId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
 
+	// Use a heuristic to understand if `undefined` values should be intended as
+	// "no value" values for controlled mode, or that the component is being
+	// used in an uncontrolled way.
+	const adjustedValueProp = useAdjustUndefinedValue( valueProp );
+
 	const [ selectedValue, setSelectedValue ] = useControlledValue( {
 		defaultValue,
-		value,
+		value: adjustedValueProp,
 		onChange,
 	} );
 

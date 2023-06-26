@@ -13,6 +13,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -32,14 +33,17 @@ const ControlledToggleGroupControl = ( {
 	const [ value, setValue ] = useState( defaultValue );
 
 	return (
-		<ToggleGroupControl
-			{ ...props }
-			onChange={ ( ...changeArgs ) => {
-				setValue( ...changeArgs );
-				onChange?.( ...changeArgs );
-			} }
-			value={ value }
-		/>
+		<>
+			<ToggleGroupControl
+				{ ...props }
+				onChange={ ( ...changeArgs ) => {
+					setValue( ...changeArgs );
+					onChange?.( ...changeArgs );
+				} }
+				value={ value }
+			/>
+			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
+		</>
 	);
 };
 const options = (
@@ -68,7 +72,7 @@ describe.each( [
 	[ 'uncontrolled', ToggleGroupControl ],
 	[ 'controlled', ControlledToggleGroupControl ],
 ] )( 'ToggleGroupControl %s', ( ...modeAndComponent ) => {
-	const [ , Component ] = modeAndComponent;
+	const [ mode, Component ] = modeAndComponent;
 
 	describe( 'should render correctly', () => {
 		it( 'with text options', () => {
@@ -170,6 +174,36 @@ describe.each( [
 		);
 	} );
 
+	if ( mode === 'controlled' ) {
+		it( 'should reset values correctly', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Component label="Test Toggle Group Control">
+					{ options }
+				</Component>
+			);
+
+			const rigasOption = screen.getByRole( 'radio', { name: 'R' } );
+			const jackOption = screen.getByRole( 'radio', { name: 'J' } );
+
+			await user.click( rigasOption );
+
+			expect( jackOption ).not.toBeChecked();
+			expect( rigasOption ).toBeChecked();
+
+			await user.click( jackOption );
+
+			expect( rigasOption ).not.toBeChecked();
+			expect( jackOption ).toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect( rigasOption ).not.toBeChecked();
+			expect( jackOption ).not.toBeChecked();
+		} );
+	}
+
 	describe( 'isDeselectable', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
@@ -211,7 +245,13 @@ describe.each( [
 				expect( rigas ).toHaveFocus();
 
 				await user.tab();
-				expect( rigas.ownerDocument.body ).toHaveFocus();
+
+				const expectedFocusTarget =
+					mode === 'uncontrolled'
+						? rigas.ownerDocument.body
+						: screen.getByRole( 'button', { name: 'Reset' } );
+
+				expect( expectedFocusTarget ).toHaveFocus();
 			} );
 		} );
 
@@ -238,7 +278,7 @@ describe.each( [
 					} )
 				);
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenLastCalledWith( '' );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
 
 				await user.click(
 					screen.getByRole( 'button', {

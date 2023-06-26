@@ -102,7 +102,7 @@ function ToggleGroupControlOptionBase(
 
 	const buttonOnClick = () => {
 		if ( isDeselectable && isPressed ) {
-			otherContextProps.setState( '' );
+			otherContextProps.setState( undefined );
 		} else {
 			otherContextProps.setState( value );
 		}
