@@ -16,31 +16,14 @@ export default function useListViewClientIds( { blocks, rootClientId } ) {
 			const {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
-				__unstableGetClientIdsTree,
-				getBlockEditingMode,
+				getListViewClientIdsTree,
 			} = unlock( select( blockEditorStore ) );
-
-			const removeDisabledBlocks = ( tree ) => {
-				return tree.flatMap( ( { clientId, innerBlocks, ...rest } ) => {
-					if ( getBlockEditingMode( clientId ) === 'disabled' ) {
-						return removeDisabledBlocks( innerBlocks );
-					}
-					return [
-						{
-							clientId,
-							innerBlocks: removeDisabledBlocks( innerBlocks ),
-							...rest,
-						},
-					];
-				} );
-			};
 
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
-				clientIdsTree: removeDisabledBlocks(
-					blocks ?? __unstableGetClientIdsTree( rootClientId )
-				),
+				clientIdsTree:
+					blocks ?? getListViewClientIdsTree( rootClientId ),
 			};
 		},
 		[ blocks, rootClientId ]

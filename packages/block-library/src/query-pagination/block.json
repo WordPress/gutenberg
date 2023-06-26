@@ -35,7 +35,7 @@
 				"link": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {

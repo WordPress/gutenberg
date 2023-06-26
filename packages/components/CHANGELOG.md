@@ -2,9 +2,31 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
+-   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
+-   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
+-   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
+-   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
+-   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
+
 ### Bug Fix
 
 -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+-   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
+-   `Autocomplete`: Announce how many results are available to screen readers when suggestions list first renders ([#51018](https://github.com/WordPress/gutenberg/pull/51018)).
+-   `ConfirmDialog`: Ensure onConfirm isn't called an extra time when submitting one of the buttons using the keyboard ([#51730](https://github.com/WordPress/gutenberg/pull/51730)).
+-   `ZStack`: ZStack: fix component bounding box to match children ([#51836](https://github.com/WordPress/gutenberg/pull/51836)).
+
+### Internal
+
+-   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
+-   `Toolbar`: Replace `reakit` dependency with `@ariakit/react` ([#51623](https://github.com/WordPress/gutenberg/pull/51623)).
+
+### Documentation
+
+-   `SearchControl`: Improve documentation around usage of `label` prop ([#51781](https://github.com/WordPress/gutenberg/pull/51781)).
 
 ## 25.1.0 (2023-06-07)
 
@@ -27,7 +49,7 @@
 ### Experimental
 
 -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
--   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component  ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
+-   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
 -   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
 
 ## 25.0.0 (2023-05-24)

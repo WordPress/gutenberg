@@ -15,6 +15,7 @@
 	height: $block-toolbar-height;
 	padding: 0 ( $grid-unit-15 + $border-width );
 	user-select: none;
+	width: max-content;
 
 	svg {
 		fill: currentColor;

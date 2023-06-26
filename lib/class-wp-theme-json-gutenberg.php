@@ -313,10 +313,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0 As `ALLOWED_TOP_LEVEL_KEYS`.
 	 * @since 5.9.0 Renamed from `ALLOWED_TOP_LEVEL_KEYS` to `VALID_TOP_LEVEL_KEYS`,
 	 *              added the `customTemplates` and `templateParts` values.
+	 * @since 6.3.0 Added the `description` value.
 	 * @var string[]
 	 */
 	const VALID_TOP_LEVEL_KEYS = array(
 		'customTemplates',
+		'description',
 		'patterns',
 		'settings',
 		'styles',
@@ -337,6 +339,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
+	 * @since 6.3.0 Removed `layout.definitions`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -371,7 +374,6 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'layout'                        => array(
 			'contentSize' => null,
-			'definitions' => null,
 			'wideSize'    => null,
 		),
 		'position'                      => array(
@@ -1263,7 +1265,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
-			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
+			if ( ! block_has_support( $block_type, array( 'layout' ), false ) && ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
 				return $block_rules;
 			}
 		}
@@ -1272,7 +1274,7 @@ class WP_Theme_JSON_Gutenberg {
 		$has_block_gap_support    = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-		$layout_definitions       = _wp_array_get( $this->theme_json, array( 'settings', 'layout', 'definitions' ), array() );
+		$layout_definitions       = gutenberg_get_layout_definitions();
 		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
 		// Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
@@ -3644,4 +3646,78 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $tree;
 	}
+
+	/**
+	 * Replaces CSS variables with their values in place.
+	 *
+	 * @since 6.3.0
+	 * @param array $styles CSS declarations to convert.
+	 * @param array $values key => value pairs to use for replacement.
+	 * @return array
+	 */
+	private static function convert_variables_to_value( $styles, $values ) {
+		foreach ( $styles as $key => $style ) {
+			if ( is_array( $style ) ) {
+				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
+				continue;
+			}
+
+			if ( 0 <= strpos( $style, 'var(' ) ) {
+				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
+
+				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
+
+				if ( $has_matches ) {
+					$resolved_style = $styles[ $key ];
+					foreach ( $var_parts[1] as $index => $var_part ) {
+						$key_in_values   = 'var(' . $var_part . ')';
+						$rule_to_replace = $var_parts[0][ $index ]; // the css rule to replace e.g. var(--wp--preset--color--vivid-green-cyan).
+						$fallback        = $var_parts[2][ $index ]; // the fallback value.
+						$resolved_style  = str_replace(
+							array(
+								$rule_to_replace,
+								$fallback,
+							),
+							array(
+								isset( $values[ $key_in_values ] ) ? $values[ $key_in_values ] : $rule_to_replace,
+								isset( $values[ $fallback ] ) ? $values[ $fallback ] : $fallback,
+							),
+							$resolved_style
+						);
+					}
+					$styles[ $key ] = $resolved_style;
+				}
+			}
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * Resolves the values of CSS variables in the given styles.
+	 *
+	 * @since 6.3.0
+	 * @param WP_Theme_JSON_Gutenberg $theme_json The theme json resolver.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg The $theme_json with resolved variables.
+	 */
+	public static function resolve_variables( $theme_json ) {
+		$settings    = $theme_json->get_settings();
+		$styles      = $theme_json->get_raw_data()['styles'];
+		$preset_vars = static::compute_preset_vars( $settings, static::VALID_ORIGINS );
+		$theme_vars  = static::compute_theme_vars( $settings );
+		$vars        = array_reduce(
+			array_merge( $preset_vars, $theme_vars ),
+			function( $carry, $item ) {
+				$name                    = $item['name'];
+				$carry[ "var({$name})" ] = $item['value'];
+				return  $carry;
+			},
+			array()
+		);
+
+		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
+		return $theme_json;
+	}
+
 }

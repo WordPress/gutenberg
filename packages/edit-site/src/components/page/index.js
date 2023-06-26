@@ -1,13 +1,31 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { NavigableRegion } from '@wordpress/interface';
+
+/**
  * Internal dependencies
  */
-
 import Header from './header';
 
-export default function Page( { title, subTitle, actions, children } ) {
+export default function Page( {
+	title,
+	subTitle,
+	actions,
+	children,
+	className,
+	hideTitleFromUI = false,
+} ) {
+	const classes = classnames( 'edit-site-page', className );
+
 	return (
-		<div className="edit-site-page">
-			{ title && (
+		<NavigableRegion className={ classes } ariaLabel={ title }>
+			{ ! hideTitleFromUI && title && (
 				<Header
 					title={ title }
 					subTitle={ subTitle }
@@ -15,6 +33,6 @@ export default function Page( { title, subTitle, actions, children } ) {
 				/>
 			) }
 			<div className="edit-site-page-content">{ children }</div>
-		</div>
+		</NavigableRegion>
 	);
 }
