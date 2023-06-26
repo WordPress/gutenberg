@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { useCallback, useMemo } from '@wordpress/element';
+import { cloneBlock, parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -21,37 +21,68 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
-	const { patternCategories, patterns } = useSelect(
+	const { patternCategories, patterns, unsyncedPatterns } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
+			const {
+				__experimentalGetAllowedPatterns,
+				getSettings,
+				getInserterItems,
+			} = select( blockEditorStore );
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
 				patternCategories:
 					getSettings().__experimentalBlockPatternCategories,
+				unsyncedPatterns: getInserterItems( rootClientId, 'unsynced' ),
 			};
 		},
 		[ rootClientId ]
 	);
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert(
-			( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
-			pattern.name
-		);
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: block pattern title. */
-				__( 'Block pattern "%s" inserted.' ),
-				pattern.title
-			),
-			{
-				type: 'snackbar',
-			}
-		);
-	}, [] );
 
-	return [ patterns, patternCategories, onClickPattern ];
+	const allPatterns = useMemo( () => {
+		const parsedUnsyncedPatterns = unsyncedPatterns.map(
+			( syncedPattern ) => ( {
+				...syncedPattern,
+				name: syncedPattern.id,
+				categories: [ 'custom' ],
+				blocks: parse( syncedPattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} ),
+			} )
+		);
+		return [ ...patterns, ...parsedUnsyncedPatterns ];
+	}, [ unsyncedPatterns, patterns ] );
+
+	const allCategories = useMemo( () => {
+		const customPatternsCategory = {
+			name: 'custom',
+			label: 'Custom patterns',
+			description: 'Custom patterns add by site users',
+		};
+		return [ ...patternCategories, customPatternsCategory ];
+	}, [ patternCategories ] );
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onClickPattern = useCallback(
+		( pattern, blocks ) => {
+			onInsert(
+				( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
+				pattern.name
+			);
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: block pattern title. */
+					__( 'Block pattern "%s" inserted.' ),
+					pattern.title
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+		},
+		[ createSuccessNotice, onInsert ]
+	);
+
+	return [ allPatterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

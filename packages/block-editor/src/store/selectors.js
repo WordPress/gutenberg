@@ -1963,10 +1963,6 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null, syncStatus ) => {
-		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-			buildScope: 'inserter',
-		} );
-
 		/*
 		 * Matches block comment delimiters amid serialized content.
 		 *
@@ -2031,12 +2027,6 @@ export const getInserterItems = createSelector(
 			};
 		};
 
-		const blockTypeInserterItems = getBlockTypes()
-			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-			)
-			.map( buildBlockTypeInserterItem );
-
 		const reusableBlockInserterItems = canInsertBlockTypeUnmemoized(
 			state,
 			'core/block',
@@ -2051,6 +2041,20 @@ export const getInserterItems = createSelector(
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
+
+		if ( syncStatus === 'unsynced' ) {
+			return reusableBlockInserterItems;
+		}
+
+		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+			buildScope: 'inserter',
+		} );
+
+		const blockTypeInserterItems = getBlockTypes()
+			.filter( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			)
+			.map( buildBlockTypeInserterItem );
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;

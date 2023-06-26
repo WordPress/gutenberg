@@ -14,7 +14,6 @@ import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
-import useUnsyncedPatterns from '../hooks/use-unsynced-patterns';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 
@@ -54,12 +53,6 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		destinationRootClientId
 	);
 
-	const filteredUnsyncedPatterns = useUnsyncedPatterns(
-		destinationRootClientId,
-		onInsertBlocks,
-		true
-	);
-
 	const registeredPatternCategories = useMemo(
 		() =>
 			patternCategories.map(
@@ -83,7 +76,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			);
 		}
 		return searchItems( allPatterns, filterValue );
-	}, [ filterValue, selectedCategory, allPatterns ] );
+	}, [
+		filterValue,
+		allPatterns,
+		selectedCategory,
+		registeredPatternCategories,
+	] );
 
 	// Announce search results on change.
 	useEffect( () => {
@@ -97,20 +95,13 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
 	const blockPatterns = useAsyncList( filteredBlockPatterns, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
-	const blockPatternsUnsynced = useAsyncList( filteredUnsyncedPatterns, {
-		step: INITIAL_INSERTER_RESULTS,
-	} );
-
-	const currentShownPatterns =
-		selectedCategory === 'reusable' ? blockPatternsUnsynced : blockPatterns;
-
-	const hasItems = !! currentShownPatterns?.length;
+	const hasItems = !! blockPatterns?.length;
 	return (
 		<div className="block-editor-block-patterns-explorer__list">
 			{ hasItems && (
@@ -123,8 +114,8 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 				{ ! hasItems && <InserterNoResults /> }
 				{ hasItems && (
 					<BlockPatternsList
-						shownPatterns={ currentShownPatterns }
-						blockPatterns={ currentShownPatterns }
+						shownPatterns={ blockPatterns }
+						blockPatterns={ blockPatterns }
 						onClickPattern={ onSelectBlockPattern }
 						isDraggable={ false }
 					/>
