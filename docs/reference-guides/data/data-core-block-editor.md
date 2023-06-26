@@ -125,6 +125,29 @@ _Returns_
 
 Determines if the given block is allowed to be moved.
 
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { canMoveBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return canMoveBlock( blockToCheck ) ? (
+		<p>{ __( 'Block is movable.' ) }</p>
+	) : (
+		<p>{ __( 'Block is NOT moveable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
@@ -139,10 +162,36 @@ _Returns_
 
 Determines if the given blocks are allowed to be moved.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { canMoveBlocks, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	// Define the list of blocks to check.
+	const blocksToCheck = [
+		availableBlocks[ 0 ]?.clientId,
+		availableBlocks[ 1 ]?.clientId,
+	];
+
+	return canMoveBlocks( blocksToCheck ) ? (
+		<p>{ __( 'Blocks are movable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks are NOT moveable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be moved.
+-   _clientIds_ `Array`: The block client IDs to be moved.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_

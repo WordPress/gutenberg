@@ -1720,6 +1720,29 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { canMoveBlock, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *     );
+ *
+ *     // Retrieve the clientId of the block to check.
+ *     const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *     return canMoveBlock( blockToCheck ) ? (
+ *         <p>{ __( 'Block is movable.' ) }</p>
+ *     ) : (
+ *         <p>{ __( 'Block is NOT moveable.' ) }</p>
+ *     );
+ * };
+ *
+ * ```
+ *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
@@ -1741,8 +1764,33 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
  * Determines if the given blocks are allowed to be moved.
  *
  * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be moved.
+ * @param {Array}   clientIds    The block client IDs to be moved.
  * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *    const { canMoveBlocks, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *    );
+ *
+ *    // Get all the blocks in the editor.
+ *    const availableBlocks = getBlocks();
+ *
+ *    // Define the list of blocks to check.
+ *    const blocksToCheck = [
+ *        availableBlocks[ 0 ]?.clientId,
+ *        availableBlocks[ 1 ]?.clientId,
+ *    ];
+ *
+ *    return canMoveBlocks( blocksToCheck ) ? (
+ *        <p>{ __( 'Blocks are movable.' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Blocks are NOT moveable.' ) }</p>
+ *    );
+ * };
+ * ```
  *
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
