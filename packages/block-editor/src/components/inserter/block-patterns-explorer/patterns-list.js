@@ -6,7 +6,6 @@ import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,7 +14,7 @@ import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
-import useBlockTypesState from '../hooks/use-block-types-state';
+import useUnsyncedPatterns from '../hooks/use-unsynced-patterns';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 
@@ -54,24 +53,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		onInsertBlocks,
 		destinationRootClientId
 	);
-	const [ unsyncedPatterns ] = useBlockTypesState(
+
+	const filteredUnsyncedPatterns = useUnsyncedPatterns(
 		destinationRootClientId,
 		onInsertBlocks,
-		'unsynced'
+		true
 	);
-	const filteredUnsyncedPatterns = useMemo( () => {
-		return unsyncedPatterns
-			.filter(
-				( { category: unsyncedPatternCategory } ) =>
-					unsyncedPatternCategory === 'reusable'
-			)
-			.map( ( syncedPattern ) => ( {
-				...syncedPattern,
-				blocks: parse( syncedPattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} ) );
-	}, [ unsyncedPatterns ] );
 
 	const registeredPatternCategories = useMemo(
 		() =>
