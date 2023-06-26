@@ -101,13 +101,13 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 	$classes[]       = 'wp-block-navigation-item';
 	// The ID of the static page assigned to the blog posts index (posts page). String, '0' if not set.
-	$page_for_posts  = get_option( 'page_for_posts' );
-	// The ID of the current page
-	$page_id         = get_queried_object_id();
+	$page_for_posts = get_option( 'page_for_posts' );
+	// The ID of the current page.
+	$page_id        = get_queried_object_id();
 
 	if ( is_front_page() ) {
 		$classes[] = 'current-menu-item';
-	} elseif ( is_home() && ( (int)$page_for_posts !== $page_id ) ) { 
+	} elseif ( is_home() && ( (int) $page_for_posts !== $page_id ) ) {
 		// Edge case where the Reading settings has a posts page set but not a static homepage.
 		$classes[] = 'current-menu-item';
 	}
@@ -135,10 +135,10 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 	if ( empty( $attributes['label'] ) ) {
 		return '';
 	}
-	$aria_current   = '';
+	$aria_current = '';
 	// The ID of the static page assigned to the blog posts index (posts page). String, '0' if not set.
 	$page_for_posts = get_option( 'page_for_posts' );
-	// The ID of the current page
+	// The ID of the current page.
 	$page_id        = get_queried_object_id();
 
 	if ( is_front_page() ) {
