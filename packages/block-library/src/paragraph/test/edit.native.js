@@ -54,9 +54,9 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	it( 'renders without crashing', () => {
+	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
-		expect( screen.container ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
@@ -255,7 +255,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Link' ) );
 
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text' ),
+			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
 			'WordPress'
 		);
 		fireEvent.press(

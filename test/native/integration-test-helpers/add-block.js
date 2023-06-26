@@ -12,7 +12,6 @@ import { AccessibilityInfo } from 'react-native';
 /**
  * Internal dependencies
  */
-import { waitFor } from './wait-for';
 import { withFakeTimers } from './with-fake-timers';
 
 /**
@@ -28,13 +27,11 @@ export const addBlock = async (
 	blockName,
 	{ isPickerOpened } = {}
 ) => {
-	const { getByLabelText, getByTestId, getByText } = screen;
-
 	if ( ! isPickerOpened ) {
-		fireEvent.press( getByLabelText( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 	}
 
-	const blockList = getByTestId( 'InserterUI-Blocks' );
+	const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items
 	fireEvent.scroll( blockList, {
 		nativeEvent: {
@@ -44,7 +41,7 @@ export const addBlock = async (
 		},
 	} );
 
-	const blockButton = await waitFor( () => getByText( blockName ) );
+	const blockButton = await screen.findByText( blockName );
 	// Blocks can perform belated state updates after they are inserted.
 	// To avoid potential `act` warnings, we ensure that all timers and queued
 	// microtasks are executed.

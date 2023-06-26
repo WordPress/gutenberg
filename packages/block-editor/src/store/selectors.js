@@ -187,16 +187,27 @@ export function getBlocks( state, rootClientId ) {
  * Returns a stripped down block object containing only its client ID,
  * and its inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object} state    Editor state.
  * @param {string} clientId Client ID of the block to get.
  *
  * @return {Object} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdWithClientIdsTree = createSelector(
-	( state, clientId ) => ( {
-		clientId,
-		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
-	} ),
+	( state, clientId ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return {
+			clientId,
+			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+		};
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -205,16 +216,26 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  * given root, consisting of stripped down block objects containing only
  * their client IDs, and their inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) =>
-		getBlockOrder( state, rootClientId ).map( ( clientId ) =>
+	( state, rootClientId = '' ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 			__unstableGetClientIdWithClientIdsTree( state, clientId )
-		),
+		);
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -303,10 +324,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		if ( ! blockName ) {
 			return EMPTY_ARRAY;
 		}
+		const blockNames = Array.isArray( blockName )
+			? blockName
+			: [ blockName ];
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
 			const block = state.blocks.byClientId.get( clientId );
-			return block.name === blockName;
+			return blockNames.includes( block.name );
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
 	},
@@ -536,18 +560,10 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return parents
-			.map( ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) )
-			.filter( ( { name } ) => {
-				if ( Array.isArray( blockName ) ) {
-					return blockName.includes( name );
-				}
-				return name === blockName;
-			} )
-			.map( ( { id } ) => id );
+		const hasName = Array.isArray( blockName )
+			? ( name ) => blockName.includes( name )
+			: ( name ) => blockName === name;
+		return parents.filter( ( id ) => hasName( getBlockName( state, id ) ) );
 	},
 	( state ) => [ state.blocks.parents ]
 );
@@ -1672,16 +1688,14 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return true;
 	}
-	if ( attributes.lock?.remove ) {
-		return false;
+	if ( attributes.lock?.remove !== undefined ) {
+		return ! attributes.lock.remove;
 	}
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1711,18 +1725,16 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
-		return;
+		return true;
 	}
-	if ( attributes.lock?.move ) {
-		return false;
+	if ( attributes.lock?.move !== undefined ) {
+		return ! attributes.lock.move;
 	}
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1933,6 +1945,7 @@ const buildBlockTypeItem =
  *
  * @param    {Object}   state             Editor state.
  * @param    {?string}  rootClientId      Optional root client ID of block list.
+ * @param    {?string}  syncStatus        Optional sync status to filter pattern blocks by.
  *
  * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
@@ -1949,7 +1962,7 @@ const buildBlockTypeItem =
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
+	( state, rootClientId = null, syncStatus ) => {
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
 			buildScope: 'inserter',
 		} );
@@ -2014,6 +2027,7 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
+				content: reusableBlock.content.raw,
 			};
 		};
 
@@ -2028,7 +2042,14 @@ export const getInserterItems = createSelector(
 			'core/block',
 			rootClientId
 		)
-			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
+			? getReusableBlocks( state )
+					.filter(
+						( reusableBlock ) =>
+							syncStatus === reusableBlock.meta?.sync_status ||
+							( ! syncStatus &&
+								reusableBlock.meta?.sync_status === '' )
+					)
+					.map( buildReusableBlockInserterItem )
 			: [];
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
@@ -2816,10 +2837,11 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
-	// can't be selected, and prevents non-disabled nested blocks from being
-	// selected.
-	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
+	// 'disabled' then the overlay is redundant since the block can't be
+	// selected. If the mode is 'contentOnly' then the overlay is redundant
+	// since there will be no controls to interact with once selected.
+	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
 		return false;
 	}
 

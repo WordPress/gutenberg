@@ -48,19 +48,27 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			)
 		);
 		// This creates the global styles for the current theme.
-		self::$global_styles_id = wp_insert_post(
+		self::$global_styles_id = $factory->post->create(
 			array(
 				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-emptytheme',
+				'post_name'    => 'wp-global-styles-emptytheme-revisions',
 				'tax_input'    => array(
 					'wp_theme' => 'emptytheme',
 				),
-			),
-			true
+			)
 		);
+	}
+
+	/**
+	 * Removes users after our tests run.
+	 */
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$admin_id );
+		self::delete_user( self::$second_admin_id );
+		self::delete_user( self::$author_id );
 	}
 
 	/**
