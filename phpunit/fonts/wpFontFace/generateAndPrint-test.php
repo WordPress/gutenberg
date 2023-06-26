@@ -12,7 +12,7 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
  * @group fonts
  * @covers WP_Font_Face::generate_and_print
  */
-class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_Fonts_TestCase {
+class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_test_generate_and_print
