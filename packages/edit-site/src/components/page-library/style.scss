@@ -6,7 +6,7 @@
 	}
 
 	.components-heading {
-		color: $white;
+		color: $gray-200;
 	}
 
 	@include break-medium {
@@ -78,7 +78,7 @@
 .edit-site-library__search {
 	&#{&} input[type="search"] {
 		background: $gray-800;
-		color: $gray-100;
+		color: $gray-200;
 
 		&:focus {
 			background: $gray-800;
