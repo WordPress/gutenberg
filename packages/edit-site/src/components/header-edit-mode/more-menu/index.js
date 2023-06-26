@@ -116,14 +116,14 @@ export default function MoreMenu( { showIconLabels } ) {
 									'\\'
 								) }
 							/>
-							<ModeSwitcher />
-							<ActionItem.Slot
-								name="core/edit-site/plugin-more-menu"
-								label={ __( 'Plugins' ) }
-								as={ MenuGroup }
-								fillProps={ { onClick: onClose } }
-							/>
 						</MenuGroup>
+						<ModeSwitcher />
+						<ActionItem.Slot
+							name="core/edit-site/plugin-more-menu"
+							label={ __( 'Plugins' ) }
+							as={ MenuGroup }
+							fillProps={ { onClick: onClose } }
+						/>
 						<MenuGroup label={ __( 'Tools' ) }>
 							<SiteExport />
 							<MenuItem
