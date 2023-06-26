@@ -92,8 +92,25 @@ function UnconnectedNavigatorScreen(
 					/* In case the root has a height, it should not be exceeded. */
 					max-height: 100%;
 
+					&::after {
+						content: '';
+						position: absolute;
+						inset: 0;
+						z-index: 9999;
+						pointer-events: none;
+					}
+
 					&:focus {
 						outline: none;
+					}
+
+					&:focus::after {
+						box-shadow: inset 0 0 0
+							var( --wp-admin-border-width-focus )
+							var( --wp-admin-theme-color );
+
+						// Windows High Contrast mode will show this outline, but not the box-shadow.
+						outline: 2px solid transparent;
 					}
 				`,
 				className
