@@ -112,16 +112,16 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const patterns =
-		selectedCategory === 'reusable'
-			? filteredUnsyncedPatterns
-			: filteredBlockPatterns;
-
-	const currentShownPatterns = useAsyncList( patterns, {
+	const blockPatterns = useAsyncList( filteredBlockPatterns, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
-	const hasItems = !! patterns?.length;
+	const currentShownPatterns =
+		selectedCategory === 'reusable'
+			? filteredUnsyncedPatterns
+			: blockPatterns;
+
+	const hasItems = !! currentShownPatterns?.length;
 	return (
 		<div className="block-editor-block-patterns-explorer__list">
 			{ hasItems && (
@@ -135,7 +135,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
-						blockPatterns={ patterns }
+						blockPatterns={ currentShownPatterns }
 						onClickPattern={ onSelectBlockPattern }
 						isDraggable={ false }
 					/>
