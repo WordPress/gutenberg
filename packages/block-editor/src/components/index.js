@@ -26,6 +26,7 @@ export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockStyles } from './block-styles';
+export { default as HeadingLevelDropdown } from './block-heading-level-dropdown';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
@@ -110,7 +111,6 @@ export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
-export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
 export {
 	default as BlockPreview,

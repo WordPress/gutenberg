@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "16.0.0-rc.5",
+	"version": "16.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -115,7 +115,7 @@
 		"@storybook/react": "6.5.7",
 		"@testing-library/jest-dom": "5.16.5",
 		"@testing-library/react": "13.4.0",
-		"@testing-library/react-native": "11.3.0",
+		"@testing-library/react-native": "12.1.2",
 		"@testing-library/user-event": "14.4.3",
 		"@types/classnames": "2.3.1",
 		"@types/eslint": "7.28.0",

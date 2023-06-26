@@ -33,6 +33,15 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
+const headerVariants = {
+	hidden: { opacity: 0 },
+	hover: {
+		opacity: 1,
+		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+	},
+	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
+};
+
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
@@ -74,14 +83,6 @@ function InterfaceSkeleton(
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
-	const headerVariants = {
-		hidden: isDistractionFree ? { opacity: 0 } : { opacity: 1 },
-		hover: {
-			opacity: 1,
-			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-		},
-	};
-
 	return (
 		<div
 			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
@@ -97,23 +98,32 @@ function InterfaceSkeleton(
 			) }
 		>
 			<div className="interface-interface-skeleton__editor">
-				{ !! header && isDistractionFree && (
+				{ !! header && (
 					<NavigableRegion
 						as={ motion.div }
 						className="interface-interface-skeleton__header"
 						aria-label={ mergedLabels.header }
-						initial={ isDistractionFree ? 'hidden' : 'hover' }
-						whileHover="hover"
+						initial={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						whileHover={
+							isDistractionFree
+								? 'hover'
+								: 'distractionFreeInactive'
+						}
+						animate={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
 						variants={ headerVariants }
-						transition={ { type: 'tween', delay: 0.8 } }
-					>
-						{ header }
-					</NavigableRegion>
-				) }
-				{ !! header && ! isDistractionFree && (
-					<NavigableRegion
-						className="interface-interface-skeleton__header"
-						ariaLabel={ mergedLabels.header }
+						transition={
+							isDistractionFree
+								? { type: 'tween', delay: 0.8 }
+								: undefined
+						}
 					>
 						{ header }
 					</NavigableRegion>
