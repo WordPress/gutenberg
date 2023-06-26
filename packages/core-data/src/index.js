@@ -13,6 +13,8 @@ import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
 import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
+import { unlock } from './lock-unlock';
+import { getNavigationFallbackId } from './private-selectors';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -63,6 +65,9 @@ const storeConfig = () => ( {
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 register( store );
+unlock( store ).registerPrivateSelectors( {
+	getNavigationFallbackId,
+} );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
