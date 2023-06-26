@@ -89,18 +89,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-pattern-enhancements',
-		__( 'Pattern enhancements', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the Pattern block enhancements', 'gutenberg' ),
-			'id'    => 'gutenberg-pattern-enhancements',
-		)
-	);
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

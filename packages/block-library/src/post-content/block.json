@@ -10,7 +10,7 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"__experimentalLayout": true,
+		"layout": true,
 		"dimensions": {
 			"minHeight": true
 		},

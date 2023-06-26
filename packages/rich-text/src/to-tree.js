@@ -101,6 +101,12 @@ function fromFormat( {
 		}
 	}
 
+	// When a format is declared as non editable, make it non editable in the
+	// editor.
+	if ( isEditableTree && formatType.contentEditable === false ) {
+		elementAttributes.contenteditable = 'false';
+	}
+
 	return {
 		type: formatType.tagName === '*' ? tagName : formatType.tagName,
 		object: formatType.object,
@@ -291,7 +297,12 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
+			const replacement = replacements[ i ];
+			if ( ! replacement ) continue;
+			const { type, attributes, innerHTML } = replacement;
+			const formatType = getFormatType( type );
+
+			if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
@@ -301,14 +312,26 @@ export function toTree( {
 				);
 				append( pointer, {
 					html: decodeURIComponent(
-						replacements[ i ].attributes[ 'data-rich-text-script' ]
+						attributes[ 'data-rich-text-script' ]
 					),
 				} );
+			} else if ( formatType?.contentEditable === false ) {
+				// For non editable formats, render the stored inner HTML.
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacement,
+						isEditableTree,
+						boundaryClass: start === i && end === i + 1,
+					} )
+				);
+
+				if ( innerHTML ) append( pointer, innerHTML );
 			} else {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
-						...replacements[ i ],
+						...replacement,
 						object: true,
 						isEditableTree,
 					} )

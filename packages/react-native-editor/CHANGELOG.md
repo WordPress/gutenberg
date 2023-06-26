@@ -11,6 +11,14 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.98.0
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
 ## 1.97.0
 -   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 -   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]

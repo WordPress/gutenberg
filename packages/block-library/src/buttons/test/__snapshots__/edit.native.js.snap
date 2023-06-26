@@ -71,3 +71,9 @@ exports[`Buttons block when a button is shown removing button along with buttons
 <p></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the delete (backspace) key 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
