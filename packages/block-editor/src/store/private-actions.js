@@ -30,11 +30,13 @@ const privateSettings = [
  *
  * @param {Object}  settings                  Updated settings
  * @param {boolean} stripExperimentalSettings Whether to strip experimental settings.
+ * @param {boolean} reset                     Whether to reset the settings.
  * @return {Object} Action object
  */
 export function __experimentalUpdateSettings(
 	settings,
-	stripExperimentalSettings = false
+	stripExperimentalSettings = false,
+	reset = false
 ) {
 	let cleanSettings = settings;
 	// There are no plugins in the mobile apps, so there is no
@@ -50,6 +52,7 @@ export function __experimentalUpdateSettings(
 	return {
 		type: 'UPDATE_SETTINGS',
 		settings: cleanSettings,
+		reset,
 	};
 }
 
