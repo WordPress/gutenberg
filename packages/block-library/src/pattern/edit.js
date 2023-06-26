@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import {
@@ -32,11 +33,21 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// because nested pattern blocks cannot be inserted if the parent block supports
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
+				// Clone blocks from the pattern before insertion to ensure they receive
+				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
+				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
+					cloneBlock( block )
+				);
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlocks( clientId, selectedPattern.blocks );
+				replaceBlocks( clientId, clonedBlocks );
 			} );
 		}
-	}, [ clientId, selectedPattern?.blocks ] );
+	}, [
+		clientId,
+		selectedPattern?.blocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlocks,
+	] );
 
 	const props = useBlockProps();
 

@@ -40,27 +40,40 @@ export const __experimentalConvertBlockToStatic =
 	};
 
 /**
- * Returns a generator converting one or more static blocks into a reusable block.
+ * Returns a generator converting one or more static blocks into a pattern.
  *
- * @param {string[]} clientIds The client IDs of the block to detach.
- * @param {string}   title     Reusable block title.
+ * @param {string[]}           clientIds The client IDs of the block to detach.
+ * @param {string}             title     Pattern title.
+ * @param {'fully'|'unsynced'} syncType  They way block is synced, current 'fully' and 'unsynced'.
  */
 export const __experimentalConvertBlocksToReusable =
-	( clientIds, title ) =>
+	( clientIds, title, syncType ) =>
 	async ( { registry, dispatch } ) => {
+		const meta =
+			syncType === 'unsynced'
+				? {
+						sync_status: syncType,
+				  }
+				: undefined;
+
 		const reusableBlock = {
-			title: title || __( 'Untitled Reusable block' ),
+			title: title || __( 'Untitled Pattern block' ),
 			content: serialize(
 				registry
 					.select( blockEditorStore )
 					.getBlocksByClientId( clientIds )
 			),
 			status: 'publish',
+			meta,
 		};
 
 		const updatedRecord = await registry
 			.dispatch( 'core' )
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
+
+		if ( syncType === 'unsynced' ) {
+			return;
+		}
 
 		const newBlock = createBlock( 'core/block', {
 			ref: updatedRecord.id,

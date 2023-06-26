@@ -6,6 +6,7 @@ import {
 	disablePrePublishChecks,
 	enablePrePublishChecks,
 	createNewPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'PostPublishButton', () => {
@@ -32,7 +33,7 @@ describe( 'PostPublishButton', () => {
 	} );
 
 	it( 'should be disabled when post is being saved', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable.
+		await canvas().type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable.
 		expect(
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).toBeNull();
@@ -44,7 +45,7 @@ describe( 'PostPublishButton', () => {
 	} );
 
 	it( 'should be disabled when metabox is being saved', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable.
+		await canvas().type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable.
 		expect(
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).toBeNull();

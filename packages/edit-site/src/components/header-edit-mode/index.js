@@ -7,19 +7,21 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
 import {
+	__unstableMotion as motion,
 	Button,
 	ToolbarItem,
 	MenuGroup,
@@ -42,7 +44,9 @@ import {
 	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -57,6 +61,7 @@ export default function HeaderEditMode() {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
+		isDistractionFree,
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
@@ -96,6 +101,10 @@ export default function HeaderEditMode() {
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
+			isDistractionFree: select( preferencesStore ).get(
+				'core/edit-site',
+				'distractionFree'
+			),
 		};
 	}, [] );
 
@@ -105,6 +114,7 @@ export default function HeaderEditMode() {
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const disableMotion = useReducedMotion();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -125,9 +135,22 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		fixedToolbarCanBeFocused;
+
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const isFocusMode = templateType === 'wp_template_part';
+	const isFocusMode =
+		templateType === 'wp_template_part' || templateType === 'wp_navigation';
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
@@ -140,6 +163,19 @@ export default function HeaderEditMode() {
 		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
+	const toolbarVariants = {
+		isDistractionFree: { y: '-50px' },
+		isDistractionFreeHovering: { y: 0 },
+		view: { y: 0 },
+		edit: { y: 0 },
+	};
+
+	const toolbarTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : 0.2,
+		ease: 'easeOut',
+	};
+
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
@@ -148,23 +184,33 @@ export default function HeaderEditMode() {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
+					as={ motion.div }
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
+					shouldUseKeyboardFocusShortcut={
+						! blockToolbarCanBeFocused
+					}
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-site-header-edit-mode__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ preventDefault }
-							onClick={ toggleInserter }
-							disabled={ ! isVisualMode }
-							icon={ plus }
-							label={ showIconLabels ? shortLabel : longLabel }
-							showTooltip={ ! showIconLabels }
-						/>
+						{ ! isDistractionFree && (
+							<ToolbarItem
+								ref={ inserterButton }
+								as={ Button }
+								className="edit-site-header-edit-mode__inserter-toggle"
+								variant="primary"
+								isPressed={ isInserterOpen }
+								onMouseDown={ preventDefault }
+								onClick={ toggleInserter }
+								disabled={ ! isVisualMode }
+								icon={ plus }
+								label={
+									showIconLabels ? shortLabel : longLabel
+								}
+								showTooltip={ ! showIconLabels }
+							/>
+						) }
 						{ isLargeViewport && (
 							<>
 								<ToolbarItem
@@ -189,57 +235,70 @@ export default function HeaderEditMode() {
 										showIconLabels ? 'tertiary' : undefined
 									}
 								/>
-								<ToolbarItem
-									as={ Button }
-									className="edit-site-header-edit-mode__list-view-toggle"
-									disabled={
-										! isVisualMode || isZoomedOutView
-									}
-									icon={ listView }
-									isPressed={ isListViewOpen }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									shortcut={ listViewShortcut }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								{ isZoomedOutViewExperimentEnabled && (
+								{ ! isDistractionFree && (
 									<ToolbarItem
 										as={ Button }
-										className="edit-site-header-edit-mode__zoom-out-view-toggle"
-										icon={ chevronUpDown }
-										isPressed={ isZoomedOutView }
+										className="edit-site-header-edit-mode__list-view-toggle"
+										disabled={
+											! isVisualMode || isZoomedOutView
+										}
+										icon={ listView }
+										isPressed={ isListViewOpen }
 										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'Zoom-out View' ) }
-										onClick={ () => {
-											setPreviewDeviceType( 'desktop' );
-											__unstableSetEditorMode(
-												isZoomedOutView
-													? 'edit'
-													: 'zoom-out'
-											);
-										} }
+										label={ __( 'List View' ) }
+										onClick={ toggleListView }
+										shortcut={ listViewShortcut }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
 									/>
 								) }
+								{ isZoomedOutViewExperimentEnabled &&
+									! isDistractionFree && (
+										<ToolbarItem
+											as={ Button }
+											className="edit-site-header-edit-mode__zoom-out-view-toggle"
+											icon={ chevronUpDown }
+											isPressed={ isZoomedOutView }
+											/* translators: button label text should, if possible, be under 16 characters. */
+											label={ __( 'Zoom-out View' ) }
+											onClick={ () => {
+												setPreviewDeviceType(
+													'desktop'
+												);
+												__unstableSetEditorMode(
+													isZoomedOutView
+														? 'edit'
+														: 'zoom-out'
+												);
+											} }
+										/>
+									) }
 							</>
 						) }
 					</div>
 				</NavigableToolbar>
 			) }
 
-			<div className="edit-site-header-edit-mode__center">
-				{ ! hasDefaultEditorCanvasView ? (
-					getEditorCanvasContainerTitle( editorCanvasView )
-				) : (
-					<DocumentActions />
-				) }
-			</div>
+			{ ! isDistractionFree && (
+				<div className="edit-site-header-edit-mode__center">
+					{ ! hasDefaultEditorCanvasView ? (
+						getEditorCanvasContainerTitle( editorCanvasView )
+					) : (
+						<DocumentActions />
+					) }
+				</div>
+			) }
 
 			<div className="edit-site-header-edit-mode__end">
-				<div className="edit-site-header-edit-mode__actions">
+				<motion.div
+					className="edit-site-header-edit-mode__actions"
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
+				>
 					{ ! isFocusMode && hasDefaultEditorCanvasView && (
 						<div
 							className={ classnames(
@@ -250,8 +309,7 @@ export default function HeaderEditMode() {
 							<PreviewOptions
 								deviceType={ deviceType }
 								setDeviceType={ setPreviewDeviceType }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								viewLabel={ __( 'View' ) }
+								label={ __( 'View' ) }
 							>
 								<MenuGroup>
 									<MenuItem
@@ -272,9 +330,11 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<SaveButton />
-					<PinnedItems.Slot scope="core/edit-site" />
+					{ ! isDistractionFree && (
+						<PinnedItems.Slot scope="core/edit-site" />
+					) }
 					<MoreMenu showIconLabels={ showIconLabels } />
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

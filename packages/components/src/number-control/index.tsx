@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { Input, SpinButton } from './styles/number-control-styles';
+import { Input, SpinButton, styles } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
@@ -24,6 +24,7 @@ import type { WordPressComponentProps } from '../ui/context/wordpress-component'
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
+import { useCx } from '../utils';
 
 const noop = () => {};
 
@@ -78,6 +79,8 @@ function UnforwardedNumberControl(
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
+	const cx = useCx();
+	const spinButtonClasses = cx( size === 'small' && styles.smallSpinButtons );
 
 	const spinValue = (
 		value: string | number | undefined,
@@ -236,6 +239,7 @@ function UnforwardedNumberControl(
 						<Spacer marginBottom={ 0 } marginRight={ 2 }>
 							<HStack spacing={ 1 }>
 								<SpinButton
+									className={ spinButtonClasses }
 									icon={ plusIcon }
 									isSmall
 									aria-hidden="true"
@@ -244,9 +248,9 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'up'
 									) }
-									size={ size }
 								/>
 								<SpinButton
+									className={ spinButtonClasses }
 									icon={ resetIcon }
 									isSmall
 									aria-hidden="true"
@@ -255,7 +259,6 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'down'
 									) }
-									size={ size }
 								/>
 							</HStack>
 						</Spacer>

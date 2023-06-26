@@ -25,7 +25,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
           />
         </svg>
       </button>
@@ -48,7 +48,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
           />
         </svg>
       </button>
@@ -80,7 +80,7 @@ exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+          d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
         />
       </svg>
     </button>
@@ -113,7 +113,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
           />
         </svg>
       </button>
@@ -136,7 +136,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
           />
         </svg>
       </button>
@@ -159,7 +159,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M11.1 19.8H20v-1.5h-8.9v1.5zm0-15.6v1.5H20V4.2h-8.9zM4 12.8h16v-1.5H4v1.5z"
+            d="M11.111 5.5H20V4h-8.889v1.5ZM4 12.5h16V11H4v1.5Zm7.111 7H20V18h-8.889v1.5Z"
           />
         </svg>
       </button>

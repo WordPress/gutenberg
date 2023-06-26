@@ -47,6 +47,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
 	'focusMode',
+	'distractionFree',
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
@@ -75,6 +76,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
+	'behaviors',
 ];
 
 /**

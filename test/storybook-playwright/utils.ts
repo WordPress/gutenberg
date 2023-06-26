@@ -21,7 +21,7 @@ const buildDecoratorString = ( decorators: Decorators = {} ) => {
 	return decoratorParamStrings.join( ';' );
 };
 
-export const gotoStoryId = (
+export const gotoStoryId = async (
 	page: Page,
 	storyId: string,
 	{ decorators }: Options = {}
@@ -35,7 +35,7 @@ export const gotoStoryId = (
 
 	params.set( 'id', storyId );
 
-	page.goto(
+	await page.goto(
 		`http://localhost:${ STORYBOOK_PORT }/iframe.html?${ params.toString() }`,
 		{ waitUntil: 'load' }
 	);
@@ -62,9 +62,10 @@ export const getAllPropsPermutations = (
 
 		// Test all values for the given prop.
 		for ( const value of propObject.valuesToTest ) {
+			const valueAsString = value === undefined ? 'undefined' : value;
 			const newAccProps = {
 				...accProps,
-				[ propObject.propName ]: value,
+				[ propObject.propName ]: valueAsString,
 			};
 
 			if ( restProps.length === 0 ) {
@@ -99,5 +100,7 @@ export const testSnapshotForPropsConfig = async (
 
 	await submitButton.click();
 
-	expect( await page.screenshot() ).toMatchSnapshot();
+	expect(
+		await page.screenshot( { animations: 'disabled' } )
+	).toMatchSnapshot();
 };

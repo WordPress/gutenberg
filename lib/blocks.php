@@ -24,6 +24,7 @@ function gutenberg_reregister_core_block_types() {
 				'comments',
 				'details',
 				'group',
+				'footnotes',
 				'html',
 				'list',
 				'list-item',
@@ -65,6 +66,7 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
 				'comments-title.php'               => 'core/comments-title',
 				'comments.php'                     => 'core/comments',
+				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
@@ -77,6 +79,7 @@ function gutenberg_reregister_core_block_types() {
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
+				'page-list-item.php'               => 'core/page-list-item',
 				'pattern.php'                      => 'core/pattern',
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
@@ -239,7 +242,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		if ( ! $stylesheet_removed ) {
 			add_action(
 				'wp_enqueue_scripts',
-				function() {
+				static function() {
 					wp_dequeue_style( 'wp-block-library-theme' );
 				}
 			);

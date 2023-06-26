@@ -52,7 +52,7 @@ describe( 'BlockList', () => {
 			await addBlock( screen, 'Social Icons' );
 			const socialLinksBlock = await getBlock( screen, 'Social Icons' );
 			fireEvent.press( socialLinksBlock );
-			triggerBlockListLayout( socialLinksBlock );
+			await triggerBlockListLayout( socialLinksBlock );
 
 			// Act
 			fireEvent.press(
@@ -82,7 +82,7 @@ describe( 'BlockList', () => {
 			await initializeEditor();
 			await addBlock( screen, 'Group' );
 			const groupBlock = await getBlock( screen, 'Group' );
-			triggerBlockListLayout( groupBlock );
+			await triggerBlockListLayout( groupBlock );
 
 			// Assert
 			expect(

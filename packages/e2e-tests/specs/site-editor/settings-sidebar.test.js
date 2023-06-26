@@ -27,11 +27,11 @@ async function getActiveTabLabel() {
 async function getTemplateCard() {
 	return {
 		title: await page.$eval(
-			'.edit-site-template-card__title',
+			'.edit-site-sidebar-card__title',
 			( element ) => element.innerText
 		),
 		description: await page.$eval(
-			'.edit-site-template-card__description',
+			'.edit-site-sidebar-card__description',
 			( element ) => element.innerText
 		),
 	};
