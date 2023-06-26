@@ -28,6 +28,15 @@ test.describe( 'Links', () => {
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
+		// Ensure that the contents of the post have not been changed, since at
+		// this point the link is still not inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'This is Gutenberg' },
+			},
+		] );
+
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.press( 'ArrowLeft' );
@@ -53,15 +62,6 @@ test.describe( 'Links', () => {
 		// Toggle should still have focus and be checked.
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
-
-		// Ensure that the contents of the post have not been changed, since at
-		// this point the link is still not inserted.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'This is Gutenberg' },
-			},
-		] );
 
 		// Tab back to the Submit and apply the link.
 		await page
