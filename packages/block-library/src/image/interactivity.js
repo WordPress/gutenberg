@@ -22,32 +22,43 @@ store( {
 		core: {
 			image: {
 				showLightbox: ( { context, event } ) => {
+					// We can't initialize the lightbox until the reference
+					// image is loaded, otherwise the UX is broken.
+					if ( ! context.core.image.imageLoaded ) {
+						return;
+					}
 					context.core.image.initialized = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollDelta = 0;
 
+					context.core.image.lightboxEnabled = true;
+					if ( context.core.image.lightboxAnimation === 'zoom' ) {
+						setZoomStyles(
+							event.target.nextElementSibling,
+							context,
+							event
+						);
+					}
+					// Hide overflow only when the animation is in progress,
+					// otherwise the removal of the scrollbars will draw attention
+					// to itself and look like an error
+					document.documentElement.classList.add(
+						'has-lightbox-open'
+					);
+
 					// Since the img is hidden and its src not loaded until
 					// the lightbox is opened, let's create an img element on the fly
 					// so we can get the dimensions we need to calculate the styles
+					context.core.image.preloadInitialized = true;
 					const imgDom = document.createElement( 'img' );
-
 					imgDom.onload = function () {
-						// Enable the lightbox only after the image
-						// is loaded to prevent flashing of unstyled content
-						context.core.image.lightboxEnabled = true;
-						if ( context.core.image.lightboxAnimation === 'zoom' ) {
-							setZoomStyles( imgDom, context, event );
-						}
-
-						// Hide overflow only when the animation is in progress,
-						// otherwise the removal of the scrollbars will draw attention
-						// to itself and look like an error
-						document.documentElement.classList.add(
-							'has-lightbox-open'
-						);
+						context.core.image.activateLargeImage = true;
 					};
-					imgDom.setAttribute( 'src', context.core.image.imageSrc );
+					imgDom.setAttribute(
+						'src',
+						context.core.image.imageUploadedSrc
+					);
 				},
 				hideLightbox: async ( { context, event } ) => {
 					context.core.image.hideAnimationEnabled = true;
@@ -131,9 +142,14 @@ store( {
 				roleAttribute: ( { context } ) => {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
-				imageSrc: ( { context } ) => {
+				responsiveImgSrc: ( { context } ) => {
+					return context.core.image.activateLargeImage
+						? ''
+						: context.core.image.imageCurrentSrc;
+				},
+				enlargedImgSrc: ( { context } ) => {
 					return context.core.image.initialized
-						? context.core.image.imageSrc
+						? context.core.image.imageUploadedSrc
 						: '';
 				},
 			},
@@ -142,6 +158,30 @@ store( {
 	effects: {
 		core: {
 			image: {
+				setCurrentSrc: ( { context, ref } ) => {
+					if ( ref.complete ) {
+						context.core.image.imageLoaded = true;
+						context.core.image.imageCurrentSrc = ref.currentSrc;
+					} else {
+						ref.addEventListener( 'load', function () {
+							context.core.image.imageLoaded = true;
+							context.core.image.imageCurrentSrc =
+								this.currentSrc;
+						} );
+					}
+				},
+				preloadLightboxImage: ( { context, ref } ) => {
+					ref.addEventListener( 'mouseover', () => {
+						if ( ! context.core.image.preloadInitialized ) {
+							context.core.image.preloadInitialized = true;
+							const imgDom = document.createElement( 'img' );
+							imgDom.setAttribute(
+								'src',
+								context.core.image.imageUploadedSrc
+							);
+						}
+					} );
+				},
 				initLightbox: async ( { context, ref } ) => {
 					context.core.image.figureRef =
 						ref.querySelector( 'figure' );
@@ -163,8 +203,8 @@ store( {
 } );
 
 function setZoomStyles( imgDom, context, event ) {
-	let targetWidth = imgDom.naturalWidth;
-	let targetHeight = imgDom.naturalHeight;
+	let targetWidth = context.core.image.targetWidth;
+	let targetHeight = context.core.image.targetHeight;
 
 	const verticalPadding = 40;
 

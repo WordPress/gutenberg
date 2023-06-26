@@ -842,13 +842,19 @@ test.describe( 'Image - interactivity', () => {
 
 			const lightbox = page.locator( '.wp-lightbox-overlay' );
 			await expect( lightbox ).toBeHidden();
-			const image = lightbox.locator( 'img' );
+			const responsiveImage = lightbox.locator( '.responsive-image img' );
+			const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
-			await expect( image ).toHaveAttribute( 'src', '' );
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+			await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-			await expect( image ).toHaveAttribute(
+			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( enlargedImage ).toHaveAttribute(
 				'src',
 				new RegExp( filename )
 			);
@@ -1076,12 +1082,19 @@ test.describe( 'Image - interactivity', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		const imageDom = lightbox.locator( 'img' );
-		await expect( imageDom ).toHaveAttribute( 'src', '' );
+		const responsiveImage = lightbox.locator( '.responsive-image img' );
+		const enlargedImage = lightbox.locator( '.enlarged-image img' );
+
+		await expect( responsiveImage ).toHaveAttribute(
+			'src',
+			new RegExp( imgUrl )
+		);
+		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
+		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
 
