@@ -172,6 +172,11 @@ describe( 'List block', () => {
 		);
 		await triggerBlockListLayout( listItemBlock1 );
 
+		// wait until inserter on the newly created indented block is enabled
+		// this is slightly delayed (by updating block list settings) and would
+		// trigger an "update not wrapped in act()" warning if not explicitly awaited.
+		screen.findByRole( 'button', { name: 'Add block', disabled: false } );
+
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 

@@ -59,6 +59,10 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		}
 	}
 
+	if ( isset( $lightbox_settings['enabled'] ) && false === $lightbox_settings['enabled'] ) {
+		return $block_content;
+	}
+
 	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
 		return $block_content;
 	}
@@ -75,8 +79,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
-	$lightbox_animation = '';
-	if ( isset( $lightbox_settings['animation'] ) ) {
+	// If we don't set a default, it won't work if Lightbox is set to enabled by default.
+	$lightbox_animation = 'zoom';
+	if ( isset( $lightbox_settings['animation'] ) && '' !== $lightbox_settings['animation'] ) {
 		$lightbox_animation = $lightbox_settings['animation'];
 	}
 

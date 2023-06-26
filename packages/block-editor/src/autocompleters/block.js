@@ -40,11 +40,13 @@ function createBlockCompleter() {
 					const {
 						getSelectedBlockClientId,
 						getBlockName,
-						getBlockInsertionPoint,
 						getBlockListSettings,
+						getBlockRootClientId,
 					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
-					const _rootClientId = getBlockInsertionPoint().rootClientId;
+					const _rootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
 					return {
 						selectedBlockName: selectedBlockClientId
 							? getBlockName( selectedBlockClientId )

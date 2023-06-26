@@ -162,7 +162,7 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
-			name: 'core/edit-site/open-styles',
+			name: 'core/edit-site/open-style-variations',
 			label: __( 'Open style variations' ),
 			icon: styles,
 			callback: ( { close } ) => {
@@ -203,7 +203,7 @@ function useSiteEditorBasicNavigationCommands() {
 			icon: symbolFilled,
 			callback: ( { close } ) => {
 				const args = {
-					path: '/wp_template_part',
+					path: '/library',
 				};
 				const targetUrl = addQueryArgs( 'site-editor.php', args );
 				if ( isSiteEditor ) {

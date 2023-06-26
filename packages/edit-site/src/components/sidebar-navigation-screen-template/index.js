@@ -9,7 +9,6 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-
 /**
  * Internal dependencies
  */
@@ -20,8 +19,10 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
+import HomeTemplateDetails from './home-template-details';
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
-function useTemplateTitleAndDescription( postType, postId ) {
+function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
@@ -41,6 +42,17 @@ function useTemplateTitleAndDescription( postType, postId ) {
 			'This is a custom template that can be applied manually to any Post or Page.'
 		);
 	}
+
+	const content =
+		record?.slug === 'home' || record?.slug === 'index' ? (
+			<HomeTemplateDetails />
+		) : null;
+
+	const footer = !! record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter
+			lastModifiedDateTime={ record.modified }
+		/>
+	) : null;
 
 	const description = (
 		<>
@@ -74,7 +86,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		</>
 	);
 
-	return { title, description };
+	return { title, description, content, footer };
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -83,7 +95,7 @@ export default function SidebarNavigationScreenTemplate() {
 		params: { postType, postId },
 	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, description } = useTemplateTitleAndDescription(
+	const { title, content, description, footer } = useTemplateDetails(
 		postType,
 		postId
 	);
@@ -109,6 +121,8 @@ export default function SidebarNavigationScreenTemplate() {
 				</>
 			}
 			description={ description }
+			content={ content }
+			footer={ footer }
 		/>
 	);
 }

@@ -31,8 +31,13 @@ export default function useInitEditedEntityFromURL() {
 		};
 	}, [] );
 
-	const { setTemplate, setTemplatePart, setPage, setNavigationMenu } =
-		useDispatch( editSiteStore );
+	const {
+		setEditedEntity,
+		setTemplate,
+		setTemplatePart,
+		setPage,
+		setNavigationMenu,
+	} = useDispatch( editSiteStore );
 
 	useEffect( () => {
 		if ( postType && postId ) {
@@ -45,6 +50,9 @@ export default function useInitEditedEntityFromURL() {
 					break;
 				case 'wp_navigation':
 					setNavigationMenu( postId );
+					break;
+				case 'wp_block':
+					setEditedEntity( postType, postId );
 					break;
 				default:
 					setPage( {
@@ -71,6 +79,7 @@ export default function useInitEditedEntityFromURL() {
 		postType,
 		homepageId,
 		isRequestingSite,
+		setEditedEntity,
 		setPage,
 		setTemplate,
 		setTemplatePart,

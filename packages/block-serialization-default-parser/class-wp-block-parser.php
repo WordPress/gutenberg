@@ -397,3 +397,17 @@ class WP_Block_Parser {
 		$this->output[] = (array) $stack_top->block;
 	}
 }
+
+/**
+ * WP_Block_Parser_Block class.
+ *
+ * Required for backward compatibility in WordPress Core.
+ */
+require_once __DIR__ . '/class-wp-block-parser-block.php';
+
+/**
+ * WP_Block_Parser_Frame class.
+ *
+ * Required for backward compatibility in WordPress Core.
+ */
+require_once __DIR__ . '/class-wp-block-parser-frame.php';

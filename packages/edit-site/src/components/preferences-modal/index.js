@@ -8,16 +8,33 @@ import {
 } from '@wordpress/interface';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import EnableFeature from './enable-feature';
+import { store as siteEditorStore } from '../../store';
 
 export default function EditSitePreferencesModal( {
 	isModalActive,
 	toggleModal,
 } ) {
+	const registry = useRegistry();
+	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( siteEditorStore );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const toggleDistractionFree = () => {
+		registry.batch( () => {
+			setPreference( 'core/edit-site', 'fixedToolbar', false );
+			setIsInserterOpened( false );
+			setIsListViewOpened( false );
+			closeGeneralSidebar();
+		} );
+	};
+
 	const sections = useMemo( () => [
 		{
 			name: 'general',
@@ -29,6 +46,14 @@ export default function EditSitePreferencesModal( {
 						'Customize options related to the block editor interface and editing flow.'
 					) }
 				>
+					<EnableFeature
+						featureName="distractionFree"
+						onToggle={ toggleDistractionFree }
+						help={ __(
+							'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+						) }
+						label={ __( 'Distraction free' ) }
+					/>
 					<EnableFeature
 						featureName="focusMode"
 						help={ __(

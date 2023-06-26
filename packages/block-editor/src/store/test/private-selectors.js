@@ -12,6 +12,7 @@ import {
 	getBlockEditingMode,
 	isBlockSubtreeDisabled,
 	getListViewClientIdsTree,
+	getEnabledBlockParents,
 } from '../private-selectors';
 
 jest.mock( '@wordpress/data/src/select', () => ( {
@@ -551,6 +552,101 @@ describe( 'private selectors', () => {
 						},
 					],
 				},
+			] );
+		} );
+	} );
+
+	describe( 'getEnabledBlockParents', () => {
+		it( 'should return an empty array if block is at the root', () => {
+			const state = {
+				settings: {},
+				blocks: {
+					parents: new Map( [
+						[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
+					] ),
+				},
+				blockEditingModes: new Map(),
+			};
+			expect(
+				getEnabledBlockParents(
+					state,
+					'6cf70164-9097-4460-bcbf-200560546988'
+				)
+			).toEqual( [] );
+		} );
+
+		it( 'should return non-disabled parents', () => {
+			const state = {
+				settings: {},
+				blocks: {
+					parents: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						],
+						[
+							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						],
+					] ),
+				},
+				blockEditingModes: new Map( [
+					[ '', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+				] ),
+				blockListSettings: {},
+			};
+			expect(
+				getEnabledBlockParents(
+					state,
+					'4c2b7140-fffd-44b4-b2a7-820c670a6514'
+				)
+			).toEqual( [
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+			] );
+		} );
+
+		it( 'should order from bottom to top if ascending is true', () => {
+			const state = {
+				settings: {},
+				blocks: {
+					parents: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+						],
+						[
+							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						],
+					] ),
+				},
+				blockEditingModes: new Map( [
+					[ '', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+				] ),
+				blockListSettings: {},
+			};
+			expect(
+				getEnabledBlockParents(
+					state,
+					'4c2b7140-fffd-44b4-b2a7-820c670a6514',
+					true
+				)
+			).toEqual( [
+				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 			] );
 		} );
 	} );

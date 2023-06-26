@@ -7,6 +7,7 @@ import { styles, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -18,28 +19,33 @@ import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
 
 export default function GlobalStylesSidebar() {
-	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea } = select( interfaceStore );
-			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _isVisualEditorMode =
-				'visual' === select( editSiteStore ).getEditorMode();
-			const _isEditCanvasMode = 'edit' === getCanvasMode();
+	const {
+		shouldClearCanvasContainerView,
+		isStyleBookOpened,
+		showListViewByDefault,
+	} = useSelect( ( select ) => {
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _isVisualEditorMode =
+			'visual' === select( editSiteStore ).getEditorMode();
+		const _isEditCanvasMode = 'edit' === getCanvasMode();
+		const _showListViewByDefault = select( preferencesStore ).get(
+			'core/edit-site',
+			'showListViewByDefault'
+		);
 
-			return {
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				shouldClearCanvasContainerView:
-					'edit-site/global-styles' !==
-						getActiveComplementaryArea( 'core/edit-site' ) ||
-					! _isVisualEditorMode ||
-					! _isEditCanvasMode,
-			};
-		},
-		[]
-	);
+		return {
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			shouldClearCanvasContainerView:
+				'edit-site/global-styles' !==
+					getActiveComplementaryArea( 'core/edit-site' ) ||
+				! _isVisualEditorMode ||
+				! _isEditCanvasMode,
+			showListViewByDefault: _showListViewByDefault,
+		};
+	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -50,6 +56,8 @@ export default function GlobalStylesSidebar() {
 		}
 	}, [ shouldClearCanvasContainerView ] );
 
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
@@ -59,7 +67,11 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex className="edit-site-global-styles-sidebar__header">
+				<Flex
+					className="edit-site-global-styles-sidebar__header"
+					role="menubar"
+					aria-label={ __( 'Styles actions' ) }
+				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
@@ -69,16 +81,17 @@ export default function GlobalStylesSidebar() {
 							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
 							disabled={ shouldClearCanvasContainerView }
-							onClick={ () =>
+							onClick={ () => {
+								setIsListViewOpened(
+									isStyleBookOpened && showListViewByDefault
+								);
 								setEditorCanvasContainerView(
 									isStyleBookOpened ? undefined : 'style-book'
-								)
-							}
+								);
+							} }
 						/>
 					</FlexItem>
-					<FlexItem>
-						<GlobalStylesMenuSlot />
-					</FlexItem>
+					<GlobalStylesMenuSlot />
 				</Flex>
 			}
 		>
