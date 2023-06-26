@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ReactText } from 'react';
+import type { ReactNode } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
 
@@ -18,7 +18,7 @@ export type ToggleGroupControlOptionBaseProps = {
 	 * @default false
 	 */
 	isIcon?: boolean;
-	value: ReactText;
+	value: string | number;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
@@ -107,15 +107,15 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: ReactText | undefined ) => void;
+	onChange?: ( value: string | number | undefined ) => void;
 	/**
 	 * The selected value.
 	 */
-	value?: ReactText;
+	value?: string | number;
 	/**
 	 * The initial value to be used when in uncontrolled mode.
 	 */
-	defaultValue?: ReactText;
+	defaultValue?: string | number;
 	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
