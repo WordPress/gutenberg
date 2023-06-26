@@ -27,6 +27,7 @@ export const ZStackView = styled.div< {
 
 	& > ${ ZStackChildView } {
 		position: relative;
+		justify-self: start;
 
 		${ ( { isLayered } ) =>
 			isLayered
