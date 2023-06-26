@@ -113,7 +113,7 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	value?: ReactText;
 	/**
-	 * The selected value.
+	 * The initial value to be used when in uncontrolled mode.
 	 */
 	defaultValue?: ReactText;
 	/**

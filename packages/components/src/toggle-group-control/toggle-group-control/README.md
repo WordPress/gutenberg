@@ -77,6 +77,11 @@ Callback when a segment is selected.
 -   Required: No
 -   Default: `() => {}`
 
+### `defaultValue`: `string | number`
+
+The initial value to be used when in uncontrolled mode.
+
+-   Required: No
 
 ### `value`: `string | number`
 
