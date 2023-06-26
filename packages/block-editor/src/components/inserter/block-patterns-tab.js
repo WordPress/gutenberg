@@ -214,7 +214,14 @@ export function BlockPatternsCategoryPanel( {
 		category.name === 'reusable'
 			? filteredUnsyncedPatterns
 			: currentCategoryPatterns;
-	const currentShownPatterns = useAsyncList( patterns );
+
+	const unsyncedPatternsList = useAsyncList( filteredUnsyncedPatterns );
+	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
+
+	const currentShownPatterns =
+		category.name === 'reusable'
+			? unsyncedPatternsList
+			: categoryPatternsList;
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );

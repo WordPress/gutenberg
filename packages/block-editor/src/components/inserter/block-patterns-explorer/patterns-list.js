@@ -116,10 +116,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
+	const blockPatternsUnsynced = useAsyncList( filteredUnsyncedPatterns, {
+		step: INITIAL_INSERTER_RESULTS,
+	} );
+
 	const currentShownPatterns =
-		selectedCategory === 'reusable'
-			? filteredUnsyncedPatterns
-			: blockPatterns;
+		selectedCategory === 'reusable' ? blockPatternsUnsynced : blockPatterns;
 
 	const hasItems = !! currentShownPatterns?.length;
 	return (
