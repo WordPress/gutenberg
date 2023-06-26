@@ -20,7 +20,6 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import SidebarNavigationScreenNavigationMenuButton from '../sidebar-navigation-screen-navigation-menus/navigator-button';
 
 export default function SidebarNavigationScreenMain() {
 	const { location } = useNavigator();
@@ -44,14 +43,14 @@ export default function SidebarNavigationScreenMain() {
 			) }
 			content={
 				<ItemGroup>
-					<SidebarNavigationScreenNavigationMenuButton
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/navigation"
 						withChevron
 						icon={ navigation }
-						as={ SidebarNavigationItem }
 					>
 						{ __( 'Navigation' ) }
-					</SidebarNavigationScreenNavigationMenuButton>
-
+					</NavigatorButton>
 					<SidebarNavigationItemGlobalStyles
 						withChevron
 						icon={ styles }
@@ -76,7 +75,7 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/wp_template_part"
+						path="/library"
 						withChevron
 						icon={ symbol }
 					>

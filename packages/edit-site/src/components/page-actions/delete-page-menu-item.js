@@ -63,6 +63,7 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 				isOpen={ isModalOpen }
 				onConfirm={ removePage }
 				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Delete' ) }
 			>
 				{ __( 'Are you sure you want to delete this page?' ) }
 			</ConfirmDialog>
