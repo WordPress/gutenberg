@@ -5,7 +5,7 @@
 	"title": "Details",
 	"category": "text",
 	"description": "Hide and show additional content.",
-	"keywords": [ "disclosure", "summary", "hide", "accordion" ],
+	"keywords": [ "disclosure", "summary", "hide" ],
 	"textdomain": "default",
 	"attributes": {
 		"showContent": {

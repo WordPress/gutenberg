@@ -168,11 +168,6 @@
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
@@ -262,25 +257,26 @@
 		/* stylelint-enable */
 	}
 
+	&.is-compact {
+		height: $button-size-compact;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			width: $button-size-compact;
+			min-width: $button-size-compact;
+		}
+	}
+
 	&.is-small {
-		height: $button-size-small-next-default-32px;
+		height: $button-size-small;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			width: $button-size-small-next-default-32px;
-			min-width: $button-size-small-next-default-32px;
-		}
-
-		&:not(.is-next-32px-small-size) {
-			height: $button-size-small;
-
-			&.has-icon:not(.has-text) {
-				width: $button-size-small;
-				min-width: $button-size-small;
-			}
+			width: $button-size-small;
+			min-width: $button-size-small;
 		}
 	}
 
@@ -296,10 +292,11 @@
 		}
 
 		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-			margin-left: 2px;
-			margin-right: 2px;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			padding: 2px;
+			box-sizing: content-box;
 		}
 
 		&.has-text {
@@ -307,10 +304,6 @@
 			padding-right: $grid-unit-15;
 			padding-left: $grid-unit-10;
 			gap: $grid-unit-05;
-		}
-
-		&.has-text .dashicon {
-			margin-right: $grid-unit-10 + 2px;
 		}
 	}
 

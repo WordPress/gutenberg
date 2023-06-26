@@ -1,11 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { trash, backup } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __, isRTL } from '@wordpress/i18n';
+import {
+	code,
+	cog,
+	trash,
+	backup,
+	layout,
+	page,
+	drawerLeft,
+	drawerRight,
+	blockDefault,
+} from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -19,16 +31,67 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 function useEditModeCommandLoader() {
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const history = useHistory();
 	const { isLoaded, record: template } = useEditedEntityRecord();
-	const isRemovable =
-		isLoaded && !! template && isTemplateRemovable( template );
-	const isRevertable =
-		isLoaded && !! template && isTemplateRevertable( template );
+	const { removeTemplate, revertTemplate, setHasPageContentFocus } =
+		useDispatch( editSiteStore );
+	const history = useHistory();
+	const { isPage, hasPageContentFocus } = useSelect(
+		( select ) => ( {
+			isPage: select( editSiteStore ).isPage(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+		} ),
+		[]
+	);
+
+	if ( ! isLoaded ) {
+		return { isLoading: true, commands: [] };
+	}
 
 	const commands = [];
-	if ( isRemovable ) {
+
+	if ( isPage ) {
+		if ( hasPageContentFocus ) {
+			commands.push( {
+				name: 'core/switch-to-template-focus',
+				label: __( 'Edit template' ),
+				icon: layout,
+				context: 'site-editor-edit',
+				callback: ( { close } ) => {
+					setHasPageContentFocus( false );
+					close();
+				},
+			} );
+		} else {
+			commands.push( {
+				name: 'core/switch-to-page-focus',
+				label: __( 'Back to page' ),
+				icon: page,
+				context: 'site-editor-edit',
+				callback: ( { close } ) => {
+					setHasPageContentFocus( true );
+					close();
+				},
+			} );
+		}
+	}
+
+	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
+		const label =
+			template.type === 'wp_template'
+				? __( 'Reset template' )
+				: __( 'Reset template part' );
+		commands.push( {
+			name: 'core/reset-template',
+			label,
+			icon: backup,
+			callback: ( { close } ) => {
+				revertTemplate( template );
+				close();
+			},
+		} );
+	}
+
+	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
 				? __( 'Delete template' )
@@ -48,24 +111,96 @@ function useEditModeCommandLoader() {
 			},
 		} );
 	}
-	if ( isRevertable ) {
-		const label =
-			template.type === 'wp_template'
-				? __( 'Reset template' )
-				: __( 'Reset template part' );
-		commands.push( {
-			name: 'core/reset-template',
-			label,
-			icon: backup,
-			callback: ( { close } ) => {
-				revertTemplate( template );
-				close();
-			},
-		} );
-	}
 
 	return {
 		isLoading: ! isLoaded,
+		commands,
+	};
+}
+
+function useEditUICommandLoader() {
+	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
+		useDispatch( editSiteStore );
+	const { canvasMode, editorMode, activeSidebar } = useSelect(
+		( select ) => ( {
+			isPage: select( editSiteStore ).isPage(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: select( editSiteStore ).getEditorMode(),
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
+		} ),
+		[]
+	);
+	const { toggle } = useDispatch( preferencesStore );
+
+	if ( canvasMode !== 'edit' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	commands.push( {
+		name: 'core/open-settings-sidebar',
+		label: __( 'Toggle settings sidebar' ),
+		icon: isRTL() ? drawerLeft : drawerRight,
+		callback: ( { close } ) => {
+			close();
+			if ( activeSidebar === 'edit-site/template' ) {
+				closeGeneralSidebar();
+			} else {
+				openGeneralSidebar( 'edit-site/template' );
+			}
+		},
+	} );
+
+	commands.push( {
+		name: 'core/open-block-inspector',
+		label: __( 'Toggle block inspector' ),
+		icon: blockDefault,
+		callback: ( { close } ) => {
+			close();
+			if ( activeSidebar === 'edit-site/block-inspector' ) {
+				closeGeneralSidebar();
+			} else {
+				openGeneralSidebar( 'edit-site/block-inspector' );
+			}
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-distraction-free-mode',
+		label: __( 'Toggle spotlight mode' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-site', 'focusMode' );
+			close();
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-top-toolbar',
+		label: __( 'Toggle top toolbar' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-site', 'fixedToolbar' );
+			close();
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-code-editor',
+		label: __( 'Toggle code editor' ),
+		icon: code,
+		callback: ( { close } ) => {
+			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
+			close();
+		},
+	} );
+
+	return {
+		isLoading: false,
 		commands,
 	};
 }
@@ -75,5 +210,10 @@ export function useEditModeCommands() {
 		name: 'core/edit-site/manipulate-document',
 		hook: useEditModeCommandLoader,
 		context: 'site-editor-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/edit-ui',
+		hook: useEditUICommandLoader,
 	} );
 }

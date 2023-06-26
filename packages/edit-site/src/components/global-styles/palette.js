@@ -91,7 +91,7 @@ function Palette( { name } ) {
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-			{ randomizeThemeColors && (
+			{ themeColors?.length > 0 && (
 				<Button
 					variant="secondary"
 					icon={ shuffle }

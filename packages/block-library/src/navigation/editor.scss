@@ -503,30 +503,6 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	left: 0;
 }
 
-// Without this, the block cannot be selected, nor does the right container get focus.
-// @todo: this is disruptive. Ideally we can retire a few of the containers,
-// so focus is applied naturally on the block container.
-// It's important the right container has focus, otherwise you can't press
-// "Delete" to remove the block.
-.wp-block-navigation:not(.is-editing-disabled) {
-	.wp-block-navigation__responsive-container,
-	.wp-block-navigation__responsive-close {
-		@include break-small() {
-			pointer-events: none;
-
-			.wp-block-navigation__responsive-container-close,
-			.block-editor-block-list__layout * {
-				pointer-events: all;
-			}
-		}
-
-		// Page List items should remain inert.
-		.wp-block-pages-list__item__link {
-			pointer-events: none;
-		}
-	}
-}
-
 // The menu and close buttons need higher specificity in the editor.
 .components-button.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open,
 .components-button.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
