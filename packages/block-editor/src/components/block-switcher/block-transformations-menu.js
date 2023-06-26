@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { MenuGroup, MenuItem } from '@wordpress/components';
 import {
 	getBlockMenuDefaultClassName,
+	getBlockType,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { useState, useMemo } from '@wordpress/element';
@@ -15,6 +16,7 @@ import { useState, useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';
+import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 
 /**
  * Helper hook to group transformations to display them in a specific order in the UI.
@@ -76,6 +78,8 @@ const BlockTransformationsMenu = ( {
 
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
+	const selectedClientIds = blocks.map( ( { clientId } ) => clientId );
+	const { onUngroup } = useConvertToGroupButtonProps( selectedClientIds );
 	// We have to check if both content transformations(priority and rest) are set
 	// in order to create a separate MenuGroup for them.
 	const hasBothContentTransformations =
@@ -87,8 +91,24 @@ const BlockTransformationsMenu = ( {
 			setHoveredTransformItemName={ setHoveredTransformItemName }
 		/>
 	);
+	const [ firstSelectedBlock ] = blocks;
+	const { name: firstSelectedBlockName } = firstSelectedBlock;
+	const { name, icon } = getBlockType( firstSelectedBlockName );
 	return (
 		<>
+			{ onUngroup && (
+				<MenuGroup className={ className }>
+					<MenuItem
+						className={ getBlockMenuDefaultClassName( name ) }
+						onClick={ () => {
+							onUngroup();
+						} }
+					>
+						<BlockIcon icon={ icon } showColors />
+						{ onUngroup.__experimentalLabel || __( 'Ungroup' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 				{ hoveredTransformItemName && (
 					<PreviewBlockPopover
