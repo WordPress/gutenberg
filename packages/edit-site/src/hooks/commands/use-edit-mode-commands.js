@@ -179,7 +179,7 @@ function useEditUICommands() {
 	} );
 
 	commands.push( {
-		name: 'core/toggle-distraction-free-mode',
+		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		icon: cog,
 		callback: ( { close } ) => {
