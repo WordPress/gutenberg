@@ -74,6 +74,7 @@ require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 // WordPress 6.2 compat.
 require __DIR__ . '/compat/wordpress-6.2/blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.2/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
 require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
@@ -81,10 +82,6 @@ require __DIR__ . '/compat/wordpress-6.2/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 require __DIR__ . '/compat/wordpress-6.2/menu.php';
-
-// WordPress 6.3 compat.
-require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
 
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
@@ -94,6 +91,8 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 
 // WordPress 6.3 compat.
+require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
