@@ -1892,14 +1892,14 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function get_paths_in_node( $node ) {
 		$paths = array();
-		foreach( $node as $key => $value ) {
+		foreach ( $node as $key => $value ) {
 			if ( is_array( $value ) ) {
 				$subpaths = static::get_paths_in_node( $value );
-				foreach( $subpaths as $subpath ) {
+				foreach ( $subpaths as $subpath ) {
 					if ( ! is_array( $subpath ) ) {
 						$subpath = array( $subpath );
 					}
-					$paths[] = array_merge( array( $key ) , $subpath );
+					$paths[] = array_merge( array( $key ), $subpath );
 				}
 			} else {
 				$paths[] = $key;
@@ -1957,8 +1957,8 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$paths_in_node         = self::get_paths_in_node( $styles );
 		$properties_to_inspect = array();
-		foreach( $properties as $key => $value ) {
-			if ( in_array( $value, $paths_in_node ) ) {
+		foreach ( $properties as $key => $value ) {
+			if ( in_array( $value, $paths_in_node, true ) ) {
 				$properties_to_inspect[ $key ] = $value;
 			}
 		}
