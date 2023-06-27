@@ -10,11 +10,6 @@
  */
 
 /**
- * Import dependencies.
- */
-require __DIR__ . '/class-wp-classic-to-block-menu-converter.php';
-
-/**
  * Manages fallback behavior for Navigation menus.
  *
  * @access public
@@ -92,7 +87,7 @@ class WP_Navigation_Fallback_Gutenberg {
 		}
 
 		// If there is a classic menu then convert it to blocks.
-		$classic_nav_menu_blocks = WP_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
+		$classic_nav_menu_blocks = Gutenberg_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
 
 		if ( empty( $classic_nav_menu_blocks ) ) {
 			return new WP_Error( 'cannot_convert_classic_menu', __( 'Unable to convert Classic Menu to blocks.', 'gutenberg' ) );

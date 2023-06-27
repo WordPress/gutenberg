@@ -10,11 +10,6 @@
  */
 
 /**
- * Import dependencies.
- */
-require __DIR__ . '/class-wp-navigation-fallback-gutenberg.php';
-
-/**
  * REST Controller to fetch a fallback Navigation Block Menu. If needed it creates one.
  */
 class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
