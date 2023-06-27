@@ -42,7 +42,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const { onClick, href } = useLink( {
+	const { onClick } = useLink( {
 		postType: item.type,
 		postId: item.type === USER_PATTERNS ? item.id : item.name,
 		categoryId,
