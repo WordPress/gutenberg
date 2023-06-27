@@ -11,6 +11,8 @@ import {
 	__experimentalVStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
@@ -83,6 +85,8 @@ function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
 export default function SidebarNavigationScreenGlobalStyles() {
 	const { openGeneralSidebar, setIsListViewOpened } =
 		useDispatch( editSiteStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -90,29 +94,40 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const browseStylesLink = useLink( {
 		path: '/wp_global_styles/browseStyles',
 	} );
-	const { isStyleBookOpened, hasGlobalStyleVariations } = useSelect(
-		( select ) => ( {
-			isStyleBookOpened:
-				'style-book' ===
-				unlock(
-					select( editSiteStore )
-				).getEditorCanvasContainerView(),
-			hasGlobalStyleVariations:
-				!! select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
-		} ),
-		[]
-	);
+	const { isStyleBookOpened, hasGlobalStyleVariations, isDistractionFree } =
+		useSelect(
+			( select ) => ( {
+				isStyleBookOpened:
+					'style-book' ===
+					unlock(
+						select( editSiteStore )
+					).getEditorCanvasContainerView(),
+				hasGlobalStyleVariations:
+					!! select(
+						coreStore
+					).__experimentalGetCurrentThemeGlobalStylesVariations()
+						?.length,
+				isDistractionFree: select( preferencesStore ).get(
+					editSiteStore.name,
+					'distractionFree'
+				),
+			} ),
+			[]
+		);
 
-	const openGlobalStyles = useCallback(
-		async () =>
-			Promise.all( [
-				setCanvasMode( 'edit' ),
-				openGeneralSidebar( 'edit-site/global-styles' ),
-			] ),
-		[ setCanvasMode, openGeneralSidebar ]
-	);
+	const openGlobalStyles = useCallback( async () => {
+		// Disable distraction free mode.
+		if ( isDistractionFree ) {
+			setPreference( editSiteStore.name, 'distractionFree', false );
+			createInfoNotice( __( 'Distraction free mode turned off.' ), {
+				type: 'snackbar',
+			} );
+		}
+		return Promise.all( [
+			setCanvasMode( 'edit' ),
+			openGeneralSidebar( 'edit-site/global-styles' ),
+		] );
+	}, [ setCanvasMode, openGeneralSidebar, isDistractionFree ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
