@@ -133,6 +133,9 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 							<Button
 								variant="link"
 								onClick={ onClick }
+								// Required for the grid's roving tab index system.
+								// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+								tabIndex="-1"
 							>
 								{ item.title }
 							</Button>
