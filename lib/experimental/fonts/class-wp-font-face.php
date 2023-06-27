@@ -264,7 +264,7 @@ class WP_Font_Face {
 				$css .= '@font-face{' . $this->build_font_face_css( $font_face ) . '}' . "\n";
 		}
 
-		return $css;
+		return rtrim( $css, "\n" );
 	}
 
 	/**
