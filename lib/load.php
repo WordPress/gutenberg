@@ -48,7 +48,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-revisions-controller-6-3.php';
-	require_once __DIR__ . '/compat/wordpress-6.3/class-wp-rest-navigation-fallback-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-classic-to-block-menu-converter.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-navigation-fallback.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-navigation-fallback-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
