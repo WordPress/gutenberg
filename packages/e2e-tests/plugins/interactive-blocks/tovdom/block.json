@@ -9,6 +9,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": ["tovdom-view", "wp-interactivity"],
+	"viewScript": "tovdom-view",
 	"render": "file:./render.php"
 }

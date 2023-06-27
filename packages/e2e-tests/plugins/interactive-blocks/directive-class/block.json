@@ -9,6 +9,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": ["directive-class-view", "wp-interactivity"],
+	"viewScript": "directive-class-view",
 	"render": "file:./render.php"
 }
