@@ -311,6 +311,7 @@
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test:performance:debug": "wp-scripts --inspect-brk test-e2e --runInBand --no-cache --verbose --config packages/e2e-tests/jest.performance.config.js --puppeteer-devtools",
+		"test:performance:playwright": "playwright test --config test/performance/playwright.config.ts",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-cli composer run-script test:watch",
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
