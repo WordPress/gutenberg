@@ -156,9 +156,9 @@ export default function SidebarNavigationScreenGlobalStyles() {
 						) }
 						<SidebarNavigationItem
 							icon={ styles }
-							onClick={ async () => await openGlobalStyles() }
+							onClick={ openGlobalStyles }
 						>
-							{ __( 'Open styles' ) }
+							{ __( 'Edit styles' ) }
 						</SidebarNavigationItem>
 					</ItemGroup>
 				}
