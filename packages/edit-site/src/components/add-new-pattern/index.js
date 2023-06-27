@@ -12,8 +12,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
-import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -58,21 +58,19 @@ export default function AddNewPattern() {
 					{
 						icon: header,
 						onClick: () => setShowTemplatePartModal( true ),
-						title: 'Create a template part',
+						title: __( 'Create template part' ),
 					},
 					{
 						icon: file,
 						onClick: () => setShowPatternModal( true ),
-						title: 'Create a pattern',
+						title: __( 'Create pattern' ),
 					},
 				] }
-				icon={
-					<SidebarButton
-						icon={ plus }
-						label={ __( 'Create a pattern' ) }
-					/>
-				}
-				label="Create a pattern."
+				toggleProps={ {
+					as: SidebarButton,
+				} }
+				icon={ plus }
+				label={ __( 'Create pattern' ) }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal

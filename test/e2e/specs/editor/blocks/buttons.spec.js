@@ -10,6 +10,9 @@ test.describe( 'Buttons', () => {
 
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await page.keyboard.type( 'Content' );
 
 		// Check the content.
@@ -50,9 +53,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -78,9 +84,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -107,9 +116,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="URL"i]' );
+		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );
@@ -145,28 +157,6 @@ test.describe( 'Buttons', () => {
 			`<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/">WordPress</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
-	} );
-
-	test( 'can resize width', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
-		await page.click(
-			'role=group[name="Button width"i] >> role=button[name="25%"i]'
-		);
-
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"width":25} -->
-<div class="wp-block-button has-custom-width wp-block-button__width-25"><a class="wp-block-button__link wp-element-button">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);

@@ -35,7 +35,7 @@ export default function CategoryItem( {
 			{ ...linkInfo }
 			icon={ icon }
 			suffix={ <span>{ count }</span> }
-			className={ isActive ? 'is-active-category' : undefined }
+			aria-current={ isActive ? 'true' : undefined }
 		>
 			{ label }
 		</SidebarNavigationItem>
