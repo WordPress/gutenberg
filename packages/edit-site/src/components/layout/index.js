@@ -258,7 +258,6 @@ export default function Layout() {
 					<AnimatePresence initial={ false }>
 						{ showSidebar && (
 							<motion.div
-								layout
 								initial={ {
 									opacity: 0,
 								} }
