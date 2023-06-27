@@ -41,7 +41,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const allPatterns = useMemo( () => {
 		const parsedUnsyncedPatterns = unsyncedPatterns.map(
 			( syncedPattern ) => ( {
-				...syncedPattern,
+				title: syncedPattern.title,
 				name: syncedPattern.id,
 				categories: [ 'custom' ],
 				blocks: parse( syncedPattern.content, {
@@ -55,8 +55,8 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const allCategories = useMemo( () => {
 		const customPatternsCategory = {
 			name: 'custom',
-			label: 'Custom patterns',
-			description: 'Custom patterns add by site users',
+			label: __( 'Custom patterns' ),
+			description: __( 'Custom patterns add by site users' ),
 		};
 		return [ ...patternCategories, customPatternsCategory ];
 	}, [ patternCategories ] );
