@@ -1865,6 +1865,50 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns an array containing the flattened paths of the given node.
+	 *
+	 * Input:
+	 *
+	 * array(
+	 *   'color' => array(
+	 *     'background' => 'value',
+	 *     'text'       => 'value',
+	 *   ),
+	 *   'typography' => array(
+	 *     'size' => 'value',
+	 *   ),
+	 * )
+	 *
+	 * Output:
+	 *
+	 * array(
+	 *   array( 'color', 'background' ),
+	 *   array( 'color', 'text' ),
+	 *   array( 'typography', 'size'),
+	 * )
+	 *
+	 * @param array $node Style node to process.
+	 * @return array
+	 */
+	private static function get_paths_in_node( $node ) {
+		$paths = array();
+		foreach( $node as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$subpaths = static::get_paths_in_node( $value );
+				foreach( $subpaths as $subpath ) {
+					if ( ! is_array( $subpath ) ) {
+						$subpath = array( $subpath );
+					}
+					$paths[] = array_merge( array( $key ) , $subpath );
+				}
+			} else {
+				$paths[] = $key;
+			}
+		}
+		return $paths;
+	}
+
+	/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
@@ -1897,9 +1941,30 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$root_variable_duplicates = array();
+		/*
+		 * Instead of iterating over the $property list (54 items as of this comment),
+		 * we iterate only over the properties present in the $styles array.
+		 *
+		 * To gauge the impact this change has, let's take a look at the numbers for
+		 * the TwentyTwentyThree theme at the time of this comment.
+		 *
+		 * - The compute_style_properties method  is called 65 times, one per style node.
+		 * - The $properties list has 54 items. For TT3, $styles may have less than 5 items per node.
+		 *
+		 * - Before: 65 * 54 = 3510 times.
+		 * - After:  65 *  5 =  325 times.
+		 *
+		 */
+		$paths_in_node         = self::get_paths_in_node( $styles );
+		$properties_to_inspect = array();
+		foreach( $properties as $key => $value ) {
+			if ( in_array( $value, $paths_in_node ) ) {
+				$properties_to_inspect[ $key ] = $value;
+			}
+		}
 
-		foreach ( $properties as $css_property => $value_path ) {
+		$root_variable_duplicates = array();
+		foreach ( $properties_to_inspect as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
 
 			if ( str_starts_with( $css_property, '--wp--style--root--' ) && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
