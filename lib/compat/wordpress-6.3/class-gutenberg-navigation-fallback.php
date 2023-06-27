@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Navigation_Fallback_Gutenberg class
+ * Gutenberg_Navigation_Fallback class
  *
  * Manages fallback behavior for Navigation menus.
  *
@@ -14,7 +14,7 @@
  *
  * @access public
  */
-class WP_Navigation_Fallback_Gutenberg {
+class Gutenberg_Navigation_Fallback {
 
 	/**
 	 * Gets (and/or creates) an appropriate fallback Navigation Menu.

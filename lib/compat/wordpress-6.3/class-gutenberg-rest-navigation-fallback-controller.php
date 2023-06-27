@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_REST_Navigation_Fallback_Controller class
+ * Gutenberg_REST_Navigation_Fallback_Controller class
  *
  * REST Controller to create/fetch a fallback Navigation Menu.
  *
@@ -12,7 +12,7 @@
 /**
  * REST Controller to fetch a fallback Navigation Block Menu. If needed it creates one.
  */
-class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
 
 	/**
 	 * The Post Type for the Controller
@@ -93,7 +93,7 @@ class WP_REST_Navigation_Fallback_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$post = WP_Navigation_Fallback_Gutenberg::get_fallback();
+		$post = Gutenberg_Navigation_Fallback::get_fallback();
 
 		if ( empty( $post ) ) {
 			return rest_ensure_response( new WP_Error( 'no_fallback_menu', __( 'No fallback menu found.', 'gutenberg' ), array( 'status' => 404 ) ) );
