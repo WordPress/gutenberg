@@ -145,7 +145,7 @@ function createBindingCache( bind ) {
  */
 export default function createReduxStore( key, options ) {
 	const privateActions = {};
-	const privateSelectors = {};
+	let privateSelectors = {};
 	const privateRegistrationFunctions = {
 		privateActions,
 		registerPrivateActions: ( actions ) => {
@@ -255,6 +255,12 @@ export default function createReduxStore( key, options ) {
 				resolvers = mapResolvers( options.resolvers );
 				selectors = mapSelectorsWithResolvers(
 					selectors,
+					resolvers,
+					store,
+					resolversCache
+				);
+				privateSelectors = mapSelectorsWithResolvers(
+					privateSelectors,
 					resolvers,
 					store,
 					resolversCache
