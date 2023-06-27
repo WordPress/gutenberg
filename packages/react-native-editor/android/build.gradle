@@ -25,7 +25,6 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
-        mavenLocal()
         maven {
             url "https://a8c-libs.s3.amazonaws.com/android"
             content {
@@ -37,5 +36,6 @@ allprojects {
         }
         maven { url 'https://www.jitpack.io' }
         google()
+        mavenLocal()
     }
 }
