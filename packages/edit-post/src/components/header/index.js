@@ -20,6 +20,16 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import DocumentTitle from './document-title';
 
+const slideY = {
+	hidden: { y: '-50px' },
+	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
+const slideX = {
+	hidden: { x: '-100%' },
+	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
 	const {
@@ -38,16 +48,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		} ),
 		[]
 	);
-
-	const slideY = {
-		hidden: { y: '-50px' },
-		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
-
-	const slideX = {
-		hidden: { x: '-100%' },
-		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
 
 	return (
 		<div className="edit-post-header">
