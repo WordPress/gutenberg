@@ -4,18 +4,19 @@
 import {
 	store as coreStore,
 	useResourcePermissions,
+	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { SELECT_NAVIGATION_MENUS_ARGS } from './constants';
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
 
-	return useSelect(
+	const useSelectResult = useSelect(
 		( select ) => {
 			const {
 				canCreate,
@@ -26,29 +27,15 @@ export default function useNavigationMenu( ref ) {
 			} = permissions;
 
 			const {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select );
-
-			const {
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
 			} = selectExistingMenu( select, ref );
 
 			return {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
-
-				canSwitchNavigationMenu: ref
-					? navigationMenus?.length > 1
-					: navigationMenus?.length > 0,
 
 				canUserCreateNavigationMenu: canCreate,
 				isResolvingCanUserCreateNavigationMenu: isResolving,
@@ -67,22 +54,26 @@ export default function useNavigationMenu( ref ) {
 		},
 		[ ref, permissions ]
 	);
-}
 
-function selectNavigationMenus( select ) {
-	const { getEntityRecords, hasFinishedResolution, isResolving } =
-		select( coreStore );
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+		canSwitchNavigationMenu = ref
+			? navigationMenus?.length > 1
+			: navigationMenus?.length > 0,
+	} = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
 
 	return {
-		navigationMenus: getEntityRecords( ...SELECT_NAVIGATION_MENUS_ARGS ),
-		isResolvingNavigationMenus: isResolving(
-			'getEntityRecords',
-			SELECT_NAVIGATION_MENUS_ARGS
-		),
-		hasResolvedNavigationMenus: hasFinishedResolution(
-			'getEntityRecords',
-			SELECT_NAVIGATION_MENUS_ARGS
-		),
+		...useSelectResult,
+		navigationMenus,
+		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
+		canSwitchNavigationMenu,
 	};
 }
 
