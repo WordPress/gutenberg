@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests covering WP_REST_Navigation_Fallback_Controller functionality.
+ * Unit tests covering Gutenberg_REST_Navigation_Fallback_Controller functionality.
  *
  * Note: that these tests are designed to provide high level coverage only. The majority of the tests
  * are made directly against the WP_Navigation_Fallback_Gutenberg class as this:
@@ -16,7 +16,7 @@
  * @group restapi
  * @group navigation
  */
-class WP_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	protected static $admin_user;
 	protected static $editor_user;

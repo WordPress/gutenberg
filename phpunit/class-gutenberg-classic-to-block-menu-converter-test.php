@@ -1,20 +1,20 @@
 <?php
 /**
- * Tests WP_Classic_To_Block_Menu_Converter_Test
+ * Tests Gutenberg_Classic_To_Block_Menu_Converter
  *
  * @package WordPress
  */
 
 /**
- * Tests for the WP_Classic_To_Block_Menu_Converter_Test class.
+ * Tests for the Gutenberg_Classic_To_Block_Menu_Converter_Test class.
  */
-class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
+class Gutenberg_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Classic_To_Block_Menu_Converter::get_fallback
 	 */
 	public function test_class_exists() {
-		$this->assertTrue( class_exists( 'WP_Classic_To_Block_Menu_Converter' ) );
+		$this->assertTrue( class_exists( 'Gutenberg_Classic_To_Block_Menu_Converter' ) );
 	}
 
 	/**
@@ -23,7 +23,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 	 */
 	public function test_passing_non_menu_object_to_converter_returns_wp_error( $data ) {
 
-		$result = WP_Classic_To_Block_Menu_Converter::convert( $data );
+		$result = Gutenberg_Classic_To_Block_Menu_Converter::convert( $data );
 
 		$this->assertTrue( is_wp_error( $result ), 'Should be a WP_Error instance' );
 
@@ -88,7 +88,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 		$classic_nav_menu = wp_get_nav_menu_object( $menu_id );
 
-		$blocks = WP_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
+		$blocks = Gutenberg_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
 
 		$this->assertNotEmpty( $blocks );
 
@@ -179,7 +179,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 			$classic_nav_menu = wp_get_nav_menu_object( $menu_id );
 
-			$blocks = WP_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
+			$blocks = Gutenberg_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
 
 			$this->assertNotEmpty( $blocks );
 
@@ -204,7 +204,7 @@ class WP_Classic_To_Block_Menu_Converter_Test extends WP_UnitTestCase {
 
 		$classic_nav_menu = wp_get_nav_menu_object( $menu_id );
 
-		$blocks = WP_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
+		$blocks = Gutenberg_Classic_To_Block_Menu_Converter::convert( $classic_nav_menu );
 
 		$this->assertEmpty( $blocks, 'Result should be empty.' );
 
