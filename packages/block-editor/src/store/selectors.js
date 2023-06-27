@@ -2037,7 +2037,8 @@ export const getInserterItems = createSelector(
 							// Filter to either fully synced patterns (sync_status === 'fully'),
 							// or old school reusable blocks (sync_status === '').
 							reusableBlock.meta?.sync_status === 'fully' ||
-							reusableBlock.meta?.sync_status === ''
+							reusableBlock.meta?.sync_status === '' ||
+							! reusableBlock.meta?.sync_status
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
