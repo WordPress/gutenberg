@@ -247,21 +247,13 @@ export default function Layout() {
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
-						{
+						{ showSidebar && (
 							<motion.div
+								layout
 								initial={ {
 									opacity: 0,
 								} }
-								animate={
-									showSidebar
-										? { opacity: 1, display: 'block' }
-										: {
-												opacity: 0,
-												transitionEnd: {
-													display: 'none',
-												},
-										  }
-								}
+								animate={ { opacity: 1 } }
 								exit={ {
 									opacity: 0,
 								} }
@@ -282,7 +274,7 @@ export default function Layout() {
 									<Sidebar />
 								</NavigableRegion>
 							</motion.div>
-						}
+						) }
 					</AnimatePresence>
 
 					<SavePanel />
