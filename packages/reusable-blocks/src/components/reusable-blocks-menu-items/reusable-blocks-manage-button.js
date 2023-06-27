@@ -51,7 +51,9 @@ function ReusableBlocksManageButton( { clientId } ) {
 	return (
 		<BlockSettingsMenuControls>
 			<MenuItem
-				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+				href={ addQueryArgs( 'site-editor.php', {
+					path: '/patterns',
+				} ) }
 			>
 				{ __( 'Manage Patterns' ) }
 			</MenuItem>
