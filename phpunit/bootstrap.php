@@ -22,10 +22,8 @@ if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
 }
 
-// Needed while Gutenberg contains tests that use the global styles and settings
-// implementation that exists in Core.
-// See https://github.com/WordPress/gutenberg/pull/51950.
-// See https://core.trac.wordpress.org/ticket/57487.
+// Pretend that these are Core unit tests. This is needed so that
+// wp_theme_has_theme_json() does not cache its return value between each test.
 if ( ! defined( 'WP_RUN_CORE_TESTS' ) ) {
 	define( 'WP_RUN_CORE_TESTS', true );
 }
