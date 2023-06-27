@@ -243,6 +243,7 @@ const SiteLogo = ( {
 				onFinishEditing={ () => {
 					setIsEditingImage( false );
 				} }
+				borderProps={ borderProps }
 			/>
 		) : (
 			<ResizableBox
@@ -586,6 +587,10 @@ export default function LogoEdit( {
 
 	const classes = classnames( className, {
 		'is-default-size': ! width,
+		'has-custom-border':
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {

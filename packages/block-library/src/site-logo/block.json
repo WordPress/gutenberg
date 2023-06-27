@@ -38,7 +38,7 @@
 			"radius": true,
 			"width": true,
 			"style": true,
-			"__experimentalSelector": "img, .components-placeholder__illustration, .components-placeholder::before",
+			"__experimentalSelector": "img, .components-placeholder__illustration, .components-placeholder::before, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,

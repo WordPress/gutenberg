@@ -19,6 +19,12 @@
 		max-width: 100%;
 	}
 
+	&.has-custom-border {
+		img {
+			box-sizing: border-box;
+		}
+	}
+
 	// Inherit border radius from style variations.
 	a,
 	img {
