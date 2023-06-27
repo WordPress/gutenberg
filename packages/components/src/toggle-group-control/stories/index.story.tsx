@@ -53,15 +53,20 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 		useState< ToggleGroupControlProps[ 'value' ] >();
 
 	return (
-		<ToggleGroupControl
-			__nextHasNoMarginBottom
-			{ ...props }
-			onChange={ ( ...changeArgs ) => {
-				setValue( ...changeArgs );
-				onChange?.( ...changeArgs );
-			} }
-			value={ value }
-		/>
+		<>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				{ ...props }
+				onChange={ ( ...changeArgs ) => {
+					setValue( ...changeArgs );
+					onChange?.( ...changeArgs );
+				} }
+				value={ value }
+			/>{ ' ' }
+			<Button onClick={ () => setValue( undefined ) } variant="tertiary">
+				Reset
+			</Button>
+		</>
 	);
 };
 
