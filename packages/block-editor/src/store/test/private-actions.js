@@ -79,7 +79,10 @@ describe( 'private actions', () => {
 
 		it( 'should dispatch provided settings with reset flag when `reset` argument is truthy', () => {
 			expect(
-				__experimentalUpdateSettings( settings, false, true )
+				__experimentalUpdateSettings( settings, {
+					stripExperimentalSettings: false,
+					reset: true,
+				} )
 			).toEqual( {
 				type: 'UPDATE_SETTINGS',
 				settings,
@@ -88,7 +91,11 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should strip experimental settings from a given settings object when `stripExperimentalSettings` argument is truthy', () => {
-			expect( __experimentalUpdateSettings( settings, true ) ).toEqual( {
+			expect(
+				__experimentalUpdateSettings( settings, {
+					stripExperimentalSettings: true,
+				} )
+			).toEqual( {
 				type: 'UPDATE_SETTINGS',
 				settings: {
 					foo: 'foo',
