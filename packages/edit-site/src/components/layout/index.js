@@ -224,6 +224,7 @@ export default function Layout() {
 					<AnimatePresence initial={ false }>
 						{ isEditorPage && isEditing && (
 							<NavigableRegion
+								key="header"
 								className="edit-site-layout__header"
 								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
@@ -236,19 +237,20 @@ export default function Layout() {
 									view: { opacity: 1, y: '-100%' },
 									edit: { opacity: 1, y: 0 },
 								} }
-								exit="view"
-								initial={
-									isDistractionFree
-										? 'isDistractionFree'
-										: 'view'
-								}
+								exit={ {
+									y: '-100%',
+								} }
+								initial={ {
+									opacity: isDistractionFree ? 1 : 0,
+									y: '-100%',
+								} }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion ? 0 : 0.2,
 									ease: 'easeOut',
 								} }
 							>
-								{ isEditing && <Header /> }
+								<Header />
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
