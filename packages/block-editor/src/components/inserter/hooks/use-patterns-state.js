@@ -12,6 +12,12 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 
+const CUSTOM_CATEGORY = {
+	name: 'custom',
+	label: __( 'Custom patterns' ),
+	description: __( 'Custom patterns add by site users' ),
+};
+
 /**
  * Retrieves the block patterns inserter state.
  *
@@ -21,45 +27,24 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
-	const { patternCategories, patterns, unsyncedPatterns } = useSelect(
+	const { patternCategories, patterns } = useSelect(
 		( select ) => {
-			const {
-				__experimentalGetAllowedPatterns,
-				getSettings,
-				getInserterItems,
-			} = select( blockEditorStore );
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
+
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
 				patternCategories:
 					getSettings().__experimentalBlockPatternCategories,
-				unsyncedPatterns: getInserterItems( rootClientId, 'unsynced' ),
 			};
 		},
 		[ rootClientId ]
 	);
 
-	const allPatterns = useMemo( () => {
-		const parsedUnsyncedPatterns = unsyncedPatterns.map(
-			( syncedPattern ) => ( {
-				title: syncedPattern.title,
-				name: syncedPattern.id,
-				categories: [ 'custom' ],
-				blocks: parse( syncedPattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} )
-		);
-		return [ ...patterns, ...parsedUnsyncedPatterns ];
-	}, [ unsyncedPatterns, patterns ] );
-
-	const allCategories = useMemo( () => {
-		const customPatternsCategory = {
-			name: 'custom',
-			label: __( 'Custom patterns' ),
-			description: __( 'Custom patterns add by site users' ),
-		};
-		return [ ...patternCategories, customPatternsCategory ];
-	}, [ patternCategories ] );
+	const allCategories = useMemo(
+		() => [ ...patternCategories, CUSTOM_CATEGORY ],
+		[ patternCategories ]
+	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
@@ -82,7 +67,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return [ allPatterns, allCategories, onClickPattern ];
+	return [ patterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;
