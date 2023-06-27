@@ -171,7 +171,7 @@ export function BlockPatternsCategoryPanel( {
 	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
 
 	// Hide block pattern preview on unmount.
-	useEffect( () => () => onHover( null ), [ onHover ] );
+	useEffect( () => () => onHover( null ), [] );
 
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
