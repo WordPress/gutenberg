@@ -108,7 +108,7 @@ const SiteLogo = ( {
 		if ( shouldSyncIcon && logoId !== iconId ) {
 			setAttributes( { shouldSyncIcon: false } );
 		}
-	}, [] );
+	}, [ iconId, logoId, setAttributes, shouldSyncIcon ] );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -126,7 +126,9 @@ const SiteLogo = ( {
 
 	const img = (
 		<img
-			className={ `custom-logo ${ borderProps.className }` }
+			className={ classnames( 'custom-logo', {
+				[ borderProps.className ]: !! borderProps.className,
+			} ) }
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
