@@ -42,6 +42,12 @@ export default function PatternsList( { categoryId, type } ) {
 
 	const { syncedPatterns, unsyncedPatterns } = patterns;
 	const hasPatterns = !! syncedPatterns.length || !! unsyncedPatterns.length;
+	const isHeaders = type === 'wp_template_part' && categoryId === 'header';
+	const isFooters = type === 'wp_template_part' && categoryId === 'footer';
+	const isTemplatePart =
+		type === 'wp_template_part' && categoryId === 'uncategorized';
+	const isCustomPattern =
+		type === 'pattern' && categoryId === 'custom-patterns';
 
 	return (
 		<VStack spacing={ 6 }>
@@ -75,18 +81,36 @@ export default function PatternsList( { categoryId, type } ) {
 			{ isResolving && __( 'Loading' ) }
 			{ ! isResolving && !! syncedPatterns.length && (
 				<>
-					<VStack className="edit-site-library__section-header">
-						<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
-						<Text variant="muted" as="p">
-							{ __(
-								'Patterns that are kept in sync across your site'
-							) }
-						</Text>
-					</VStack>
+					{ isCustomPattern && (
+						<VStack className="edit-site-library__section-header">
+							<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
+
+							<Text variant="muted" as="p">
+								{ __(
+									'Patterns that are kept in sync across your site'
+								) }
+							</Text>
+						</VStack>
+					) }
 					<Grid
 						icon={ symbol }
 						categoryId={ categoryId }
-						label={ __( 'Synced patterns' ) }
+						label={ ( () => {
+							switch ( true ) {
+								case isHeaders: {
+									return __( 'Headers' );
+								}
+								case isFooters: {
+									return __( 'Footers' );
+								}
+								case isTemplatePart: {
+									return __( 'Uncategorized' );
+								}
+								default: {
+									return __( 'Synced patterns' );
+								}
+							}
+						} )() }
 						items={ syncedPatterns }
 					/>
 				</>
