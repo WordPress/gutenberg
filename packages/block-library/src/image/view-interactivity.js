@@ -143,7 +143,8 @@ store( {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
 				responsiveImgSrc: ( { context } ) => {
-					return context.core.image.activateLargeImage
+					return context.core.image.activateLargeImage &&
+						context.core.image.hideAnimationEnabled
 						? ''
 						: context.core.image.imageCurrentSrc;
 				},
