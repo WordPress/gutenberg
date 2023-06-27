@@ -21,6 +21,9 @@ if ( ! defined( 'LOCAL_SCRIPT_DEBUG' ) ) {
 if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
 }
+if ( ! defined( 'WP_RUN_CORE_TESTS' ) ) {
+	define( 'WP_RUN_CORE_TESTS', true );
+}
 
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
