@@ -223,8 +223,6 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		closeGeneralSidebar();
-		setIsListViewOpened( false );
 		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
 		createInfoNotice(
