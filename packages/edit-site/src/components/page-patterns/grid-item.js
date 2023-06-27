@@ -15,6 +15,8 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__unstableCompositeItem as CompositeItem,
+	Tooltip,
+	Flex,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
@@ -26,6 +28,7 @@ import {
 	footer,
 	symbolFilled,
 	moreHorizontal,
+	lockSmall,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -141,8 +144,37 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						spacing={ 3 }
 						className="edit-site-patterns__pattern-title"
 					>
-						{ icon && <Icon icon={ itemIcon } /> }
+						{ icon && (
+							<Icon
+								className="edit-site-library__pattern-icon"
+								icon={ itemIcon }
+							/>
+						) }
 						<Heading level={ 5 }>{ item.title }</Heading>
+						<Flex
+							as={ Heading }
+							level={ 5 }
+							gap={ 0 }
+							justify="left"
+						>
+							{ item.title }
+							{ item.type === PATTERNS && (
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Theme patterns cannot be edited here'
+									) }
+								>
+									<span style={ { display: 'inline-flex' } }>
+										<Icon
+											style={ { fill: 'currentcolor' } }
+											icon={ lockSmall }
+											size={ 24 }
+										/>
+									</span>
+								</Tooltip>
+							) }
+						</Flex>
 					</HStack>
 					{ item.type === USER_PATTERNS && (
 						<DropdownMenu

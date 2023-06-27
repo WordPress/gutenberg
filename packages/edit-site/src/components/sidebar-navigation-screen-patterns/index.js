@@ -4,13 +4,16 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	Flex,
+	Icon,
+	Tooltip,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file, starFilled } from '@wordpress/icons';
+import { file, starFilled, lockSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -138,7 +141,38 @@ export default function SidebarNavigationScreenPatterns() {
 										<CategoryItem
 											key={ category.name }
 											count={ category.count }
-											label={ category.label }
+											label={
+												<Flex
+													justify="left"
+													align="center"
+													gap={ 0 }
+												>
+													{ category.label }
+													<Tooltip
+														position="top center"
+														text={ __(
+															'Theme patterns cannot be edited here'
+														) }
+													>
+														<span
+															style={ {
+																display:
+																	'inline-flex',
+															} }
+														>
+															<Icon
+																style={ {
+																	fill: 'currentcolor',
+																} }
+																icon={
+																	lockSmall
+																}
+																size={ 24 }
+															/>
+														</span>
+													</Tooltip>
+												</Flex>
+											}
 											icon={ file }
 											id={ category.name }
 											type="pattern"
