@@ -1,5 +1,76 @@
 == Changelog ==
 
+= 16.1.0-rc.2 =
+
+## Changelog
+
+### Enhancements
+
+#### Block Editor
+- Improve LinkControl Edit UI. ([51712](https://github.com/WordPress/gutenberg/pull/51712))
+
+#### Site Editor
+- Adding the distraction-free mode to the site editor (#51173). ([51932](https://github.com/WordPress/gutenberg/pull/51932))
+- Update colors in 'Site view'. ([51856](https://github.com/WordPress/gutenberg/pull/51856))
+- Site Editor: Make string to add Template parts and Patterns consistent and translatable [51743](https://github.com/WordPress/gutenberg/pull/51743)
+
+#### Block Library
+- Add image block aspect ratio control [51545](https://github.com/WordPress/gutenberg/pull/51545)
+
+#### Components
+- Button: Introduce size prop [51842](https://github.com/WordPress/gutenberg/pull/51842)
+
+#### Navigation
+- Ensure there is always a Navigation available in the browse mode sidebar via fallback algorithm [50321](https://github.com/WordPress/gutenberg/pull/50321)
+
+### Accessibility
+
+- BlockLockModal: restore focus on fallback toolbar button when original button is not rendered [51666](https://github.com/WordPress/gutenberg/pull/51666)
+- Site Editor Sidebar: improvements to buttons [51762](https://github.com/WordPress/gutenberg/pull/51762)
+
+### Bug fixes
+
+#### Site Editor
+- Disable the revision button if there is no clickable menu [51851](https://github.com/WordPress/gutenberg/pull/51851)
+- Library: Fix misalignment of description in custom template parts  [51868](https://github.com/WordPress/gutenberg/pull/51868)
+- Library: Fix delete shortcut incorrectly bound to non-user patterns [51830](https://github.com/WordPress/gutenberg/pull/51830)
+- Add distraction free to site editor
+[51173](https://github.com/WordPress/gutenberg/pull/51173)
+- Fix toolbar overlap in site editor
+[51810](https://github.com/WordPress/gutenberg/pull/51810)
+- Increase space between page meta and details section [51858](https://github.com/WordPress/gutenberg/pull/51858/)
+- Fix missing MenuGroup segment in Site Editor header more menu [51860](https://github.com/WordPress/gutenberg/pull/51860)
+- Update the add template modal design [51806](https://github.com/WordPress/gutenberg/pull/51806)
+- Update text color of site editor menu item hover/active states [51847](https://github.com/WordPress/gutenberg/pull/51847)
+
+#### Block Library
+- Buttons Block: add support for orientation-based block movers [51831](https://github.com/WordPress/gutenberg/pull/51831)
+
+#### Command Center
+- Add manage all custom patterns command [51845](https://github.com/WordPress/gutenberg/pull/51845)
+- Add another batch of commands to the site editor [51832](https://github.com/WordPress/gutenberg/pull/51832)
+- Add UI commands to the post editor [51900](https://github.com/WordPress/gutenberg/pull/51900)
+
+#### Components
+- Keep framer-motion from updating minor version [51894](https://github.com/WordPress/gutenberg/pull/51894)
+- ConfirmDialog: Fix affirmative action being triggered an extra time when selecting a button via keyboard [51730](https://github.com/WordPress/gutenberg/pull/51730)
+- Tweak more icons for high-resolution devices [51768](https://github.com/WordPress/gutenberg/pull/51768)
+- ZStack: fix component bounding box to match children [51836](https://github.com/WordPress/gutenberg/pull/51836)
+
+#### Page Content Focus 
+- Switch to Page panel when deselecting a block [51881](https://github.com/WordPress/gutenberg/pull/51881)
+- Don't show 'Back to page' notification when navigating away from page [51880](https://github.com/WordPress/gutenberg/pull/51880)
+- useBlockSync(): Reset inner blocks when component unmounts [51783](https://github.com/WordPress/gutenberg/pull/51783)
+- Fix black pixel appearing when block toolbar is empty [51779](https://github.com/WordPress/gutenberg/pull/51779)
+- Only show Page Content Focus commands when in edit mode [51888](https://github.com/WordPress/gutenberg/pull/51888)
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jameskoster @priethor @richtabor @t-hamano @draganescu @noisysocks @tellthemachines @ciampo @ntsekouras @youknowriad @talldan @getdave @ajlende @mirka 
+
+
 = 16.1.0-rc.1 =
 
 ## Changelog
