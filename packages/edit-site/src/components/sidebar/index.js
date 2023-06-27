@@ -23,6 +23,7 @@ import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SidebarNavigationScreenBrowseGlobalStyles from '../sidebar-navigation-screen-browse-global-styles';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
@@ -46,6 +47,9 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/wp_global_styles">
 				<SidebarNavigationScreenGlobalStyles />
+			</NavigatorScreen>
+			<NavigatorScreen path="/wp_global_styles/browseStyles">
+				<SidebarNavigationScreenBrowseGlobalStyles />
 			</NavigatorScreen>
 			<NavigatorScreen path="/page">
 				<SidebarNavigationScreenPages />
