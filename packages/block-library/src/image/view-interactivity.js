@@ -211,12 +211,12 @@ function setZoomStyles( imgDom, context, event ) {
 	// to calculate dimensions and positioning.
 
 	// As per the design, let's constrain the height with fixed padding
-	const containerOuterHeight = context.core.image.figureRef.clientHeight;
+	const containerOuterHeight = window.innerHeight;
 	const verticalPadding = 40;
 	const containerInnerHeight = containerOuterHeight - verticalPadding * 2;
 
 	// Let's set a variable horizontal padding based on the container width
-	const containerOuterWidth = context.core.image.figureRef.clientWidth;
+	const containerOuterWidth = window.innerWidth;
 	let horizontalPadding = 0;
 	if ( containerOuterWidth > 480 ) {
 		horizontalPadding = 40;
