@@ -264,6 +264,7 @@ class WP_Font_Face {
 				$css .= '@font-face{' . $this->build_font_face_css( $font_face ) . '}' . "\n";
 		}
 
+		// Don't print the last newline character.
 		return rtrim( $css, "\n" );
 	}
 
