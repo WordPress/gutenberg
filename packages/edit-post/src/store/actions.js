@@ -10,6 +10,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -42,27 +43,39 @@ export const closeGeneralSidebar =
 /**
  * Returns an action object used in signalling that the user opened a modal.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
+ *
  * @param {string} name A string that uniquely identifies the modal.
  *
  * @return {Object} Action object.
  */
-export function openModal( name ) {
-	return {
-		type: 'OPEN_MODAL',
-		name,
+export const openModal =
+	( name ) =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).openModal( name )", {
+			since: '6.3',
+			alternative: "select( 'core/interface').openModal( name )",
+		} );
+		return registry.dispatch( interfaceStore ).openModal( name );
 	};
-}
 
 /**
  * Returns an action object signalling that the user closed a modal.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
  * @return {Object} Action object.
  */
-export function closeModal() {
-	return {
-		type: 'CLOSE_MODAL',
+export const closeModal =
+	() =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).closeModal()", {
+			since: '6.3',
+			alternative: "select( 'core/interface').closeModal()",
+		} );
+		return registry.dispatch( interfaceStore ).closeModal();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user opened the publish
