@@ -37,7 +37,7 @@ describe( 'Post Comments Form', () => {
 			);
 			await expect( page ).toClick(
 				'.edit-site-sidebar-navigation-item',
-				{ text: /singular/i }
+				{ text: /single entries/i }
 			);
 			await enterEditMode();
 
