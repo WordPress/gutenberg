@@ -24,7 +24,7 @@ export const unstyledButton = css`
 		color: ${ COLORS.ui.theme };
 	}
 
-	&:focus {
+	&:focus-visible {
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			var(
 				--wp-components-color-accent,
