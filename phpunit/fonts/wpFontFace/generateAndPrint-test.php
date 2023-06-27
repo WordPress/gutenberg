@@ -12,7 +12,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
  * Test WP_Font_Face::generate_and_print().
  *
  * @package WordPress
- * @subpackage Fonts API
+ * @subpackage Fonts
  *
  * @since X.X.X
  * @group fonts
