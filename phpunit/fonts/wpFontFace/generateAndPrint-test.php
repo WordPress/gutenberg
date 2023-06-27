@@ -41,49 +41,200 @@ class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
 	 */
 	public function data_test_generate_and_print() {
 		return array(
-			'truetype format' => array(
+			'single truetype format font' => array(
 				'fonts'    => array(
-					'open-sans-bold-italic-local' => array(
-						'provider'    => 'local',
-						'font-family' => 'Open Sans',
-						'font-style'  => 'italic',
-						'font-weight' => 'bold',
-						'src'         => 'http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf',
-					),
+					'Inter' =>
+						array (
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf',
+									),
+								'font-family' => 'Inter',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '200',
+							),
+						),
 				),
-				'expected' => array(
+                'expected' => array(
 					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
-@font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
+@font-face{font-family:Inter;font-style:normal;font-weight:200;font-display:fallback;src:url('https://example.org/assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf') format('truetype');font-stretch:normal;}
 CSS
 				,
 				),
 			),
-			'woff2 format'    => array(
+			'multiple truetype format fonts' => array(
 				'fonts'    => array(
-					'source-serif-pro-200-900-normal-local' => array(
-						'provider'     => 'local',
-						'font-family'  => 'Source Serif Pro',
-						'font-style'   => 'normal',
-						'font-weight'  => '200 900',
-						'font-stretch' => 'normal',
-						'src'          => 'http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
-					),
-					'source-serif-pro-400-900-italic-local' => array(
-						'provider'     => 'local',
-						'font-family'  => 'Source Serif Pro',
-						'font-style'   => 'italic',
-						'font-weight'  => '200 900',
-						'font-stretch' => 'normal',
-						'src'          => 'http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
-					),
+					'Inter' =>
+						array (
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf',
+									),
+								'font-family' => 'Inter',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '200',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf',
+									),
+								'font-family' => 'Inter',
+								'font-stretch' => 'normal',
+								'font-style' => 'italic',
+								'font-weight' => '900',
+							),
+						),
 				),
 				'expected' => array(
 					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:200 900;font-display:fallback;src:url('https://example.org/assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf') format('truetype');font-stretch:normal;}
 CSS
-
+				,
+				),
+			),
+			'single woff2 format font'    => array(
+				'fonts'    => array(
+					'DM Sans' =>
+						array (
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/dm-sans/DMSans-Regular.woff2',
+									),
+								'font-family' => 'DM Sans',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '400',
+							),
+						),
+				),
+				'expected' => array(
+					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Regular.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:400;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:700;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Bold.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:700;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:300;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Light.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:italic;font-weight:400;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:700;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2') format('woff2');font-stretch:normal;}
+CSS
+				,
+				),
+			),
+			'multiple woff2 format fonts'    => array(
+				'fonts'    => array(
+					'DM Sans' =>
+						array (
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/dm-sans/DMSans-Regular.woff2',
+									),
+								'font-family' => 'DM Sans',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '400',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2',
+									),
+								'font-family' => 'DM Sans',
+								'font-stretch' => 'normal',
+								'font-style' => 'italic',
+								'font-weight' => '400',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/dm-sans/DMSans-Bold.woff2',
+									),
+								'font-family' => 'DM Sans',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '700',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2',
+									),
+								'font-family' => 'DM Sans',
+								'font-stretch' => 'normal',
+								'font-style' => 'italic',
+								'font-weight' => '700',
+							),
+						),
+					'IBM Plex Mono' =>
+						array (
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Light.woff2',
+									),
+								'font-family' => 'IBM Plex Mono',
+								'font-display' => 'block',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '300',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+									),
+								'font-family' => 'IBM Plex Mono',
+								'font-display' => 'block',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '400',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2',
+									),
+								'font-family' => 'IBM Plex Mono',
+								'font-display' => 'block',
+								'font-stretch' => 'normal',
+								'font-style' => 'italic',
+								'font-weight' => '400',
+							),
+							array (
+								'src' =>
+									array (
+										'https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+									),
+								'font-family' => 'IBM Plex Mono',
+								'font-display' => 'block',
+								'font-stretch' => 'normal',
+								'font-style' => 'normal',
+								'font-weight' => '700',
+							),
+						),
+				),
+				'expected' => array(
+					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Regular.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:400;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:700;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Bold.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:700;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:300;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Light.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:italic;font-weight:400;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:700;font-display:block;src:url('https://example.org/assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2') format('woff2');font-stretch:normal;}
+CSS
 				,
 				),
 			),
