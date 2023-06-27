@@ -840,6 +840,8 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
 /**
  * Turns menu item data into a nested array of parsed blocks
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
+ *
  * @param array $menu_items               An array of menu items that represent
  *                                        an individual level of a menu.
  * @param array $menu_items_by_parent_id  An array keyed by the id of the
@@ -895,6 +897,8 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
 /**
  * Get the classic navigation menu to use as a fallback.
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback() instead.
+ *
  * @return object WP_Term The classic navigation.
  */
 function block_core_navigation_get_classic_menu_fallback() {
@@ -937,6 +941,8 @@ function block_core_navigation_get_classic_menu_fallback() {
 /**
  * Converts a classic navigation to blocks.
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
+ *
  * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
@@ -975,7 +981,9 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 }
 
 /**
- * If there's a the classic menu then use it as a fallback.
+ * If there's a classic menu then use it as a fallback.
+ *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::create_classic_menu_fallback() instead.
  *
  * @return array the normalized parsed blocks.
  */
@@ -1019,6 +1027,8 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 
 /**
  * Finds the most recently published `wp_navigation` Post.
+ *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_most_recently_published_navigation() instead.
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
