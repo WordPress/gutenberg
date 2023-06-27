@@ -219,64 +219,79 @@ function getWebpackEntryPoints() {
 		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
-				const { editorScript, script, viewScript } = JSON.parse(
-					readFileSync( blockMetadataFile )
-				);
-				[ editorScript, script, viewScript ]
-					.flat()
-					.filter( ( value ) => value && value.startsWith( 'file:' ) )
-					.forEach( ( value ) => {
-						// Removes the `file:` prefix.
-						const filepath = join(
-							dirname( blockMetadataFile ),
-							value.replace( 'file:', '' )
-						);
-
-						// Takes the path without the file extension, and relative to the defined source directory.
-						if ( ! filepath.startsWith( srcDirectory ) ) {
-							log(
-								chalk.yellow(
-									`Skipping "${ value.replace(
-										'file:',
-										''
-									) }" listed in "${ blockMetadataFile.replace(
-										fromProjectRoot( sep ),
-										''
-									) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
-								)
+				// wrapping in try/catch in case the file is malformed
+				// this happens especially when new block.json files are added
+				// at which point they are completely empty and therefore not valid JSON
+				try {
+					const { editorScript, script, viewScript } = JSON.parse(
+						readFileSync( blockMetadataFile )
+					);
+					[ editorScript, script, viewScript ]
+						.flat()
+						.filter(
+							( value ) => value && value.startsWith( 'file:' )
+						)
+						.forEach( ( value ) => {
+							// Removes the `file:` prefix.
+							const filepath = join(
+								dirname( blockMetadataFile ),
+								value.replace( 'file:', '' )
 							);
-							return;
-						}
-						const entryName = filepath
-							.replace( extname( filepath ), '' )
-							.replace( srcDirectory, '' )
-							.replace( /\\/g, '/' );
 
-						// Detects the proper file extension used in the defined source directory.
-						const [ entryFilepath ] = glob(
-							`${ getWordPressSrcDirectory() }/${ entryName }.[jt]s?(x)`,
-							{
-								absolute: true,
+							// Takes the path without the file extension, and relative to the defined source directory.
+							if ( ! filepath.startsWith( srcDirectory ) ) {
+								log(
+									chalk.yellow(
+										`Skipping "${ value.replace(
+											'file:',
+											''
+										) }" listed in "${ blockMetadataFile.replace(
+											fromProjectRoot( sep ),
+											''
+										) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
+									)
+								);
+								return;
 							}
-						);
+							const entryName = filepath
+								.replace( extname( filepath ), '' )
+								.replace( srcDirectory, '' )
+								.replace( /\\/g, '/' );
 
-						if ( ! entryFilepath ) {
-							log(
-								chalk.yellow(
-									`Skipping "${ value.replace(
-										'file:',
-										''
-									) }" listed in "${ blockMetadataFile.replace(
-										fromProjectRoot( sep ),
-										''
-									) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
-								)
+							// Detects the proper file extension used in the defined source directory.
+							const [ entryFilepath ] = glob(
+								`${ getWordPressSrcDirectory() }/${ entryName }.[jt]s?(x)`,
+								{
+									absolute: true,
+								}
 							);
-							return;
-						}
-						accumulator[ entryName ] = entryFilepath;
-					} );
-				return accumulator;
+
+							if ( ! entryFilepath ) {
+								log(
+									chalk.yellow(
+										`Skipping "${ value.replace(
+											'file:',
+											''
+										) }" listed in "${ blockMetadataFile.replace(
+											fromProjectRoot( sep ),
+											''
+										) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
+									)
+								);
+								return;
+							}
+							accumulator[ entryName ] = entryFilepath;
+						} );
+					return accumulator;
+				} catch ( error ) {
+					chalk.yellow(
+						`Skipping "${ blockMetadataFile.replace(
+							fromProjectRoot( sep ),
+							''
+						) }" due to malformed JSON.`
+					);
+					return accumulator;
+				}
 			},
 			{}
 		);
