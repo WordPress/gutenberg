@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Classic_To_Block_Menu_Converter class
+ * Gutenberg_Classic_To_Block_Menu_Converter class
  *
  * @package gutenberg
  * @since 6.3.0
@@ -11,7 +11,7 @@
  *
  * @access public
  */
-class WP_Classic_To_Block_Menu_Converter {
+class Gutenberg_Classic_To_Block_Menu_Converter {
 
 	/**
 	 * Converts a Classic Menu to blocks.
