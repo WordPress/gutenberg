@@ -152,12 +152,18 @@ function BottomSheetNavigationContainer( {
 				>
 					{ main ? (
 						<NavigationContainer theme={ _theme }>
-							<Stack.Navigator screenOptions={ options }>
+							<Stack.Navigator
+								screenOptions={ options }
+								detachInactiveScreens={ false }
+							>
 								{ screens }
 							</Stack.Navigator>
 						</NavigationContainer>
 					) : (
-						<Stack.Navigator screenOptions={ options }>
+						<Stack.Navigator
+							screenOptions={ options }
+							detachInactiveScreens={ false }
+						>
 							{ screens }
 						</Stack.Navigator>
 					) }
