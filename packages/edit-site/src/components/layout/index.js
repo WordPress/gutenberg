@@ -260,14 +260,9 @@ export default function Layout() {
 					<AnimatePresence initial={ false }>
 						{ showSidebar && (
 							<motion.div
-								layout
-								initial={ {
-									opacity: 0,
-								} }
+								initial={ { opacity: 0 } }
 								animate={ { opacity: 1 } }
-								exit={ {
-									opacity: 0,
-								} }
+								exit={ { opacity: 0 } }
 								transition={ {
 									type: 'tween',
 									duration:
