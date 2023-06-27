@@ -131,7 +131,6 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						{ icon && <Icon icon={ icon } /> }
 						<Heading level={ 5 }>
 							<Button
-								href={ href }
 								variant="link"
 								onClick={ onClick }
 							>
