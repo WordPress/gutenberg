@@ -36,7 +36,7 @@ const privateSettings = [
  */
 export function __experimentalUpdateSettings(
 	settings,
-	{ stripExperimentalSettings = false, reset = false }
+	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
 	let cleanSettings = settings;
 	// There are no plugins in the mobile apps, so there is no
