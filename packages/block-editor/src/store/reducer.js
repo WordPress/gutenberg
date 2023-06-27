@@ -1623,6 +1623,12 @@ export function template( state = { isValid: true }, action ) {
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_SETTINGS':
+			if ( action.reset ) {
+				return {
+					...SETTINGS_DEFAULTS,
+					...action.settings,
+				};
+			}
 			return {
 				...state,
 				...action.settings,

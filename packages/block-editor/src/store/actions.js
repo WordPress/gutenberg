@@ -1390,7 +1390,9 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return __experimentalUpdateSettings( settings, true );
+	return __experimentalUpdateSettings( settings, {
+		stripExperimentalSettings: true,
+	} );
 }
 
 /**
