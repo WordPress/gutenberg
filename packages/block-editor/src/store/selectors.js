@@ -1945,7 +1945,6 @@ const buildBlockTypeItem =
  *
  * @param    {Object}   state             Editor state.
  * @param    {?string}  rootClientId      Optional root client ID of block list.
- * @param    {?string}  syncStatus        Optional sync status to filter pattern blocks by.
  *
  * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
@@ -1962,7 +1961,7 @@ const buildBlockTypeItem =
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, rootClientId = null, syncStatus ) => {
+	( state, rootClientId = null ) => {
 		/*
 		 * Matches block comment delimiters amid serialized content.
 		 *
