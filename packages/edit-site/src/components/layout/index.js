@@ -242,7 +242,7 @@ export default function Layout() {
 								} }
 								initial={ {
 									opacity: isDistractionFree ? 1 : 0,
-									y: '-100%',
+									y: isDistractionFree ? 0 : '-100%',
 								} }
 								transition={ {
 									type: 'tween',
