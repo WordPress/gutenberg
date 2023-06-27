@@ -192,7 +192,7 @@ describe.each( [
 			expect( jackOption ).not.toBeChecked();
 			expect( rigasOption ).toBeChecked();
 
-			await user.click( jackOption );
+			await user.keyboard( '[ArrowRight]' );
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).toBeChecked();
