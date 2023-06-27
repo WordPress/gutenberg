@@ -11,6 +11,7 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
+	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -142,33 +143,42 @@ function GlobalStylesRevisionsMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-				{ ( { onClose } ) => (
-					<MenuGroup>
-						{ hasRevisions && (
+			{ canReset || hasRevisions ? (
+				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ hasRevisions && (
+								<MenuItem
+									onClick={ loadRevisions }
+									icon={
+										<RevisionsCountBadge>
+											{ revisionsCount }
+										</RevisionsCountBadge>
+									}
+								>
+									{ __( 'Revision history' ) }
+								</MenuItem>
+							) }
 							<MenuItem
-								onClick={ loadRevisions }
-								icon={
-									<RevisionsCountBadge>
-										{ revisionsCount }
-									</RevisionsCountBadge>
-								}
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+								disabled={ ! canReset }
 							>
-								{ __( 'Revision history' ) }
+								{ __( 'Reset to defaults' ) }
 							</MenuItem>
-						) }
-						<MenuItem
-							onClick={ () => {
-								onReset();
-								onClose();
-							} }
-							disabled={ ! canReset }
-						>
-							{ __( 'Reset to defaults' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+			) : (
+				<Button
+					label={ __( 'Revisions' ) }
+					icon={ backup }
+					disabled
+					__experimentalIsFocusable
+				/>
+			) }
 		</GlobalStylesMenuFill>
 	);
 }

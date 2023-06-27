@@ -256,6 +256,7 @@
 			transform-origin: top left;
 			width: var(--lightbox-image-max-width);
 			height: var(--lightbox-image-max-height);
+			cursor: zoom-out;
 		}
 
 		&.active {

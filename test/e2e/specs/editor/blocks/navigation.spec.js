@@ -902,7 +902,7 @@ test.describe( 'Navigation block', () => {
 
 			// Immediately dismiss the Link UI thereby not populating the `url` attribute
 			// of the block.
-			await linkControl.pressCancel();
+			await page.keyboard.press( 'Escape' );
 
 			// Get the Inspector Tabs.
 			const blockSettings = page.getByRole( 'region', {
@@ -1259,16 +1259,8 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'URL',
+			name: 'Link',
 		} );
-	}
-
-	async pressCancel() {
-		const cancelButton = this.page.getByRole( 'button', {
-			name: 'Cancel',
-		} );
-
-		return cancelButton.click();
 	}
 
 	async getSearchResults() {
@@ -1304,7 +1296,9 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.locator(
+				'.components-menu-item__info-wrapper .components-menu-item__item'
+			) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }

@@ -46,7 +46,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		postId: item.type === USER_PATTERNS ? item.id : item.name,
 		categoryId,
 		categoryType: item.type,
-		canvas: 'edit',
+		canvas: 'view',
 	} );
 
 	const onKeyDown = ( event ) => {
@@ -97,7 +97,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					role="option"
 					as="div"
 					{ ...composite }
-					onClick={ isUserPattern ? onClick : undefined }
+					onClick={ item.type !== PATTERNS ? onClick : undefined }
 					onKeyDown={ isUserPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={

@@ -61,7 +61,8 @@ export default function SidebarNavigationScreen( {
 						<NavigatorToParentButton
 							as={ SidebarButton }
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							aria-label={ __( 'Back' ) }
+							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ ! isRoot && backPath && (
@@ -69,6 +70,7 @@ export default function SidebarNavigationScreen( {
 							onClick={ () => goTo( backPath, { isBack: true } ) }
 							icon={ icon }
 							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ isRoot && (
@@ -88,7 +90,7 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ 'white' }
+						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
 						size={ 20 }
 					>
