@@ -3,7 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Radio } from 'reakit';
+import { Radio } from '@ariakit/react/radio';
 // eslint-disable-next-line no-restricted-imports
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -47,29 +47,36 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 };
 
 function ToggleGroupControlOptionBase(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionBaseProps,
-		'button',
-		false
+	props: Omit<
+		WordPressComponentProps<
+			ToggleGroupControlOptionBaseProps,
+			'button',
+			false
+		>,
+		// the element's id is generated internally
+		'id'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const shouldReduceMotion = useReducedMotion();
 	const toggleGroupControlContext = useToggleGroupControlContext();
+
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
 		toggleGroupControlContext.baseId || 'toggle-group-control-option-base'
 	) as string;
+
 	const buttonProps = useContextSystem(
 		{ ...props, id },
 		'ToggleGroupControlOptionBase'
 	);
+
 	const {
 		isBlock = false,
 		isDeselectable = false,
 		size = 'default',
-		...otherContextProps /* context props for Ariakit Radio */
 	} = toggleGroupControlContext;
+
 	const {
 		className,
 		isIcon = false,
@@ -79,7 +86,7 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
-	const isPressed = otherContextProps.state === value;
+	const isPressed = toggleGroupControlContext.value === value;
 	const cx = useCx();
 	const labelViewClasses = useMemo(
 		() => cx( isBlock && styles.labelBlock ),
@@ -102,9 +109,9 @@ function ToggleGroupControlOptionBase(
 
 	const buttonOnClick = () => {
 		if ( isDeselectable && isPressed ) {
-			otherContextProps.setState( undefined );
+			toggleGroupControlContext.setValue( undefined );
 		} else {
-			otherContextProps.setState( value );
+			toggleGroupControlContext.setValue( value );
 		}
 	};
 
@@ -131,12 +138,20 @@ function ToggleGroupControlOptionBase(
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
+					// @ts-expect-error Even if we're passing `button` through the
+					// `render` prop, the component is still expecting `input` props
 					<Radio
 						{ ...commonProps }
-						{
-							...otherContextProps /* these are only for Ariakit Radio */
-						}
-						as="button"
+						onFocus={ (
+							event: React.FocusEvent< HTMLInputElement >
+						) => {
+							// @ts-expect-error Even if we're passing `button` through the
+							// `render` prop, the component is still expecting `input` props
+							commonProps.onFocus?.( event );
+							if ( event.defaultPrevented ) return;
+							toggleGroupControlContext.setValue( value );
+						} }
+						render={ <button /> }
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>

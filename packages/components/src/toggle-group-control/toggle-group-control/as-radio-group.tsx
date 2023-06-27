@@ -3,7 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioState } from 'reakit';
+import { RadioGroup, useRadioStore } from '@ariakit/react/radio';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		size,
 		value: valueProp,
 		defaultValue: defaultValueProp,
+		id: idProp,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -40,67 +41,54 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const baseId = useInstanceId(
+	const generatedId = useInstanceId(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
 	).toString();
+	const baseId = idProp || generatedId;
 
-	// Use a heuristic to understand if `undefined` values should be intended as
-	// "no value" values for controlled mode, or that the component is being
-	// used in an uncontrolled way.
+	// Use a heuristic to understand if an `undefined` value should be intended as
+	// "no value" for controlled mode, or that the component is being used in
+	// an uncontrolled way.
 	const adjustedValueProp = useAdjustUndefinedValue( valueProp );
 
-	// Handle controlled and uncontrolled updates to the component.
-	// Similar to the logic in the `useControlledState` hook, but with:
-	// - `useRadioState` instead of `useState`
-	// - a guard in `onChange` so that it doesn't fire if the value doesn't change
-	const hasValue = typeof adjustedValueProp !== 'undefined';
-	const initialValue = hasValue ? adjustedValueProp : defaultValueProp;
-	const { state, setState, ...radio } = useRadioState( {
-		baseId,
-		state: initialValue,
-	} );
-	const value = hasValue ? adjustedValueProp : state;
-	const onChange =
-		typeof onChangeProp === 'function'
-			? ( ( ( newValue ) => {
-					if ( newValue !== value ) {
-						onChangeProp( newValue );
-					}
-			  } ) as typeof onChangeProp )
-			: undefined;
+	// `useRadioStore`'s `setValue` prop can be called with `null`, while
+	// the component's `onChange` prop only expects `undefined`
+	const wrappedOnChangeProp = onChangeProp
+		? ( value: string | number | null ) => {
+				onChangeProp( value ?? undefined );
+		  }
+		: undefined;
 
-	let setValue: ( nextValue: typeof value ) => void;
-	if ( hasValue && typeof onChange === 'function' ) {
-		setValue = onChange;
-	} else if ( ! hasValue && typeof onChange === 'function' ) {
-		setValue = ( nextValue ) => {
-			onChange( nextValue );
-			setState( nextValue );
-		};
-	} else {
-		setValue = setState;
-	}
+	const radio = useRadioStore( {
+		defaultValue: defaultValueProp,
+		value: adjustedValueProp,
+		setValue: wrappedOnChangeProp,
+	} );
+
+	const selectedValue = radio.useState( 'value' );
+	const setValue = radio.setValue;
 
 	const groupContextValue = useMemo(
 		() =>
 			( {
-				...radio,
-				state: value,
-				setState: setValue,
+				baseId,
 				isBlock: ! isAdaptiveWidth,
 				size,
+				value: selectedValue,
+				setValue,
 			} as ToggleGroupControlContextProps ),
-		[ radio, setValue, value, isAdaptiveWidth, size ]
+		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
 	);
 
 	return (
 		<ToggleGroupControlContext.Provider value={ groupContextValue }>
 			<RadioGroup
-				{ ...radio }
+				store={ radio }
 				aria-label={ label }
 				as={ View }
 				{ ...otherProps }
+				id={ baseId }
 				ref={ forwardedRef }
 			>
 				{ children }

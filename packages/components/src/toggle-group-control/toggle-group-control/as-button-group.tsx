@@ -26,6 +26,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		size,
 		value: valueProp,
 		defaultValue,
+		id: idProp,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -34,14 +35,15 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	>,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
-	const baseId = useInstanceId(
+	const generatedId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
+	const baseId = idProp || generatedId;
 
-	// Use a heuristic to understand if `undefined` values should be intended as
-	// "no value" values for controlled mode, or that the component is being
-	// used in an uncontrolled way.
+	// Use a heuristic to understand if an `undefined` value should be intended as
+	// "no value" for controlled mode, or that the component is being used in
+	// an uncontrolled way.
 	const adjustedValueProp = useAdjustUndefinedValue( valueProp );
 
 	const [ selectedValue, setSelectedValue ] = useControlledValue( {
@@ -54,8 +56,8 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		() =>
 			( {
 				baseId,
-				state: selectedValue,
-				setState: setSelectedValue,
+				value: selectedValue,
+				setValue: setSelectedValue,
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,

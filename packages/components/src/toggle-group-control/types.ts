@@ -2,8 +2,6 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import type { RadioStateReturn } from 'reakit';
 
 /**
  * Internal dependencies
@@ -129,21 +127,14 @@ export type ToggleGroupControlProps = Pick<
 	size?: 'default' | '__unstable-large';
 };
 
-type ToggleGroupControlAsRadioContext = {
-	isDeselectable?: false;
-} & RadioStateReturn;
-
-type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
-	RadioStateReturn,
-	'state' | 'setState'
->;
-
-export type ToggleGroupControlContextProps = Pick<
-	ToggleGroupControlProps,
-	'isBlock' | 'size'
-> & {
+export type ToggleGroupControlContextProps = {
+	isDeselectable?: boolean;
 	baseId: string;
-} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
+	isBlock: ToggleGroupControlProps[ 'isBlock' ];
+	size: ToggleGroupControlProps[ 'size' ];
+	value: ToggleGroupControlProps[ 'value' ];
+	setValue: ( newValue: string | number | undefined ) => void;
+};
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
