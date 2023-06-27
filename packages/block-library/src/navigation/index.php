@@ -94,7 +94,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 *
 	 * @return string Submenu markup with the directives injected.
 	 */
-	function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
+	function block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
 		while ( $w->next_tag(
 			array(
 				'tag_name'   => 'LI',
@@ -124,7 +124,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			};
 
 			// Iterate through subitems if exist.
-			gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
+			block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
 		}
 		return $w->get_updated_html();
 	};
@@ -677,7 +677,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// Add directives to the submenu if needed.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-		$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w, $attributes );
+		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
 
 	$modal_unique_id = wp_unique_id( 'modal-' );
