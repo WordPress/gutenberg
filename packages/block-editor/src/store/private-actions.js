@@ -28,15 +28,15 @@ const privateSettings = [
  * Action that updates the block editor settings and
  * conditionally preserves the experimental ones.
  *
- * @param {Object}  settings                  Updated settings
- * @param {boolean} stripExperimentalSettings Whether to strip experimental settings.
- * @param {boolean} reset                     Whether to reset the settings.
+ * @param {Object}  settings                          Updated settings
+ * @param {Object}  options                           Options object.
+ * @param {boolean} options.stripExperimentalSettings Whether to strip experimental settings.
+ * @param {boolean} options.reset                     Whether to reset the settings.
  * @return {Object} Action object
  */
 export function __experimentalUpdateSettings(
 	settings,
-	stripExperimentalSettings = false,
-	reset = false
+	{ stripExperimentalSettings = false, reset = false }
 ) {
 	let cleanSettings = settings;
 	// There are no plugins in the mobile apps, so there is no

@@ -28,8 +28,10 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					...settings,
 					__internalIsInitialized: true,
 				},
-				stripExperimentalSettings,
-				true
+				{
+					stripExperimentalSettings,
+					reset: true,
+				}
 			);
 		}, [
 			settings,
