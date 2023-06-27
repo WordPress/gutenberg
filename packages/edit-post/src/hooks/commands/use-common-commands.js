@@ -9,6 +9,7 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
+	keyboardClose,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -17,11 +18,14 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
+import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
+import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
 
 export default function useCommonCommands() {
 	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
 		useDispatch( editPostStore );
+	const { openModal } = useDispatch( interfaceStore );
 	const { editorMode, activeSidebar } = useSelect(
 		( select ) => ( {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
@@ -98,6 +102,24 @@ export default function useCommonCommands() {
 		callback: ( { close } ) => {
 			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
 			close();
+		},
+	} );
+
+	useCommand( {
+		name: 'core/open-preferences',
+		label: __( 'Open editor preferences' ),
+		icon: cog,
+		callback: () => {
+			openModal( PREFERENCES_MODAL_NAME );
+		},
+	} );
+
+	useCommand( {
+		name: 'core/open-shortcut-help',
+		label: __( 'Open keyboard shortcuts' ),
+		icon: keyboardClose,
+		callback: () => {
+			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
 }
