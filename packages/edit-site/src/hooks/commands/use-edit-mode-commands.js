@@ -213,8 +213,8 @@ function useEditUICommands() {
 	} );
 
 	commands.push( {
-		name: 'core/edit-site/open-preferences',
-		label: __( 'Editor preferences' ),
+		name: 'core/open-preferences',
+		label: __( 'Open editor preferences' ),
 		icon: cog,
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
@@ -222,8 +222,8 @@ function useEditUICommands() {
 	} );
 
 	commands.push( {
-		name: 'core/edit-site/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
+		name: 'core/open-shortcut-help',
+		label: __( 'Open keyboard shortcuts' ),
 		icon: keyboardClose,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
