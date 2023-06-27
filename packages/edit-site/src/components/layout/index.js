@@ -228,11 +228,20 @@ export default function Layout() {
 								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
 								variants={ {
-									isDistractionFree: { opacity: 0 },
-									isDistractionFreeHovering: { opacity: 1 },
-									view: { opacity: 1 },
-									edit: { opacity: 1 },
+									isDistractionFree: { opacity: 0, y: 0 },
+									isDistractionFreeHovering: {
+										opacity: 1,
+										y: 0,
+									},
+									view: { opacity: 1, y: '-100%' },
+									edit: { opacity: 1, y: 0 },
 								} }
+								exit="view"
+								initial={
+									isDistractionFree
+										? 'isDistractionFree'
+										: 'view'
+								}
 								transition={ {
 									type: 'tween',
 									duration: disableMotion ? 0 : 0.2,
