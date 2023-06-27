@@ -175,21 +175,23 @@ export default () => {
 		}
 	);
 
-	// data-wp-text
+	// data-wp-show
 	directive(
-		'text',
+		'show',
 		( {
 			directives: {
-				text: { default: text },
+				show: { default: show },
 			},
 			element,
 			evaluate,
 			context,
 		} ) => {
 			const contextValue = useContext( context );
-			element.props.children = evaluate( text, {
-				context: contextValue,
-			} );
+
+			if ( ! evaluate( show, { context: contextValue } ) )
+				element.props.children = (
+					<template>{ element.props.children }</template>
+				);
 		}
 	);
 
@@ -210,6 +212,24 @@ export default () => {
 					{ ...rest }
 				/>
 			);
+		}
+	);
+
+	// data-wp-text
+	directive(
+		'text',
+		( {
+			directives: {
+				text: { default: text },
+			},
+			element,
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			element.props.children = evaluate( text, {
+				context: contextValue,
+			} );
 		}
 	);
 };
