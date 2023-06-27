@@ -1,7 +1,7 @@
 <?php
 /**
  * Temporary compatibility shims for features present in Gutenberg.
- * This file should be removed when WordPress 6.1.0 becomes the lowest
+ * This file should be removed when WordPress 6.2.0 becomes the lowest
  * supported version by this plugin.
  *
  * @package gutenberg
@@ -119,7 +119,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	}
 	if ( isset( $default_template_types['home'] ) ) {
 		$default_template_types['home'] = array(
-			'title'       => _x( 'Blog home page', 'Template name', 'gutenberg' ),
+			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
 			'description' => __(
 				'Displays the latest posts as either the site homepage or as the "Posts page" as defined under reading settings. If it exists, the Front Page template overrides this template when posts are shown on the homepage.',
 				'gutenberg'
