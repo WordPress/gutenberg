@@ -102,19 +102,30 @@ function createResolversCache() {
 	};
 }
 
-function createBindingCache( bind ) {
+function createBindingCache( getItem, bindItem ) {
 	const cache = new WeakMap();
 
 	return {
-		get( item, itemName ) {
+		get( itemName ) {
+			const item = getItem( itemName );
+			if ( ! item ) {
+				return null;
+			}
 			let boundItem = cache.get( item );
 			if ( ! boundItem ) {
-				boundItem = bind( item, itemName );
+				boundItem = bindItem( item, itemName );
 				cache.set( item, boundItem );
 			}
 			return boundItem;
 		},
 	};
+}
+
+function createPrivateProxy( publicItems, privateItems ) {
+	return new Proxy( publicItems, {
+		get: ( target, itemName ) =>
+			privateItems.get( itemName ) || Reflect.get( target, itemName ),
+	} );
 }
 
 /**
@@ -207,20 +218,18 @@ export default function createReduxStore( key, options ) {
 				...mapValues( options.actions, bindAction ),
 			};
 
-			const boundPrivateActions = createBindingCache( bindAction );
-			const allActions = new Proxy( () => {}, {
-				get: ( target, prop ) => {
-					const privateAction = privateActions[ prop ];
-					return privateAction
-						? boundPrivateActions.get( privateAction, prop )
-						: actions[ prop ];
-				},
-			} );
+			const allActions = createPrivateProxy(
+				actions,
+				createBindingCache(
+					( name ) => privateActions[ name ],
+					bindAction
+				)
+			);
 
-			const thunkActions = new Proxy( allActions, {
-				apply: ( target, thisArg, [ action ] ) =>
-					store.dispatch( action ),
-			} );
+			const thunkActions = new Proxy(
+				( action ) => store.dispatch( action ),
+				{ get: ( target, name ) => allActions[ name ] }
+			);
 
 			lock( actions, allActions );
 
@@ -261,39 +270,73 @@ export default function createReduxStore( key, options ) {
 				return boundSelector;
 			}
 
+			const boundMetadataSelectors = mapValues(
+				metadataSelectors,
+				bindMetadataSelector
+			);
+
+			const boundSelectors = mapValues( options.selectors, bindSelector );
+
 			const selectors = {
-				...mapValues( metadataSelectors, bindMetadataSelector ),
-				...mapValues( options.selectors, bindSelector ),
+				...boundMetadataSelectors,
+				...boundSelectors,
 			};
 
-			const boundPrivateSelectors = createBindingCache( bindSelector );
+			const privateSelectorsCache = createBindingCache(
+				( name ) => privateSelectors[ name ],
+				bindSelector
+			);
+			const allSelectors = createPrivateProxy(
+				selectors,
+				privateSelectorsCache
+			);
 
 			// Pre-bind the private selectors that have been registered by the time of
 			// instantiation, so that registry selectors are bound to the registry.
-			for ( const [ selectorName, selector ] of Object.entries(
-				privateSelectors
-			) ) {
-				boundPrivateSelectors.get( selector, selectorName );
+			for ( const selectorName of Object.keys( privateSelectors ) ) {
+				privateSelectorsCache.get( selectorName );
 			}
 
-			const allSelectors = new Proxy( () => {}, {
-				get: ( target, prop ) => {
-					const privateSelector = privateSelectors[ prop ];
-					return privateSelector
-						? boundPrivateSelectors.get( privateSelector, prop )
-						: selectors[ prop ];
-				},
-			} );
-
-			const thunkSelectors = new Proxy( allSelectors, {
-				apply: ( target, thisArg, [ selector ] ) =>
-					selector( store.__unstableOriginalGetState() ),
-			} );
+			const thunkSelectors = new Proxy(
+				( selector ) => selector( store.__unstableOriginalGetState() ),
+				{ get: ( target, name ) => allSelectors[ name ] }
+			);
 
 			lock( selectors, allSelectors );
 
-			const resolveSelectors = mapResolveSelectors( selectors, store );
-			const suspendSelectors = mapSuspendSelectors( selectors, store );
+			const bindResolveSelector = mapResolveSelector( store );
+
+			const resolveSelectors = mapValues(
+				boundSelectors,
+				bindResolveSelector
+			);
+
+			const allResolveSelectors = createPrivateProxy(
+				resolveSelectors,
+				createBindingCache(
+					( name ) => privateSelectorsCache.get( name ),
+					bindResolveSelector
+				)
+			);
+
+			lock( resolveSelectors, allResolveSelectors );
+
+			const bindSuspendSelector = mapSuspendSelector( store );
+
+			const suspendSelectors = {
+				...boundMetadataSelectors, // no special suspense behavior
+				...mapValues( boundSelectors, bindSuspendSelector ),
+			};
+
+			const allSuspendSelectors = createPrivateProxy(
+				suspendSelectors,
+				createBindingCache(
+					( name ) => privateSelectorsCache.get( name ),
+					bindSuspendSelector
+				)
+			);
+
+			lock( suspendSelectors, allSuspendSelectors );
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
@@ -412,45 +455,40 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 }
 
 /**
- * Maps selectors to functions that return a resolution promise for them
+ * Maps selectors to functions that return a resolution promise for them.
  *
- * @param {Object} selectors Selectors to map.
- * @param {Object} store     The redux store the selectors select from.
+ * @param {Object} store The redux store the selectors are bound to.
  *
- * @return {Object} Selectors mapped to their resolution functions.
+ * @return {Function} Function that maps selectors to resolvers.
  */
-function mapResolveSelectors( selectors, store ) {
-	const {
-		getIsResolving,
-		hasStartedResolution,
-		hasFinishedResolution,
-		hasResolutionFailed,
-		isResolving,
-		getCachedResolvers,
-		getResolutionState,
-		getResolutionError,
-		hasResolvingSelectors,
-		...storeSelectors
-	} = selectors;
-
-	return mapValues( storeSelectors, ( selector, selectorName ) => {
+function mapResolveSelector( store ) {
+	return ( selector, selectorName ) => {
 		// If the selector doesn't have a resolver, just convert the return value
 		// (including exceptions) to a Promise, no additional extra behavior is needed.
 		if ( ! selector.hasResolver ) {
 			return async ( ...args ) => selector.apply( null, args );
 		}
 
-		return ( ...args ) => {
-			return new Promise( ( resolve, reject ) => {
-				const hasFinished = () =>
-					selectors.hasFinishedResolution( selectorName, args );
+		return ( ...args ) =>
+			new Promise( ( resolve, reject ) => {
+				const hasFinished = () => {
+					const { metadata } = store.__unstableOriginalGetState();
+					return metadataSelectors.hasFinishedResolution(
+						metadata,
+						selectorName,
+						args
+					);
+				};
 				const finalize = ( result ) => {
-					const hasFailed = selectors.hasResolutionFailed(
+					const { metadata } = store.__unstableOriginalGetState();
+					const hasFailed = metadataSelectors.hasResolutionFailed(
+						metadata,
 						selectorName,
 						args
 					);
 					if ( hasFailed ) {
-						const error = selectors.getResolutionError(
+						const error = metadataSelectors.getResolutionError(
+							metadata,
 							selectorName,
 							args
 						);
@@ -460,6 +498,7 @@ function mapResolveSelectors( selectors, store ) {
 					}
 				};
 				const getResult = () => selector.apply( null, args );
+
 				// Trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
@@ -473,20 +512,18 @@ function mapResolveSelectors( selectors, store ) {
 					}
 				} );
 			} );
-		};
-	} );
+	};
 }
 
 /**
  * Maps selectors to functions that throw a suspense promise if not yet resolved.
  *
- * @param {Object} selectors Selectors to map.
- * @param {Object} store     The redux store the selectors select from.
+ * @param {Object} store The redux store the selectors select from.
  *
- * @return {Object} Selectors mapped to their suspense functions.
+ * @return {Function} Function that maps selectors to their suspending versions.
  */
-function mapSuspendSelectors( selectors, store ) {
-	return mapValues( selectors, ( selector, selectorName ) => {
+function mapSuspendSelector( store ) {
+	return ( selector, selectorName ) => {
 		// Selector without a resolver doesn't have any extra suspense behavior.
 		if ( ! selector.hasResolver ) {
 			return selector;
@@ -495,9 +532,26 @@ function mapSuspendSelectors( selectors, store ) {
 		return ( ...args ) => {
 			const result = selector.apply( null, args );
 
-			if ( selectors.hasFinishedResolution( selectorName, args ) ) {
-				if ( selectors.hasResolutionFailed( selectorName, args ) ) {
-					throw selectors.getResolutionError( selectorName, args );
+			const { metadata } = store.__unstableOriginalGetState();
+			if (
+				metadataSelectors.hasFinishedResolution(
+					metadata,
+					selectorName,
+					args
+				)
+			) {
+				if (
+					metadataSelectors.hasResolutionFailed(
+						metadata,
+						selectorName,
+						args
+					)
+				) {
+					throw metadataSelectors.getResolutionError(
+						metadata,
+						selectorName,
+						args
+					);
 				}
 
 				return result;
@@ -506,7 +560,11 @@ function mapSuspendSelectors( selectors, store ) {
 			throw new Promise( ( resolve ) => {
 				const unsubscribe = store.subscribe( () => {
 					if (
-						selectors.hasFinishedResolution( selectorName, args )
+						metadataSelectors.hasFinishedResolution(
+							store.__unstableOriginalGetState().metadata,
+							selectorName,
+							args
+						)
 					) {
 						resolve();
 						unsubscribe();
@@ -514,7 +572,7 @@ function mapSuspendSelectors( selectors, store ) {
 				} );
 			} );
 		};
-	} );
+	};
 }
 
 /**
