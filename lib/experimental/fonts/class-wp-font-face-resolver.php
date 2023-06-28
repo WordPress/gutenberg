@@ -34,7 +34,7 @@ class WP_Font_Face_Resolver {
 
 		// Bail out early if there are no font settings.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
-			return;
+			return array();
 		}
 
 		return static::parse_settings( $settings );
