@@ -133,16 +133,6 @@ store( {
 						}
 					}
 				},
-				preloadLightboxImage: ( { context } ) => {
-					if ( ! context.core.image.preloadInitialized ) {
-						context.core.image.preloadInitialized = true;
-						const imgDom = document.createElement( 'img' );
-						imgDom.setAttribute(
-							'src',
-							context.core.image.imageUploadedSrc
-						);
-					}
-				},
 			},
 		},
 	},
@@ -180,6 +170,18 @@ store( {
 								this.currentSrc;
 						} );
 					}
+				},
+				preloadLightboxImage: ( { context, ref } ) => {
+					ref.addEventListener( 'mouseover', () => {
+						if ( ! context.core.image.preloadInitialized ) {
+							context.core.image.preloadInitialized = true;
+							const imgDom = document.createElement( 'img' );
+							imgDom.setAttribute(
+								'src',
+								context.core.image.imageUploadedSrc
+							);
+						}
+					} );
 				},
 				initLightbox: async ( { context, ref } ) => {
 					context.core.image.figureRef =
