@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Input types which are classified as button types, for use in considering
@@ -58,6 +58,10 @@ type UseFocusOutsideReturn = {
 	onBlur: React.FocusEventHandler;
 };
 
+function isIframe( element?: Element | null ): element is HTMLIFrameElement {
+	return element?.tagName === 'IFRAME';
+}
+
 /**
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
@@ -79,6 +83,55 @@ export default function useFocusOutside(
 	const preventBlurCheck = useRef( false );
 
 	const blurCheckTimeoutId = useRef< number | undefined >();
+
+	const [ pollingData, setPollingData ] = useState< {
+		event: React.FocusEvent< Element >;
+		wrapperEl: Element;
+	} | null >( null );
+	const pollingIntervalId = useRef< number | undefined >();
+
+	// Thoughts:
+	// - it needs to always stop when component unmounted
+	// - it needs to work when resuming focus from another doc and clicking
+	//   immediately on the backdrop
+
+	// Sometimes the blur event is not reliable, for example when focus moves
+	// to an iframe inside the wrapper. In these scenarios, we resort to polling,
+	// and we explicitly check if focus has indeed moved outside the wrapper.
+	useEffect( () => {
+		if ( pollingData ) {
+			const { wrapperEl, event } = pollingData;
+
+			pollingIntervalId.current = window.setInterval( () => {
+				const focusedElement = wrapperEl.ownerDocument.activeElement;
+
+				if (
+					! wrapperEl.contains( focusedElement ) &&
+					wrapperEl.ownerDocument.hasFocus()
+				) {
+					// If focus is not inside the wrapper (but the document is in focus),
+					// we can fire the `onFocusOutside` callback and stop polling.
+					currentOnFocusOutside.current( event );
+					setPollingData( null );
+				} else if ( ! isIframe( focusedElement ) ) {
+					// If focus is still inside the wrapper, but an iframe is not the
+					// element currently focused, we can stop polling, because the regular
+					// blur events will fire as expected.
+					setPollingData( null );
+				}
+			}, 50 );
+		} else if ( pollingIntervalId.current ) {
+			window.clearInterval( pollingIntervalId.current );
+			pollingIntervalId.current = undefined;
+		}
+
+		return () => {
+			if ( pollingIntervalId.current ) {
+				window.clearInterval( pollingIntervalId.current );
+				pollingIntervalId.current = undefined;
+			}
+		};
+	}, [ pollingData ] );
 
 	/**
 	 * Cancel a blur check timeout.
@@ -134,6 +187,10 @@ export default function useFocusOutside(
 		// due to recycling behavior, except when explicitly persisted.
 		event.persist();
 
+		// Grab currentTarget immediately,
+		// otherwise it will change as the event bubbles up.
+		const wrapperEl = event.currentTarget;
+
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
 		if ( preventBlurCheck.current ) {
 			return;
@@ -157,19 +214,36 @@ export default function useFocusOutside(
 		}
 
 		blurCheckTimeoutId.current = setTimeout( () => {
-			// If document is not focused then focus should remain
-			// inside the wrapped component and therefore we cancel
-			// this blur event thereby leaving focus in place.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
+			const activeElement = wrapperEl.ownerDocument.activeElement;
+
+			// On blur events, the onFocusOutside prop should not be called:
+			// 1. If document is not focused
+			//    https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+			// 2. If the focus was moved to an element inside the wrapper component
+			//    (this would be the case, for example, of an iframe)
+			if (
+				! wrapperEl.ownerDocument.hasFocus() ||
+				( activeElement && wrapperEl.contains( activeElement ) )
+			) {
 				event.preventDefault();
+
+				// If focus is moved to an iframe inside the wrapper, start manually
+				// polling to check for correct focus outside events. See the useEffect
+				// above for more information.
+				if ( isIframe( activeElement ) ) {
+					setPollingData( { wrapperEl, event } );
+				}
+
 				return;
 			}
 
 			if ( 'function' === typeof currentOnFocusOutside.current ) {
 				currentOnFocusOutside.current( event );
 			}
-		}, 0 );
+			// the timeout delay is necessary to wait for browser's focus event to
+			// fire after the blur event, and therefore for this callback to be able
+			// to retrieve the correct document.activeElement.
+		}, 50 );
 	}, [] );
 
 	return {
