@@ -1,9 +1,4 @@
 .edit-widgets-welcome-guide {
-	// Make Guide component's colors compliment the colors in the GIF.
-	--wp-components-color-accent: #1386bf;
-	--wp-components-color-accent-darker-10: #{darken(#1386bf, 10%)};
-	--wp-components-color-accent-darker-20: #{darken(#1386bf, 20%)};
-
 	width: 312px;
 
 	&__image {
