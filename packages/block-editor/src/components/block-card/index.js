@@ -43,7 +43,9 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	}, [] );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-
+	// Only synced patterns are selectable in the editor so change the title to show the sync status.
+	const blockTitle =
+		title === __( 'Pattern' ) ? __( 'Synced Pattern' ) : title;
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
 			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
@@ -61,7 +63,9 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			) }
 			<BlockIcon icon={ icon } showColors />
 			<div className="block-editor-block-card__content">
-				<h2 className="block-editor-block-card__title">{ title }</h2>
+				<h2 className="block-editor-block-card__title">
+					{ blockTitle }
+				</h2>
 				<span className="block-editor-block-card__description">
 					{ description }
 				</span>
