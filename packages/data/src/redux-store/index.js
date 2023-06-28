@@ -422,6 +422,7 @@ function mapResolveSelectors( selectors, store ) {
 		getCachedResolvers,
 		getResolutionState,
 		getResolutionError,
+		hasResolvingSelectors,
 		...storeSelectors
 	} = selectors;
 
