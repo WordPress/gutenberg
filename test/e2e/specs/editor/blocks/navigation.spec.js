@@ -935,30 +935,30 @@ test.describe( 'Navigation block', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			//we want emptytheme because it doesn't have any styles
 			await requestUtils.activateTheme( 'emptytheme' );
-			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllTemplates( 'wp_template_part' );
 			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
 
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
-			await admin.visitSiteEditor();
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
 			await editor.canvas.click( 'body' );
-
 			await requestUtils.createNavigationMenu( {
-				title: 'Test Menu',
+				title: 'Hidden menu',
 				content:
 					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 			} );
-
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'always' },
 			} );
 			await editor.saveSiteEditorEntities();
 		} );
 
 		test.afterEach( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllTemplates( 'wp_template_part' );
 			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
@@ -966,7 +966,6 @@ test.describe( 'Navigation block', () => {
 		test( 'As a user I expect my navigation links to have appropriate default colors', async ( {
 			editor,
 		} ) => {
-			await editor.insertBlock( { name: 'core/navigation' } );
 			const firstlink = editor.canvas.locator(
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
@@ -974,14 +973,13 @@ test.describe( 'Navigation block', () => {
 			await expect( firstlink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 			//TODO check frontend on desktop and mobile
 			//TODO then the same for second link (make sure it has a background color!)
-			//Then the same for background colors
+			//Then the same for background colors. This one is important when the theme doesn't define an overlay background color
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
 			page,
 			editor,
 		} ) => {
-			await editor.insertBlock( { name: 'core/navigation' } );
 			const firstlink = editor.canvas.locator(
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
@@ -1017,8 +1015,6 @@ test.describe( 'Navigation block', () => {
 			page,
 			editor,
 		} ) => {
-			await editor.insertBlock( { name: 'core/navigation' } );
-
 			//We group the nav block and add colors to the links inside the group block
 			await page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
