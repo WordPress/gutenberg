@@ -84,7 +84,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	// more than one menu.
 	useEffect( () => {
 		if ( navigationMenus?.length === 1 ) {
-			history.push( {
+			history.replace( {
 				postId: navigationMenus[ 0 ].id,
 				postType: 'wp_navigation',
 			} );
