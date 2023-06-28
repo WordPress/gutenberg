@@ -4,7 +4,6 @@
 import {
 	render,
 	screen,
-	fireEvent,
 	waitForElementToBeRemoved,
 	waitFor,
 } from '@testing-library/react';
@@ -18,6 +17,18 @@ import { ConfirmDialog } from '..';
 const noop = () => {};
 
 describe( 'Confirm', () => {
+	let mockedDocumentHasFocus;
+
+	beforeEach( () => {
+		mockedDocumentHasFocus = jest
+			.spyOn( document, 'hasFocus' )
+			.mockImplementation( () => true );
+	} );
+
+	afterEach( () => {
+		mockedDocumentHasFocus.mockRestore();
+	} );
+
 	describe( 'Confirm component', () => {
 		describe( 'Structure', () => {
 			it( 'should render correctly', () => {
@@ -137,24 +148,27 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
+				const user = userEvent.setup();
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				render(
-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
-						Are you sure?
-					</ConfirmDialog>
+					<div aria-label="Under the overlay">
+						<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+							Are you sure?
+						</ConfirmDialog>
+					</div>
 				);
 
 				const confirmDialog = screen.getByRole( 'dialog' );
 
-				//The overlay click is handled by detecting an onBlur from the modal frame.
-				// TODO: replace with `@testing-library/user-event`
-				fireEvent.blur( confirmDialog );
+				await user.click(
+					screen.getByLabelText( 'Under the overlay' )
+				);
 
 				await waitForElementToBeRemoved( confirmDialog );
 
 				expect( confirmDialog ).not.toBeInTheDocument();
-				expect( onCancel ).toHaveBeenCalled();
+				await waitFor( () => expect( onCancel ).toHaveBeenCalled() );
 			} );
 
 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
@@ -315,23 +329,22 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
+			const user = userEvent.setup();
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ noop }
-					onCancel={ onCancel }
-				>
-					Are you sure?
-				</ConfirmDialog>
+				<div aria-label="Under the overlay">
+					<ConfirmDialog
+						isOpen={ true }
+						onConfirm={ noop }
+						onCancel={ onCancel }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				</div>
 			);
 
-			const confirmDialog = screen.getByRole( 'dialog' );
-
-			//The overlay click is handled by detecting an onBlur from the modal frame.
-			// TODO: replace with `@testing-library/user-event`
-			fireEvent.blur( confirmDialog );
+			await user.click( screen.getByLabelText( 'Under the overlay' ) );
 
 			// Wait for a DOM side effect here, so that the `queueBlurCheck` in the
 			// `useFocusOutside` hook properly executes its timeout task.

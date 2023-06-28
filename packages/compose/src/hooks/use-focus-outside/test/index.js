@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -9,22 +9,38 @@ import userEvent from '@testing-library/user-event';
  */
 import useFocusOutside from '../';
 
-const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
-	<div>
-		{ /* Wrapper */ }
-		<div { ...useFocusOutside( callback ) }>
-			<input type="text" />
-			<button>Button inside the wrapper</button>
-			<iframe title="test-iframe">
-				<button>Inside the iframe</button>
-			</iframe>
-		</div>
+const FocusOutsideComponent = ( { onFocusOutside: callback } ) => {
+	const focusOutsideProps = useFocusOutside( callback );
 
-		<button>Button outside the wrapper</button>
-	</div>
-);
+	return (
+		<div>
+			{ /* Wrapper */ }
+			<div { ...focusOutsideProps }>
+				<input type="text" />
+				<button>Button inside the wrapper</button>
+				<iframe title="test-iframe">
+					<button>Inside the iframe</button>
+				</iframe>
+			</div>
+
+			<button>Button outside the wrapper</button>
+		</div>
+	);
+};
 
 describe( 'useFocusOutside', () => {
+	let mockedDocumentHasFocus;
+
+	beforeEach( () => {
+		mockedDocumentHasFocus = jest
+			.spyOn( document, 'hasFocus' )
+			.mockImplementation( () => true );
+	} );
+
+	afterEach( () => {
+		mockedDocumentHasFocus.mockRestore();
+	} );
+
 	it( 'should not call handler if focus shifts to element within component', async () => {
 		const mockOnFocusOutside = jest.fn();
 		const user = userEvent.setup();
@@ -72,24 +88,30 @@ describe( 'useFocusOutside', () => {
 		);
 
 		// Click and focus button inside the wrapper
-		await user.click(
-			screen.getByRole( 'button', { name: 'Button inside the wrapper' } )
-		);
+		const buttonInside = screen.getByRole( 'button', {
+			name: 'Button inside the wrapper',
+		} );
+		await user.click( buttonInside );
+
+		// TODO: find a way to guarantee that the callback does not fire
+		await new Promise( ( r ) => setTimeout( r, 200 ) );
 
 		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
-
 		// Click and focus button outside the wrapper
-		await user.click(
-			screen.getByRole( 'button', { name: 'Button outside the wrapper' } )
-		);
+		const buttonOutside = screen.getByRole( 'button', {
+			name: 'Button outside the wrapper',
+		} );
+		await user.click( buttonOutside );
 
-		expect( mockOnFocusOutside ).toHaveBeenCalled();
+		await waitFor( () =>
+			expect( mockOnFocusOutside ).toHaveBeenCalledTimes( 1 )
+		);
 	} );
 
 	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
 		// Force document.hasFocus() to return false to simulate the window/document losing focus
 		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-		const mockedDocumentHasFocus = jest
+		mockedDocumentHasFocus = jest
 			.spyOn( document, 'hasFocus' )
 			.mockImplementation( () => false );
 		const mockOnFocusOutside = jest.fn();
