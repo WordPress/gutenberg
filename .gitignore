@@ -15,6 +15,7 @@ coverage
 *.log
 yarn.lock
 /artifacts
+/test/e2e/artifacts
 /perf-envs
 /composer.lock
 

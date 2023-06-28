@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { store } from '../utils/interactivity';
+import { store } from '@wordpress/interactivity';
 
 const focusableSelectors = [
 	'a[href]',
