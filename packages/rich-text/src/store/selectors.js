@@ -46,6 +46,33 @@ export const getFormatTypes = createSelector(
  * @param {Object} state Data state.
  * @param {string} name  Format type name.
  *
+ * @example
+ * ```js
+ * import { store as richTextStore } from '@wordpress/rich-text';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getFormatType } = useSelect(
+ *        ( select ) => select( richTextStore ),
+ *        []
+ *    );
+ *
+ *    const boldFormat = getFormatType( 'core/bold' );
+ *
+ *    return boldFormat ? (
+ *        <ul>
+ *            { Object.entries( boldFormat )?.map( ( [ key, value ] ) => (
+ *                <li>
+ *                    { key } : { value }
+ *                </li>
+ *           ) ) }
+ *       </ul>
+ *    ) : (
+ *        __( 'Not Found' )
+ *    ;
+ * };
+ * ```
+ *
  * @return {Object?} Format type.
  */
 export function getFormatType( state, name ) {
