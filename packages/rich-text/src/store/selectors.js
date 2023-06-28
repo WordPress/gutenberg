@@ -10,6 +10,7 @@ import createSelector from 'rememo';
  *
  * @example
  * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
  * import { store as richTextStore } from '@wordpress/rich-text';
  * import { useSelect } from '@wordpress/data';
  *
@@ -48,6 +49,7 @@ export const getFormatTypes = createSelector(
  *
  * @example
  * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
  * import { store as richTextStore } from '@wordpress/rich-text';
  * import { useSelect } from '@wordpress/data';
  *
@@ -86,6 +88,25 @@ export function getFormatType( state, name ) {
  * @param {Object} state              Data state.
  * @param {string} bareElementTagName The tag name of the element to find a
  *                                    format type for.
+ *
+ * @example
+ * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
+ * import { store as richTextStore } from '@wordpress/rich-text';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getFormatTypeForBareElement } = useSelect(
+ *        ( select ) => select( richTextStore ),
+ *        []
+ *    );
+ *
+ *    const format = getFormatTypeForBareElement( 'strong' );
+ *
+ *    return format && <p>{ sprintf( __( 'Format name: %s' ), format.name ) }</p>;
+ * }
+ * ```
+ *
  * @return {?Object} Format type.
  */
 export function getFormatTypeForBareElement( state, bareElementTagName ) {
@@ -106,6 +127,25 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
  * @param {Object} state            Data state.
  * @param {string} elementClassName The classes of the element to find a format
  *                                  type for.
+ *
+ * @example
+ * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
+ * import { store as richTextStore } from '@wordpress/rich-text';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getFormatTypeForClassName } = useSelect(
+ *        ( select ) => select( richTextStore ),
+ *        []
+ *    );
+ *
+ *    const format = getFormatTypeForClassName( 'has-inline-color' );
+ *
+ *    return format && <p>{ sprintf( __( 'Format name: %s' ), format.name ) }</p>;
+ * };
+ * ```
+ *
  * @return {?Object} Format type.
  */
 export function getFormatTypeForClassName( state, elementClassName ) {
