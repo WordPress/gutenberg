@@ -26,13 +26,10 @@ export default function PostSyncStatus() {
 		editPost( {
 			meta: {
 				...meta,
-				wp_block:
-					syncStatus === 'unsynced'
-						? { sync_status: syncStatus }
-						: null,
+				sync_status: syncStatus === 'unsynced' ? syncStatus : null,
 			},
 		} );
-	const syncStatus = meta?.wp_block?.sync_status;
+	const syncStatus = meta?.sync_status;
 	const isFullySynced = ! syncStatus;
 
 	return (

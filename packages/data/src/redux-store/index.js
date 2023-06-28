@@ -24,6 +24,7 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
+/** @typedef {import('../types').ListenerFunction} ListenerFunction */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../types').AnyConfig} C
@@ -158,6 +159,19 @@ export default function createReduxStore( key, options ) {
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
+			/**
+			 * Stores listener functions registered with `subscribe()`.
+			 *
+			 * When functions register to listen to store changes with
+			 * `subscribe()` they get added here. Although Redux offers
+			 * its own `subscribe()` function directly, by wrapping the
+			 * subscription in this store instance it's possible to
+			 * optimize checking if the state has changed before calling
+			 * each listener.
+			 *
+			 * @type {Set<ListenerFunction>}
+			 */
+			const listeners = new Set();
 			const reducer = options.reducer;
 			const thunkArgs = {
 				registry,
@@ -290,17 +304,23 @@ export default function createReduxStore( key, options ) {
 			const subscribe =
 				store &&
 				( ( listener ) => {
-					let lastState = store.__unstableOriginalGetState();
-					return store.subscribe( () => {
-						const state = store.__unstableOriginalGetState();
-						const hasChanged = state !== lastState;
-						lastState = state;
+					listeners.add( listener );
 
-						if ( hasChanged ) {
-							listener();
-						}
-					} );
+					return () => listeners.delete( listener );
 				} );
+
+			let lastState = store.__unstableOriginalGetState();
+			store.subscribe( () => {
+				const state = store.__unstableOriginalGetState();
+				const hasChanged = state !== lastState;
+				lastState = state;
+
+				if ( hasChanged ) {
+					for ( const listener of listeners ) {
+						listener();
+					}
+				}
+			} );
 
 			// This can be simplified to just { subscribe, getSelectors, getActions }
 			// Once we remove the use function.
