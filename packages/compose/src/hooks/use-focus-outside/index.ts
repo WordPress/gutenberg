@@ -90,7 +90,7 @@ export default function useFocusOutside(
 	// Cancel blur checks on unmount.
 	useEffect( () => {
 		return () => cancelBlurCheck();
-	}, [] );
+	}, [ cancelBlurCheck ] );
 
 	// Cancel a blur check if the callback or ref is no longer provided.
 	useEffect( () => {
