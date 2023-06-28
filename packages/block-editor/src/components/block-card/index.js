@@ -43,7 +43,8 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	}, [] );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	// Only synced patterns are selectable in the editor so change the title to show the sync status.
+	// As with Navigation block it's not ideal having Pattern block specific code here, but only synced patterns are selectable in the editor
+	// currently and finding the sync status higher up involves a call to the core-data store which isn't allowed in the block editor.
 	const blockTitle =
 		title === __( 'Pattern' ) ? __( 'Synced Pattern' ) : title;
 	return (
