@@ -94,8 +94,8 @@ function HeaderToolbar( {
 		insertBlocks( [ createBlock( blockType ) ] );
 	}
 
-	const renderMediaButtons = () => {
-		const buttons = [
+	const renderMediaButtons = (
+		<>
 			<ToolbarButton
 				key="imageButton"
 				title={ __( 'Image' ) }
@@ -104,7 +104,7 @@ function HeaderToolbar( {
 				extraProps={ {
 					hint: __( 'Insert Image Block' ),
 				} }
-			/>,
+			/>
 			<ToolbarButton
 				key="videoButton"
 				title={ __( 'Video' ) }
@@ -113,7 +113,7 @@ function HeaderToolbar( {
 				extraProps={ {
 					hint: __( 'Insert Video Block' ),
 				} }
-			/>,
+			/>
 			<ToolbarButton
 				key="galleryButton"
 				title={ __( 'Gallery' ) }
@@ -122,7 +122,7 @@ function HeaderToolbar( {
 				extraProps={ {
 					hint: __( 'Insert Gallery Block' ),
 				} }
-			/>,
+			/>
 			<ToolbarButton
 				key="audioButton"
 				title={ __( 'Audio' ) }
@@ -131,11 +131,9 @@ function HeaderToolbar( {
 				extraProps={ {
 					hint: __( 'Insert Audio Block' ),
 				} }
-			/>,
-		];
-
-		return buttons;
-	};
+			/>
+		</>
+	);
 
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
@@ -185,7 +183,7 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
-				{ noContentSelected && renderMediaButtons() }
+				{ noContentSelected && renderMediaButtons }
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
