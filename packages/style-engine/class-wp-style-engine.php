@@ -241,6 +241,12 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'letterSpacing' ),
 			),
+			'writingMode'    => array(
+				'property_keys' => array(
+					'default' => 'writing-mode',
+				),
+				'path'          => array( 'typography', 'writingMode' ),
+			),
 		),
 	);
 

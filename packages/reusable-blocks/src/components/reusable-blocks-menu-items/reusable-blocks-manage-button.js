@@ -58,8 +58,8 @@ function ReusableBlocksManageButton( { clientId } ) {
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
 					{ innerBlockCount > 1
-						? __( 'Convert to regular blocks' )
-						: __( 'Convert to regular block' ) }
+						? __( 'Detach patterns' )
+						: __( 'Detach pattern' ) }
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>

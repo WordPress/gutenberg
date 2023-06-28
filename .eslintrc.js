@@ -100,6 +100,7 @@ const restrictedImports = [
 			'isPlainObject',
 			'isString',
 			'isUndefined',
+			'kebabCase',
 			'keyBy',
 			'keys',
 			'last',
