@@ -42,6 +42,9 @@ function buildMenuLabel( title, id, status ) {
 	);
 }
 
+// Save a boolean to prevent us creating a fallback more than once per session.
+let hasCreatedFallback = false;
+
 export default function SidebarNavigationScreenNavigationMenus() {
 	const {
 		records: navigationMenus,
@@ -60,12 +63,18 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
+	// Save a boolean to prevent us creating a fallback more than once per session.
+	if ( firstNavigationMenu ) {
+		hasCreatedFallback = true;
+	}
+
 	// If there is no navigation menu found
 	// then trigger fallback algorithm to create one.
 	if (
 		! firstNavigationMenu &&
 		! isResolvingNavigationMenus &&
-		hasResolvedNavigationMenus
+		hasResolvedNavigationMenus &&
+		! hasCreatedFallback
 	) {
 		getNavigationFallbackId();
 	}
