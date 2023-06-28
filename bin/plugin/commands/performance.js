@@ -198,7 +198,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	const resultsFilename = `${ runKey }.performance-results.json`;
 
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite }`,
+		`npm run test:performance:playwright -- ${ testSuite }`,
 		performanceTestDirectory,
 		{
 			...process.env,
@@ -285,7 +285,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && node ./bin/packages/build.js',
+		'npm ci && npx playwright install chromium --with-deps && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
