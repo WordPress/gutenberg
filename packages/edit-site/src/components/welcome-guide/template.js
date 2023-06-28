@@ -15,12 +15,21 @@ export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
 	const isVisible = useSelect( ( select ) => {
-		const isActive = !! select( preferencesStore ).get(
+		const isTemplateActive = !! select( preferencesStore ).get(
 			'core/edit-site',
 			'welcomeGuideTemplate'
 		);
+		const isEditorActive = !! select( preferencesStore ).get(
+			'core/edit-site',
+			'welcomeGuide'
+		);
 		const { isPage, hasPageContentFocus } = select( editSiteStore );
-		return isActive && isPage() && ! hasPageContentFocus();
+		return (
+			isTemplateActive &&
+			! isEditorActive &&
+			isPage() &&
+			! hasPageContentFocus()
+		);
 	}, [] );
 
 	if ( ! isVisible ) {

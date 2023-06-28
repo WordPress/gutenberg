@@ -15,12 +15,16 @@ export default function WelcomeGuidePage() {
 	const { toggle } = useDispatch( preferencesStore );
 
 	const isVisible = useSelect( ( select ) => {
-		const isActive = !! select( preferencesStore ).get(
+		const isPageActive = !! select( preferencesStore ).get(
 			'core/edit-site',
 			'welcomeGuidePage'
 		);
+		const isEditorActive = !! select( preferencesStore ).get(
+			'core/edit-site',
+			'welcomeGuide'
+		);
 		const { hasPageContentFocus } = select( editSiteStore );
-		return isActive && hasPageContentFocus();
+		return isPageActive && ! isEditorActive && hasPageContentFocus();
 	}, [] );
 
 	if ( ! isVisible ) {
