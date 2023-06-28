@@ -37,11 +37,17 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createNotice } = useDispatch( noticesStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const hasGlobalStyleVariations = useSelect(
-		( select ) =>
-			!! select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+	const { hasGlobalStyleVariations, isDistractionFree } = useSelect(
+		( select ) => ( {
+			hasGlobalStyleVariations:
+				!! select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+		} ),
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
@@ -58,15 +64,21 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			{ ...props }
 			onClick={ () => {
 				// Disable distraction free mode.
-				setPreference( editSiteStore.name, 'distractionFree', false );
-				createNotice(
-					'info',
-					__( 'Distraction free mode turned off' ),
-					{
-						isDismissible: true,
-						type: 'snackbar',
-					}
-				);
+				if ( isDistractionFree ) {
+					setPreference(
+						editSiteStore.name,
+						'distractionFree',
+						false
+					);
+					createNotice(
+						'info',
+						__( 'Distraction free mode turned off' ),
+						{
+							isDismissible: true,
+							type: 'snackbar',
+						}
+					);
+				}
 				// Switch to edit mode.
 				setCanvasMode( 'edit' );
 				// Open global styles sidebar.
