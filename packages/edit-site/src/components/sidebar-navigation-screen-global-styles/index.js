@@ -16,6 +16,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,9 +33,10 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
-	const { openGeneralSidebar, toggleFeature } = useDispatch( editSiteStore );
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -56,7 +58,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			{ ...props }
 			onClick={ () => {
 				// Disable distraction free mode.
-				toggleFeature( 'distractionFree', false );
+				setPreference( editSiteStore.name, 'distractionFree', false );
 				createNotice(
 					'info',
 					__( 'Distraction free mode turned off' ),
