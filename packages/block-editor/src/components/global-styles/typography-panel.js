@@ -19,6 +19,7 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -32,6 +33,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -43,6 +45,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasWritingMode ||
 		hasTextColumns
 	);
 }
@@ -103,6 +106,10 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasWritingModeControl( settings ) {
+	return settings?.typography?.writingMode;
+}
+
 function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
@@ -138,6 +145,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	writingMode: true,
 	textColumns: true,
 };
 
@@ -310,6 +318,21 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
+	// Text Orientation
+	const hasWritingModeControl = useHasWritingModeControl( settings );
+	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
+	const setWritingMode = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'writingMode' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasWritingMode = () => !! value?.typography?.writingMode;
+	const resetWritingMode = () => setWritingMode( undefined );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -453,6 +476,23 @@ export default function TypographyPanel( {
 						onChange={ setTextDecoration }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
