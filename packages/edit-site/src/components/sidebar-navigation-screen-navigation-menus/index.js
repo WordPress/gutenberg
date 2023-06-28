@@ -21,6 +21,7 @@ import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import { unlock } from '../../lock-unlock';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
@@ -55,9 +56,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	const isLoading =
 		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
 
-	const getNavigationFallbackId = useSelect(
-		( select ) => select( coreStore ).getNavigationFallbackId
-	);
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
