@@ -37,12 +37,11 @@
 }
 
 .edit-post-document-title__shortcut {
-	flex-shrink: 0;
-	color: $gray-700;
-	padding: 0 $grid-unit-15;
+	color: $gray-800;
+	text-align: right;
 
-	&:hover {
-		color: $gray-700;
+	.edit-post-document-title__shortcut:hover & {
+		color: $gray-900;
 	}
 }
 

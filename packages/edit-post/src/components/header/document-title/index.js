@@ -72,12 +72,9 @@ function DocumentTitle() {
 						{ templateTitle }
 					</Text>
 				</HStack>
-			</Button>
-			<Button
-				className="edit-post-document-title__shortcut"
-				onClick={ () => openCommandCenter() }
-			>
-				{ displayShortcut.primary( 'k' ) }
+				<span className="edit-post-document-title__shortcut">
+					{ displayShortcut.primary( 'k' ) }
+				</span>
 			</Button>
 		</div>
 	);
