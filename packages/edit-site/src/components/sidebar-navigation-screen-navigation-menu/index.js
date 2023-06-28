@@ -17,6 +17,7 @@ import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-nav
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
+import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
 
 export const postType = `wp_navigation`;
 
@@ -90,7 +91,11 @@ export default function SidebarNavigationScreenNavigationMenu() {
 						onDuplicate={ _handleDuplicate }
 					/>
 				}
-				title={ decodeEntities( menuTitle ) }
+				title={ buildNavigationLabel(
+					navigationMenu?.title,
+					navigationMenu?.id,
+					navigationMenu?.status
+				) }
 				description={ __( 'This Navigation Menu is empty.' ) }
 			/>
 		);
