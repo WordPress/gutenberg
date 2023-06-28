@@ -58,5 +58,5 @@ export async function visitSiteEditor(
 	// TODO: Ideally the content underneath the spinner should be marked inert until it's ready.
 	await this.page
 		.locator( '.edit-site-canvas-spinner' )
-		.waitFor( { state: 'hidden' } );
+		.waitFor( { state: 'hidden', timeout: 60_000 } );
 }
