@@ -86,6 +86,10 @@ declare module './base-entity-records' {
 			 */
 			'automatic-feed-links': boolean;
 			/**
+			 * Whether border settings are enabled.
+			 */
+			border: boolean;
+			/**
 			 * Custom background if defined by the theme.
 			 */
 			'custom-background': boolean | CustomBackground;

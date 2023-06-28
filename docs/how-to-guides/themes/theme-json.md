@@ -343,6 +343,7 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
 | `appearance-tools`          | Set `appearanceTools` to `true`.                          |
+| `border`                    | Set `border: color, radius, style, width` to `true`.      |
 | `link-color `               | Set `color.link` to `true`.                               |
 
 #### Presets
