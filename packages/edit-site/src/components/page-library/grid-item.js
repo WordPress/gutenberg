@@ -20,7 +20,13 @@ import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { Icon, moreHorizontal } from '@wordpress/icons';
+import {
+	Icon,
+	header,
+	footer,
+	symbolFilled,
+	moreHorizontal,
+} from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
@@ -89,6 +95,15 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		ariaDescription = item.description;
 	}
 
+	let itemIcon = icon;
+	if ( categoryId === 'header' ) {
+		itemIcon = header;
+	} else if ( categoryId === 'footer' ) {
+		itemIcon = footer;
+	} else if ( categoryId === 'uncategorized' ) {
+		itemIcon = symbolFilled;
+	}
+
 	return (
 		<>
 			<div className={ patternClassNames }>
@@ -127,7 +142,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						spacing={ 3 }
 						className="edit-site-library__pattern-title"
 					>
-						{ icon && <Icon icon={ icon } /> }
+						{ icon && <Icon icon={ itemIcon } /> }
 						<Heading level={ 5 }>{ item.title }</Heading>
 					</HStack>
 					{ item.type === USER_PATTERNS && (
