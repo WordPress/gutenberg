@@ -10,9 +10,6 @@ const { baseConfig } = require( './shared' );
 
 module.exports = {
 	...baseConfig,
-	watchOptions: {
-		aggregateTimeout: 200,
-	},
 	name: 'interactivity',
 	entry: {
 		index: {
