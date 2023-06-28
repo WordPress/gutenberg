@@ -41,7 +41,16 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	return do_blocks( $pattern['content'] );
+	$content = $pattern['content'];
+
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+		// TODO: In the long run, we'd likely want to have a filter in the `WP_Block_Patterns_Registry` class
+		// instead to allow us plugging in code like this.
+		$blocks  = parse_blocks( $content );
+		$content = gutenberg_serialize_blocks( $blocks );
+	}
+
+	return do_blocks( $content );
 }
 
 add_action( 'init', 'register_block_core_pattern' );

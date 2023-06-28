@@ -91,6 +91,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-auto-inserting-blocks',
+		__( 'Auto-inserting blocks', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test Auto-inserting blocks', 'gutenberg' ),
+			'id'    => 'gutenberg-auto-inserting-blocks',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

@@ -85,5 +85,8 @@
 		{ "name": "pill-shape", "label": "Pill Shape" }
 	],
 	"editorStyle": "wp-block-social-links-editor",
-	"style": "wp-block-social-links"
+	"style": "wp-block-social-links",
+	"__experimentalAutoInsert": {
+		"core/post-content": "after"
+	}
 }
