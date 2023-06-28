@@ -54,7 +54,10 @@ export default function CreatePatternModal( {
 					title: name || __( 'Untitled Pattern' ),
 					content: '',
 					status: 'publish',
-					meta: { sync_status: syncType },
+					meta:
+						syncType === SYNC_TYPES.unsynced
+							? { sync_status: syncType }
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
