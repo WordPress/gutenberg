@@ -146,11 +146,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					>
 						{ icon && (
 							<Icon
-								className="edit-site-library__pattern-icon"
+								className="edit-site-patterns__pattern-icon"
 								icon={ itemIcon }
 							/>
 						) }
-						<Heading level={ 5 }>{ item.title }</Heading>
 						<Flex
 							as={ Heading }
 							level={ 5 }
@@ -165,7 +164,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 										'Theme patterns cannot be edited here'
 									) }
 								>
-									<span style={ { display: 'inline-flex' } }>
+									<span className="edit-site-patterns__pattern-lock-icon">
 										<Icon
 											style={ { fill: 'currentcolor' } }
 											icon={ lockSmall }

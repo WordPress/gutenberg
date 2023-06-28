@@ -154,12 +154,7 @@ export default function SidebarNavigationScreenPatterns() {
 															'Theme patterns cannot be edited here'
 														) }
 													>
-														<span
-															style={ {
-																display:
-																	'inline-flex',
-															} }
-														>
+														<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
 															<Icon
 																style={ {
 																	fill: 'currentcolor',
