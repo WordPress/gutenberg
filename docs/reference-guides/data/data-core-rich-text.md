@@ -49,6 +49,32 @@ _Returns_
 
 Returns all the available format types.
 
+_Usage_
+
+```js
+import { store as richTextStore } from '@wordpress/rich-text';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { getFormatTypes } = useSelect(
+		( select ) => select( richTextStore ),
+		[]
+	);
+
+	const availableFormats = getFormatTypes();
+
+	return availableFormats ? (
+		<ul>
+			{ availableFormats?.map( ( format ) => (
+				<li>{ format.name }</li>
+			) ) }
+		</ul>
+	) : (
+		__( 'No Formats available' )
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.

@@ -8,6 +8,31 @@ import createSelector from 'rememo';
  *
  * @param {Object} state Data state.
  *
+ * @example
+ * ```js
+ * import { store as richTextStore } from '@wordpress/rich-text';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getFormatTypes } = useSelect(
+ *        ( select ) => select( richTextStore ),
+ *        []
+ *    );
+ *
+ *    const availableFormats = getFormatTypes();
+ *
+ *    return availableFormats ? (
+ *        <ul>
+ *            { availableFormats?.map( ( format ) => (
+ *                <li>{ format.name }</li>
+ *           ) ) }
+ *        </ul>
+ *    ) : (
+ *        __( 'No Formats available' )
+ *    );
+ * };
+ * ```
+ *
  * @return {Array} Format types.
  */
 export const getFormatTypes = createSelector(
