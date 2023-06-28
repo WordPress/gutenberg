@@ -90,11 +90,6 @@ export default function useFocusOutside(
 	} | null >( null );
 	const pollingIntervalId = useRef< number | undefined >();
 
-	// Thoughts:
-	// - it needs to always stop when component unmounted
-	// - it needs to work when resuming focus from another doc and clicking
-	//   immediately on the backdrop
-
 	// Sometimes the blur event is not reliable, for example when focus moves
 	// to an iframe inside the wrapper. In these scenarios, we resort to polling,
 	// and we explicitly check if focus has indeed moved outside the wrapper.
