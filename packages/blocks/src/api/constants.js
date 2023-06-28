@@ -215,6 +215,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
+	writingMode: {
+		value: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
+		useEngine: true,
+	},
 	'--wp--style--root--padding': {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
