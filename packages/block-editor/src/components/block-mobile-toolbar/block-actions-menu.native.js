@@ -213,16 +213,12 @@ const BlockActionsMenu = ( {
 			id: 'convertToRegularBlocksOption',
 			label:
 				innerBlockCount > 1
-					? __( 'Convert to regular blocks' )
-					: __( 'Convert to regular block' ),
+					? __( 'Detach patterns' )
+					: __( 'Detach pattern' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
-				const successNotice =
-					innerBlockCount > 1
-						? /* translators: %s: name of the reusable block */
-						  __( '%s converted to regular blocks' )
-						: /* translators: %s: name of the reusable block */
-						  __( '%s converted to regular block' );
+				/* translators: %s: name of the synced block */
+				const successNotice = __( '%s detached' );
 				createSuccessNotice(
 					sprintf(
 						successNotice,

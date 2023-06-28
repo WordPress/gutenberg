@@ -113,7 +113,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 
 		// Check that we have a paragraph block on the page.
 		const paragraphBlock = await canvas().$(
@@ -221,7 +221,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular blocks' );
+		await clickBlockToolbarButton( 'Detach patterns' );
 
 		// Check that we have two paragraph blocks on the page.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -353,7 +353,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert back to regular blocks.
 		await clickBlockToolbarButton( 'Select Pattern' );
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 		await page.waitForXPath( selector, {
 			hidden: true,
 		} );
