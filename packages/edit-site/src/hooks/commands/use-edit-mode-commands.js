@@ -4,8 +4,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	code,
-	cog,
 	trash,
 	backup,
 	layout,
@@ -13,6 +11,9 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
+	cog,
+	code,
+	keyboardClose,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -26,6 +27,8 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
+import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
+import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -142,6 +145,7 @@ function useEditUICommands() {
 		} ),
 		[]
 	);
+	const { openModal } = useDispatch( interfaceStore );
 	const { toggle } = useDispatch( preferencesStore );
 
 	if ( canvasMode !== 'edit' ) {
@@ -205,6 +209,24 @@ function useEditUICommands() {
 		callback: ( { close } ) => {
 			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
 			close();
+		},
+	} );
+
+	commands.push( {
+		name: 'core/open-preferences',
+		label: __( 'Open editor preferences' ),
+		icon: cog,
+		callback: () => {
+			openModal( PREFERENCES_MODAL_NAME );
+		},
+	} );
+
+	commands.push( {
+		name: 'core/open-shortcut-help',
+		label: __( 'Open keyboard shortcuts' ),
+		icon: keyboardClose,
+		callback: () => {
+			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
 

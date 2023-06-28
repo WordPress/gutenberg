@@ -48,7 +48,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-revisions-controller-6-3.php';
-	require_once __DIR__ . '/compat/wordpress-6.3/class-wp-rest-navigation-fallback-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-classic-to-block-menu-converter.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-navigation-fallback.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-navigation-fallback-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
@@ -80,9 +82,6 @@ require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 require __DIR__ . '/compat/wordpress-6.2/menu.php';
 
-// WordPress 6.3 compat.
-require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
-
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-span.php';
@@ -91,6 +90,8 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 
 // WordPress 6.3 compat.
+require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
