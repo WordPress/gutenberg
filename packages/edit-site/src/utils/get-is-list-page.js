@@ -15,6 +15,7 @@ export default function getIsListPage(
 ) {
 	return (
 		path === '/wp_template/all' ||
+		path === '/wp_template_part/all' ||
 		( path === '/library' &&
 			// Don't treat "/library" without categoryType and categoryId as a list page
 			// in mobile because the sidebar covers the whole page.
