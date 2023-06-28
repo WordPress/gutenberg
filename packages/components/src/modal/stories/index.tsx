@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { createPortal } from 'react-dom';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 /**
@@ -42,6 +43,29 @@ const meta: ComponentMeta< typeof Modal > = {
 };
 export default meta;
 
+const IFrame: React.FC< {
+	title?: string;
+	width: number;
+	height: number;
+	children: React.ReactNode;
+} > = ( { children, ...props } ) => {
+	const [ contentRef, setContentRef ] = useState< HTMLIFrameElement | null >(
+		null
+	);
+	const mountNode = contentRef?.contentWindow?.document?.body;
+
+	return (
+		<iframe
+			title="test-iframe"
+			{ ...props }
+			ref={ setContentRef }
+			tabIndex={ -1 }
+		>
+			{ mountNode && createPortal( children, mountNode ) }
+		</iframe>
+	);
+};
+
 const Template: ComponentStory< typeof Modal > = ( {
 	onRequestClose,
 	...args
@@ -77,6 +101,19 @@ const Template: ComponentStory< typeof Modal > = ( {
 					</p>
 
 					<InputControl style={ { marginBottom: '20px' } } />
+
+					<button>Button outside iframe</button>
+
+					<iframe
+						title="Example 1"
+						width="300"
+						height="200"
+						src="https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik"
+					/>
+
+					<IFrame title="Example 2" width={ 300 } height={ 200 }>
+						<button>Button inside iframe</button>
+					</IFrame>
 
 					<Button variant="secondary" onClick={ closeModal }>
 						Close Modal
