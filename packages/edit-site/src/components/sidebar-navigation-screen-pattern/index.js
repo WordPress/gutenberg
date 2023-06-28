@@ -14,7 +14,6 @@ import SidebarButton from '../sidebar-button';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import usePatternDetails from './use-pattern-details';
-import useNavigationMenuContent from './use-navigation-menu-content';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -27,7 +26,6 @@ export default function SidebarNavigationScreenPattern() {
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
-	const content = useNavigationMenuContent( postType, postId );
 
 	// The absence of a category type in the query params for template parts
 	// indicates the user has arrived at the template part via the "manage all"
@@ -47,7 +45,6 @@ export default function SidebarNavigationScreenPattern() {
 				/>
 			}
 			backPath={ backPath }
-			content={ content }
 			{ ...patternDetails }
 		/>
 	);
