@@ -1,570 +1,294 @@
 <?php
 
+require_once __DIR__ . '/../../fonts-api/wp-fonts-testcase.php';
+// This code is only needed if the Font API is enabled.
+// It should be removed after Font Manager is merged into Gutenberg.
+if ( ! class_exists( 'WP_Font_Face' ) ) {
+	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face.php';
+	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face-resolver.php';
+	require_once __DIR__ . '/../../../lib/experimental/fonts/fonts.php';
+}
+
 /**
  * Test WP_Theme_JSON_Resolver_Gutenberg class.
  *
  * @package Gutenberg
  */
 
-class Tests_Fonts_WpFontFaceResolver_EnqueueUserSelectedFonts extends WP_UnitTestCase {
-	/**
-	 * Administrator ID.
-	 *
-	 * @var int
-	 */
-	protected static $administrator_id;
-
-	/**
-	 * WP_Theme_JSON_Resolver::$blocks_cache property.
-	 *
-	 * @var ReflectionProperty
-	 */
-	private static $property_blocks_cache;
-
-	/**
-	 * Original value of the WP_Theme_JSON_Resolver::$blocks_cache property.
-	 *
-	 * @var array
-	 */
-	private static $property_blocks_cache_orig_value;
-
-	/**
-	 * WP_Theme_JSON_Resolver::$core property.
-	 *
-	 * @var ReflectionProperty
-	 */
-	private static $property_core;
-
-	/**
-	 * Original value of the WP_Theme_JSON_Resolver::$core property.
-	 *
-	 * @var WP_Theme_JSON
-	 */
-	private static $property_core_orig_value;
-
-	/**
-	 * @var string|null
-	 */
-	private $theme_root;
-
-	/**
-	 * @var array|null
-	 */
-	private $orig_theme_dir;
-
-	/**
-	 * @var array|null
-	 */
-	private $queries;
+class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
+	const FONTS_THEME   = 'fonts-block-theme';
+	const FONT_FAMILIES = array(
+		'fonts-block-theme' => array(
+			// From theme.json.
+			'dm-sans',
+			'source-serif-pro',
+			// From style variation.
+			'open-sans',
+		),
+	);
 
 	public static function set_up_before_class() {
+		self::$requires_switch_theme_fixtures = true;
+
 		parent::set_up_before_class();
-
-		self::$administrator_id = self::factory()->user->create(
-			array(
-				'role'       => 'administrator',
-				'user_email' => 'administrator@example.com',
-			)
-		);
-
-		static::$property_blocks_cache = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'blocks_cache' );
-		static::$property_blocks_cache->setAccessible( true );
-		static::$property_blocks_cache_orig_value = static::$property_blocks_cache->getValue();
-
-		static::$property_core = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'core' );
-		static::$property_core->setAccessible( true );
-		static::$property_core_orig_value = static::$property_core->getValue();
 	}
 
-	public function set_up() {
-		parent::set_up();
-		$this->theme_root = realpath( __DIR__ . '/data/themedir1' );
-
-		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
-
-		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
-		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
-
-		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
-		add_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
-		add_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
-		$this->queries = array();
-		// Clear caches.
-		wp_clean_themes_cache();
-		unset( $GLOBALS['wp_themes'] );
-	}
-
-	public function tear_down() {
-		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
-		wp_clean_themes_cache();
-		unset( $GLOBALS['wp_themes'] );
-		parent::tear_down();
-	}
-
-	public function filter_set_theme_root() {
-		return $this->theme_root;
-	}
-
-	public function filter_set_locale_to_polish() {
-		return 'pl_PL';
-	}
-
-	public function filter_db_query( $query ) {
-		if ( preg_match( '#post_type = \'wp_global_styles\'#', $query ) ) {
-			$this->queries[] = $query;
-		}
-		return $query;
-	}
-
-	public function test_translations_are_applied() {
-		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
-		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
-
-		switch_theme( 'block-theme' );
-		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
-
-		unload_textdomain( 'block-theme' );
-		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
-
-		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'block-theme' );
-		$this->assertSame(
-			array(
-				'color'      => array(
-					'custom'         => false,
-					'customGradient' => true,
-					'palette'        => array(
-						'theme' => array(
-							array(
-								'slug'  => 'light',
-								'name'  => 'Jasny',
-								'color' => '#f5f7f9',
-							),
-							array(
-								'slug'  => 'dark',
-								'name'  => 'Ciemny',
-								'color' => '#000',
-							),
-						),
-					),
-				),
-				'typography' => array(
-					'customFontSize' => true,
-					'lineHeight'     => false,
-				),
-				'spacing'    => array(
-					'units'   => false,
-					'padding' => false,
-				),
-				'blocks'     => array(
-					'core/paragraph' => array(
-						'color' => array(
-							'palette' => array(
-								'theme' => array(
-									array(
-										'slug'  => 'light',
-										'name'  => 'Jasny',
-										'color' => '#f5f7f9',
-									),
-								),
-							),
-						),
-					),
-				),
-			),
-			$actual->get_settings()
-		);
-		$this->assertSame(
-			$actual->get_custom_templates(),
-			array(
-				'page-home' => array(
-					'title'     => 'Szablon strony głównej',
-					'postTypes' => array( 'page' ),
-				),
-			)
-		);
-		$this->assertSame(
-			$actual->get_template_parts(),
-			array(
-				'small-header' => array(
-					'title' => 'Mały nagłówek',
-					'area'  => 'header',
-				),
-			)
-		);
-	}
-
-	public function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
-		switch_theme( 'default' );
-		$color_palette = array(
-			array(
-				'name'  => 'Primary',
-				'slug'  => 'primary',
-				'color' => '#F00',
-			),
-			array(
-				'name'  => 'Secondary',
-				'slug'  => 'secondary',
-				'color' => '#0F0',
-			),
-			array(
-				'name'  => 'Tertiary',
-				'slug'  => 'tertiary',
-				'color' => '#00F',
-			),
-		);
-		add_theme_support( 'editor-color-palette', $color_palette );
-		add_theme_support( 'custom-line-height' );
-
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
-
-		remove_theme_support( 'custom-line-height' );
-		remove_theme_support( 'editor-color-palette' );
-
-		$this->assertFalse( wp_theme_has_theme_json() );
-		$this->assertTrue( $settings['typography']['lineHeight'] );
-		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
-	}
-
-	/**
-	 * Recursively applies ksort to an array.
-	 */
-	private static function recursive_ksort( &$array ) {
-		foreach ( $array as &$value ) {
-			if ( is_array( $value ) ) {
-				self::recursive_ksort( $value );
-			}
-		}
-		ksort( $array );
-	}
-
-	public function test_merges_child_theme_json_into_parent_theme_json() {
-		switch_theme( 'block-theme-child' );
-
-		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
-		$expected_settings = array(
-			'color'      => array(
-				'custom'         => false,
-				'customGradient' => true,
-				'palette'        => array(
-					'theme' => array(
-						array(
-							'slug'  => 'light',
-							'name'  => 'Light',
-							'color' => '#f3f4f6',
-						),
-						array(
-							'slug'  => 'primary',
-							'name'  => 'Primary',
-							'color' => '#3858e9',
-						),
-						array(
-							'slug'  => 'dark',
-							'name'  => 'Dark',
-							'color' => '#111827',
-						),
-					),
-				),
-				'link'           => true,
-			),
-			'typography' => array(
-				'customFontSize' => true,
-				'lineHeight'     => false,
-			),
-			'spacing'    => array(
-				'units'   => false,
-				'padding' => false,
-			),
-			'blocks'     => array(
-				'core/paragraph'  => array(
-					'color' => array(
-						'palette' => array(
-							'theme' => array(
-								array(
-									'slug'  => 'light',
-									'name'  => 'Light',
-									'color' => '#f5f7f9',
-								),
-							),
-						),
-					),
-				),
-				'core/post-title' => array(
-					'color' => array(
-						'palette' => array(
-							'theme' => array(
-								array(
-									'slug'  => 'light',
-									'name'  => 'Light',
-									'color' => '#f3f4f6',
-								),
-							),
-						),
-					),
-				),
-			),
-		);
-		self::recursive_ksort( $actual_settings );
-		self::recursive_ksort( $expected_settings );
-
-		// Should merge settings.
-		$this->assertSame(
-			$expected_settings,
-			$actual_settings
-		);
-
-		$this->assertSame(
-			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates(),
-			array(
-				'page-home' => array(
-					'title'     => 'Homepage',
-					'postTypes' => array( 'page' ),
-				),
-			)
-		);
-	}
-
-	public function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
-		// Switch to a theme that does have support.
-		switch_theme( 'block-theme' );
-		wp_set_current_user( self::$administrator_id );
-		$theme = wp_get_theme();
-		WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-		add_filter( 'query', array( $this, 'filter_db_query' ) );
-		$query_count = count( $this->queries );
-		for ( $i = 0; $i < 3; $i++ ) {
-			WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-		}
-		$query_count = count( $this->queries ) - $query_count;
-		$this->assertSame( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type prior to creation.' );
-
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
-
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme, true );
-		$this->assertNotEmpty( $user_cpt, 'User CPT is expected not to be empty.' );
-
-		$query_count = count( $this->queries );
-		for ( $i = 0; $i < 3; $i ++ ) {
-			$new_user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-			$this->assertSameSets( $user_cpt, $new_user_cpt, "User CPTs do not match on run {$i}." );
-		}
-		$query_count = count( $this->queries ) - $query_count;
-		$this->assertSame( 1, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type after creation.' );
-	}
-
-	/**
-	 * @covers WP_Theme_JSON_Resolver::get_user_data_from_wp_global_styles
-	 */
-	public function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries_for_logged_out_users() {
-		$theme = wp_get_theme();
-		WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-		add_filter( 'query', array( $this, 'filter_db_query' ) );
-		$query_count = count( $this->queries );
-		for ( $i = 0; $i < 3; $i++ ) {
-			WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-		}
-		$query_count = count( $this->queries ) - $query_count;
-		$this->assertSame( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type prior to creation.' );
-
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
-	}
-
-	/**
-	 * Test that get_merged_data returns the data merged up to the proper origin.
-	 *
-	 * @covers WP_Theme_JSON_Resolver::get_merged_data
-	 *
-	 * @dataProvider data_get_merged_data_returns_origin
-	 *
-	 * @param string $origin            What origin to get data from.
-	 * @param bool   $core_palette      Whether the core palette is present.
-	 * @param string $core_palette_text Message.
-	 * @param string $block_styles      Whether the block styles are present.
-	 * @param string $block_styles_text Message.
-	 * @param bool   $theme_palette      Whether the theme palette is present.
-	 * @param string $theme_palette_text Message.
-	 * @param bool   $user_palette      Whether the user palette is present.
-	 * @param string $user_palette_text Message.
-	 */
-	public function test_get_merged_data_returns_origin( $origin, $core_palette, $core_palette_text, $block_styles, $block_styles_text, $theme_palette, $theme_palette_text, $user_palette, $user_palette_text ) {
-		// Make sure there is data from the blocks origin.
-		register_block_type(
-			'my/block-with-styles',
-			array(
-				'api_version' => 3,
-				'attributes'  => array(
-					'borderColor' => array(
-						'type' => 'string',
-					),
-					'style'       => array(
-						'type' => 'object',
-					),
-				),
-				'supports'    => array(
-					'__experimentalStyle' => array(
-						'typography' => array(
-							'fontSize' => '42rem',
-						),
-					),
-				),
-			)
-		);
-
-		// Make sure there is data from the theme origin.
+	public function test_should_return_no_fonts_when_no_fonts_defined() {
 		switch_theme( 'block-theme' );
 
-		// Make sure there is data from the user origin.
-		wp_set_current_user( self::$administrator_id );
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
-		$config   = json_decode( $user_cpt['post_content'], true );
-		$config['settings']['color']['palette']['custom'] = array(
-			array(
-				'color' => 'hotpink',
-				'name'  => 'My color',
-				'slug'  => 'my-color',
-			),
-		);
-		$user_cpt['post_content']                         = wp_json_encode( $config );
-		wp_update_post( $user_cpt, true, false );
+		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		$this->assertEmpty( $fonts );
+	}
 
-		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
-		$settings   = $theme_json->get_settings();
-		$styles     = $theme_json->get_styles_block_nodes();
-		$this->assertSame( $core_palette, isset( $settings['color']['palette']['default'] ), $core_palette_text );
-		$styles = array_filter(
-			$styles,
-			static function( $element ) {
-				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
-			}
-		);
-		$this->assertSame( $block_styles, count( $styles ) === 1, $block_styles_text );
-		$this->assertSame( $theme_palette, isset( $settings['color']['palette']['theme'] ), $theme_palette_text );
-		$this->assertSame( $user_palette, isset( $settings['color']['palette']['custom'] ), $user_palette_text );
+	public function test_should_return_style_variation_fonts() {
+		switch_theme( static::FONTS_THEME );
 
-		unregister_block_type( 'my/block-with-styles' );
+		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+
+		$this->assertArrayHasKey( 'DM Sans', $fonts );
+		$this->assertArrayHasKey( 'Source Serif Pro', $fonts );
 	}
 
 	/**
-	 * Data provider for test_get_merged_data_returns_origin
+	 * Tests all font families are registered and enqueued. "All" means all font families from
+	 * the theme's theme.json and within the style variations.
+	 */
+	public function test_should_return_all_defined_font_families() {
+		switch_theme( static::FONTS_THEME );
+
+		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+
+		$expected = static::FONT_FAMILIES[ static::FONTS_THEME ];
+		$this->assertSameSetsWithIndex( $expected, $fonts );
+	}
+
+	/**
+	 * Test ensures duplicate fonts and variations in the style variations
+	 * are not re-registered.
+	 *
+	 * The Dm Sans fonts are duplicated in the theme's /styles/variations-duplicate-fonts.json.
+	 */
+	public function test_should_not_reregister_duplicate_fonts_from_style_variations() {
+		switch_theme( static::FONTS_THEME );
+
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
+		$wp_fonts = wp_fonts();
+
+		// Font families are not duplicated.
+		$this->assertSameSetsWithIndex(
+			static::FONT_FAMILIES[ static::FONTS_THEME ],
+			$wp_fonts->get_registered_font_families(),
+			'Font families should not be duplicated'
+		);
+
+		// Font variations are not duplicated.
+		$this->assertSameSets(
+			array(
+				// From theme.json.
+				'dm-sans',
+				'dm-sans-400-normal',
+				'dm-sans-400-italic',
+				'dm-sans-700-normal',
+				'dm-sans-700-italic',
+				'source-serif-pro',
+				'source-serif-pro-200-900-normal',
+				'source-serif-pro-200-900-italic',
+				// From style variation.
+				'open-sans',
+				'open-sans-400-normal',
+				'open-sans-400-italic',
+				'dm-sans-500-normal',
+				'dm-sans-500-italic',
+			),
+			$wp_fonts->get_registered(),
+			'Font families and their variations should not be duplicated'
+		);
+	}
+
+	/**
+	 * @dataProvider data_should_replace_src_file_placeholder
+	 *
+	 * @param string $handle   Variation's handle.
+	 * @param string $expected Expected src.
+	 */
+	public function test_should_replace_src_file_placeholder( $handle, $expected ) {
+		switch_theme( static::FONTS_THEME );
+
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
+
+		$variation = wp_fonts()->registered[ $handle ];
+		$actual    = array_pop( $variation->src );
+		$expected  = get_stylesheet_directory_uri() . $expected;
+
+		$this->assertStringNotContainsString( 'file:./', $actual, 'Font src should not contain the "file:./" placeholder' );
+		$this->assertSame( $expected, $actual, 'Font src should be an URL to its file' );
+	}
+
+	/**
+	 * Data provider.
 	 *
 	 * @return array
 	 */
-	public function data_get_merged_data_returns_origin() {
+	public function data_should_replace_src_file_placeholder() {
 		return array(
-			'origin_default' => array(
-				'origin'             => 'default',
-				'core_palette'       => true,
-				'core_palette_text'  => 'Core palette must be present',
-				'block_styles'       => false,
-				'block_styles_text'  => 'Block styles should not be present',
-				'theme_palette'      => false,
-				'theme_palette_text' => 'Theme palette should not be present',
-				'user_palette'       => false,
-				'user_palette_text'  => 'User palette should not be present',
+			// Theme's theme.json.
+			'DM Sans: 400 normal'                          => array(
+				'handle'   => 'dm-sans-400-normal',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Regular.woff2',
 			),
-			'origin_blocks'  => array(
-				'origin'             => 'blocks',
-				'core_palette'       => true,
-				'core_palette_text'  => 'Core palette must be present',
-				'block_styles'       => true,
-				'block_styles_text'  => 'Block styles must be present',
-				'theme_palette'      => false,
-				'theme_palette_text' => 'Theme palette should not be present',
-				'user_palette'       => false,
-				'user_palette_text'  => 'User palette should not be present',
+			'DM Sans: 400 italic'                          => array(
+				'handle'   => 'dm-sans-400-italic',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2',
 			),
-			'origin_theme'   => array(
-				'origin'             => 'theme',
-				'core_palette'       => true,
-				'core_palette_text'  => 'Core palette must be present',
-				'block_styles'       => true,
-				'block_styles_text'  => 'Block styles must be present',
-				'theme_palette'      => true,
-				'theme_palette_text' => 'Theme palette must be present',
-				'user_palette'       => false,
-				'user_palette_text'  => 'User palette should not be present',
+			'DM Sans: 700 normal'                          => array(
+				'handle'   => 'dm-sans-700-normal',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Bold.woff2',
 			),
-			'origin_custom'  => array(
-				'origin'             => 'custom',
-				'core_palette'       => true,
-				'core_palette_text'  => 'Core palette must be present',
-				'block_styles'       => true,
-				'block_styles_text'  => 'Block styles must be present',
-				'theme_palette'      => true,
-				'theme_palette_text' => 'Theme palette must be present',
-				'user_palette'       => true,
-				'user_palette_text'  => 'User palette must be present',
+			'DM Sans: 700 italic'                          => array(
+				'handle'   => 'dm-sans-700-italic',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2',
+			),
+			'Source Serif Pro: 200-900 normal'             => array(
+				'handle'   => 'source-serif-pro-200-900-normal',
+				'expected' => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+			),
+			'Source Serif Pro: 200-900 italic'             => array(
+				'handle'   => 'source-serif-pro-200-900-italic',
+				'expected' => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+			),
+
+			// Style Variation: variation-with-new-font-family.json.
+			'Style Variation: new font-family'             => array(
+				'handle'   => 'open-sans-400-normal',
+				'expected' => '/assets/fonts/open-sans/OpenSans-VariableFont_wdth,wght.tff',
+			),
+			'Style Variation: new font-family italic variation' => array(
+				'handle'   => 'open-sans-400-italic',
+				'expected' => '/assets/fonts/open-sans/OpenSans-Italic-VariableFont_wdth,wght.tff',
+			),
+
+			// Style Variation: variation-with-new-variation.json.
+			'Style Variation: new medium variation'        => array(
+				'handle'   => 'dm-sans-500-normal',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Medium.woff2',
+			),
+			'Style Variation: new medium italic variation' => array(
+				'handle'   => 'dm-sans-500-italic',
+				'expected' => '/assets/fonts/dm-sans/DMSans-Medium-Italic.woff2',
 			),
 		);
 	}
 
+	public function test_should_convert_font_face_properties_into_kebab_case() {
+		switch_theme( static::FONTS_THEME );
+
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
+
+		// Testing only one variation since this theme's fonts use the same properties.
+		$variation         = wp_fonts()->registered['dm-sans-400-normal'];
+		$actual_properties = $variation->extra['font-properties'];
+
+		$this->assertArrayHasKey( 'font-family', $actual_properties, 'fontFamily should have been converted into font-family' );
+		$this->assertArrayNotHasKey( 'fontFamily', $actual_properties, 'fontFamily should not exist.' );
+		$this->assertArrayHasKey( 'font-stretch', $actual_properties, 'fontStretch should have been converted into font-stretch' );
+		$this->assertArrayNotHasKey( 'fontStretch', $actual_properties, 'fontStretch should not exist' );
+		$this->assertArrayHasKey( 'font-style', $actual_properties, 'fontStyle should have been converted into font-style' );
+		$this->assertArrayNotHasKey( 'fontStyle', $actual_properties, 'fontStyle should not exist.' );
+		$this->assertArrayHasKey( 'font-weight', $actual_properties, 'fontWeight should have been converted into font-weight' );
+		$this->assertArrayNotHasKey( 'fontWeight', $actual_properties, 'fontWeight should not exist' );
+	}
 
 	/**
-	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child,
-	 * and that the child variation overwrites the parent variation of the same name.
+	 * Tests that WP_Fonts_Resolver::register_fonts_from_theme_json() skips fonts that are already registered
+	 * in the Fonts API. How does it do that? Using the 'origin' property when checking each variation.
+	 * This property is added when WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() runs.
 	 *
-	 * @covers WP_Theme_JSON_Resolver::get_style_variations
-	 **/
-	public function test_get_style_variations_returns_all_variations() {
-		// Switch to a child theme.
-		switch_theme( 'block-theme-child' );
-		wp_set_current_user( self::$administrator_id );
+	 * To simulate this scenario, a font is registered first, but not enqueued. Then after running,
+	 * it checks if the WP_Fonts_Resolver::register_fonts_from_theme_json() enqueued the font. If no, then
+	 * it was skipped as expected.
+	 */
+	public function test_should_skip_registered_fonts() {
+		switch_theme( static::FONTS_THEME );
 
-		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
-		$expected_settings = array(
+		// Register Lato font.
+		wp_register_fonts(
 			array(
-				'version'  => 2,
-				'title'    => 'variation-a',
-				'settings' => array(
-					'blocks' => array(
-						'core/paragraph' => array(
-							'color' => array(
-								'palette' => array(
-									'theme' => array(
-										array(
-											'slug'  => 'dark',
-											'name'  => 'Dark',
-											'color' => '#010101',
-										),
-									),
-								),
-							),
-						),
+				'Lato' => array(
+					array(
+						'font-family' => 'Lato',
+						'font-style'  => 'normal',
+						'font-weight' => '400',
+						'src'         => 'https://example.com/tests/assets/fonts/lato/Lato-Regular.woff2',
+					),
+					array(
+						'font-family' => 'Lato',
+						'font-style'  => 'italic',
+						'font-weight' => '400',
+						'src'         => 'https://example.com/tests/assets/fonts/lato/Lato-Regular-Italic.woff2',
 					),
 				),
-			),
-			array(
-				'version'  => 2,
-				'title'    => 'variation-b',
-				'settings' => array(
-					'blocks' => array(
-						'core/post-title' => array(
-							'color' => array(
-								'palette' => array(
-									'theme' => array(
-										array(
-											'slug'  => 'light',
-											'name'  => 'Light',
-											'color' => '#f1f1f1',
-										),
-									),
-								),
-							),
-						),
-					),
-				),
-			),
+			)
 		);
-		self::recursive_ksort( $actual_settings );
-		self::recursive_ksort( $expected_settings );
 
-		$this->assertSame(
-			$expected_settings,
-			$actual_settings
-		);
+		// Pre-check to ensure no fonts are enqueued.
+		$this->assertEmpty( wp_fonts()->get_enqueued(), 'No fonts should be enqueued before running WP_Fonts_Resolver::register_fonts_from_theme_json()' );
+
+		/*
+		 * When this function runs, it invokes WP_Theme_JSON_Resolver_Gutenberg::get_merged_data(),
+		 * which will include the Lato fonts with a 'origin' property set in each variation.
+		 */
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
+
+		$actual_enqueued_fonts = wp_fonts()->get_enqueued();
+
+		$this->assertNotContains( 'lato', $actual_enqueued_fonts, 'Lato font-family should not be enqueued' );
+		$this->assertSameSets( static::FONT_FAMILIES[ static::FONTS_THEME ], $actual_enqueued_fonts, 'Only the theme font families should be enqueued' );
+	}
+
+	public function test_should_skip_when_font_face_not_defined() {
+		switch_theme( static::FONTS_THEME );
+		$expected_font_family = 'source-serif-pro';
+
+		/**
+		 * Callback that removes the 'fontFace' of the expected font family from the theme's theme.json data.
+		 * This callback is invoked at the start of WP_Fonts_Resolver::register_fonts_from_theme_json() before processing
+		 * within that function. How? It's in the call stack of WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
+		 *
+		 * @param WP_Theme_JSON_Data_Gutenberg| WP_Theme_JSON_Data $theme_json_data Instance of the Data object.
+		 * @return WP_Theme_JSON_Data_Gutenberg| WP_Theme_JSON_Data Modified instance.
+		 * @throws ReflectionException
+		 */
+		$remove_expected_font_family = static function( $theme_json_data ) use ( $expected_font_family ) {
+			// Need to get the underlying data array which is in WP_Theme_JSON_Gutenberg | WP_Theme_JSON object.
+			$property = new ReflectionProperty( $theme_json_data, 'theme_json' );
+			$property->setAccessible( true );
+			$theme_json_object = $property->getValue( $theme_json_data );
+
+			$property = new ReflectionProperty( $theme_json_object, 'theme_json' );
+			$property->setAccessible( true );
+			$data = $property->getValue( $theme_json_object );
+
+			// Loop through the fonts to find the expected font-family to modify.
+			foreach ( $data['settings']['typography']['fontFamilies']['theme'] as $index => $definitions ) {
+				if ( $expected_font_family !== $definitions['slug'] ) {
+					continue;
+				}
+
+				// Remove the 'fontFace' element, which removes the font's variations.
+				unset( $data['settings']['typography']['fontFamilies']['theme'][ $index ]['fontFace'] );
+				break;
+			}
+
+			$theme_json_data->update_with( $data );
+
+			return $theme_json_data;
+		};
+		add_filter( 'wp_theme_json_data_theme', $remove_expected_font_family );
+
+		WP_Fonts_Resolver::register_fonts_from_theme_json();
+
+		remove_filter( 'wp_theme_json_data_theme', $remove_expected_font_family );
+
+		$this->assertNotContains( $expected_font_family, wp_fonts()->get_registered_font_families() );
 	}
 }
