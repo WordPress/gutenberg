@@ -41,6 +41,9 @@ class PerformanceReporter implements Reporter {
 			inserterOpen,
 			inserterHover,
 			inserterSearch,
+			timeToFirstByte,
+			largestContentfulPaint,
+			lcpMinusTtfb,
 		} = JSON.parse( results );
 
 		if ( serverResponse && serverResponse.length ) {
@@ -163,6 +166,21 @@ Slowest time to move mouse between two block item in the inserter: ${ success(
 			) }
 Fastest time to move mouse between two block item in the inserter: ${ success(
 				round( Math.min( ...inserterHover ) ) + 'ms'
+			) }` );
+		}
+
+		if ( timeToFirstByte && timeToFirstByte.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Front End Performance:' ) }
+Average time to first byte (TTFB): ${ success(
+				round( average( timeToFirstByte ) ) + 'ms'
+			) }
+Average time to largest contentful paint (LCP): ${ success(
+				round( average( largestContentfulPaint ) ) + 'ms'
+			) }
+Average primary content load time (LCP - TTFB): ${ success(
+				round( average( lcpMinusTtfb ) ) + 'ms'
 			) }` );
 		}
 
