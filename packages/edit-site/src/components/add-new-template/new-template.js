@@ -34,7 +34,7 @@ import {
 	page,
 	plus,
 	pin,
-	postList,
+	verse,
 	search,
 	tag,
 } from '@wordpress/icons';
@@ -78,7 +78,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	home: postList,
+	home: verse,
 	single: pin,
 	page,
 	archive,
