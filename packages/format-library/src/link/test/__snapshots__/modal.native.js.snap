@@ -71,7 +71,7 @@ exports[`LinksUI LinksUI renders 1`] = `
               ]
             }
           >
-            <View
+            <RNSScreenContainer
               onLayout={[Function]}
               style={
                 {
@@ -79,14 +79,22 @@ exports[`LinksUI LinksUI renders 1`] = `
                 }
               }
             >
-              <View
+              <RNSScreen
+                activityState={2}
                 collapsable={false}
                 forwardedRef={[Function]}
+                gestureResponseDistance={
+                  {
+                    "bottom": -1,
+                    "end": -1,
+                    "start": -1,
+                    "top": -1,
+                  }
+                }
                 pointerEvents="box-none"
                 style={
                   {
                     "bottom": 0,
-                    "display": "flex",
                     "left": 0,
                     "position": "absolute",
                     "right": 0,
@@ -523,8 +531,8 @@ exports[`LinksUI LinksUI renders 1`] = `
                     </View>
                   </View>
                 </View>
-              </View>
-            </View>
+              </RNSScreen>
+            </RNSScreenContainer>
             <View
               collapsable={false}
               pointerEvents="box-none"
