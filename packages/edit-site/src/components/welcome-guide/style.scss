@@ -1,8 +1,38 @@
 .edit-site-welcome-guide {
 	width: 312px;
 
+	&.guide-editor,
+	&.guide-styles {
+		// Make Guide component's colors compliment the colors in the GIF.
+		--wp-components-color-accent: #1386bf;
+		--wp-components-color-accent-darker-10: #{darken(#1386bf, 10%)};
+		--wp-components-color-accent-darker-20: #{darken(#1386bf, 20%)};
+
+		.edit-site-welcome-guide__image {
+			background: #00a0d2;
+		}
+	}
+
+	&.guide-page,
+	&.guide-template {
+		// Make Guide component's colors compliment the colors in the video.
+		--wp-components-color-accent: #3858e9;
+		--wp-components-color-accent-darker-10: #{darken(#3858e9, 10%)};
+		--wp-components-color-accent-darker-20: #{darken(#3858e9, 20%)};
+
+	}
+
+	&.guide-page .edit-site-welcome-guide__video {
+		border-right: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
+	&.guide-template .edit-site-welcome-guide__video {
+		border-left: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
 	&__image {
-		background: #00a0d2;
 		margin: 0 0 $grid-unit-20;
 		> img {
 			display: block;

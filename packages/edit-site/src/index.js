@@ -67,6 +67,8 @@ export function initializeEditor( id, settings ) {
 		keepCaretInsideBlock: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
+		welcomeGuidePage: true,
+		welcomeGuideTemplate: true,
 		showListViewByDefault: false,
 		showBlockBreadcrumbs: true,
 	} );
