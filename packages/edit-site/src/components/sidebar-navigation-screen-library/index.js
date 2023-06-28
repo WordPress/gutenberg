@@ -48,6 +48,20 @@ export default function SidebarNavigationScreenLibrary() {
 	}, [] );
 
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
+	const footer = ! isMobileViewport ? (
+		<ItemGroup>
+			<SidebarNavigationItem withChevron { ...templatePartsLink }>
+				{ __( 'Manage all template parts' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				as="a"
+				href="edit.php?post_type=wp_block"
+				withChevron
+			>
+				{ __( 'Manage all custom patterns' ) }
+			</SidebarNavigationItem>
+		</ItemGroup>
+	) : undefined;
 
 	return (
 		<SidebarNavigationScreen
@@ -57,27 +71,7 @@ export default function SidebarNavigationScreenLibrary() {
 				'Manage what patterns are available when editing your site.'
 			) }
 			actions={ <AddNewPattern /> }
-			footer={
-				<ItemGroup>
-					{ ! isMobileViewport && (
-						<>
-							<SidebarNavigationItem
-								withChevron
-								{ ...templatePartsLink }
-							>
-								{ __( 'Manage all template parts' ) }
-							</SidebarNavigationItem>
-							<SidebarNavigationItem
-								as="a"
-								href="edit.php?post_type=wp_block"
-								withChevron
-							>
-								{ __( 'Manage all custom patterns' ) }
-							</SidebarNavigationItem>
-						</>
-					) }
-				</ItemGroup>
-			}
+			footer={ footer }
 			content={
 				<>
 					{ isLoading && __( 'Loading library' ) }
