@@ -24,13 +24,15 @@ structure for its PHP code:
 
 ### Prefer the `wp` prefix
 
-For features that may be merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes.
+For features that have already been merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes over the `gutenberg_` equivalent (if it exists).
 
-This applies to both experimental and stable features.
-
-Using the `wp_` prefix avoids us having to rename functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
+Using the `wp_` prefix avoids us having to rename functions and classes from `gutenberg_` to `wp_` when releasing Gutenberg updates to Core.
 
 Functions that are intended solely for the plugin, e.g., plugin infrastructure, should use the `gutenberg_` prefix.
+
+The exception would be functions or class methods that are in constant iteration. Because the Gutenberg plugin is released more frequently than WordPress Core, a particular block of code might be subject enhancement and improvements, even after its initial incarnation has been ported to Core.
+
+Not only does it avoid name clashes, and therefore fatal errors, but users who have updated the plugin to the latest version, but are running previous versions of Core, will have the benefit of all the latest Core-compatible code.
 
 #### Feature that might be merged to Core
 
