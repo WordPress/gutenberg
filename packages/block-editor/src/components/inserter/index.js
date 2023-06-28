@@ -231,7 +231,7 @@ export const ComposedPrivateInserter = compose( [
 				getBlockRootClientId,
 				hasInserterItems,
 				getAllowedBlocks,
-				__experimentalGetDirectInsertBlock,
+				getDirectInsertBlock,
 				getSettings,
 			} = select( blockEditorStore );
 
@@ -243,8 +243,7 @@ export const ComposedPrivateInserter = compose( [
 			const allowedBlocks = getAllowedBlocks( rootClientId );
 
 			const directInsertBlock =
-				shouldDirectInsert &&
-				__experimentalGetDirectInsertBlock( rootClientId );
+				shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
 			const settings = getSettings();
 

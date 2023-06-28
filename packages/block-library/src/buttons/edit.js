@@ -51,8 +51,8 @@ function ButtonsEdit( { attributes, className } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		template: [
 			[
 				buttonBlockName,

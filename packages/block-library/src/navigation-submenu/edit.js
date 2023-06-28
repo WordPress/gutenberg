@@ -320,8 +320,8 @@ export default function NavigationSubmenuEdit( {
 		getNavigationChildBlockProps( innerBlocksColors );
 	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
 		allowedBlocks,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 
 		// Ensure block toolbar is not too far removed from item
 		// being edited.

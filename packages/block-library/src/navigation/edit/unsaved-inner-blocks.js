@@ -68,8 +68,8 @@ export default function UnsavedInnerBlocks( {
 		{
 			renderAppender: hasSelection ? undefined : false,
 			allowedBlocks: ALLOWED_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: shouldDirectInsert,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: shouldDirectInsert,
 		}
 	);
 
