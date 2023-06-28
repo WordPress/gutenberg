@@ -573,7 +573,7 @@ export const getBlockPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, select } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -585,7 +585,16 @@ export const getNavigationFallbackId =
 		dispatch.receiveNavigationFallbackId( fallback?.id );
 
 		if ( record ) {
-			const invalidateNavigationQueries = true;
+			// If the fallback is already in the store, don't invalidate navigation queries.
+			// Otherwise, invalidate the cache for the scenario where there were no Navigation
+			// posts in the state and the fallback created one.
+			const invalidateNavigationQueries = select.getEntityRecord(
+				'postType',
+				'wp_navigation',
+				fallback?.id
+			)
+				? false
+				: true;
 
 			dispatch.receiveEntityRecords(
 				'postType',
