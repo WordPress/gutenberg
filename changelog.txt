@@ -1,77 +1,6 @@
 == Changelog ==
 
-= 16.1.0-rc.2 =
-
-## Changelog
-
-### Enhancements
-
-#### Block Editor
-- Improve LinkControl Edit UI. ([51712](https://github.com/WordPress/gutenberg/pull/51712))
-
-#### Site Editor
-- Adding the distraction-free mode to the site editor (#51173). ([51932](https://github.com/WordPress/gutenberg/pull/51932))
-- Update colors in 'Site view'. ([51856](https://github.com/WordPress/gutenberg/pull/51856))
-- Site Editor: Make string to add Template parts and Patterns consistent and translatable [51743](https://github.com/WordPress/gutenberg/pull/51743)
-
-#### Block Library
-- Add image block aspect ratio control [51545](https://github.com/WordPress/gutenberg/pull/51545)
-
-#### Components
-- Button: Introduce size prop [51842](https://github.com/WordPress/gutenberg/pull/51842)
-
-#### Navigation
-- Ensure there is always a Navigation available in the browse mode sidebar via fallback algorithm [50321](https://github.com/WordPress/gutenberg/pull/50321)
-
-### Accessibility
-
-- BlockLockModal: restore focus on fallback toolbar button when original button is not rendered [51666](https://github.com/WordPress/gutenberg/pull/51666)
-- Site Editor Sidebar: improvements to buttons [51762](https://github.com/WordPress/gutenberg/pull/51762)
-
-### Bug fixes
-
-#### Site Editor
-- Disable the revision button if there is no clickable menu [51851](https://github.com/WordPress/gutenberg/pull/51851)
-- Library: Fix misalignment of description in custom template parts  [51868](https://github.com/WordPress/gutenberg/pull/51868)
-- Library: Fix delete shortcut incorrectly bound to non-user patterns [51830](https://github.com/WordPress/gutenberg/pull/51830)
-- Add distraction free to site editor
-[51173](https://github.com/WordPress/gutenberg/pull/51173)
-- Fix toolbar overlap in site editor
-[51810](https://github.com/WordPress/gutenberg/pull/51810)
-- Increase space between page meta and details section [51858](https://github.com/WordPress/gutenberg/pull/51858/)
-- Fix missing MenuGroup segment in Site Editor header more menu [51860](https://github.com/WordPress/gutenberg/pull/51860)
-- Update the add template modal design [51806](https://github.com/WordPress/gutenberg/pull/51806)
-- Update text color of site editor menu item hover/active states [51847](https://github.com/WordPress/gutenberg/pull/51847)
-
-#### Block Library
-- Buttons Block: add support for orientation-based block movers [51831](https://github.com/WordPress/gutenberg/pull/51831)
-
-#### Command Center
-- Add manage all custom patterns command [51845](https://github.com/WordPress/gutenberg/pull/51845)
-- Add another batch of commands to the site editor [51832](https://github.com/WordPress/gutenberg/pull/51832)
-- Add UI commands to the post editor [51900](https://github.com/WordPress/gutenberg/pull/51900)
-
-#### Components
-- Keep framer-motion from updating minor version [51894](https://github.com/WordPress/gutenberg/pull/51894)
-- ConfirmDialog: Fix affirmative action being triggered an extra time when selecting a button via keyboard [51730](https://github.com/WordPress/gutenberg/pull/51730)
-- Tweak more icons for high-resolution devices [51768](https://github.com/WordPress/gutenberg/pull/51768)
-- ZStack: fix component bounding box to match children [51836](https://github.com/WordPress/gutenberg/pull/51836)
-
-#### Page Content Focus 
-- Switch to Page panel when deselecting a block [51881](https://github.com/WordPress/gutenberg/pull/51881)
-- Don't show 'Back to page' notification when navigating away from page [51880](https://github.com/WordPress/gutenberg/pull/51880)
-- useBlockSync(): Reset inner blocks when component unmounts [51783](https://github.com/WordPress/gutenberg/pull/51783)
-- Fix black pixel appearing when block toolbar is empty [51779](https://github.com/WordPress/gutenberg/pull/51779)
-- Only show Page Content Focus commands when in edit mode [51888](https://github.com/WordPress/gutenberg/pull/51888)
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@jameskoster @priethor @richtabor @t-hamano @draganescu @noisysocks @tellthemachines @ciampo @ntsekouras @youknowriad @talldan @getdave @ajlende @mirka 
-
-
-= 16.1.0-rc.1 =
+= 16.1.0 =
 
 ## Changelog
 
@@ -90,8 +19,11 @@ The following contributors merged PRs in this release:
 - Reusable blocks: Rename to 'Patterns' and add option to also add a non-synced Pattern. ([51144](https://github.com/WordPress/gutenberg/pull/51144))
 - Site Editor: Add Library for Template Parts & Patterns Management. ([51078](https://github.com/WordPress/gutenberg/pull/51078))
 
-### Themes
+#### Themes
 - Remove the experiment option for Block Theme Previews. ([50983](https://github.com/WordPress/gutenberg/pull/50983))
+
+#### Site Editor
+- Add distraction free to site editor [51173](https://github.com/WordPress/gutenberg/pull/51173)
 
 ### Enhancements
 
@@ -117,13 +49,16 @@ The following contributors merged PRs in this release:
 - Show actions for empty menus in Navigation on Browse mode. ([51420](https://github.com/WordPress/gutenberg/pull/51420))
 - Unify welcome guides labels casing. ([51700](https://github.com/WordPress/gutenberg/pull/51700))
 - Site editor sidebar: Add footer to template part and ensure nested template areas display. ([51669](https://github.com/WordPress/gutenberg/pull/51669))
+- Update colors in 'Site view'. ([51856](https://github.com/WordPress/gutenberg/pull/51856))
+- Site Editor: Make string to add Template parts and Patterns consistent and translatable [51743](https://github.com/WordPress/gutenberg/pull/51743)
 
 #### Components
 - ItemGroup: Update button focus styles to be more consistent. ([51576](https://github.com/WordPress/gutenberg/pull/51576))
 - Toolbar: Use Ariakit instead of Reakit. ([51623](https://github.com/WordPress/gutenberg/pull/51623))
 - Update: Adjust modal radius to be between frame and buttons. ([51254](https://github.com/WordPress/gutenberg/pull/51254))
-- `UnitControl`: Revamp support for changing unit by typing. ([39303](https://github.com/WordPress/gutenberg/pull/39303))
+- UnitControl: Revamp support for changing unit by typing. ([39303](https://github.com/WordPress/gutenberg/pull/39303))
 - Move HeadinglevelDropdown to its own component. ([46003](https://github.com/WordPress/gutenberg/pull/46003))
+- Button: Introduce size prop [51842](https://github.com/WordPress/gutenberg/pull/51842)
 
 #### Block Editor
 - List View: Try showing blocks that are dragged (no longer hide them). ([51724](https://github.com/WordPress/gutenberg/pull/51724))
@@ -133,6 +68,7 @@ The following contributors merged PRs in this release:
 - Limit Copy/Paste Styles menu item. ([51503](https://github.com/WordPress/gutenberg/pull/51503))
 - Force disable suggestions until URL field is dirty in Link Control. ([51354](https://github.com/WordPress/gutenberg/pull/51354))
 - Top toolbar: Refine the icons on the right. ([51735](https://github.com/WordPress/gutenberg/pull/51735))
+- Improve LinkControl Edit UI. ([51712](https://github.com/WordPress/gutenberg/pull/51712))
 
 #### Block Library
 - List block: Add numbering type selection. ([51186](https://github.com/WordPress/gutenberg/pull/51186))
@@ -147,12 +83,16 @@ The following contributors merged PRs in this release:
 - Post Author - don't show 0 in inspector controls. ([51345](https://github.com/WordPress/gutenberg/pull/51345))
 - Remove anchor support from dynamic blocks. ([51288](https://github.com/WordPress/gutenberg/pull/51288))
 - Site Tagline Block: Remove unnecessary square path from block icon SVG. ([51611](https://github.com/WordPress/gutenberg/pull/51611))
+- Add image block aspect ratio control [51545](https://github.com/WordPress/gutenberg/pull/51545)
+- Updating social link attributes [51997](https://github.com/WordPress/gutenberg/pull/51997)
 
 #### Accessibility
 - Autocomplete: Announce results to screen readers when first becoming visible. ([51018](https://github.com/WordPress/gutenberg/pull/51018))
 - List View: A11Y focus enhancements for edit-site based on modifications to edit-post. ([51404](https://github.com/WordPress/gutenberg/pull/51404))
 - Add a description key to theme.json style variations. ([45242](https://github.com/WordPress/gutenberg/pull/45242))
 - Focus first focusable on Link UI. ([51105](https://github.com/WordPress/gutenberg/pull/51105))
+- BlockLockModal: restore focus on fallback toolbar button when original button is not rendered [51666](https://github.com/WordPress/gutenberg/pull/51666)
+- Site Editor Sidebar: improvements to buttons [51762](https://github.com/WordPress/gutenberg/pull/51762)
 
 #### Interactivity API
 - Add missing tests for image block. ([51305](https://github.com/WordPress/gutenberg/pull/51305))
@@ -197,15 +137,16 @@ The following contributors merged PRs in this release:
 - Add commands to access template, template parts and styles. ([51501](https://github.com/WordPress/gutenberg/pull/51501))
 - Add global styles related commands. ([51637](https://github.com/WordPress/gutenberg/pull/51637))
 
-### Themes
-
+#### Themes
 - Block Theme Previews: Change the URL query string for more safety. ([51312](https://github.com/WordPress/gutenberg/pull/51312))
 - Update the Save Button label when you're previewing a theme. ([51361](https://github.com/WordPress/gutenberg/pull/51361))
+
+#### Navigation
+- Ensure there is always a Navigation available in the browse mode sidebar via fallback algorithm [50321](https://github.com/WordPress/gutenberg/pull/50321)
 
 ### Bug Fixes
 
 #### Block Library
-
 - Fix navigation error in library. ([51589](https://github.com/WordPress/gutenberg/pull/51589))
 - Fix site editor rendering of Categories block. ([51329](https://github.com/WordPress/gutenberg/pull/51329))
 - Gallery block - Add default value for innerBlockImages. ([51443](https://github.com/WordPress/gutenberg/pull/51443))
@@ -217,12 +158,17 @@ The following contributors merged PRs in this release:
 - Query Loop: Properly initialize and update `perPage` when we inherit from global query. ([51641](https://github.com/WordPress/gutenberg/pull/51641))
 - Avatar block: Fix not 1:1 between the editor and the front-end. ([49963](https://github.com/WordPress/gutenberg/pull/49963))
 - Spacer block: Fix invalid markup when set to fill. ([51317](https://github.com/WordPress/gutenberg/pull/51317))
+- Buttons Block: add support for orientation-based block movers [51831](https://github.com/WordPress/gutenberg/pull/51831)
+- Rename navigation fallback classes from WP_ to Gutenberg_ [51959](https://github.com/WordPress/gutenberg/pull/51959)
 
 #### Commands
 - Show pages with any status in the command center. ([51324](https://github.com/WordPress/gutenberg/pull/51324))
+- Add manage all custom patterns command [51845](https://github.com/WordPress/gutenberg/pull/51845)
+- Add another batch of commands to the site editor [51832](https://github.com/WordPress/gutenberg/pull/51832)
+- Add UI commands to the post editor [51900](https://github.com/WordPress/gutenberg/pull/51900)
+- Add preferences and keyboard shortcuts commands [51862](https://github.com/WordPress/gutenberg/pull/51862)
 
 #### Core Data
-
 - Core Data: Fix ESLint warning for the 'useEntityRecord' hook. ([51562](https://github.com/WordPress/gutenberg/pull/51562))
 - useEntityRecord: Fix destructure error when `enabled` option is `false`. ([51534](https://github.com/WordPress/gutenberg/pull/51534))
 
@@ -242,6 +188,16 @@ The following contributors merged PRs in this release:
 - Global styles: Fix back button tooltip. ([51725](https://github.com/WordPress/gutenberg/pull/51725))
 - Site editor header: Fix document title back and shortcut color contrast. ([51442](https://github.com/WordPress/gutenberg/pull/51442))
 - Site editor sidebar: Fix the heading hierarchy. ([51696](https://github.com/WordPress/gutenberg/pull/51696))
+- Disable the revision button if there is no clickable menu [51851](https://github.com/WordPress/gutenberg/pull/51851)
+- Library: Fix misalignment of description in custom template parts  [51868](https://github.com/WordPress/gutenberg/pull/51868)
+- Library: Fix delete shortcut incorrectly bound to non-user patterns [51830](https://github.com/WordPress/gutenberg/pull/51830)
+- Fix toolbar overlap in site editor [51810](https://github.com/WordPress/gutenberg/pull/51810)
+- Increase space between page meta and details section [51858](https://github.com/WordPress/gutenberg/pull/51858/)
+- Fix missing MenuGroup segment in Site Editor header more menu [51860](https://github.com/WordPress/gutenberg/pull/51860)
+- Update the add template modal design [51806](https://github.com/WordPress/gutenberg/pull/51806)
+- Update text color of site editor menu item hover/active states [51847](https://github.com/WordPress/gutenberg/pull/51847)
+- Fix library command path [51837](https://github.com/WordPress/gutenberg/pull/51837)
+- Restore sidebar in focus mode on Pattern click through in Browse Mode Library [51897](https://github.com/WordPress/gutenberg/pull/51897)
 
 #### Accessibility
 - Distraction Free: Avoid focus loss when enabling/disabling distraction free mode via the more menu. ([51627](https://github.com/WordPress/gutenberg/pull/51627))
@@ -257,6 +213,10 @@ The following contributors merged PRs in this release:
 - MediaPlaceholder: Fix position of URLPopover. ([51363](https://github.com/WordPress/gutenberg/pull/51363))
 - Popover: Allow legitimate 0 positions to update popover position. ([51320](https://github.com/WordPress/gutenberg/pull/51320))
 - Button: Remove unnecessary margin from dashicon. ([51395](https://github.com/WordPress/gutenberg/pull/51395))
+- Keep framer-motion from updating minor version [51894](https://github.com/WordPress/gutenberg/pull/51894)
+- ConfirmDialog: Fix affirmative action being triggered an extra time when selecting a button via keyboard [51730](https://github.com/WordPress/gutenberg/pull/51730)
+- Tweak more icons for high-resolution devices [51768](https://github.com/WordPress/gutenberg/pull/51768)
+- ZStack: fix component bounding box to match children [51836](https://github.com/WordPress/gutenberg/pull/51836)
 
 #### Patterns
 - Library: Reinstate sidebar navigation menu editing for template parts. ([51825](https://github.com/WordPress/gutenberg/pull/51825))
@@ -278,6 +238,13 @@ The following contributors merged PRs in this release:
 
 #### Block Variations
 - [Block Library - Post Terms]: Custom taxonomies do not show icons when transforming from the toolbar. ([51476](https://github.com/WordPress/gutenberg/pull/51476))
+
+#### Page Content Focus 
+- Switch to Page panel when deselecting a block [51881](https://github.com/WordPress/gutenberg/pull/51881)
+- Don't show 'Back to page' notification when navigating away from page [51880](https://github.com/WordPress/gutenberg/pull/51880)
+- useBlockSync(): Reset inner blocks when component unmounts [51783](https://github.com/WordPress/gutenberg/pull/51783)
+- Fix black pixel appearing when block toolbar is empty [51779](https://github.com/WordPress/gutenberg/pull/51779)
+- Only show Page Content Focus commands when in edit mode [51888](https://github.com/WordPress/gutenberg/pull/51888)
 
 ### Performance
 
@@ -309,7 +276,8 @@ The following contributors merged PRs in this release:
 - Updated getEntityRecord doc by using selector instead of dispatch. ([51298](https://github.com/WordPress/gutenberg/pull/51298))
 
 ### Code Quality
-- Add tests for WP_Classic_To_Block_Menu_Converter class. ([51410](https://github.com/WordPress/gutenberg/pull/51410))
+
+#### General
 - Adopt lock-unlock.js and private-apis.js convention. ([51322](https://github.com/WordPress/gutenberg/pull/51322))
 - Formats: Avoid rerendering language edit component when typing. ([51440](https://github.com/WordPress/gutenberg/pull/51440))
 - Keyboard Shortcut: Clean up shortcut names. ([51739](https://github.com/WordPress/gutenberg/pull/51739))
@@ -320,6 +288,7 @@ The following contributors merged PRs in this release:
 - Require relocated class files for back-compat in WordPress releases. ([51670](https://github.com/WordPress/gutenberg/pull/51670))
 
 #### Block Library
+- Add tests for WP_Classic_To_Block_Menu_Converter class. ([51410](https://github.com/WordPress/gutenberg/pull/51410))
 - Details: Set 'clientId' as useSelect dependency. ([51634](https://github.com/WordPress/gutenberg/pull/51634))
 - Move Navigation fallback files to 6.3 directory. ([51572](https://github.com/WordPress/gutenberg/pull/51572))
 - Navigation: Fix ListView deprecation notice. ([51094](https://github.com/WordPress/gutenberg/pull/51094))
@@ -406,7 +375,6 @@ The following contributors merged PRs in this release:
 - Performance tests: Make theme versions consistent cross-env. ([50905](https://github.com/WordPress/gutenberg/pull/50905))
 - Performance tests: Update base point to compare. ([51381](https://github.com/WordPress/gutenberg/pull/51381))
 
-
 #### Build Tooling
 - Babel config: Enable useSpread option for JSX transform to reduce transpilation. ([51574](https://github.com/WordPress/gutenberg/pull/51574))
 - Lodash: Remove from lint staged type check. ([51698](https://github.com/WordPress/gutenberg/pull/51698))
@@ -430,7 +398,9 @@ The following PRs were merged by first time contributors:
 
 The following contributors merged PRs in this release:
 
-@aaronrobertshaw @afercia @alexstine @andrewserong @aristath @artemiomorales @aurooba @bangank36 @c4rl0sbr4v0 @carolinan @ciampo @dcalhoun @derekblank @diegohaz @draganescu @ellatrix @fabiankaegy @fluiddot @geriux @getdave @glendaviesnz @jameskoster @jasmussen @jeryj @jhnstn @jsnajdr @juanfra @kozer @luisherranz @MaggieCabrera @Mamaduka @matiasbenedetto @mcliwanow @mcsf @mikachan @n2erjo00 @noahtallen @noisysocks @ntsekouras @oandregal @okmttdhr @paulopmt1 @pbking @peterwilsoncc @pooja-muchandikar @ramonjd @richtabor @samnajian @SantosGuillamot @SavPhill @SaxonF @scruffian @shimotmk @Sidsector9 @SiobhyB @spacedmonkey @stokesman @sunyatasattva @t-hamano @talldan @tellthemachines @tyxla @walbo @WunderBart @xerpa43 @youknowriad
+@aaronrobertshaw @afercia @alexstine @andrewserong @aristath @artemiomorales @aurooba @bangank36 @c4rl0sbr4v0 @carolinan @ciampo @dcalhoun @derekblank @diegohaz @draganescu @ellatrix @fabiankaegy @fluiddot @geriux @getdave @glendaviesnz @jameskoster @jasmussen @jeryj @jhnstn @jsnajdr @juanfra @kozer @luisherranz @MaggieCabrera @Mamaduka @matiasbenedetto @mcliwanow @mcsf @mikachan @n2erjo00 @noahtallen @noisysocks @ntsekouras @oandregal @okmttdhr @paulopmt1 @pbking @peterwilsoncc @pooja-muchandikar @ramonjd @richtabor @samnajian @SantosGuillamot @SavPhill @SaxonF @scruffian @shimotmk @Sidsector9 @SiobhyB @spacedmonkey @stokesman @sunyatasattva @t-hamano @talldan @tellthemachines @tyxla @walbo @WunderBart @xerpa43 @youknowriad @priethor @ajlende @mirka 
+
+
 
 
 = 16.0.0 =
