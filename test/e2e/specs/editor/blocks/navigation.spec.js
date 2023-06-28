@@ -932,26 +932,41 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Navigation colors', () => {
-		test.beforeEach( async ( { requestUtils } ) => {
-			await Promise.all( [ requestUtils.deleteAllMenus() ] );
+		test.beforeAll( async ( { requestUtils } ) => {
+			//we want emptytheme because it doesn't have any styles
+			await requestUtils.activateTheme( 'emptytheme' );
+			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllPages();
+			await requestUtils.deleteAllMenus();
+		} );
+
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor();
+			await editor.canvas.click( 'body' );
+
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content:
 					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'always' },
+			} );
+			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'As a user I expect my navigation links to have good default colors', async ( {
-			admin,
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllPages();
+			await requestUtils.deleteAllMenus();
+		} );
+
+		test( 'As a user I expect my navigation links to have appropriate default colors', async ( {
 			editor,
-			requestUtils,
 		} ) => {
-			//we want emptytheme because it doesn't have any styles
-			await requestUtils.activateTheme( 'emptytheme' );
-
-			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/navigation' } );
-
 			const firstlink = editor.canvas.locator(
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
@@ -963,35 +978,45 @@ test.describe( 'Navigation block', () => {
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
-			admin,
+			page,
 			editor,
 		} ) => {
-			//setup: define a link color in the theme
-			await admin.createNewPost();
-
 			await editor.insertBlock( { name: 'core/navigation' } );
-
 			const firstlink = editor.canvas.locator(
 				`role=textbox[name="Navigation link text"i] >> text="First link"`
 			);
-
-			await admin.page.pause();
-			//Expect the first link to inherit the link color from the theme.
-			//In this case TT3 defines the link colors inside the post-content block to be --wp--preset--color--secondary = #345C00
-			await expect( firstlink ).toHaveCSS( 'color', 'rgb(52, 92, 0)' );
+			//Set a link color for the theme
+			await page
+				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.click();
+			await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Link styles' } )
+				.click();
+			//rgba(207,46,46) is the color of the "vivid red" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid red' } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Save', exact: true } )
+				.click();
+			await page
+				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
+			await editor.page.pause();
 			//Expect the first link to inherit the nav link color from the theme
+			await expect( firstlink ).toHaveCSS( 'color', 'rgb(207, 46, 46)' );
+
 			//TODO check frontend on desktop and mobile
 			//TODO then the same for second link
 			//Then the same for background colors
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the parent container', async ( {
-			admin,
 			page,
 			editor,
 		} ) => {
-			await admin.createNewPost();
-
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			//We group the nav block and add colors to the links inside the group block
