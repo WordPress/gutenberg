@@ -43,7 +43,7 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
-	insertBlocks,
+	insertBlock,
 	onHideKeyboard,
 	isRTL,
 	noContentSelected,
@@ -90,9 +90,14 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
-	const onInsertBlock = ( blockType ) => () => {
-		insertBlocks( [ createBlock( blockType ) ] );
-	};
+	const onInsertBlock = useCallback(
+		( blockType ) => () => {
+			insertBlock( createBlock( blockType ), undefined, undefined, true, {
+				source: 'inserter_menu',
+			} );
+		},
+		[ insertBlock ]
+	);
 
 	const renderMediaButtons = (
 		<>
@@ -234,7 +239,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock, insertBlocks } =
+		const { clearSelectedBlock, insertBlock } =
 			dispatch( blockEditorStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
@@ -245,7 +250,7 @@ export default compose( [
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
 			},
-			insertBlocks,
+			insertBlock,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
