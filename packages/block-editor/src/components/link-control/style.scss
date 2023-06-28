@@ -41,6 +41,7 @@ $preview-image-height: 140px;
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
+	margin-bottom: $grid-unit-10;
 	position: relative;
 }
 
@@ -59,29 +60,18 @@ $preview-image-height: 140px;
 .block-editor-link-control__field {
 	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 
-	// Element wrapping the label and input.
-	> .components-base-control__field {
-		display: flex;
-		align-items: center;
-	}
-
-	.components-base-control__label {
-		margin-right: $grid-unit-20;
-		margin-bottom: 0;
-		min-width: 29px; // align with search results.
-	}
-
 	input[type="text"],
 	// Specificity overide of URLInput defaults.
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
-		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
-		padding: 11px $grid-unit-20;
-		margin: 0;
-		position: relative;
-		border: 1px solid $gray-300;
+		border: 1px solid $gray-600;
 		border-radius: $radius-block-ui;
+		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
+		margin: 0;
+		padding: $grid-unit-10 $grid-unit-20;
+		position: relative;
+		width: 100%;
 	}
 }
 
@@ -94,12 +84,12 @@ $preview-image-height: 140px;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
 	justify-content: flex-start;
 	gap: $grid-unit-10;
+	padding: $grid-unit-10;
 	order: 20;
 }
 
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
-	margin-top: -$grid-unit-20 + 1px;
 
 	&::before,
 	&::after {
@@ -126,8 +116,8 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-results {
-	margin: 0;
-	padding: $grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20 * 0.5;
+	margin-top: -$grid-unit-20;
+	padding: $grid-unit-10;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -137,39 +127,28 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-item {
-	position: relative;
-	display: flex;
-	align-items: flex-start; // when link text is very long it is important this indicator remains visible and thus should be aligned top.
-	font-size: $default-font-size;
-	cursor: pointer;
-	background: $white;
-	width: 100%;
-	border: none;
-	text-align: left;
-	padding: $grid-unit-15 $grid-unit-20;
-	border-radius: 2px;
-	height: auto;
 
-	&:hover,
-	&:focus {
-		background-color: $gray-100;
-
-		.block-editor-link-control__search-item-type {
-			background: $white;
-		}
+	&.components-button.components-menu-item__button {
+		height: auto;
+		text-align: left;
 	}
 
-	// The added specificity is needed to override.
-	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+	.components-menu-item__item {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		// Inline block required to preserve white space
+		// between `<mark>` elements and text nodes.
+		display: inline-block;
 	}
 
-	&.is-selected {
+	.components-menu-item__shortcut {
+		color: $gray-700;
+		text-transform: capitalize;
+		white-space: nowrap; // tags shouldn't go over two lines.
+	}
+
+	&[aria-selected] {
 		background: $gray-100;
-
-		.block-editor-link-control__search-item-type {
-			background: $white;
-		}
 	}
 
 	&.is-current {
@@ -209,7 +188,6 @@ $preview-image-height: 140px;
 
 	.block-editor-link-control__search-item-icon {
 		position: relative;
-		top: 0.2em;
 		margin-right: $grid-unit-10;
 		max-height: 24px;
 		flex-shrink: 0;
@@ -226,18 +204,6 @@ $preview-image-height: 140px;
 		top: 0;
 		width: 32px;
 		max-height: 32px;
-	}
-
-	.block-editor-link-control__search-item-info,
-	.block-editor-link-control__search-item-title {
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-		.components-external-link__icon {
-			position: absolute;
-			right: 0;
-			margin-top: 0;
-		}
 	}
 
 	.block-editor-link-control__search-item-title {
@@ -259,28 +225,6 @@ $preview-image-height: 140px;
 		svg {
 			display: none; // specifically requested to be removed visually as well.
 		}
-	}
-
-	.block-editor-link-control__search-item-info {
-		display: block;
-		color: $gray-700;
-		font-size: 0.9em;
-		line-height: 1.3;
-	}
-
-	.block-editor-link-control__search-item-error-notice {
-		font-style: italic;
-		font-size: 1.1em;
-	}
-
-	.block-editor-link-control__search-item-type {
-		display: block;
-		padding: 3px 6px;
-		margin-left: auto;
-		font-size: 0.9em;
-		background-color: $gray-100;
-		border-radius: 2px;
-		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
 	.block-editor-link-control__search-item-description {
@@ -422,11 +366,6 @@ $preview-image-height: 140px;
 	}
 }
 
-// Specificity override
-.block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
-	padding: 10px;
-}
-
 .block-editor-link-control__drawer {
 	display: flex; // allow for ordering.
 	order: 30;
@@ -440,36 +379,7 @@ $preview-image-height: 140px;
 	display: flex; // allow for ordering.
 	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
-	margin-top: $grid-unit-20;
-	padding-top: $grid-unit-20;
 	position: relative;
-
-	&::after {
-		content: "";
-		display: block;
-		height: 1px;
-		background-color: $gray-300;
-		position: absolute;
-		left: -$grid-unit-20;
-		right: -$grid-unit-20;
-		top: 0;
-	}
-}
-
-.block-editor-link-control__tools {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	margin: 0;
-	padding: $grid-unit-20;
-
-	// To hide the horizontal scrollbar on toggle.
-	// Margin and padding are needed to prevent cutoff of the toggle button focus outline.
-	// See: https://github.com/WordPress/gutenberg/pull/47986
-	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
-	padding-top: var(--wp-admin-border-width-focus);
-	overflow: hidden;
 }
 
 .block-editor-link-control__unlink {
@@ -477,17 +387,10 @@ $preview-image-height: 140px;
 	padding-right: $grid-unit-20;
 }
 
-.block-editor-link-control__settings {
-	flex: 1;
-	margin: 0;
-
-	.is-alternate & {
-		border-top: $border-width solid $gray-900;
-	}
-}
-
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
+	flex: 1;
+	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
 
 	// Cancel left margin inherited from WP Admin Forms CSS.
 	input {
@@ -496,6 +399,31 @@ $preview-image-height: 140px;
 
 	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
+	}
+}
+
+.block-editor-link-control__tools {
+	padding: $grid-unit-10 $grid-unit-10 0 $grid-unit-10;
+	margin-top: #{$grid-unit-20 * -1};
+
+	.components-button.block-editor-link-control__drawer-toggle {
+		padding-left: 0;
+		gap: 0;
+
+		// Point downwards when open (same as list view expander)
+		&[aria-expanded="true"] svg {
+			visibility: visible;
+			transition: transform 0.1s ease;
+			transform: rotate(90deg);
+			@include reduce-motion("transition");
+		}
+		// Point rightwards when closed (same as list view expander)
+		&[aria-expanded="false"] svg {
+			visibility: visible;
+			transform: rotate(0deg);
+			transition: transform 0.1s ease;
+			@include reduce-motion("transition");
+		}
 	}
 }
 

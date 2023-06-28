@@ -33,10 +33,7 @@ function render_block_core_search( $attributes ) {
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
 	$button_behavior     = ( ! empty( $attributes['buttonBehavior'] ) ) ? $attributes['buttonBehavior'] : 'default';
-	$input_markup        = '';
-	$button_markup       = '';
-	$input_aria          = '';
-	$button_aria         = '';
+	$button              = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
 	$color_classes       = get_color_classes_for_block_core_search( $attributes );
@@ -47,31 +44,20 @@ function render_block_core_search( $attributes ) {
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
-
-	$label_markup = sprintf(
-		'<label for="%1$s" class="wp-block-search__label screen-reader-text">%2$s</label>',
-		esc_attr( $input_id ),
-		$label_inner_html
-	);
-	if ( $show_label && ! empty( $attributes['label'] ) ) {
-		$label_classes = array( 'wp-block-search__label' );
-		if ( ! empty( $typography_classes ) ) {
-			$label_classes[] = $typography_classes;
+	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
+	if ( $label->next_tag() ) {
+		$label->set_attribute( 'for', $input_id );
+		$label->add_class( 'wp-block-search__label' );
+		if ( $show_label && ! empty( $attributes['label'] ) ) {
+			if ( ! empty( $typography_classes ) ) {
+				$label->add_class( $typography_classes );
+			}
+		} else {
+			$label->add_class( 'screen-reader-text' );
 		}
-		$label_markup = sprintf(
-			'<label for="%1$s" class="%2$s" %3$s>%4$s</label>',
-			esc_attr( $input_id ),
-			esc_attr( implode( ' ', $label_classes ) ),
-			$inline_styles['label'],
-			$label_inner_html
-		);
 	}
 
-	if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
-		$input_aria = 'aria-hidden="true" tabindex="-1"';
-		wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
-	}
-
+	$input         = new WP_HTML_Tag_Processor( sprintf( '<input type="search" name="s" required %s/>', $inline_styles['input'] ) );
 	$input_classes = array( 'wp-block-search__input' );
 	if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 		$input_classes[] = $border_color_classes;
@@ -79,15 +65,17 @@ function render_block_core_search( $attributes ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
-	$input_markup = sprintf(
-		'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required %s/>',
-		$input_id,
-		esc_attr( implode( ' ', $input_classes ) ),
-		get_search_query(),
-		esc_attr( $attributes['placeholder'] ),
-		$inline_styles['input'],
-		$input_aria
-	);
+	if ( $input->next_tag() ) {
+		$input->add_class( implode( ' ', $input_classes ) );
+		$input->set_attribute( 'id', $input_id );
+		$input->set_attribute( 'value', get_search_query() );
+		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
+		if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
+			$input->set_attribute( 'aria-hidden', 'true' );
+			$input->set_attribute( 'tabindex', '-1' );
+			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
+		}
+	}
 
 	if ( count( $query_params ) > 0 ) {
 		foreach ( $query_params as $param => $value ) {
@@ -117,27 +105,27 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			$button_aria      = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
-			$button_classes[] = 'has-icon';
-
+			$button_classes[]       = 'has-icon';
 			$button_internal_markup =
 				'<svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
 					<path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path>
 				</svg>';
 		}
-		if ( 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-			$button_aria = sprintf( 'aria-label="%s" aria-expanded="false" aria-controls="wp-block-search__input-%s"', __( 'Expand search field' ), esc_attr( $input_id ) );
-		}
 
 		// Include the button element class.
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
-		$button_markup    = sprintf(
-			'<button type="submit" class="%s" %s %s>%s</button>',
-			esc_attr( implode( ' ', $button_classes ) ),
-			$inline_styles['button'],
-			$button_aria,
-			$button_internal_markup
-		);
+		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
+
+		if ( $button->next_tag() ) {
+			$button->add_class( implode( ' ', $button_classes ) );
+			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
+				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
+				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
+				$button->set_attribute( 'aria-expanded', 'false' );
+			} else {
+				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
+			}
+		}
 	}
 
 	$field_markup_classes = $is_button_inside ? $border_color_classes : '';
@@ -145,7 +133,7 @@ function render_block_core_search( $attributes ) {
 		'<div class="wp-block-search__inside-wrapper %s" %s>%s</div>',
 		esc_attr( $field_markup_classes ),
 		$inline_styles['wrapper'],
-		$input_markup . $query_params_markup . $button_markup
+		$input . $query_params_markup . $button
 	);
 	$wrapper_attributes   = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
@@ -155,7 +143,7 @@ function render_block_core_search( $attributes ) {
 		'<form role="search" method="get" action="%s" %s>%s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
-		$label_markup . $field_markup
+		$label . $field_markup
 	);
 }
 

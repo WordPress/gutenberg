@@ -33,6 +33,8 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 			array(
 				'context'   => 'edit',
 				'per_page'  => 100,
+				'order'     => 'desc',
+				'orderby'   => 'date',
 				'_locale'   => 'user',
 				// array indices are required to avoid query being encoded and not matching in cache.
 				'status[0]' => 'publish',
@@ -47,11 +49,12 @@ function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
 	$preload_paths[] = array(
 		add_query_arg(
 			array(
-				'context'  => 'edit',
-				'per_page' => 100,
-				'order'    => 'desc',
-				'orderby'  => 'date',
-				'status'   => 'publish',
+				'context'   => 'edit',
+				'per_page'  => 100,
+				'order'     => 'desc',
+				'orderby'   => 'date',
+				'status[0]' => 'publish',
+				'status[1]' => 'draft',
 			),
 			$navigation_rest_route
 		),

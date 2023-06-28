@@ -123,7 +123,7 @@
 			"background": true,
 			"gradients": true
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowEditing": false,

@@ -15,15 +15,6 @@ function gutenberg_register_rest_block_pattern_categories() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
 
 /**
- * Registers the block patterns REST API routes.
- */
-function gutenberg_register_rest_block_patterns() {
-	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_2();
-	$block_patterns->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-
-/**
  * Add extra collection params to pattern directory requests.
  *
  * @param array $query_params JSON Schema-formatted collection parameters.
@@ -139,3 +130,13 @@ function filter_block_pattern_response( $response, $raw_pattern ) {
 	return $response;
 }
 add_filter( 'rest_prepare_block_pattern', 'filter_block_pattern_response', 10, 2 );
+
+
+/**
+ * Registers the block pattern directory.
+ */
+function gutenberg_register_rest_pattern_directory() {
+	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
+	$pattern_directory_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );

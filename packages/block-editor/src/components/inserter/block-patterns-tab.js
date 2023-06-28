@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, isRTL } from '@wordpress/i18n';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -17,7 +17,7 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -95,7 +95,7 @@ function usePatternsCategories( rootClientId ) {
 		}
 
 		return categories;
-	}, [ allPatterns, allCategories ] );
+	}, [ allCategories, allPatterns, hasRegisteredCategory ] );
 
 	return populatedCategories;
 }
@@ -165,10 +165,10 @@ export function BlockPatternsCategoryPanel( {
 
 				return availablePatternCategories.length === 0;
 			} ),
-		[ allPatterns, category ]
+		[ allPatterns, availableCategories, category.name ]
 	);
 
-	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
+	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
@@ -184,7 +184,7 @@ export function BlockPatternsCategoryPanel( {
 			</div>
 			<p>{ category.description }</p>
 			<BlockPatternList
-				shownPatterns={ currentShownPatterns }
+				shownPatterns={ categoryPatternsList }
 				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
 				onHover={ onHover }
@@ -240,7 +240,13 @@ function BlockPatternsTabs( {
 										<FlexBlock>
 											{ category.label }
 										</FlexBlock>
-										<Icon icon={ chevronRight } />
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
 									</HStack>
 								</Item>
 							) ) }

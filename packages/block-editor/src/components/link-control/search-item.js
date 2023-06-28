@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import { Button, TextHighlight } from '@wordpress/components';
+import { MenuItem, TextHighlight } from '@wordpress/components';
 import {
 	Icon,
 	globe,
@@ -19,6 +13,7 @@ import {
 	file,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 const ICONS_MAP = {
 	post: postList,
@@ -52,50 +47,33 @@ function SearchItemIcon( { isURL, suggestion } ) {
 export const LinkControlSearchItem = ( {
 	itemProps,
 	suggestion,
-	isSelected = false,
+	searchTerm,
 	onClick,
 	isURL = false,
-	searchTerm = '',
 	shouldShowType = false,
 } ) => {
-	return (
-		<Button
-			{ ...itemProps }
-			onClick={ onClick }
-			className={ classnames( 'block-editor-link-control__search-item', {
-				'is-selected': isSelected,
-				'is-url': isURL,
-				'is-entity': ! isURL,
-			} ) }
-		>
-			<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
+	const info = isURL
+		? __( 'Press ENTER to add this link' )
+		: filterURLForDisplay( safeDecodeURI( suggestion?.url ) );
 
-			<span className="block-editor-link-control__search-item-header">
-				<span className="block-editor-link-control__search-item-title">
-					<TextHighlight
-						// The component expects a plain text string.
-						text={ stripHTML( suggestion.title ) }
-						highlight={ searchTerm }
-					/>
-				</span>
-				<span
-					aria-hidden={ ! isURL }
-					className="block-editor-link-control__search-item-info"
-				>
-					{ ! isURL &&
-						( filterURLForDisplay(
-							safeDecodeURI( suggestion.url )
-						) ||
-							'' ) }
-					{ isURL && __( 'Press ENTER to add this link' ) }
-				</span>
-			</span>
-			{ shouldShowType && suggestion.type && (
-				<span className="block-editor-link-control__search-item-type">
-					{ getVisualTypeName( suggestion ) }
-				</span>
-			) }
-		</Button>
+	return (
+		<MenuItem
+			{ ...itemProps }
+			info={ info }
+			iconPosition="left"
+			icon={
+				<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
+			}
+			onClick={ onClick }
+			shortcut={ shouldShowType && getVisualTypeName( suggestion ) }
+			className="block-editor-link-control__search-item"
+		>
+			<TextHighlight
+				// The component expects a plain text string.
+				text={ stripHTML( suggestion.title ) }
+				highlight={ searchTerm }
+			/>
+		</MenuItem>
 	);
 };
 

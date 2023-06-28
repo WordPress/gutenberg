@@ -19,7 +19,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
@@ -32,6 +32,7 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
+const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -82,14 +83,9 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
-
-	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree.
-	const clientIdsTree = useSelect(
+	const hasChildren = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
-			return __unstableGetClientIdsTree( clientId );
+			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
 	);
@@ -116,13 +112,12 @@ const MainContent = ( {
 
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">
-			{ clientIdsTree.length === 0 && (
+			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
 					{ __( 'This navigation menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView
-				blocks={ clientIdsTree }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
@@ -143,6 +138,7 @@ const MenuInspectorControls = ( props ) => {
 		onSelectClassicMenu,
 		onSelectNavigationMenu,
 		isManageMenusButtonDisabled,
+		blockEditingMode,
 	} = props;
 
 	return (
@@ -155,22 +151,24 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					<NavigationMenuSelector
-						currentMenuId={ currentMenuId }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
-						actionLabel={ actionLabel }
-						isManageMenusButtonDisabled={
-							isManageMenusButtonDisabled
-						}
-					/>
+					{ blockEditingMode === 'default' && (
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+						/>
+					) }
 				</HStack>
 				<MainContent { ...props } />
 			</PanelBody>
