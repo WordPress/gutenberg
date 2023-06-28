@@ -31,7 +31,7 @@ const closeMenu = ( { context, selectors }, menuClosedOn ) => {
 	// Check if the menu is still open or not.
 	if ( ! selectors.core.navigation.isMenuOpen( { context } ) ) {
 		if (
-			context.core.navigation.modal.contains(
+			context.core.navigation.modal?.contains(
 				window.document.activeElement
 			)
 		) {
@@ -155,7 +155,7 @@ store( {
 					// `window.document.activeElement` doesn't change
 					if (
 						context.core.navigation.isMenuOpen.click &&
-						! context.core.navigation.modal.contains(
+						! context.core.navigation.modal?.contains(
 							event.relatedTarget
 						) &&
 						event.target !== window.document.activeElement
