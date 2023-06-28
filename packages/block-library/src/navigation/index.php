@@ -1049,7 +1049,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
-	if ( count( $navigation_post->posts ) > 0 ) {
+	if ( $navigation_post->found_posts > 0 ) {
 		return $navigation_post->posts[0];
 	}
 
