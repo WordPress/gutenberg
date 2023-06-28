@@ -142,6 +142,10 @@ declare module './base-entity-records' {
 			 */
 			formats: PostFormat[];
 			/**
+			 * Whether link colors are enabled.
+			 */
+			'link-color': boolean;
+			/**
 			 * The post types that support thumbnails or true if all post types are supported.
 			 */
 			'post-thumbnails': boolean | string[];
