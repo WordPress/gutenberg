@@ -90,9 +90,9 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
-	function onInsertBlock( blockType ) {
+	const onInsertBlock = ( blockType ) => () => {
 		insertBlocks( [ createBlock( blockType ) ] );
-	}
+	};
 
 	const renderMediaButtons = (
 		<>
@@ -100,7 +100,7 @@ function HeaderToolbar( {
 				key="imageButton"
 				title={ __( 'Image' ) }
 				icon={ imageIcon }
-				onClick={ () => onInsertBlock( 'core/image' ) }
+				onClick={ onInsertBlock( 'core/image' ) }
 				extraProps={ {
 					hint: __( 'Insert Image Block' ),
 				} }
@@ -109,7 +109,7 @@ function HeaderToolbar( {
 				key="videoButton"
 				title={ __( 'Video' ) }
 				icon={ videoIcon }
-				onClick={ () => onInsertBlock( 'core/video' ) }
+				onClick={ onInsertBlock( 'core/video' ) }
 				extraProps={ {
 					hint: __( 'Insert Video Block' ),
 				} }
@@ -118,7 +118,7 @@ function HeaderToolbar( {
 				key="galleryButton"
 				title={ __( 'Gallery' ) }
 				icon={ galleryIcon }
-				onClick={ () => onInsertBlock( 'core/gallery' ) }
+				onClick={ onInsertBlock( 'core/gallery' ) }
 				extraProps={ {
 					hint: __( 'Insert Gallery Block' ),
 				} }
@@ -127,7 +127,7 @@ function HeaderToolbar( {
 				key="audioButton"
 				title={ __( 'Audio' ) }
 				icon={ audioIcon }
-				onClick={ () => onInsertBlock( 'core/audio' ) }
+				onClick={ onInsertBlock( 'core/audio' ) }
 				extraProps={ {
 					hint: __( 'Insert Audio Block' ),
 				} }
