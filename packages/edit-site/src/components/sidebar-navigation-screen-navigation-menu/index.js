@@ -17,7 +17,7 @@ import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-nav
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
-import { buildNavigationLabel } from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
+import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
 
 export const postType = `wp_navigation`;
 

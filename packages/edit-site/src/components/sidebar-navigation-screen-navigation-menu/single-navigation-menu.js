@@ -9,7 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import NavigationMenuEditor from './navigation-menu-editor';
-import { buildNavigationLabel } from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
+import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
 
 export default function SingleNavigationMenu( {
 	navigationMenu,

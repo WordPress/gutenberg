@@ -5,7 +5,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
-export function buildNavigationLabel( title, id, status ) {
+export default function buildNavigationLabel( title, id, status ) {
 	if ( ! title?.rendered ) {
 		/* translators: %s is the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
