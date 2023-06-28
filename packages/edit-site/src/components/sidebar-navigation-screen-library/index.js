@@ -21,6 +21,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-library/utils';
 import { store as editSiteStore } from '../../store';
+import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 
@@ -46,6 +47,22 @@ export default function SidebarNavigationScreenLibrary() {
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
 
+	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
+	const footer = ! isMobileViewport ? (
+		<ItemGroup>
+			<SidebarNavigationItem withChevron { ...templatePartsLink }>
+				{ __( 'Manage all template parts' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				as="a"
+				href="edit.php?post_type=wp_block"
+				withChevron
+			>
+				{ __( 'Manage all custom patterns' ) }
+			</SidebarNavigationItem>
+		</ItemGroup>
+	) : undefined;
+
 	return (
 		<SidebarNavigationScreen
 			isRoot={ isTemplatePartsMode }
@@ -54,19 +71,7 @@ export default function SidebarNavigationScreenLibrary() {
 				'Manage what patterns are available when editing your site.'
 			) }
 			actions={ <AddNewPattern /> }
-			footer={
-				<ItemGroup>
-					{ ! isMobileViewport && (
-						<SidebarNavigationItem
-							as="a"
-							href="edit.php?post_type=wp_block"
-							withChevron
-						>
-							{ __( 'Manage all custom patterns' ) }
-						</SidebarNavigationItem>
-					) }
-				</ItemGroup>
-			}
+			footer={ footer }
 			content={
 				<>
 					{ isLoading && __( 'Loading library' ) }
