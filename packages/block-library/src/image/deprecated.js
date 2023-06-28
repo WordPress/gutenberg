@@ -406,8 +406,8 @@ const v5 = {
 			default: '',
 		},
 		caption: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'figcaption',
 		},
 		title: {
@@ -419,7 +419,7 @@ const v5 = {
 		href: {
 			type: 'string',
 			source: 'attribute',
-			selector: 'a',
+			selector: 'figure > a',
 			attribute: 'href',
 		},
 		rel: {
@@ -464,14 +464,9 @@ const v5 = {
 			background: false,
 		},
 		__experimentalBorder: {
-			color: true,
 			radius: true,
-			width: true,
-			__experimentalSkipSerialization: true,
 			__experimentalDefaultControls: {
-				color: true,
 				radius: true,
-				width: true,
 			},
 		},
 		__experimentalStyle: {
