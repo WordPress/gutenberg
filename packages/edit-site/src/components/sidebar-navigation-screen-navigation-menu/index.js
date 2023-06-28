@@ -33,11 +33,8 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const { isSaving, isDeleting } = useSelect(
 		( select ) => {
-			const {
-				isSavingEntityRecord,
-				isDeletingEntityRecord,
-				getEditedEntityRecord: getEditedEntityRecordSelector,
-			} = select( coreStore );
+			const { isSavingEntityRecord, isDeletingEntityRecord } =
+				select( coreStore );
 
 			return {
 				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
@@ -46,7 +43,6 @@ export default function SidebarNavigationScreenNavigationMenu() {
 					postType,
 					postId
 				),
-				getEditedEntityRecord: getEditedEntityRecordSelector,
 			};
 		},
 		[ postId ]
