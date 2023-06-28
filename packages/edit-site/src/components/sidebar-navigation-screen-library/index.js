@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file } from '@wordpress/icons';
+import { file, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,6 +23,7 @@ import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-library/utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
+import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
 const templatePartAreaLabels = {
@@ -41,6 +42,7 @@ export default function SidebarNavigationScreenLibrary() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
+	const { myPatterns, hasPatterns: hasMyPatterns } = useMyPatterns();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
@@ -58,7 +60,7 @@ export default function SidebarNavigationScreenLibrary() {
 				href="edit.php?post_type=wp_block"
 				withChevron
 			>
-				{ __( 'Manage all custom patterns' ) }
+				{ __( 'Manage all of my patterns' ) }
 			</SidebarNavigationItem>
 		</ItemGroup>
 	) : undefined;
@@ -84,6 +86,23 @@ export default function SidebarNavigationScreenLibrary() {
 											'No template parts or patterns found'
 										) }
 									</Item>
+								</ItemGroup>
+							) }
+							{ hasMyPatterns && (
+								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+									<CategoryItem
+										key={ myPatterns.name }
+										count={ myPatterns.count }
+										label={ myPatterns.label }
+										icon={ starFilled }
+										id={ myPatterns.name }
+										type="wp_block"
+										isActive={
+											currentCategory ===
+												`${ myPatterns.name }` &&
+											currentType === 'wp_block'
+										}
+									/>
 								</ItemGroup>
 							) }
 							{ hasTemplateParts && (

@@ -33,6 +33,7 @@ const noop = () => {};
 // Preferred order of pattern categories. Any other categories should
 // be at the bottom without any re-ordering.
 const patternCategoriesOrder = [
+	'custom',
 	'featured',
 	'posts',
 	'text',
