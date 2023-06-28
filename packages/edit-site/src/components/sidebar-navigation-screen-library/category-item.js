@@ -4,6 +4,11 @@
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
 
+/**
+ * WordPress dependencies
+ */
+import { sprintf, _n } from '@wordpress/i18n';
+
 export default function CategoryItem( {
 	count,
 	icon,
@@ -11,6 +16,7 @@ export default function CategoryItem( {
 	isActive,
 	label,
 	type,
+	typeLabel,
 } ) {
 	const linkInfo = useLink(
 		{
@@ -30,12 +36,21 @@ export default function CategoryItem( {
 		return;
 	}
 
+	const ariaLabel = sprintf(
+		/* translators: %1$s is the category name, %2$s is the type (pattern or template part), %3$s is the number of items. */
+		_n( '%1$s (%2$s), %3$s item', '%1$s (%2$s), %3$s items', count ),
+		label,
+		typeLabel ? typeLabel : type,
+		count
+	);
+
 	return (
 		<SidebarNavigationItem
 			{ ...linkInfo }
 			icon={ icon }
 			suffix={ <span>{ count }</span> }
 			aria-current={ isActive ? 'true' : undefined }
+			aria-label={ ariaLabel }
 		>
 			{ label }
 		</SidebarNavigationItem>

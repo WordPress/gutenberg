@@ -98,6 +98,10 @@ export default function SidebarNavigationScreenLibrary() {
 												}
 												id={ area }
 												type="wp_template_part"
+												// A human readable label for the type.
+												typeLabel={ __(
+													'template part'
+												) }
 												isActive={
 													currentCategory === area &&
 													currentType ===
