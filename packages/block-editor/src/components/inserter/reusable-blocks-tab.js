@@ -67,7 +67,7 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 						post_type: 'wp_block',
 					} ) }
 				>
-					{ __( 'Manage custom patterns' ) }
+					{ __( 'Manage my patterns' ) }
 				</Button>
 			</div>
 		</>
