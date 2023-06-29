@@ -63,6 +63,41 @@ describe( 'when title is focused', () => {
 			screen.getAllByLabelText( /Paragraph Block. Row 3/ )[ 0 ]
 		).toBeDefined();
 	} );
+
+	it( 'media blocks should be displayed', async () => {
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Focus first block
+		fireEvent.press(
+			screen.getAllByLabelText( /Paragraph Block. Row 1/ )[ 0 ]
+		);
+
+		// Focus title
+		fireEvent(
+			screen.getAllByLabelText( 'Post title. test' )[ 0 ],
+			'select'
+		);
+
+		// Focus last block
+		fireEvent.press(
+			screen.getAllByLabelText( /Paragraph Block. Row 2/ )[ 0 ]
+		);
+
+		// Assert that the media buttons are not visible
+		const imageButtons = screen.queryAllByTestId( 'image-button' );
+		expect( imageButtons ).toBeDefined();
+
+		const videoButtons = screen.queryAllByTestId( 'video-button' );
+		expect( videoButtons ).toBeDefined();
+
+		const galleryButtons = screen.queryAllByTestId( 'gallery-button' );
+		expect( galleryButtons ).toBeDefined();
+
+		const audioButtons = screen.queryAllByTestId( 'audio-button' );
+		expect( audioButtons ).toBeDefined();
+	} );
 } );
 
 describe( 'when title is no longer focused', () => {
@@ -100,5 +135,40 @@ describe( 'when title is no longer focused', () => {
 		expect(
 			screen.getAllByLabelText( /Heading Block. Row 3/ )[ 0 ]
 		).toBeDefined();
+	} );
+
+	it( 'media blocks should not be displayed', async () => {
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Focus first block
+		fireEvent.press(
+			screen.getAllByLabelText( /Paragraph Block. Row 1/ )[ 0 ]
+		);
+
+		// Focus title
+		fireEvent(
+			screen.getAllByLabelText( 'Post title. test' )[ 0 ],
+			'select'
+		);
+
+		// Focus last block
+		fireEvent.press(
+			screen.getAllByLabelText( /Paragraph Block. Row 2/ )[ 0 ]
+		);
+
+		// Assert that the media buttons are not visible
+		const imageButtons = screen.queryAllByTestId( 'image-button' );
+		expect( imageButtons ).toHaveLength( 0 );
+
+		const videoButtons = screen.queryAllByTestId( 'video-button' );
+		expect( videoButtons ).toHaveLength( 0 );
+
+		const galleryButtons = screen.queryAllByTestId( 'gallery-button' );
+		expect( galleryButtons ).toHaveLength( 0 );
+
+		const audioButtons = screen.queryAllByTestId( 'audio-button' );
+		expect( audioButtons ).toHaveLength( 0 );
 	} );
 } );
