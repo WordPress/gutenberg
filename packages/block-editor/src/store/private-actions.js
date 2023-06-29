@@ -158,19 +158,7 @@ export const privateRemoveBlocks =
 		// register using `toggleRemovalPromptSupport()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
-		if (
-			! forceRemove &&
-			// FIXME: Without this existence check, the unit tests for
-			// `__experimentalDeleteReusableBlock` in
-			// `packages/reusable-blocks/src/store/test/actions.js` fail due to
-			// the fact that the `registry` object passed to the thunk actions
-			// doesn't include this private action. This needs to be
-			// investigated to understand whether it's a real smell or if it's
-			// because not all store code has been updated to accommodate
-			// private selectors.
-			select.isRemovalPromptSupported &&
-			select.isRemovalPromptSupported()
-		) {
+		if ( ! forceRemove && select.isRemovalPromptSupported() ) {
 			const blockNamesForPrompt = new Set();
 
 			// Given a list of client IDs of blocks that the user intended to
