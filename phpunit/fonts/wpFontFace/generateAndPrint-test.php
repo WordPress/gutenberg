@@ -3,11 +3,11 @@
  * Test case for the Fonts API tests.
  *
  * @package    WordPress
- * @subpackage Fonts API
+ * @subpackage Fonts
  */
 
 /**
- * These code is only needed if the Font API is enabled.
+ * This code is only needed if the Font API is enabled.
  * It should be removed after Font Manager is merged into Gutenberg.
  */
 if ( ! class_exists( 'WP_Font_Face' ) ) {
