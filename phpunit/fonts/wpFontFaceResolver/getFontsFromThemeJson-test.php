@@ -51,7 +51,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 		switch_theme( 'block-theme' );
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
-		$this->assertSame( array() );
+		$this->assertSame( array(), $fonts );
 	}
 
 	/**
