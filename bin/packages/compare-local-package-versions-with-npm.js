@@ -54,7 +54,6 @@ async function compareLocalAndNpmPackageVersions() {
 		);
 
 	// Print info about mismatched packages.
-	console.log( mismatchedPackages );
 	if ( mismatchedPackages.length ) {
 		console.log(
 			`\n${ mismatchedPackages.length } packages have local versions which don't match npm:`
