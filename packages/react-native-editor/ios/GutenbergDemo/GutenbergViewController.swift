@@ -41,14 +41,14 @@ class GutenbergViewController: UIViewController {
     }
     
     lazy var undoButton: UIButton = {
-        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
-        let undoImage = UIImage(systemName: "arrow.uturn.backward")?.withConfiguration(symbolConfiguration)
-
+        let undoImage = UIImage(named: "undo")
         let button = UIButton(type: .system)
         button.setImage(undoImage, for: .normal)
         button.accessibilityIdentifier = "editor-undo-button"
+        button.accessibilityLabel = "Undo"
         button.accessibilityHint = "Double tap to undo last change"
         button.addTarget(self, action: #selector(undoButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
         button.sizeToFit()
         button.alpha = 0.3
         button.isUserInteractionEnabled = false
@@ -56,14 +56,14 @@ class GutenbergViewController: UIViewController {
     }()
     
     lazy var redoButton: UIButton = {
-        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 14, weight: .regular)
-        let redoImage = UIImage(systemName: "arrow.uturn.forward")?.withConfiguration(symbolConfiguration)
-
+        let redoImage = UIImage(named: "redo")
         let button = UIButton(type: .system)
         button.setImage(redoImage, for: .normal)
         button.accessibilityIdentifier = "editor-redo-button"
+        button.accessibilityLabel = "Redo"
         button.accessibilityHint = "Double tap to redo last change"
         button.addTarget(self, action: #selector(redoButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
         button.sizeToFit()
         button.alpha = 0.3
         button.isUserInteractionEnabled = false
@@ -71,14 +71,15 @@ class GutenbergViewController: UIViewController {
     }()
     
     lazy var moreButton: UIButton = {
+        let moreImage = UIImage(named: "more")
         let button = UIButton(type: .system)
-        button.setTitle("...", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.setImage(moreImage, for: .normal)
         button.titleLabel?.minimumScaleFactor = 0.5
-        button.titleLabel?.lineBreakMode = .byTruncatingTail
         button.accessibilityIdentifier = "editor-menu-button"
+        button.accessibilityLabel = "More options"
+        button.accessibilityHint = "Double tap to see options"
         button.addTarget(self, action: #selector(moreButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
         button.sizeToFit()
 
         let spacing: CGFloat = 2.0
@@ -436,6 +437,19 @@ extension GutenbergViewController {
     func configureNavigationBar() {
         addSaveButton()
         addRightButtons()
+        
+        navigationController?.navigationBar.tintColor = UIColor(named: "Primary")
+        
+        // Add a bottom border to the navigation bar
+        let borderBottom = CALayer()
+        borderBottom.backgroundColor = UIColor(named: "HeaderLine")?.cgColor
+               borderBottom.frame = CGRect(
+                   x: 0,
+                   y: navigationController?.navigationBar.frame.height ?? 0 - (1.0 / UIScreen.main.scale),
+                   width: navigationController?.navigationBar.frame.width ?? 0,
+                   height: 1.0 / UIScreen.main.scale
+               )
+               navigationController?.navigationBar.layer.addSublayer(borderBottom)
     }
 
     func addSaveButton() {
