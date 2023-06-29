@@ -588,14 +588,12 @@ export const getNavigationFallbackId =
 			// If the fallback is already in the store, don't invalidate navigation queries.
 			// Otherwise, invalidate the cache for the scenario where there were no Navigation
 			// posts in the state and the fallback created one.
-			const invalidateNavigationQueries = select.getEntityRecord(
+			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
 				fallback?.id
-			)
-				? false
-				: true;
-
+			);
+			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
 				'postType',
 				'wp_navigation',
