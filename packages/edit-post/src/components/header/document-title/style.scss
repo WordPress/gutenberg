@@ -13,9 +13,11 @@
 	border-radius: 4px;
 	width: min(100%, 450px);
 
-	&:hover {
-		color: currentColor;
-		background: $gray-200;
+	.components-button {
+		&:hover {
+			color: var(--wp-block-synced-color);
+			background: $gray-200;
+		}
 	}
 }
 
@@ -24,37 +26,25 @@
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
 
-	&:hover {
-		color: var(--wp-block-synced-color);
-	}
-
 	h1 {
-		color: var(--wp-block-synced-color);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: var(--wp-block-synced-color);
 	}
 }
 
 .edit-post-document-title__shortcut {
 	color: $gray-800;
-	text-align: right;
-
-	.edit-post-document-title__shortcut:hover & {
-		color: $gray-900;
-	}
 }
 
-.edit-post-document-title__left {
+.edit-post-document-title__back.components-button.has-icon.has-text {
 	min-width: $button-size;
 	flex-shrink: 0;
+	color: $gray-700;
+	gap: 0;
 
-	.components-button.has-icon.has-text {
-		color: $gray-700;
-		gap: 0;
-
-		&:hover {
-			color: currentColor;
-		}
+	&:hover {
+		color: currentColor;
 	}
 }

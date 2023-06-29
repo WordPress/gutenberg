@@ -47,18 +47,16 @@ function DocumentTitle() {
 
 	return (
 		<div className="edit-post-document-title">
-			<span className="edit-post-document-title__left">
-				<Button
-					onClick={ () => {
-						clearSelectedBlock();
-						setIsEditingTemplate( false );
-					} }
-					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				>
-					{ __( 'Back' ) }
-				</Button>
-			</span>
-
+			<Button
+				className="edit-post-document-title__back"
+				onClick={ () => {
+					clearSelectedBlock();
+					setIsEditingTemplate( false );
+				} }
+				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+			>
+				{ __( 'Back' ) }
+			</Button>
 			<Button
 				className="edit-post-document-title__title"
 				onClick={ () => openCommandCenter() }
