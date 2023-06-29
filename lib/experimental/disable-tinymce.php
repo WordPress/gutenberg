@@ -45,7 +45,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
 
 /**
  * Example TinyMCE usage used for testing.
- * Uncomment the last line of this file to enable.
+ * Uncomment line 8 in this file to enable.
  */
 function gutenberg_test_tinymce_access() {
 	echo '<script type="text/javascript">const a = window.tinymce.$;</script>';
