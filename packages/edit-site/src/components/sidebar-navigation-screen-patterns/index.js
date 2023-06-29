@@ -33,7 +33,7 @@ const templatePartAreaLabels = {
 	uncategorized: __( 'Uncategorized' ),
 };
 
-export default function SidebarNavigationScreenLibrary() {
+export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || DEFAULT_CATEGORY;
@@ -68,7 +68,7 @@ export default function SidebarNavigationScreenLibrary() {
 	return (
 		<SidebarNavigationScreen
 			isRoot={ isTemplatePartsMode }
-			title={ __( 'Library' ) }
+			title={ __( 'Patterns' ) }
 			description={ __(
 				'Manage what patterns are available when editing your site.'
 			) }
@@ -76,11 +76,11 @@ export default function SidebarNavigationScreenLibrary() {
 			footer={ footer }
 			content={
 				<>
-					{ isLoading && __( 'Loading library' ) }
+					{ isLoading && __( 'Loading patterns' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									<Item>
 										{ __(
 											'No template parts or patterns found'
@@ -89,7 +89,7 @@ export default function SidebarNavigationScreenLibrary() {
 								</ItemGroup>
 							) }
 							{ hasMyPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									<CategoryItem
 										key={ myPatterns.name }
 										count={ myPatterns.count }
@@ -106,7 +106,7 @@ export default function SidebarNavigationScreenLibrary() {
 								</ItemGroup>
 							) }
 							{ hasTemplateParts && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									{ Object.entries( templatePartAreas ).map(
 										( [ area, parts ] ) => (
 											<CategoryItem
@@ -133,7 +133,7 @@ export default function SidebarNavigationScreenLibrary() {
 								</ItemGroup>
 							) }
 							{ hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									{ patternCategories.map( ( category ) => (
 										<CategoryItem
 											key={ category.name }
