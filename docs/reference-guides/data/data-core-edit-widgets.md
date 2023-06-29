@@ -124,6 +124,36 @@ _Returns_
 
 Returns all API widgets.
 
+_Usage_
+
+```js
+import { _n, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+   const { getWidgets } = useSelect(
+       ( select ) => select( 'core/edit-widgets' ),
+       []
+   );
+
+   const widgets = getWidgets();
+   const widgetCount = Object.entries( widgets ).length;
+
+   return (
+       <p>
+           { sprintf(
+               _n(
+                   'There is %d active widget',
+                   'There are %d active widgets',
+                   widgetCount
+               ),
+               widgetCount
+          }
+      </p>
+   );
+};
+```
+
 _Returns_
 
 -   `Object[]`: API List of widgets.
