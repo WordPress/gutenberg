@@ -38,24 +38,6 @@ export const onSubKey =
 		};
 	};
 
-function isNumeric( n ) {
-	return ! isNaN( parseFloat( n ) ) && isFinite( n );
-}
-
-// write a function to parse an array of args and convert numeric strings to true numbers
-// using the isNumeric function
-function normalizeNumeric( args ) {
-	return args?.map( ( arg ) => {
-		if ( Array.isArray( arg ) ) {
-			return normalizeNumeric( arg );
-		}
-		if ( typeof arg === 'string' && isNumeric( arg ) ) {
-			return parseFloat( arg );
-		}
-		return arg;
-	} );
-}
-
 /**
  * Normalize selector argument array by defaulting `undefined` value to an empty array
  * and removing trailing `undefined` values.
@@ -64,8 +46,6 @@ function normalizeNumeric( args ) {
  * @return Normalized state key array
  */
 export function selectorArgsToStateKey( args: unknown[] | null | undefined ) {
-	args = normalizeNumeric( args );
-
 	if ( args === undefined || args === null ) {
 		return [];
 	}
