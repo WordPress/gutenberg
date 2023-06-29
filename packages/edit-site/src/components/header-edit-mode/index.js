@@ -108,6 +108,9 @@ export default function HeaderEditMode() {
 		};
 	}, [] );
 
+	const { get: getPreference } = useSelect( preferencesStore );
+	const hasFixedToolbar = getPreference( editSiteStore.name, 'fixedToolbar' );
+
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
@@ -213,14 +216,18 @@ export default function HeaderEditMode() {
 						) }
 						{ isLargeViewport && (
 							<>
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									disabled={ ! isVisualMode }
-								/>
+								{ ! hasFixedToolbar && (
+									<ToolbarItem
+										as={ ToolSelector }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+										disabled={ ! isVisualMode }
+									/>
+								) }
 								<ToolbarItem
 									as={ UndoButton }
 									showTooltip={ ! showIconLabels }
