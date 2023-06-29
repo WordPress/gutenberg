@@ -48,7 +48,7 @@ class GutenbergViewController: UIViewController {
         button.accessibilityLabel = "Undo"
         button.accessibilityHint = "Double tap to undo last change"
         button.addTarget(self, action: #selector(undoButtonPressed(sender:)), for: .touchUpInside)
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         button.sizeToFit()
         button.alpha = 0.3
         button.isUserInteractionEnabled = false
@@ -63,7 +63,7 @@ class GutenbergViewController: UIViewController {
         button.accessibilityLabel = "Redo"
         button.accessibilityHint = "Double tap to redo last change"
         button.addTarget(self, action: #selector(redoButtonPressed(sender:)), for: .touchUpInside)
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         button.sizeToFit()
         button.alpha = 0.3
         button.isUserInteractionEnabled = false
@@ -79,11 +79,8 @@ class GutenbergViewController: UIViewController {
         button.accessibilityLabel = "More options"
         button.accessibilityHint = "Double tap to see options"
         button.addTarget(self, action: #selector(moreButtonPressed(sender:)), for: .touchUpInside)
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         button.sizeToFit()
-
-        let spacing: CGFloat = 2.0
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing, bottom: 10, right: 0)
         return button
     }()
 
@@ -441,15 +438,17 @@ extension GutenbergViewController {
         navigationController?.navigationBar.tintColor = UIColor(named: "Primary")
         
         // Add a bottom border to the navigation bar
-        let borderBottom = CALayer()
-        borderBottom.backgroundColor = UIColor(named: "HeaderLine")?.cgColor
-               borderBottom.frame = CGRect(
-                   x: 0,
-                   y: navigationController?.navigationBar.frame.height ?? 0 - (1.0 / UIScreen.main.scale),
-                   width: navigationController?.navigationBar.frame.width ?? 0,
-                   height: 1.0 / UIScreen.main.scale
-               )
-               navigationController?.navigationBar.layer.addSublayer(borderBottom)
+        let borderBottom = UIView()
+        borderBottom.backgroundColor = UIColor(named: "HeaderLine")
+        borderBottom.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        borderBottom.frame = CGRect(
+            x: 0,
+            y: navigationController?.navigationBar.frame.height ?? 0 - (1.0 / UIScreen.main.scale),
+            width: navigationController?.navigationBar.frame.width ?? 0,
+            height: 1.0 / UIScreen.main.scale
+        )
+        
+        navigationController?.navigationBar.addSubview(borderBottom)
     }
 
     func addSaveButton() {
