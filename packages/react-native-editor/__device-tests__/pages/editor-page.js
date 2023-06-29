@@ -26,7 +26,7 @@ const {
 
 const ADD_BLOCK_ID = isAndroid()
 	? 'Add block, Double tap to add a block'
-	: 'Add block';
+	: 'add-block-button';
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
