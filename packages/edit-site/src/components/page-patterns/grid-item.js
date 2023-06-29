@@ -18,9 +18,8 @@ import {
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Icon,
@@ -40,9 +39,10 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { PATTERNS, USER_PATTERNS } from './utils';
 import { useLink } from '../routes/link';
 
+const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited here' );
+
 export default function GridItem( { categoryId, composite, icon, item } ) {
-	const instanceId = useInstanceId( GridItem );
-	const descriptionId = `edit-site-patterns__pattern-description-${ instanceId }`;
+	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
 	const { __experimentalDeleteReusableBlock } =
@@ -87,14 +87,17 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	};
 
 	const isUserPattern = item.type === USER_PATTERNS;
-	let ariaDescription;
+	const ariaDescriptions = [];
 	if ( isUserPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
-		ariaDescription = __(
-			'Press Enter to edit, or Delete to delete the pattern.'
+		ariaDescriptions.push(
+			__( 'Press Enter to edit, or Delete to delete the pattern.' )
 		);
 	} else if ( item.description ) {
-		ariaDescription = item.description;
+		ariaDescriptions.push( item.description );
+	}
+	if ( item.type === PATTERNS ) {
+		ariaDescriptions.push( THEME_PATTERN_TOOLTIP );
 	}
 
 	let itemIcon = icon;
@@ -118,21 +121,23 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					onKeyDown={ isUserPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={
-						ariaDescription ? descriptionId : undefined
+						ariaDescriptions.length
+							? ariaDescriptions.join( ' ' )
+							: undefined
 					}
 				>
 					{ isEmpty && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 				</CompositeItem>
-				{ ariaDescription && (
+				{ ariaDescriptions.map( ( ariaDescription, index ) => (
 					<div
-						aria-hidden="true"
-						style={ { display: 'none' } }
-						id={ descriptionId }
+						key={ index }
+						hidden
+						id={ `${ descriptionId }-${ index }` }
 					>
 						{ ariaDescription }
 					</div>
-				) }
+				) ) }
 				<HStack
 					aria-hidden="true"
 					className="edit-site-patterns__footer"
