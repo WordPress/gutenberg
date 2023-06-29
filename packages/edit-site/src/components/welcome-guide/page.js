@@ -63,7 +63,7 @@ export default function WelcomeGuidePage() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
-									'We’ve recently introduced the ability to modify pages within the site editor. You can switch to editing your template using the sidebar.'
+									'We’ve recently introduced the ability to edit pages within the site editor. You can switch to editing your template using the settings sidebar.'
 								) }
 							</p>
 						</>
