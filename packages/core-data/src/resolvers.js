@@ -172,15 +172,33 @@ export const getEntityRecord =
 		}
 	};
 
-function isNumeric( n ) {
-	return ! isNaN( parseFloat( n ) ) && isFinite( n );
+function isNumericID( str ) {
+	// Remove leading/trailing whitespace
+	str = str.trim();
+
+	// Check if the string is empty
+	if ( str.length === 0 ) {
+		return false;
+	}
+
+	// Check if the string is a number
+	if ( ! isNaN( str ) ) {
+		return true;
+	}
+
+	// Check if the string contains only numeric characters
+	if ( /^\d+$/.test( str ) ) {
+		return true;
+	}
+
+	return false;
 }
 
 getEntityRecord.normalizeArgs = ( args ) => {
 	let key = args && args[ 2 ];
 
 	// If key is numeric, assume it's an ID and coerce to number.
-	if ( key && typeof key === 'string' && isNumeric( key ) ) {
+	if ( key && typeof key === 'string' && isNumericID( key ) ) {
 		key = Number( key );
 	}
 
