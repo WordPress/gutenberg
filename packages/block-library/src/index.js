@@ -229,11 +229,12 @@ const getAllBlocks = () => {
 		postAuthorBiography,
 	];
 
-	// Only add the classic block in WP Context
-	// and when either of the following is true:
-	// - TinyMCE experiment is disabled;
-	// - there is a classic block in the current post's content;
-	// - the query argument to require TinyMCE is set.
+	// When in a WordPress context, conditionally
+	// add the classic block and TinyMCE editor
+	// under any of the following conditions:
+	//   - the current post contains a classic block
+	//   - TinyMCE experiment hasn't been intentionally disabled
+	//   - a query argument specifies that TinyMCE should be loaded
 	if (
 		window?.wp?.oldEditor &&
 		( window?.wp?.needsClassicBlock ||
