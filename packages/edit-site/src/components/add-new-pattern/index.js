@@ -4,7 +4,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { plus, header, file } from '@wordpress/icons';
+import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -56,12 +56,12 @@ export default function AddNewPattern() {
 			<DropdownMenu
 				controls={ [
 					{
-						icon: header,
+						icon: symbolFilled,
 						onClick: () => setShowTemplatePartModal( true ),
 						title: __( 'Create template part' ),
 					},
 					{
-						icon: file,
+						icon: symbol,
 						onClick: () => setShowPatternModal( true ),
 						title: __( 'Create pattern' ),
 					},
