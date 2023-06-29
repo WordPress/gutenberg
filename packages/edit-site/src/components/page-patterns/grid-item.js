@@ -39,7 +39,7 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { PATTERNS, USER_PATTERNS } from './utils';
 import { useLink } from '../routes/link';
 
-const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited here' );
+const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited.' );
 
 export default function GridItem( { categoryId, composite, icon, item } ) {
 	const descriptionId = useId();
@@ -166,7 +166,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 								<Tooltip
 									position="top center"
 									text={ __(
-										'Theme patterns cannot be edited here'
+										'Theme patterns cannot be edited.'
 									) }
 								>
 									<span className="edit-site-patterns__pattern-lock-icon">

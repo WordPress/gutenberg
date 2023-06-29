@@ -151,7 +151,7 @@ export default function SidebarNavigationScreenPatterns() {
 													<Tooltip
 														position="top center"
 														text={ __(
-															'Theme patterns cannot be edited here'
+															'Theme patterns cannot be edited.'
 														) }
 													>
 														<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
