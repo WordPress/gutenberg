@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import com.facebook.react.ReactActivity;
-import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 
@@ -106,7 +104,7 @@ public class MainActivity extends ReactActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mReactRootView = findViewById(R.id.react_root_view);
-        mReactRootView.startReactApplication(getReactNativeHost().getReactInstanceManager(), "gutenberg", null);
+        mReactRootView.startReactApplication(getReactNativeHost().getReactInstanceManager(), "gutenberg", getAppOptions());
     }
 
     public static MainActivity getInstance() {
@@ -122,35 +120,28 @@ public class MainActivity extends ReactActivity {
         return "gutenberg";
     }
 
-    @Override
-    protected ReactActivityDelegate createReactActivityDelegate() {
-        return new ReactActivityDelegate(this, getMainComponentName()) {
-            @Nullable
-            @Override
-            protected Bundle getLaunchOptions() {
-                Bundle bundle = new Bundle();
+    private Bundle getAppOptions() {
+        Bundle bundle = new Bundle();
 
-                // Add locale
-                String languageString = Locale.getDefault().toString();
-                String localeSlug = languageString.replace("_", "-").toLowerCase(Locale.ENGLISH);
-                bundle.putString(GutenbergProps.PROP_LOCALE, localeSlug);
+        // Add locale
+        String languageString = Locale.getDefault().toString();
+        String localeSlug = languageString.replace("_", "-").toLowerCase(Locale.ENGLISH);
+        bundle.putString(GutenbergProps.PROP_LOCALE, localeSlug);
 
-                // Add capabilities
-                Bundle capabilities = new Bundle();
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_REUSABLE_BLOCK, false);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_TILED_GALLERY_BLOCK, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_VIDEOPRESS_BLOCK, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_LOOM_EMBED_BLOCK, true);
-                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, true);
-                bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
-                return bundle;
-            }
-        };
+        // Add capabilities
+        Bundle capabilities = new Bundle();
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_REUSABLE_BLOCK, false);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_TILED_GALLERY_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_VIDEOPRESS_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_LOOM_EMBED_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, true);
+        bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
+        return bundle;
     }
 }
