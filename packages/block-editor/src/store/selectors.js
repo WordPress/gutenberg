@@ -14,19 +14,20 @@ import {
 	getPossibleBlockTransformations,
 	parse,
 	switchToBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
-import { getBlockEditingMode } from './private-selectors';
 
 /**
  * A block selection object.
@@ -2884,3 +2885,59 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	}
 	return false;
 }
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Returns the block editing mode for a given block.
+ *
+ * The mode can be one of three options:
+ *
+ * - `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+ *   selected.
+ * - `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+ *   toolbar, the block movers, block settings.
+ * - `'default'`: Allows editing the block as normal.
+ *
+ * Blocks can set a mode using the `useBlockEditingMode` hook.
+ *
+ * The mode is inherited by all of the block's inner blocks, unless they have
+ * their own mode.
+ *
+ * A template lock can also set a mode. If the template lock is `'contentOnly'`,
+ * the block's mode is overridden to `'contentOnly'` if the block has a content
+ * role attribute, or `'disabled'` otherwise.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
+ *                            `'contentOnly'`, or `'default'`.
+ */
+export const getBlockEditingMode = createRegistrySelector(
+	( select ) =>
+		( state, clientId = '' ) => {
+			if ( state.blockEditingModes.has( clientId ) ) {
+				return state.blockEditingModes.get( clientId );
+			}
+			if ( ! clientId ) {
+				return 'default';
+			}
+			const rootClientId = getBlockRootClientId( state, clientId );
+			const templateLock = getTemplateLock( state, rootClientId );
+			if ( templateLock === 'contentOnly' ) {
+				const name = getBlockName( state, clientId );
+				const isContent =
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					);
+				return isContent ? 'contentOnly' : 'disabled';
+			}
+			const parentMode = getBlockEditingMode( state, rootClientId );
+			return parentMode === 'contentOnly' ? 'default' : parentMode;
+		}
+);
