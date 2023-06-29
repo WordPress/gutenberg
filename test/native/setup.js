@@ -104,6 +104,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowNotice: jest.fn(),
 		subscribeParentGetHtml: jest.fn(),
 		subscribeShowEditorHelp: jest.fn(),
+		subscribeOnUndoPressed: jest.fn(),
+		subscribeOnRedoPressed: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -124,6 +126,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		fetchRequest: jest.fn(),
 		requestPreview: jest.fn(),
 		generateHapticFeedback: jest.fn(),
+		toggleUndoButton: jest.fn(),
+		toggleRedoButton: jest.fn(),
 	};
 } );
 

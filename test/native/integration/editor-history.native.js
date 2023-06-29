@@ -14,9 +14,29 @@ import {
 	within,
 } from 'test/helpers';
 
+/**
+ * WordPress dependencies
+ */
+import {
+	subscribeOnUndoPressed,
+	subscribeOnRedoPressed,
+} from '@wordpress/react-native-bridge';
+
 setupCoreBlocks();
 
 describe( 'Editor History', () => {
+	let toggleUndo;
+	let toggleRedo;
+
+	beforeAll( () => {
+		subscribeOnUndoPressed.mockImplementation( ( callback ) => {
+			toggleUndo = callback;
+		} );
+		subscribeOnRedoPressed.mockImplementation( ( callback ) => {
+			toggleRedo = callback;
+		} );
+	} );
+
 	it( 'should remove and add blocks', async () => {
 		// Arrange
 		const screen = await initializeEditor();
@@ -42,17 +62,17 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
+		toggleUndo();
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `""` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		toggleRedo();
+		toggleRedo();
+		toggleRedo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -95,7 +115,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -105,7 +125,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		toggleRedo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -145,7 +165,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -155,7 +175,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -165,8 +185,8 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		toggleRedo();
+		toggleRedo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -212,8 +232,8 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -223,8 +243,8 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		toggleRedo();
+		toggleRedo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
