@@ -14,7 +14,8 @@ const getPackageMeta = require( '../get-package-meta.js' );
 /**
  * This script verifies that the local npm package.json files match the versions
  * published to npm. Rarely, the two can get out of sync, making it necessary
- * to manually update the local package.json files.
+ * to update the local package.json files. Updating the package.json versions
+ * to the latest version can be done with the '--fix' flag.
  */
 async function compareLocalAndNpmPackageVersions() {
 	const pkgWithVersions = await Promise.allSettled(
