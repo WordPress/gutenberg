@@ -15,23 +15,23 @@ The Interactivity API is [being used in some core blocks](https://github.com/sea
 
 At this point, some of the questions you have about the Interactivity API may be:
 
-#### What is this?
+### What is this?
 
 This is the base of a new standard to create interactive blocks. Read [the proposal](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/) to learn more about this.
 
-#### Can I use it?
+### Can I use it?
 
 You can test it, but it's still very experimental.
 
-#### How do I get started?
+### How do I get started?
 
-A "Getting started guide" section of the Interactivity API Docs is in progress. In the meantime check the **Docs & Examples** section below for resources to learn. You can also ask for guidance at the [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in the Gutenberg repo.
+A "Getting started guide" section of the Interactivity API Docs is in progress. In the meantime check the **Docs & Examples** section below for resources to learn. You can also ask for guidance at the [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions.
 
-#### Where can I ask questions?
+### Where can I ask questions?
 
 The [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions is the best place to ask questions about the Interactivity API.
 
-#### Where can I share my feedback about the API?
+### Where can I share my feedback about the API?
 
 The [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions is also the best place to share your feedback about the Interactivity API.
 
