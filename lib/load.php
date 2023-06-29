@@ -28,8 +28,10 @@ function gutenberg_is_experiment_enabled( $name ) {
 	return ! empty( $experiments[ $name ] );
 }
 
-// These files only need to be loaded if within a rest server instance
-// which this class will exist if that is the case.
+/*
+ * These files only need to be loaded if within a rest server instance.
+ * WP_REST_Controller will exist if that is the case.
+ */
 if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';

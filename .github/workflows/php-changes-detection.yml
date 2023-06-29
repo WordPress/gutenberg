@@ -1,0 +1,57 @@
+name: OPTIONAL - Confirm if PHP changes require backporting to WordPress Core
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+jobs:
+    detect_php_changes:
+        name: Detect PHP changes
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+              with:
+                  fetch-depth: 0
+            - name: Get changed PHP files
+              id: changed-files-php
+              uses: tj-actions/changed-files@v37
+              with:
+                  files: |
+                      *.{php}
+                      lib/**
+                      phpunit/**
+                      packages/block-library/src/**
+            - name: List all changed files
+              if: steps.changed-files-php.outputs.any_changed == 'true'
+              id: list-changed-php-files
+              run: |
+                  echo "Changed files:"
+                  formatted_change_list=""
+                  for file in ${{ steps.changed-files-php.outputs.all_changed_files }}; do
+                    echo "$file was changed"
+                    formatted_change_list+="<br>:grey_question: $file"
+                  done
+                  formatted_change_list+="<br>"
+                  echo "formatted_change_list=$formatted_change_list" >> $GITHUB_OUTPUT
+            - name: Update PR comment
+              if: steps.changed-files-php.outputs.any_changed == 'true'
+              uses: edumserrano/find-create-or-update-comment@v1
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body-includes: '<!-- pr-contains-php-changes -->'
+                  comment-author: 'github-actions[bot]'
+                  body: |
+                      <!-- pr-contains-php-changes -->
+                      This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
+
+                      If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after this pull request is merged.
+
+                      If you're unsure, you can always ask for help in the #core-editor channel in  [WordPress Slack](https://make.wordpress.org/chat/).
+
+                      Thank you! :heart:
+
+                      <details>
+                        <summary>View changed files</summary>
+                        ${{ steps.list-changed-php-files.outputs.formatted_change_list }}
+                      </details>
+                  edit-mode: replace

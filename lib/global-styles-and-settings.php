@@ -1,6 +1,6 @@
 <?php
 /**
- * API to interact with global settings & styles.
+ * API to interact with global settings and styles.
  *
  * @package gutenberg
  */
