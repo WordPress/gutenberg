@@ -10,6 +10,24 @@ Namespace: `core/customize-widgets`.
 
 Returns true if the inserter is opened.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { isInserterOpened } = useSelect(
+		( select ) => select( 'core/customize-widgets' ),
+		[]
+	);
+
+	return isInserterOpened()
+		? __( 'Inserter is open' )
+		: __( 'Inserter is closed.' );
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
