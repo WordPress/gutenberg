@@ -22,7 +22,7 @@ export default function PageMain() {
 		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
-	} else if ( path === '/library' ) {
+	} else if ( path === '/patterns' ) {
 		return <PageLibrary />;
 	}
 

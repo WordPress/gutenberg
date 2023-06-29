@@ -53,10 +53,10 @@ export default function PatternsList( { categoryId, type } ) {
 						onClick={ () => {
 							// Go back in history if we came from the library page.
 							// Otherwise push a stack onto the history.
-							if ( location.state?.backPath === '/library' ) {
+							if ( location.state?.backPath === '/patterns' ) {
 								history.back();
 							} else {
-								history.push( { path: '/library' } );
+								history.push( { path: '/patterns' } );
 							}
 						} }
 					/>
