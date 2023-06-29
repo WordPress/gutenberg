@@ -76,8 +76,8 @@ class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
 
 		$style_variations_fonts = static::STYLE_VARIATIONS_FONTS[ static::FONTS_THEME ];
-		foreach ($style_variations_fonts as $style_variations_font ) {
-			$this->assertArrayNotHasKey($style_variations_font, $fonts);
+		foreach ( $style_variations_fonts as $style_variations_font ) {
+			$this->assertArrayNotHasKey( $style_variations_font, $fonts );
 		}
 	}
 
@@ -93,8 +93,8 @@ class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
 
-		$actual    = $fonts[ $font_name ][ $font_index ]['src'][0];
-		$expected  = get_stylesheet_directory_uri() . $expected;
+		$actual   = $fonts[ $font_name ][ $font_index ]['src'][0];
+		$expected = get_stylesheet_directory_uri() . $expected;
 
 		$this->assertStringNotContainsString( 'file:./', $actual, 'Font src should not contain the "file:./" placeholder' );
 		$this->assertSame( $expected, $actual, 'Font src should be an URL to its file' );
@@ -108,35 +108,35 @@ class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 	public function data_should_replace_src_file_placeholder() {
 		return array(
 			// Theme's theme.json.
-			'DM Sans: 400 normal'                          => array(
-				'font_name' =>   'DM Sans',
-				'font_index'   => 0,
-				'expected' => '/assets/fonts/dm-sans/DMSans-Regular.woff2',
+			'DM Sans: 400 normal'              => array(
+				'font_name'  => 'DM Sans',
+				'font_index' => 0,
+				'expected'   => '/assets/fonts/dm-sans/DMSans-Regular.woff2',
 			),
-			'DM Sans: 400 italic'                          => array(
-				'font_name' =>   'DM Sans',
-				'font_index'   => 1,
-				'expected' => '/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2',
+			'DM Sans: 400 italic'              => array(
+				'font_name'  => 'DM Sans',
+				'font_index' => 1,
+				'expected'   => '/assets/fonts/dm-sans/DMSans-Regular-Italic.woff2',
 			),
-			'DM Sans: 700 normal'                          => array(
-				'font_name' =>   'DM Sans',
-				'font_index'   => 2,
-				'expected' => '/assets/fonts/dm-sans/DMSans-Bold.woff2',
+			'DM Sans: 700 normal'              => array(
+				'font_name'  => 'DM Sans',
+				'font_index' => 2,
+				'expected'   => '/assets/fonts/dm-sans/DMSans-Bold.woff2',
 			),
-			'DM Sans: 700 italic'                          => array(
-				'font_name' =>   'DM Sans',
-				'font_index'   => 3,
-				'expected' => '/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2',
+			'DM Sans: 700 italic'              => array(
+				'font_name'  => 'DM Sans',
+				'font_index' => 3,
+				'expected'   => '/assets/fonts/dm-sans/DMSans-Bold-Italic.woff2',
 			),
-			'Source Serif Pro: 200-900 normal'             => array(
-				'font_name' =>   'Source Serif Pro',
-				'font_index'   => 0,
-				'expected' => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+			'Source Serif Pro: 200-900 normal' => array(
+				'font_name'  => 'Source Serif Pro',
+				'font_index' => 0,
+				'expected'   => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
 			),
-			'Source Serif Pro: 200-900 italic'             => array(
-				'font_name' =>   'Source Serif Pro',
-				'font_index'   => 1,
-				'expected' => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+			'Source Serif Pro: 200-900 italic' => array(
+				'font_name'  => 'Source Serif Pro',
+				'font_index' => 1,
+				'expected'   => '/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
 			),
 		);
 	}
