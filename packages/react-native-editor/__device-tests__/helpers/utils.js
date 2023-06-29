@@ -486,10 +486,11 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
+
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch to HTML"]'
@@ -497,10 +498,10 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch To Visual"]'
