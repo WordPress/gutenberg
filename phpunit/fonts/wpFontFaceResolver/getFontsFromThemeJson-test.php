@@ -1,4 +1,10 @@
 <?php
+/**
+ * Test case for the Fonts tests.
+ *
+ * @package    WordPress
+ * @subpackage Fonts
+ */
 
 require_once __DIR__ . '/../../fonts-api/wp-fonts-testcase.php';
 // This code is only needed if the Font API is enabled.
@@ -10,11 +16,15 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 }
 
 /**
- * Test WP_Theme_JSON_Resolver_Gutenberg class.
+ * Tests WP_Font_Face_Resolver::get_fonts_from_theme_json().
  *
- * @package Gutenberg
+ * @package WordPress
+ * @subpackage Fonts
+ *
+ * @since X.X.X
+ * @group fonts
+ * @covers WP_Font_Face_Resolver::get_fonts_from_theme_json
  */
-
 class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME   = 'fonts-block-theme';
 	const FONT_FAMILIES = array(

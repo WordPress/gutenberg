@@ -1,6 +1,6 @@
 <?php
 /**
- * Test case for the Fonts API tests.
+ * Test case for the Fonts tests.
  *
  * @package    WordPress
  * @subpackage Fonts
