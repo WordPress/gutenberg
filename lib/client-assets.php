@@ -206,7 +206,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				if (
 					! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
 					! empty( $_GET['requiresTinymce'] ) ||
-					gutenberg_current_content_contains_classic_block()
+					gutenberg_post_being_edited_requires_classic_block()
 				) {
 					array_push( $dependencies, 'editor' );
 				}
