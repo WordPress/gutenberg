@@ -3,8 +3,12 @@ package com.gutenberg;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactInstanceManager;
@@ -91,24 +95,57 @@ public class MainActivity extends ReactActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static MainActivity getInstance() {
+        return currentInstance;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         currentInstance = this;
 
-        setContentView(R.layout.activity_main);
+        // Create a LinearLayout that will hold both the toolbar and React Native content
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        // Create and configure the Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        // Create a Toolbar instance
+        Toolbar toolbar = new Toolbar(this);
+
+        // Set toolbar properties (you can customize this as you want)
+        toolbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // Set the toolbar as the Activity's action bar
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mReactRootView = findViewById(R.id.react_root_view);
-        mReactRootView.startReactApplication(getReactNativeHost().getReactInstanceManager(), "gutenberg", getAppOptions());
-    }
+        // Add the toolbar to the linear layout
+        linearLayout.addView(toolbar);
 
-    public static MainActivity getInstance() {
-        return currentInstance;
+        // Create a View to be used as the border
+        View borderView = new View(this);
+        borderView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        borderView.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbarBorder));
+
+        // Add the border view to the linear layout
+        linearLayout.addView(borderView);
+
+        // Create a ReactRootView and assign it to mReactRootView
+        mReactRootView = new ReactRootView(this);
+        LinearLayout.LayoutParams reactViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
+        mReactRootView.setLayoutParams(reactViewParams);
+
+        // Add ReactView to the linear layout
+        linearLayout.addView(mReactRootView);
+
+        // Set the linear layout as the content view
+        setContentView(linearLayout);
+
+        // Load the React application
+        mReactRootView.startReactApplication(
+                ((MainApplication) getApplication()).getReactNativeHost().getReactInstanceManager(),
+                getMainComponentName(),
+                getAppOptions()
+        );
     }
 
     /**
