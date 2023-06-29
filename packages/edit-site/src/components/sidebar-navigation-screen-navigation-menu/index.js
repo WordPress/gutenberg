@@ -17,6 +17,7 @@ import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-nav
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
+import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
 
 export const postType = `wp_navigation`;
 
@@ -33,11 +34,8 @@ export default function SidebarNavigationScreenNavigationMenu() {
 
 	const { isSaving, isDeleting } = useSelect(
 		( select ) => {
-			const {
-				isSavingEntityRecord,
-				isDeletingEntityRecord,
-				getEditedEntityRecord: getEditedEntityRecordSelector,
-			} = select( coreStore );
+			const { isSavingEntityRecord, isDeletingEntityRecord } =
+				select( coreStore );
 
 			return {
 				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
@@ -46,7 +44,6 @@ export default function SidebarNavigationScreenNavigationMenu() {
 					postType,
 					postId
 				),
-				getEditedEntityRecord: getEditedEntityRecordSelector,
 			};
 		},
 		[ postId ]
@@ -94,7 +91,11 @@ export default function SidebarNavigationScreenNavigationMenu() {
 						onDuplicate={ _handleDuplicate }
 					/>
 				}
-				title={ decodeEntities( menuTitle ) }
+				title={ buildNavigationLabel(
+					navigationMenu?.title,
+					navigationMenu?.id,
+					navigationMenu?.status
+				) }
 				description={ __( 'This Navigation Menu is empty.' ) }
 			/>
 		);

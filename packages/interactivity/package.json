@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/interactivity",
-	"version": "0.1.0",
-	"description": "API for developing interactive blocks.",
+	"version": "1.0.0",
+	"description": "Package that provides a standard and simple way to handle the frontend interactivity of Gutenberg blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
