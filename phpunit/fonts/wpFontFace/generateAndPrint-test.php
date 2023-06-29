@@ -1,7 +1,15 @@
 <?php
+/**
+ * Test case for the Fonts API tests.
+ *
+ * @package    WordPress
+ * @subpackage Fonts API
+ */
 
-// These code is only needed if the Font API is enabled.
-// It should be removed after Font Manager is merged into Gutenberg.
+/**
+ * These code is only needed if the Font API is enabled.
+ * It should be removed after Font Manager is merged into Gutenberg.
+ */
 if ( ! class_exists( 'WP_Font_Face' ) ) {
 	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face.php';
 	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face-resolver.php';
@@ -121,7 +129,8 @@ CSS
 				),
 				'expected' => <<<CSS
 @font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:fallback;src:url('https://example.org/assets/fonts/dm-sans/DMSans-Regular.woff2') format('woff2');font-stretch:normal;}
-CSS,
+CSS
+				,
 			),
 			'multiple woff2 format fonts'    => array(
 				'fonts'    => array(
