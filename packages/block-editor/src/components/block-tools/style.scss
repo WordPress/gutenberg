@@ -158,19 +158,24 @@
 				}
 			}
 
+			& > .block-editor-block-toolbar.is-showing-movers {
+				flex-grow: initial;
+				width: initial;
+			}
+
 			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
 				border: none;
 
 				// Add a border as separator in the block toolbar.
-				&::after {
+				&::before {
 					content: "";
 					width: $border-width;
-					height: 24px;
+					height: 26px;
 					margin-top: $grid-unit + $grid-unit-05;
-					margin-bottom: $grid-unit + $grid-unit-05;
+					margin-right: $grid-unit-10;
 					background-color: $gray-300;
-					position: absolute;
-					left: 44px;
+					position: relative;
+					left: 0;
 					top: -1px;
 				}
 			}
@@ -186,8 +191,8 @@
 					margin-bottom: $grid-unit + $grid-unit-05;
 					background-color: $gray-300;
 					position: relative;
-					left: -12px; //the padding of buttons
-					height: 24px;
+					left: -10px; //the padding of buttons
+					height: 26px;
 				}
 			}
 
