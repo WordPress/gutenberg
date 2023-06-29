@@ -4,7 +4,6 @@
  * External dependencies
  */
 const { green, red, yellow } = require( 'chalk' );
-const { get } = require( 'https' );
 const { spawn } = require( 'child_process' );
 const semver = require( 'semver' );
 
@@ -16,6 +15,7 @@ const {
 	// Ignore reason: `package.json` exists outside `bin` `rootDir`.
 	// @ts-ignore
 } = require( '../package.json' );
+const getPackageMeta = require( './get-package-meta' );
 
 /**
  * Returns a promise resolving with the version number of the latest available
@@ -24,66 +24,27 @@ const {
  * @return {Promise<string>} Promise resolving with latest npm version.
  */
 async function getLatestNPMVersion() {
-	return new Promise( ( resolve, reject ) => {
-		get(
-			'https://registry.npmjs.org/npm',
-			{
-				headers: {
-					// By passing a specialized `Accept` header, the registry
-					// will return an abbreviated form of the package data which
-					// includes enough detail to determine the latest version.
-					//
-					// See: https://github.com/npm/registry/blob/HEAD/docs/responses/package-metadata.md
-					Accept: 'application/vnd.npm.install-v1+json',
-				},
-			},
-			async ( response ) => {
-				if ( response.statusCode !== 200 ) {
-					return reject(
-						new Error( 'Package data for npm not found' )
-					);
-				}
-
-				let body = '';
-				for await ( const chunk of response ) {
-					body += chunk.toString();
-				}
-
-				let data;
-				try {
-					data = JSON.parse( body );
-				} catch {
-					return reject(
-						new Error(
-							'Package data for npm returned invalid response body'
-						)
-					);
-				}
-
-				const versions = Object.values( data[ 'dist-tags' ] );
-
-				resolve( semver.maxSatisfying( versions, npmRange ) );
-			}
-		).on( 'error', ( error ) => {
-			if (
-				/** @type {NodeJS.ErrnoException} */ ( error ).code ===
-				'ENOTFOUND'
-			) {
-				error =
-					new Error( `Could not contact the npm registry to determine latest version.
+	try {
+		const npmMetadata = await getPackageMeta( 'npm' );
+		const versions = Object.values( npmMetadata[ 'dist-tags' ] );
+		return semver.maxSatisfying( versions, npmRange );
+	} catch ( error ) {
+		if (
+			/** @type {NodeJS.ErrnoException} */ ( error ).code === 'ENOTFOUND'
+		) {
+			error =
+				new Error( `Could not contact the npm registry to determine latest version.
 
 This could be due to an intermittent outage of the service, or because you are not connected to the internet.
 
 Because it is important that \`package-lock.json\` files only be committed while running the latest version of npm, this commit has been blocked.
 
 If you are certain of your changes and desire to commit anyways, you should either connect to the internet or bypass commit verification using ${ yellow(
-						'git commit --no-verify'
-					) } .` );
-			}
-
-			reject( error );
-		} );
-	} );
+					'git commit --no-verify'
+				) } .` );
+		}
+		throw error;
+	}
 }
 
 /**
