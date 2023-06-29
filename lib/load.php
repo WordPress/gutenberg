@@ -56,6 +56,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/link-template.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/block-patterns.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
