@@ -19,7 +19,7 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-library/utils';
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';

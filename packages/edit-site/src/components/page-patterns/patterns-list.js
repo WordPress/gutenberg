@@ -51,7 +51,7 @@ export default function PatternsList( { categoryId, type } ) {
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						label={ __( 'Back' ) }
 						onClick={ () => {
-							// Go back in history if we came from the library page.
+							// Go back in history if we came from the Patterns page.
 							// Otherwise push a stack onto the history.
 							if ( location.state?.backPath === '/patterns' ) {
 								history.back();
@@ -63,7 +63,7 @@ export default function PatternsList( { categoryId, type } ) {
 				) }
 				<FlexBlock>
 					<SearchControl
-						className="edit-site-library__search"
+						className="edit-site-patterns__search"
 						onChange={ ( value ) => setFilterValue( value ) }
 						placeholder={ __( 'Search patterns' ) }
 						label={ __( 'Search patterns' ) }
@@ -75,7 +75,7 @@ export default function PatternsList( { categoryId, type } ) {
 			{ isResolving && __( 'Loading' ) }
 			{ ! isResolving && !! syncedPatterns.length && (
 				<>
-					<VStack className="edit-site-library__section-header">
+					<VStack className="edit-site-patterns__section-header">
 						<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
 						<Text variant="muted" as="p">
 							{ __(
@@ -93,7 +93,7 @@ export default function PatternsList( { categoryId, type } ) {
 			) }
 			{ ! isResolving && !! unsyncedPatterns.length && (
 				<>
-					<VStack className="edit-site-library__section-header">
+					<VStack className="edit-site-patterns__section-header">
 						<Heading level={ 4 }>{ __( 'Standard' ) }</Heading>
 						<Text variant="muted" as="p">
 							{ __(
