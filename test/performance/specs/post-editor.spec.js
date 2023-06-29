@@ -175,11 +175,6 @@ test.describe( 'Post Editor Performance', () => {
 			.first()
 			.click();
 
-		// Ignore firsted typed character because it's different
-		// It probably deserves a dedicated metric.
-		// (isTyping triggers so it's slower)
-		await page.keyboard.type( 'x' );
-
 		await browser.startTracing( page, {
 			path: traceFilePath,
 			screenshots: false,
