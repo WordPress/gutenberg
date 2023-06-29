@@ -8,6 +8,30 @@
  * @param {string}         value.rootClientId   The root client ID to insert at.
  * @param {number}         value.insertionIndex The index to insert at.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { Button } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const ExampleComponent = () => {
+ *   const { setIsInserterOpened } = useDispatch( 'core/customize-widgets' );
+ *   const [ isOpen, setIsOpen ] = useState( false );
+ *
+ *    return (
+ *        <Button
+ *            onClick={ () => {
+ *                setIsInserterOpened( ! isOpen );
+ *                setIsOpen( ! isOpen );
+ *            } }
+ *        >
+ *            { __( 'Open/close inserter' ) }
+ *        </Button>
+ *    );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function setIsInserterOpened( value ) {

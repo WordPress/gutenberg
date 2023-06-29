@@ -28,6 +28,31 @@ _Returns_
 
 Returns an action object used to open/close the inserter.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const ExampleComponent = () => {
+	const { setIsInserterOpened } = useDispatch( 'core/customize-widgets' );
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<Button
+			onClick={ () => {
+				setIsInserterOpened( ! isOpen );
+				setIsOpen( ! isOpen );
+			} }
+		>
+			{ __( 'Open/close inserter' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
