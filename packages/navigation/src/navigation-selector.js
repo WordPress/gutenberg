@@ -16,8 +16,8 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
+import useNavigationMenu from './use-navigation-menu';
+import useNavigationEntities from './use-navigation-entities';
 
 function buildMenuLabel( title, id, status ) {
 	if ( ! title?.rendered ) {
@@ -37,7 +37,7 @@ function buildMenuLabel( title, id, status ) {
 	);
 }
 
-function NavigationMenuSelector( {
+function NavigationSelector( {
 	currentMenuId,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
@@ -192,4 +192,4 @@ function NavigationMenuSelector( {
 	return NavigationMenuSelectorDropdown;
 }
 
-export default NavigationMenuSelector;
+export default NavigationSelector;

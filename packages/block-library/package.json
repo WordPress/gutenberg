@@ -53,6 +53,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/navigation": "file:../navigation",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",

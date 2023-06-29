@@ -14,14 +14,13 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { NavigationSelector, useNavigationMenu } from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
-import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
-import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
@@ -152,7 +151,7 @@ const MenuInspectorControls = ( props ) => {
 						{ __( 'Menu' ) }
 					</Heading>
 					{ blockEditingMode === 'default' && (
-						<NavigationMenuSelector
+						<NavigationSelector
 							currentMenuId={ currentMenuId }
 							onSelectClassicMenu={ onSelectClassicMenu }
 							onSelectNavigationMenu={ onSelectNavigationMenu }

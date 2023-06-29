@@ -7,9 +7,9 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import NavigationMenuSelector from '../navigation-menu-selector';
-import useNavigationMenu from '../../use-navigation-menu';
-import useNavigationEntities from '../../use-navigation-entities';
+import NavigationSelector from '../navigation-selector';
+import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
 
 jest.mock( '../../use-navigation-menu', () => {
 	// This allows us to tweak the returned value on each test.
@@ -70,7 +70,7 @@ const classicMenusFixture = [
 	},
 ];
 
-describe( 'NavigationMenuSelector', () => {
+describe( 'NavigationSelector', () => {
 	describe( 'Toggle', () => {
 		it( 'should show dropdown toggle with loading message when menus have not resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
@@ -80,7 +80,7 @@ describe( 'NavigationMenuSelector', () => {
 				canSwitchNavigationMenu: true,
 			} );
 
-			render( <NavigationMenuSelector /> );
+			render( <NavigationSelector /> );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -97,7 +97,7 @@ describe( 'NavigationMenuSelector', () => {
 				canSwitchNavigationMenu: true,
 			} );
 
-			render( <NavigationMenuSelector /> );
+			render( <NavigationSelector /> );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -119,7 +119,7 @@ describe( 'NavigationMenuSelector', () => {
 				canSwitchNavigationMenu: true,
 			} );
 
-			render( <NavigationMenuSelector /> );
+			render( <NavigationSelector /> );
 
 			const toggleButton = screen.getByRole( 'button' );
 			await user.click( toggleButton );
@@ -156,7 +156,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button', {
 					name: 'Choose or create a Navigation menu',
@@ -207,7 +207,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -230,7 +230,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector onCreateNew={ handler } /> );
+				render( <NavigationSelector onCreateNew={ handler } /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -258,7 +258,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				const { rerender } = render(
-					<NavigationMenuSelector onCreateNew={ handler } />
+					<NavigationSelector onCreateNew={ handler } />
 				);
 
 				const toggleButton = screen.getByRole( 'button' );
@@ -286,7 +286,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// Simulate the menu being created and component being re-rendered.
 				rerender(
-					<NavigationMenuSelector
+					<NavigationSelector
 						onCreateNew={ handler }
 						createNavigationMenuIsSuccess={ true }
 					/>
@@ -312,7 +312,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: false,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -333,7 +333,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -372,7 +372,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -407,7 +407,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				render(
-					<NavigationMenuSelector
+					<NavigationSelector
 						currentMenuId={ navigationMenusFixture[ 0 ].id }
 					/>
 				);
@@ -435,9 +435,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				const { rerender } = render(
-					<NavigationMenuSelector
-						onSelectNavigationMenu={ handler }
-					/>
+					<NavigationSelector onSelectNavigationMenu={ handler } />
 				);
 				const toggleButton = screen.getByRole( 'button' );
 
@@ -474,7 +472,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// // Simulate the menu being created and component being re-rendered.
 				rerender(
-					<NavigationMenuSelector
+					<NavigationSelector
 						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
 					/>
 				);
@@ -502,7 +500,7 @@ describe( 'NavigationMenuSelector', () => {
 					menus: [],
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -524,7 +522,7 @@ describe( 'NavigationMenuSelector', () => {
 					menus: classicMenusFixture,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -546,7 +544,7 @@ describe( 'NavigationMenuSelector', () => {
 					menus: classicMenusFixture,
 				} );
 
-				render( <NavigationMenuSelector /> );
+				render( <NavigationSelector /> );
 
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
@@ -579,7 +577,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				const { rerender } = render(
-					<NavigationMenuSelector onSelectClassicMenu={ handler } />
+					<NavigationSelector onSelectClassicMenu={ handler } />
 				);
 
 				const toggleButton = screen.getByRole( 'button' );
@@ -615,7 +613,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// Simulate the menu being created and component being re-rendered.
 				rerender(
-					<NavigationMenuSelector
+					<NavigationSelector
 						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
 					/>
 				);

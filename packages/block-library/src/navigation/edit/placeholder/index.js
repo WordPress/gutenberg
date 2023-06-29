@@ -6,13 +6,15 @@ import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { useEffect } from '@wordpress/element';
+import {
+	useNavigationEntities,
+	NavigationSelector,
+} from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
-import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-import NavigationMenuSelector from '../navigation-menu-selector';
 
 export default function NavigationPlaceholder( {
 	isSelected,
@@ -65,7 +67,7 @@ export default function NavigationPlaceholder( {
 
 						{ isResolvingActions && <Spinner /> }
 
-						<NavigationMenuSelector
+						<NavigationSelector
 							currentMenuId={ currentMenuId }
 							clientId={ clientId }
 							onSelectNavigationMenu={ onSelectNavigationMenu }

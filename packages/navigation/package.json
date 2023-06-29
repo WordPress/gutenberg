@@ -1,0 +1,40 @@
+{
+	"name": "@wordpress/navigation",
+	"version": "0.0.1",
+	"description": "Shared utilies for Navigation.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"navigation"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/navigation/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/navigation"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"npm": ">=6.9.0"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"types": "build-types",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/components": "file:packages/components",
+		"@wordpress/core-data": "file:packages/core-data",
+		"@wordpress/data": "file:packages/data",
+		"@wordpress/element": "file:packages/element",
+		"@wordpress/html-entities": "file:packages/html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:packages/icons"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

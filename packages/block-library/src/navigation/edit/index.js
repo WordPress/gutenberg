@@ -42,12 +42,14 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
+import {
+	useNavigationMenu,
+	useNavigationEntities,
+} from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
-import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
