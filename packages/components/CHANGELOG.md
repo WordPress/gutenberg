@@ -44,6 +44,10 @@
 -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
 -   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
 
+### Experimental
+
+-   `Tabs`: Create a new version of `TabPanel` with updated internals, while maintaining the same functionality and API surface  ([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
+
 ### Bug Fix
 
 -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
