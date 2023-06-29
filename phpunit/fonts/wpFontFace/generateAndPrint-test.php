@@ -41,10 +41,10 @@ class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_test_generate_and_print
 	 *
-	 * @param array  $fonts Prepared fonts (to store in WP_Fonts_Provider_Local::$fonts property).
+	 * @param array  $fonts Prepared fonts.
 	 * @param string $expected Expected CSS.
 	 */
-	public function test_generate_and_print( array $fonts, $expected ) {
+	public function test_should_generate_and_print_passed_fonts( array $fonts, $expected ) {
 		$style_element   = "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n";
 		$expected_output = sprintf( $style_element, $expected );
 		$this->expectOutputString( $expected_output );
