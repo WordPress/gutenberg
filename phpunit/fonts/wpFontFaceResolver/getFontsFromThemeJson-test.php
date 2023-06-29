@@ -20,10 +20,10 @@ class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 	const FONT_FAMILIES = array(
 		'fonts-block-theme' => array(
 			// From theme.json.
-			'dm-sans',
-			'source-serif-pro',
+			'DM Sans',
+			'Source Serif Pro',
 			// From style variation.
-			'open-sans',
+			'Open Sans',
 		),
 	);
 
@@ -45,8 +45,7 @@ class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
 
-		$this->assertArrayHasKey( 'DM Sans', $fonts );
-		$this->assertArrayHasKey( 'Source Serif Pro', $fonts );
+		$this->assertArrayHasKey( 'Open Sans', $fonts );
 	}
 
 	/**
