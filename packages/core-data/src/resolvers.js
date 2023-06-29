@@ -180,7 +180,7 @@ export const getEntityRecords =
 
 			let records = Object.values( await apiFetch( { path } ) );
 			// If we request fields but the result doesn't contain the fields,
-			// explicitely set these fields as "undefined"
+			// explicitly set these fields as "undefined"
 			// that way we consider the query "fullfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
@@ -500,6 +500,51 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		);
 	};
 
+/**
+ * Fetches and returns the revisions of the current global styles theme.
+ */
+export const getCurrentThemeGlobalStylesRevisions =
+	() =>
+	async ( { resolveSelect, dispatch } ) => {
+		const globalStylesId =
+			await resolveSelect.__experimentalGetCurrentGlobalStylesId();
+		const record = globalStylesId
+			? await resolveSelect.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+			  )
+			: undefined;
+		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+
+		if ( revisionsURL ) {
+			const resetRevisions = await apiFetch( {
+				url: revisionsURL,
+			} );
+			const revisions = resetRevisions?.map( ( revision ) =>
+				Object.fromEntries(
+					Object.entries( revision ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
+			);
+			dispatch.receiveThemeGlobalStyleRevisions(
+				globalStylesId,
+				revisions
+			);
+		}
+	};
+
+getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
+	return (
+		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+		action.kind === 'root' &&
+		! action.error &&
+		action.name === 'globalStyles'
+	);
+};
+
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
@@ -528,7 +573,7 @@ export const getBlockPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, select } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -540,10 +585,21 @@ export const getNavigationFallbackId =
 		dispatch.receiveNavigationFallbackId( fallback?.id );
 
 		if ( record ) {
+			// If the fallback is already in the store, don't invalidate navigation queries.
+			// Otherwise, invalidate the cache for the scenario where there were no Navigation
+			// posts in the state and the fallback created one.
+			const existingFallbackEntityRecord = select.getEntityRecord(
+				'postType',
+				'wp_navigation',
+				fallback?.id
+			);
+			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
 				'postType',
 				'wp_navigation',
-				record
+				record,
+				undefined,
+				invalidateNavigationQueries
 			);
 
 			// Resolve to avoid further network requests.

@@ -46,8 +46,6 @@ import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as details from './details';
-import * as detailsContent from './details-content';
-import * as detailsSummary from './details-summary';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -118,6 +116,7 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
@@ -149,6 +148,7 @@ const getAllBlocks = () => {
 		columns,
 		commentAuthorAvatar,
 		cover,
+		details,
 		embed,
 		file,
 		group,
@@ -177,6 +177,7 @@ const getAllBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		footnotes,
 
 		// theme blocks
 		navigation,
@@ -228,11 +229,6 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
-	if ( window?.__experimentalEnableDetailsBlocks ) {
-		blocks.push( details );
-		blocks.push( detailsContent );
-		blocks.push( detailsSummary );
-	}
 	return blocks.filter( Boolean );
 };
 

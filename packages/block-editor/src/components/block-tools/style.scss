@@ -121,6 +121,10 @@
 		}
 	}
 
+	&:has(.block-editor-block-toolbar:empty) {
+		display: none;
+	}
+
 	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
 
@@ -217,6 +221,14 @@
 						background-color: $gray-300;
 						position: relative;
 					}
+				}
+			}
+
+			.blocks-widgets-container & {
+				margin-left: $grid-unit-80 * 2.4;
+
+				&.is-collapsed {
+					margin-left: $grid-unit-80 * 4.2;
 				}
 			}
 		}

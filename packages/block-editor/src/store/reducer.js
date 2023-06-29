@@ -1470,6 +1470,48 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
+function removalPromptData( state = false, action ) {
+	switch ( action.type ) {
+		case 'DISPLAY_REMOVAL_PROMPT':
+			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			return {
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+			};
+		case 'CLEAR_REMOVAL_PROMPT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer prompt availability state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function isRemovalPromptSupported( state = false, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_REMOVAL_PROMPT_SUPPORT':
+			return action.status;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
@@ -1581,6 +1623,12 @@ export function template( state = { isValid: true }, action ) {
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_SETTINGS':
+			if ( action.reset ) {
+				return {
+					...SETTINGS_DEFAULTS,
+					...action.settings,
+				};
+			}
 			return {
 				...state,
 				...action.settings,
@@ -1604,18 +1652,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
+				let id = blockName;
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				const match = select( blocksStore ).getActiveBlockVariation(
 					blockName,
 					attributes
 				);
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				let id = match?.name
-					? `${ blockName }/${ match.name }`
-					: blockName;
-				const insert = { name: id };
+				if ( match?.name ) {
+					id += '/' + match.name;
+				}
 				if ( blockName === 'core/block' ) {
-					insert.ref = attributes.ref;
 					id += '/' + attributes.ref;
 				}
 
@@ -1628,7 +1675,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 							count: prevState.insertUsage[ id ]
 								? prevState.insertUsage[ id ].count + 1
 								: 1,
-							insert,
 						},
 					},
 				};
@@ -1834,6 +1880,32 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of block client IDs to block editing modes.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function blockEditingModes( state = new Map(), action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EDITING_MODE':
+			return new Map( state ).set( action.clientId, action.mode );
+		case 'UNSET_BLOCK_EDITING_MODE': {
+			const newState = new Map( state );
+			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'RESET_BLOCKS': {
+			return state.has( '' )
+				? new Map().set( '', state.get( '' ) )
+				: state;
+		}
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1856,6 +1928,9 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	blockEditingModes,
+	removalPromptData,
+	isRemovalPromptSupported,
 } );
 
 function withAutomaticChangeReset( reducer ) {

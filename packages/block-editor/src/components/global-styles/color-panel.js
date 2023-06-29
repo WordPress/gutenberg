@@ -20,7 +20,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -230,6 +230,11 @@ function ColorPanelDropdown( {
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
+						'aria-label': sprintf(
+							/* translators: %s is the type of color property, e.g., "background" */
+							__( 'Color %s styles' ),
+							label
+						),
 					};
 
 					return (
@@ -520,14 +525,14 @@ export default function ColorPanel( {
 			isShownByDefault: defaultControls.background,
 			indicators: [ gradient ?? backgroundColor ],
 			tabs: [
-				{
+				hasSolidColors && {
 					key: 'background',
 					label: __( 'Solid' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				{
+				hasGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
@@ -535,7 +540,7 @@ export default function ColorPanel( {
 					userValue: userGradient,
 					isGradient: true,
 				},
-			],
+			].filter( Boolean ),
 		},
 		showLinkPanel && {
 			key: 'link',

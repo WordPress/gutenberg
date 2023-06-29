@@ -23,7 +23,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
+          d="M5 5.5h8V4H5v1.5ZM5 20h8v-1.5H5V20ZM19 9H5v6h14V9Z"
         />
       </svg>
     </button>
@@ -55,7 +55,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"
+            d="M19 5.5H5V4h14v1.5ZM19 20H5v-1.5h14V20ZM5 9h14v6H5V9Z"
           />
         </svg>
       </button>
@@ -77,7 +77,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
+            d="M5 5.5h8V4H5v1.5ZM5 20h8v-1.5H5V20ZM19 9H5v6h14V9Z"
           />
         </svg>
       </button>
@@ -99,7 +99,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M7 9v6h10V9H7zM5 19.8h14v-1.5H5v1.5zM5 4.3v1.5h14V4.3H5z"
+            d="M19 5.5H5V4h14v1.5ZM19 20H5v-1.5h14V20ZM7 9h10v6H7V9Z"
           />
         </svg>
       </button>
@@ -121,7 +121,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M6 15h14V9H6v6zm6-10.8v1.5h8V4.2h-8zm0 15.6h8v-1.5h-8v1.5z"
+            d="M19 5.5h-8V4h8v1.5ZM19 20h-8v-1.5h8V20ZM5 9h14v6H5V9Z"
           />
         </svg>
       </button>

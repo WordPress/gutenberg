@@ -181,4 +181,10 @@ module.exports = {
 	defaultAppender: {
 		marginLeft: 16,
 	},
+	'components-picker__button-title': {
+		color: 'white',
+	},
+	placeholderColor: {
+		color: 'gray',
+	},
 };

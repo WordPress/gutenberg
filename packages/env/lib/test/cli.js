@@ -22,7 +22,7 @@ jest.mock( '../env', () => {
 		clean: jest.fn( Promise.resolve.bind( Promise ) ),
 		run: jest.fn( Promise.resolve.bind( Promise ) ),
 		ValidationError: actual.ValidationError,
-		AfterSetupError: actual.AfterSetupError,
+		LifecycleScriptError: actual.LifecycleScriptError,
 	};
 } );
 

@@ -53,13 +53,13 @@ function ReusableBlocksManageButton( { clientId } ) {
 			<MenuItem
 				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 			>
-				{ __( 'Manage Reusable blocks' ) }
+				{ __( 'Manage Patterns' ) }
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
 					{ innerBlockCount > 1
-						? __( 'Convert to regular blocks' )
-						: __( 'Convert to regular block' ) }
+						? __( 'Detach patterns' )
+						: __( 'Detach pattern' ) }
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>

@@ -74,8 +74,15 @@ function checkStringArray( configFile, configKey, array ) {
  * @param {string}   configKey  The configuration key we're validating.
  * @param {string[]} obj        The object that we're checking.
  * @param {string[]} allowTypes The types that are allowed.
+ * @param {boolean}  allowEmpty Indicates whether or not empty values are allowed.
  */
-function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
+function checkObjectWithValues(
+	configFile,
+	configKey,
+	obj,
+	allowTypes,
+	allowEmpty
+) {
 	if ( allowTypes === undefined ) {
 		allowTypes = [];
 	}
@@ -87,18 +94,37 @@ function checkObjectWithValues( configFile, configKey, obj, allowTypes ) {
 	}
 
 	for ( const key in obj ) {
-		if ( ! obj[ key ] && ! allowTypes.includes( 'empty' ) ) {
-			throw new ValidationError(
-				`Invalid ${ configFile }: "${ configKey }.${ key }" must not be empty.`
-			);
+		// Some values need to be uniquely validated.
+		switch ( obj[ key ] ) {
+			case null:
+			case undefined: {
+				break;
+			}
+
+			default: {
+				if ( ! obj[ key ] && ! allowEmpty ) {
+					throw new ValidationError(
+						`Invalid ${ configFile }: "${ configKey }.${ key }" must not be empty.`
+					);
+				}
+			}
 		}
 
-		// Identify arrays uniquely.
-		const type = Array.isArray( obj[ key ] ) ? 'array' : typeof obj[ key ];
+		// Some types need to be uniquely identified.
+		let type;
+		if ( obj[ key ] === undefined ) {
+			type = 'undefined';
+		} else if ( obj[ key ] === null ) {
+			type = 'null';
+		} else if ( Array.isArray( obj[ key ] ) ) {
+			type = 'array';
+		} else {
+			type = typeof obj[ key ];
+		}
 
 		if ( ! allowTypes.includes( type ) ) {
 			throw new ValidationError(
-				`Invalid ${ configFile }: "${ configKey }.${ key }" must be a ${ allowTypes.join(
+				`Invalid ${ configFile }: "${ configKey }.${ key }" must be of type: ${ allowTypes.join(
 					' or '
 				) }.`
 			);

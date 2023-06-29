@@ -41,10 +41,12 @@
 .components-search-control__icon {
 	position: absolute;
 	top: 0;
+	width: $icon-size;
 	right: ( $grid-unit-60 - $icon-size ) * 0.5;
 	bottom: 0;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 
 	> svg {
 		margin: $grid-unit-10 0;

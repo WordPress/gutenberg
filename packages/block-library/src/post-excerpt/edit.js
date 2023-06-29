@@ -109,16 +109,7 @@ export default function PostExcerptEditor( {
 					/>
 				</BlockControls>
 				<div { ...blockProps }>
-					<p>
-						{ __(
-							'This is the Post Excerpt block, it will display the excerpt from single posts.'
-						) }
-					</p>
-					<p>
-						{ __(
-							'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
-						) }
-					</p>
+					<p>{ __( 'This block will display the excerpt.' ) }</p>
 				</div>
 			</>
 		);
@@ -128,7 +119,7 @@ export default function PostExcerptEditor( {
 			<div { ...blockProps }>
 				<Warning>
 					{ __(
-						'There is no excerpt because this is a protected post.'
+						'The content is currently protected and does not have the available excerpt.'
 					) }
 				</Warning>
 			</div>
@@ -195,14 +186,14 @@ export default function PostExcerptEditor( {
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
-			aria-label={ __( 'Post excerpt text' ) }
+			aria-label={ __( 'Excerpt text' ) }
 			value={
 				isSelected
 					? rawOrRenderedExcerpt
 					: ( ! isTrimmed
 							? rawOrRenderedExcerpt
 							: trimmedExcerpt + ELLIPSIS ) ||
-					  __( 'No post excerpt found' )
+					  __( 'No excerpt found' )
 			}
 			onChange={ setExcerpt }
 			tagName="p"
@@ -210,7 +201,7 @@ export default function PostExcerptEditor( {
 	) : (
 		<p className={ excerptClassName }>
 			{ ! isTrimmed
-				? rawOrRenderedExcerpt || __( 'No post excerpt found' )
+				? rawOrRenderedExcerpt || __( 'No excerpt found' )
 				: trimmedExcerpt + ELLIPSIS }
 		</p>
 	);

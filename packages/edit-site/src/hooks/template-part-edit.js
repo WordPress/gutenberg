@@ -14,7 +14,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { useLink } from '../components/routes/link';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 

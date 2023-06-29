@@ -24,7 +24,7 @@ The [npx command](https://docs.npmjs.com/cli/v8/commands/npx) runs a command fro
 
 You now need to activate the plugin from inside wp-admin plugins page.
 
-After activated, go to the block editor and use the inserter to search and add your new block.
+After activation, go to the block editor and use the inserter to search and add your new block.
 
 ## Table of Contents
 

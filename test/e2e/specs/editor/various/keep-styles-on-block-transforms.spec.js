@@ -12,10 +12,10 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
-		await page.click( 'role=button[name="Text"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '## Heading' );
+		await page.click( 'role=button[name="Color Text styles"i]' );
 		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
@@ -37,8 +37,15 @@ test.describe( 'Keep styles on block transforms', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		// Create a paragraph block with some content.
-		await page.click( 'role=button[name="Add default block"i]' );
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Line 2 to be made large' );
@@ -70,8 +77,8 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
-		// Create a paragraph block with some content.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.click( 'role=radio[name="Large"i]' );
 		await editor.showBlockToolbar();

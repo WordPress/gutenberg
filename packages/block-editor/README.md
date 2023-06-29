@@ -539,11 +539,23 @@ Provides the CSS class names and inline styles for a block's typography support 
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
+-   _settings_ `Object|boolean`: Merged theme.json settings
 
 _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
+
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
 
 ### HeightControl
 
@@ -699,6 +711,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
