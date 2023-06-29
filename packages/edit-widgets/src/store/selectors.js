@@ -60,6 +60,29 @@ export const getWidget = createRegistrySelector(
 /**
  * Returns all API widget areas.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getWidgetAreas } = useSelect(
+ *        ( select ) => select( 'core/edit-widgets' ),
+ *        []
+ *    );
+ *
+ *    const widgetAreas = getWidgetAreas();
+ *
+ *    return (
+ *        <ul>
+ *            { widgetAreas?.map( ( { id, name } ) => (
+ *                <li key={ id }>{ name }</li>
+ *            ) ) }
+ *        </ul>
+ *    );
+ * }
+ * ```
+ *
  * @return {Object[]} API List of widget areas.
  */
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
