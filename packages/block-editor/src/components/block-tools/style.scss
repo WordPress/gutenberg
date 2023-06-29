@@ -131,8 +131,8 @@
 	@include break-medium() {
 		&.is-fixed {
 
-			// leave room for block inserter
-			margin-left: $grid-unit-80;
+			// leave room for block inserter, undo and redo
+			margin-left: $grid-unit-80 * 3;
 			// position on top of interface header
 			position: fixed;
 			top: $admin-bar-height + $grid-unit;
@@ -145,22 +145,37 @@
 
 			&.is-collapsed {
 				width: initial;
-				margin-left: $grid-unit-80 * 3 + $grid-unit-30;
+				// leave room for block inserter, undo and redo
+				margin-left: $grid-unit-80 * 3;
 			}
 
 			.is-fullscreen-mode & {
-				// leave room for block inserter
-				margin-left: $grid-unit-80 + $grid-unit-70;
+				// leave room for block inserter, undo and redo
+				margin-left: $grid-unit-80 * 4;
 				top: $grid-unit;
 				&.is-collapsed {
 					width: initial;
-					margin-left: $grid-unit-80 * 4 + $grid-unit-30;
+					// leave room for block inserter, undo and redo
+					margin-left: $grid-unit-80 * 4;
 				}
 			}
 
 			& > .block-editor-block-toolbar.is-showing-movers {
 				flex-grow: initial;
 				width: initial;
+
+				// Add a border as separator in the block toolbar.
+				&::before {
+					content: "";
+					width: $border-width;
+					height: 26px;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-right: 0;
+					background-color: $gray-300;
+					position: relative;
+					left: -$grid-unit-05;
+					top: -1px;
+				}
 			}
 
 			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
@@ -239,12 +254,14 @@
 		}
 
 		&.is-fixed .block-editor-block-parent-selector {
+
 			.block-editor-block-parent-selector__button {
 				position: relative;
 				top: -1px;
 				border: 0;
 				padding-right: 6px;
 				padding-left: 6px;
+
 				&::after {
 					content: "\00B7";
 					font-size: 16px;

@@ -10,7 +10,8 @@
 		@include break-medium() {
 			&.is-fixed {
 				// the combined with of the tools at the right of the header and the margin left
-				width: calc(100% - 240px - #{$grid-unit-80} - #{$grid-unit-70});
+				// of the toolbar which includes four buttons
+				width: calc(100% - 240px - #{4 * $grid-unit-80});
 			}
 		}
 	}
