@@ -369,22 +369,19 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
      */
     function download_font_face_assets ( $font_face ) {
         $new_font_face = $font_face;
-        if ( is_array( $font_face['src'] ) ) {
-            $new_font_face['src'] = array();
-            $i = 0;
-            foreach ( $font_face['src'] as $src ) {              
-                $filename = $this->get_filename_from_font_face( $font_face, $src, ++$i );
-                $new_src = $this->download_asset($src, $filename);
-                if ( $new_src ) {
-                    $new_font_face['src'][] = $new_src;
-                }
-            }
-        } else {
-            $filename = $this->get_filename_from_font_face( $font_face, $font_face['src'] );
-            $new_src = $this->download_asset( $font_face['src'], $filename );
+        $srcs = !empty ( $font_face['src'] ) && is_array( $font_face['src'] )
+            ? $font_face['src']
+            : array( $font_face['src'] );
+        $new_font_face['src'] = array();
+        foreach ( $srcs as $src ) {              
+            $filename = $this->get_filename_from_font_face( $font_face, $src, ++$i );
+            $new_src = $this->download_asset($src, $filename);
             if ( $new_src ) {
-                $new_font_face['src'] = $new_src;
+                $new_font_face['src'][] = $new_src;
             }
+        }
+        if ( count( $new_font_face['src'] ) === 1 ) {
+            $new_font_face['src'] = $new_font_face['src'][0];
         }
         return $new_font_face;
     }
