@@ -1740,6 +1740,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/navigation",
+		"slug": "packages-navigation",
+		"markdown_source": "../packages/navigation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",
