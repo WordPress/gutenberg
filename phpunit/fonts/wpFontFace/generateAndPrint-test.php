@@ -1,6 +1,6 @@
 <?php
 /**
- * Test case for the Fonts tests.
+ * Test case for WP_Font_Face::generate_and_print().
  *
  * @package    WordPress
  * @subpackage Fonts

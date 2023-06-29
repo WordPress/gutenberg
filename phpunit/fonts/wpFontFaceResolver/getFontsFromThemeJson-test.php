@@ -1,6 +1,6 @@
 <?php
 /**
- * Test case for the Fonts tests.
+ * Test case for WP_Font_Face_Resolver::get_fonts_from_theme_json().
  *
  * @package    WordPress
  * @subpackage Fonts
@@ -25,7 +25,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
  * @group fonts
  * @covers WP_Font_Face_Resolver::get_fonts_from_theme_json
  */
-class Tests_Fonts_WpFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
+class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
 	const FONTS_THEME   = 'fonts-block-theme';
 	const FONT_FAMILIES = array(
 		'fonts-block-theme' => array(
