@@ -66,15 +66,6 @@ class WP_Font_Face {
 	private $valid_font_display = array( 'auto', 'block', 'fallback', 'swap', 'optional' );
 
 	/**
-	 * Fonts to be processed.
-	 *
-	 * @since X.X.X
-	 *
-	 * @var array[]
-	 */
-	private $fonts = array();
-
-	/**
 	 * Array of font-face style tag's attribute(s)
 	 * where the key is the attribute name and the
 	 * value is its value.
@@ -83,7 +74,7 @@ class WP_Font_Face {
 	 *
 	 * @var string[]
 	 */
-	private $style_tag_atts = array();
+	private $style_tag_attrs = array();
 
 	/**
 	 * Creates and initializes an instance of WP_Font_Face.
@@ -113,7 +104,7 @@ class WP_Font_Face {
 			&&
 			function_exists( 'current_theme_supports' ) && ! current_theme_supports( 'html5', 'style' )
 		) {
-			$this->style_tag_atts = array( 'type' => 'text/css' );
+			$this->style_tag_attrs = array( 'type' => 'text/css' );
 		}
 	}
 
@@ -235,7 +226,7 @@ class WP_Font_Face {
 	 */
 	private function generate_style_element_attributes() {
 		$attributes = '';
-		foreach ( $this->style_tag_atts as $name => $value ) {
+		foreach ( $this->style_tag_attrs as $name => $value ) {
 			$attributes .= " {$name}='{$value}'";
 		}
 		return $attributes;
