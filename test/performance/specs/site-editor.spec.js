@@ -185,16 +185,19 @@ test.describe( 'Site Editor Performance', () => {
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		// Type "x" 200 times.
-		const typingSequence = new Array( 200 ).fill( 'x' ).join( '' );
-		await page.keyboard.type( typingSequence );
+		// Type "x" 10 times.
+		const samples = 10;
+		const throwaway = 1;
+		await page.keyboard.type( 'x'.repeat( samples + throwaway ), {
+			delay: 1000,
+		} );
 
 		// Stop tracing and save results.
 		await browser.stopTracing();
 		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
-		for ( let i = 0; i < keyDownEvents.length; i++ ) {
+		for ( let i = throwaway; i < keyDownEvents.length; i++ ) {
 			results.type.push(
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);

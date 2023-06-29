@@ -131,15 +131,14 @@ test.describe( 'Post Editor Performance', () => {
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		let i = 20;
-		while ( i-- ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// The timeout should be big enough to allow all async tasks tor run.
-			// And also to allow Rich Text to mark the change as persistent.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 2000 );
-			await page.keyboard.type( 'x' );
-		}
+		const samples = 10;
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const throwaway = 1;
+		await page.keyboard.type( 'x'.repeat( samples + throwaway ), {
+			delay: 1000,
+		} );
 
 		await browser.stopTracing();
 		const traceResults = JSON.parse( readFile( traceFilePath ) );
@@ -151,9 +150,9 @@ test.describe( 'Post Editor Performance', () => {
 		) {
 			// The first character typed triggers a longer time (isTyping change)
 			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
+			for ( let i = throwaway; i < keyDownEvents.length; i++ ) {
 				results.type.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 				);
 			}
 		}
@@ -181,15 +180,15 @@ test.describe( 'Post Editor Performance', () => {
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		let i = 10;
-		while ( i-- ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 500 );
-			await page.keyboard.type( 'x' );
-		}
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 500 );
+		const samples = 10;
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const throwaway = 1;
+		await page.keyboard.type( 'x'.repeat( samples + throwaway ), {
+			delay: 1000,
+		} );
+
 		await browser.stopTracing();
 		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -198,11 +197,9 @@ test.describe( 'Post Editor Performance', () => {
 			keyDownEvents.length === keyPressEvents.length &&
 			keyPressEvents.length === keyUpEvents.length
 		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
+			for ( let i = throwaway; i < keyDownEvents.length; i++ ) {
 				results.typeContainer.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 				);
 			}
 		}
