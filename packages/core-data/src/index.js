@@ -13,7 +13,7 @@ import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
 import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
-import { unlock } from './lock-unlock';
+import { unlock } from './private-apis';
 import { getNavigationFallbackId } from './private-selectors';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
