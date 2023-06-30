@@ -194,15 +194,13 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		} );
 	}, [ createNotice, setPreference, getPrefference ] );
 
-	const openGlobalStyles = useCallback(
-		async () =>
-			Promise.all( [
-				setCanvasMode( 'edit' ),
-				openGeneralSidebar( 'edit-site/global-styles' ),
-				turnOffDistractionFreeMode(),
-			] ),
-		[ setCanvasMode, openGeneralSidebar, turnOffDistractionFreeMode ]
-	);
+	const openGlobalStyles = useCallback( async () => {
+		turnOffDistractionFreeMode();
+		return Promise.all( [
+			setCanvasMode( 'edit' ),
+			openGeneralSidebar( 'edit-site/global-styles' ),
+		] );
+	}, [ setCanvasMode, openGeneralSidebar, turnOffDistractionFreeMode ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
