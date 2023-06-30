@@ -263,7 +263,7 @@ export default function Layout() {
 						// so we can't remove the element entirely. Using `inert` will make
 						// it inaccessible to screen readers and keyboard navigation.
 						inert={ showSidebar ? undefined : 'inert' }
-						animate={ { opacity: canvasMode === 'view' ? 1 : 0 } }
+						animate={ { opacity: showSidebar ? 1 : 0 } }
 						transition={ {
 							type: 'tween',
 							duration:
