@@ -40,7 +40,7 @@ class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller {
 		unset( $data['content']['rendered'] );
 
 		// Add the core sync_status meta as top level property to the response.
-		$wp_sync_status = $data['meta']['wp_sync_status'];
+		$wp_sync_status         = $data['meta']['wp_sync_status'];
 		$data['wp_sync_status'] = $wp_sync_status;
 		unset( $data['meta']['wp_sync_status'] );
 		return $data;
