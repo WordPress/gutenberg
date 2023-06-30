@@ -42,10 +42,12 @@ function NavigationMenuSelector( {
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
 	onCreateNew,
-	actionLabel,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 } ) {
+	/* translators: %s: The name of a menu. */
+	let actionLabel = __( "Switch to '%s'" );
+
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
