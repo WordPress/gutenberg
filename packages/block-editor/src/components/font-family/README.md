@@ -4,8 +4,9 @@ FontFamilyControl is a React component that renders a UI that allows users to se
 The component renders a user interface that allows the user to select from a set of predefined font families as defined by the `typography.fontFamilies` presets.
 Optionally, you can provide a `fontFamilies` prop that overrides the predefined font families.
 
-## Usage
+![FontFamilyControl component preview](https://i.imgur.com/blS5iA3.png)
 
+## Usage
 
 ```jsx
 import { FontFamilyControl } from '@wordpress/block-editor';
