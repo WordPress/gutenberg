@@ -212,6 +212,19 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
+
+		/**
+		 * Do not show the panel for pattern and template part blocks.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/issues/52139
+		 */
+		if (
+			'core/block' === props.name ||
+			'core/template-part' === props.name
+		) {
+			return <BlockEdit { ...props } />;
+		}
+
 		return (
 			<>
 				<BlockEdit { ...props } />
