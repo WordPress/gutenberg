@@ -2,11 +2,10 @@
  * Recursive stable sorting comparator function.
  *
  * @param {string|Function} field Field to sort by.
- * @param {Array}           items Items to sort.
  * @param {string}          order Order, 'asc' or 'desc'.
  * @return {Function} Comparison function to be used in a `.sort()`.
  */
-const comparator = ( field, items, order ) => {
+const comparator = ( field, order ) => {
 	return ( a, b ) => {
 		let cmpA, cmpB;
 
@@ -18,23 +17,14 @@ const comparator = ( field, items, order ) => {
 			cmpB = b[ field ];
 		}
 
+		let result = 0;
 		if ( cmpA > cmpB ) {
-			return order === 'asc' ? 1 : -1;
+			result = 1;
 		} else if ( cmpB > cmpA ) {
-			return order === 'asc' ? -1 : 1;
+			result = -1;
 		}
 
-		const orderA = items.findIndex( ( item ) => item === a );
-		const orderB = items.findIndex( ( item ) => item === b );
-
-		// Stable sort: maintaining original array order
-		if ( orderA > orderB ) {
-			return 1;
-		} else if ( orderB > orderA ) {
-			return -1;
-		}
-
-		return 0;
+		return order === 'asc' ? result : -result;
 	};
 };
 
@@ -50,5 +40,5 @@ const comparator = ( field, items, order ) => {
  * @return {Array} Sorted items.
  */
 export function orderBy( items, field, order = 'asc' ) {
-	return items.concat().sort( comparator( field, items, order ) );
+	return items.concat().sort( comparator( field, order ) );
 }
