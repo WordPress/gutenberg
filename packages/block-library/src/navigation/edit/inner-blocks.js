@@ -9,16 +9,17 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import {
-	DEFAULT_BLOCK,
-	ALLOWED_BLOCKS,
-	PRIORITIZED_INSERTER_BLOCKS,
-} from '@wordpress/navigation';
+import { privateApis as navigationPrivateApis } from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
+import { unlock } from '../../lock-unlock';
+
+const { DEFAULT_BLOCK, ALLOWED_BLOCKS, PRIORITIZED_INSERTER_BLOCKS } = unlock(
+	navigationPrivateApis
+);
 
 export default function NavigationInnerBlocks( {
 	clientId,

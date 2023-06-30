@@ -32,7 +32,8 @@
 		"@wordpress/element": "file:packages/element",
 		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:packages/icons"
+		"@wordpress/icons": "file:packages/icons",
+		"@wordpress/private-apis": "file:packages/private-apis"
 	},
 	"publishConfig": {
 		"access": "public"

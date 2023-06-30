@@ -14,8 +14,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { NavigationSelector, useNavigationMenu } from '@wordpress/navigation';
-
+import { privateApis as navigationPrivateApis } from '@wordpress/navigation';
 /**
  * Internal dependencies
  */
@@ -24,6 +23,10 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
+
+const { NavigationSelector, useNavigationMenu } = unlock(
+	navigationPrivateApis
+);
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );

@@ -42,10 +42,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import {
-	useNavigationMenu,
-	useNavigationEntities,
-} from '@wordpress/navigation';
+import { privateApis as navigationPrivateApis } from '@wordpress/navigation';
 
 /**
  * Internal dependencies
@@ -72,6 +69,9 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
+const { useNavigationMenu, useNavigationEntities } = unlock(
+	navigationPrivateApis
+);
 
 function Navigation( {
 	attributes,
