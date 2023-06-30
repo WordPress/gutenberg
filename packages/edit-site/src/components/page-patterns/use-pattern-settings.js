@@ -12,7 +12,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { filterOutDuplicatesByName } from './utils';
 
-export default function useLibrarySettings() {
+export default function usePatternSettings() {
 	const storedSettings = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return getSettings();
