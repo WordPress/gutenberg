@@ -143,7 +143,7 @@ export default function Layout() {
 		headerAnimationState = canvasMode; // edit, view, init
 	}
 
-	// Sets the right context for the command center
+	// Sets the right context for the command palette
 	const commandContext =
 		canvasMode === 'edit' && isEditorPage
 			? 'site-editor-edit'
