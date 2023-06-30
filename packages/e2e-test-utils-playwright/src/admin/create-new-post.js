@@ -31,11 +31,15 @@ export async function createNewPost( {
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'post-new.php', query );
-	const canvasRoot = legacyCanvas
-		? this.page
-		: this.page.frameLocator( '[name=editor-canvas]' );
 
-	await canvasRoot.locator( '.editor-styles-wrapper' ).waitFor();
+	const canvasReadyLocator = legacyCanvas
+		? this.page.locator( '.edit-post-layout' )
+		: this.page
+				.frameLocator( '[name=editor-canvas]' )
+				.locator( 'body > *' )
+				.first();
+
+	await canvasReadyLocator.waitFor();
 
 	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data
