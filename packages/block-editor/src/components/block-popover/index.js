@@ -44,8 +44,6 @@ function BlockPopover(
 		usePopoverScroll( __unstableContentRef ),
 	] );
 
-	console.log( mergedRefs );
-
 	const [
 		popoverDimensionsRecomputeCounter,
 		forceRecomputePopoverDimensions,

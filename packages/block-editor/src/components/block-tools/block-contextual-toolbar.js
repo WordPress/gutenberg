@@ -27,7 +27,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import { unlock } from '../../lock-unlock';
 
-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+function BlockContextualToolbar( { isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
 	const [ isCollapsed, setIsCollapsed ] = useState( false );
 	const toolbarButtonRef = useRef();
@@ -87,7 +87,6 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	return (
 		<NavigableToolbar
-			focusOnMount={ focusOnMount }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }

@@ -83,25 +83,18 @@ function SelectedBlockPopover( {
 		! hasMultiSelection &&
 		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
-	const toolbarRef = useRef();
-
-	function focusFirstTabbableIn( container ) {
-		console.log( container );
-		// const [ firstTabbable ] = focus.tabbable.find( container );
-		// if ( firstTabbable ) {
-		// 	firstTabbable.focus();
-		// }
-	}
-
 	useShortcut(
 		'core/block-editor/focus-toolbar',
 		() => {
-			console.log( 'using shortcut', toolbarRef.current );
-			// isToolbarForced.current = true;
-			focusFirstTabbableIn( toolbarRef.current );
+			console.log( 'inside shortcut', shouldShowContextualToolbar );
 			stopTyping( true );
+		},
+		{
+			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
+
+	console.log( 'outside shortcut', shouldShowContextualToolbar );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -116,7 +109,6 @@ function SelectedBlockPopover( {
 
 		return (
 			<BlockPopover
-				ref={ toolbarRef }
 				clientId={ capturingClientId || clientId }
 				bottomClientId={ lastClientId }
 				className={ classnames(
@@ -146,7 +138,9 @@ function SelectedBlockPopover( {
 
 				<BlockContextualToolbar
 					style={ {
-						visibility: shouldShowContextualToolbar ? 'visible' : 'hidden',
+						position: ! shouldShowContextualToolbar ? 'absolute' : undefined,
+						left: ! shouldShowContextualToolbar ? '-9999999999px' : undefined,
+						opacity: ! shouldShowContextualToolbar ? 0 : undefined,
 					} }
 					// Resets the index whenever the active block changes so
 					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
