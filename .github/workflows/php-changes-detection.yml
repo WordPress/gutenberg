@@ -50,7 +50,6 @@ jobs:
               uses: peter-evans/create-or-update-comment@v3
               with:
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
@@ -72,7 +71,6 @@ jobs:
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
@@ -94,7 +92,6 @@ jobs:
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request changed or added PHP files in previous commits, but none have been detected in the latest commit.
