@@ -842,13 +842,22 @@ test.describe( 'Image - interactivity', () => {
 
 			const lightbox = page.locator( '.wp-lightbox-overlay' );
 			await expect( lightbox ).toBeHidden();
-			const image = lightbox.locator( 'img' );
+			const responsiveImage = lightbox.locator( '.responsive-image img' );
+			const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
-			await expect( image ).toHaveAttribute( 'src', '' );
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+			await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-			await expect( image ).toHaveAttribute(
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+			await expect( enlargedImage ).toHaveAttribute(
 				'src',
 				new RegExp( filename )
 			);
@@ -859,6 +868,12 @@ test.describe( 'Image - interactivity', () => {
 				name: 'Close',
 			} );
 			await closeButton.click();
+
+			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
 
 			await expect( lightbox ).toBeHidden();
 		} );
@@ -915,6 +930,51 @@ test.describe( 'Image - interactivity', () => {
 			await expect(
 				page.getByRole( 'button', { name: 'Enlarge image' } )
 			).not.toBeInViewport();
+		} );
+
+		test.describe( 'Animation Select visibility', () => {
+			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'lightbox' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is None', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( '' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'default' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
 		} );
 
 		test.describe( 'keyboard navigation', () => {
@@ -1031,12 +1091,24 @@ test.describe( 'Image - interactivity', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		const imageDom = lightbox.locator( 'img' );
-		await expect( imageDom ).toHaveAttribute( 'src', '' );
+		const responsiveImage = lightbox.locator( '.responsive-image img' );
+		const enlargedImage = lightbox.locator( '.enlarged-image img' );
+
+		await expect( responsiveImage ).toHaveAttribute(
+			'src',
+			new RegExp( imgUrl )
+		);
+		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
+
+		await page.getByRole( 'button', { name: 'Close' } ).click();
+
+		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
 

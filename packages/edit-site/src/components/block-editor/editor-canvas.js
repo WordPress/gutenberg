@@ -87,7 +87,9 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
-					canvasMode === 'view' ? 'cursor: pointer;' : ''
+					canvasMode === 'view'
+						? 'cursor: pointer; height: 100vh'
+						: ''
 				}}}`
 			}</style>
 			{ children }

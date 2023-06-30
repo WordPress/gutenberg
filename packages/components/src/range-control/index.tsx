@@ -37,6 +37,7 @@ import {
 
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import { space } from '../ui/utils/space';
 
 const noop = () => {};
 
@@ -69,6 +70,7 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
+		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -208,7 +210,6 @@ function UnforwardedRangeControl(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
-
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
@@ -218,7 +219,10 @@ function UnforwardedRangeControl(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
+			<Root
+				className="components-range-control__root"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+			>
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />
@@ -305,6 +309,14 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
+						size={
+							__next40pxDefaultSize
+								? '__unstable-large'
+								: 'default'
+						}
+						__unstableInputWidth={
+							__next40pxDefaultSize ? space( 20 ) : space( 16 )
+						}
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }

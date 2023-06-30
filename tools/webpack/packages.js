@@ -75,7 +75,8 @@ const gutenbergPackages = Object.keys( dependencies )
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
 			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
