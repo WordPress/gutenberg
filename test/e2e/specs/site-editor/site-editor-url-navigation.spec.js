@@ -62,7 +62,7 @@ test.describe( 'Site editor url navigation', () => {
 			page,
 		} ) => {
 			await admin.visitSiteEditor();
-			await page.click( 'role=button[name="Library"i]' );
+			await page.click( 'role=button[name="Patterns"i]' );
 			await page.click( 'role=button[name="Create pattern"i]' );
 			await page
 				.getByRole( 'menu', { name: 'Create pattern' } )

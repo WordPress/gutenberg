@@ -22,7 +22,7 @@ export default function Grid( { categoryId, label, icon, items } ) {
 		<Composite
 			{ ...composite }
 			role="listbox"
-			className="edit-site-library__grid"
+			className="edit-site-patterns__grid"
 			aria-label={ label }
 		>
 			{ items.map( ( item ) => (

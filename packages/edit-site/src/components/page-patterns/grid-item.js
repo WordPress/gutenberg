@@ -39,7 +39,7 @@ import { useLink } from '../routes/link';
 
 export default function GridItem( { categoryId, composite, icon, item } ) {
 	const instanceId = useInstanceId( GridItem );
-	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+	const descriptionId = `edit-site-patterns__pattern-description-${ instanceId }`;
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
 	const { __experimentalDeleteReusableBlock } =
@@ -61,10 +61,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	};
 
 	const isEmpty = ! item.blocks?.length;
-	const patternClassNames = classnames( 'edit-site-library__pattern', {
+	const patternClassNames = classnames( 'edit-site-patterns__pattern', {
 		'is-placeholder': isEmpty,
 	} );
-	const previewClassNames = classnames( 'edit-site-library__preview', {
+	const previewClassNames = classnames( 'edit-site-patterns__preview', {
 		'is-inactive': item.type === PATTERNS,
 	} );
 
@@ -132,14 +132,14 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 				) }
 				<HStack
 					aria-hidden="true"
-					className="edit-site-library__footer"
+					className="edit-site-patterns__footer"
 					justify="space-between"
 				>
 					<HStack
 						alignment="center"
 						justify="left"
 						spacing={ 3 }
-						className="edit-site-library__pattern-title"
+						className="edit-site-patterns__pattern-title"
 					>
 						{ icon && <Icon icon={ itemIcon } /> }
 						<Heading level={ 5 }>{ item.title }</Heading>
@@ -148,10 +148,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						<DropdownMenu
 							icon={ moreHorizontal }
 							label={ __( 'Actions' ) }
-							className="edit-site-library__dropdown"
+							className="edit-site-patterns__dropdown"
 							popoverProps={ { placement: 'bottom-end' } }
 							toggleProps={ {
-								className: 'edit-site-library__button',
+								className: 'edit-site-patterns__button',
 								isSmall: true,
 								describedBy: sprintf(
 									/* translators: %s: pattern name */
