@@ -5,7 +5,7 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
-	'This page list is synced with the published pages on your site. Unsync the page list to add, delete, or reorder pages yourself.'
+	'This page list is synced with the published pages on your site. Detach the page list to add, delete, or reorder pages yourself.'
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
