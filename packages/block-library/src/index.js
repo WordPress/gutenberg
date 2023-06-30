@@ -233,7 +233,7 @@ const getAllBlocks = () => {
 	// add the classic block and TinyMCE editor
 	// under any of the following conditions:
 	//   - the current post contains a classic block
-	//   - TinyMCE experiment hasn't been intentionally disabled
+	//   - the experiment to disable TinyMCE isn't active.
 	//   - a query argument specifies that TinyMCE should be loaded
 	if (
 		window?.wp?.oldEditor &&
