@@ -60,6 +60,7 @@ function gutenberg_rename_reusable_block_cpt_to_pattern( $args, $post_type ) {
 		$args['labels']['item_reverted_to_draft']   = __( 'Pattern reverted to draft.' );
 		$args['labels']['item_scheduled']           = __( 'Pattern scheduled.' );
 		$args['labels']['item_updated']             = __( 'Pattern updated.' );
+		$args['rest_controller_class']              = 'Gutenberg_REST_Blocks_Controller';
 	}
 
 	return $args;

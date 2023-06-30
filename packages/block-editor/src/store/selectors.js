@@ -2036,9 +2036,9 @@ export const getInserterItems = createSelector(
 						( reusableBlock ) =>
 							// Filter to either fully synced patterns (sync_status === 'fully'),
 							// or old school reusable blocks (sync_status === '').
-							reusableBlock.meta?.sync_status === 'fully' ||
-							reusableBlock.meta?.sync_status === '' ||
-							! reusableBlock.meta?.sync_status
+							reusableBlock.sync_status === 'fully' ||
+							reusableBlock.sync_status === '' ||
+							! reusableBlock.sync_status
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
@@ -2312,9 +2312,7 @@ function getUnsyncedPatterns( state ) {
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 
 	return reusableBlocks
-		.filter(
-			( reusableBlock ) => reusableBlock.meta?.sync_status === 'unsynced'
-		)
+		.filter( ( reusableBlock ) => reusableBlock.sync_status === 'unsynced' )
 		.map( ( reusableBlock ) => {
 			return {
 				name: `core/block/${ reusableBlock.id }`,
