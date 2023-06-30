@@ -22,7 +22,7 @@ class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller {
 	 * Filters a response based on the context defined in the schema.
 	 *
 	 * @since 5.0.0
-	 * @since 6.3 Adds the `sync_status` property to the response.
+	 * @since 6.3 Adds the `wp_sync_status` property to the response.
 	 *
 	 * @param array  $data    Response data to filter.
 	 * @param string $context Context defined in the schema.
@@ -40,9 +40,9 @@ class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller {
 		unset( $data['content']['rendered'] );
 
 		// Add the core sync_status meta as top level property to the response.
-		$sync_status         = $data['meta']['sync_status'];
-		$data['sync_status'] = $sync_status;
-		unset( $data['meta']['sync_status'] );
+		$wp_sync_status = $data['meta']['wp_sync_status'];
+		$data['wp_sync_status'] = $wp_sync_status;
+		unset( $data['meta']['wp_sync_status'] );
 		return $data;
 	}
 }

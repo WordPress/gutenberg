@@ -14,7 +14,7 @@ export default function PostSyncStatus() {
 	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		return {
-			syncStatus: getEditedPostAttribute( 'sync_status' ),
+			syncStatus: getEditedPostAttribute( 'wp_sync_status' ),
 			postType: getEditedPostAttribute( 'type' ),
 		};
 	}, [] );

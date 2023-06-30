@@ -2034,11 +2034,11 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state )
 					.filter(
 						( reusableBlock ) =>
-							// Filter to either fully synced patterns (sync_status === 'fully'),
-							// or old school reusable blocks (sync_status === '').
-							reusableBlock.sync_status === 'fully' ||
-							reusableBlock.sync_status === '' ||
-							! reusableBlock.sync_status
+							// Filter to either fully synced patterns (wp_sync_status === 'fully'),
+							// or old school reusable blocks (wp_sync_status === '').
+							reusableBlock.wp_sync_status === 'fully' ||
+							reusableBlock.wp_sync_status === '' ||
+							! reusableBlock.wp_sync_status
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
@@ -2312,7 +2312,9 @@ function getUnsyncedPatterns( state ) {
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 
 	return reusableBlocks
-		.filter( ( reusableBlock ) => reusableBlock.sync_status === 'unsynced' )
+		.filter(
+			( reusableBlock ) => reusableBlock.wp_sync_status === 'unsynced'
+		)
 		.map( ( reusableBlock ) => {
 			return {
 				name: `core/block/${ reusableBlock.id }`,
