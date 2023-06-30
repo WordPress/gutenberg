@@ -1236,10 +1236,6 @@ test.describe( 'Navigation block', () => {
 			await secondLink.click();
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
 
-			//TODO check frontend on desktop and mobile
-			//TODO then the same for second link
-			//Then the same for background colors
-
 			//We test the overlay on mobile too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
@@ -1294,7 +1290,106 @@ test.describe( 'Navigation block', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {} ) => {} );
+		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
+			editor,
+			page,
+		} ) => {
+			//We add a group cointainer and change its colors so we can test if the nav block settings will prevail
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Settings', exact: true } )
+				.click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page.getByRole( 'button', { name: 'Color options' } ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+				.click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Link styles' } )
+				.click();
+			//rgba(0,208,132) is the color of the "Vivid green cyan" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
+				.click( { force: true } );
+			await page.getByRole( 'tab', { name: 'Hover' } ).click();
+			//rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
+				.click( { force: true } );
+			await editor.canvas.click( 'body' );
+
+			//We change the nav block colors
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Text', exact: true } )
+				.click();
+			//247, 141, 167 is the color of the "Pale pink" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Pale pink' } )
+				.click( { force: true } );
+			await page
+				.getByRole( 'button', { name: 'Background', exact: true } )
+				.click();
+			//142, 209, 252 is the color of the "Pale cyan blue" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+				.click( { force: true } );
+			await page
+				.getByRole( 'button', { name: 'Submenu & overlay text' } )
+				.click();
+			//171, 184, 195 is the color of the "Cyan bluish gray" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+				.click( { force: true } );
+			await page
+				.getByRole( 'button', { name: 'Submenu & overlay background' } )
+				.click();
+			//rgba(252,185,0) is the color of the "Luminous vivid amber" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
+				.click( { force: true } );
+
+			await editor.canvas.click( 'body' );
+
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+
+			//Expect the first link to be "Pale pink" we selected for the nav block
+			await expect( firstLink ).toHaveCSS(
+				'color',
+				'rgb(247, 141, 167)'
+			);
+
+			//TODO Check the background colors
+
+			//TODO Check the overlay on mobile
+
+			//TODO check the frontend
+		} );
 	} );
 } );
 
