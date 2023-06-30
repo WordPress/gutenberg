@@ -617,7 +617,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => undefined,
 				canRemoveBlocks: () => true,
-				isRemovalPromptSupported: () => false,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -728,7 +728,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
-				isRemovalPromptSupported: () => false,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -753,7 +753,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
-				isRemovalPromptSupported: () => false,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
