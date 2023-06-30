@@ -923,7 +923,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[${ position }]/android.view.ViewGroup/android.widget.Button`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();
