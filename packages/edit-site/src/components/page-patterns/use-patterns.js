@@ -38,6 +38,15 @@ const templatePartToPattern = ( templatePart ) => ( {
 	templatePart,
 } );
 
+const templatePartCategories = [ 'header', 'footer', 'sidebar' ];
+const templatePartHasCategory = ( item, category ) => {
+	if ( category === 'uncategorized' ) {
+		return ! templatePartCategories.includes( item.templatePart.area );
+	}
+
+	return item.templatePart.area === category;
+};
+
 const useTemplatePartsAsPatterns = (
 	categoryId,
 	postType = TEMPLATE_PARTS,
@@ -83,7 +92,7 @@ const useTemplatePartsAsPatterns = (
 
 		return searchItems( templateParts, filterValue, {
 			categoryId,
-			hasCategory: ( item, area ) => item.templatePart.area === area,
+			hasCategory: templatePartHasCategory,
 		} );
 	}, [ templateParts, filterValue, categoryId ] );
 
