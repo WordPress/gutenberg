@@ -24,10 +24,12 @@ test.describe( 'Site editor block removal prompt', () => {
 		page,
 	} ) => {
 		// Open and focus List View
-		await page.getByRole( 'button', { name: 'List View' } ).click();
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		await topBar.getByRole( 'button', { name: 'List View' } ).click();
 
-		// Select and try to remove Query Loop
-		await page.getByRole( 'link', { name: 'Query Loop' } ).click();
+		// Select and try to remove Query Loop block
+		const listView = page.getByRole( 'region', { name: 'List View' } );
+		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect the block removal prompt to have appeared
@@ -41,26 +43,25 @@ test.describe( 'Site editor block removal prompt', () => {
 		page,
 	} ) => {
 		// Open and focus List View
-		await page.getByRole( 'button', { name: 'List View' } ).click();
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		await topBar.getByRole( 'button', { name: 'List View' } ).click();
 
 		// Select Query Loop list item
-		await page.getByRole( 'link', { name: 'Query Loop' } ).click();
+		const listView = page.getByRole( 'region', { name: 'List View' } );
+		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
 
 		// Reveal its inner blocks in the list view
 		await page.keyboard.press( 'ArrowRight' );
 
-		// Select its Post Template inner block
-		await page.getByRole( 'link', { name: 'Post Template' } ).click();
-
-		// Expect to remove the Post Template with no prompts
-		expect( await getQueryBlockInnerBlocks( editor ) ).toHaveLength( 1 );
+		// Select and remove its Post Template inner block
+		await listView.getByRole( 'link', { name: 'Post Template' } ).click();
 		await page.keyboard.press( 'Backspace' );
-		expect( await getQueryBlockInnerBlocks( editor ) ).toHaveLength( 0 );
+
+		// Expect the block to have been removed with no prompt
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Post Template',
+			} )
+		).toBeHidden();
 	} );
 } );
-
-async function getQueryBlockInnerBlocks( editor ) {
-	const block = await editor.getBlocks();
-	const query = block.find( ( { name } ) => name === 'core/query' );
-	return query.innerBlocks;
-}
