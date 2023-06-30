@@ -196,7 +196,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 						icon={ search }
 						onClick={ () => openCommandCenter() }
 						label={ __( 'Open command palette' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
+						shortcut={ displayShortcut.primary( '/' ) }
 					/>
 				) }
 			</HStack>
