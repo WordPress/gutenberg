@@ -72,11 +72,8 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 					);
 					createNotice(
 						'info',
-						__( 'Distraction free mode turned off' ),
-						{
-							isDismissible: true,
-							type: 'snackbar',
-						}
+						__( 'Distraction free mode turned off.' ),
+						{ type: 'snackbar' }
 					);
 				}
 				// Switch to edit mode.
