@@ -141,7 +141,7 @@ describe( 'Gallery block', () => {
 
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'block remains selected after dimissing the media options picker', async () => {
+	it.skip( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -155,7 +155,7 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'Choose images' ) ).toBeVisible();
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 
-		// Dimiss the picker
+		// Dismiss the picker
 		if ( Platform.isIOS ) {
 			fireEvent.press( getByText( 'Cancel' ) );
 		} else {
