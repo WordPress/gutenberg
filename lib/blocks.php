@@ -1,6 +1,6 @@
 <?php
 /**
- * Block functions specific to the Gutenberg editor plugin.
+ * Block functions specific for the Gutenberg editor plugin.
  *
  * @package gutenberg
  */
