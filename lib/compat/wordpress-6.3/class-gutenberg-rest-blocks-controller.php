@@ -17,7 +17,7 @@
  * @see WP_REST_Posts_Controller
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller  {
+class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller {
 	/**
 	 * Filters a response based on the context defined in the schema.
 	 *
@@ -38,10 +38,10 @@ class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller  {
 		 */
 		unset( $data['title']['rendered'] );
 		unset( $data['content']['rendered'] );
-		
+
 		// Add the core sync_status meta as top level property to the response.
-		$sync_status = $data['meta']['sync_status'];
-		$data['sync_status'] = $sync_status ;
+		$sync_status         = $data['meta']['sync_status'];
+		$data['sync_status'] = $sync_status;
 		unset( $data['meta']['sync_status'] );
 		return $data;
 	}
