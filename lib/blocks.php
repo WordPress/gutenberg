@@ -372,3 +372,85 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+
+/**
+ * Extract the blocks from post content for the REST API post response.
+ *
+ * @since 1.1.0
+ *
+ * @param string $content The post content.
+ *
+ * @return array Array of block data.
+ */
+function gutenberg_add_blocks_to_post_resource( $content ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	$parser   = new WP_Block_Parser();
+	$blocks   = $parser->parse( $content );
+	$data     = array();
+
+	$attributes = array( 'blockName', 'attrs', 'innerHTML', 'innerBlocks', 'innerContent' );
+
+	// Loop thru the blocks, adding rendered content when available.
+	foreach ( $blocks as $block ) {
+		foreach( $attributes as $attribute ) {
+			if ( isset( $block[ $attribute ] ) ) {
+				$item[ $attribute ] = $block[ $attribute ];
+			}
+		}
+
+		$data[] = $item;
+	}
+
+	return $data;
+}
+
+/**
+ * Attach a post's block data callback to the REST API response.
+ *
+ * @since 1.1.0
+ *
+ * @param string | array $post_types Post type, or array of post types.
+ */
+function gutenberg_attach_block_response_callback( $post_types ) {
+	if ( ! is_array( $post_types ) ) {
+		$post_types = array( $post_types );
+	}
+	foreach ( $post_types as $post_type ) {
+
+		/**
+		 * Filter whether a post type has its blocks data added the REST API response content.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param bool   $blocks_show_in_rest Whether to show blocks in the REST API response.
+		 * @param string $post_type           The post type.
+		 */
+		if ( apply_filters( 'gutenberg_add_blocks_to_rest_for_post_type', true, $post_type ) ) {
+			add_filter( 'rest_prepare_' . $post_type, 'gutenberg_extract_blocks_from_post_content', 10, 3 );
+		}
+	}
+}
+gutenberg_attach_block_response_callback( array( 'post', 'page' ) );
+
+/**
+ * Attach a post's block data to the REST API response.
+ *
+ * @since 1.1.0
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     The Post object.
+ *
+ * @return WP_REST_Response $response The filtered response object.
+ */
+function gutenberg_extract_blocks_from_post_content( $response, $post ) {
+	if ( ! $post ) {
+		return $response;
+	}
+
+	// Extract the block data from the post content.
+	$blocks                              = gutenberg_add_blocks_to_post_resource( $post->post_content );
+	$response->data['content']['blocks'] = $blocks;
+
+	return $response;
+}
