@@ -250,7 +250,6 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
-		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {
