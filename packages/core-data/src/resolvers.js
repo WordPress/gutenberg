@@ -15,7 +15,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	isNumericID,
+} from './utils';
 import { getSyncProvider } from './sync';
 
 /**
@@ -171,28 +175,6 @@ export const getEntityRecord =
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
-
-function isNumericID( str ) {
-	// Remove leading/trailing whitespace
-	str = str.trim();
-
-	// Check if the string is empty
-	if ( str.length === 0 ) {
-		return false;
-	}
-
-	// Check if the string is a number
-	if ( ! isNaN( str ) ) {
-		return true;
-	}
-
-	// Check if the string contains only numeric characters
-	if ( /^\d+$/.test( str ) ) {
-		return true;
-	}
-
-	return false;
-}
 
 getEntityRecord.normalizeArgs = ( args ) => {
 	let key = args && args[ 2 ];
