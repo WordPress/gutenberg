@@ -21,6 +21,7 @@ import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 
 function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -48,11 +49,23 @@ function useTemplateDetails( postType, postId ) {
 			<HomeTemplateDetails />
 		) : null;
 
-	const footer = !! record?.modified ? (
+	const revisionsLink = !! record?.modified ? (
 		<SidebarNavigationScreenDetailsFooter
 			lastModifiedDateTime={ record.modified }
 		/>
 	) : null;
+
+	const manageLink =
+		record?.slug === 'home' || record?.slug === 'index' ? (
+			<SidebarNavigationItem
+				href="edit.php?post_type=post"
+				onClick={ () => {
+					document.location = 'edit.php?post_type=post';
+				} }
+			>
+				{ __( 'Manage all posts' ) }
+			</SidebarNavigationItem>
+		) : null;
 
 	const description = (
 		<>
@@ -86,7 +99,7 @@ function useTemplateDetails( postType, postId ) {
 		</>
 	);
 
-	return { title, description, content, footer };
+	return { title, description, content, revisionsLink, manageLink };
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -95,10 +108,8 @@ export default function SidebarNavigationScreenTemplate() {
 		params: { postType, postId },
 	} = navigator;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { title, content, description, footer } = useTemplateDetails(
-		postType,
-		postId
-	);
+	const { title, content, description, revisionsLink, manageLink } =
+		useTemplateDetails( postType, postId );
 
 	return (
 		<SidebarNavigationScreen
@@ -122,7 +133,7 @@ export default function SidebarNavigationScreenTemplate() {
 			}
 			description={ description }
 			content={ content }
-			footer={ footer }
+			footer={ [ revisionsLink, manageLink ] }
 		/>
 	);
 }
