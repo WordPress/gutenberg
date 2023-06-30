@@ -160,7 +160,7 @@ module.exports = {
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,
-			endYear: 2030,
+			endYear: 2040,
 		} ),
 	].filter( Boolean ),
 };
