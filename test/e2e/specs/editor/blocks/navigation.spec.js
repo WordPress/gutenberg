@@ -936,6 +936,7 @@ test.describe( 'Navigation block', () => {
 			//we want emptytheme because it doesn't have any styles
 			await requestUtils.activateTheme( 'emptytheme' );
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
@@ -950,30 +951,97 @@ test.describe( 'Navigation block', () => {
 				title: 'Hidden menu',
 				content:
 					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
+				attributes: { openSubmenusOnClick: true },
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
 			} );
+
 			await editor.saveSiteEditorEntities();
+			await admin.visitSiteEditor();
+			await editor.canvas.click( 'body' );
 		} );
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
 
 		test( 'As a user I expect my navigation links to have appropriate default colors', async ( {
 			editor,
+			page,
 		} ) => {
-			const firstlink = editor.canvas.locator(
-				`role=textbox[name="Navigation link text"i] >> text="First link"`
-			);
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
 			//Expect the first link to default to black when the theme doesn't define a link color
-			await expect( firstlink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
-			//TODO check frontend on desktop and mobile
-			//TODO then the same for second link (make sure it has a background color!)
-			//Then the same for background colors. This one is important when the theme doesn't define an overlay background color
+			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.click();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+			await firstLink.click();
+			//We check that the submenu links also have black text
+			const secondLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			const submenuWrapper = editor.canvas
+				.getByRole( 'document', { name: 'Block: Custom Link' } )
+				.filter( { has: secondLink } );
+			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			//We check for the submenu's background color. This one is important when the theme doesn't define an overlay background color
+			await expect( submenuWrapper ).toHaveCSS(
+				'background-color',
+				'rgb(255, 255, 255)'
+			);
+
+			//We test the overlay on mobile too.
+			await page
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
+			await editor.canvas
+				.getByRole( 'button', { name: 'Open menu' } )
+				.click();
+			const overlay = editor.canvas
+				.locator( '.wp-block-navigation__responsive-container' )
+				.filter( { hasText: 'Second Link' } );
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				'rgb(255, 255, 255)'
+			);
+			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+
+			//And finally we check the frontend
+			await page.goto( '/' );
+			const firstLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			const secondLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			const submenuWrapperFront = page
+				.locator( '.wp-block-navigation__submenu-container' )
+				.filter( { has: secondLinkFront } );
+			await expect( firstLinkFront ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			await firstLinkFront.hover();
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				'rgb(0, 0, 0)'
+			);
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				'rgb(0, 0, 0)'
+			);
+			await expect( submenuWrapperFront ).toHaveCSS(
+				'background-color',
+				'rgb(255, 255, 255)'
+			);
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
@@ -995,14 +1063,7 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Save', exact: true } )
-				.click();
-			await page
-				.getByRole( 'region', { name: 'Save panel' } )
-				.getByRole( 'button', { name: 'Save' } )
-				.click();
-			await editor.page.pause();
+			//TODO Hover too!
 			//Expect the first link to inherit the nav link color from the theme
 			await expect( firstlink ).toHaveCSS( 'color', 'rgb(207, 46, 46)' );
 
