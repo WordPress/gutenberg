@@ -6,16 +6,16 @@ import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
+import {
+	DEFAULT_BLOCK,
+	ALLOWED_BLOCKS,
+	SELECT_NAVIGATION_MENUS_ARGS,
+} from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
 import { areBlocksDirty } from './are-blocks-dirty';
-import {
-	DEFAULT_BLOCK,
-	ALLOWED_BLOCKS,
-	SELECT_NAVIGATION_MENUS_ARGS,
-} from '../constants';
 
 const EMPTY_OBJECT = {};
 
