@@ -10,6 +10,7 @@ import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -71,7 +72,6 @@ function SelectedBlockPopover( {
 		},
 		[ clientId ]
 	);
-	const isToolbarForced = useRef( false );
 	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
 		useShouldContextualToolbarShow();
 
@@ -83,98 +83,75 @@ function SelectedBlockPopover( {
 		! hasMultiSelection &&
 		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
+	const toolbarRef = useRef();
+
+	function focusFirstTabbableIn( container ) {
+		console.log( container );
+		// const [ firstTabbable ] = focus.tabbable.find( container );
+		// if ( firstTabbable ) {
+		// 	firstTabbable.focus();
+		// }
+	}
+
 	useShortcut(
 		'core/block-editor/focus-toolbar',
 		() => {
-			isToolbarForced.current = true;
+			console.log( 'using shortcut', toolbarRef.current );
+			// isToolbarForced.current = true;
+			focusFirstTabbableIn( toolbarRef.current );
 			stopTyping( true );
-		},
-		{
-			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
-
-	useEffect( () => {
-		isToolbarForced.current = false;
-	} );
-
-	// Stores the active toolbar item index so the block toolbar can return focus
-	// to it when re-mounting.
-	const initialToolbarItemIndexRef = useRef();
-
-	useEffect( () => {
-		// Resets the index whenever the active block changes so this is not
-		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-		initialToolbarItemIndexRef.current = undefined;
-	}, [ clientId ] );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
 	} );
 
-	if ( showEmptyBlockSideInserter ) {
-		return (
-			<BlockPopover
-				clientId={ capturingClientId || clientId }
-				__unstableCoverTarget
-				bottomClientId={ lastClientId }
-				className={ classnames(
-					'block-editor-block-list__block-side-inserter-popover',
-					{
-						'is-insertion-point-visible': isInsertionPointVisible,
-					}
-				) }
-				__unstablePopoverSlot={ __unstablePopoverSlot }
-				__unstableContentRef={ __unstableContentRef }
-				resize={ false }
-				shift={ false }
-				{ ...popoverProps }
-			>
-				<div className="block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="bottom right"
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-						__experimentalIsQuick
-					/>
-				</div>
-			</BlockPopover>
-		);
-	}
+	// We'll show one of the following:
+	// - The block breadcrumb.
+	// - The block toolbar.
+	// - The breadcrumb
+	// We want the toolbar to always be in the DOM so it can be accessed via shift+tab keypress
 
-	if ( shouldShowBreadcrumb || shouldShowContextualToolbar ) {
 		return (
 			<BlockPopover
+				ref={ toolbarRef }
 				clientId={ capturingClientId || clientId }
 				bottomClientId={ lastClientId }
 				className={ classnames(
-					'block-editor-block-list__block-popover',
 					{
+						'block-editor-block-list__block-side-inserter-popover': showEmptyBlockSideInserter,
+						'block-editor-block-list__block-popover': shouldShowBreadcrumb || shouldShowContextualToolbar,
 						'is-insertion-point-visible': isInsertionPointVisible,
 					}
-				) }
+					) }
 				__unstablePopoverSlot={ __unstablePopoverSlot }
-				__unstableContentRef={ __unstableContentRef }
 				resize={ false }
+				__unstableContentRef={ __unstableContentRef }
+				__unstableCoverTarget={ showEmptyBlockSideInserter }
+				shift={ ! showEmptyBlockSideInserter }
 				{ ...popoverProps }
 			>
-				{ shouldShowContextualToolbar && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isToolbarForced.current }
-						__experimentalInitialIndex={
-							initialToolbarItemIndexRef.current
-						}
-						__experimentalOnIndexChange={ ( index ) => {
-							initialToolbarItemIndexRef.current = index;
-						} }
-						// Resets the index whenever the active block changes so
-						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-						key={ clientId }
-					/>
+				{ showEmptyBlockSideInserter && (
+					<div className="block-editor-block-list__empty-block-inserter">
+						<Inserter
+							position="bottom right"
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							__experimentalIsQuick
+						/>
+					</div>
 				) }
+
+				<BlockContextualToolbar
+					style={ {
+						visibility: shouldShowContextualToolbar ? 'visible' : 'hidden',
+					} }
+					// Resets the index whenever the active block changes so
+					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+					key={ clientId }
+				/>
 				{ shouldShowBreadcrumb && (
 					<BlockSelectionButton
 						clientId={ clientId }
@@ -183,9 +160,7 @@ function SelectedBlockPopover( {
 				) }
 			</BlockPopover>
 		);
-	}
 
-	return null;
 }
 
 function wrapperSelector( select ) {

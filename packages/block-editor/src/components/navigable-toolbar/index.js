@@ -101,12 +101,14 @@ function useToolbarFocus(
 	const [ initialIndex ] = useState( defaultIndex );
 
 	const focusToolbar = useCallback( () => {
+		console.log( ref.current );
 		focusFirstTabbableIn( ref.current );
 	}, [] );
 
 	const focusToolbarViaShortcut = () => {
 		if ( shouldUseKeyboardFocusShortcut ) {
-			focusToolbar();
+			console.log( 'focusToolbarViaShortcut')
+			// focusToolbar();
 		}
 	};
 
